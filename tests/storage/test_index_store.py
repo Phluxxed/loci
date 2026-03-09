@@ -107,3 +107,41 @@ def test_store_atomic_write(store: IndexStore, tmp_path: Path, sample_symbols):
     # Verify it's valid JSON (not partial)
     data = json.loads(index_file.read_text())
     assert "symbols" in data
+
+
+def test_get_symbol_content_returns_source(store: IndexStore, tmp_path: Path):
+    source_path = tmp_path / "repo"
+    source_path.mkdir()
+    (source_path / "src").mkdir()
+    source_text = "# header\ndef login(): pass\n\nclass User: pass\n"
+    (source_path / "src" / "auth.py").write_text(source_text)
+
+    source_bytes = source_text.encode()
+    symbols = [
+        Symbol(
+            id="src/auth.py::login#function",
+            name="login",
+            qualified_name="login",
+            kind="function",
+            language="python",
+            file_path="src/auth.py",
+            byte_offset=source_bytes.index(b"def login"),
+            byte_length=len(b"def login(): pass"),
+        )
+    ]
+    store.write(source_path, symbols, file_hashes={})
+
+    content = store.get_symbol_content(source_path, "src/auth.py::login#function")
+    assert content is not None
+    assert "def login" in content
+
+
+def test_get_symbol_content_returns_none_for_missing_id(store: IndexStore, tmp_path: Path, sample_symbols):
+    source_path = tmp_path / "repo"
+    source_path.mkdir()
+    (source_path / "src").mkdir()
+    (source_path / "src" / "auth.py").write_text("def login(): pass")
+    store.write(source_path, sample_symbols, file_hashes={})
+
+    result = store.get_symbol_content(source_path, "src/auth.py::nonexistent#function")
+    assert result is None

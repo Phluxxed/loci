@@ -66,3 +66,25 @@ class IndexStore:
         if not index_path.exists():
             return None
         return json.loads(index_path.read_text())
+
+    def get_symbol_content(self, repo_path: Path, symbol_id: str) -> Optional[str]:
+        index = self.load(repo_path)
+        if index is None:
+            return None
+
+        sym_data = next(
+            (s for s in index["symbols"] if s["id"] == symbol_id),
+            None,
+        )
+        if sym_data is None:
+            return None
+
+        source_file = self._sources_dir(repo_path) / sym_data["file_path"]
+        if not source_file.exists():
+            return None
+
+        with open(source_file, "rb") as f:
+            f.seek(sym_data["byte_offset"])
+            raw = f.read(sym_data["byte_length"])
+
+        return raw.decode("utf-8", errors="replace")
