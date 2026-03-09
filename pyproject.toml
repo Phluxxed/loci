@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "loci"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "tree-sitter-language-pack>=0.7.0",
+]
+
+[project.scripts]
+loci = "loci.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/loci"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
