@@ -7,7 +7,6 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-import pytest
 
 
 def run_loci(*args: str, env: dict) -> subprocess.CompletedProcess:
