@@ -121,7 +121,7 @@ def _extract_symbol(
     byte_offset = start
     byte_length = end - start
 
-    signature = _extract_signature(node, spec, source)
+    signature = _extract_signature(node, source)
     docstring = _extract_docstring(node, spec, source)
 
     sym_id = make_symbol_id(file_path, qualified_name, kind)
@@ -148,7 +148,7 @@ def _extract_name(node, spec: LanguageSpec, source: bytes) -> Optional[str]:
     return None
 
 
-def _extract_signature(node, spec: LanguageSpec, source: bytes) -> str:
+def _extract_signature(node, source: bytes) -> str:
     """Extract the first line of the symbol as its signature."""
     text = source[node.start_byte:node.end_byte].decode("utf-8", errors="replace")
     first_line = text.split("\n")[0].rstrip(":")
