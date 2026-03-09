@@ -124,6 +124,48 @@ class IndexStore:
         return results
 
 
+    def list_repos(self) -> list[dict[str, Any]]:
+        repos = []
+        for repo_dir in self.base_dir.iterdir():
+            if not repo_dir.is_dir():
+                continue
+            index_file = repo_dir / "index.json"
+            if not index_file.exists():
+                continue
+            try:
+                data = json.loads(index_file.read_text())
+                repos.append({
+                    "cache_key": repo_dir.name,
+                    "symbols": len(data.get("symbols", [])),
+                    "path": data.get("repo_path", repo_dir.name),
+                })
+            except Exception:
+                continue
+        return repos
+
+    def invalidate(self, repo_path: Path) -> None:
+        import shutil
+        repo_dir = self._repo_dir(repo_path)
+        if repo_dir.exists():
+            shutil.rmtree(repo_dir)
+
+    def apply_summaries(self, repo_path: Path, summaries: list[dict[str, str]]) -> int:
+        index = self.load(repo_path)
+        if index is None:
+            return 0
+        summary_map = {s["id"]: s["summary"] for s in summaries}
+        applied = 0
+        for sym in index["symbols"]:
+            if sym["id"] in summary_map:
+                sym["summary"] = summary_map[sym["id"]]
+                applied += 1
+        index_path = self._index_path(repo_path)
+        tmp_path = index_path.with_suffix(".tmp")
+        tmp_path.write_text(json.dumps(index, indent=2))
+        tmp_path.replace(index_path)
+        return applied
+
+
 def _score_symbol(sym: dict[str, Any], q: str, q_words: set[str]) -> float:
     if not q:
         return 0.0
