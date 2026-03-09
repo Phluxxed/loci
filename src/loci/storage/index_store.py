@@ -88,3 +88,74 @@ class IndexStore:
             raw = f.read(sym_data["byte_length"])
 
         return raw.decode("utf-8", errors="replace")
+
+    def search(
+        self,
+        repo_path: Path,
+        query: str,
+        kind: Optional[str] = None,
+        lang: Optional[str] = None,
+        limit: int = 20,
+    ) -> list[dict[str, Any]]:
+        index = self.load(repo_path)
+        if index is None:
+            return []
+
+        q = query.lower()
+        q_words = set(q.split()) if q else set()
+        scored: list[tuple[float, dict]] = []
+
+        for sym in index["symbols"]:
+            if kind and sym.get("kind") != kind:
+                continue
+            if lang and sym.get("language") != lang:
+                continue
+            score = _score_symbol(sym, q, q_words)
+            scored.append((score, sym))
+
+        scored.sort(key=lambda x: x[0], reverse=True)
+        results = []
+        for score, sym in scored[:limit]:
+            if not q or score > 0:
+                entry = dict(sym)
+                entry["score"] = round(score, 2)
+                results.append(entry)
+
+        return results
+
+
+def _score_symbol(sym: dict[str, Any], q: str, q_words: set[str]) -> float:
+    if not q:
+        return 0.0
+
+    score = 0.0
+    name = sym.get("name", "").lower()
+    sig = sym.get("signature", "").lower()
+    summary = sym.get("summary", "").lower()
+    docstring = sym.get("docstring", "").lower()
+
+    if name == q:
+        score += 20
+    elif q in name:
+        score += 10
+
+    if q in sig:
+        score += 8
+    else:
+        for word in q_words:
+            if word in sig:
+                score += 2
+
+    if summary:
+        if q in summary:
+            score += 5
+        else:
+            for word in q_words:
+                if word in summary:
+                    score += 1
+
+    for word in q_words:
+        if word in docstring:
+            score += 2
+
+    return score

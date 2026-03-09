@@ -145,3 +145,101 @@ def test_get_symbol_content_returns_none_for_missing_id(store: IndexStore, tmp_p
 
     result = store.get_symbol_content(source_path, "src/auth.py::nonexistent#function")
     assert result is None
+
+
+@pytest.fixture
+def store_with_data(store: IndexStore, tmp_path: Path) -> tuple[IndexStore, Path]:
+    source_path = tmp_path / "repo"
+    source_path.mkdir()
+    (source_path / "src").mkdir()
+    (source_path / "src" / "auth.py").write_text("def login(): pass\n\nclass User: pass")
+    (source_path / "src").mkdir(exist_ok=True)
+    # Create utils.py too
+    (source_path / "src" / "utils.py").write_text("def hash_password(): pass")
+
+    symbols = [
+        Symbol(
+            id="src/auth.py::login#function",
+            name="login",
+            qualified_name="login",
+            kind="function",
+            language="python",
+            file_path="src/auth.py",
+            byte_offset=0,
+            byte_length=20,
+            signature="def login(username: str) -> bool",
+            docstring="Authenticate a user by checking credentials.",
+            summary="Validates username and password against the database.",
+        ),
+        Symbol(
+            id="src/auth.py::User#class",
+            name="User",
+            qualified_name="User",
+            kind="class",
+            language="python",
+            file_path="src/auth.py",
+            byte_offset=22,
+            byte_length=50,
+            signature="class User",
+            docstring="Represents an authenticated user.",
+            summary="",
+        ),
+        Symbol(
+            id="src/utils.py::hash_password#function",
+            name="hash_password",
+            qualified_name="hash_password",
+            kind="function",
+            language="python",
+            file_path="src/utils.py",
+            byte_offset=0,
+            byte_length=80,
+            signature="def hash_password(password: str) -> str",
+            docstring="Hash a password using bcrypt.",
+            summary="",
+        ),
+    ]
+    store.write(source_path, symbols, file_hashes={})
+    return store, source_path
+
+
+def test_search_exact_name_match_scores_highest(store_with_data):
+    store, path = store_with_data
+    results = store.search(path, "login")
+    assert results[0]["id"] == "src/auth.py::login#function"
+
+
+def test_search_returns_list(store_with_data):
+    store, path = store_with_data
+    results = store.search(path, "user")
+    assert isinstance(results, list)
+
+
+def test_search_respects_limit(store_with_data):
+    store, path = store_with_data
+    results = store.search(path, "password", limit=1)
+    assert len(results) <= 1
+
+
+def test_search_filters_by_kind(store_with_data):
+    store, path = store_with_data
+    results = store.search(path, "user", kind="class")
+    assert all(r["kind"] == "class" for r in results)
+
+
+def test_search_filters_by_lang(store_with_data):
+    store, path = store_with_data
+    results = store.search(path, "login", lang="python")
+    assert all(r["language"] == "python" for r in results)
+
+
+def test_search_returns_score(store_with_data):
+    store, path = store_with_data
+    results = store.search(path, "login")
+    assert all("score" in r for r in results)
+    assert results[0]["score"] > 0
+
+
+def test_search_empty_query_returns_all(store_with_data):
+    store, path = store_with_data
+    results = store.search(path, "")
+    assert len(results) == 3
