@@ -2,10 +2,11 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from typing import Optional
 import pytest
 
 
-def run_loci(*args: str, env_extra: dict = None) -> subprocess.CompletedProcess:
+def run_loci(*args: str, env_extra: Optional[dict] = None) -> subprocess.CompletedProcess:
     import os
     env = os.environ.copy()
     if env_extra:

@@ -125,7 +125,7 @@ def cmd_get(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_list(args: argparse.Namespace) -> int:
+def cmd_list(_args: argparse.Namespace) -> int:
     store = _get_store()
     repos = store.list_repos()
     print(json.dumps(repos))
