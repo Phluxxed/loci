@@ -110,16 +110,22 @@ def cmd_search(args: argparse.Namespace) -> int:
 def cmd_get(args: argparse.Namespace) -> int:
     repo_path = Path(args.repo).resolve()
     store = _get_store()
+    index = store.load(repo_path)
+    if index is None:
+        print(json.dumps({"error": f"Repo not indexed"}), file=sys.stderr)
+        return 1
+    meta = next((s for s in index["symbols"] if s["id"] == args.symbol_id), None)
+    if meta is None:
+        print(json.dumps({"error": f"Symbol not found: {args.symbol_id}"}), file=sys.stderr)
+        return 1
     content = store.get_symbol_content(repo_path, args.symbol_id)
     if content is None:
         print(json.dumps({"error": f"Symbol not found: {args.symbol_id}"}), file=sys.stderr)
         return 1
-    index = store.load(repo_path)
-    meta = next((s for s in index["symbols"] if s["id"] == args.symbol_id), {})
     result = {
         "id": args.symbol_id,
         "source": content,
-        **{k: meta.get(k) for k in ("byte_offset", "byte_length", "signature", "kind", "language")},
+        **{k: meta.get(k) for k in ("byte_offset", "byte_length", "signature", "kind", "language")},  # type: ignore[union-attr]
     }
     print(json.dumps(result))
     return 0

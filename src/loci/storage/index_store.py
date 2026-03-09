@@ -144,7 +144,6 @@ class IndexStore:
         return repos
 
     def invalidate(self, repo_path: Path) -> None:
-        import shutil
         repo_dir = self._repo_dir(repo_path)
         if repo_dir.exists():
             shutil.rmtree(repo_dir)
