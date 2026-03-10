@@ -204,3 +204,83 @@ def test_ts_fixture_no_spurious_symbols():
     extracted = _extracted("sample.ts")
     names = [name for name, _ in extracted]
     assert "helper" not in names  # arrow function const, should not be extracted
+
+
+# ── Go ground-truth ─────────────────────────────────────────────────────────
+
+GO_EXPECTED = [
+    ("Greet", "function"),
+    ("helper", "function"),
+    ("Calculator", "type"),
+    ("Add", "method"),
+    ("Reset", "method"),
+    ("Shape", "type"),
+    ("Vector", "type"),
+]
+
+
+def test_go_fixture_ground_truth():
+    extracted = _extracted("sample.go")
+    for name, kind in GO_EXPECTED:
+        assert (name, kind) in extracted, (
+            f"Expected ({name!r}, {kind!r}) in sample.go symbols, got: {extracted}"
+        )
+
+
+def test_go_fixture_no_spurious_symbols():
+    extracted = _extracted("sample.go")
+    names = [name for name, _ in extracted]
+    assert "PI" not in names  # constant, should not be extracted
+
+
+# ── Rust ground-truth ────────────────────────────────────────────────────────
+
+RUST_EXPECTED = [
+    ("add", "function"),
+    ("Counter", "struct"),
+    ("Counter", "impl"),
+    ("new", "method"),
+    ("increment", "method"),
+    ("value", "method"),
+    ("Describable", "trait"),
+    ("Color", "enum"),
+]
+
+
+def test_rust_fixture_ground_truth():
+    extracted = _extracted("sample.rs")
+    for name, kind in RUST_EXPECTED:
+        assert (name, kind) in extracted, (
+            f"Expected ({name!r}, {kind!r}) in sample.rs symbols, got: {extracted}"
+        )
+
+
+def test_rust_fixture_no_spurious_symbols():
+    extracted = _extracted("sample.rs")
+    names = [name for name, _ in extracted]
+    assert "MAX_COUNT" not in names  # constant, should not be extracted
+
+
+# ── JavaScript ground-truth ──────────────────────────────────────────────────
+
+JS_EXPECTED = [
+    ("greet", "function"),
+    ("User", "class"),
+    ("getDisplayName", "method"),
+    ("UserRepository", "class"),
+    ("findById", "method"),
+]
+
+
+def test_js_fixture_ground_truth():
+    extracted = _extracted("sample.js")
+    for name, kind in JS_EXPECTED:
+        assert (name, kind) in extracted, (
+            f"Expected ({name!r}, {kind!r}) in sample.js symbols, got: {extracted}"
+        )
+
+
+def test_js_fixture_no_spurious_symbols():
+    extracted = _extracted("sample.js")
+    names = [name for name, _ in extracted]
+    assert "helper" not in names  # arrow function const, should not be extracted

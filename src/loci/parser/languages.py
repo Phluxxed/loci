@@ -43,12 +43,57 @@ _SPECS: dict[str, LanguageSpec] = {
         docstring_strategy="preceding_comment",
         container_node_types=["class_declaration", "class_body"],
     ),
+    "go": LanguageSpec(
+        ts_language="go",
+        symbol_node_types={
+            "function_declaration": "function",
+            "method_declaration": "method",
+            "type_spec": "type",
+        },
+        name_fields=["name"],
+        param_fields=["parameters"],
+        return_type_fields=["result"],
+        docstring_strategy="preceding_comment",
+        container_node_types=[],
+    ),
+    "rust": LanguageSpec(
+        ts_language="rust",
+        symbol_node_types={
+            "function_item": "function",
+            "struct_item": "struct",
+            "enum_item": "enum",
+            "trait_item": "trait",
+            "impl_item": "impl",
+        },
+        # impl_item has no "name" field — falls back to "type" (the implementing type)
+        name_fields=["name", "type"],
+        param_fields=["parameters"],
+        return_type_fields=["return_type"],
+        docstring_strategy="preceding_comment",
+        container_node_types=["impl_item"],
+    ),
+    "javascript": LanguageSpec(
+        ts_language="javascript",
+        symbol_node_types={
+            "function_declaration": "function",
+            "class_declaration": "class",
+            "method_definition": "method",
+        },
+        name_fields=["name"],
+        param_fields=["parameters"],
+        return_type_fields=[],
+        docstring_strategy="preceding_comment",
+        container_node_types=["class_declaration", "class_body"],
+    ),
 }
 
 EXTENSION_MAP: dict[str, str] = {
     ".py": "python",
     ".ts": "typescript",
     ".tsx": "typescript",
+    ".go": "go",
+    ".rs": "rust",
+    ".js": "javascript",
 }
 
 
