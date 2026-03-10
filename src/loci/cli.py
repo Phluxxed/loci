@@ -303,6 +303,48 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "") -> str:
     lines.append(f"Savings meter:   {_bar(ratio_f)} {ratio_str}")
     lines.append("")
 
+    FILE_W = 44  # width for file column in nested view
+    REPO_W = 38  # width for repo name column
+
+    def _render_nested(repo_rows: list, file_rows: list) -> None:
+        if not repo_rows:
+            return
+        sep = "─" * W
+        lines.append("By Repo")
+        lines.append(sep)
+        lines.append(f"  {'#':>2}  {'Repo':<{REPO_W}}  {'Gets':>4}  {'Saved':>6}  {'Ratio':>5}  Impact")
+        lines.append(sep)
+
+        # Build lookup: repo_path -> [file rows] with relative file paths
+        file_by_repo: dict[str, list] = {}
+        for frow in file_rows:
+            fname = frow["name"]  # e.g. "/repo/path/src/foo.py"
+            for rrow in repo_rows:
+                repo_path = rrow["name"]
+                prefix = repo_path + "/"
+                if fname.startswith(prefix):
+                    rel = fname[len(prefix):]
+                    file_by_repo.setdefault(repo_path, []).append({**frow, "rel": rel})
+                    break
+
+        for i, rrow in enumerate(repo_rows, 1):
+            repo_path = rrow["name"]
+            repo_display = repo_path if len(repo_path) <= REPO_W else "..." + repo_path[-(REPO_W - 3):]
+            impact = _bar(rrow["ratio_pct"] / 100, width=10)
+            lines.append(
+                f"  {i:>2}.  {repo_display:<{REPO_W}}  {rrow['gets']:>4}  "
+                f"{_fmt_bytes(rrow['saved_bytes']):>6}  {rrow['ratio_pct']:>4}%  {impact}"
+            )
+            for frow in file_by_repo.get(repo_path, []):
+                rel = frow["rel"]
+                rel_display = rel if len(rel) <= FILE_W else "..." + rel[-(FILE_W - 3):]
+                fimpact = _bar(frow["ratio_pct"] / 100, width=10)
+                lines.append(
+                    f"        {rel_display:<{FILE_W}}  {frow['gets']:>4}  "
+                    f"{_fmt_bytes(frow['saved_bytes']):>6}  {frow['ratio_pct']:>4}%  {fimpact}"
+                )
+        lines.append(sep)
+
     def _render_table(heading: str, rows: list, name_col: str, name_width: int) -> None:
         if not rows:
             return
@@ -311,7 +353,7 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "") -> str:
         lines.append(sep)
         lines.append(f"  {'#':>2}  {name_col:<{name_width}}  {'Gets':>4}  {'Saved':>6}  {'Ratio':>5}  Impact")
         lines.append(sep)
-        for i, row in enumerate(rows[:10], 1):
+        for i, row in enumerate(rows[:20], 1):
             name = row["name"]
             display = name if len(name) <= name_width else "..." + name[-(name_width - 3):]
             impact = _bar(row["ratio_pct"] / 100, width=10)
@@ -324,8 +366,7 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "") -> str:
     if repo_filter:
         _render_table("By File", stats.get("by_file", []), "File", 50)
     else:
-        _render_table("By Repo", stats.get("by_repo", []), "Repo", 42)
-        _render_table("By File", stats.get("by_file", []), "File", 50)
+        _render_nested(stats.get("by_repo", []), stats.get("by_file", []))
 
     return "\n".join(lines)
 
