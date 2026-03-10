@@ -59,6 +59,20 @@ def test_parse_python_byte_offset_matches_source(sample_py: Path):
     assert "def add" in extracted
 
 
+def test_parse_python_line_numbers(sample_py: Path):
+    symbols = parse_file(sample_py)
+    add_sym = next(s for s in symbols if s.name == "add")
+    assert add_sym.line > 0
+    assert add_sym.end_line >= add_sym.line
+
+
+def test_parse_python_keywords(sample_py: Path):
+    symbols = parse_file(sample_py)
+    add_sym = next(s for s in symbols if s.name == "add")
+    # "add" → single word, stays as keyword
+    assert "add" in add_sym.keywords
+
+
 def test_parse_python_stable_ids(sample_py: Path):
     symbols = parse_file(sample_py)
     add_sym = next(s for s in symbols if s.name == "add")

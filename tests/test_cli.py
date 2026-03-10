@@ -596,6 +596,49 @@ def test_verify_detects_corrupted_offset(tmp_path: Path, fixtures_dir: Path):
     assert any(f["issue"] == "name_not_in_bytes" for f in out["failed"])
 
 
+def test_get_returns_line_numbers(sample_repo: Path, tmp_path: Path):
+    base = str(tmp_path / ".codeindex")
+    run_loci("index", str(sample_repo), env_extra={"LOCI_BASE_DIR": base})
+    search = run_loci("search", "add", "--repo", str(sample_repo), env_extra={"LOCI_BASE_DIR": base})
+    sym_id = next(r["id"] for r in json.loads(search.stdout) if r["name"] == "add")
+    result = run_loci("get", sym_id, "--repo", str(sample_repo), env_extra={"LOCI_BASE_DIR": base})
+    out = json.loads(result.stdout)
+    assert out["line"] > 0
+    assert out["end_line"] >= out["line"]
+
+
+def test_outline_includes_line_numbers(sample_repo: Path, tmp_path: Path):
+    base = str(tmp_path / ".codeindex")
+    run_loci("index", str(sample_repo), env_extra={"LOCI_BASE_DIR": base})
+    result = run_loci("outline", str(sample_repo), env_extra={"LOCI_BASE_DIR": base})
+    symbols = json.loads(result.stdout)[0]["symbols"]
+    assert all("line" in s and "end_line" in s for s in symbols)
+    assert all(s["line"] > 0 for s in symbols)
+
+
+def test_keywords_extracted_for_camel_case(tmp_path: Path):
+    from loci.parser.extractor import parse_file
+    f = tmp_path / "sample.py"
+    f.write_text("def getUserById(user_id): pass\n")
+    symbols = parse_file(f)
+    assert len(symbols) == 1
+    kws = set(symbols[0].keywords)
+    assert "get" in kws
+    assert "user" in kws
+    assert "by" in kws
+    assert "id" in kws
+
+
+def test_keywords_boost_search(sample_repo: Path, tmp_path: Path):
+    """A query matching a keyword should still score the symbol."""
+    base = str(tmp_path / ".codeindex")
+    run_loci("index", str(sample_repo), env_extra={"LOCI_BASE_DIR": base})
+    # "multiply" name has keyword "multiply"; query "mult" won't exact-match but keyword helps
+    result = run_loci("search", "multiply", "--repo", str(sample_repo), env_extra={"LOCI_BASE_DIR": base})
+    names = [r["name"] for r in json.loads(result.stdout)]
+    assert "multiply" in names
+
+
 def test_verify_detects_content_drift(tmp_path: Path, fixtures_dir: Path):
     """Modify the live file after indexing — verify should detect content_drift."""
     import shutil

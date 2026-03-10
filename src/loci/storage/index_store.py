@@ -505,4 +505,8 @@ def _score_symbol(sym: dict[str, Any], q: str, q_words: set[str]) -> float:
         if word in docstring:
             score += 1
 
+    # Keyword match (+3 per matching keyword)
+    keywords = set(sym.get("keywords", []))
+    score += len(q_words & keywords) * 3
+
     return score

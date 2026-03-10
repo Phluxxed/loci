@@ -160,7 +160,7 @@ def cmd_get(args: argparse.Namespace) -> int:
         result: dict = {
             "id": symbol_id,
             "source": content,
-            **{k: meta.get(k) for k in ("byte_offset", "byte_length", "signature", "kind", "language")},  # type: ignore[union-attr]
+            **{k: meta.get(k) for k in ("byte_offset", "byte_length", "line", "end_line", "signature", "kind", "language")},  # type: ignore[union-attr]
         }
         if meta.get("decorators"):
             result["decorators"] = meta["decorators"]
@@ -360,6 +360,8 @@ def cmd_outline(args: argparse.Namespace) -> int:
             "id": s.get("id", ""),
             "name": s.get("name", ""),
             "kind": s.get("kind", ""),
+            "line": s.get("line", 0),
+            "end_line": s.get("end_line", 0),
             "signature": s.get("signature", ""),
             "summary": s.get("summary", ""),
         }

@@ -131,6 +131,13 @@ def _extract_symbol(
     docstring = _extract_docstring(node, spec, source)
     content_hash = hashlib.sha256(source[byte_offset:byte_offset + byte_length]).hexdigest()
 
+    # Line numbers (1-indexed) derived from byte offsets
+    line = source[:byte_offset].count(b"\n") + 1
+    end_line = source[:byte_offset + byte_length].count(b"\n") + 1
+
+    # Keywords: camelCase/snake_case word split of the symbol name
+    keywords = _name_words(name)
+
     # Decorators: child-type (Python/TS/JS) or preceding-sibling-type (Rust)
     decorators: list[str] = []
     if spec.decorator_child_type:
@@ -154,6 +161,9 @@ def _extract_symbol(
         docstring=docstring,
         content_hash=content_hash,
         decorators=decorators,
+        keywords=sorted(keywords),
+        line=line,
+        end_line=end_line,
     ))
 
 
@@ -261,6 +271,19 @@ def _decorator_name(node, source: bytes) -> Optional[str]:
         if child.type == "attribute":
             return _decorator_name(child, source)
     return None
+
+
+def _name_words(name: str) -> set[str]:
+    """Split a symbol name into words for keyword extraction.
+
+    Handles snake_case, SCREAMING_SNAKE, camelCase, PascalCase.
+    e.g. "getUserById" → {"get", "user", "by", "id"}
+    """
+    parts: list[str] = []
+    for segment in name.split("_"):
+        camel_split = re.sub(r"([a-z])([A-Z])", r"\1 \2", segment)
+        parts.extend(camel_split.lower().split())
+    return {p for p in parts if len(p) > 1}
 
 
 def _disambiguate(symbols: list[Symbol]) -> None:

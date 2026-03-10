@@ -18,6 +18,9 @@ class Symbol:
     summary: str = ""
     content_hash: str = ""  # SHA-256 of symbol bytes at index time; "" for old indexes
     decorators: list[str] = field(default_factory=list)  # decorator/attribute names
+    keywords: list[str] = field(default_factory=list)    # name words for search
+    line: int = 0      # 1-indexed start line
+    end_line: int = 0  # 1-indexed end line
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -34,6 +37,9 @@ class Symbol:
             "summary": self.summary,
             "content_hash": self.content_hash,
             "decorators": self.decorators,
+            "keywords": self.keywords,
+            "line": self.line,
+            "end_line": self.end_line,
         }
 
     @classmethod
@@ -52,6 +58,9 @@ class Symbol:
             summary=data.get("summary", ""),
             content_hash=data.get("content_hash", ""),
             decorators=data.get("decorators", []),
+            keywords=data.get("keywords", []),
+            line=data.get("line", 0),
+            end_line=data.get("end_line", 0),
         )
 
 
