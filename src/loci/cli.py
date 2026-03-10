@@ -311,11 +311,10 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "") -> str:
         lines.append(sep)
         lines.append(f"  {'#':>2}  {name_col:<{name_width}}  {'Gets':>4}  {'Saved':>6}  {'Ratio':>5}  Impact")
         lines.append(sep)
-        max_saved = rows[0]["saved_bytes"] if rows else 1
         for i, row in enumerate(rows[:10], 1):
             name = row["name"]
             display = name if len(name) <= name_width else "..." + name[-(name_width - 3):]
-            impact = _bar(row["saved_bytes"] / max_saved if max_saved else 0, width=10)
+            impact = _bar(row["ratio_pct"] / 100, width=10)
             lines.append(
                 f"  {i:>2}.  {display:<{name_width}}  {row['gets']:>4}  "
                 f"{_fmt_bytes(row['saved_bytes']):>6}  {row['ratio_pct']:>4}%  {impact}"
@@ -323,9 +322,10 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "") -> str:
         lines.append(sep)
 
     if repo_filter:
-        _render_table("By File", stats.get("by_file", []), "File", 42)
+        _render_table("By File", stats.get("by_file", []), "File", 50)
     else:
         _render_table("By Repo", stats.get("by_repo", []), "Repo", 42)
+        _render_table("By File", stats.get("by_file", []), "File", 50)
 
     return "\n".join(lines)
 

@@ -211,14 +211,15 @@ class IndexStore:
                 symbol_bytes_total += sb
                 file_bytes_total += fb
 
-                file_path = entry["symbol_id"].split("::", 1)[0]
-                if file_path not in by_file:
-                    by_file[file_path] = {"gets": 0, "symbol_bytes": 0, "file_bytes": 0}
-                by_file[file_path]["gets"] += 1
-                by_file[file_path]["symbol_bytes"] += sb
-                by_file[file_path]["file_bytes"] += fb
-
                 repo_key = repo or "unknown"
+
+                file_path = entry["symbol_id"].split("::", 1)[0]
+                file_key = f"{repo_key}/{file_path}" if repo_key != "unknown" else file_path
+                if file_key not in by_file:
+                    by_file[file_key] = {"gets": 0, "symbol_bytes": 0, "file_bytes": 0}
+                by_file[file_key]["gets"] += 1
+                by_file[file_key]["symbol_bytes"] += sb
+                by_file[file_key]["file_bytes"] += fb
                 if repo_key not in by_repo:
                     by_repo[repo_key] = {"gets": 0, "symbol_bytes": 0, "file_bytes": 0}
                 by_repo[repo_key]["gets"] += 1
