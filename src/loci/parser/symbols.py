@@ -16,6 +16,7 @@ class Symbol:
     signature: str = ""
     docstring: str = ""
     summary: str = ""
+    content_hash: str = ""  # SHA-256 of symbol bytes at index time; "" for old indexes
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -30,6 +31,7 @@ class Symbol:
             "signature": self.signature,
             "docstring": self.docstring,
             "summary": self.summary,
+            "content_hash": self.content_hash,
         }
 
     @classmethod
@@ -46,6 +48,7 @@ class Symbol:
             signature=data.get("signature", ""),
             docstring=data.get("docstring", ""),
             summary=data.get("summary", ""),
+            content_hash=data.get("content_hash", ""),
         )
 
 

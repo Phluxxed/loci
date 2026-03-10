@@ -1,6 +1,7 @@
 from __future__ import annotations
 from pathlib import Path
 from typing import Optional
+import hashlib
 import re
 
 from .symbols import Symbol, make_symbol_id
@@ -113,6 +114,11 @@ def _extract_symbol(
     if parent_name and kind == "function":
         kind = "method"
 
+    # For constants, apply the name pattern filter if the spec defines one
+    if kind == "constant" and spec.constant_name_pattern:
+        if not re.fullmatch(spec.constant_name_pattern, name):
+            return
+
     qualified_name = f"{parent_name}.{name}" if parent_name else name
 
     # Use decorator node start offset if present (covers entire decorated definition)
@@ -123,6 +129,7 @@ def _extract_symbol(
 
     signature = _extract_signature(node, source)
     docstring = _extract_docstring(node, spec, source)
+    content_hash = hashlib.sha256(source[byte_offset:byte_offset + byte_length]).hexdigest()
 
     sym_id = make_symbol_id(file_path, qualified_name, kind)
 
@@ -137,6 +144,7 @@ def _extract_symbol(
         byte_length=byte_length,
         signature=signature,
         docstring=docstring,
+        content_hash=content_hash,
     ))
 
 

@@ -158,6 +158,7 @@ PYTHON_EXPECTED = [
     ("Outer", "class"),
     ("Inner", "class"),
     ("inner_method", "method"),
+    ("MY_CONSTANT", "constant"),
 ]
 
 # (name, kind) pairs that MUST appear in sample.ts
@@ -187,9 +188,10 @@ def test_python_fixture_ground_truth():
 
 def test_python_fixture_no_spurious_symbols():
     extracted = _extracted("sample.py")
-    names = [name for name, _ in extracted]
-    # Module-level constants should NOT be extracted
-    assert "MY_CONSTANT" not in names
+    kinds = {kind for _, kind in extracted}
+    # Lowercase assignments inside functions should NOT become constants
+    # (the walker doesn't recurse into function bodies)
+    assert kinds <= {"function", "class", "method", "constant"}
 
 
 def test_ts_fixture_ground_truth():
@@ -216,6 +218,7 @@ GO_EXPECTED = [
     ("Reset", "method"),
     ("Shape", "type"),
     ("Vector", "type"),
+    ("PI", "constant"),
 ]
 
 
@@ -229,8 +232,8 @@ def test_go_fixture_ground_truth():
 
 def test_go_fixture_no_spurious_symbols():
     extracted = _extracted("sample.go")
-    names = [name for name, _ in extracted]
-    assert "PI" not in names  # constant, should not be extracted
+    kinds = {kind for _, kind in extracted}
+    assert kinds <= {"function", "method", "type", "constant"}
 
 
 # ── Rust ground-truth ────────────────────────────────────────────────────────
@@ -244,6 +247,7 @@ RUST_EXPECTED = [
     ("value", "method"),
     ("Describable", "trait"),
     ("Color", "enum"),
+    ("MAX_COUNT", "constant"),
 ]
 
 
@@ -257,8 +261,8 @@ def test_rust_fixture_ground_truth():
 
 def test_rust_fixture_no_spurious_symbols():
     extracted = _extracted("sample.rs")
-    names = [name for name, _ in extracted]
-    assert "MAX_COUNT" not in names  # constant, should not be extracted
+    kinds = {kind for _, kind in extracted}
+    assert kinds <= {"function", "method", "struct", "enum", "trait", "impl", "constant"}
 
 
 # ── JavaScript ground-truth ──────────────────────────────────────────────────

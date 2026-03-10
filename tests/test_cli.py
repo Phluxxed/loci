@@ -546,3 +546,24 @@ def test_verify_detects_corrupted_offset(tmp_path: Path, fixtures_dir: Path):
     out = json.loads(result.stdout)
     assert len(out["failed"]) > 0
     assert any(f["issue"] == "name_not_in_bytes" for f in out["failed"])
+
+
+def test_verify_detects_content_drift(tmp_path: Path, fixtures_dir: Path):
+    """Modify the live file after indexing — verify should detect content_drift."""
+    import shutil
+    repo = tmp_path / "drift_repo"
+    repo.mkdir()
+    shutil.copy(fixtures_dir / "sample.py", repo / "sample.py")
+    base = str(tmp_path / ".codeindex")
+
+    run_loci("index", str(repo), env_extra={"LOCI_BASE_DIR": base})
+
+    # Mutate the live file after indexing (simulate a file edit without re-index)
+    live = repo / "sample.py"
+    original = live.read_text()
+    live.write_text(original.replace("def add(", "def add_modified("))
+
+    result = run_loci("verify", str(repo), env_extra={"LOCI_BASE_DIR": base})
+    assert result.returncode == 1
+    out = json.loads(result.stdout)
+    assert any(f["issue"] == "content_drift" for f in out["failed"])

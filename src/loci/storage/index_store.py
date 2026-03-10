@@ -364,6 +364,28 @@ class IndexStore:
                     "file": file_path,
                     "issue": "name_not_in_bytes",
                 })
+                continue
+
+            # Drift check: if we have a stored hash, compare against the live file.
+            stored_hash = sym.get("content_hash", "")
+            if stored_hash:
+                live_file = repo_path / file_path
+                if live_file.exists():
+                    try:
+                        with open(live_file, "rb") as lf:
+                            lf.seek(byte_offset)
+                            live_raw = lf.read(byte_length)
+                        live_hash = hashlib.sha256(live_raw).hexdigest()
+                        if live_hash != stored_hash:
+                            failed.append({
+                                "id": sym_id,
+                                "name": name,
+                                "kind": kind,
+                                "file": file_path,
+                                "issue": "content_drift",
+                            })
+                    except OSError:
+                        pass  # live file unreadable; skip drift check
 
         return {
             "repo": str(repo_path),
@@ -389,20 +411,50 @@ class IndexStore:
         return applied
 
 
+def _name_words(name: str) -> set[str]:
+    """Split a symbol name into words for overlap scoring.
+
+    Handles snake_case, SCREAMING_SNAKE, camelCase, PascalCase.
+    e.g. "getUserById" → {"get", "user", "by", "id"}
+         "MAX_RETRY_COUNT" → {"max", "retry", "count"}
+    """
+    # Split on underscores first, then split each part on camelCase boundaries
+    parts: list[str] = []
+    for segment in name.split("_"):
+        # Insert a space before each uppercase letter that follows a lowercase letter
+        camel_split = re.sub(r"([a-z])([A-Z])", r"\1 \2", segment)
+        parts.extend(camel_split.lower().split())
+    return {p for p in parts if len(p) > 1}  # skip single-char fragments
+
+
 def _score_symbol(sym: dict[str, Any], q: str, q_words: set[str]) -> float:
     if not q:
         return 0.0
 
     score = 0.0
     name = sym.get("name", "").lower()
+    qualified = sym.get("qualified_name", "").lower()
     sig = sym.get("signature", "").lower()
     summary = sym.get("summary", "").lower()
     docstring = sym.get("docstring", "").lower()
 
+    # Exact and substring matches on qualified name (highest signal)
+    if qualified == q:
+        score += 25
+    elif q in qualified:
+        score += 12
+
+    # Exact and substring matches on bare name
     if name == q:
         score += 20
     elif q in name:
         score += 10
+
+    # Name word overlap: "get user" matches getUserById
+    name_words = _name_words(sym.get("name", ""))
+    for word in q_words:
+        if word in name_words:
+            score += 5
 
     if q in sig:
         score += 8
@@ -421,6 +473,6 @@ def _score_symbol(sym: dict[str, Any], q: str, q_words: set[str]) -> float:
 
     for word in q_words:
         if word in docstring:
-            score += 2
+            score += 1
 
     return score

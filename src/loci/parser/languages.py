@@ -12,6 +12,7 @@ class LanguageSpec:
     return_type_fields: list[str]            # field names for return type
     docstring_strategy: str                  # "next_sibling_string" | "preceding_comment"
     container_node_types: list[str]          # node types whose children become methods
+    constant_name_pattern: str = ""          # regex; if set, only extract constants whose name matches
 
 
 _SPECS: dict[str, LanguageSpec] = {
@@ -21,12 +22,15 @@ _SPECS: dict[str, LanguageSpec] = {
             "function_definition": "function",
             "class_definition": "class",
             "decorated_definition": "function",  # resolved during walk
+            "assignment": "constant",
         },
-        name_fields=["name"],
+        # "left" is the name field for assignment nodes; "name" for function/class
+        name_fields=["name", "left"],
         param_fields=["parameters"],
         return_type_fields=["return_type"],
         docstring_strategy="next_sibling_string",
         container_node_types=["class_definition"],
+        constant_name_pattern=r"^[A-Z][A-Z0-9_]*$",
     ),
     "typescript": LanguageSpec(
         ts_language="typescript",
@@ -36,12 +40,14 @@ _SPECS: dict[str, LanguageSpec] = {
             "method_definition": "method",
             "type_alias_declaration": "type",
             "interface_declaration": "interface",
+            "variable_declarator": "constant",
         },
         name_fields=["name"],
         param_fields=["parameters"],
         return_type_fields=["return_type"],
         docstring_strategy="preceding_comment",
         container_node_types=["class_declaration", "class_body"],
+        constant_name_pattern=r"^[A-Z][A-Z0-9_]*$",
     ),
     "go": LanguageSpec(
         ts_language="go",
@@ -49,6 +55,7 @@ _SPECS: dict[str, LanguageSpec] = {
             "function_declaration": "function",
             "method_declaration": "method",
             "type_spec": "type",
+            "const_spec": "constant",
         },
         name_fields=["name"],
         param_fields=["parameters"],
@@ -64,6 +71,7 @@ _SPECS: dict[str, LanguageSpec] = {
             "enum_item": "enum",
             "trait_item": "trait",
             "impl_item": "impl",
+            "const_item": "constant",
         },
         # impl_item has no "name" field — falls back to "type" (the implementing type)
         name_fields=["name", "type"],
@@ -78,12 +86,14 @@ _SPECS: dict[str, LanguageSpec] = {
             "function_declaration": "function",
             "class_declaration": "class",
             "method_definition": "method",
+            "variable_declarator": "constant",
         },
         name_fields=["name"],
         param_fields=["parameters"],
         return_type_fields=[],
         docstring_strategy="preceding_comment",
         container_node_types=["class_declaration", "class_body"],
+        constant_name_pattern=r"^[A-Z][A-Z0-9_]*$",
     ),
 }
 
