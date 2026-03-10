@@ -131,6 +131,12 @@ def _extract_symbol(
     docstring = _extract_docstring(node, spec, source)
     content_hash = hashlib.sha256(source[byte_offset:byte_offset + byte_length]).hexdigest()
 
+    # Decorators: for Python use the decorated_definition node; for TS/JS use node itself
+    decorators: list[str] = []
+    if spec.decorator_child_type:
+        dec_source = decorator_node if decorator_node else node
+        decorators = _extract_decorators(dec_source, source, spec.decorator_child_type)
+
     sym_id = make_symbol_id(file_path, qualified_name, kind)
 
     out.append(Symbol(
@@ -145,6 +151,7 @@ def _extract_symbol(
         signature=signature,
         docstring=docstring,
         content_hash=content_hash,
+        decorators=decorators,
     ))
 
 
@@ -213,6 +220,33 @@ def _preceding_comment(node, source: bytes) -> str:
         if raw.startswith("//"):
             return raw[2:].strip()
     return ""
+
+
+def _extract_decorators(node, source: bytes, decorator_type: str) -> list[str]:
+    """Collect decorator names from children of node matching decorator_type."""
+    result = []
+    for child in node.children:
+        if child.type == decorator_type:
+            name = _decorator_name(child, source)
+            if name:
+                result.append(name)
+    return result
+
+
+def _decorator_name(node, source: bytes) -> Optional[str]:
+    """Return the base identifier name of a decorator node."""
+    for child in node.children:
+        if child.type in ("identifier", "type_identifier"):
+            return source[child.start_byte:child.end_byte].decode("utf-8", errors="replace")
+        if child.type in ("call", "call_expression"):
+            func = child.child_by_field_name("function")
+            if func:
+                text = source[func.start_byte:func.end_byte].decode("utf-8", errors="replace")
+                return text.split(".")[-1]  # last segment for dotted names like app.route
+        if child.type == "attribute":
+            text = source[child.start_byte:child.end_byte].decode("utf-8", errors="replace")
+            return text.split(".")[-1]
+    return None
 
 
 def _disambiguate(symbols: list[Symbol]) -> None:

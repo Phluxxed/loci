@@ -91,6 +91,36 @@ class IndexStore:
 
         return raw.decode("utf-8", errors="replace")
 
+    def get_symbol_context(
+        self,
+        repo_path: Path,
+        symbol_id: str,
+        context_lines: int,
+    ) -> Optional[dict[str, list[str]]]:
+        """Return N lines of context before and after a symbol in the cached source."""
+        index = self.load(repo_path)
+        if index is None:
+            return None
+        sym_data = next((s for s in index["symbols"] if s["id"] == symbol_id), None)
+        if sym_data is None:
+            return None
+        source_file = self._sources_dir(repo_path) / sym_data["file_path"]
+        if not source_file.exists():
+            return None
+
+        raw = source_file.read_bytes()
+        all_lines = raw.decode("utf-8", errors="replace").splitlines()
+
+        byte_offset = sym_data["byte_offset"]
+        byte_length = sym_data["byte_length"]
+        start_line = raw[:byte_offset].count(b"\n")           # 0-indexed
+        end_line = start_line + raw[byte_offset:byte_offset + byte_length].count(b"\n")
+
+        return {
+            "context_before": all_lines[max(0, start_line - context_lines):start_line],
+            "context_after": all_lines[end_line + 1:end_line + 1 + context_lines],
+        }
+
     def search(
         self,
         repo_path: Path,

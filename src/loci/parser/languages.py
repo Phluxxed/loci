@@ -13,6 +13,7 @@ class LanguageSpec:
     docstring_strategy: str                  # "next_sibling_string" | "preceding_comment"
     container_node_types: list[str]          # node types whose children become methods
     constant_name_pattern: str = ""          # regex; if set, only extract constants whose name matches
+    decorator_child_type: str = ""           # child node type that represents a decorator/attribute
 
 
 _SPECS: dict[str, LanguageSpec] = {
@@ -31,6 +32,7 @@ _SPECS: dict[str, LanguageSpec] = {
         docstring_strategy="next_sibling_string",
         container_node_types=["class_definition"],
         constant_name_pattern=r"^[A-Z][A-Z0-9_]*$",
+        decorator_child_type="decorator",
     ),
     "typescript": LanguageSpec(
         ts_language="typescript",
@@ -48,6 +50,7 @@ _SPECS: dict[str, LanguageSpec] = {
         docstring_strategy="preceding_comment",
         container_node_types=["class_declaration", "class_body"],
         constant_name_pattern=r"^[A-Z][A-Z0-9_]*$",
+        decorator_child_type="decorator",
     ),
     "go": LanguageSpec(
         ts_language="go",
@@ -94,6 +97,7 @@ _SPECS: dict[str, LanguageSpec] = {
         docstring_strategy="preceding_comment",
         container_node_types=["class_declaration", "class_body"],
         constant_name_pattern=r"^[A-Z][A-Z0-9_]*$",
+        decorator_child_type="decorator",
     ),
 }
 

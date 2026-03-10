@@ -1,5 +1,5 @@
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 
@@ -17,6 +17,7 @@ class Symbol:
     docstring: str = ""
     summary: str = ""
     content_hash: str = ""  # SHA-256 of symbol bytes at index time; "" for old indexes
+    decorators: list[str] = field(default_factory=list)  # decorator/attribute names
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -32,6 +33,7 @@ class Symbol:
             "docstring": self.docstring,
             "summary": self.summary,
             "content_hash": self.content_hash,
+            "decorators": self.decorators,
         }
 
     @classmethod
@@ -49,6 +51,7 @@ class Symbol:
             docstring=data.get("docstring", ""),
             summary=data.get("summary", ""),
             content_hash=data.get("content_hash", ""),
+            decorators=data.get("decorators", []),
         )
 
 

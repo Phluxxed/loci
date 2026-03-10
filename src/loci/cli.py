@@ -142,6 +142,7 @@ def cmd_get(args: argparse.Namespace) -> int:
     store = _get_store()
     index = store.load(repo_path)
     single = len(args.symbol_ids) == 1
+    context_lines: int = getattr(args, "context", 0) or 0
 
     def _fetch(symbol_id: str) -> dict:
         if index is None:
@@ -156,11 +157,19 @@ def cmd_get(args: argparse.Namespace) -> int:
         file_bytes = store.get_symbol_file_size(repo_path, symbol_id)
         if file_bytes is not None:
             store.log_retrieval(symbol_id, symbol_bytes, file_bytes, repo_path=str(repo_path))
-        return {
+        result: dict = {
             "id": symbol_id,
             "source": content,
             **{k: meta.get(k) for k in ("byte_offset", "byte_length", "signature", "kind", "language")},  # type: ignore[union-attr]
         }
+        if meta.get("decorators"):
+            result["decorators"] = meta["decorators"]
+        if context_lines > 0:
+            ctx = store.get_symbol_context(repo_path, symbol_id, context_lines)
+            if ctx:
+                result["context_before"] = ctx["context_before"]
+                result["context_after"] = ctx["context_after"]
+        return result
 
     if single:
         result = _fetch(args.symbol_ids[0])
@@ -347,13 +356,16 @@ def cmd_outline(args: argparse.Namespace) -> int:
         fp = s["file_path"]
         if args.file and fp != args.file:
             continue
-        grouped.setdefault(fp, []).append({
+        entry: dict = {
             "id": s.get("id", ""),
             "name": s.get("name", ""),
             "kind": s.get("kind", ""),
             "signature": s.get("signature", ""),
             "summary": s.get("summary", ""),
-        })
+        }
+        if s.get("decorators"):
+            entry["decorators"] = s["decorators"]
+        grouped.setdefault(fp, []).append(entry)
 
     result = [{"file": fp, "symbols": syms} for fp, syms in sorted(grouped.items())]
     print(json.dumps(result))
@@ -378,6 +390,8 @@ def main() -> None:
     p_get = sub.add_parser("get", help="Get symbol source by ID")
     p_get.add_argument("symbol_ids", nargs="+", help="Symbol ID(s)")
     p_get.add_argument("--repo", required=True, help="Path to indexed repo")
+    p_get.add_argument("--context", type=int, default=0, metavar="N",
+                       help="Include N lines of context before and after each symbol")
 
     p_file = sub.add_parser("file", help="Get cached file content")
     p_file.add_argument("file_path", help="Relative file path (as indexed, e.g. src/foo.py)")

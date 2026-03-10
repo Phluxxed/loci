@@ -494,6 +494,54 @@ def test_get_round_trip_contains_symbol_name(indexed_repo: tuple[Path, str]):
     )
 
 
+def test_get_context_lines_returned(indexed_repo: tuple[Path, str]):
+    """loci get --context N should include context_before and context_after."""
+    repo, base = indexed_repo
+    outline_result = run_loci("outline", str(repo), env_extra={"LOCI_BASE_DIR": base})
+    sym_id = json.loads(outline_result.stdout)[0]["symbols"][0]["id"]
+
+    result = run_loci("get", sym_id, "--repo", str(repo), "--context", "3",
+                      env_extra={"LOCI_BASE_DIR": base})
+    assert result.returncode == 0
+    data = json.loads(result.stdout)
+    assert "context_before" in data
+    assert "context_after" in data
+    assert isinstance(data["context_before"], list)
+    assert isinstance(data["context_after"], list)
+
+
+def test_get_no_context_by_default(indexed_repo: tuple[Path, str]):
+    """loci get without --context should not include context keys."""
+    repo, base = indexed_repo
+    outline_result = run_loci("outline", str(repo), env_extra={"LOCI_BASE_DIR": base})
+    sym_id = json.loads(outline_result.stdout)[0]["symbols"][0]["id"]
+
+    result = run_loci("get", sym_id, "--repo", str(repo), env_extra={"LOCI_BASE_DIR": base})
+    assert result.returncode == 0
+    data = json.loads(result.stdout)
+    assert "context_before" not in data
+    assert "context_after" not in data
+
+
+def test_decorators_extracted_for_decorated_function(tmp_path: Path, fixtures_dir: Path):
+    """@decorator functions should have decorator names in symbol metadata."""
+    import shutil
+    repo = tmp_path / "dec_repo"
+    repo.mkdir()
+    shutil.copy(fixtures_dir / "sample.py", repo / "sample.py")
+    base = str(tmp_path / ".codeindex")
+
+    run_loci("index", str(repo), env_extra={"LOCI_BASE_DIR": base})
+    outline = run_loci("outline", str(repo), env_extra={"LOCI_BASE_DIR": base})
+    symbols = json.loads(outline.stdout)[0]["symbols"]
+
+    # decorated_function has @decorator applied
+    decorated = next((s for s in symbols if s["name"] == "decorated_function"), None)
+    assert decorated is not None
+    assert "decorators" in decorated
+    assert "decorator" in decorated["decorators"]
+
+
 def test_verify_clean_repo_passes(indexed_repo: tuple[Path, str]):
     repo, base = indexed_repo
     result = run_loci("verify", str(repo), env_extra={"LOCI_BASE_DIR": base})
