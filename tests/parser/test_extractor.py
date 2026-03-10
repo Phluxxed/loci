@@ -259,6 +259,13 @@ def test_rust_fixture_ground_truth():
         )
 
 
+def test_rust_fixture_derive_decorator():
+    path = FIXTURES_DIR / "sample.rs"
+    symbols = parse_file(path)
+    counter = next(s for s in symbols if s.name == "Counter" and s.kind == "struct")
+    assert "derive" in counter.decorators
+
+
 def test_rust_fixture_no_spurious_symbols():
     extracted = _extracted("sample.rs")
     kinds = {kind for _, kind in extracted}

@@ -6,6 +6,7 @@ pub fn add(x: i32, y: i32) -> i32 {
 }
 
 /// A simple counter struct.
+#[derive(Debug, Clone)]
 pub struct Counter {
     count: u32,
 }

@@ -14,6 +14,7 @@ class LanguageSpec:
     container_node_types: list[str]          # node types whose children become methods
     constant_name_pattern: str = ""          # regex; if set, only extract constants whose name matches
     decorator_child_type: str = ""           # child node type that represents a decorator/attribute
+    decorator_sibling_type: str = ""         # preceding-sibling node type for decorators (e.g. Rust attribute_item)
 
 
 _SPECS: dict[str, LanguageSpec] = {
@@ -82,6 +83,7 @@ _SPECS: dict[str, LanguageSpec] = {
         return_type_fields=["return_type"],
         docstring_strategy="preceding_comment",
         container_node_types=["impl_item"],
+        decorator_sibling_type="attribute_item",
     ),
     "javascript": LanguageSpec(
         ts_language="javascript",

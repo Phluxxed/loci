@@ -131,11 +131,13 @@ def _extract_symbol(
     docstring = _extract_docstring(node, spec, source)
     content_hash = hashlib.sha256(source[byte_offset:byte_offset + byte_length]).hexdigest()
 
-    # Decorators: for Python use the decorated_definition node; for TS/JS use node itself
+    # Decorators: child-type (Python/TS/JS) or preceding-sibling-type (Rust)
     decorators: list[str] = []
     if spec.decorator_child_type:
         dec_source = decorator_node if decorator_node else node
         decorators = _extract_decorators(dec_source, source, spec.decorator_child_type)
+    if spec.decorator_sibling_type:
+        decorators.extend(_extract_sibling_decorators(node, source, spec.decorator_sibling_type))
 
     sym_id = make_symbol_id(file_path, qualified_name, kind)
 
@@ -222,6 +224,18 @@ def _preceding_comment(node, source: bytes) -> str:
     return ""
 
 
+def _extract_sibling_decorators(node, source: bytes, sibling_type: str) -> list[str]:
+    """Collect decorator names from consecutive preceding named siblings of the given type."""
+    result = []
+    prev = node.prev_named_sibling
+    while prev is not None and prev.type == sibling_type:
+        name = _decorator_name(prev, source)
+        if name:
+            result.append(name)
+        prev = prev.prev_named_sibling
+    return list(reversed(result))  # restore top-to-bottom order
+
+
 def _extract_decorators(node, source: bytes, decorator_type: str) -> list[str]:
     """Collect decorator names from children of node matching decorator_type."""
     result = []
@@ -243,9 +257,9 @@ def _decorator_name(node, source: bytes) -> Optional[str]:
             if func:
                 text = source[func.start_byte:func.end_byte].decode("utf-8", errors="replace")
                 return text.split(".")[-1]  # last segment for dotted names like app.route
+        # Rust attribute node: recurse to find the identifier within it
         if child.type == "attribute":
-            text = source[child.start_byte:child.end_byte].decode("utf-8", errors="replace")
-            return text.split(".")[-1]
+            return _decorator_name(child, source)
     return None
 
 
