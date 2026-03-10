@@ -1,7 +1,9 @@
 from __future__ import annotations
 import hashlib
 import json
+import re
 import shutil
+import time
 from pathlib import Path
 from typing import Any, Optional
 
@@ -143,10 +145,232 @@ class IndexStore:
                 continue
         return repos
 
+    def _session_log_path(self) -> Path:
+        return self.base_dir / "session.jsonl"
+
+    def log_retrieval(self, symbol_id: str, symbol_bytes: int, file_bytes: int, repo_path: str = "") -> None:
+        entry = {
+            "ts": time.time(),
+            "symbol_id": symbol_id,
+            "symbol_bytes": symbol_bytes,
+            "file_bytes": file_bytes,
+            "repo": repo_path,
+        }
+        with open(self._session_log_path(), "a") as f:
+            f.write(json.dumps(entry) + "\n")
+
+    def get_session_stats(self, repo_filter: Optional[str] = None) -> dict[str, Any]:
+        log_path = self._session_log_path()
+        total_gets = 0
+        symbol_bytes_total = 0
+        file_bytes_total = 0
+        by_file: dict[str, dict[str, int]] = {}
+        by_repo: dict[str, dict[str, int]] = {}
+
+        if log_path.exists():
+            for line in log_path.read_text().splitlines():
+                if not line.strip():
+                    continue
+                entry = json.loads(line)
+                repo = entry.get("repo", "")
+                if repo_filter and repo != repo_filter:
+                    continue
+                total_gets += 1
+                sb = entry["symbol_bytes"]
+                fb = entry["file_bytes"]
+                symbol_bytes_total += sb
+                file_bytes_total += fb
+
+                file_path = entry["symbol_id"].split("::", 1)[0]
+                if file_path not in by_file:
+                    by_file[file_path] = {"gets": 0, "symbol_bytes": 0, "file_bytes": 0}
+                by_file[file_path]["gets"] += 1
+                by_file[file_path]["symbol_bytes"] += sb
+                by_file[file_path]["file_bytes"] += fb
+
+                repo_key = repo or "unknown"
+                if repo_key not in by_repo:
+                    by_repo[repo_key] = {"gets": 0, "symbol_bytes": 0, "file_bytes": 0}
+                by_repo[repo_key]["gets"] += 1
+                by_repo[repo_key]["symbol_bytes"] += sb
+                by_repo[repo_key]["file_bytes"] += fb
+
+        not_loaded = max(0, file_bytes_total - symbol_bytes_total)
+        tokens_not_loaded = not_loaded // 4
+        ratio = f"{int(not_loaded / file_bytes_total * 100)}%" if file_bytes_total > 0 else "0%"
+
+        def _make_rows(mapping: dict[str, dict[str, int]], key: str) -> list[dict]:
+            rows = []
+            for name, d in mapping.items():
+                saved = max(0, d["file_bytes"] - d["symbol_bytes"])
+                ratio_pct = int(saved / d["file_bytes"] * 100) if d["file_bytes"] > 0 else 0
+                rows.append({"name": name if key == "repo" else name, "gets": d["gets"],
+                              "saved_bytes": saved, "ratio_pct": ratio_pct})
+            rows.sort(key=lambda r: r["saved_bytes"], reverse=True)
+            return rows
+
+        return {
+            "total_gets": total_gets,
+            "symbol_bytes_retrieved": symbol_bytes_total,
+            "file_bytes_not_loaded": not_loaded,
+            "tokens_not_loaded": tokens_not_loaded,
+            "savings_ratio": ratio,
+            "by_file": _make_rows(by_file, "file"),
+            "by_repo": _make_rows(by_repo, "repo"),
+        }
+
+    def reset_session(self) -> None:
+        log_path = self._session_log_path()
+        if log_path.exists():
+            log_path.unlink()
+
+    def get_file_content(
+        self,
+        repo_path: Path,
+        file_path: str,
+        start_line: Optional[int] = None,
+        end_line: Optional[int] = None,
+    ) -> Optional[dict]:
+        source_file = self._sources_dir(repo_path) / file_path
+        if not source_file.resolve().is_relative_to(self._sources_dir(repo_path).resolve()):
+            return None
+        if not source_file.exists():
+            return None
+        raw = source_file.read_bytes()
+        content = raw.decode("utf-8", errors="replace")
+        lines = content.splitlines(keepends=True)
+        total_lines = len(lines)
+        file_bytes = len(raw)
+
+        start = (start_line - 1) if start_line is not None else 0
+        end = end_line if end_line is not None else total_lines
+        start = max(0, min(start, total_lines))
+        end = max(start, min(end, total_lines))
+        sliced = "".join(lines[start:end])
+
+        return {
+            "file": file_path,
+            "content": sliced,
+            "total_lines": total_lines,
+            "start_line": start + 1,
+            "end_line": end,
+            "file_bytes": file_bytes,
+        }
+
+    def grep_files(self, repo_path: Path, pattern: str) -> list[dict[str, Any]]:
+        try:
+            regex = re.compile(pattern)
+        except re.error as exc:
+            raise ValueError(f"Invalid regex pattern: {exc}") from exc
+
+        sources = self._sources_dir(repo_path)
+        if not sources.exists():
+            return []
+
+        results: list[dict[str, Any]] = []
+        for src_file in sorted(sources.rglob("*")):
+            if not src_file.is_file():
+                continue
+            rel_path = str(src_file.relative_to(sources))
+            try:
+                lines = src_file.read_text(encoding="utf-8", errors="replace").splitlines()
+            except OSError:
+                continue
+            for i, line in enumerate(lines):
+                if regex.search(line):
+                    results.append({
+                        "file": rel_path,
+                        "line": i + 1,
+                        "match": line,
+                        "context_before": lines[max(0, i - 2):i],
+                        "context_after": lines[i + 1:min(len(lines), i + 3)],
+                    })
+        return results
+
+    def get_symbol_file_size(self, repo_path: Path, symbol_id: str) -> Optional[int]:
+        index = self.load(repo_path)
+        if index is None:
+            return None
+        sym_data = next((s for s in index["symbols"] if s["id"] == symbol_id), None)
+        if sym_data is None:
+            return None
+        source_file = self._sources_dir(repo_path) / sym_data["file_path"]
+        if not source_file.exists():
+            return None
+        return source_file.stat().st_size
+
     def invalidate(self, repo_path: Path) -> None:
         repo_dir = self._repo_dir(repo_path)
         if repo_dir.exists():
             shutil.rmtree(repo_dir)
+
+    def verify_index(self, repo_path: Path) -> dict[str, Any]:
+        """Check that every symbol's byte offset points to text containing its name.
+
+        Returns a dict with 'repo', 'checked', 'passed', 'failed'. Each failure
+        has the symbol id, name, kind, file, and the issue description.
+
+        Note: uses name-in-bytes check (not a full re-parse). Catches byte offset
+        corruption and wrong-node-type extraction.
+        """
+        index = self.load(repo_path)
+        if index is None:
+            return {"repo": str(repo_path), "error": "Repo not indexed"}
+
+        sources = self._sources_dir(repo_path)
+        checked = 0
+        failed: list[dict[str, Any]] = []
+
+        for sym in index["symbols"]:
+            checked += 1
+            sym_id = sym.get("id", "")
+            name = sym.get("name", "")
+            kind = sym.get("kind", "")
+            file_path = sym.get("file_path", "")
+            byte_offset = sym.get("byte_offset", 0)
+            byte_length = sym.get("byte_length", 0)
+
+            source_file = sources / file_path
+            if not source_file.exists():
+                failed.append({
+                    "id": sym_id,
+                    "name": name,
+                    "kind": kind,
+                    "file": file_path,
+                    "issue": "source_file_missing",
+                })
+                continue
+
+            try:
+                with open(source_file, "rb") as f:
+                    f.seek(byte_offset)
+                    raw = f.read(byte_length)
+                text = raw.decode("utf-8", errors="replace")
+            except OSError as exc:
+                failed.append({
+                    "id": sym_id,
+                    "name": name,
+                    "kind": kind,
+                    "file": file_path,
+                    "issue": f"read_error: {exc}",
+                })
+                continue
+
+            if name and name not in text:
+                failed.append({
+                    "id": sym_id,
+                    "name": name,
+                    "kind": kind,
+                    "file": file_path,
+                    "issue": "name_not_in_bytes",
+                })
+
+        return {
+            "repo": str(repo_path),
+            "checked": checked,
+            "passed": checked - len(failed),
+            "failed": failed,
+        }
 
     def apply_summaries(self, repo_path: Path, summaries: list[dict[str, str]]) -> int:
         index = self.load(repo_path)

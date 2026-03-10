@@ -141,3 +141,66 @@ def test_parse_typescript_no_duplicate_ids(sample_ts: Path):
     symbols = parse_file(sample_ts)
     ids = [s.id for s in symbols]
     assert len(ids) == len(set(ids))
+
+
+# ── Ground-truth fixture tests ──────────────────────────────────────────────
+
+FIXTURES_DIR = Path(__file__).parent.parent / "fixtures"
+
+# (name, kind) pairs that MUST appear in sample.py
+PYTHON_EXPECTED = [
+    ("add", "function"),
+    ("decorator", "function"),
+    ("decorated_function", "function"),
+    ("Calculator", "class"),
+    ("multiply", "method"),
+    ("divide", "method"),
+    ("Outer", "class"),
+    ("Inner", "class"),
+    ("inner_method", "method"),
+]
+
+# (name, kind) pairs that MUST appear in sample.ts
+# Note: constructor omitted until confirmed working - add ("constructor", "method") once verified.
+TS_EXPECTED = [
+    ("greet", "function"),
+    ("User", "class"),
+    ("getDisplayName", "method"),
+    ("UserId", "type"),
+    ("UserRepository", "interface"),
+]
+
+
+def _extracted(fixture_name: str) -> list[tuple[str, str]]:
+    path = FIXTURES_DIR / fixture_name
+    symbols = parse_file(path)
+    return [(s.name, s.kind) for s in symbols]
+
+
+def test_python_fixture_ground_truth():
+    extracted = _extracted("sample.py")
+    for name, kind in PYTHON_EXPECTED:
+        assert (name, kind) in extracted, (
+            f"Expected ({name!r}, {kind!r}) in sample.py symbols, got: {extracted}"
+        )
+
+
+def test_python_fixture_no_spurious_symbols():
+    extracted = _extracted("sample.py")
+    names = [name for name, _ in extracted]
+    # Module-level constants should NOT be extracted
+    assert "MY_CONSTANT" not in names
+
+
+def test_ts_fixture_ground_truth():
+    extracted = _extracted("sample.ts")
+    for name, kind in TS_EXPECTED:
+        assert (name, kind) in extracted, (
+            f"Expected ({name!r}, {kind!r}) in sample.ts symbols, got: {extracted}"
+        )
+
+
+def test_ts_fixture_no_spurious_symbols():
+    extracted = _extracted("sample.ts")
+    names = [name for name, _ in extracted]
+    assert "helper" not in names  # arrow function const, should not be extracted

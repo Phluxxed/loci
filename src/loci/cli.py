@@ -6,6 +6,8 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
+import pathspec
+
 from loci.parser.extractor import parse_file
 from loci.parser.languages import EXTENSION_MAP
 from loci.parser.symbols import Symbol
@@ -25,6 +27,14 @@ SKIP_EXTENSIONS = {
 def _get_store() -> IndexStore:
     base = os.environ.get("LOCI_BASE_DIR")
     return IndexStore(base_dir=Path(base)) if base else IndexStore()
+
+
+def _load_gitignore(repo_path: Path) -> "pathspec.PathSpec | None":
+    gitignore = repo_path / ".gitignore"
+    if not gitignore.exists():
+        return None
+    lines = gitignore.read_text(encoding="utf-8", errors="replace").splitlines()
+    return pathspec.PathSpec.from_lines("gitwildmatch", lines)
 
 
 def _should_skip_file(path: Path) -> bool:
@@ -52,6 +62,8 @@ def cmd_index(args: argparse.Namespace) -> int:
     new_file_hashes: dict[str, str] = dict(existing_hashes)
     files_skipped = 0
     language_counts: dict[str, int] = defaultdict(int)
+    zero_symbol_warnings: list[dict] = []
+    gitignore = _load_gitignore(repo_path)
 
     for src_file in sorted(repo_path.rglob("*")):
         if not src_file.is_file():
@@ -62,6 +74,8 @@ def cmd_index(args: argparse.Namespace) -> int:
             continue
 
         rel_path = str(src_file.relative_to(repo_path))
+        if gitignore and gitignore.match_file(rel_path):
+            continue
         file_hash = store.hash_file(src_file)
 
         if args.incremental and existing_hashes.get(rel_path) == file_hash:
@@ -81,15 +95,31 @@ def cmd_index(args: argparse.Namespace) -> int:
         lang = EXTENSION_MAP.get(src_file.suffix, "unknown")
         if symbols:
             language_counts[lang] += 1
+        else:
+            # Warn on non-trivial files with known extensions that yield 0 symbols
+            try:
+                line_count = len(src_file.read_bytes().splitlines())
+            except OSError:
+                line_count = 0
+            if line_count > 10:
+                zero_symbol_warnings.append({
+                    "file": rel_path,
+                    "lines": line_count,
+                    "reason": "0 symbols extracted",
+                })
 
     store.write(repo_path, all_symbols, file_hashes=new_file_hashes)
 
-    print(json.dumps({
+    output: dict = {
         "path": str(repo_path),
         "symbols_indexed": len(all_symbols),
         "files_skipped": files_skipped,
         "languages": dict(language_counts),
-    }))
+    }
+    if zero_symbol_warnings:
+        output["warnings"] = zero_symbol_warnings
+
+    print(json.dumps(output))
     return 0
 
 
@@ -111,24 +141,78 @@ def cmd_get(args: argparse.Namespace) -> int:
     repo_path = Path(args.repo).resolve()
     store = _get_store()
     index = store.load(repo_path)
-    if index is None:
-        print(json.dumps({"error": f"Repo not indexed"}), file=sys.stderr)
+    single = len(args.symbol_ids) == 1
+
+    def _fetch(symbol_id: str) -> dict:
+        if index is None:
+            return {"id": symbol_id, "error": "Repo not indexed"}
+        meta = next((s for s in index["symbols"] if s["id"] == symbol_id), None)
+        if meta is None:
+            return {"id": symbol_id, "error": f"Symbol not found: {symbol_id}"}
+        content = store.get_symbol_content(repo_path, symbol_id)
+        if content is None:
+            return {"id": symbol_id, "error": f"Symbol not found: {symbol_id}"}
+        symbol_bytes = len(content.encode("utf-8"))
+        file_bytes = store.get_symbol_file_size(repo_path, symbol_id)
+        if file_bytes is not None:
+            store.log_retrieval(symbol_id, symbol_bytes, file_bytes, repo_path=str(repo_path))
+        return {
+            "id": symbol_id,
+            "source": content,
+            **{k: meta.get(k) for k in ("byte_offset", "byte_length", "signature", "kind", "language")},  # type: ignore[union-attr]
+        }
+
+    if single:
+        result = _fetch(args.symbol_ids[0])
+        if "error" in result:
+            print(json.dumps(result), file=sys.stderr)
+            return 1
+        print(json.dumps(result))
+        return 0
+
+    results = [_fetch(sid) for sid in args.symbol_ids]
+    print(json.dumps(results))
+    return 0
+
+
+def cmd_file(args: argparse.Namespace) -> int:
+    repo_path = Path(args.repo).resolve()
+    store = _get_store()
+    result = store.get_file_content(
+        repo_path, args.file_path, start_line=args.start, end_line=args.end
+    )
+    if result is None:
+        print(json.dumps({"error": f"File not found in cache: {args.file_path}"}), file=sys.stderr)
         return 1
-    meta = next((s for s in index["symbols"] if s["id"] == args.symbol_id), None)
-    if meta is None:
-        print(json.dumps({"error": f"Symbol not found: {args.symbol_id}"}), file=sys.stderr)
-        return 1
-    content = store.get_symbol_content(repo_path, args.symbol_id)
-    if content is None:
-        print(json.dumps({"error": f"Symbol not found: {args.symbol_id}"}), file=sys.stderr)
-        return 1
-    result = {
-        "id": args.symbol_id,
-        "source": content,
-        **{k: meta.get(k) for k in ("byte_offset", "byte_length", "signature", "kind", "language")},  # type: ignore[union-attr]
-    }
+    symbol_bytes = len(result["content"].encode("utf-8"))
+    file_bytes = result.pop("file_bytes")
+    store.log_retrieval(args.file_path, symbol_bytes, file_bytes, repo_path=str(repo_path))
     print(json.dumps(result))
     return 0
+
+
+def cmd_grep(args: argparse.Namespace) -> int:
+    repo_path = Path(args.repo).resolve()
+    store = _get_store()
+    try:
+        results = store.grep_files(repo_path, args.pattern)
+    except ValueError as e:
+        print(json.dumps({"error": str(e)}), file=sys.stderr)
+        return 1
+    print(json.dumps(results))
+    return 0
+
+
+def cmd_verify(args: argparse.Namespace) -> int:
+    repo_path = Path(args.path).resolve()
+    store = _get_store()
+    result = store.verify_index(repo_path)
+    if "error" in result:
+        print(json.dumps(result), file=sys.stderr)
+        return 1
+    has_failures = len(result["failed"]) > 0
+    print(json.dumps(result))
+    return 1 if has_failures else 0
 
 
 def cmd_list(_args: argparse.Namespace) -> int:
@@ -175,6 +259,107 @@ def cmd_summarize(args: argparse.Namespace) -> int:
     return 0
 
 
+def _fmt_bytes(n: int) -> str:
+    if n >= 1_048_576:
+        return f"{n / 1_048_576:.1f}M"
+    if n >= 1024:
+        return f"{n / 1024:.1f}K"
+    return f"{n}B"
+
+
+def _bar(ratio: float, width: int = 24) -> str:
+    filled = max(0, min(width, int(ratio * width)))
+    return "█" * filled + "░" * (width - filled)
+
+
+def _format_stats_pretty(stats: dict, repo_filter: str = "") -> str:
+    W = 68
+    lines = []
+    scope = f" ({repo_filter.split('/')[-1]})" if repo_filter else " (Global)"
+    lines.append(f"loci Retrieval Savings{scope}")
+    lines.append("═" * W)
+    lines.append("")
+
+    total = stats["total_gets"]
+    sb = stats["symbol_bytes_retrieved"]
+    fb_total = sb + stats["file_bytes_not_loaded"]
+    not_loaded = stats["file_bytes_not_loaded"]
+    tokens = stats["tokens_not_loaded"]
+    ratio_str = stats["savings_ratio"]
+    ratio_f = float(ratio_str.rstrip("%")) / 100 if ratio_str != "0%" else 0.0
+
+    lines.append(f"Total gets:      {total}")
+    lines.append(f"Bytes retrieved: {_fmt_bytes(sb):<8}  (of {_fmt_bytes(fb_total)} file bytes)")
+    lines.append(f"Bytes not read:  {_fmt_bytes(not_loaded):<8}  (~{tokens:,} tokens)")
+    lines.append(f"Savings meter:   {_bar(ratio_f)} {ratio_str}")
+    lines.append("")
+
+    def _render_table(heading: str, rows: list, name_col: str, name_width: int) -> None:
+        if not rows:
+            return
+        sep = "─" * W
+        lines.append(heading)
+        lines.append(sep)
+        lines.append(f"  {'#':>2}  {name_col:<{name_width}}  {'Gets':>4}  {'Saved':>6}  {'Ratio':>5}  Impact")
+        lines.append(sep)
+        max_saved = rows[0]["saved_bytes"] if rows else 1
+        for i, row in enumerate(rows[:10], 1):
+            name = row["name"]
+            display = name if len(name) <= name_width else "..." + name[-(name_width - 3):]
+            impact = _bar(row["saved_bytes"] / max_saved if max_saved else 0, width=10)
+            lines.append(
+                f"  {i:>2}.  {display:<{name_width}}  {row['gets']:>4}  "
+                f"{_fmt_bytes(row['saved_bytes']):>6}  {row['ratio_pct']:>4}%  {impact}"
+            )
+        lines.append(sep)
+
+    if repo_filter:
+        _render_table("By File", stats.get("by_file", []), "File", 42)
+    else:
+        _render_table("By Repo", stats.get("by_repo", []), "Repo", 42)
+
+    return "\n".join(lines)
+
+
+def cmd_stats(args: argparse.Namespace) -> int:
+    store = _get_store()
+    if args.reset:
+        store.reset_session()
+    repo_filter = str(Path(args.repo).resolve()) if args.repo else ""
+    stats = store.get_session_stats(repo_filter=repo_filter or None)
+    if args.pretty:
+        print(_format_stats_pretty(stats, repo_filter=repo_filter))
+    else:
+        print(json.dumps(stats))
+    return 0
+
+
+def cmd_outline(args: argparse.Namespace) -> int:
+    repo_path = Path(args.path).resolve()
+    store = _get_store()
+    index = store.load(repo_path)
+    if index is None:
+        print(json.dumps({"error": "Repo not indexed"}), file=sys.stderr)
+        return 1
+
+    grouped: dict[str, list[dict]] = {}
+    for s in index["symbols"]:
+        fp = s["file_path"]
+        if args.file and fp != args.file:
+            continue
+        grouped.setdefault(fp, []).append({
+            "id": s.get("id", ""),
+            "name": s.get("name", ""),
+            "kind": s.get("kind", ""),
+            "signature": s.get("signature", ""),
+            "summary": s.get("summary", ""),
+        })
+
+    result = [{"file": fp, "symbols": syms} for fp, syms in sorted(grouped.items())]
+    print(json.dumps(result))
+    return 0
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="loci", description="Code symbol indexer")
     sub = parser.add_subparsers(dest="command")
@@ -191,8 +376,18 @@ def main() -> None:
     p_search.add_argument("--limit", type=int, default=20, help="Max results")
 
     p_get = sub.add_parser("get", help="Get symbol source by ID")
-    p_get.add_argument("symbol_id", help="Symbol ID")
+    p_get.add_argument("symbol_ids", nargs="+", help="Symbol ID(s)")
     p_get.add_argument("--repo", required=True, help="Path to indexed repo")
+
+    p_file = sub.add_parser("file", help="Get cached file content")
+    p_file.add_argument("file_path", help="Relative file path (as indexed, e.g. src/foo.py)")
+    p_file.add_argument("--repo", required=True, help="Path to indexed repo")
+    p_file.add_argument("--start", type=int, default=None, help="Start line (1-indexed, inclusive)")
+    p_file.add_argument("--end", type=int, default=None, help="End line (1-indexed, inclusive)")
+
+    p_grep = sub.add_parser("grep", help="Search text across cached files")
+    p_grep.add_argument("pattern", help="Regex pattern to search for")
+    p_grep.add_argument("--repo", required=True, help="Path to indexed repo")
 
     sub.add_parser("list", help="List indexed repos")
 
@@ -203,6 +398,18 @@ def main() -> None:
     p_sum.add_argument("path", help="Path to repo")
     p_sum.add_argument("--apply", help="JSON file with summaries to apply")
 
+    p_out = sub.add_parser("outline", help="Show all symbols grouped by file")
+    p_out.add_argument("path", help="Path to repo")
+    p_out.add_argument("--file", help="Filter to a single file (relative path)", default=None)
+
+    p_stats = sub.add_parser("stats", help="Show session retrieval savings")
+    p_stats.add_argument("--repo", default=None, help="Filter to a specific repo path")
+    p_stats.add_argument("--reset", action="store_true", help="Clear session log")
+    p_stats.add_argument("--pretty", action="store_true", help="Human-readable formatted output")
+
+    p_verify = sub.add_parser("verify", help="Verify byte offsets for all indexed symbols")
+    p_verify.add_argument("path", help="Path to repo")
+
     args = parser.parse_args()
 
     if args.command == "index":
@@ -211,12 +418,22 @@ def main() -> None:
         sys.exit(cmd_search(args))
     elif args.command == "get":
         sys.exit(cmd_get(args))
+    elif args.command == "file":
+        sys.exit(cmd_file(args))
+    elif args.command == "grep":
+        sys.exit(cmd_grep(args))
     elif args.command == "list":
         sys.exit(cmd_list(args))
     elif args.command == "invalidate":
         sys.exit(cmd_invalidate(args))
     elif args.command == "summarize":
         sys.exit(cmd_summarize(args))
+    elif args.command == "outline":
+        sys.exit(cmd_outline(args))
+    elif args.command == "stats":
+        sys.exit(cmd_stats(args))
+    elif args.command == "verify":
+        sys.exit(cmd_verify(args))
     else:
         parser.print_help()
         sys.exit(1)

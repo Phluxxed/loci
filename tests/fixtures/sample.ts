@@ -3,6 +3,9 @@ function greet(name: string): string {
     return `Hello, ${name}`;
 }
 
+/** An arrow function assigned to a const — NOT extracted (not a declaration). */
+const helper = (x: number) => x * 2;
+
 /** A user class. */
 class User {
     name: string;
@@ -18,4 +21,10 @@ class User {
     }
 }
 
+/** A type alias. */
 type UserId = string;
+
+/** An interface. */
+interface UserRepository {
+    findById(id: UserId): User | null;
+}

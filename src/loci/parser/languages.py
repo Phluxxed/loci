@@ -35,7 +35,7 @@ _SPECS: dict[str, LanguageSpec] = {
             "class_declaration": "class",
             "method_definition": "method",
             "type_alias_declaration": "type",
-            "interface_declaration": "type",
+            "interface_declaration": "interface",
         },
         name_fields=["name"],
         param_fields=["parameters"],
