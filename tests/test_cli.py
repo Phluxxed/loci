@@ -658,3 +658,110 @@ def test_verify_detects_content_drift(tmp_path: Path, fixtures_dir: Path):
     assert result.returncode == 1
     out = json.loads(result.stdout)
     assert any(f["issue"] == "content_drift" for f in out["failed"])
+
+
+# ---------------------------------------------------------------------------
+# Helpers for logging tests
+# ---------------------------------------------------------------------------
+
+FIXTURES_DIR = Path(__file__).parent / "fixtures"
+
+
+def _index_repo(repo: Path) -> str:
+    """Create a minimal repo with sample.py and index it. Returns the base dir path."""
+    import shutil
+    repo.mkdir(parents=True, exist_ok=True)
+    shutil.copy(FIXTURES_DIR / "sample.py", repo / "sample.py")
+    base = str(repo.parent / ".idx")
+    result = run_loci("index", str(repo), env_extra={"LOCI_BASE_DIR": base})
+    assert result.returncode == 0, f"index failed: {result.stderr}"
+    return base
+
+
+# ---------------------------------------------------------------------------
+# Logging tests: cmd_search
+# ---------------------------------------------------------------------------
+
+def test_cmd_search_logs_search_event(tmp_path: Path):
+    """search with results writes a search event to session.jsonl."""
+    repo = tmp_path / "repo"
+    base = _index_repo(repo)
+    run_loci("search", "--repo", str(repo), "add", env_extra={"LOCI_BASE_DIR": base})
+    log_path = Path(base) / "session.jsonl"
+    entries = [json.loads(l) for l in log_path.read_text().splitlines() if l.strip()]
+    search_events = [e for e in entries if e.get("event") == "search"]
+    assert len(search_events) == 1
+    assert search_events[0]["query"] == "add"
+    assert "search_id" in search_events[0]
+    assert "result_ids" in search_events[0]
+
+
+def test_cmd_search_logs_miss_on_empty_results(tmp_path: Path):
+    """search with 0 results writes a miss event, NOT a search event."""
+    repo = tmp_path / "repo"
+    base = _index_repo(repo)
+    run_loci("search", "--repo", str(repo), "zzz_nonexistent_xyz", env_extra={"LOCI_BASE_DIR": base})
+    log_path = Path(base) / "session.jsonl"
+    entries = [json.loads(l) for l in log_path.read_text().splitlines() if l.strip()]
+    assert any(e.get("event") == "miss" and e["miss_type"] == "search_empty" for e in entries)
+    assert all(e.get("event") != "search" for e in entries)
+
+
+def test_cmd_search_empty_does_not_write_last_search(tmp_path: Path):
+    """Empty search result must not write last_search.json (prevents false blind_spot)."""
+    repo = tmp_path / "repo"
+    base = _index_repo(repo)
+    run_loci("search", "--repo", str(repo), "zzz_nonexistent_xyz", env_extra={"LOCI_BASE_DIR": base})
+    assert not (Path(base) / "last_search.json").exists()
+
+
+# ---------------------------------------------------------------------------
+# Logging tests: cmd_get
+# ---------------------------------------------------------------------------
+
+def test_cmd_get_logs_kind_and_language(tmp_path: Path):
+    """get command enriches the log entry with kind and language."""
+    repo = tmp_path / "repo"
+    base = _index_repo(repo)
+    # Get a real symbol ID from the outline
+    outline_result = run_loci("outline", str(repo), env_extra={"LOCI_BASE_DIR": base})
+    symbols = json.loads(outline_result.stdout)
+    symbol_id = symbols[0]["symbols"][0]["id"]
+    run_loci("get", symbol_id, "--repo", str(repo), env_extra={"LOCI_BASE_DIR": base})
+    log_path = Path(base) / "session.jsonl"
+    entries = [json.loads(l) for l in log_path.read_text().splitlines() if l.strip()]
+    get_events = [e for e in entries if e.get("event") == "get"]
+    assert len(get_events) == 1
+    assert get_events[0]["kind"] is not None
+    assert get_events[0]["language"] is not None
+
+
+def test_cmd_get_logs_miss_on_not_found(tmp_path: Path):
+    """get on a missing symbol writes a miss event."""
+    repo = tmp_path / "repo"
+    base = _index_repo(repo)
+    run_loci("get", "src/foo.py::nonexistent#function", "--repo", str(repo),
+             env_extra={"LOCI_BASE_DIR": base})
+    log_path = Path(base) / "session.jsonl"
+    entries = [json.loads(l) for l in log_path.read_text().splitlines() if l.strip()]
+    assert any(e.get("event") == "miss" and e["miss_type"] == "get_not_found" for e in entries)
+
+
+def test_cmd_get_records_search_correlation(tmp_path: Path):
+    """get after search records search_id on the get event."""
+    repo = tmp_path / "repo"
+    base = _index_repo(repo)
+    # Get a real symbol ID from the outline
+    outline_result = run_loci("outline", str(repo), env_extra={"LOCI_BASE_DIR": base})
+    symbols = json.loads(outline_result.stdout)
+    symbol_id = symbols[0]["symbols"][0]["id"]
+    # Extract the bare name for the search query
+    bare_name = symbol_id.split("::")[-1].split("#")[0]
+    # Search first (ensure results), then get
+    run_loci("search", "--repo", str(repo), bare_name, env_extra={"LOCI_BASE_DIR": base})
+    run_loci("get", symbol_id, "--repo", str(repo), env_extra={"LOCI_BASE_DIR": base})
+    log_path = Path(base) / "session.jsonl"
+    entries = [json.loads(l) for l in log_path.read_text().splitlines() if l.strip()]
+    get_events = [e for e in entries if e.get("event") == "get"]
+    assert len(get_events) == 1
+    assert get_events[0]["search_id"] is not None

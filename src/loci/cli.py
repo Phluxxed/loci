@@ -3,6 +3,7 @@ import argparse
 import json
 import os
 import sys
+import uuid
 from collections import defaultdict
 from pathlib import Path
 
@@ -133,6 +134,12 @@ def cmd_search(args: argparse.Namespace) -> int:
         lang=args.lang,
         limit=args.limit,
     )
+    if results:
+        search_id = str(uuid.uuid4())
+        result_ids = [r["id"] for r in results]
+        store.log_search(search_id, args.query, str(repo_path), result_ids)
+    else:
+        store.log_miss("search_empty", repo_path=str(repo_path), query=args.query)
     print(json.dumps(results))
     return 0
 
@@ -149,14 +156,26 @@ def cmd_get(args: argparse.Namespace) -> int:
             return {"id": symbol_id, "error": "Repo not indexed"}
         meta = next((s for s in index["symbols"] if s["id"] == symbol_id), None)
         if meta is None:
+            store.log_miss("get_not_found", repo_path=str(repo_path), symbol_id=symbol_id)
             return {"id": symbol_id, "error": f"Symbol not found: {symbol_id}"}
         content = store.get_symbol_content(repo_path, symbol_id)
         if content is None:
+            store.log_miss("get_not_found", repo_path=str(repo_path), symbol_id=symbol_id)
             return {"id": symbol_id, "error": f"Symbol not found: {symbol_id}"}
         symbol_bytes = len(content.encode("utf-8"))
         file_bytes = store.get_symbol_file_size(repo_path, symbol_id)
         if file_bytes is not None:
-            store.log_retrieval(symbol_id, symbol_bytes, file_bytes, repo_path=str(repo_path))
+            search_id, search_rank = store.resolve_search_correlation(symbol_id)
+            store.log_retrieval(
+                symbol_id,
+                symbol_bytes,
+                file_bytes,
+                repo_path=str(repo_path),
+                kind=meta.get("kind"),
+                language=meta.get("language"),
+                search_id=search_id,
+                search_rank=search_rank,
+            )
         result: dict = {
             "id": symbol_id,
             "source": content,
@@ -277,6 +296,9 @@ def _fmt_bytes(n: int) -> str:
 
 
 # ANSI color helpers — no-ops when colors disabled
+import re as _re
+_ANSI_RE = _re.compile(r"\033\[[0-9;]*m")
+
 def _ansi(code: str, text: str, use_color: bool) -> str:
     return f"\033[{code}m{text}\033[0m" if use_color else text
 
@@ -285,8 +307,18 @@ def _dim(text: str, c: bool) -> str:     return _ansi("2", text, c)
 def _ratio_color(pct: int, text: str, c: bool) -> str:
     if not c:
         return text
-    code = "92" if pct >= 90 else "93" if pct >= 70 else "91"
+    code = "92" if pct >= 70 else "93" if pct >= 50 else "91"
     return f"\033[{code}m{text}\033[0m"
+
+def _vlen(s: str) -> int:
+    """Visible length: strip ANSI escape codes before measuring."""
+    return len(_ANSI_RE.sub("", s))
+
+def _ljust(s: str, w: int) -> str:
+    return s + " " * max(0, w - _vlen(s))
+
+def _rjust(s: str, w: int) -> str:
+    return " " * max(0, w - _vlen(s)) + s
 
 def _two_tone_bar(ratio: float, width: int, use_color: bool) -> str:
     """Two-segment bar: filled (savings) + empty (retrieved)."""
@@ -296,10 +328,16 @@ def _two_tone_bar(ratio: float, width: int, use_color: bool) -> str:
         return f"\033[42m{' ' * filled}\033[0m\033[100m{' ' * empty}\033[0m"
     return "█" * filled + "░" * empty
 
-def _solid_bar(ratio: float, width: int, use_color: bool) -> str:
-    filled = max(0, min(width, int(ratio * width)))
-    bar = "█" * filled
-    return _ansi("96", bar, use_color) if filled else ""
+def _ratio_bar(ratio_pct: int, width: int, use_color: bool) -> str:
+    """Two-tone bar coloured by ratio: green/yellow/red fill + grey empty."""
+    filled = max(0, min(width, int(ratio_pct / 100 * width)))
+    empty = width - filled
+    if use_color:
+        bg = "42" if ratio_pct >= 70 else "43" if ratio_pct >= 50 else "41"
+        return f"\033[{bg}m{' ' * filled}\033[0m\033[100m{' ' * empty}\033[0m"
+    filled_char = "█" * filled
+    empty_char = "░" * empty
+    return filled_char + empty_char
 
 
 def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = True) -> str:
@@ -314,7 +352,6 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
     total = stats["total_gets"]
     sb = stats["symbol_bytes_retrieved"]
     fb_total = sb + stats["file_bytes_not_loaded"]
-    not_loaded = stats["file_bytes_not_loaded"]
     tokens = stats["tokens_not_loaded"]
     ratio_str = stats["savings_ratio"]
     ratio_f = float(ratio_str.rstrip("%")) / 100 if ratio_str != "0%" else 0.0
@@ -328,9 +365,33 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
     lines.append(f"{'Savings meter:':<{label_w}}{meter}  {_ratio_color(ratio_pct, ratio_str, use_color)}")
     lines.append("")
 
-    REPO_W = 32
-    FILE_W = 46
+    # Column widths (visible chars)
+    NUM_W  = 7   # "  1.  " = 2+2+1+2 = 7 chars
+    NAME_W = 28  # repo or file name, truncated
+    GETS_W = 5
+    SAVE_W = 7
+    RATI_W = 4   # "91%" .. "100%"
     IMPACT_W = 12
+    # File indent = 7 spaces; file name column = NAME_W (data cols start at same offset)
+    FILE_NW = NAME_W  # 7 spaces indent + NAME_W chars = same start as NUM_W + NAME_W
+
+    def _row(num_str: str, name_str: str, name_w: int,
+             gets: int, saved_bytes: int, ratio_pct: int) -> str:
+        ratio_raw = f"{ratio_pct}%"
+        ratio_col = _ratio_color(ratio_pct, ratio_raw, use_color)
+        impact = _ratio_bar(ratio_pct, IMPACT_W, use_color)
+        return (
+            num_str
+            + _ljust(name_str, name_w)
+            + "  "
+            + _rjust(str(gets), GETS_W)
+            + "  "
+            + _rjust(_fmt_bytes(saved_bytes), SAVE_W)
+            + "  "
+            + _rjust(ratio_col, RATI_W)
+            + "  "
+            + impact
+        )
 
     def _render_nested(repo_rows: list, file_rows: list) -> None:
         if not repo_rows:
@@ -350,54 +411,67 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
 
         lines.append(_cyan("By Repo", use_color))
         lines.append("─" * W)
-        hdr = (f"  {'#':>2}  {'Repo':<{REPO_W}}  {'Gets':>5}  {'Saved':>7}  {'Ratio':>6}  Impact")
+        hdr = (
+            " " * NUM_W
+            + _ljust("Repo", NAME_W) + "  "
+            + _rjust("Gets", GETS_W) + "  "
+            + _rjust("Saved", SAVE_W) + "  "
+            + _rjust("Ratio", RATI_W) + "  "
+            + "Impact"
+        )
         lines.append(_dim(hdr, use_color))
         lines.append("─" * W)
 
-        max_saved = repo_rows[0]["saved_bytes"] if repo_rows else 1
         for i, rrow in enumerate(repo_rows, 1):
             repo_path = rrow["name"]
             repo_name = repo_path.split("/")[-1]
-            repo_display = repo_name if len(repo_name) <= REPO_W else repo_name[:REPO_W]
-            ratio_txt = _ratio_color(rrow["ratio_pct"], f"{rrow['ratio_pct']}%", use_color)
-            impact = _solid_bar(rrow["saved_bytes"] / max_saved, IMPACT_W, use_color)
-            lines.append(
-                f"  {i:>2}.  {_cyan(repo_display, use_color):<{REPO_W + (9 if use_color else 0)}}  "
-                f"{rrow['gets']:>5}  {_fmt_bytes(rrow['saved_bytes']):>7}  {ratio_txt:>6}  {impact}"
+            repo_display = _cyan(
+                repo_name if len(repo_name) <= NAME_W else repo_name[:NAME_W],
+                use_color,
             )
-            for frow in file_by_repo.get(repo_path, []):
+            num_str = f"  {i:>2}.  "
+            lines.append(_row(num_str, repo_display, NAME_W,
+                               rrow["gets"], rrow["saved_bytes"], rrow["ratio_pct"]))
+
+            files_here = file_by_repo.get(repo_path, [])
+            for frow in files_here:
                 rel = frow["rel"]
-                rel_display = rel if len(rel) <= FILE_W else "..." + rel[-(FILE_W - 3):]
-                fratio = _ratio_color(frow["ratio_pct"], f"{frow['ratio_pct']}%", use_color)
-                fimpact = _solid_bar(frow["saved_bytes"] / max_saved, IMPACT_W, use_color)
-                lines.append(
-                    f"       {_dim(rel_display, use_color):<{FILE_W + (9 if use_color else 0)}}  "
-                    f"{frow['gets']:>5}  {_fmt_bytes(frow['saved_bytes']):>7}  {fratio:>6}  {fimpact}"
+                rel_display = _dim(
+                    rel if len(rel) <= FILE_NW else "..." + rel[-(FILE_NW - 3):],
+                    use_color,
                 )
+                lines.append(_row(" " * 7, rel_display, FILE_NW,
+                                   frow["gets"], frow["saved_bytes"], frow["ratio_pct"]))
         lines.append("─" * W)
 
-    def _render_table(heading: str, rows: list, name_width: int) -> None:
+    def _render_table(heading: str, rows: list) -> None:
         if not rows:
             return
         lines.append(_cyan(heading, use_color))
         lines.append("─" * W)
-        hdr = f"  {'#':>2}  {'File':<{name_width}}  {'Gets':>5}  {'Saved':>7}  {'Ratio':>6}  Impact"
+        hdr = (
+            " " * NUM_W
+            + _ljust("File", NAME_W) + "  "
+            + _rjust("Gets", GETS_W) + "  "
+            + _rjust("Saved", SAVE_W) + "  "
+            + _rjust("Ratio", RATI_W) + "  "
+            + "Impact"
+        )
         lines.append(_dim(hdr, use_color))
         lines.append("─" * W)
-        max_saved = rows[0]["saved_bytes"] if rows else 1
         for i, row in enumerate(rows[:20], 1):
             name = row["name"]
-            display = name if len(name) <= name_width else "..." + name[-(name_width - 3):]
-            ratio_txt = _ratio_color(row["ratio_pct"], f"{row['ratio_pct']}%", use_color)
-            impact = _solid_bar(row["saved_bytes"] / max_saved, IMPACT_W, use_color)
-            lines.append(
-                f"  {i:>2}.  {_cyan(display, use_color):<{name_width + (9 if use_color else 0)}}  "
-                f"{row['gets']:>5}  {_fmt_bytes(row['saved_bytes']):>7}  {ratio_txt:>6}  {impact}"
+            display = _cyan(
+                name if len(name) <= NAME_W else "..." + name[-(NAME_W - 3):],
+                use_color,
             )
+            num_str = f"  {i:>2}.  "
+            lines.append(_row(num_str, display, NAME_W,
+                               row["gets"], row["saved_bytes"], row["ratio_pct"]))
         lines.append("─" * W)
 
     if repo_filter:
-        _render_table("By File", stats.get("by_file", []), 50)
+        _render_table("By File", stats.get("by_file", []))
     else:
         _render_nested(stats.get("by_repo", []), stats.get("by_file", []))
 
