@@ -178,13 +178,28 @@ class IndexStore:
     def _session_log_path(self) -> Path:
         return self.base_dir / "session.jsonl"
 
-    def log_retrieval(self, symbol_id: str, symbol_bytes: int, file_bytes: int, repo_path: str = "") -> None:
+    def log_retrieval(
+        self,
+        symbol_id: str,
+        symbol_bytes: int,
+        file_bytes: int,
+        repo_path: str = "",
+        kind: Optional[str] = None,
+        language: Optional[str] = None,
+        search_id: Optional[str] = None,
+        search_rank: Optional[int] = None,
+    ) -> None:
         entry = {
             "ts": time.time(),
+            "event": "get",
             "symbol_id": symbol_id,
             "symbol_bytes": symbol_bytes,
             "file_bytes": file_bytes,
             "repo": repo_path,
+            "kind": kind,
+            "language": language,
+            "search_id": search_id,
+            "search_rank": search_rank,
         }
         with open(self._session_log_path(), "a") as f:
             f.write(json.dumps(entry) + "\n")

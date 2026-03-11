@@ -243,3 +243,45 @@ def test_search_empty_query_returns_all(store_with_data):
     store, path = store_with_data
     results = store.search(path, "")
     assert len(results) == 3
+
+
+def test_log_retrieval_includes_kind_and_language(tmp_path):
+    store = IndexStore(tmp_path)
+    store.log_retrieval(
+        "src/foo.py::bar", symbol_bytes=100, file_bytes=1000,
+        repo_path="/repo", kind="function", language="python"
+    )
+    entries = [json.loads(l) for l in (tmp_path / "session.jsonl").read_text().splitlines()]
+    assert entries[0]["event"] == "get"
+    assert entries[0]["kind"] == "function"
+    assert entries[0]["language"] == "python"
+
+
+def test_log_retrieval_includes_search_correlation(tmp_path):
+    store = IndexStore(tmp_path)
+    store.log_retrieval(
+        "src/foo.py::bar", symbol_bytes=100, file_bytes=1000,
+        repo_path="/repo", kind="function", language="python",
+        search_id="abc123", search_rank=2
+    )
+    entry = json.loads((tmp_path / "session.jsonl").read_text().strip())
+    assert entry["search_id"] == "abc123"
+    assert entry["search_rank"] == 2
+
+
+def test_log_retrieval_search_correlation_defaults_to_null(tmp_path):
+    store = IndexStore(tmp_path)
+    store.log_retrieval("src/foo.py::bar", symbol_bytes=100, file_bytes=1000, repo_path="/repo")
+    entry = json.loads((tmp_path / "session.jsonl").read_text().strip())
+    assert entry["search_id"] is None
+    assert entry["search_rank"] is None
+
+
+def test_log_retrieval_old_stats_aggregation_unaffected(tmp_path):
+    """get_session_stats must still work with enriched entries."""
+    store = IndexStore(tmp_path)
+    store.log_retrieval("src/foo.py::bar", symbol_bytes=100, file_bytes=1000,
+                        repo_path="/repo", kind="function", language="python")
+    stats = store.get_session_stats()
+    assert stats["total_gets"] == 1
+    assert stats["symbol_bytes_retrieved"] == 100
