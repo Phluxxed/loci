@@ -455,10 +455,13 @@ class IndexStore:
         p = self._last_search_path()
         if not p.exists():
             return None
-        data = json.loads(p.read_text())
-        if time.time() - data["ts"] > LAST_SEARCH_TTL:
+        try:
+            data = json.loads(p.read_text())
+            if time.time() - data["ts"] > LAST_SEARCH_TTL:
+                return None
+            return data
+        except (json.JSONDecodeError, KeyError):
             return None
-        return data
 
     def resolve_search_correlation(self, symbol_id: str) -> tuple[Optional[str], Optional[int]]:
         """Return (search_id, rank) for symbol_id against last search, or (None, None)."""
@@ -528,7 +531,10 @@ class IndexStore:
             for line in log_path.read_text().splitlines():
                 if not line.strip():
                     continue
-                entry = json.loads(line)
+                try:
+                    entry = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
                 if entry.get("ts", 0) < cutoff:
                     continue
                 if repo_filter and entry.get("repo", "") != repo_filter:

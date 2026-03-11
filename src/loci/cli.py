@@ -153,6 +153,7 @@ def cmd_get(args: argparse.Namespace) -> int:
 
     def _fetch(symbol_id: str) -> dict:
         if index is None:
+            store.log_miss("get_not_found", repo_path=str(repo_path), symbol_id=symbol_id)
             return {"id": symbol_id, "error": "Repo not indexed"}
         meta = next((s for s in index["symbols"] if s["id"] == symbol_id), None)
         if meta is None:
