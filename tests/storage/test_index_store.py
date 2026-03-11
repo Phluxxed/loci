@@ -1,5 +1,6 @@
 import pytest
 import json
+import time
 import time as time_module
 from pathlib import Path
 from loci.parser.symbols import Symbol
@@ -374,3 +375,163 @@ def test_resolve_search_correlation_no_recent_search(tmp_path):
     search_id, rank = store.resolve_search_correlation("id1")
     assert search_id is None
     assert rank is None
+
+
+def _write_log(path, entries):
+    (path / "session.jsonl").write_text("\n".join(json.dumps(e) for e in entries) + "\n")
+
+
+def test_analyze_search_miss_finding(tmp_path):
+    store = IndexStore(tmp_path)
+    _write_log(tmp_path, [
+        {"ts": time.time(), "event": "miss", "miss_type": "search_empty",
+         "query": "handle_error", "repo": "/r"},
+        {"ts": time.time(), "event": "miss", "miss_type": "search_empty",
+         "query": "handle_error", "repo": "/r"},
+        {"ts": time.time(), "event": "miss", "miss_type": "search_empty",
+         "query": "BaseModel", "repo": "/r"},
+    ])
+    result = store.analyze()
+    finding = next(f for f in result["findings"] if f["type"] == "search_miss")
+    assert set(finding["data"]["queries"]) == {"handle_error", "BaseModel"}
+    assert finding["severity"] == "high"
+    assert "suggestion" in finding
+
+
+def test_analyze_search_blind_spot_finding(tmp_path):
+    store = IndexStore(tmp_path)
+    _write_log(tmp_path, [
+        {"ts": time.time(), "event": "get", "symbol_id": "c", "symbol_bytes": 100,
+         "file_bytes": 1000, "repo": "/r", "kind": "function", "language": "python",
+         "search_id": "s1", "search_rank": None},
+        {"ts": time.time(), "event": "get", "symbol_id": "d", "symbol_bytes": 100,
+         "file_bytes": 1000, "repo": "/r", "kind": "function", "language": "python",
+         "search_id": "s1", "search_rank": None},
+        {"ts": time.time(), "event": "get", "symbol_id": "e", "symbol_bytes": 100,
+         "file_bytes": 1000, "repo": "/r", "kind": "function", "language": "python",
+         "search_id": "s1", "search_rank": None},
+    ])
+    result = store.analyze()
+    finding = next((f for f in result["findings"] if f["type"] == "search_blind_spot"), None)
+    assert finding is not None
+    assert finding["severity"] == "high"
+
+
+def test_analyze_search_ranking_poor_finding(tmp_path):
+    store = IndexStore(tmp_path)
+    entries = []
+    for i in range(5):
+        entries.append({"ts": time.time(), "event": "get", "symbol_id": f"s{i}",
+                        "symbol_bytes": 100, "file_bytes": 1000, "repo": "/r",
+                        "kind": "function", "language": "python",
+                        "search_id": "abc", "search_rank": 4})
+    _write_log(tmp_path, entries)
+    result = store.analyze()
+    finding = next((f for f in result["findings"] if f["type"] == "search_ranking_poor"), None)
+    assert finding is not None
+    assert finding["severity"] == "medium"
+
+
+def test_analyze_kind_dead_weight_finding(tmp_path):
+    """kind_dead_weight triggers when a kind is indexed but never fetched."""
+    store = IndexStore(tmp_path)
+    repo_path = tmp_path / "fakerepo"
+    repo_path.mkdir()
+    # Use store's own path helper — avoids replicating internal hashing logic
+    index_path = store._index_path(repo_path)
+    index_path.parent.mkdir(parents=True, exist_ok=True)
+    fake_symbols = [
+        {"id": f"src/c.py::CONST_{i}#constant", "name": f"CONST_{i}", "kind": "constant",
+         "language": "python", "file_path": "src/c.py", "byte_offset": i * 20, "byte_length": 10,
+         "signature": f"CONST_{i} = {i}", "docstring": "", "summary": "", "content_hash": "",
+         "decorators": [], "keywords": [], "line": i + 1, "end_line": i + 1}
+        for i in range(60)
+    ]
+    index_path.write_text(json.dumps({
+        "repo_path": str(repo_path), "indexed_at": time.time(), "symbols": fake_symbols
+    }))
+    # Log only function fetches — no constants
+    _write_log(tmp_path, [
+        {"ts": time.time(), "event": "get", "symbol_id": "src/foo.py::bar",
+         "symbol_bytes": 100, "file_bytes": 1000, "repo": str(repo_path),
+         "kind": "function", "language": "python", "search_id": None, "search_rank": None},
+    ])
+    result = store.analyze()
+    finding = next((f for f in result["findings"] if f["type"] == "kind_dead_weight"), None)
+    assert finding is not None
+    assert finding["data"]["kind"] == "constant"
+    assert finding["data"]["indexed_count"] >= 50
+    assert finding["data"]["fetched_count"] == 0
+    assert finding["severity"] == "low"
+
+
+def test_analyze_poor_extraction_finding(tmp_path):
+    store = IndexStore(tmp_path)
+    _write_log(tmp_path, [
+        {"ts": time.time(), "event": "get", "symbol_id": "src/foo.rs::bar",
+         "symbol_bytes": 800, "file_bytes": 1000, "repo": "/r",
+         "kind": "function", "language": "rust",
+         "search_id": None, "search_rank": None},
+    ] * 5)
+    result = store.analyze()
+    finding = next((f for f in result["findings"] if f["type"] == "poor_extraction"), None)
+    assert finding is not None
+    assert finding["data"]["language"] == "rust"
+    assert finding["severity"] == "medium"
+
+
+def test_analyze_refetch_hotspot_finding(tmp_path):
+    store = IndexStore(tmp_path)
+    _write_log(tmp_path, [
+        {"ts": time.time(), "event": "get", "symbol_id": "src/foo.py::bar",
+         "symbol_bytes": 100, "file_bytes": 1000, "repo": "/r",
+         "kind": "function", "language": "python",
+         "search_id": None, "search_rank": None},
+    ] * 4)
+    result = store.analyze()
+    finding = next((f for f in result["findings"] if f["type"] == "refetch_hotspot"), None)
+    assert finding is not None
+    assert finding["data"]["symbols"][0]["symbol_id"] == "src/foo.py::bar"
+    assert finding["data"]["symbols"][0]["fetch_count"] == 4
+
+
+def test_analyze_summary_fields_are_floats(tmp_path):
+    """miss_rate and correlated_pct are floats 0.0–1.0 per spec schema."""
+    store = IndexStore(tmp_path)
+    _write_log(tmp_path, [
+        {"ts": time.time(), "event": "get", "symbol_id": "s1",
+         "symbol_bytes": 100, "file_bytes": 1000, "repo": "/r",
+         "kind": "function", "language": "python", "search_id": "x", "search_rank": 0},
+        {"ts": time.time(), "event": "search", "search_id": "x", "query": "foo",
+         "repo": "/r", "result_ids": ["s1"], "result_count": 1},
+        {"ts": time.time(), "event": "miss", "miss_type": "search_empty",
+         "query": "bar", "repo": "/r"},
+    ])
+    result = store.analyze()
+    assert result["summary"]["total_gets"] == 1
+    assert result["summary"]["total_searches"] == 1
+    assert result["summary"]["total_misses"] == 1
+    assert isinstance(result["summary"]["miss_rate"], float)
+    assert 0.0 <= result["summary"]["miss_rate"] <= 1.0
+    assert isinstance(result["summary"]["correlated_pct"], float)
+    assert 0.0 <= result["summary"]["correlated_pct"] <= 1.0
+    assert "period" in result
+    assert "findings" in result
+
+
+def test_analyze_empty_log(tmp_path):
+    store = IndexStore(tmp_path)
+    result = store.analyze()
+    assert result["findings"] == []
+    assert result["summary"]["total_gets"] == 0
+
+
+def test_analyze_since_days_filter(tmp_path):
+    store = IndexStore(tmp_path)
+    old_ts = time.time() - (35 * 86400)
+    _write_log(tmp_path, [
+        {"ts": old_ts, "event": "miss", "miss_type": "search_empty",
+         "query": "old_query", "repo": "/r"},
+    ])
+    result = store.analyze(since_days=30)
+    assert all(f["type"] != "search_miss" for f in result["findings"])

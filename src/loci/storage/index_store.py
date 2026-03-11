@@ -513,6 +513,181 @@ class IndexStore:
         with open(self._session_log_path(), "a") as f:
             f.write(json.dumps(entry) + "\n")
 
+    def analyze(self, since_days: int = 30, repo_filter: Optional[str] = None) -> dict[str, Any]:
+        """Read session log and produce actionable findings."""
+        from collections import Counter, defaultdict
+
+        log_path = self._session_log_path()
+        cutoff = time.time() - since_days * 86400
+
+        gets: list[dict] = []
+        searches: list[dict] = []
+        misses: list[dict] = []
+
+        if log_path.exists():
+            for line in log_path.read_text().splitlines():
+                if not line.strip():
+                    continue
+                entry = json.loads(line)
+                if entry.get("ts", 0) < cutoff:
+                    continue
+                if repo_filter and entry.get("repo", "") != repo_filter:
+                    continue
+                event = entry.get("event", "get")  # backwards compat: old entries have no event field
+                if event == "get":
+                    gets.append(entry)
+                elif event == "search":
+                    searches.append(entry)
+                elif event == "miss":
+                    misses.append(entry)
+
+        findings: list[dict] = []
+
+        # --- search_miss: queries returning 0 results ---
+        empty_queries = [e["query"] for e in misses
+                         if e.get("miss_type") == "search_empty" and e.get("query")]
+        if empty_queries:
+            counts = Counter(empty_queries)
+            findings.append({
+                "type": "search_miss",
+                "severity": "high",
+                "data": {"queries": list(counts.keys()), "count": len(empty_queries)},
+                "suggestion": (
+                    f"{len(counts)} unique queries return 0 results. "
+                    "Check keyword extraction handles these name patterns."
+                ),
+            })
+
+        # --- search_blind_spot: fetched symbol not returned by preceding search ---
+        # 15% threshold suppresses noise when a few gets happen to precede unrelated searches.
+        # Below 15%, individual outliers are more likely than a systemic gap.
+        correlated_gets = [g for g in gets if g.get("search_id") is not None]
+        blind_spots = [g for g in correlated_gets if g.get("search_rank") is None]
+        if correlated_gets and len(blind_spots) / len(correlated_gets) >= 0.15:
+            blind_pct = len(blind_spots) / len(correlated_gets)
+            findings.append({
+                "type": "search_blind_spot",
+                "severity": "high",
+                "data": {
+                    "blind_spot_count": len(blind_spots),
+                    "correlated_gets": len(correlated_gets),
+                    "blind_pct": round(blind_pct, 3),
+                },
+                "suggestion": (
+                    f"{round(blind_pct * 100)}% of gets fetch symbols not returned by "
+                    "the preceding search. Search is missing entire symbol classes — "
+                    "check indexing and scoring."
+                ),
+            })
+
+        # --- search_ranking_poor: fetched symbol ranked ≥3 too often ---
+        ranked_gets = [g for g in correlated_gets if g.get("search_rank") is not None]
+        poor_ranked = [g for g in ranked_gets if g["search_rank"] >= 3]
+        if ranked_gets and len(poor_ranked) / len(ranked_gets) >= 0.20:
+            poor_pct = len(poor_ranked) / len(ranked_gets)
+            avg_rank = sum(g["search_rank"] for g in ranked_gets) / len(ranked_gets)
+            findings.append({
+                "type": "search_ranking_poor",
+                "severity": "medium",
+                "data": {
+                    "poor_ranked_count": len(poor_ranked),
+                    "ranked_gets": len(ranked_gets),
+                    "poor_pct": round(poor_pct, 3),
+                    "avg_rank": round(avg_rank, 1),
+                },
+                "suggestion": (
+                    f"Fetched symbols ranked \u22653 in {round(poor_pct * 100)}% of correlated "
+                    f"searches (avg rank {avg_rank:.1f}). Adjust scoring weights for "
+                    "name/keyword matches."
+                ),
+            })
+
+        # --- kind_dead_weight: kind indexed many times but never fetched ---
+        # list_repos() returns list[dict] with "path" key — use that to load each index
+        fetched_kinds: set[str] = {g["kind"] for g in gets if g.get("kind")}
+        indexed_by_kind: dict[str, int] = Counter()
+        for repo_info in self.list_repos():
+            index = self.load(Path(repo_info["path"]))
+            if index is None:
+                continue
+            for sym in index.get("symbols", []):
+                k = sym.get("kind")
+                if k:
+                    indexed_by_kind[k] += 1
+        for kind, count in indexed_by_kind.items():
+            if count > 50 and kind not in fetched_kinds:
+                findings.append({
+                    "type": "kind_dead_weight",
+                    "severity": "low",
+                    "data": {"kind": kind, "indexed_count": count, "fetched_count": 0},
+                    "suggestion": (
+                        f"'{kind}' symbols are indexed ({count} across all repos) but never "
+                        "fetched. Consider excluding from index or lowering search score weight."
+                    ),
+                })
+
+        # --- poor_extraction: language avg savings ratio < 50% ---
+        lang_bytes: dict[str, dict[str, int]] = defaultdict(lambda: {"symbol": 0, "file": 0})
+        for g in gets:
+            lang = g.get("language")
+            if lang:
+                lang_bytes[lang]["symbol"] += g.get("symbol_bytes", 0)
+                lang_bytes[lang]["file"] += g.get("file_bytes", 0)
+        for lang, b in lang_bytes.items():
+            if b["file"] == 0:
+                continue
+            ratio = (b["file"] - b["symbol"]) / b["file"]
+            if ratio < 0.50:
+                findings.append({
+                    "type": "poor_extraction",
+                    "severity": "medium",
+                    "data": {"language": lang, "avg_ratio_pct": round(ratio * 100)},
+                    "suggestion": (
+                        f"{lang} symbols average {round(ratio * 100)}% savings ratio. "
+                        "Extractor may be including too much context per symbol."
+                    ),
+                })
+
+        # --- refetch_hotspot: same symbol fetched 3+ times ---
+        fetch_counts = Counter(g["symbol_id"] for g in gets if g.get("symbol_id"))
+        hotspots = sorted(
+            [{"symbol_id": sid, "fetch_count": cnt} for sid, cnt in fetch_counts.items() if cnt >= 3],
+            key=lambda x: x["fetch_count"], reverse=True,
+        )
+        if hotspots:
+            findings.append({
+                "type": "refetch_hotspot",
+                "severity": "low",
+                "data": {"symbols": hotspots[:10]},
+                "suggestion": (
+                    f"{len(hotspots)} symbol(s) fetched 3+ times. "
+                    "They may be too large to stay in context — consider splitting or summarizing."
+                ),
+            })
+
+        # --- Summary ---
+        all_ts = [e["ts"] for e in gets + searches + misses if e.get("ts")]
+        period_from = min(all_ts) if all_ts else time.time()
+        period_to = max(all_ts) if all_ts else time.time()
+        total_events = len(gets) + len(misses)
+        miss_rate = len(misses) / total_events if total_events > 0 else 0.0
+        correlated_pct = len(correlated_gets) / len(gets) if gets else 0.0
+
+        return {
+            "period": {
+                "from": _ts_to_iso(period_from),
+                "to": _ts_to_iso(period_to),
+            },
+            "summary": {
+                "total_gets": len(gets),
+                "total_searches": len(searches),
+                "total_misses": len(misses),
+                "miss_rate": round(miss_rate, 3),
+                "correlated_pct": round(correlated_pct, 3),
+            },
+            "findings": findings,
+        }
+
     def apply_summaries(self, repo_path: Path, summaries: list[dict[str, str]]) -> int:
         index = self.load(repo_path)
         if index is None:
@@ -528,6 +703,11 @@ class IndexStore:
         tmp_path.write_text(json.dumps(index, indent=2))
         tmp_path.replace(index_path)
         return applied
+
+
+def _ts_to_iso(ts: float) -> str:
+    from datetime import datetime, timezone
+    return datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _name_words(name: str) -> set[str]:
