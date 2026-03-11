@@ -442,6 +442,50 @@ class IndexStore:
             "failed": failed,
         }
 
+    def _write_last_search(self, search_id: str, query: str, result_ids: list[str]) -> None:
+        """Stub — full implementation added in Task 3."""
+        pass
+
+    def log_search(
+        self,
+        search_id: str,
+        query: str,
+        repo_path: str,
+        result_ids: list[str],
+        result_count: Optional[int] = None,
+    ) -> None:
+        # result_count is the true total from search; result_ids may be top-N subset
+        entry = {
+            "ts": time.time(),
+            "event": "search",
+            "search_id": search_id,
+            "query": query,
+            "repo": repo_path,
+            "result_ids": result_ids,
+            "result_count": result_count if result_count is not None else len(result_ids),
+        }
+        with open(self._session_log_path(), "a") as f:
+            f.write(json.dumps(entry) + "\n")
+        self._write_last_search(search_id, query, result_ids)
+
+    def log_miss(
+        self,
+        miss_type: str,
+        repo_path: str = "",
+        query: Optional[str] = None,
+        symbol_id: Optional[str] = None,
+    ) -> None:
+        entry = {
+            "ts": time.time(),
+            "event": "miss",
+            "miss_type": miss_type,
+            "repo": repo_path,
+            "query": query,
+            "symbol_id": symbol_id,
+        }
+        with open(self._session_log_path(), "a") as f:
+            f.write(json.dumps(entry) + "\n")
+
     def apply_summaries(self, repo_path: Path, summaries: list[dict[str, str]]) -> int:
         index = self.load(repo_path)
         if index is None:

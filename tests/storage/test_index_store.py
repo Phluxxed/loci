@@ -285,3 +285,38 @@ def test_log_retrieval_old_stats_aggregation_unaffected(tmp_path):
     stats = store.get_session_stats()
     assert stats["total_gets"] == 1
     assert stats["symbol_bytes_retrieved"] == 100
+
+
+def test_log_search_writes_event_and_last_search_file(tmp_path):
+    store = IndexStore(tmp_path)
+    store.log_search("abc123", "get_user", "/repo", ["src/users.py::get_user", "src/auth.py::get_user_by_id"])
+    # Check session.jsonl
+    entry = json.loads((tmp_path / "session.jsonl").read_text().strip())
+    assert entry["event"] == "search"
+    assert entry["search_id"] == "abc123"
+    assert entry["query"] == "get_user"
+    assert entry["repo"] == "/repo"
+    assert entry["result_ids"] == ["src/users.py::get_user", "src/auth.py::get_user_by_id"]
+    assert entry["result_count"] == 2
+    # Check last_search.json was also written
+    last = json.loads((tmp_path / "last_search.json").read_text())
+    assert last["search_id"] == "abc123"
+    assert last["result_ids"] == ["src/users.py::get_user", "src/auth.py::get_user_by_id"]
+
+
+def test_log_miss_search_empty(tmp_path):
+    store = IndexStore(tmp_path)
+    store.log_miss("search_empty", repo_path="/repo", query="handle_error")
+    entry = json.loads((tmp_path / "session.jsonl").read_text().strip())
+    assert entry["event"] == "miss"
+    assert entry["miss_type"] == "search_empty"
+    assert entry["query"] == "handle_error"
+
+
+def test_log_miss_get_not_found(tmp_path):
+    store = IndexStore(tmp_path)
+    store.log_miss("get_not_found", repo_path="/repo", symbol_id="src/foo.py::missing")
+    entry = json.loads((tmp_path / "session.jsonl").read_text().strip())
+    assert entry["event"] == "miss"
+    assert entry["miss_type"] == "get_not_found"
+    assert entry["symbol_id"] == "src/foo.py::missing"
