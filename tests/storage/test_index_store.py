@@ -1,5 +1,6 @@
 import pytest
 import json
+import time as time_module
 from pathlib import Path
 from loci.parser.symbols import Symbol
 from loci.storage.index_store import IndexStore
@@ -320,3 +321,56 @@ def test_log_miss_get_not_found(tmp_path):
     assert entry["event"] == "miss"
     assert entry["miss_type"] == "get_not_found"
     assert entry["symbol_id"] == "src/foo.py::missing"
+
+
+def test_last_search_path(tmp_path):
+    store = IndexStore(tmp_path)
+    assert store._last_search_path() == tmp_path / "last_search.json"
+
+
+def test_write_and_read_last_search(tmp_path):
+    store = IndexStore(tmp_path)
+    store._write_last_search("abc123", "get_user", ["id1", "id2"])
+    data = store._read_last_search()
+    assert data is not None
+    assert data["search_id"] == "abc123"
+    assert data["query"] == "get_user"
+    assert data["result_ids"] == ["id1", "id2"]
+
+
+def test_read_last_search_returns_none_when_missing(tmp_path):
+    store = IndexStore(tmp_path)
+    assert store._read_last_search() is None
+
+
+def test_read_last_search_returns_none_when_stale(tmp_path):
+    store = IndexStore(tmp_path)
+    store._write_last_search("abc123", "q", ["id1"])
+    stale_ts = time_module.time() - 400
+    data = json.loads((tmp_path / "last_search.json").read_text())
+    data["ts"] = stale_ts
+    (tmp_path / "last_search.json").write_text(json.dumps(data))
+    assert store._read_last_search() is None
+
+
+def test_resolve_search_correlation_found(tmp_path):
+    store = IndexStore(tmp_path)
+    store._write_last_search("abc123", "get_user", ["id1", "id2", "id3"])
+    search_id, rank = store.resolve_search_correlation("id2")
+    assert search_id == "abc123"
+    assert rank == 1
+
+
+def test_resolve_search_correlation_not_in_results(tmp_path):
+    store = IndexStore(tmp_path)
+    store._write_last_search("abc123", "get_user", ["id1", "id2"])
+    search_id, rank = store.resolve_search_correlation("id_other")
+    assert search_id == "abc123"
+    assert rank is None  # preceded by a search but symbol not in results
+
+
+def test_resolve_search_correlation_no_recent_search(tmp_path):
+    store = IndexStore(tmp_path)
+    search_id, rank = store.resolve_search_correlation("id1")
+    assert search_id is None
+    assert rank is None

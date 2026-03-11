@@ -9,6 +9,8 @@ from typing import Any, Optional
 
 from loci.parser.symbols import Symbol
 
+LAST_SEARCH_TTL = 300  # 5 minutes
+
 
 class IndexStore:
     def __init__(self, base_dir: Optional[Path] = None) -> None:
@@ -442,9 +444,34 @@ class IndexStore:
             "failed": failed,
         }
 
+    def _last_search_path(self) -> Path:
+        return self.base_dir / "last_search.json"
+
     def _write_last_search(self, search_id: str, query: str, result_ids: list[str]) -> None:
-        """Stub — full implementation added in Task 3."""
-        pass
+        data = {"search_id": search_id, "ts": time.time(), "query": query, "result_ids": result_ids}
+        self._last_search_path().write_text(json.dumps(data))
+
+    def _read_last_search(self) -> Optional[dict]:
+        p = self._last_search_path()
+        if not p.exists():
+            return None
+        data = json.loads(p.read_text())
+        if time.time() - data["ts"] > LAST_SEARCH_TTL:
+            return None
+        return data
+
+    def resolve_search_correlation(self, symbol_id: str) -> tuple[Optional[str], Optional[int]]:
+        """Return (search_id, rank) for symbol_id against last search, or (None, None)."""
+        data = self._read_last_search()
+        if data is None:
+            return None, None
+        search_id = data["search_id"]
+        result_ids = data["result_ids"]
+        try:
+            rank = result_ids.index(symbol_id)
+        except ValueError:
+            rank = None
+        return search_id, rank
 
     def log_search(
         self,
