@@ -217,6 +217,8 @@ class IndexStore:
                 if not line.strip():
                     continue
                 entry = json.loads(line)
+                if entry.get("event", "get") != "get":
+                    continue
                 repo = entry.get("repo", "")
                 if repo_filter and repo != repo_filter:
                     continue
