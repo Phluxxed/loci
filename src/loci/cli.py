@@ -359,6 +359,8 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
     ratio_pct = int(ratio_f * 100)
 
     label_w = 18
+    total_outlines = stats.get("total_outlines", 0)
+    lines.append(f"{'Total outlines:':<{label_w}}{total_outlines}")
     lines.append(f"{'Total gets:':<{label_w}}{total}")
     lines.append(f"{'Bytes retrieved:':<{label_w}}{_fmt_bytes(sb)}  (of {_fmt_bytes(fb_total)} file bytes)")
     lines.append(f"{'Tokens saved:':<{label_w}}{tokens:,}  ({_ratio_color(ratio_pct, ratio_str, use_color)})")
@@ -398,11 +400,14 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
         if not repo_rows:
             return
 
-        # Group files under their repo, strip repo prefix
+        # Group files under their repo, strip repo prefix.
+        # Sort by path length descending so more specific paths (e.g. worktrees)
+        # match before their parent repos.
+        repos_by_specificity = sorted(repo_rows, key=lambda r: len(r["name"]), reverse=True)
         file_by_repo: dict[str, list] = {}
         for frow in file_rows:
             fname = frow["name"]
-            for rrow in repo_rows:
+            for rrow in repos_by_specificity:
                 prefix = rrow["name"] + "/"
                 if fname.startswith(prefix):
                     file_by_repo.setdefault(rrow["name"], []).append(
@@ -557,6 +562,8 @@ def cmd_outline(args: argparse.Namespace) -> int:
         grouped.setdefault(fp, []).append(entry)
 
     result = [{"file": fp, "symbols": syms} for fp, syms in sorted(grouped.items())]
+    symbol_count = sum(len(syms) for syms in grouped.values())
+    store.log_outline(str(repo_path), symbol_count, file_filter=args.file or None)
     print(json.dumps(result))
     return 0
 

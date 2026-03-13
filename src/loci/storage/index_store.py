@@ -209,6 +209,7 @@ class IndexStore:
     def get_session_stats(self, repo_filter: Optional[str] = None) -> dict[str, Any]:
         log_path = self._session_log_path()
         total_gets = 0
+        total_outlines = 0
         symbol_bytes_total = 0
         file_bytes_total = 0
         by_file: dict[str, dict[str, int]] = {}
@@ -219,10 +220,14 @@ class IndexStore:
                 if not line.strip():
                     continue
                 entry = json.loads(line)
-                if entry.get("event", "get") != "get":
-                    continue
+                event = entry.get("event", "get")
                 repo = entry.get("repo", "")
                 if repo_filter and repo != repo_filter:
+                    continue
+                if event == "outline":
+                    total_outlines += 1
+                    continue
+                if event != "get":
                     continue
                 total_gets += 1
                 sb = entry["symbol_bytes"]
@@ -261,6 +266,7 @@ class IndexStore:
 
         return {
             "total_gets": total_gets,
+            "total_outlines": total_outlines,
             "symbol_bytes_retrieved": symbol_bytes_total,
             "file_bytes_not_loaded": not_loaded,
             "tokens_not_loaded": tokens_not_loaded,
@@ -512,6 +518,22 @@ class IndexStore:
             "repo": repo_path,
             "query": query,
             "symbol_id": symbol_id,
+        }
+        with open(self._session_log_path(), "a") as f:
+            f.write(json.dumps(entry) + "\n")
+
+    def log_outline(
+        self,
+        repo_path: str,
+        symbol_count: int,
+        file_filter: Optional[str] = None,
+    ) -> None:
+        entry = {
+            "ts": time.time(),
+            "event": "outline",
+            "repo": repo_path,
+            "symbol_count": symbol_count,
+            "file_filter": file_filter,
         }
         with open(self._session_log_path(), "a") as f:
             f.write(json.dumps(entry) + "\n")
