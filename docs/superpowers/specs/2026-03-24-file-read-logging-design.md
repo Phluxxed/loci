@@ -25,10 +25,10 @@ Log direct file reads for files in indexed repos so `analyze` can surface which 
 New method alongside existing `log_*` methods in `src/loci/storage/index_store.py`.
 
 **Behaviour:**
-- Resolve `file_path` to absolute path
-- Check extension is in `EXTENSION_MAP` — return silently if not a source file
-- Iterate `list_repos()` to find which indexed repo is a parent of `file_path`
-- Return silently if no matching repo found
+- Resolve `file_path` to absolute path via `Path.resolve()` — this handles symlinks correctly by operating on the real path
+- Check extension is in `EXTENSION_MAP` (imported from `loci.parser.languages`) — return silently if not a source file
+- Iterate `list_repos()` — each entry is a dict with a `"path"` string key (always absolute) — and find the first repo where `resolved_file.is_relative_to(Path(repo["path"]))`. Return silently if none match.
+- Compute `rel_path = str(resolved_file.relative_to(Path(repo["path"])))`
 - Write to `session.jsonl`:
 
 ```json
@@ -39,17 +39,23 @@ New method alongside existing `log_*` methods in `src/loci/storage/index_store.p
 
 ---
 
-### 2. `loci log-read <path>` CLI Subcommand
+### 2. `loci log-read` CLI Subcommand
 
-Thin wrapper in `src/loci/cli.py`.
+Purpose-built hook handler in `src/loci/cli.py`. Reads the Claude Code hook JSON payload from stdin.
 
 ```
-loci log-read <file_path>
+loci log-read
 ```
 
-- Calls `store.log_file_read(args.file_path)`
-- Always exits 0, including on error
+- Reads stdin, parses JSON, extracts `.tool_input.file_path`
+- Calls `store.log_file_read(file_path)`
+- Always exits 0, including on any error (malformed JSON, missing field, store error)
 - Produces no stdout output (silent by design)
+
+Claude Code hooks deliver tool input as JSON on stdin:
+```json
+{"hook_event_name": "PostToolUse", "tool_name": "Read", "tool_input": {"file_path": "/abs/path"}, ...}
+```
 
 ---
 
@@ -62,7 +68,7 @@ Added to `~/.claude/settings.json` under `hooks.PostToolUse`:
   "matcher": "Read",
   "hooks": [{
     "type": "command",
-    "command": "loci log-read \"$CLAUDE_TOOL_INPUT_FILE_PATH\""
+    "command": "loci log-read"
   }]
 }
 ```
@@ -73,7 +79,7 @@ Fires after every `Read` tool call. `log_file_read` filters to indexed source fi
 
 ### 4. `analyze` Finding: `file_read_fallback`
 
-New finding type in `IndexStore.analyze()`.
+New finding type in `IndexStore.analyze()`. The existing event collection loop (which currently accumulates `get`, `search`, and `miss` events) must be extended to also collect `file_read` events into a `file_reads` list. `file_read` events are subject to the same `repo_filter` as all other events.
 
 **Detection logic:**
 - Collect all `file_read` events from the log window
@@ -108,8 +114,8 @@ New finding type in `IndexStore.analyze()`.
 ```
 Claude Read tool
     → PostToolUse hook
-    → loci log-read <path>
-    → IndexStore.log_file_read()
+    → loci log-read  (reads stdin JSON, extracts .tool_input.file_path)
+    → IndexStore.log_file_read(file_path)
     → filter: source file? in indexed repo?
     → append file_read event to session.jsonl
 
@@ -126,14 +132,17 @@ loci analyze
 
 | Trigger | Value | Rationale |
 |---------|-------|-----------|
-| Min reads per file to count as fallback | > 1 | Single reads may be intentional (e.g. checking a config section) |
-| Min total fallback reads to fire finding | ≥ 5 | Suppresses noise from occasional reads |
-| Min fallback file count to fire finding | ≥ 3 | Either condition triggers the finding |
+| Min reads per file to count as fallback | > 1 | Single reads may be intentional (checking a config section, one-off inspection) |
+| Min total fallback reads to fire finding | ≥ 5 | Counts all reads for qualifying files (e.g. a file read 5 times = 5 total). Catches a single heavily-read file. |
+| Min fallback file count to fire finding | ≥ 3 | Catches many lightly-read files (e.g. 3 files × 2 reads each = 6 total) |
+
+The two thresholds are independent OR conditions: either a single file is read many times, or many files are each read more than once. Both patterns indicate systematic loci failure.
 
 ---
 
 ## Testing
 
 - Unit test `log_file_read`: non-source file → no log entry; file not in indexed repo → no log entry; valid source file → correct entry written
+- Unit test `loci log-read` CLI: malformed stdin → exits 0; empty stdin → exits 0; stdin missing `tool_input.file_path` → exits 0; valid payload → log entry written
 - Unit test `analyze` finding: synthetic log with file_read events → finding fires at threshold; below threshold → no finding
-- Manual: install hook, do a session with some `Read` calls, run `loci analyze --pretty` and confirm fallback files appear
+- Manual: install hook, do a session with some `Read` calls on indexed source files, run `loci analyze --pretty` and confirm fallback files appear
