@@ -276,11 +276,14 @@ def _decorator_name(node, source: bytes) -> Optional[str]:
 def _name_words(name: str) -> set[str]:
     """Split a symbol name into words for keyword extraction.
 
-    Handles snake_case, SCREAMING_SNAKE, camelCase, PascalCase.
-    e.g. "getUserById" → {"get", "user", "by", "id"}
+    Handles snake_case, SCREAMING_SNAKE, camelCase, PascalCase,
+    and leading/trailing underscores (_private, __dunder__).
+    e.g. "getUserById"      → {"get", "user", "by", "id"}
+         "_forecast_model"  → {"forecast", "model"}
+         "__init__"         → {"init"}
     """
     parts: list[str] = []
-    for segment in name.split("_"):
+    for segment in name.strip("_").split("_"):
         camel_split = re.sub(r"([a-z])([A-Z])", r"\1 \2", segment)
         parts.extend(camel_split.lower().split())
     return {p for p in parts if len(p) > 1}

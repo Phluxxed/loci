@@ -53,6 +53,24 @@ _SPECS: dict[str, LanguageSpec] = {
         constant_name_pattern=r"^[A-Z][A-Z0-9_]*$",
         decorator_child_type="decorator",
     ),
+    "tsx": LanguageSpec(
+        ts_language="tsx",
+        symbol_node_types={
+            "function_declaration": "function",
+            "class_declaration": "class",
+            "method_definition": "method",
+            "type_alias_declaration": "type",
+            "interface_declaration": "interface",
+            "variable_declarator": "constant",
+        },
+        name_fields=["name"],
+        param_fields=["parameters"],
+        return_type_fields=["return_type"],
+        docstring_strategy="preceding_comment",
+        container_node_types=["class_declaration", "class_body"],
+        constant_name_pattern=r"^[A-Z][A-Z0-9_]*$",
+        decorator_child_type="decorator",
+    ),
     "go": LanguageSpec(
         ts_language="go",
         symbol_node_types={
@@ -106,7 +124,7 @@ _SPECS: dict[str, LanguageSpec] = {
 EXTENSION_MAP: dict[str, str] = {
     ".py": "python",
     ".ts": "typescript",
-    ".tsx": "typescript",
+    ".tsx": "tsx",
     ".go": "go",
     ".rs": "rust",
     ".js": "javascript",

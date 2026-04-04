@@ -64,6 +64,10 @@ loci verify /path/to/repo          # check for content drift
 loci list                           # all indexed repos
 loci invalidate /path/to/repo      # clear stale cache
 
+# Auto-summarize symbols (run after every index)
+loci summarize /path/to/repo       # check for unsummarized symbols
+loci summarize /path/to/repo --apply summaries.json  # write generated summaries back
+
 # Token savings analytics
 loci stats
 loci stats --pretty
@@ -91,6 +95,30 @@ loci logs every search and get to a session file. The `analyze` command reads th
 | `poor_extraction` | High refetch rate on a symbol kind |
 | `refetch_hotspot` | Same symbol fetched repeatedly in a session |
 | `kind_dead_weight` | A symbol kind is indexed but never retrieved |
+
+## Claude Code integration
+
+loci is most useful inside Claude Code, where it auto-indexes your repo at session start and injects context into subagent prompts. The hooks that wire this up live in `.claude/` in this repo.
+
+**Prerequisites**
+
+- loci installed (`pip install loci`)
+- Claude Code with the [loci skill](https://marketplace.claude.ai) installed
+
+**Install**
+
+```bash
+python3 .claude/install-hooks.sh
+```
+
+This symlinks the hooks into `~/.claude/hooks/` and patches `~/.claude/settings.json` to register them. Restart Claude Code after running it.
+
+**What the hooks do**
+
+| Hook | Trigger | Effect |
+|---|---|---|
+| `loci-session-start.sh` | Session open/resume | Runs `loci index --incremental` and injects a context line telling Claude the repo is indexed |
+| `loci-agent-inject.sh` | Before any `Agent` tool call | Injects the loci skill content into subagent prompts so subagents can also navigate via loci |
 
 ## Development
 

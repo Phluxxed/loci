@@ -12,10 +12,34 @@ from loci.parser.symbols import Symbol
 LAST_SEARCH_TTL = 300  # 5 minutes
 
 
+def _resolve_worktree_root(path: str) -> str:
+    """If path is a git worktree, return the main repo root. Otherwise return path unchanged."""
+    p = Path(path)
+    git_entry = p / ".git"
+    if not git_entry.is_file():
+        return path
+    # .git file content: "gitdir: /abs/path/to/.git/worktrees/<name>"
+    content = git_entry.read_text().strip()
+    if not content.startswith("gitdir:"):
+        return path
+    gitdir = Path(content[len("gitdir:"):].strip())
+    # worktrees live at <main_git_dir>/worktrees/<name> — main repo root is gitdir.parent.parent
+    if gitdir.parent.name == "worktrees":
+        main_git = gitdir.parent.parent  # the main .git dir
+        return str(main_git.parent)
+    return path
+
+
 class IndexStore:
     def __init__(self, base_dir: Optional[Path] = None) -> None:
         self.base_dir = base_dir or Path.home() / ".codeindex"
         self.base_dir.mkdir(parents=True, exist_ok=True)
+        self._worktree_cache: dict[str, str] = {}
+
+    def _canonical_repo(self, repo_path: str) -> str:
+        if repo_path not in self._worktree_cache:
+            self._worktree_cache[repo_path] = _resolve_worktree_root(repo_path)
+        return self._worktree_cache[repo_path]
 
     def _cache_key(self, repo_path: Path) -> str:
         abs_path = str(repo_path.resolve())
@@ -191,6 +215,7 @@ class IndexStore:
         search_id: Optional[str] = None,
         search_rank: Optional[int] = None,
     ) -> None:
+        repo_path = self._canonical_repo(repo_path)
         entry = {
             "ts": time.time(),
             "event": "get",
@@ -206,20 +231,24 @@ class IndexStore:
         with open(self._session_log_path(), "a") as f:
             f.write(json.dumps(entry) + "\n")
 
-    def get_session_stats(self, repo_filter: Optional[str] = None) -> dict[str, Any]:
+    def get_session_stats(self, repo_filter: Optional[str] = None, since_days: Optional[int] = None) -> dict[str, Any]:
         log_path = self._session_log_path()
         total_gets = 0
         total_outlines = 0
         symbol_bytes_total = 0
         file_bytes_total = 0
-        by_file: dict[str, dict[str, int]] = {}
-        by_repo: dict[str, dict[str, int]] = {}
+        by_file: dict[str, dict] = {}
+        by_repo: dict[str, dict] = {}
+        cutoff_ts = time.time() - since_days * 86400 if since_days is not None else None
+        last_get_ts: Optional[float] = None
 
         if log_path.exists():
             for line in log_path.read_text().splitlines():
                 if not line.strip():
                     continue
                 entry = json.loads(line)
+                if cutoff_ts is not None and entry.get("ts", 0) < cutoff_ts:
+                    continue
                 event = entry.get("event", "get")
                 repo = entry.get("repo", "")
                 if repo_filter and repo != repo_filter:
@@ -230,6 +259,9 @@ class IndexStore:
                 if event != "get":
                     continue
                 total_gets += 1
+                ts = entry.get("ts")
+                if ts is not None and (last_get_ts is None or ts > last_get_ts):
+                    last_get_ts = ts
                 sb = entry["symbol_bytes"]
                 fb = entry["file_bytes"]
                 symbol_bytes_total += sb
@@ -240,15 +272,19 @@ class IndexStore:
                 file_path = entry["symbol_id"].split("::", 1)[0]
                 file_key = f"{repo_key}/{file_path}" if repo_key != "unknown" else file_path
                 if file_key not in by_file:
-                    by_file[file_key] = {"gets": 0, "symbol_bytes": 0, "file_bytes": 0}
+                    by_file[file_key] = {"gets": 0, "symbol_bytes": 0, "file_bytes": 0, "last_ts": None}
                 by_file[file_key]["gets"] += 1
                 by_file[file_key]["symbol_bytes"] += sb
                 by_file[file_key]["file_bytes"] += fb
+                if ts is not None and (by_file[file_key]["last_ts"] is None or ts > by_file[file_key]["last_ts"]):
+                    by_file[file_key]["last_ts"] = ts
                 if repo_key not in by_repo:
-                    by_repo[repo_key] = {"gets": 0, "symbol_bytes": 0, "file_bytes": 0}
+                    by_repo[repo_key] = {"gets": 0, "symbol_bytes": 0, "file_bytes": 0, "last_ts": None}
                 by_repo[repo_key]["gets"] += 1
                 by_repo[repo_key]["symbol_bytes"] += sb
                 by_repo[repo_key]["file_bytes"] += fb
+                if ts is not None and (by_repo[repo_key]["last_ts"] is None or ts > by_repo[repo_key]["last_ts"]):
+                    by_repo[repo_key]["last_ts"] = ts
 
         not_loaded = max(0, file_bytes_total - symbol_bytes_total)
         tokens_not_loaded = not_loaded // 4
@@ -259,8 +295,9 @@ class IndexStore:
             for name, d in mapping.items():
                 saved = max(0, d["file_bytes"] - d["symbol_bytes"])
                 ratio_pct = int(saved / d["file_bytes"] * 100) if d["file_bytes"] > 0 else 0
-                rows.append({"name": name if key == "repo" else name, "gets": d["gets"],
-                              "saved_bytes": saved, "ratio_pct": ratio_pct})
+                rows.append({"name": name, "gets": d["gets"],
+                              "saved_bytes": saved, "ratio_pct": ratio_pct,
+                              "last_ts": d.get("last_ts")})
             rows.sort(key=lambda r: r["saved_bytes"], reverse=True)
             return rows
 
@@ -271,6 +308,7 @@ class IndexStore:
             "file_bytes_not_loaded": not_loaded,
             "tokens_not_loaded": tokens_not_loaded,
             "savings_ratio": ratio,
+            "last_get_ts": last_get_ts,
             "by_file": _make_rows(by_file, "file"),
             "by_repo": _make_rows(by_repo, "repo"),
         }
@@ -453,8 +491,8 @@ class IndexStore:
     def _last_search_path(self) -> Path:
         return self.base_dir / "last_search.json"
 
-    def _write_last_search(self, search_id: str, query: str, result_ids: list[str]) -> None:
-        data = {"search_id": search_id, "ts": time.time(), "query": query, "result_ids": result_ids}
+    def _write_last_search(self, search_id: str, query: str, result_ids: list[str], repo: str = "") -> None:
+        data = {"search_id": search_id, "ts": time.time(), "query": query, "result_ids": result_ids, "repo": repo}
         self._last_search_path().write_text(json.dumps(data))
 
     def _read_last_search(self) -> Optional[dict]:
@@ -469,10 +507,16 @@ class IndexStore:
         except (json.JSONDecodeError, KeyError):
             return None
 
-    def resolve_search_correlation(self, symbol_id: str) -> tuple[Optional[str], Optional[int]]:
-        """Return (search_id, rank) for symbol_id against last search, or (None, None)."""
+    def resolve_search_correlation(self, symbol_id: str, repo: str = "") -> tuple[Optional[str], Optional[int]]:
+        """Return (search_id, rank) for symbol_id against last search, or (None, None).
+
+        Returns (None, None) if the last search was for a different repo, preventing
+        cross-repo correlation noise in analyze findings.
+        """
         data = self._read_last_search()
         if data is None:
+            return None, None
+        if repo and data.get("repo", "") != repo:
             return None, None
         search_id = data["search_id"]
         result_ids = data["result_ids"]
@@ -491,6 +535,7 @@ class IndexStore:
         result_count: Optional[int] = None,
     ) -> None:
         # result_count is the true total from search; result_ids may be top-N subset
+        repo_path = self._canonical_repo(repo_path)
         entry = {
             "ts": time.time(),
             "event": "search",
@@ -502,7 +547,7 @@ class IndexStore:
         }
         with open(self._session_log_path(), "a") as f:
             f.write(json.dumps(entry) + "\n")
-        self._write_last_search(search_id, query, result_ids)
+        self._write_last_search(search_id, query, result_ids, repo=repo_path)
 
     def log_miss(
         self,
@@ -511,6 +556,7 @@ class IndexStore:
         query: Optional[str] = None,
         symbol_id: Optional[str] = None,
     ) -> None:
+        repo_path = self._canonical_repo(repo_path)
         entry = {
             "ts": time.time(),
             "event": "miss",
@@ -528,6 +574,7 @@ class IndexStore:
         symbol_count: int,
         file_filter: Optional[str] = None,
     ) -> None:
+        repo_path = self._canonical_repo(repo_path)
         entry = {
             "ts": time.time(),
             "event": "outline",
@@ -589,7 +636,15 @@ class IndexStore:
         # --- search_blind_spot: fetched symbol not returned by preceding search ---
         # 15% threshold suppresses noise when a few gets happen to precede unrelated searches.
         # Below 15%, individual outliers are more likely than a systemic gap.
-        correlated_gets = [g for g in gets if g.get("search_id") is not None]
+        # Only correlate gets to searches in the same repo — cross-repo correlations
+        # are an artifact of stale last_search state, not a real signal.
+        search_by_id: dict[str, dict] = {s["search_id"]: s for s in searches if s.get("search_id")}
+        correlated_gets = [
+            g for g in gets
+            if g.get("search_id") is not None
+            and g["search_id"] in search_by_id
+            and search_by_id[g["search_id"]].get("repo", "") == g.get("repo", "")
+        ]
         blind_spots = [g for g in correlated_gets if g.get("search_rank") is None]
         if correlated_gets and len(blind_spots) / len(correlated_gets) >= 0.15:
             blind_pct = len(blind_spots) / len(correlated_gets)
@@ -741,17 +796,48 @@ def _ts_to_iso(ts: float) -> str:
 def _name_words(name: str) -> set[str]:
     """Split a symbol name into words for overlap scoring.
 
-    Handles snake_case, SCREAMING_SNAKE, camelCase, PascalCase.
-    e.g. "getUserById" → {"get", "user", "by", "id"}
-         "MAX_RETRY_COUNT" → {"max", "retry", "count"}
+    Handles snake_case, SCREAMING_SNAKE, camelCase, PascalCase,
+    and leading/trailing underscores (_private, __dunder__).
+    e.g. "getUserById"      → {"get", "user", "by", "id"}
+         "MAX_RETRY_COUNT"  → {"max", "retry", "count"}
+         "_forecast_model"  → {"forecast", "model"}
+         "__init__"         → {"init"}
     """
-    # Split on underscores first, then split each part on camelCase boundaries
+    # Strip leading/trailing underscores before splitting so _private and __dunder__
+    # names don't produce empty segments that swallow their keywords.
     parts: list[str] = []
-    for segment in name.split("_"):
+    for segment in name.strip("_").split("_"):
         # Insert a space before each uppercase letter that follows a lowercase letter
         camel_split = re.sub(r"([a-z])([A-Z])", r"\1 \2", segment)
         parts.extend(camel_split.lower().split())
     return {p for p in parts if len(p) > 1}  # skip single-char fragments
+
+
+_KIND_WEIGHTS: dict[str, dict[str, float]] = {
+    "python": {
+        "function": 10, "method": 10, "class": 3, "constant": -5,
+    },
+    "typescript": {
+        "function": 10, "method": 10, "class": 8, "type": 8, "constant": -3,
+    },
+    "javascript": {
+        "function": 10, "method": 10, "class": 6, "constant": -3,
+    },
+    "go": {
+        "function": 10, "method": 10, "type": 8, "constant": -3,
+    },
+    "rust": {
+        "function": 10, "method": 10, "type": 6, "constant": -3,
+    },
+    "_default": {
+        "function": 8, "method": 8, "class": 4, "constant": -2,
+    },
+}
+
+
+def _kind_weight(kind: str, language: str) -> float:
+    lang_weights = _KIND_WEIGHTS.get(language, _KIND_WEIGHTS["_default"])
+    return lang_weights.get(kind, 0.0)
 
 
 def _score_symbol(sym: dict[str, Any], q: str, q_words: set[str]) -> float:
@@ -764,6 +850,8 @@ def _score_symbol(sym: dict[str, Any], q: str, q_words: set[str]) -> float:
     sig = sym.get("signature", "").lower()
     summary = sym.get("summary", "").lower()
     docstring = sym.get("docstring", "").lower()
+
+    score += _kind_weight(sym.get("kind", ""), sym.get("language", ""))
 
     # Exact and substring matches on qualified name (highest signal)
     if qualified == q:

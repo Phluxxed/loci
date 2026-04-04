@@ -1,5 +1,6 @@
 from __future__ import annotations
 import argparse
+import datetime
 import json
 import os
 import sys
@@ -17,7 +18,12 @@ from loci.storage.index_store import IndexStore
 SKIP_DIRS = {
     ".git", "node_modules", "__pycache__", ".venv", "venv",
     ".tox", "dist", "build", ".mypy_cache", ".pytest_cache",
+    "__tests__", "tests",
 }
+TEST_FILE_SUFFIXES = (
+    ".test.ts", ".test.tsx", ".test.js", ".test.jsx",
+    ".spec.ts", ".spec.tsx", ".spec.js", ".spec.jsx",
+)
 SKIP_FILES = {".env", ".env.local", "credentials.json", "secrets.json"}
 SKIP_EXTENSIONS = {
     ".pyc", ".pyo", ".so", ".dylib", ".dll", ".exe",
@@ -44,6 +50,11 @@ def _should_skip_file(path: Path) -> bool:
     if path.suffix in SKIP_EXTENSIONS:
         return True
     if path.suffix not in EXTENSION_MAP:
+        return True
+    name = path.name
+    if name.startswith("test_") or name.endswith("_test.py") or name.endswith("_test.go"):
+        return True
+    if any(name.endswith(s) for s in TEST_FILE_SUFFIXES):
         return True
     return False
 
@@ -166,7 +177,7 @@ def cmd_get(args: argparse.Namespace) -> int:
         symbol_bytes = len(content.encode("utf-8"))
         file_bytes = store.get_symbol_file_size(repo_path, symbol_id)
         if file_bytes is not None:
-            search_id, search_rank = store.resolve_search_correlation(symbol_id)
+            search_id, search_rank = store.resolve_search_correlation(symbol_id, repo=str(repo_path))
             store.log_retrieval(
                 symbol_id,
                 symbol_bytes,
@@ -321,6 +332,21 @@ def _ljust(s: str, w: int) -> str:
 def _rjust(s: str, w: int) -> str:
     return " " * max(0, w - _vlen(s)) + s
 
+def _rel_time(ts: float | None) -> str:
+    """Return a compact relative time string, e.g. '2h ago', '3d ago', 'Mar 24'."""
+    if ts is None:
+        return "—"
+    import time as _time
+    delta = _time.time() - ts
+    if delta < 3600:
+        return f"{int(delta / 60)}m ago"
+    if delta < 86400:
+        return f"{int(delta / 3600)}h ago"
+    if delta < 7 * 86400:
+        return f"{int(delta / 86400)}d ago"
+    return datetime.datetime.fromtimestamp(ts).strftime("%b %-d")
+
+
 def _two_tone_bar(ratio: float, width: int, use_color: bool) -> str:
     """Two-segment bar: filled (savings) + empty (retrieved)."""
     filled = max(0, min(width, int(ratio * width)))
@@ -341,12 +367,13 @@ def _ratio_bar(ratio_pct: int, width: int, use_color: bool) -> str:
     return filled_char + empty_char
 
 
-def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = True) -> str:
-    W = 72
+def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = True, since_days: int | None = None) -> str:
+    W = 88
     lines = []
     scope = f" ({repo_filter.split('/')[-1]})" if repo_filter else " (Global Scope)"
+    window = f" — last {since_days}d" if since_days is not None else " — all time"
 
-    lines.append(_cyan(f"loci Symbol Savings{scope}", use_color))
+    lines.append(_cyan(f"loci Symbol Savings{scope}{window}", use_color))
     lines.append("─" * W)
     lines.append("")
 
@@ -360,8 +387,14 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
 
     label_w = 18
     total_outlines = stats.get("total_outlines", 0)
+    last_get_ts = stats.get("last_get_ts")
+    if last_get_ts is not None:
+        last_get_str = datetime.datetime.fromtimestamp(last_get_ts).strftime("%Y-%m-%d %H:%M")
+    else:
+        last_get_str = "never"
     lines.append(f"{'Total outlines:':<{label_w}}{total_outlines}")
     lines.append(f"{'Total gets:':<{label_w}}{total}")
+    lines.append(f"{'Last get:':<{label_w}}{last_get_str}")
     lines.append(f"{'Bytes retrieved:':<{label_w}}{_fmt_bytes(sb)}  (of {_fmt_bytes(fb_total)} file bytes)")
     lines.append(f"{'Tokens saved:':<{label_w}}{tokens:,}  ({_ratio_color(ratio_pct, ratio_str, use_color)})")
     meter = _two_tone_bar(ratio_f, 20, use_color)
@@ -374,12 +407,13 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
     GETS_W = 5
     SAVE_W = 7
     RATI_W = 4   # "91%" .. "100%"
-    IMPACT_W = 12
+    IMPACT_W = 20
+    LAST_W = 7   # "59m ago" / "3d ago" / "Mar 24"
     # File indent = 7 spaces; file name column = NAME_W (data cols start at same offset)
     FILE_NW = NAME_W  # 7 spaces indent + NAME_W chars = same start as NUM_W + NAME_W
 
     def _row(num_str: str, name_str: str, name_w: int,
-             gets: int, saved_bytes: int, ratio_pct: int) -> str:
+             gets: int, saved_bytes: int, ratio_pct: int, last_ts: float | None) -> str:
         ratio_raw = f"{ratio_pct}%"
         ratio_col = _ratio_color(ratio_pct, ratio_raw, use_color)
         impact = _ratio_bar(ratio_pct, IMPACT_W, use_color)
@@ -394,6 +428,8 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
             + _rjust(ratio_col, RATI_W)
             + "  "
             + impact
+            + "  "
+            + _rel_time(last_ts)
         )
 
     def _render_nested(repo_rows: list, file_rows: list) -> None:
@@ -423,7 +459,8 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
             + _rjust("Gets", GETS_W) + "  "
             + _rjust("Saved", SAVE_W) + "  "
             + _rjust("Ratio", RATI_W) + "  "
-            + "Impact"
+            + _ljust("Impact", IMPACT_W) + "  "
+            + "Last"
         )
         lines.append(_dim(hdr, use_color))
         lines.append("─" * W)
@@ -437,7 +474,7 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
             )
             num_str = f"  {i:>2}.  "
             lines.append(_row(num_str, repo_display, NAME_W,
-                               rrow["gets"], rrow["saved_bytes"], rrow["ratio_pct"]))
+                               rrow["gets"], rrow["saved_bytes"], rrow["ratio_pct"], rrow.get("last_ts")))
 
             files_here = file_by_repo.get(repo_path, [])
             for frow in files_here:
@@ -447,7 +484,7 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
                     use_color,
                 )
                 lines.append(_row(" " * 7, rel_display, FILE_NW,
-                                   frow["gets"], frow["saved_bytes"], frow["ratio_pct"]))
+                                   frow["gets"], frow["saved_bytes"], frow["ratio_pct"], frow.get("last_ts")))
         lines.append("─" * W)
 
     def _render_table(heading: str, rows: list) -> None:
@@ -461,7 +498,8 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
             + _rjust("Gets", GETS_W) + "  "
             + _rjust("Saved", SAVE_W) + "  "
             + _rjust("Ratio", RATI_W) + "  "
-            + "Impact"
+            + _ljust("Impact", IMPACT_W) + "  "
+            + "Last"
         )
         lines.append(_dim(hdr, use_color))
         lines.append("─" * W)
@@ -473,7 +511,7 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
             )
             num_str = f"  {i:>2}.  "
             lines.append(_row(num_str, display, NAME_W,
-                               row["gets"], row["saved_bytes"], row["ratio_pct"]))
+                               row["gets"], row["saved_bytes"], row["ratio_pct"], row.get("last_ts")))
         lines.append("─" * W)
 
     if repo_filter:
@@ -489,9 +527,10 @@ def cmd_stats(args: argparse.Namespace) -> int:
     if args.reset:
         store.reset_session()
     repo_filter = str(Path(args.repo).resolve()) if args.repo else ""
-    stats = store.get_session_stats(repo_filter=repo_filter or None)
+    since_days = None if args.all_time else args.since
+    stats = store.get_session_stats(repo_filter=repo_filter or None, since_days=since_days)
     if args.pretty:
-        print(_format_stats_pretty(stats, repo_filter=repo_filter, use_color=sys.stdout.isatty()))
+        print(_format_stats_pretty(stats, repo_filter=repo_filter, use_color=sys.stdout.isatty(), since_days=since_days))
     else:
         print(json.dumps(stats))
     return 0
@@ -616,6 +655,10 @@ def main() -> None:
     p_stats.add_argument("--repo", default=None, help="Filter to a specific repo path")
     p_stats.add_argument("--reset", action="store_true", help="Clear session log")
     p_stats.add_argument("--pretty", action="store_true", help="Human-readable formatted output")
+    p_stats.add_argument("--since", type=int, default=7, metavar="DAYS",
+                         help="Limit to last N days (default: 7)")
+    p_stats.add_argument("--all", dest="all_time", action="store_true",
+                         help="Show all-time stats (overrides --since)")
 
     p_verify = sub.add_parser("verify", help="Verify byte offsets for all indexed symbols")
     p_verify.add_argument("path", help="Path to repo")
