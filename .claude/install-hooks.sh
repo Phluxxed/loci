@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Install loci Claude Code hooks.
+Install loci Claude Code hooks and skill files.
 
-Symlinks the hooks from this repo into ~/.claude/hooks/ and patches
+Symlinks hooks and skills from this repo into ~/.claude/ and patches
 ~/.claude/settings.json to register them.
 """
 
@@ -11,9 +11,12 @@ import os
 import sys
 from pathlib import Path
 
-REPO_HOOKS = Path(__file__).parent / "hooks"
+REPO_ROOT = Path(__file__).parent
+REPO_HOOKS = REPO_ROOT / "hooks"
+REPO_SKILLS = REPO_ROOT / "skills" / "loci"
 CLAUDE_DIR = Path.home() / ".claude"
 CLAUDE_HOOKS = CLAUDE_DIR / "hooks"
+CLAUDE_SKILLS = CLAUDE_DIR / "skills" / "loci"
 SETTINGS = CLAUDE_DIR / "settings.json"
 
 SESSION_START_HOOK = {
@@ -38,6 +41,16 @@ def symlink_hooks() -> None:
         dest.symlink_to(hook.resolve())
         dest.chmod(0o755)
         print(f"  linked: {dest} -> {hook.resolve()}")
+
+
+def symlink_skills() -> None:
+    CLAUDE_SKILLS.mkdir(parents=True, exist_ok=True)
+    for skill_file in REPO_SKILLS.glob("*.md"):
+        dest = CLAUDE_SKILLS / skill_file.name
+        if dest.exists() or dest.is_symlink():
+            dest.unlink()
+        dest.symlink_to(skill_file.resolve())
+        print(f"  linked: {dest} -> {skill_file.resolve()}")
 
 
 def _hook_present(hooks: list, command_fragment: str) -> bool:
@@ -94,10 +107,13 @@ def patch_settings() -> None:
 
 
 def main() -> None:
-    print("Installing loci Claude Code hooks...\n")
+    print("Installing loci Claude Code hooks and skills...\n")
 
     print("Symlinking hooks:")
     symlink_hooks()
+
+    print("\nSymlinking skills:")
+    symlink_skills()
 
     print("\nPatching settings.json:")
     patch_settings()

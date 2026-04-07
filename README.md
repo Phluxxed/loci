@@ -96,14 +96,28 @@ loci logs every search and get to a session file. The `analyze` command reads th
 | `refetch_hotspot` | Same symbol fetched repeatedly in a session |
 | `kind_dead_weight` | A symbol kind is indexed but never retrieved |
 
+## Agent configuration
+
+For loci to be useful, your agent needs to know it exists and how to use it. The full workflow guide is in `.claude/skills/loci/SKILL.md` — paste it into your system prompt or agent instructions.
+
+The one-line version to add to any agent's instructions:
+
+```
+Use loci for all codebase navigation. Run `loci index <path>` once, then prefer
+`loci outline → loci get` over reading files directly.
+```
+
+For Claude specifically, add this to your `CLAUDE.md`:
+
+```
+**MANDATORY**: Use the `loci` skill at the start of any non-trivial codebase task.
+loci is auto-indexed at session start. Prefer `loci outline → get` over
+Read/Grep/Explore for any indexed repo.
+```
+
 ## Claude Code integration
 
-loci is most useful inside Claude Code, where it auto-indexes your repo at session start and injects context into subagent prompts. The hooks that wire this up live in `.claude/` in this repo.
-
-**Prerequisites**
-
-- loci installed (`pip install loci`)
-- Claude Code with the [loci skill](https://marketplace.claude.ai) installed
+loci is most useful inside Claude Code, where it auto-indexes your repo at session start and injects context into subagent prompts. The hooks and skill files that wire this up live in `.claude/` in this repo.
 
 **Install**
 
@@ -111,14 +125,16 @@ loci is most useful inside Claude Code, where it auto-indexes your repo at sessi
 python3 .claude/install-hooks.sh
 ```
 
-This symlinks the hooks into `~/.claude/hooks/` and patches `~/.claude/settings.json` to register them. Restart Claude Code after running it.
+This symlinks the hooks and skill files into `~/.claude/` and patches `~/.claude/settings.json` to register them. Restart Claude Code after running it.
 
-**What the hooks do**
+**What gets installed**
 
-| Hook | Trigger | Effect |
+| Component | Location | Effect |
 |---|---|---|
-| `loci-session-start.sh` | Session open/resume | Runs `loci index --incremental` and injects a context line telling Claude the repo is indexed |
-| `loci-agent-inject.sh` | Before any `Agent` tool call | Injects the loci skill content into subagent prompts so subagents can also navigate via loci |
+| `loci-session-start.sh` | `~/.claude/hooks/` | Runs `loci index --incremental` on session open/resume |
+| `loci-agent-inject.sh` | `~/.claude/hooks/` | Injects the skill into subagent prompts before `Agent` tool calls |
+| `SKILL.md` | `~/.claude/skills/loci/` | The agent workflow guide Claude loads via the `loci` skill |
+| `summarizer-prompt.md` | `~/.claude/skills/loci/` | Prompt used by the auto-summarize workflow |
 
 ## Development
 
