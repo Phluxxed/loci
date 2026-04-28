@@ -136,6 +136,32 @@ This symlinks the hooks and skill files into `~/.claude/` and patches `~/.claude
 | `SKILL.md` | `~/.claude/skills/loci/` | The agent workflow guide Claude loads via the `loci` skill |
 | `summarizer-prompt.md` | `~/.claude/skills/loci/` | Prompt used by the auto-summarize workflow |
 
+## Codex integration
+
+loci can also auto-index repos inside Codex so symbol navigation is ready before the first real code task. The Codex hooks live in `.codex/`.
+
+**Prerequisites**
+
+- loci installed (`pip install loci`)
+- Codex using the default `~/.codex` home
+- root direnv Python available at `~/.direnv/python-*`
+
+**Install**
+
+```bash
+python3 .codex/install-hooks.py
+```
+
+This symlinks the repo hooks into `~/.codex/hooks/` and patches `~/.codex/hooks.json` to register the `SessionStart` hook. Restart Codex after running it.
+
+The session-start hook sources the shared root direnv Python environment before resolving `loci`, so installing `loci` into that root environment is the intended setup.
+
+**What gets installed**
+
+| Component | Location | Effect |
+|---|---|---|
+| `loci-session-start.sh` | `~/.codex/hooks/` | Runs `loci index --incremental` and injects a context line telling Codex the repo is indexed |
+
 ## Development
 
 ```bash
