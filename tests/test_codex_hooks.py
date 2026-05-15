@@ -14,9 +14,16 @@ def _make_executable(path: Path, content: str) -> None:
     path.chmod(path.stat().st_mode | stat.S_IXUSR)
 
 
+def _git_init(repo: Path) -> None:
+    subprocess.run(
+        ["git", "init", "-q", "-b", "main"], cwd=repo, check=True, capture_output=True
+    )
+
+
 def test_codex_session_start_hook_emits_context_json(tmp_path: Path):
     repo = tmp_path / "repo"
     repo.mkdir()
+    _git_init(repo)
     fake_bin = tmp_path / "bin"
     fake_bin.mkdir()
     fake_loci = fake_bin / "loci"
@@ -56,6 +63,55 @@ exit 1
     assert "loci: repo indexed at" in message
     assert str(repo) in message
     assert "(42 symbols)" in message
+
+
+def test_codex_session_start_hook_bails_silently_when_not_in_git_repo(tmp_path: Path):
+    """When cwd is not inside any git repo, the hook still emits a valid JSON
+    envelope (codex protocol requires it) but the additional_context fields
+    are empty — signalling 'no context to inject'."""
+    not_repo = tmp_path / "not_a_repo"
+    not_repo.mkdir()
+    # Deliberately NO `git init` here.
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    fake_loci = fake_bin / "loci"
+    _make_executable(
+        fake_loci,
+        """#!/usr/bin/env bash
+if [ "$1" = "index" ]; then
+  printf '{"symbols_indexed": 999}\n'
+  exit 0
+fi
+if [ "$1" = "list" ]; then
+  printf '[]\n'
+  exit 0
+fi
+exit 1
+""",
+    )
+
+    fake_home = tmp_path / "home"
+    fake_home.mkdir()
+
+    env = os.environ.copy()
+    env["HOME"] = str(fake_home)
+    env["PATH"] = f"{fake_bin}:{env['PATH']}"
+    # Ensure git rev-parse can't walk up into a parent repo.
+    env["GIT_CEILING_DIRECTORIES"] = str(tmp_path)
+
+    result = subprocess.run(
+        ["bash", str(REPO_ROOT / ".codex" / "hooks" / "loci-session-start.sh")],
+        cwd=not_repo,
+        capture_output=True,
+        text=True,
+        env=env,
+        check=True,
+    )
+
+    payload = json.loads(result.stdout)
+    assert payload["additional_context"] == ""
+    assert payload["hookSpecificOutput"]["additionalContext"] == ""
+    assert payload["hookSpecificOutput"]["hookEventName"] == "SessionStart"
 
 
 def test_codex_install_hooks_patches_hooks_json_idempotently(tmp_path: Path):
@@ -122,6 +178,7 @@ def test_codex_install_hooks_patches_hooks_json_idempotently(tmp_path: Path):
 def test_codex_session_start_hook_uses_root_direnv_python(tmp_path: Path):
     repo = tmp_path / "repo"
     repo.mkdir()
+    _git_init(repo)
 
     fake_home = tmp_path / "home"
     fake_home.mkdir()
