@@ -31,15 +31,24 @@ AGENT_INJECT_HOOK = {
     "timeout": 5,
 }
 
+ENFORCE_READ_HOOK = {
+    "type": "command",
+    "command": f"{CLAUDE_HOOKS}/loci-enforce-read.py",
+    "timeout": 5,
+}
+
 
 def symlink_hooks() -> None:
     CLAUDE_HOOKS.mkdir(parents=True, exist_ok=True)
-    for hook in REPO_HOOKS.glob("*.sh"):
+    # .sh hooks invoked via `bash <path>` and .py hooks invoked directly via
+    # their shebang — both need symlinking + execute bit.
+    for hook in list(REPO_HOOKS.glob("*.sh")) + list(REPO_HOOKS.glob("*.py")):
         dest = CLAUDE_HOOKS / hook.name
         if dest.exists() or dest.is_symlink():
             dest.unlink()
         dest.symlink_to(hook.resolve())
-        dest.chmod(0o755)
+        # chmod the source so the symlink is executable via shebang too.
+        hook.chmod(0o755)
         print(f"  linked: {dest} -> {hook.resolve()}")
 
 
@@ -97,6 +106,19 @@ def patch_settings() -> None:
         agent_entry["hooks"].append(AGENT_INJECT_HOOK)
         changed = True
         print("  added loci-agent-inject to PreToolUse[Agent]")
+
+    # PreToolUse — add to Read matcher (whole-file Read enforcement)
+    read_entry = next(
+        (e for e in cfg["hooks"]["PreToolUse"] if e.get("matcher") == "Read"),
+        None,
+    )
+    if read_entry is None:
+        read_entry = {"matcher": "Read", "hooks": []}
+        cfg["hooks"]["PreToolUse"].append(read_entry)
+    if not _hook_present(read_entry["hooks"], "loci-enforce-read"):
+        read_entry["hooks"].append(ENFORCE_READ_HOOK)
+        changed = True
+        print("  added loci-enforce-read to PreToolUse[Read]")
 
     if changed:
         with open(SETTINGS, "w") as f:
