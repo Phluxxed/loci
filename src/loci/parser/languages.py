@@ -124,7 +124,7 @@ _SPECS: dict[str, LanguageSpec] = {
 EXTENSION_MAP: dict[str, str] = {
     ".py": "python",
     ".ts": "typescript",
-    ".tsx": "tsx",
+    ".tsx": "typescript",
     ".go": "go",
     ".rs": "rust",
     ".js": "javascript",
