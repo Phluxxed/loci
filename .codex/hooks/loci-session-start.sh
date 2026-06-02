@@ -3,8 +3,8 @@
 #
 # Thin wrapper around .shared/loci-session-start-core.sh. The wrapper's
 # only job is platform-specific output formatting:
-#   - Codex expects a JSON envelope with additional_context fields.
-#   - This script always emits the envelope; the inner message is empty
+#   - Codex expects a JSON envelope with hookSpecificOutput fields.
+#   - This script always emits the envelope; additionalContext is empty
 #     if the core bailed (no loci installed, or cwd not in a git repo).
 #
 # Source of truth is in the loci repo at .codex/hooks/. The runtime
@@ -43,7 +43,6 @@ escaped_message="$(escape_for_json "${LOCI_SESSION_MESSAGE:-}")"
 
 cat <<EOF
 {
-  "additional_context": "${escaped_message}",
   "hookSpecificOutput": {
     "hookEventName": "SessionStart",
     "additionalContext": "${escaped_message}"

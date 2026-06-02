@@ -636,14 +636,17 @@ class IndexStore:
         # --- search_blind_spot: fetched symbol not returned by preceding search ---
         # 15% threshold suppresses noise when a few gets happen to precede unrelated searches.
         # Below 15%, individual outliers are more likely than a systemic gap.
-        # Only correlate gets to searches in the same repo — cross-repo correlations
-        # are an artifact of stale last_search state, not a real signal.
+        # When a search event is present, only correlate gets to searches in the same repo —
+        # cross-repo correlations are an artifact of stale last_search state, not a real signal.
+        # Older logs only stored search_id/search_rank on get events; keep those analyzable.
         search_by_id: dict[str, dict] = {s["search_id"]: s for s in searches if s.get("search_id")}
         correlated_gets = [
             g for g in gets
             if g.get("search_id") is not None
-            and g["search_id"] in search_by_id
-            and search_by_id[g["search_id"]].get("repo", "") == g.get("repo", "")
+            and (
+                g["search_id"] not in search_by_id
+                or search_by_id[g["search_id"]].get("repo", "") == g.get("repo", "")
+            )
         ]
         blind_spots = [g for g in correlated_gets if g.get("search_rank") is None]
         if correlated_gets and len(blind_spots) / len(correlated_gets) >= 0.15:
@@ -851,8 +854,6 @@ def _score_symbol(sym: dict[str, Any], q: str, q_words: set[str]) -> float:
     summary = sym.get("summary", "").lower()
     docstring = sym.get("docstring", "").lower()
 
-    score += _kind_weight(sym.get("kind", ""), sym.get("language", ""))
-
     # Exact and substring matches on qualified name (highest signal)
     if qualified == q:
         score += 25
@@ -894,4 +895,7 @@ def _score_symbol(sym: dict[str, Any], q: str, q_words: set[str]) -> float:
     keywords = set(sym.get("keywords", []))
     score += len(q_words & keywords) * 3
 
-    return score
+    if score <= 0:
+        return 0.0
+
+    return score + _kind_weight(sym.get("kind", ""), sym.get("language", ""))

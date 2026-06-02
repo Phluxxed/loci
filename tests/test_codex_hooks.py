@@ -59,7 +59,7 @@ exit 1
 
     payload = json.loads(result.stdout)
     message = payload["hookSpecificOutput"]["additionalContext"]
-    assert payload["additional_context"] == message
+    assert set(payload) == {"hookSpecificOutput"}
     assert "loci: repo indexed at" in message
     assert str(repo) in message
     assert "(42 symbols)" in message
@@ -67,8 +67,8 @@ exit 1
 
 def test_codex_session_start_hook_bails_silently_when_not_in_git_repo(tmp_path: Path):
     """When cwd is not inside any git repo, the hook still emits a valid JSON
-    envelope (codex protocol requires it) but the additional_context fields
-    are empty — signalling 'no context to inject'."""
+    envelope (codex protocol requires it) but the additionalContext field
+    is empty — signalling 'no context to inject'."""
     not_repo = tmp_path / "not_a_repo"
     not_repo.mkdir()
     # Deliberately NO `git init` here.
@@ -109,7 +109,7 @@ exit 1
     )
 
     payload = json.loads(result.stdout)
-    assert payload["additional_context"] == ""
+    assert set(payload) == {"hookSpecificOutput"}
     assert payload["hookSpecificOutput"]["additionalContext"] == ""
     assert payload["hookSpecificOutput"]["hookEventName"] == "SessionStart"
 
