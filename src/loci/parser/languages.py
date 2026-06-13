@@ -128,7 +128,12 @@ EXTENSION_MAP: dict[str, str] = {
     ".go": "go",
     ".rs": "rust",
     ".js": "javascript",
+    ".md": "markdown",
+    ".markdown": "markdown",
 }
+
+# Markdown is handled by a dedicated extractor, not a LanguageSpec.
+MARKDOWN_SUFFIXES: set[str] = {".md", ".markdown"}
 
 
 def get_language_spec(language: str) -> Optional[LanguageSpec]:

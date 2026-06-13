@@ -7,12 +7,15 @@ import re
 import textwrap
 
 from .symbols import Symbol, make_symbol_id
-from .languages import get_language_spec, EXTENSION_MAP, LanguageSpec
+from .languages import get_language_spec, EXTENSION_MAP, MARKDOWN_SUFFIXES, LanguageSpec
 
 
 def parse_file(path: Path) -> list[Symbol]:
     """Parse a source file and return all symbols with byte offsets."""
     suffix = path.suffix.lower()
+    if suffix in MARKDOWN_SUFFIXES:
+        return parse_markdown(path)
+
     language = EXTENSION_MAP.get(suffix)
     if language is None:
         return []
@@ -640,6 +643,159 @@ def _name_words(name: str) -> set[str]:
         camel_split = re.sub(r"([a-z])([A-Z])", r"\1 \2", segment)
         parts.extend(camel_split.lower().split())
     return {p for p in parts if len(p) > 1}
+
+
+def parse_markdown(path: Path) -> list[Symbol]:
+    """Parse a markdown file into one Symbol per heading section.
+
+    Each section spans its heading through the end of its nested subtree, nested
+    by heading level via a ' > ' qualified-name path. Returns the same Symbol
+    dataclass as the code path so all downstream commands work unchanged.
+    """
+    try:
+        source = path.read_bytes()
+    except (OSError, PermissionError):
+        return []
+
+    rel_path = str(path)
+
+    try:
+        from tree_sitter_language_pack import get_parser
+        parser = get_parser("markdown")
+        parse = getattr(parser, "parse", None)
+        if parse is None:
+            return []
+        tree = parse(source)
+    except Exception:
+        return []
+
+    sections = [c for c in tree.root_node.children if c.type == "section"]
+    has_heading = any(_md_heading_node(sec) is not None for sec in sections)
+
+    symbols: list[Symbol] = []
+    for sec in sections:
+        _walk_md_section(sec, source, rel_path, parent_path=[], out=symbols, emit_preamble=has_heading)
+
+    if not has_heading and source.strip():
+        # No headings anywhere — index the whole file as a single section named
+        # after the file stem.
+        _append_md_symbol(
+            source, rel_path, out=symbols,
+            name=path.stem, qualified_name=path.stem,
+            signature=path.stem, start=0, end=len(source),
+            docstring=_md_first_paragraph(tree.root_node, source),
+        )
+
+    _disambiguate(symbols)
+    return symbols
+
+
+def _walk_md_section(
+    node,
+    source: bytes,
+    rel_path: str,
+    parent_path: list[str],
+    out: list[Symbol],
+    emit_preamble: bool,
+) -> None:
+    heading = _md_heading_node(node)
+
+    if heading is None:
+        # A top-level section with no heading is document preamble (content
+        # before the first heading). Capture it only when the doc has headings.
+        if emit_preamble and source[node.start_byte:node.end_byte].strip():
+            _append_md_symbol(
+                source, rel_path, out=out,
+                name="(preamble)", qualified_name="(preamble)",
+                signature="(preamble)", start=node.start_byte, end=node.end_byte,
+                docstring=_md_first_paragraph(node, source),
+            )
+        return
+
+    name = _md_heading_text(heading, source)
+    if not name:
+        return
+    path_parts = [*parent_path, name]
+    qualified_name = " > ".join(path_parts)
+
+    _append_md_symbol(
+        source, rel_path, out=out,
+        name=name, qualified_name=qualified_name,
+        signature=_md_heading_line(heading, source),
+        start=node.start_byte, end=node.end_byte,
+        docstring=_md_first_paragraph(node, source),
+    )
+
+    for child in node.children:
+        if child.type == "section":
+            _walk_md_section(child, source, rel_path, path_parts, out, emit_preamble=False)
+
+
+def _append_md_symbol(
+    source: bytes,
+    rel_path: str,
+    out: list[Symbol],
+    name: str,
+    qualified_name: str,
+    signature: str,
+    start: int,
+    end: int,
+    docstring: str,
+) -> None:
+    line = source[:start].count(b"\n") + 1
+    end_line = source[:end].count(b"\n") + 1
+    out.append(Symbol(
+        id=make_symbol_id(rel_path, qualified_name, "section"),
+        name=name,
+        qualified_name=qualified_name,
+        kind="section",
+        language="markdown",
+        file_path=rel_path,
+        byte_offset=start,
+        byte_length=end - start,
+        signature=signature,
+        docstring=docstring,
+        content_hash=hashlib.sha256(source[start:end]).hexdigest(),
+        keywords=sorted(_prose_words(name)),
+        line=line,
+        end_line=end_line,
+    ))
+
+
+def _md_heading_node(section_node):
+    """Return the ATX heading child of a section node, or None."""
+    for child in section_node.children:
+        if child.type == "atx_heading":
+            return child
+    return None
+
+
+def _md_heading_text(heading_node, source: bytes) -> str:
+    """The heading text, taken from the heading's inline child."""
+    for child in heading_node.children:
+        if child.type == "inline":
+            return source[child.start_byte:child.end_byte].decode("utf-8", errors="replace").strip()
+    return ""
+
+
+def _md_heading_line(heading_node, source: bytes) -> str:
+    """The raw heading line including markers, e.g. '### Details'."""
+    text = source[heading_node.start_byte:heading_node.end_byte].decode("utf-8", errors="replace")
+    return text.split("\n")[0].strip()
+
+
+def _md_first_paragraph(node, source: bytes) -> str:
+    """First direct-child paragraph's text, whitespace-collapsed."""
+    for child in node.children:
+        if child.type == "paragraph":
+            raw = source[child.start_byte:child.end_byte].decode("utf-8", errors="replace")
+            return " ".join(raw.split())
+    return ""
+
+
+def _prose_words(text: str) -> set[str]:
+    """Tokenise natural-language heading text into search keywords."""
+    return {w for w in re.split(r"[^A-Za-z0-9]+", text.lower()) if len(w) > 1}
 
 
 def _disambiguate(symbols: list[Symbol]) -> None:
