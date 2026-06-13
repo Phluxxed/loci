@@ -313,10 +313,28 @@ class IndexStore:
             "by_repo": _make_rows(by_repo, "repo"),
         }
 
-    def reset_session(self) -> None:
+    def reset_session(self) -> Optional[Path]:
+        """Clear the session log, backing it up first so a reset is never lossy.
+
+        Copies the current log to a timestamped ``session.jsonl.<ts>.bak`` before
+        truncating it. Returns the backup path, or None if there was nothing to
+        back up.
+        """
         log_path = self._session_log_path()
-        if log_path.exists():
-            log_path.unlink()
+        if not log_path.exists():
+            return None
+
+        timestamp = time.strftime("%Y%m%d-%H%M%S")
+        backup_path = log_path.with_name(f"{log_path.name}.{timestamp}.bak")
+        # Don't clobber an existing backup (e.g. two resets within one second).
+        counter = 1
+        while backup_path.exists():
+            backup_path = log_path.with_name(f"{log_path.name}.{timestamp}-{counter}.bak")
+            counter += 1
+
+        shutil.copy2(log_path, backup_path)
+        log_path.unlink()
+        return backup_path
 
     def get_file_content(
         self,

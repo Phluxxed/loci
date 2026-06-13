@@ -525,7 +525,9 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
 def cmd_stats(args: argparse.Namespace) -> int:
     store = _get_store()
     if args.reset:
-        store.reset_session()
+        backup = store.reset_session()
+        if backup is not None:
+            print(json.dumps({"reset": True, "backup": str(backup)}), file=sys.stderr)
     repo_filter = str(Path(args.repo).resolve()) if args.repo else ""
     since_days = None if args.all_time else args.since
     stats = store.get_session_stats(repo_filter=repo_filter or None, since_days=since_days)

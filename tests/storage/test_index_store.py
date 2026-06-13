@@ -289,6 +289,47 @@ def test_log_retrieval_old_stats_aggregation_unaffected(tmp_path):
     assert stats["symbol_bytes_retrieved"] == 100
 
 
+# ── reset_session: must never lose data ─────────────────────────────────────
+
+def test_reset_session_backs_up_before_clearing(tmp_path):
+    store = IndexStore(tmp_path)
+    store.log_retrieval("src/foo.py::bar", symbol_bytes=100, file_bytes=1000, repo_path="/repo")
+    store.log_retrieval("src/foo.py::baz", symbol_bytes=50, file_bytes=500, repo_path="/repo")
+    original = (tmp_path / "session.jsonl").read_text()
+
+    backup = store.reset_session()
+
+    # Live log is cleared...
+    assert store.get_session_stats()["total_gets"] == 0
+    # ...but the prior content survives verbatim in the returned backup.
+    assert backup is not None
+    assert backup.exists()
+    assert backup.read_text() == original
+    assert backup.name.startswith("session.jsonl.")
+    assert backup.name.endswith(".bak")
+
+
+def test_reset_session_no_backup_when_empty(tmp_path):
+    store = IndexStore(tmp_path)
+    backup = store.reset_session()
+    assert backup is None
+    assert not list(tmp_path.glob("session.jsonl*.bak"))
+
+
+def test_reset_session_consecutive_resets_do_not_clobber(tmp_path):
+    store = IndexStore(tmp_path)
+    store.log_retrieval("src/a.py::one", symbol_bytes=1, file_bytes=10, repo_path="/repo")
+    first = store.reset_session()
+    store.log_retrieval("src/b.py::two", symbol_bytes=2, file_bytes=20, repo_path="/repo")
+    second = store.reset_session()
+
+    assert first is not None and second is not None
+    assert first != second
+    assert first.exists() and second.exists()
+    assert "one" in first.read_text()
+    assert "two" in second.read_text()
+
+
 def test_log_search_writes_event_and_last_search_file(tmp_path):
     store = IndexStore(tmp_path)
     store.log_search("abc123", "get_user", "/repo", ["src/users.py::get_user", "src/auth.py::get_user_by_id"])
