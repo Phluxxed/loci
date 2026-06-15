@@ -2,21 +2,17 @@
 # loci launcher — tracked source of truth.
 #
 # The runtime location ~/.local/bin/loci is a symlink to this file. Its job is
-# to pick a per-host base dir so Claude Code's index + analytics live under
-# ~/.claude and don't commingle with Codex's, then exec the real loci entry
-# point from this repo's virtualenv.
+# to pick the base dir so loci's index + analytics live under ~/.claude, then
+# exec the real loci entry point from this repo's virtualenv.
 #
-# Host routing (an explicit LOCI_BASE_DIR from the caller always wins):
-#   - Claude Code (CLAUDECODE=1)  -> ~/.claude/loci-index
-#   - Codex / anything else       -> ~/.codex/loci-index
+# Everything defaults to the Claude Code store so that an interactive
+# `loci stats` from a plain terminal (where CLAUDECODE is unset) reads the same
+# log that Claude Code sessions write to — no split, no stale "last get".
+# An explicit LOCI_BASE_DIR from the caller always wins.
 set -euo pipefail
 
 if [[ -z "${LOCI_BASE_DIR:-}" ]]; then
-    if [[ "${CLAUDECODE:-}" == "1" ]]; then
-        export LOCI_BASE_DIR="$HOME/.claude/loci-index"
-    else
-        export LOCI_BASE_DIR="$HOME/.codex/loci-index"
-    fi
+    export LOCI_BASE_DIR="$HOME/.claude/loci-index"
 fi
 
 # Resolve this script through any symlink so we can find the repo's .venv,

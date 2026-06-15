@@ -290,7 +290,10 @@ def test_stats_pretty_shows_formatted_header(indexed_repo):
     assert result.returncode == 0
     assert "loci" in result.stdout
     assert "Savings" in result.stdout
-    assert "Total gets" in result.stdout
+    # Two side-by-side panels: a Code panel and a Markdown panel
+    assert "Gets" in result.stdout
+    assert "Code" in result.stdout
+    assert "Markdown" in result.stdout
 
 
 def test_stats_pretty_shows_savings_meter(indexed_repo):
@@ -331,6 +334,104 @@ def test_stats_pretty_is_not_json(indexed_repo):
     assert result.returncode == 0
     with pytest.raises(json.JSONDecodeError):
         json.loads(result.stdout)
+
+
+@pytest.fixture
+def indexed_repo_with_docs(tmp_path: Path, fixtures_dir: Path) -> tuple[Path, str]:
+    repo = tmp_path / "docrepo"
+    repo.mkdir()
+    import shutil
+    shutil.copy(fixtures_dir / "sample.py", repo / "sample.py")
+    (repo / "README.md").write_text(
+        "# Title\n\nIntro.\n\n## Section A\n\nBody A.\n\n## Section B\n\nBody B.\n"
+    )
+    base = str(tmp_path / ".codeindex")
+    run_loci("index", str(repo), env_extra={"LOCI_BASE_DIR": base})
+    return repo, base
+
+
+def _get_one_code_and_doc(repo: Path, base: str) -> tuple[str, str]:
+    """Outline the repo and return (code_symbol_id, markdown_symbol_id).
+
+    outline groups symbols by file, so the file extension tells us which
+    bucket a symbol belongs to without needing a language field in the row.
+    """
+    outline = json.loads(
+        run_loci("outline", str(repo), env_extra={"LOCI_BASE_DIR": base}).stdout
+    )
+    code_id = doc_id = None
+    for f in outline:
+        for s in f["symbols"]:
+            if f["file"].endswith(".py") and code_id is None:
+                code_id = s["id"]
+            if f["file"].endswith(".md") and doc_id is None:
+                doc_id = s["id"]
+    assert code_id and doc_id, f"missing ids: {code_id=} {doc_id=}"
+    return code_id, doc_id
+
+
+def test_stats_splits_code_and_docs(indexed_repo_with_docs):
+    repo, base = indexed_repo_with_docs
+    code_id, doc_id = _get_one_code_and_doc(repo, base)
+    run_loci("get", code_id, "--repo", str(repo), env_extra={"LOCI_BASE_DIR": base})
+    run_loci("get", doc_id, "--repo", str(repo), env_extra={"LOCI_BASE_DIR": base})
+
+    data = json.loads(run_loci("stats", env_extra={"LOCI_BASE_DIR": base}).stdout)
+    # Combined totals stay (back-compat)
+    assert data["total_gets"] == 2
+    # Split summaries
+    assert data["code"]["gets"] == 1
+    assert data["docs"]["gets"] == 1
+    # Separate doc table holds the markdown file; code file table excludes it
+    assert data["by_doc"] and "README.md" in data["by_doc"][0]["name"]
+    assert data["by_file_code"] and all(
+        "README.md" not in r["name"] for r in data["by_file_code"]
+    )
+    assert any("sample.py" in r["name"] for r in data["by_file_code"])
+
+
+def test_stats_outlines_split_by_language(indexed_repo_with_docs):
+    repo, base = indexed_repo_with_docs
+    # A whole-repo outline surfaces both python and markdown symbols, so it
+    # counts toward both lanes.
+    run_loci("outline", str(repo), env_extra={"LOCI_BASE_DIR": base})
+    data = json.loads(run_loci("stats", env_extra={"LOCI_BASE_DIR": base}).stdout)
+    assert data["total_outlines"] == 1
+    assert data["code"]["outlines"] == 1
+    assert data["docs"]["outlines"] == 1
+
+
+def test_stats_outline_of_code_file_only_counts_code(indexed_repo_with_docs):
+    repo, base = indexed_repo_with_docs
+    run_loci("outline", str(repo), "--file", "sample.py",
+             env_extra={"LOCI_BASE_DIR": base})
+    data = json.loads(run_loci("stats", env_extra={"LOCI_BASE_DIR": base}).stdout)
+    assert data["code"]["outlines"] == 1
+    assert data["docs"]["outlines"] == 0
+
+
+def test_stats_pretty_shows_doc_lane(indexed_repo_with_docs):
+    repo, base = indexed_repo_with_docs
+    code_id, doc_id = _get_one_code_and_doc(repo, base)
+    run_loci("get", code_id, "--repo", str(repo), env_extra={"LOCI_BASE_DIR": base})
+    run_loci("get", doc_id, "--repo", str(repo), env_extra={"LOCI_BASE_DIR": base})
+
+    out = run_loci("stats", "--pretty", env_extra={"LOCI_BASE_DIR": base}).stdout
+    assert "Code" in out and "Markdown" in out
+    assert "By Doc" in out
+    assert "README.md" in out
+
+
+def test_stats_file_read_of_markdown_lands_in_docs_lane(indexed_repo_with_docs):
+    repo, base = indexed_repo_with_docs
+    # A raw `loci file` read (not a section get) of a markdown file should still
+    # be attributed to the docs lane via its extension.
+    run_loci("file", "README.md", "--repo", str(repo), env_extra={"LOCI_BASE_DIR": base})
+
+    data = json.loads(run_loci("stats", env_extra={"LOCI_BASE_DIR": base}).stdout)
+    assert data["docs"]["gets"] == 1
+    assert data["code"]["gets"] == 0
+    assert data["by_doc"] and "README.md" in data["by_doc"][0]["name"]
 
 
 def test_summarize_apply_writes_summaries(indexed_repo, tmp_path):
