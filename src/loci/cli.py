@@ -226,7 +226,10 @@ def cmd_file(args: argparse.Namespace) -> int:
         return 1
     symbol_bytes = len(result["content"].encode("utf-8"))
     file_bytes = result.pop("file_bytes")
-    store.log_retrieval(args.file_path, symbol_bytes, file_bytes, repo_path=str(repo_path))
+    language = EXTENSION_MAP.get(Path(args.file_path).suffix)
+    store.log_retrieval(
+        args.file_path, symbol_bytes, file_bytes, repo_path=str(repo_path), language=language
+    )
     print(json.dumps(result))
     return 0
 
@@ -368,49 +371,47 @@ def _ratio_bar(ratio_pct: int, width: int, use_color: bool) -> str:
 
 
 def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = True, since_days: int | None = None) -> str:
-    W = 88
+    W = 88            # width of a single panel
+    GAP_VIS = 3       # visible width of the divider between the two panels
+    TW = W * 2 + GAP_VIS
+    gap = " " + _dim("│", use_color) + " "
     lines = []
     scope = f" ({repo_filter.split('/')[-1]})" if repo_filter else " (Global Scope)"
     window = f" — last {since_days}d" if since_days is not None else " — all time"
 
-    lines.append(_cyan(f"loci Symbol Savings{scope}{window}", use_color))
-    lines.append("─" * W)
+    code = stats.get("code", {})
+    docs = stats.get("docs", {})
+
+    lines.append(_cyan(f"loci Savings{scope}{window}", use_color))
+    lines.append("─" * TW)
     lines.append("")
 
-    total = stats["total_gets"]
-    sb = stats["symbol_bytes_retrieved"]
-    fb_total = sb + stats["file_bytes_not_loaded"]
-    tokens = stats["tokens_not_loaded"]
-    ratio_str = stats["savings_ratio"]
-    ratio_f = float(ratio_str.rstrip("%")) / 100 if ratio_str != "0%" else 0.0
-    ratio_pct = int(ratio_f * 100)
+    def _last_str(ts: float | None) -> str:
+        if ts is None:
+            return "never"
+        return datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M")
 
-    label_w = 18
-    total_outlines = stats.get("total_outlines", 0)
-    last_get_ts = stats.get("last_get_ts")
-    if last_get_ts is not None:
-        last_get_str = datetime.datetime.fromtimestamp(last_get_ts).strftime("%Y-%m-%d %H:%M")
-    else:
-        last_get_str = "never"
-    lines.append(f"{'Total outlines:':<{label_w}}{total_outlines}")
-    lines.append(f"{'Total gets:':<{label_w}}{total}")
-    lines.append(f"{'Last get:':<{label_w}}{last_get_str}")
-    lines.append(f"{'Bytes retrieved:':<{label_w}}{_fmt_bytes(sb)}  (of {_fmt_bytes(fb_total)} file bytes)")
-    lines.append(f"{'Tokens saved:':<{label_w}}{tokens:,}  ({_ratio_color(ratio_pct, ratio_str, use_color)})")
-    meter = _two_tone_bar(ratio_f, 20, use_color)
-    lines.append(f"{'Savings meter:':<{label_w}}{meter}  {_ratio_color(ratio_pct, ratio_str, use_color)}")
-    lines.append("")
-
-    # Column widths (visible chars)
+    # Column widths (visible chars) — a data row sums to exactly W.
     NUM_W  = 7   # "  1.  " = 2+2+1+2 = 7 chars
     NAME_W = 28  # repo or file name, truncated
     GETS_W = 5
     SAVE_W = 7
     RATI_W = 4   # "91%" .. "100%"
     IMPACT_W = 20
-    LAST_W = 7   # "59m ago" / "3d ago" / "Mar 24"
-    # File indent = 7 spaces; file name column = NAME_W (data cols start at same offset)
     FILE_NW = NAME_W  # 7 spaces indent + NAME_W chars = same start as NUM_W + NAME_W
+
+    def _summary(out: list, title: str, d: dict) -> None:
+        ratio_str = d.get("savings_ratio", "0%")
+        ratio_pct = int(ratio_str.rstrip("%")) if ratio_str != "0%" else 0
+        lw = 14
+        out.append(_cyan(title, use_color))
+        out.append("─" * W)
+        out.append(f"{'Outlines':<{lw}}{d.get('outlines', 0)}")
+        out.append(f"{'Gets':<{lw}}{d.get('gets', 0)}")
+        out.append(f"{'Last get':<{lw}}{_last_str(d.get('last_get_ts'))}")
+        out.append(f"{'Tokens saved':<{lw}}{d.get('tokens_not_loaded', 0):,}  ({_ratio_color(ratio_pct, ratio_str, use_color)})")
+        out.append(f"{'Savings meter':<{lw}}{_two_tone_bar(ratio_pct / 100, 20, use_color)}  {_ratio_color(ratio_pct, ratio_str, use_color)}")
+        out.append("")
 
     def _row(num_str: str, name_str: str, name_w: int,
              gets: int, saved_bytes: int, ratio_pct: int, last_ts: float | None) -> str:
@@ -432,13 +433,27 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
             + _rel_time(last_ts)
         )
 
-    def _render_nested(repo_rows: list, file_rows: list) -> None:
+    def _hdr(name_label: str) -> str:
+        return (
+            " " * NUM_W
+            + _ljust(name_label, NAME_W) + "  "
+            + _rjust("Gets", GETS_W) + "  "
+            + _rjust("Saved", SAVE_W) + "  "
+            + _rjust("Ratio", RATI_W) + "  "
+            + _ljust("Impact", IMPACT_W) + "  "
+            + "Last"
+        )
+
+    def _render_nested(out: list, heading: str, repo_rows: list, file_rows: list) -> None:
+        out.append(_cyan(heading, use_color))
+        out.append("─" * W)
         if not repo_rows:
+            out.append(_dim("(no code gets yet)", use_color))
+            out.append("─" * W)
             return
 
-        # Group files under their repo, strip repo prefix.
-        # Sort by path length descending so more specific paths (e.g. worktrees)
-        # match before their parent repos.
+        # Group files under their repo, strip repo prefix. Sort by path length
+        # descending so more specific paths (e.g. worktrees) match before parents.
         repos_by_specificity = sorted(repo_rows, key=lambda r: len(r["name"]), reverse=True)
         file_by_repo: dict[str, list] = {}
         for frow in file_rows:
@@ -451,20 +466,8 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
                     )
                     break
 
-        lines.append(_cyan("By Repo", use_color))
-        lines.append("─" * W)
-        hdr = (
-            " " * NUM_W
-            + _ljust("Repo", NAME_W) + "  "
-            + _rjust("Gets", GETS_W) + "  "
-            + _rjust("Saved", SAVE_W) + "  "
-            + _rjust("Ratio", RATI_W) + "  "
-            + _ljust("Impact", IMPACT_W) + "  "
-            + "Last"
-        )
-        lines.append(_dim(hdr, use_color))
-        lines.append("─" * W)
-
+        out.append(_dim(_hdr("Repo"), use_color))
+        out.append("─" * W)
         for i, rrow in enumerate(repo_rows, 1):
             repo_path = rrow["name"]
             repo_name = repo_path.split("/")[-1]
@@ -472,52 +475,52 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
                 repo_name if len(repo_name) <= NAME_W else repo_name[:NAME_W],
                 use_color,
             )
-            num_str = f"  {i:>2}.  "
-            lines.append(_row(num_str, repo_display, NAME_W,
-                               rrow["gets"], rrow["saved_bytes"], rrow["ratio_pct"], rrow.get("last_ts")))
-
-            files_here = file_by_repo.get(repo_path, [])
-            for frow in files_here:
+            out.append(_row(f"  {i:>2}.  ", repo_display, NAME_W,
+                            rrow["gets"], rrow["saved_bytes"], rrow["ratio_pct"], rrow.get("last_ts")))
+            for frow in file_by_repo.get(repo_path, []):
                 rel = frow["rel"]
                 rel_display = _dim(
                     rel if len(rel) <= FILE_NW else "..." + rel[-(FILE_NW - 3):],
                     use_color,
                 )
-                lines.append(_row(" " * 7, rel_display, FILE_NW,
-                                   frow["gets"], frow["saved_bytes"], frow["ratio_pct"], frow.get("last_ts")))
-        lines.append("─" * W)
+                out.append(_row(" " * 7, rel_display, FILE_NW,
+                                frow["gets"], frow["saved_bytes"], frow["ratio_pct"], frow.get("last_ts")))
+        out.append("─" * W)
 
-    def _render_table(heading: str, rows: list) -> None:
+    def _render_table(out: list, heading: str, rows: list) -> None:
+        out.append(_cyan(heading, use_color))
+        out.append("─" * W)
         if not rows:
+            out.append(_dim("(no markdown gets yet)", use_color))
+            out.append("─" * W)
             return
-        lines.append(_cyan(heading, use_color))
-        lines.append("─" * W)
-        hdr = (
-            " " * NUM_W
-            + _ljust("File", NAME_W) + "  "
-            + _rjust("Gets", GETS_W) + "  "
-            + _rjust("Saved", SAVE_W) + "  "
-            + _rjust("Ratio", RATI_W) + "  "
-            + _ljust("Impact", IMPACT_W) + "  "
-            + "Last"
-        )
-        lines.append(_dim(hdr, use_color))
-        lines.append("─" * W)
+        out.append(_dim(_hdr("File"), use_color))
+        out.append("─" * W)
         for i, row in enumerate(rows[:20], 1):
             name = row["name"]
             display = _cyan(
                 name if len(name) <= NAME_W else "..." + name[-(NAME_W - 3):],
                 use_color,
             )
-            num_str = f"  {i:>2}.  "
-            lines.append(_row(num_str, display, NAME_W,
-                               row["gets"], row["saved_bytes"], row["ratio_pct"], row.get("last_ts")))
-        lines.append("─" * W)
+            out.append(_row(f"  {i:>2}.  ", display, NAME_W,
+                            row["gets"], row["saved_bytes"], row["ratio_pct"], row.get("last_ts")))
+        out.append("─" * W)
 
+    # Build the two panels independently, then stitch them side by side.
+    left: list[str] = []
+    right: list[str] = []
+    _summary(left, "Code", code)
+    _summary(right, "Markdown", docs)
     if repo_filter:
-        _render_table("By File", stats.get("by_file", []))
+        _render_table(left, "By File (code)", stats.get("by_file_code", []))
     else:
-        _render_nested(stats.get("by_repo", []), stats.get("by_file", []))
+        _render_nested(left, "By Repo (code)", stats.get("by_repo_code", []), stats.get("by_file_code", []))
+    _render_table(right, "By Doc (markdown)", stats.get("by_doc", []))
+
+    for i in range(max(len(left), len(right))):
+        l = left[i] if i < len(left) else ""
+        r = right[i] if i < len(right) else ""
+        lines.append(_ljust(l, W) + gap + r)
 
     return "\n".join(lines)
 
@@ -585,6 +588,7 @@ def cmd_outline(args: argparse.Namespace) -> int:
         return 1
 
     grouped: dict[str, list[dict]] = {}
+    languages: set[str] = set()
     for s in index["symbols"]:
         fp = s["file_path"]
         if args.file and fp != args.file:
@@ -601,10 +605,13 @@ def cmd_outline(args: argparse.Namespace) -> int:
         if s.get("decorators"):
             entry["decorators"] = s["decorators"]
         grouped.setdefault(fp, []).append(entry)
+        if s.get("language"):
+            languages.add(s["language"])
 
     result = [{"file": fp, "symbols": syms} for fp, syms in sorted(grouped.items())]
     symbol_count = sum(len(syms) for syms in grouped.values())
-    store.log_outline(str(repo_path), symbol_count, file_filter=args.file or None)
+    store.log_outline(str(repo_path), symbol_count, file_filter=args.file or None,
+                      languages=sorted(languages))
     print(json.dumps(result))
     return 0
 

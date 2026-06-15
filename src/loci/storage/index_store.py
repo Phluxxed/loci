@@ -233,14 +233,31 @@ class IndexStore:
 
     def get_session_stats(self, repo_filter: Optional[str] = None, since_days: Optional[int] = None) -> dict[str, Any]:
         log_path = self._session_log_path()
-        total_gets = 0
         total_outlines = 0
-        symbol_bytes_total = 0
-        file_bytes_total = 0
-        by_file: dict[str, dict] = {}
-        by_repo: dict[str, dict] = {}
         cutoff_ts = time.time() - since_days * 86400 if since_days is not None else None
         last_get_ts: Optional[float] = None
+
+        # Per-bucket summary accumulators. A get is a "doc" if its symbol came
+        # from a markdown file (heading-section retrieval), else "code".
+        buckets = {
+            "code": {"gets": 0, "sb": 0, "fb": 0, "last_ts": None, "outlines": 0},
+            "docs": {"gets": 0, "sb": 0, "fb": 0, "last_ts": None, "outlines": 0},
+        }
+        by_file: dict[str, dict] = {}        # combined (back-compat)
+        by_repo: dict[str, dict] = {}        # combined (back-compat)
+        by_file_code: dict[str, dict] = {}   # code gets only, per file
+        by_repo_code: dict[str, dict] = {}   # code gets only, per repo
+        by_doc: dict[str, dict] = {}         # markdown gets only, per file
+
+        def _accum(mapping: dict[str, dict], key: str, sb: int, fb: int, ts: Optional[float]) -> None:
+            d = mapping.get(key)
+            if d is None:
+                d = mapping[key] = {"gets": 0, "symbol_bytes": 0, "file_bytes": 0, "last_ts": None}
+            d["gets"] += 1
+            d["symbol_bytes"] += sb
+            d["file_bytes"] += fb
+            if ts is not None and (d["last_ts"] is None or ts > d["last_ts"]):
+                d["last_ts"] = ts
 
         if log_path.exists():
             for line in log_path.read_text().splitlines():
@@ -255,42 +272,53 @@ class IndexStore:
                     continue
                 if event == "outline":
                     total_outlines += 1
+                    # A whole-repo outline spans both lanes, so it counts toward
+                    # each language it surfaced. Events logged before languages
+                    # were recorded have none -> attribute to the code lane.
+                    langs = entry.get("languages") or []
+                    has_md = "markdown" in langs
+                    has_code = any(l != "markdown" for l in langs) or not langs
+                    if has_code:
+                        buckets["code"]["outlines"] += 1
+                    if has_md:
+                        buckets["docs"]["outlines"] += 1
                     continue
                 if event != "get":
                     continue
-                total_gets += 1
                 ts = entry.get("ts")
                 if ts is not None and (last_get_ts is None or ts > last_get_ts):
                     last_get_ts = ts
                 sb = entry["symbol_bytes"]
                 fb = entry["file_bytes"]
-                symbol_bytes_total += sb
-                file_bytes_total += fb
+                is_doc = entry.get("language") == "markdown"
+
+                b = buckets["docs" if is_doc else "code"]
+                b["gets"] += 1
+                b["sb"] += sb
+                b["fb"] += fb
+                if ts is not None and (b["last_ts"] is None or ts > b["last_ts"]):
+                    b["last_ts"] = ts
 
                 repo_key = repo or "unknown"
-
                 file_path = entry["symbol_id"].split("::", 1)[0]
                 file_key = f"{repo_key}/{file_path}" if repo_key != "unknown" else file_path
-                if file_key not in by_file:
-                    by_file[file_key] = {"gets": 0, "symbol_bytes": 0, "file_bytes": 0, "last_ts": None}
-                by_file[file_key]["gets"] += 1
-                by_file[file_key]["symbol_bytes"] += sb
-                by_file[file_key]["file_bytes"] += fb
-                if ts is not None and (by_file[file_key]["last_ts"] is None or ts > by_file[file_key]["last_ts"]):
-                    by_file[file_key]["last_ts"] = ts
-                if repo_key not in by_repo:
-                    by_repo[repo_key] = {"gets": 0, "symbol_bytes": 0, "file_bytes": 0, "last_ts": None}
-                by_repo[repo_key]["gets"] += 1
-                by_repo[repo_key]["symbol_bytes"] += sb
-                by_repo[repo_key]["file_bytes"] += fb
-                if ts is not None and (by_repo[repo_key]["last_ts"] is None or ts > by_repo[repo_key]["last_ts"]):
-                    by_repo[repo_key]["last_ts"] = ts
 
+                _accum(by_file, file_key, sb, fb, ts)
+                _accum(by_repo, repo_key, sb, fb, ts)
+                if is_doc:
+                    _accum(by_doc, file_key, sb, fb, ts)
+                else:
+                    _accum(by_file_code, file_key, sb, fb, ts)
+                    _accum(by_repo_code, repo_key, sb, fb, ts)
+
+        symbol_bytes_total = buckets["code"]["sb"] + buckets["docs"]["sb"]
+        file_bytes_total = buckets["code"]["fb"] + buckets["docs"]["fb"]
+        total_gets = buckets["code"]["gets"] + buckets["docs"]["gets"]
         not_loaded = max(0, file_bytes_total - symbol_bytes_total)
         tokens_not_loaded = not_loaded // 4
         ratio = f"{int(not_loaded / file_bytes_total * 100)}%" if file_bytes_total > 0 else "0%"
 
-        def _make_rows(mapping: dict[str, dict[str, int]], key: str) -> list[dict]:
+        def _make_rows(mapping: dict[str, dict[str, int]]) -> list[dict]:
             rows = []
             for name, d in mapping.items():
                 saved = max(0, d["file_bytes"] - d["symbol_bytes"])
@@ -301,6 +329,19 @@ class IndexStore:
             rows.sort(key=lambda r: r["saved_bytes"], reverse=True)
             return rows
 
+        def _summary(b: dict) -> dict:
+            nl = max(0, b["fb"] - b["sb"])
+            r = f"{int(nl / b['fb'] * 100)}%" if b["fb"] > 0 else "0%"
+            return {
+                "outlines": b["outlines"],
+                "gets": b["gets"],
+                "symbol_bytes": b["sb"],
+                "file_bytes_not_loaded": nl,
+                "tokens_not_loaded": nl // 4,
+                "savings_ratio": r,
+                "last_get_ts": b["last_ts"],
+            }
+
         return {
             "total_gets": total_gets,
             "total_outlines": total_outlines,
@@ -309,8 +350,14 @@ class IndexStore:
             "tokens_not_loaded": tokens_not_loaded,
             "savings_ratio": ratio,
             "last_get_ts": last_get_ts,
-            "by_file": _make_rows(by_file, "file"),
-            "by_repo": _make_rows(by_repo, "repo"),
+            "by_file": _make_rows(by_file),
+            "by_repo": _make_rows(by_repo),
+            # Code / docs split (used by the two-lane pretty view)
+            "code": _summary(buckets["code"]),
+            "docs": _summary(buckets["docs"]),
+            "by_file_code": _make_rows(by_file_code),
+            "by_repo_code": _make_rows(by_repo_code),
+            "by_doc": _make_rows(by_doc),
         }
 
     def reset_session(self) -> Optional[Path]:
@@ -591,6 +638,7 @@ class IndexStore:
         repo_path: str,
         symbol_count: int,
         file_filter: Optional[str] = None,
+        languages: Optional[list[str]] = None,
     ) -> None:
         repo_path = self._canonical_repo(repo_path)
         entry = {
@@ -599,6 +647,7 @@ class IndexStore:
             "repo": repo_path,
             "symbol_count": symbol_count,
             "file_filter": file_filter,
+            "languages": languages or [],
         }
         with open(self._session_log_path(), "a") as f:
             f.write(json.dumps(entry) + "\n")
