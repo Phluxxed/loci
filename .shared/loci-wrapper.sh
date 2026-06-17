@@ -2,17 +2,27 @@
 # loci launcher — tracked source of truth.
 #
 # The runtime location ~/.local/bin/loci is a symlink to this file. Its job is
-# to pick the base dir so loci's index + analytics live under ~/.claude, then
-# exec the real loci entry point from this repo's virtualenv.
+# to pick a per-host base dir so Claude Code's index + analytics live under
+# ~/.claude and don't commingle with Codex's, then exec the real loci entry
+# point from this repo's virtualenv.
 #
-# Everything defaults to the Claude Code store so that an interactive
-# `loci stats` from a plain terminal (where CLAUDECODE is unset) reads the same
-# log that Claude Code sessions write to — no split, no stale "last get".
-# An explicit LOCI_BASE_DIR from the caller always wins.
+# Host routing (an explicit LOCI_BASE_DIR from the caller always wins):
+#   - Claude Code (CLAUDECODE=1)  -> ~/.claude/loci-index
+#   - Codex / anything else       -> ~/.codex/loci-index
+#
+# The split is the security boundary: Codex's sandbox denies ~/.claude, and its
+# store must only ever hold repos Codex can read — so denied repos (e.g.
+# claude-otel, improvements) never leak into the Codex index. The non-Claude
+# branch landing a bare terminal on the Codex store is deliberate and harmless:
+# `loci get`/`stats` are for the agents, not for interactive use.
 set -euo pipefail
 
 if [[ -z "${LOCI_BASE_DIR:-}" ]]; then
-    export LOCI_BASE_DIR="$HOME/.claude/loci-index"
+    if [[ "${CLAUDECODE:-}" == "1" ]]; then
+        export LOCI_BASE_DIR="$HOME/.claude/loci-index"
+    else
+        export LOCI_BASE_DIR="$HOME/.codex/loci-index"
+    fi
 fi
 
 # Resolve this script through any symlink so we can find the repo's .venv,
