@@ -65,6 +65,96 @@ exit 1
     assert "(42 symbols)" in message
 
 
+def test_codex_session_start_hook_uses_cached_index_before_indexing(tmp_path: Path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _git_init(repo)
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    fake_loci = fake_bin / "loci"
+    _make_executable(
+        fake_loci,
+        f"""#!/usr/bin/env bash
+if [ "$1" = "list" ]; then
+  printf '[{{"path": "{repo}", "symbols": 123}}]\n'
+  exit 0
+fi
+if [ "$1" = "index" ]; then
+  printf 'index should not be called\n' >&2
+  exit 2
+fi
+exit 1
+""",
+    )
+
+    fake_home = tmp_path / "home"
+    fake_home.mkdir()
+
+    env = os.environ.copy()
+    env["HOME"] = str(fake_home)
+    env["PATH"] = f"{fake_bin}:{env['PATH']}"
+    result = subprocess.run(
+        ["bash", str(REPO_ROOT / ".codex" / "hooks" / "loci-session-start.sh")],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        env=env,
+        check=True,
+    )
+
+    payload = json.loads(result.stdout)
+    message = payload["hookSpecificOutput"]["additionalContext"]
+    assert set(payload) == {"hookSpecificOutput"}
+    assert "123 symbols already indexed" in message
+    assert str(repo) in message
+
+
+def test_codex_session_start_hook_emits_valid_json_when_index_times_out(tmp_path: Path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _git_init(repo)
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    fake_loci = fake_bin / "loci"
+    _make_executable(
+        fake_loci,
+        """#!/usr/bin/env bash
+if [ "$1" = "list" ]; then
+  printf '[]\n'
+  exit 0
+fi
+if [ "$1" = "index" ]; then
+  sleep 2
+  printf '{"symbols_indexed": 42}\n'
+  exit 0
+fi
+exit 1
+""",
+    )
+
+    fake_home = tmp_path / "home"
+    fake_home.mkdir()
+
+    env = os.environ.copy()
+    env["HOME"] = str(fake_home)
+    env["PATH"] = f"{fake_bin}:{env['PATH']}"
+    env["LOCI_SESSION_INDEX_TIMEOUT"] = "0.1"
+    result = subprocess.run(
+        ["bash", str(REPO_ROOT / ".codex" / "hooks" / "loci-session-start.sh")],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        env=env,
+        check=True,
+        timeout=1,
+    )
+
+    payload = json.loads(result.stdout)
+    assert set(payload) == {"hookSpecificOutput"}
+    assert payload["hookSpecificOutput"]["hookEventName"] == "SessionStart"
+    assert payload["hookSpecificOutput"]["additionalContext"] == ""
+
+
 def test_codex_session_start_hook_bails_silently_when_not_in_git_repo(tmp_path: Path):
     """When cwd is not inside any git repo, the hook still emits a valid JSON
     envelope (codex protocol requires it) but the additionalContext field

@@ -18,7 +18,7 @@ from loci.storage.index_store import IndexStore
 SKIP_DIRS = {
     ".git", "node_modules", "__pycache__", ".venv", "venv",
     ".tox", "dist", "build", ".mypy_cache", ".pytest_cache",
-    "__tests__", "tests",
+    ".ruff_cache", ".uv-cache", "uv-cache", "__tests__", "tests",
 }
 TEST_FILE_SUFFIXES = (
     ".test.ts", ".test.tsx", ".test.js", ".test.jsx",
