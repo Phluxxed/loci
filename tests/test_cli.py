@@ -47,6 +47,23 @@ def test_index_respects_gitignore(tmp_path: Path, fixtures_dir: Path):
     assert data["symbols_indexed"] > 0
 
 
+def test_index_skips_uv_cache_directories(tmp_path: Path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "sample.py").write_text("def should_be_indexed(): pass\n")
+    uv_cache = repo / "debug" / "uv-cache" / "archive-v0" / "package"
+    uv_cache.mkdir(parents=True)
+    (uv_cache / "cached_dependency.py").write_text("def should_not_be_indexed(): pass\n")
+
+    base = str(tmp_path / ".codeindex")
+    result = run_loci("index", str(repo), env_extra={"LOCI_BASE_DIR": base})
+
+    assert result.returncode == 0, result.stderr
+    search = run_loci("search", "should_not_be_indexed", "--repo", str(repo), env_extra={"LOCI_BASE_DIR": base})
+    names = [r["name"] for r in json.loads(search.stdout)]
+    assert "should_not_be_indexed" not in names
+
+
 def test_index_exits_zero(sample_repo: Path, tmp_path: Path):
     result = run_loci("index", str(sample_repo), env_extra={"LOCI_BASE_DIR": str(tmp_path / ".codeindex")})
     assert result.returncode == 0, result.stderr

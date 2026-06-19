@@ -48,9 +48,21 @@ loci_session_compute() {
     fi
     LOCI_SESSION_REPO_ROOT="$repo_root"
 
-    # Try an incremental index first (fast no-op if nothing changed).
+    # SessionStart is latency-sensitive. If the repo is already indexed, do
+    # not run an incremental index synchronously; large generated trees can
+    # turn a "fast no-op" into a startup timeout. Agents can refresh explicitly
+    # with `loci index <repo> --incremental` when they need fresh symbols.
+    local listed
+    listed="$(_loci_cached_symbol_count "$loci" "$repo_root")"
+    if [[ -n "$listed" ]]; then
+        LOCI_SESSION_SYMBOL_COUNT="$listed"
+        LOCI_SESSION_MESSAGE="loci: $listed symbols already indexed for $repo_root. Use the loci skill."
+        return 0
+    fi
+
+    # Try an initial incremental index, but keep it inside the hook budget.
     local index_output
-    index_output="$("$loci" index "$repo_root" --incremental 2>/dev/null || true)"
+    index_output="$(_loci_index_with_timeout "$loci" "$repo_root")"
 
     if [[ -n "$index_output" ]]; then
         local count
@@ -64,17 +76,46 @@ loci_session_compute() {
 
     # Fallback: if `loci index` didn't produce parseable output, see if
     # this repo is already cached from a previous session.
-    local listed
-    listed="$("$loci" list 2>/dev/null | python3 -c "
-import json, sys
-target = '$repo_root'
-for r in json.load(sys.stdin):
-    if r.get('path', '') == target:
-        print(r.get('symbols', '?'))
-        break
-" 2>/dev/null || true)"
+    listed="$(_loci_cached_symbol_count "$loci" "$repo_root")"
     if [[ -n "$listed" ]]; then
         LOCI_SESSION_SYMBOL_COUNT="$listed"
         LOCI_SESSION_MESSAGE="loci: $listed symbols already indexed for $repo_root. Use the loci skill."
     fi
+}
+
+_loci_cached_symbol_count() {
+    local loci="$1"
+    local repo_root="$2"
+    "$loci" list 2>/dev/null | python3 -c "
+import json, sys
+target = sys.argv[1]
+for r in json.load(sys.stdin):
+    if r.get('path', '') == target:
+        print(r.get('symbols', '?'))
+        break
+" "$repo_root" 2>/dev/null || true
+}
+
+_loci_index_with_timeout() {
+    local loci="$1"
+    local repo_root="$2"
+    python3 - "$loci" "$repo_root" <<'PY' 2>/dev/null || true
+import os
+import subprocess
+import sys
+
+timeout = float(os.environ.get("LOCI_SESSION_INDEX_TIMEOUT", "8"))
+try:
+    result = subprocess.run(
+        [sys.argv[1], "index", sys.argv[2], "--incremental"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        text=True,
+        timeout=timeout,
+        check=False,
+    )
+except subprocess.TimeoutExpired:
+    raise SystemExit(0)
+sys.stdout.write(result.stdout)
+PY
 }
