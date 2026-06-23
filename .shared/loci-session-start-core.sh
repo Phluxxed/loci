@@ -47,6 +47,8 @@ loci_session_compute() {
         return 0
     fi
     LOCI_SESSION_REPO_ROOT="$repo_root"
+    local mcp_hint
+    mcp_hint=' Prefer loci MCP tools. If MCP tools are missing, configure loci as a local stdio MCP server first with command `loci-mcp` and a host-specific LOCI_BASE_DIR; a fresh session may be required before the tools are visible. Use CLI only as a temporary bridge.'
 
     # SessionStart is latency-sensitive. If the repo is already indexed, do
     # not run an incremental index synchronously; large generated trees can
@@ -56,7 +58,7 @@ loci_session_compute() {
     listed="$(_loci_cached_symbol_count "$loci" "$repo_root")"
     if [[ -n "$listed" ]]; then
         LOCI_SESSION_SYMBOL_COUNT="$listed"
-        LOCI_SESSION_MESSAGE="loci: $listed symbols already indexed for $repo_root. Use the loci skill."
+        LOCI_SESSION_MESSAGE="loci: $listed symbols already indexed for $repo_root. Use the loci skill.$mcp_hint"
         return 0
     fi
 
@@ -69,7 +71,7 @@ loci_session_compute() {
         count="$(printf '%s' "$index_output" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('symbols_indexed', '?'))" 2>/dev/null || true)"
         if [[ -n "$count" ]]; then
             LOCI_SESSION_SYMBOL_COUNT="$count"
-            LOCI_SESSION_MESSAGE="loci: repo indexed at $repo_root ($count symbols). Use the loci skill for codebase navigation."
+            LOCI_SESSION_MESSAGE="loci: repo indexed at $repo_root ($count symbols). Use the loci skill for codebase navigation.$mcp_hint"
             return 0
         fi
     fi
@@ -79,7 +81,7 @@ loci_session_compute() {
     listed="$(_loci_cached_symbol_count "$loci" "$repo_root")"
     if [[ -n "$listed" ]]; then
         LOCI_SESSION_SYMBOL_COUNT="$listed"
-        LOCI_SESSION_MESSAGE="loci: $listed symbols already indexed for $repo_root. Use the loci skill."
+        LOCI_SESSION_MESSAGE="loci: $listed symbols already indexed for $repo_root. Use the loci skill.$mcp_hint"
     fi
 }
 

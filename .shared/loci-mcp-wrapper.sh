@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# loci launcher — tracked source of truth.
+# loci MCP launcher - tracked source of truth.
 #
-# The runtime location ~/.local/bin/loci is a symlink to this file. Its job is
-# to pick a safe default base dir when the caller did not set one, then exec
-# the real loci entry point from this repo's virtualenv.
+# The runtime location ~/.local/bin/loci-mcp is a symlink to this file. It
+# mirrors .shared/loci-wrapper.sh so MCP and CLI use the same safe default
+# routing, then execs the real MCP entry point from this repo's virtualenv.
 #
 # Host routing (an explicit LOCI_BASE_DIR from the caller always wins):
 #   - Claude Code (CLAUDECODE=1)  -> ~/.claude/loci-index
@@ -25,4 +25,4 @@ fi
 # regardless of where the runtime symlink lives.
 _self="$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "${BASH_SOURCE[0]}")"
 _repo_root="$(cd "$(dirname "$_self")/.." && pwd)"
-exec "$_repo_root/.venv/bin/loci" "$@"
+exec "$_repo_root/.venv/bin/loci-mcp" "$@"

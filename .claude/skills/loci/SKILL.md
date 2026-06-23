@@ -1,13 +1,32 @@
 ---
 name: loci
-description: Use at the start of any non-trivial codebase task to navigate symbols efficiently. loci is a code symbol indexer that replaces Read/Grep/Explore for indexed repos.
+description: Use at the start of any non-trivial codebase task to navigate symbols efficiently. Prefer the local loci MCP server; configure it when missing.
 ---
 
-# loci — Agent Workflow Guide
+# loci - Agent Workflow Guide
 
-loci is your primary tool for codebase navigation. It indexes symbols with byte-precise offsets so you fetch exactly what you need instead of reading entire files.
+loci is your primary tool for codebase navigation. It indexes symbols with byte-precise offsets so you fetch exactly what you need instead of reading entire files. MCP is the production interface; the CLI is legacy/debug and temporary bridge tooling.
 
 ## Core Workflow
+
+Prefer the local MCP server when its tools are available:
+
+```text
+loci_index(path, incremental=true)
+loci_outline(path) or loci_search(repo, query)
+loci_get(repo, symbol_ids)
+```
+
+If MCP tools are not configured in Claude Code, configure MCP first. Do not quietly continue with the CLI as the steady-state path.
+
+```bash
+claude mcp add loci -s local -e LOCI_BASE_DIR="$HOME/.claude/loci-index" -- loci-mcp
+claude mcp get loci
+```
+
+If `loci-mcp` is not on `PATH`, fix the install or wrapper symlink first. For this repo-local install, `~/.local/bin/loci-mcp` should resolve to `.shared/loci-mcp-wrapper.sh`. Use `/absolute/path/to/python -m loci.mcp_server` only as a diagnostic fallback, not as the permanent MCP client config.
+
+After adding MCP, tell the user a fresh Claude session may be required before the new `loci_*` tools are visible. Use CLI fallback only as a temporary bridge when MCP was just configured but the current Claude session cannot see the new tools yet, when MCP configuration fails, or when the user explicitly asks to continue without restarting.
 
 ```
 loci index <path>                    # index once (or --incremental after edits)
@@ -15,11 +34,30 @@ loci outline <path>                  # get ALL symbols + IDs in one call
 loci get ID1 ID2 ...  --repo <path>  # fetch specific symbol source by ID
 ```
 
-`outline → get` is the key flow. `outline` gives you every symbol ID in one shot — use those IDs to call `get`. This replaces 15–20 iterative Read/Grep calls.
+When MCP tools are not visible in Claude, say this once before configuring MCP:
 
-## All Commands
+```text
+loci MCP is not configured in this Claude session; I am adding it as a local stdio MCP server with command `loci-mcp`. A fresh Claude session may be required before the `loci_*` tools are visible.
+```
 
-| Command | Use when |
+`outline -> get` is the key flow. `outline` gives you every symbol ID in one shot; use those IDs to call `get`. `search -> get` is the right flow when you know the concept or symbol name but not the file. This replaces 15-20 iterative Read/Grep calls.
+
+## MCP Tools
+
+| Tool | Use when |
+|---------|----------|
+| `loci_index` | Starting work, or after edits |
+| `loci_outline` | Getting the full symbol map |
+| `loci_search` | Finding symbols by name/concept |
+| `loci_get` | Fetching symbol source |
+| `loci_file` | Reading targeted non-symbol files |
+| `loci_grep` | Hunting string literals, error messages, config keys |
+| `loci_verify` | Checking index integrity + content drift |
+| `loci_list` | Listing indexed repos |
+
+## CLI Fallback
+
+| Command | Use when MCP is unavailable |
 |---------|----------|
 | `loci index <path> [--incremental]` | Starting work, or after edits |
 | `loci outline <path> [--file <rel>]` | Getting the full symbol map |
@@ -40,38 +78,40 @@ Every symbol has: `id`, `name`, `qualified_name`, `kind`, `language`, `file_path
 
 ## Output Schemas
 
-**outline** (grouped by file):
+**loci_outline** (grouped by file):
 ```json
-[{"file": "src/foo.py", "symbols": [{"id": "...", "name": "...", "kind": "...", "line": 1, "end_line": 10, "signature": "...", "summary": ""}]}]
+{"files":[{"file": "src/foo.py", "symbols": [{"id": "...", "name": "...", "kind": "...", "line": 1, "end_line": 10, "signature": "...", "summary": ""}]}]}
 ```
 
-**get** (single or array for batch):
+**loci_get**:
 ```json
-{"id": "...", "source": "...", "line": 1, "end_line": 10, "byte_offset": 0, "byte_length": 200, "signature": "...", "kind": "function", "language": "python"}
+{"symbols":[{"id": "...", "source": "...", "line": 1, "end_line": 10, "byte_offset": 0, "byte_length": 200, "signature": "...", "kind": "function", "language": "python"}]}
 ```
 
-**search**:
+**loci_search**:
 ```json
-[{"id": "...", "name": "...", "kind": "...", "score": 20.0, "signature": "...", "summary": ""}]
+{"symbols":[{"id": "...", "name": "...", "kind": "...", "score": 20.0, "signature": "...", "summary": ""}]}
 ```
 
-**grep**:
+**loci_grep**:
 ```json
-[{"file": "...", "line": 42, "match": "...", "context_before": [...], "context_after": [...]}]
+{"matches":[{"file": "...", "line": 42, "match": "...", "context_before": [...], "context_after": [...]}]}
 ```
+
+MCP tool errors are structured under `structuredContent.error` with `code`, `message`, and `details`.
 
 ## When to Use What
 
-- **Know the file, want all symbols** → `outline --file <rel>`
-- **Know the symbol name** → `search <name>` then `get`
-- **Know the symbol ID** (from outline) → `get` directly
-- **Hunting a string/regex** → `grep`
-- **Need surrounding file context** → `get --context N` or `file`
-- **Non-code file** (JSON, YAML, Markdown) → `file`
+- **Know the file, want all symbols** -> `loci_outline` with `file`
+- **Know the symbol name** -> `loci_search` then `loci_get`
+- **Know the symbol ID** (from outline) -> `loci_get` directly
+- **Hunting a string/regex** -> `loci_grep`
+- **Need surrounding file context** -> `loci_get` with `context` or `loci_file`
+- **Non-code file** (JSON, YAML, Markdown) -> `loci_file`
 
 ## Summaries Workflow (mandatory after index)
 
-After every `loci index`, run:
+After every `loci_index` or CLI `loci index`, run the CLI maintenance command:
 
 ```bash
 loci summarize <path>

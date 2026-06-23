@@ -70,6 +70,40 @@ def test_claude_hook_indexes_when_cwd_is_repo_root(tmp_path: Path):
     assert "(42 symbols)" in result.stdout
 
 
+def test_claude_hook_sets_claude_base_dir(tmp_path: Path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _git_init(repo)
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    fake_loci = fake_bin / "loci"
+    fake_loci.write_text(
+        """#!/usr/bin/env bash
+expected="$HOME/.claude/loci-index"
+if [ "${LOCI_BASE_DIR:-}" != "$expected" ]; then
+  exit 2
+fi
+if [ "$1" = "index" ]; then
+  printf '{"symbols_indexed": 42}\n'
+  exit 0
+fi
+if [ "$1" = "list" ]; then
+  printf '[]\n'
+  exit 0
+fi
+exit 1
+"""
+    )
+    fake_loci.chmod(fake_loci.stat().st_mode | stat.S_IXUSR)
+    env = _env_with_path(tmp_path, fake_bin)
+    env.pop("LOCI_BASE_DIR", None)
+
+    result = _run_hook(repo, env)
+
+    assert result.returncode == 0, result.stderr
+    assert "loci: repo indexed at" in result.stdout
+
+
 def test_claude_hook_bails_silently_when_not_in_git_repo(tmp_path: Path):
     not_repo = tmp_path / "not_a_repo"
     not_repo.mkdir()
