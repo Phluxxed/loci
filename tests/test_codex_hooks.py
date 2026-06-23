@@ -65,6 +65,54 @@ exit 1
     assert "(42 symbols)" in message
 
 
+def test_codex_session_start_hook_sets_codex_base_dir(tmp_path: Path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _git_init(repo)
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    fake_loci = fake_bin / "loci"
+    _make_executable(
+        fake_loci,
+        """#!/usr/bin/env bash
+expected="$HOME/.codex/loci-index"
+if [ "${LOCI_BASE_DIR:-}" != "$expected" ]; then
+  exit 2
+fi
+if [ "$1" = "index" ]; then
+  printf '{"symbols_indexed": 42}\n'
+  exit 0
+fi
+if [ "$1" = "list" ]; then
+  printf '[]\n'
+  exit 0
+fi
+exit 1
+""",
+    )
+
+    fake_home = tmp_path / "home"
+    fake_home.mkdir()
+
+    env = os.environ.copy()
+    env["HOME"] = str(fake_home)
+    env["PATH"] = f"{fake_bin}:{env['PATH']}"
+    env.pop("LOCI_BASE_DIR", None)
+    result = subprocess.run(
+        ["bash", str(REPO_ROOT / ".codex" / "hooks" / "loci-session-start.sh")],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        env=env,
+        check=True,
+    )
+
+    payload = json.loads(result.stdout)
+    message = payload["hookSpecificOutput"]["additionalContext"]
+    assert "loci: repo indexed at" in message
+    assert "(42 symbols)" in message
+
+
 def test_codex_session_start_hook_uses_cached_index_before_indexing(tmp_path: Path):
     repo = tmp_path / "repo"
     repo.mkdir()

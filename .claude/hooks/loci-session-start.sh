@@ -11,6 +11,10 @@
 # location ~/.claude/hooks/loci-session-start.sh is a symlink installed
 # by .claude/install-hooks.sh.
 
+if [[ -z "${LOCI_BASE_DIR:-}" ]]; then
+    export LOCI_BASE_DIR="$HOME/.claude/loci-index"
+fi
+
 # Resolve our real path through any symlink so we can find the sibling
 # .shared/ dir. Python's os.path.realpath handles this portably.
 _LOCI_HOOK_DIR="$(cd "$(dirname "$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "${BASH_SOURCE[0]}")")" && pwd)"
