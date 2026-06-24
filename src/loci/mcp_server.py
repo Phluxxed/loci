@@ -7,6 +7,7 @@ from mcp.types import CallToolResult, TextContent
 
 from loci.service import (
     LociError,
+    analyze_usage,
     get_cached_file,
     get_symbols,
     grep_repo,
@@ -14,6 +15,7 @@ from loci.service import (
     list_repos,
     outline_repo,
     search_symbols,
+    session_stats,
     verify_repo,
 )
 
@@ -96,6 +98,27 @@ def create_server() -> FastMCP:
     def loci_list() -> CallToolResult:
         """List repositories present in the loci cache."""
         return _handle_loci_error(lambda: {"repos": list_repos()})
+
+    @mcp.tool()
+    def loci_stats(
+        repo: str | None = None,
+        since_days: int = 7,
+        all_time: bool = False,
+    ) -> CallToolResult:
+        """Return structured session retrieval stats for the active loci store."""
+        return _handle_loci_error(
+            lambda: session_stats(
+                repo=repo,
+                since_days=None if all_time else since_days,
+            )
+        )
+
+    @mcp.tool()
+    def loci_analyze(repo: str | None = None, since_days: int = 30) -> CallToolResult:
+        """Analyze loci usage logs and return actionable tool-quality findings."""
+        return _handle_loci_error(
+            lambda: analyze_usage(repo=repo, since_days=since_days)
+        )
 
     return mcp
 

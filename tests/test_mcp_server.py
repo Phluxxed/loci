@@ -19,6 +19,7 @@ def test_mcp_index_outline_get_round_trip(tmp_path: Path, fixtures_dir: Path):
 
     assert result["indexed"]["symbols_indexed"] > 0
     assert result["tools"] == [
+        "loci_analyze",
         "loci_file",
         "loci_get",
         "loci_grep",
@@ -26,6 +27,7 @@ def test_mcp_index_outline_get_round_trip(tmp_path: Path, fixtures_dir: Path):
         "loci_list",
         "loci_outline",
         "loci_search",
+        "loci_stats",
         "loci_verify",
     ]
     assert result["outline"]["files"][0]["file"] == "sample.py"
@@ -35,6 +37,10 @@ def test_mcp_index_outline_get_round_trip(tmp_path: Path, fixtures_dir: Path):
     assert result["grep"]["matches"][0]["file"] == "sample.py"
     assert result["verify"]["failed"] == []
     assert any(entry["path"] == str(repo.resolve()) for entry in result["list"]["repos"])
+    assert result["stats"]["total_gets"] >= 1
+    assert result["stats"]["store"]["base_dir"] == str((tmp_path / ".codeindex").resolve())
+    assert "summary" in result["analyze"]
+    assert result["analyze"]["store"]["base_dir"] == str((tmp_path / ".codeindex").resolve())
     assert result["invalid_grep"]["error"]["code"] == "INVALID_REGEX"
 
 
@@ -128,6 +134,14 @@ async def _round_trip(
                 arguments={"path": str(repo)},
             )
             repos = await session.call_tool("loci_list", arguments={})
+            stats = await session.call_tool(
+                "loci_stats",
+                arguments={"repo": str(repo), "since_days": 7},
+            )
+            analyze = await session.call_tool(
+                "loci_analyze",
+                arguments={"repo": str(repo), "since_days": 7},
+            )
             invalid_grep = await session.call_tool(
                 "loci_grep",
                 arguments={"repo": str(repo), "pattern": "["},
@@ -144,6 +158,8 @@ async def _round_trip(
         "grep": grep.structuredContent,
         "verify": verify.structuredContent,
         "list": repos.structuredContent,
+        "stats": stats.structuredContent,
+        "analyze": analyze.structuredContent,
         "invalid_grep": invalid_grep.structuredContent,
     }
 

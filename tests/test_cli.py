@@ -10,7 +10,11 @@ def run_loci(*args: str, env_extra: Optional[dict] = None) -> subprocess.Complet
     import os
     env = os.environ.copy()
     if env_extra:
-        env.update(env_extra)
+        for key, value in env_extra.items():
+            if value is None:
+                env.pop(key, None)
+            else:
+                env[key] = value
     return subprocess.run(
         [sys.executable, "-m", "loci.cli"] + list(args),
         capture_output=True,
@@ -256,6 +260,76 @@ def test_stats_empty_session_returns_zeros(tmp_path):
     assert data["symbol_bytes_retrieved"] == 0
     assert data["file_bytes_not_loaded"] == 0
     assert data["tokens_not_loaded"] == 0
+    assert data["store"]["base_dir"] == base
+    assert data["store"]["source"] == "env"
+
+
+def test_stats_without_env_prefers_codex_mcp_store(tmp_path):
+    import pytest
+    pytest.importorskip("tomllib")
+
+    from loci.storage.index_store import IndexStore
+
+    codex_home = tmp_path / ".codex"
+    mcp_store = tmp_path / "mcp-store"
+    codex_home.mkdir()
+    (codex_home / "config.toml").write_text(
+        "[mcp_servers.loci]\n"
+        "command = \"loci-mcp\"\n"
+        "[mcp_servers.loci.env]\n"
+        f"LOCI_BASE_DIR = \"{mcp_store}\"\n"
+    )
+    store = IndexStore(base_dir=mcp_store)
+    store.log_retrieval("src/app.py::run#function", 20, 120, repo_path="/tmp/repo")
+
+    result = run_loci(
+        "stats",
+        env_extra={"CODEX_HOME": str(codex_home), "LOCI_BASE_DIR": None},
+    )
+
+    assert result.returncode == 0, result.stderr
+    data = json.loads(result.stdout)
+    assert data["total_gets"] == 1
+    assert data["store"]["base_dir"] == str(mcp_store)
+    assert data["store"]["source"] == "codex_mcp_config"
+
+
+def test_stats_env_override_wins_over_codex_mcp_store(tmp_path):
+    import pytest
+    pytest.importorskip("tomllib")
+
+    from loci.storage.index_store import IndexStore
+
+    codex_home = tmp_path / ".codex"
+    mcp_store = tmp_path / "mcp-store"
+    override_store = tmp_path / "override-store"
+    codex_home.mkdir()
+    (codex_home / "config.toml").write_text(
+        "[mcp_servers.loci]\n"
+        "command = \"loci-mcp\"\n"
+        "[mcp_servers.loci.env]\n"
+        f"LOCI_BASE_DIR = \"{mcp_store}\"\n"
+    )
+    IndexStore(base_dir=mcp_store).log_retrieval(
+        "src/app.py::run#function",
+        20,
+        120,
+        repo_path="/tmp/repo",
+    )
+
+    result = run_loci(
+        "stats",
+        env_extra={
+            "CODEX_HOME": str(codex_home),
+            "LOCI_BASE_DIR": str(override_store),
+        },
+    )
+
+    assert result.returncode == 0, result.stderr
+    data = json.loads(result.stdout)
+    assert data["total_gets"] == 0
+    assert data["store"]["base_dir"] == str(override_store)
+    assert data["store"]["source"] == "env"
 
 
 def test_stats_accumulates_after_get(indexed_repo):
