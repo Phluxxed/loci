@@ -11,7 +11,7 @@ from pathlib import Path
 import pathspec
 
 from loci.parser.extractor import parse_file
-from loci.parser.languages import EXTENSION_MAP
+from loci.parser.languages import EXTENSION_MAP, MARKDOWN_SUFFIXES
 from loci.parser.symbols import Symbol
 from loci.storage.index_store import IndexStore
 
@@ -110,10 +110,15 @@ def cmd_index(args: argparse.Namespace) -> int:
         else:
             # Warn on non-trivial files with known extensions that yield 0 symbols
             try:
-                line_count = len(src_file.read_bytes().splitlines())
+                file_bytes = src_file.read_bytes()
             except OSError:
-                line_count = 0
-            if line_count > 10:
+                file_bytes = b""
+            line_count = len(file_bytes.splitlines())
+            is_nonempty_markdown = (
+                src_file.suffix.lower() in MARKDOWN_SUFFIXES
+                and bool(file_bytes.strip())
+            )
+            if line_count > 10 or is_nonempty_markdown:
                 zero_symbol_warnings.append({
                     "file": rel_path,
                     "lines": line_count,
