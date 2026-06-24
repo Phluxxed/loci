@@ -195,15 +195,6 @@ def test_invalidate_removes_cache(indexed_repo):
     assert store.load(repo) is None
 
 
-def test_summarize_outputs_unsummarized(indexed_repo):
-    repo, base = indexed_repo
-    result = run_loci("summarize", str(repo), env_extra={"LOCI_BASE_DIR": base})
-    assert result.returncode == 0
-    data = json.loads(result.stdout)
-    assert isinstance(data, list)
-    assert all(not s.get("summary") for s in data)
-
-
 def test_outline_returns_files_with_symbols(indexed_repo):
     repo, base = indexed_repo
     result = run_loci("outline", str(repo), env_extra={"LOCI_BASE_DIR": base})
@@ -262,6 +253,14 @@ def test_stats_empty_session_returns_zeros(tmp_path):
     assert data["tokens_not_loaded"] == 0
     assert data["store"]["base_dir"] == base
     assert data["store"]["source"] == "env"
+
+
+def test_cli_help_excludes_removed_agent_maintenance_commands():
+    result = run_loci("--help")
+
+    assert result.returncode == 0, result.stderr
+    assert "summarize" not in result.stdout
+    assert "analyze" not in result.stdout
 
 
 def test_stats_without_env_prefers_codex_mcp_store(tmp_path):
@@ -523,24 +522,6 @@ def test_stats_file_read_of_markdown_lands_in_docs_lane(indexed_repo_with_docs):
     assert data["docs"]["gets"] == 1
     assert data["code"]["gets"] == 0
     assert data["by_doc"] and "README.md" in data["by_doc"][0]["name"]
-
-
-def test_summarize_apply_writes_summaries(indexed_repo, tmp_path):
-    repo, base = indexed_repo
-    result = run_loci("summarize", str(repo), env_extra={"LOCI_BASE_DIR": base})
-    symbols = json.loads(result.stdout)
-    assert len(symbols) > 0
-
-    summaries = [{"id": s["id"], "summary": "Test summary."} for s in symbols]
-    summaries_file = tmp_path / "summaries.json"
-    summaries_file.write_text(json.dumps(summaries))
-
-    result = run_loci("summarize", str(repo), "--apply", str(summaries_file), env_extra={"LOCI_BASE_DIR": base})
-    assert result.returncode == 0
-
-    result2 = run_loci("summarize", str(repo), env_extra={"LOCI_BASE_DIR": base})
-    remaining = json.loads(result2.stdout)
-    assert len(remaining) == 0
 
 
 def test_file_returns_full_content(indexed_repo):
@@ -957,67 +938,3 @@ def test_cmd_get_records_search_correlation(tmp_path: Path):
     get_events = [e for e in entries if e.get("event") == "get"]
     assert len(get_events) == 1
     assert get_events[0]["search_id"] is not None
-
-
-# ---------------------------------------------------------------------------
-# analyze command tests
-# ---------------------------------------------------------------------------
-
-def test_cmd_analyze_json_output(tmp_path):
-    """analyze outputs valid JSON with required top-level keys."""
-    result = run_loci("analyze", env_extra={"LOCI_BASE_DIR": str(tmp_path / "idx")})
-    assert result.returncode == 0, result.stderr
-    data = json.loads(result.stdout)
-    assert "findings" in data
-    assert "summary" in data
-    assert "period" in data
-
-
-def test_cmd_analyze_empty_findings_when_no_data(tmp_path):
-    result = run_loci("analyze", env_extra={"LOCI_BASE_DIR": str(tmp_path / "idx")})
-    assert result.returncode == 0, result.stderr
-    data = json.loads(result.stdout)
-    assert data["findings"] == []
-
-
-def test_cmd_analyze_since_flag(tmp_path):
-    """--since N scopes to last N days."""
-    result = run_loci("analyze", "--since", "7", env_extra={"LOCI_BASE_DIR": str(tmp_path / "idx")})
-    assert result.returncode == 0, result.stderr
-    data = json.loads(result.stdout)
-    assert "findings" in data
-
-
-def test_cmd_analyze_repo_filter(tmp_path):
-    """--repo filters findings to that repo only."""
-    import time as _time
-    idx_dir = tmp_path / "idx"
-    idx_dir.mkdir(parents=True, exist_ok=True)
-    repo_a = str(tmp_path / "repo_a")
-    repo_b = str(tmp_path / "repo_b")
-    log_lines = [
-        json.dumps({"ts": _time.time(), "event": "miss", "miss_type": "search_empty",
-                    "query": "foo_only_in_a", "repo": repo_a}),
-        json.dumps({"ts": _time.time(), "event": "miss", "miss_type": "search_empty",
-                    "query": "bar_only_in_b", "repo": repo_b}),
-    ]
-    (idx_dir / "session.jsonl").write_text("\n".join(log_lines) + "\n")
-    result = run_loci("analyze", "--repo", repo_a, env_extra={"LOCI_BASE_DIR": str(idx_dir)})
-    assert result.returncode == 0, result.stderr
-    data = json.loads(result.stdout)
-    miss_finding = next((f for f in data["findings"] if f["type"] == "search_miss"), None)
-    assert miss_finding is not None, "Expected search_miss finding for repo_a"
-    assert "foo_only_in_a" in miss_finding["data"]["queries"]
-    assert "bar_only_in_b" not in miss_finding["data"]["queries"]
-
-
-def test_cmd_analyze_pretty_flag(tmp_path):
-    """--pretty outputs human-readable text, not JSON."""
-    result = run_loci("analyze", "--pretty", env_extra={"LOCI_BASE_DIR": str(tmp_path / "idx")})
-    assert result.returncode == 0, result.stderr
-    try:
-        json.loads(result.stdout)
-        assert False, "Expected non-JSON output"
-    except json.JSONDecodeError:
-        pass
-    assert "findings" in result.stdout.lower() or "no issues" in result.stdout.lower()

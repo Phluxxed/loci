@@ -13,7 +13,6 @@ from loci.parser.extractor import parse_file
 from loci.parser.languages import EXTENSION_MAP, MARKDOWN_SUFFIXES
 from loci.parser.symbols import Symbol
 from loci.service import (
-    analyze_usage,
     get_store as get_service_store,
     reset_session_stats,
     session_stats,
@@ -282,35 +281,6 @@ def cmd_invalidate(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_summarize(args: argparse.Namespace) -> int:
-    repo_path = Path(args.path).resolve()
-    store = _get_store()
-
-    if args.apply:
-        summaries = json.loads(Path(args.apply).read_text())
-        count = store.apply_summaries(repo_path, summaries)
-        print(json.dumps({"summaries_applied": count}))
-        return 0
-
-    index = store.load(repo_path)
-    if index is None:
-        print(json.dumps({"error": "Repo not indexed"}), file=sys.stderr)
-        return 1
-
-    unsummarized = [
-        {
-            "id": s["id"],
-            "signature": s.get("signature", ""),
-            "docstring": s.get("docstring", ""),
-            "summary": s.get("summary", ""),
-        }
-        for s in index["symbols"]
-        if not s.get("summary")
-    ]
-    print(json.dumps(unsummarized))
-    return 0
-
-
 def _fmt_bytes(n: int) -> str:
     if n >= 1_048_576:
         return f"{n / 1_048_576:.1f}M"
@@ -560,42 +530,6 @@ def cmd_stats(args: argparse.Namespace) -> int:
     return 0
 
 
-def _format_analyze_pretty(result: dict) -> str:
-    lines = []
-    summary = result["summary"]
-    lines.append(f"loci Audit Report  {result['period']['from']} → {result['period']['to']}")
-    lines.append("─" * 72)
-    lines.append(
-        f"Gets: {summary['total_gets']}  "
-        f"Searches: {summary['total_searches']}  "
-        f"Misses: {summary['total_misses']}  "
-        f"Miss rate: {round(summary['miss_rate'] * 100)}%  "
-        f"Correlated: {round(summary['correlated_pct'] * 100)}%"
-    )
-    lines.append("")
-    findings = result["findings"]
-    if not findings:
-        lines.append("No issues found. Tool is working well.")
-        return "\n".join(lines)
-    lines.append(f"Findings ({len(findings)}):")
-    lines.append("─" * 72)
-    for f in findings:
-        lines.append(f"[{f['severity'].upper()}] {f['type']}")
-        lines.append(f"  {f['suggestion']}")
-        lines.append(f"  data: {json.dumps(f['data'])}")
-        lines.append("")
-    return "\n".join(lines)
-
-
-def cmd_analyze(args: argparse.Namespace) -> int:
-    result = analyze_usage(repo=getattr(args, "repo", None), since_days=args.since)
-    if args.pretty:
-        print(_format_analyze_pretty(result))
-    else:
-        print(json.dumps(result))
-    return 0
-
-
 def cmd_outline(args: argparse.Namespace) -> int:
     repo_path = Path(args.path).resolve()
     store = _get_store()
@@ -669,10 +603,6 @@ def main() -> None:
     p_inv = sub.add_parser("invalidate", help="Clear cache for a path")
     p_inv.add_argument("path", help="Path to repo")
 
-    p_sum = sub.add_parser("summarize", help="Output/apply symbol summaries")
-    p_sum.add_argument("path", help="Path to repo")
-    p_sum.add_argument("--apply", help="JSON file with summaries to apply")
-
     p_out = sub.add_parser("outline", help="Show all symbols grouped by file")
     p_out.add_argument("path", help="Path to repo")
     p_out.add_argument("--file", help="Filter to a single file (relative path)", default=None)
@@ -688,13 +618,6 @@ def main() -> None:
 
     p_verify = sub.add_parser("verify", help="Verify byte offsets for all indexed symbols")
     p_verify.add_argument("path", help="Path to repo")
-
-    p_analyze = sub.add_parser("analyze", help="Audit loci usage and emit improvement findings")
-    p_analyze.add_argument("--repo", help="Filter to a specific repo path")
-    p_analyze.add_argument("--since", type=int, default=30,
-                           help="Days of history to analyze (default: 30)")
-    p_analyze.add_argument("--pretty", action="store_true", help="Human-readable output")
-    p_analyze.set_defaults(func=cmd_analyze)
 
     args = parser.parse_args()
 
@@ -712,16 +635,12 @@ def main() -> None:
         sys.exit(cmd_list(args))
     elif args.command == "invalidate":
         sys.exit(cmd_invalidate(args))
-    elif args.command == "summarize":
-        sys.exit(cmd_summarize(args))
     elif args.command == "outline":
         sys.exit(cmd_outline(args))
     elif args.command == "stats":
         sys.exit(cmd_stats(args))
     elif args.command == "verify":
         sys.exit(cmd_verify(args))
-    elif args.command == "analyze":
-        sys.exit(cmd_analyze(args))
     else:
         parser.print_help()
         sys.exit(1)

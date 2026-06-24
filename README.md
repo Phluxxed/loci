@@ -36,9 +36,9 @@ pip install -e .
 
 For repo-local dogfooding, install the tracked wrappers so both commands are
 globally resolvable. The wrappers honor an explicit `LOCI_BASE_DIR`; otherwise
-Claude Code uses `~/.claude/loci-index` via `CLAUDECODE=1` and a bare terminal
-uses the neutral `~/.codeindex` store. Codex and Claude MCP configs should pass
-their agent-specific stores explicitly:
+Claude Code uses `~/.claude/loci-index` via `CLAUDECODE=1`, and bare terminal
+calls fall through to the Python store resolver. Codex and Claude MCP configs
+should pass their agent-specific stores explicitly:
 
 ```bash
 mkdir -p ~/.local/bin
@@ -152,7 +152,9 @@ For clients that use `mcpServers` JSON, configure the server as a local stdio pr
 }
 ```
 
-`LOCI_BASE_DIR` is optional. If omitted, loci uses `~/.codeindex`.
+`LOCI_BASE_DIR` is optional. If omitted, loci first looks for a configured
+Codex MCP `LOCI_BASE_DIR`, then an existing `~/.codex/loci-index`, then falls
+back to `~/.codeindex`.
 
 ### MCP Tools
 
@@ -166,6 +168,8 @@ For clients that use `mcpServers` JSON, configure the server as a local stdio pr
 | `loci_grep` | Regex-search cached files |
 | `loci_verify` | Verify index integrity and content drift |
 | `loci_list` | List indexed repos |
+| `loci_stats` | Return structured retrieval savings stats |
+| `loci_analyze` | Return structured search and extraction diagnostics |
 
 ## CLI Usage
 
@@ -200,19 +204,10 @@ loci verify /path/to/repo          # check for content drift
 loci list                           # all indexed repos
 loci invalidate /path/to/repo      # clear stale cache
 
-# Auto-summarize symbols (run after every index)
-loci summarize /path/to/repo       # check for unsummarized symbols
-loci summarize /path/to/repo --apply summaries.json  # write generated summaries back
-
-# Token savings analytics
+# Human token savings analytics
 loci stats
 loci stats --pretty
 loci stats --repo /path/to/repo
-
-# Self-improvement audit (finds search blind spots, ranking issues)
-loci analyze
-loci analyze --pretty
-loci analyze --since 7             # last N days
 ```
 
 ## Symbol fields
@@ -221,7 +216,8 @@ Every symbol carries: `id`, `name`, `qualified_name`, `kind`, `language`, `file_
 
 ## Analytics
 
-loci logs every search and get to a session file. The `analyze` command reads that log and surfaces actionable findings:
+loci logs every search and get to a session file. The `loci_analyze` MCP tool
+reads that log and surfaces actionable findings:
 
 | Finding type | What it means |
 |---|---|
@@ -231,6 +227,10 @@ loci logs every search and get to a session file. The `analyze` command reads th
 | `poor_extraction` | High refetch rate on a symbol kind |
 | `refetch_hotspot` | Same symbol fetched repeatedly in a session |
 | `kind_dead_weight` | A symbol kind is indexed but never retrieved |
+
+For a shell or tmux stats readout, use `loci stats --pretty`. Without
+`LOCI_BASE_DIR`, CLI stats prefer the configured Codex MCP store when it is
+discoverable. Set `LOCI_BASE_DIR=/path/to/store` to inspect a specific store.
 
 ## Agent configuration
 
@@ -277,7 +277,6 @@ This symlinks the hooks and skill files into `~/.claude/` and patches `~/.claude
 | `loci-session-start.sh` | `~/.claude/hooks/` | Runs `loci index --incremental` on session open/resume |
 | `loci-agent-inject.sh` | `~/.claude/hooks/` | Injects the skill into subagent prompts before `Agent` tool calls |
 | `SKILL.md` | `~/.claude/skills/loci/` | The agent workflow guide Claude loads via the `loci` skill |
-| `summarizer-prompt.md` | `~/.claude/skills/loci/` | Prompt used by the auto-summarize workflow |
 
 ## Codex integration
 

@@ -841,23 +841,6 @@ class IndexStore:
             "findings": findings,
         }
 
-    def apply_summaries(self, repo_path: Path, summaries: list[dict[str, str]]) -> int:
-        index = self.load(repo_path)
-        if index is None:
-            return 0
-        summary_map = {s["id"]: s["summary"] for s in summaries}
-        applied = 0
-        for sym in index["symbols"]:
-            if sym["id"] in summary_map:
-                sym["summary"] = summary_map[sym["id"]]
-                applied += 1
-        index_path = self._index_path(repo_path)
-        tmp_path = index_path.with_suffix(".tmp")
-        tmp_path.write_text(json.dumps(index, indent=2))
-        tmp_path.replace(index_path)
-        return applied
-
-
 def _ts_to_iso(ts: float) -> str:
     from datetime import datetime, timezone
     return datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
