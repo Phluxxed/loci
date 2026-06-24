@@ -256,9 +256,9 @@ navigation subcommands or convert temporary debug commands into thin wrappers ov
 The preferred endpoint is removal once MCP tools are visible in fresh sessions.
 
 **Acceptance criteria:**
-- [ ] No duplicate indexing loop remains in `cli.py`.
-- [ ] CLI no longer defines independent `index/search/get/file/grep/outline/verify/list` behavior.
-- [ ] MCP smoke tests cover the removed CLI behavior.
+- [x] No duplicate indexing loop remains in `cli.py`.
+- [x] CLI no longer defines independent `index/search/get/file/grep/outline/verify/list` behavior.
+- [x] MCP smoke tests cover the removed CLI behavior.
 - [ ] CLI tests are reduced to retained human/operator commands.
 
 **Verification:**
@@ -344,8 +344,8 @@ accident.
 ### Checkpoint C: CLI retirement
 
 - [ ] MCP navigation is verified in a fresh session.
-- [ ] CLI navigation duplication is removed or reduced to temporary wrappers.
-- [ ] README and skills no longer encourage CLI navigation.
+- [x] CLI navigation duplication is removed or reduced to temporary wrappers.
+- [x] README and skills no longer encourage CLI navigation.
 
 ## Risks and mitigations
 
