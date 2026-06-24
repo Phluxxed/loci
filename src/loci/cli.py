@@ -2,7 +2,6 @@ from __future__ import annotations
 import argparse
 import datetime
 import json
-import os
 import sys
 import uuid
 from collections import defaultdict
@@ -13,6 +12,12 @@ import pathspec
 from loci.parser.extractor import parse_file
 from loci.parser.languages import EXTENSION_MAP, MARKDOWN_SUFFIXES
 from loci.parser.symbols import Symbol
+from loci.service import (
+    analyze_usage,
+    get_store as get_service_store,
+    reset_session_stats,
+    session_stats,
+)
 from loci.storage.index_store import IndexStore
 
 SKIP_DIRS = {
@@ -32,8 +37,7 @@ SKIP_EXTENSIONS = {
 
 
 def _get_store() -> IndexStore:
-    base = os.environ.get("LOCI_BASE_DIR")
-    return IndexStore(base_dir=Path(base)) if base else IndexStore()
+    return get_service_store()
 
 
 def _load_gitignore(repo_path: Path) -> "pathspec.PathSpec | None":
@@ -319,6 +323,15 @@ def _fmt_bytes(n: int) -> str:
 import re as _re
 _ANSI_RE = _re.compile(r"\033\[[0-9;]*m")
 
+
+def _store_label(stats: dict) -> str:
+    store = stats.get("store") or {}
+    base_dir = store.get("base_dir")
+    if not base_dir:
+        return ""
+    source = store.get("source", "unknown")
+    return f"Store: {base_dir} ({source})"
+
 def _ansi(code: str, text: str, use_color: bool) -> str:
     return f"\033[{code}m{text}\033[0m" if use_color else text
 
@@ -388,6 +401,9 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
     docs = stats.get("docs", {})
 
     lines.append(_cyan(f"loci Savings{scope}{window}", use_color))
+    store_label = _store_label(stats)
+    if store_label:
+        lines.append(_dim(store_label, use_color))
     lines.append("─" * TW)
     lines.append("")
 
@@ -531,14 +547,12 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
 
 
 def cmd_stats(args: argparse.Namespace) -> int:
-    store = _get_store()
     if args.reset:
-        backup = store.reset_session()
-        if backup is not None:
-            print(json.dumps({"reset": True, "backup": str(backup)}), file=sys.stderr)
+        reset = reset_session_stats()
+        print(json.dumps(reset), file=sys.stderr)
     repo_filter = str(Path(args.repo).resolve()) if args.repo else ""
     since_days = None if args.all_time else args.since
-    stats = store.get_session_stats(repo_filter=repo_filter or None, since_days=since_days)
+    stats = session_stats(repo=args.repo, since_days=since_days)
     if args.pretty:
         print(_format_stats_pretty(stats, repo_filter=repo_filter, use_color=sys.stdout.isatty(), since_days=since_days))
     else:
@@ -574,9 +588,7 @@ def _format_analyze_pretty(result: dict) -> str:
 
 
 def cmd_analyze(args: argparse.Namespace) -> int:
-    store = _get_store()
-    repo_filter = str(Path(args.repo).resolve()) if getattr(args, "repo", None) else None
-    result = store.analyze(since_days=args.since, repo_filter=repo_filter)
+    result = analyze_usage(repo=getattr(args, "repo", None), since_days=args.since)
     if args.pretty:
         print(_format_analyze_pretty(result))
     else:

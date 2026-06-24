@@ -5,6 +5,7 @@ import pytest
 import loci.service as service_module
 from loci.service import (
     LociError,
+    analyze_usage,
     get_cached_file,
     get_symbols,
     grep_repo,
@@ -12,8 +13,10 @@ from loci.service import (
     list_repos,
     outline_repo,
     search_symbols,
+    session_stats,
     verify_repo,
 )
+from loci.storage.index_store import IndexStore
 
 
 @pytest.fixture
@@ -63,6 +66,47 @@ def test_service_index_warns_on_short_nonempty_markdown_with_zero_symbols(
         "lines": 1,
         "reason": "0 symbols extracted",
     }]
+
+
+def test_service_session_stats_reads_codex_mcp_store_without_env(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    pytest.importorskip("tomllib")
+
+    monkeypatch.delenv("LOCI_BASE_DIR", raising=False)
+    codex_home = tmp_path / ".codex"
+    mcp_store = tmp_path / "mcp-store"
+    codex_home.mkdir()
+    (codex_home / "config.toml").write_text(
+        "[mcp_servers.loci]\n"
+        "command = \"loci-mcp\"\n"
+        "[mcp_servers.loci.env]\n"
+        f"LOCI_BASE_DIR = \"{mcp_store}\"\n"
+    )
+    monkeypatch.setenv("CODEX_HOME", str(codex_home))
+    IndexStore(base_dir=mcp_store).log_retrieval(
+        "src/app.py::run#function",
+        20,
+        120,
+        repo_path="/tmp/repo",
+    )
+
+    stats = session_stats()
+
+    assert stats["total_gets"] == 1
+    assert stats["store"]["base_dir"] == str(mcp_store)
+    assert stats["store"]["source"] == "codex_mcp_config"
+
+
+def test_service_analyze_includes_store_metadata(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+
+    result = analyze_usage(since_days=7)
+
+    assert "summary" in result
+    assert result["store"]["base_dir"] == str(tmp_path / ".codeindex")
+    assert result["store"]["source"] == "env"
 
 
 def test_service_index_missing_path_raises_structured_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):

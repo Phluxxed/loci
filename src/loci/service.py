@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import uuid
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -13,6 +12,7 @@ from loci.parser.extractor import parse_file
 from loci.parser.languages import EXTENSION_MAP, MARKDOWN_SUFFIXES
 from loci.parser.symbols import Symbol
 from loci.storage.index_store import IndexStore
+from loci.storage.store_resolver import StoreResolution, resolve_store_base_dir
 
 SKIP_DIRS = {
     ".git", "node_modules", "__pycache__", ".venv", "venv",
@@ -48,8 +48,16 @@ class LociError(Exception):
 
 
 def get_store() -> IndexStore:
-    base = os.environ.get("LOCI_BASE_DIR")
-    return IndexStore(base_dir=Path(base)) if base else IndexStore()
+    return _get_store_with_resolution()[0]
+
+
+def get_store_resolution() -> StoreResolution:
+    return resolve_store_base_dir()
+
+
+def _get_store_with_resolution() -> tuple[IndexStore, StoreResolution]:
+    resolution = resolve_store_base_dir()
+    return IndexStore(base_dir=resolution.base_dir), resolution
 
 
 def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
@@ -317,6 +325,52 @@ def verify_repo(path: str | Path) -> dict[str, Any]:
 
 def list_repos() -> list[dict[str, Any]]:
     return get_store().list_repos()
+
+
+def session_stats(
+    repo: str | Path | None = None,
+    since_days: int | None = 7,
+) -> dict[str, Any]:
+    if since_days is not None and since_days < 0:
+        raise LociError(
+            "INVALID_INPUT",
+            "since_days must be greater than or equal to 0",
+            {"since_days": since_days},
+        )
+
+    store, resolution = _get_store_with_resolution()
+    repo_filter = str(Path(repo).resolve()) if repo else None
+    stats = store.get_session_stats(repo_filter=repo_filter, since_days=since_days)
+    stats["store"] = resolution.to_dict()
+    return stats
+
+
+def reset_session_stats() -> dict[str, Any]:
+    store, resolution = _get_store_with_resolution()
+    backup = store.reset_session()
+    return {
+        "reset": True,
+        "backup": str(backup) if backup is not None else None,
+        "store": resolution.to_dict(),
+    }
+
+
+def analyze_usage(
+    repo: str | Path | None = None,
+    since_days: int = 30,
+) -> dict[str, Any]:
+    if since_days < 0:
+        raise LociError(
+            "INVALID_INPUT",
+            "since_days must be greater than or equal to 0",
+            {"since_days": since_days},
+        )
+
+    store, resolution = _get_store_with_resolution()
+    repo_filter = str(Path(repo).resolve()) if repo else None
+    result = store.analyze(since_days=since_days, repo_filter=repo_filter)
+    result["store"] = resolution.to_dict()
+    return result
 
 
 def _get_symbol(
