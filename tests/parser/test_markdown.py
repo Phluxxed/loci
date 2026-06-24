@@ -57,6 +57,21 @@ def test_parse_markdown_byte_offsets_valid(sample_md: Path):
         assert sym.byte_offset + sym.byte_length <= len(source)
 
 
+def test_parse_markdown_unicode_byte_offsets_round_trip(tmp_path: Path):
+    p = tmp_path / "unicode.md"
+    p.write_text("# Café\n\nBody with π chars.\n", encoding="utf-8")
+    source = p.read_bytes()
+
+    symbols = parse_file(p)
+    section = next(s for s in symbols if s.name == "Café")
+    body = source[section.byte_offset:section.byte_offset + section.byte_length]
+
+    assert section.byte_offset == 0
+    assert section.byte_length == len(source)
+    assert section.line == 1
+    assert body.decode("utf-8") == "# Café\n\nBody with π chars.\n"
+
+
 def test_parse_markdown_section_body_round_trips(sample_md: Path):
     source = sample_md.read_bytes()
     overview = next(s for s in parse_file(sample_md) if s.qualified_name == "Overview")
@@ -125,6 +140,21 @@ def test_parse_markdown_extension_alias(tmp_path: Path):
     symbols = parse_file(p)
     assert len(symbols) == 1
     assert symbols[0].name == "Heading"
+
+
+def test_parse_markdown_parser_errors_surface(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    p = tmp_path / "broken.md"
+    p.write_text("# Heading\n\nbody\n")
+
+    import tree_sitter_language_pack
+
+    def fail_get_language(language: str):
+        raise RuntimeError(f"cannot load {language}")
+
+    monkeypatch.setattr(tree_sitter_language_pack, "get_language", fail_get_language)
+
+    with pytest.raises(RuntimeError, match="cannot load markdown"):
+        parse_file(p)
 
 
 def test_parse_markdown_content_hash_deterministic(sample_md: Path):

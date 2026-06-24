@@ -659,15 +659,11 @@ def parse_markdown(path: Path) -> list[Symbol]:
 
     rel_path = str(path)
 
-    try:
-        from tree_sitter_language_pack import get_parser
-        parser = get_parser("markdown")
-        parse = getattr(parser, "parse", None)
-        if parse is None:
-            return []
-        tree = parse(source)
-    except Exception:
-        return []
+    from tree_sitter import Parser
+    from tree_sitter_language_pack import get_language
+
+    parser = Parser(get_language("markdown"))
+    tree = parser.parse(source)
 
     sections = [c for c in tree.root_node.children if c.type == "section"]
     has_heading = any(_md_heading_node(sec) is not None for sec in sections)

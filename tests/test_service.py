@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 
+import loci.service as service_module
 from loci.service import (
     LociError,
     get_cached_file,
@@ -43,6 +44,25 @@ def test_service_index_outline_get_round_trip(sample_repo: Path, tmp_path: Path,
     assert "def add" in results[0]["source"]
     assert "context_before" in results[0]
     assert "context_after" in results[0]
+
+
+def test_service_index_warns_on_short_nonempty_markdown_with_zero_symbols(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "README.md").write_text("# Heading\n")
+    monkeypatch.setattr(service_module, "parse_file", lambda path: [])
+
+    indexed = index_repo(repo, incremental=False)
+
+    assert indexed["warnings"] == [{
+        "file": "README.md",
+        "lines": 1,
+        "reason": "0 symbols extracted",
+    }]
 
 
 def test_service_index_missing_path_raises_structured_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
