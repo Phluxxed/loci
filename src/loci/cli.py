@@ -2,213 +2,76 @@ from __future__ import annotations
 import argparse
 import datetime
 import json
+import re as _re
 import sys
-import uuid
-from collections import defaultdict
 from pathlib import Path
 
-import pathspec
-
-from loci.parser.extractor import parse_file
-from loci.parser.languages import EXTENSION_MAP, MARKDOWN_SUFFIXES
-from loci.parser.symbols import Symbol
 from loci.service import (
+    LociError,
+    get_cached_file,
+    get_symbols,
     get_store as get_service_store,
+    grep_repo,
+    index_repo,
+    list_repos,
+    outline_repo,
     reset_session_stats,
+    search_symbols,
     session_stats,
+    verify_repo,
 )
-from loci.storage.index_store import IndexStore
-
-SKIP_DIRS = {
-    ".git", "node_modules", "__pycache__", ".venv", "venv",
-    ".tox", "dist", "build", ".mypy_cache", ".pytest_cache",
-    ".ruff_cache", ".uv-cache", "uv-cache", "__tests__", "tests",
-}
-TEST_FILE_SUFFIXES = (
-    ".test.ts", ".test.tsx", ".test.js", ".test.jsx",
-    ".spec.ts", ".spec.tsx", ".spec.js", ".spec.jsx",
-)
-SKIP_FILES = {".env", ".env.local", "credentials.json", "secrets.json"}
-SKIP_EXTENSIONS = {
-    ".pyc", ".pyo", ".so", ".dylib", ".dll", ".exe",
-    ".bin", ".pem", ".key", ".p12",
-}
 
 
-def _get_store() -> IndexStore:
-    return get_service_store()
-
-
-def _load_gitignore(repo_path: Path) -> "pathspec.PathSpec | None":
-    gitignore = repo_path / ".gitignore"
-    if not gitignore.exists():
-        return None
-    lines = gitignore.read_text(encoding="utf-8", errors="replace").splitlines()
-    return pathspec.PathSpec.from_lines("gitwildmatch", lines)
-
-
-def _should_skip_file(path: Path) -> bool:
-    if path.name in SKIP_FILES:
-        return True
-    if path.suffix in SKIP_EXTENSIONS:
-        return True
-    if path.suffix not in EXTENSION_MAP:
-        return True
-    name = path.name
-    if name.startswith("test_") or name.endswith("_test.py") or name.endswith("_test.go"):
-        return True
-    if any(name.endswith(s) for s in TEST_FILE_SUFFIXES):
-        return True
-    return False
+def _print_loci_error(exc: LociError) -> None:
+    print(
+        json.dumps({
+            "error": exc.message,
+            "code": exc.code,
+            "details": exc.details,
+        }),
+        file=sys.stderr,
+    )
 
 
 def cmd_index(args: argparse.Namespace) -> int:
-    repo_path = Path(args.path).resolve()
-    if not repo_path.exists():
-        print(json.dumps({"error": f"Path not found: {repo_path}"}), file=sys.stderr)
+    try:
+        print(json.dumps(index_repo(args.path, incremental=args.incremental)))
+        return 0
+    except LociError as exc:
+        _print_loci_error(exc)
         return 1
-
-    store = _get_store()
-    existing = store.load(repo_path) if args.incremental else None
-    existing_hashes: dict[str, str] = existing.get("file_hashes", {}) if existing else {}
-    existing_symbols: list[dict] = existing.get("symbols", []) if existing else []
-
-    all_symbols: list[Symbol] = []
-    new_file_hashes: dict[str, str] = dict(existing_hashes)
-    files_skipped = 0
-    language_counts: dict[str, int] = defaultdict(int)
-    zero_symbol_warnings: list[dict] = []
-    gitignore = _load_gitignore(repo_path)
-
-    for src_file in sorted(repo_path.rglob("*")):
-        if not src_file.is_file():
-            continue
-        if any(part in SKIP_DIRS for part in src_file.parts):
-            continue
-        if _should_skip_file(src_file):
-            continue
-
-        rel_path = str(src_file.relative_to(repo_path))
-        if gitignore and gitignore.match_file(rel_path):
-            continue
-        file_hash = store.hash_file(src_file)
-
-        if args.incremental and existing_hashes.get(rel_path) == file_hash:
-            kept = [Symbol.from_dict(s) for s in existing_symbols if s["file_path"] == rel_path]
-            all_symbols.extend(kept)
-            files_skipped += 1
-            lang = EXTENSION_MAP.get(src_file.suffix, "unknown")
-            language_counts[lang] += 1
-            continue
-
-        symbols = parse_file(src_file)
-        for sym in symbols:
-            sym.file_path = rel_path
-            sym.id = f"{rel_path}::{sym.qualified_name}#{sym.kind}"
-        all_symbols.extend(symbols)
-        new_file_hashes[rel_path] = file_hash
-        lang = EXTENSION_MAP.get(src_file.suffix, "unknown")
-        if symbols:
-            language_counts[lang] += 1
-        else:
-            # Warn on non-trivial files with known extensions that yield 0 symbols
-            try:
-                file_bytes = src_file.read_bytes()
-            except OSError:
-                file_bytes = b""
-            line_count = len(file_bytes.splitlines())
-            is_nonempty_markdown = (
-                src_file.suffix.lower() in MARKDOWN_SUFFIXES
-                and bool(file_bytes.strip())
-            )
-            if line_count > 10 or is_nonempty_markdown:
-                zero_symbol_warnings.append({
-                    "file": rel_path,
-                    "lines": line_count,
-                    "reason": "0 symbols extracted",
-                })
-
-    store.write(repo_path, all_symbols, file_hashes=new_file_hashes)
-
-    output: dict = {
-        "path": str(repo_path),
-        "symbols_indexed": len(all_symbols),
-        "files_skipped": files_skipped,
-        "languages": dict(language_counts),
-    }
-    if zero_symbol_warnings:
-        output["warnings"] = zero_symbol_warnings
-
-    print(json.dumps(output))
-    return 0
 
 
 def cmd_search(args: argparse.Namespace) -> int:
-    repo_path = Path(args.repo).resolve()
-    store = _get_store()
-    results = store.search(
-        repo_path,
-        args.query,
-        kind=args.kind,
-        lang=args.lang,
-        limit=args.limit,
-    )
-    if results:
-        search_id = str(uuid.uuid4())
-        result_ids = [r["id"] for r in results]
-        store.log_search(search_id, args.query, str(repo_path), result_ids)
-    else:
-        store.log_miss("search_empty", repo_path=str(repo_path), query=args.query)
-    print(json.dumps(results))
-    return 0
+    try:
+        results = search_symbols(
+            args.repo,
+            args.query,
+            kind=args.kind,
+            lang=args.lang,
+            limit=args.limit,
+        )
+        print(json.dumps(results))
+        return 0
+    except LociError as exc:
+        _print_loci_error(exc)
+        return 1
 
 
 def cmd_get(args: argparse.Namespace) -> int:
-    repo_path = Path(args.repo).resolve()
-    store = _get_store()
-    index = store.load(repo_path)
     single = len(args.symbol_ids) == 1
     context_lines: int = getattr(args, "context", 0) or 0
 
     def _fetch(symbol_id: str) -> dict:
-        if index is None:
-            store.log_miss("get_not_found", repo_path=str(repo_path), symbol_id=symbol_id)
-            return {"id": symbol_id, "error": "Repo not indexed"}
-        meta = next((s for s in index["symbols"] if s["id"] == symbol_id), None)
-        if meta is None:
-            store.log_miss("get_not_found", repo_path=str(repo_path), symbol_id=symbol_id)
-            return {"id": symbol_id, "error": f"Symbol not found: {symbol_id}"}
-        content = store.get_symbol_content(repo_path, symbol_id)
-        if content is None:
-            store.log_miss("get_not_found", repo_path=str(repo_path), symbol_id=symbol_id)
-            return {"id": symbol_id, "error": f"Symbol not found: {symbol_id}"}
-        symbol_bytes = len(content.encode("utf-8"))
-        file_bytes = store.get_symbol_file_size(repo_path, symbol_id)
-        if file_bytes is not None:
-            search_id, search_rank = store.resolve_search_correlation(symbol_id, repo=str(repo_path))
-            store.log_retrieval(
-                symbol_id,
-                symbol_bytes,
-                file_bytes,
-                repo_path=str(repo_path),
-                kind=meta.get("kind"),
-                language=meta.get("language"),
-                search_id=search_id,
-                search_rank=search_rank,
-            )
-        result: dict = {
-            "id": symbol_id,
-            "source": content,
-            **{k: meta.get(k) for k in ("byte_offset", "byte_length", "line", "end_line", "signature", "kind", "language")},  # type: ignore[union-attr]
-        }
-        if meta.get("decorators"):
-            result["decorators"] = meta["decorators"]
-        if context_lines > 0:
-            ctx = store.get_symbol_context(repo_path, symbol_id, context_lines)
-            if ctx:
-                result["context_before"] = ctx["context_before"]
-                result["context_after"] = ctx["context_after"]
-        return result
+        try:
+            return get_symbols(args.repo, [symbol_id], context=context_lines)[0]
+        except LociError as exc:
+            return {
+                "id": symbol_id,
+                "error": exc.message,
+                "code": exc.code,
+                "details": exc.details,
+            }
 
     if single:
         result = _fetch(args.symbol_ids[0])
@@ -224,42 +87,37 @@ def cmd_get(args: argparse.Namespace) -> int:
 
 
 def cmd_file(args: argparse.Namespace) -> int:
-    repo_path = Path(args.repo).resolve()
-    store = _get_store()
-    result = store.get_file_content(
-        repo_path, args.file_path, start_line=args.start, end_line=args.end
-    )
-    if result is None:
-        print(json.dumps({"error": f"File not found in cache: {args.file_path}"}), file=sys.stderr)
+    try:
+        result = get_cached_file(
+            args.repo,
+            args.file_path,
+            start_line=args.start,
+            end_line=args.end,
+        )
+        print(json.dumps(result))
+        return 0
+    except LociError as exc:
+        _print_loci_error(exc)
         return 1
-    symbol_bytes = len(result["content"].encode("utf-8"))
-    file_bytes = result.pop("file_bytes")
-    language = EXTENSION_MAP.get(Path(args.file_path).suffix)
-    store.log_retrieval(
-        args.file_path, symbol_bytes, file_bytes, repo_path=str(repo_path), language=language
-    )
-    print(json.dumps(result))
-    return 0
 
 
 def cmd_grep(args: argparse.Namespace) -> int:
-    repo_path = Path(args.repo).resolve()
-    store = _get_store()
     try:
-        results = store.grep_files(repo_path, args.pattern)
-    except ValueError as e:
-        print(json.dumps({"error": str(e)}), file=sys.stderr)
+        print(json.dumps(grep_repo(args.repo, args.pattern)))
+        return 0
+    except LociError as exc:
+        if exc.code == "REPO_NOT_INDEXED":
+            print(json.dumps([]))
+            return 0
+        _print_loci_error(exc)
         return 1
-    print(json.dumps(results))
-    return 0
 
 
 def cmd_verify(args: argparse.Namespace) -> int:
-    repo_path = Path(args.path).resolve()
-    store = _get_store()
-    result = store.verify_index(repo_path)
-    if "error" in result:
-        print(json.dumps(result), file=sys.stderr)
+    try:
+        result = verify_repo(args.path)
+    except LociError as exc:
+        _print_loci_error(exc)
         return 1
     has_failures = len(result["failed"]) > 0
     print(json.dumps(result))
@@ -267,15 +125,13 @@ def cmd_verify(args: argparse.Namespace) -> int:
 
 
 def cmd_list(_args: argparse.Namespace) -> int:
-    store = _get_store()
-    repos = store.list_repos()
-    print(json.dumps(repos))
+    print(json.dumps(list_repos()))
     return 0
 
 
 def cmd_invalidate(args: argparse.Namespace) -> int:
     repo_path = Path(args.path).resolve()
-    store = _get_store()
+    store = get_service_store()
     store.invalidate(repo_path)
     print(json.dumps({"invalidated": str(repo_path)}))
     return 0
@@ -290,7 +146,6 @@ def _fmt_bytes(n: int) -> str:
 
 
 # ANSI color helpers — no-ops when colors disabled
-import re as _re
 _ANSI_RE = _re.compile(r"\033\[[0-9;]*m")
 
 
@@ -531,40 +386,12 @@ def cmd_stats(args: argparse.Namespace) -> int:
 
 
 def cmd_outline(args: argparse.Namespace) -> int:
-    repo_path = Path(args.path).resolve()
-    store = _get_store()
-    index = store.load(repo_path)
-    if index is None:
-        print(json.dumps({"error": "Repo not indexed"}), file=sys.stderr)
+    try:
+        print(json.dumps(outline_repo(args.path, file=args.file)))
+        return 0
+    except LociError as exc:
+        _print_loci_error(exc)
         return 1
-
-    grouped: dict[str, list[dict]] = {}
-    languages: set[str] = set()
-    for s in index["symbols"]:
-        fp = s["file_path"]
-        if args.file and fp != args.file:
-            continue
-        entry: dict = {
-            "id": s.get("id", ""),
-            "name": s.get("name", ""),
-            "kind": s.get("kind", ""),
-            "line": s.get("line", 0),
-            "end_line": s.get("end_line", 0),
-            "signature": s.get("signature", ""),
-            "summary": s.get("summary", ""),
-        }
-        if s.get("decorators"):
-            entry["decorators"] = s["decorators"]
-        grouped.setdefault(fp, []).append(entry)
-        if s.get("language"):
-            languages.add(s["language"])
-
-    result = [{"file": fp, "symbols": syms} for fp, syms in sorted(grouped.items())]
-    symbol_count = sum(len(syms) for syms in grouped.values())
-    store.log_outline(str(repo_path), symbol_count, file_filter=args.file or None,
-                      languages=sorted(languages))
-    print(json.dumps(result))
-    return 0
 
 
 def main() -> None:
