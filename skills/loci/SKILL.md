@@ -15,6 +15,7 @@ Prefer the local MCP server when its tools are available:
 loci_index(path, incremental=true)
 loci_outline(path) or loci_search(repo, query)
 loci_get(repo, symbol_ids)
+loci_analyze(repo) when diagnostics are needed
 ```
 
 If MCP tools are not configured in the current agent runtime, configure MCP first. Do not quietly continue with the CLI as the steady-state path.
@@ -72,6 +73,8 @@ If loci is unavailable, fails, or the task is a standalone doc/config check wher
 | `loci_grep` | Hunting string literals, errors, or config keys |
 | `loci_verify` | Checking index integrity and content drift |
 | `loci_list` | Listing indexed repos |
+| `loci_stats` | Reading structured usage and savings stats |
+| `loci_analyze` | Finding search or extraction blind spots |
 
 ## CLI Fallback
 
@@ -84,11 +87,9 @@ If loci is unavailable, fails, or the task is a standalone doc/config check wher
 | `loci file <rel_path> --repo <path> [--start N] [--end N]` | Reading non-symbol files |
 | `loci grep <pattern> --repo <path>` | Hunting string literals, errors, or config keys |
 | `loci verify <path>` | Checking index integrity and content drift |
-| `loci summarize <path>` | Checking for unsummarized symbols |
 | `loci stats [--repo <path>] [--pretty]` | Checking token savings |
 | `loci list` | Listing indexed repos |
 | `loci invalidate <path>` | Clearing stale cache |
-| `loci analyze [--repo <path>]` | Finding search or extraction blind spots |
 
 ## Output Schemas
 
@@ -127,24 +128,8 @@ MCP tool errors are structured under `structuredContent.error` with `code`, `mes
 - Need exact surrounding context: `loci_get` with `context` or `loci_file`.
 - Non-code file such as JSON, YAML, TOML, or Markdown: `loci_file` or a normal targeted read.
 
-## Summaries
+## Diagnostics
 
-After indexing a repo you expect to keep using, run the CLI maintenance command `loci summarize <path>` to report symbols without summaries. If it returns an empty array, continue with `loci_outline`, `loci_search`, and `loci_get`.
+Use `loci_analyze` when search misses, poor ranking, repeated refetches, or extraction quality look suspect. Treat findings as diagnostics to inspect, not orders to follow blindly.
 
-Generate summaries as agent maintenance only when better symbol summaries would materially help repeated navigation, conceptual search, or ranking. If summarization is not worth the extra work for the task, skip it.
-
-When generating summaries:
-
-1. Split the unsummarized symbol array into chunks of up to 200 symbols.
-2. Use `summarizer-prompt.md` from this skill directory as the prompt for each chunk.
-3. Require raw JSON only. If the response includes markdown fences or extra text, strip them. If JSON is still malformed, retry once with: `Return only a raw JSON array, no markdown`.
-4. Merge chunk results into one JSON array of `{ "id": "...", "summary": "..." }` objects.
-5. Write the merged array to a temp file, apply it, then delete the temp file.
-
-To apply generated summaries:
-
-```bash
-loci summarize <path> --apply /path/to/summaries.json
-```
-
-The expected summaries file is a JSON array of summary objects.
+Use CLI `loci stats --pretty` only for a human-readable shell/tmux savings view. Agents should prefer `loci_stats` for structured stats.

@@ -1,6 +1,6 @@
 # Plan: MCP production surface plus human maintenance CLI
 
-**Status:** draft for review
+**Status:** in implementation
 **Date:** 2026-06-24
 **Scope:** loci MCP/CLI surface cleanup, stats store routing, agent diagnostics, summarize decision
 
@@ -12,8 +12,8 @@ or vice versa. The remaining CLI value is human/operator maintenance, especially
 from a shell or tmux.
 
 This plan keeps that human CLI value while moving agent-facing diagnostics into MCP, fixing the
-`LOCI_BASE_DIR` store mismatch, and making an evidence-based decision on whether `summarize` still
-earns its complexity.
+`LOCI_BASE_DIR` store mismatch, and removing the stale `summarize` workflow after audit showed it
+does not earn its complexity.
 
 ## Architecture decisions
 
@@ -22,8 +22,8 @@ earns its complexity.
 - The CLI is not a second navigation product. It should become a human/operator maintenance surface.
 - `stats` stays as CLI because it is mainly for a human in tmux.
 - `analyze` becomes an MCP tool because it is for agents to diagnose loci behavior.
-- `summarize` is undecided. Keep it only if current evidence shows summaries materially improve
-  outline triage or ambiguous search.
+- `summarize` is removed. Current evidence does not show useful populated summaries or meaningful
+  ambiguous-search value.
 - Store resolution must be explicit and consistent. `loci stats` must read the same store MCP writes
   to, unless the caller intentionally overrides it.
 
@@ -31,12 +31,17 @@ earns its complexity.
 
 - Existing MCP tools: `loci_index`, `loci_outline`, `loci_search`, `loci_get`, `loci_file`,
   `loci_grep`, `loci_verify`, `loci_list`.
-- CLI-only maintenance commands: `stats`, `analyze`, `summarize`, `invalidate`.
+- CLI-only maintenance commands before cleanup: `stats`, `analyze`, `summarize`, `invalidate`.
 - Existing design docs already say MCP is production and CLI is legacy/debug/migration safety.
 - `stats` can look broken when MCP writes to `$HOME/.codex/loci-index` but plain CLI defaults to
   `~/.codeindex`.
 - `summarize` was originally intended to help humans/agents decide whether to fetch a symbol from
-  `outline` and to enrich search ranking, but it needs current validation.
+  `outline` and to enrich search ranking.
+- Current audit: the Codex MCP store had 28 indexed repos, 16,766 symbols, and 0 non-empty
+  summaries. The legacy store had 90 indexed repos, 9,587 symbols, and 0 non-empty summaries.
+- Search scoring gives summary text only weak optional weight (`+5` exact summary match, `+1` per
+  query word), and tests only covered CLI plumbing/fake application, not real ambiguous-search
+  value.
 
 ## Task list
 
@@ -48,13 +53,13 @@ earns its complexity.
 actual store paths used by MCP config, wrappers, and default `IndexStore`.
 
 **Acceptance criteria:**
-- [ ] `codex mcp get --json loci` store env is recorded.
-- [ ] `loci stats --pretty` and `LOCI_BASE_DIR=<mcp-store> loci stats --pretty` behavior is compared.
-- [ ] The plan identifies whether the bug is only default store selection or also missing MCP event logging.
+- [x] `codex mcp get --json loci` store env is recorded.
+- [x] `loci stats --pretty` and `LOCI_BASE_DIR=<mcp-store> loci stats --pretty` behavior is compared.
+- [x] The plan identifies whether the bug is only default store selection or also missing MCP event logging.
 
 **Verification:**
-- [ ] Run `loci_stats` or equivalent MCP calls after a real MCP `search/get` once available.
-- [ ] Confirm `session.jsonl` is written in the expected MCP store.
+- [x] Run `loci_stats` or equivalent MCP calls after a real MCP `search/get` once available.
+- [x] Confirm `session.jsonl` is written in the expected MCP store.
 
 **Dependencies:** None
 
@@ -68,10 +73,10 @@ actual store paths used by MCP config, wrappers, and default `IndexStore`.
 `LOCI_BASE_DIR` as an explicit override.
 
 **Acceptance criteria:**
-- [ ] `LOCI_BASE_DIR` still wins when set.
-- [ ] Without `LOCI_BASE_DIR`, `loci stats` prefers the active agent MCP store when discoverable.
-- [ ] The chosen store is visible in JSON output or `--pretty` output so wrong-store diagnosis is easy.
-- [ ] Tests cover default, override, and no-store cases.
+- [x] `LOCI_BASE_DIR` still wins when set.
+- [x] Without `LOCI_BASE_DIR`, `loci stats` prefers the active agent MCP store when discoverable.
+- [x] The chosen store is visible in JSON output or `--pretty` output so wrong-store diagnosis is easy.
+- [x] Tests cover default, override, and no-store cases.
 
 **Verification:**
 - [ ] `.venv/bin/python -m pytest tests/test_cli.py -k stats`
@@ -94,10 +99,10 @@ actual store paths used by MCP config, wrappers, and default `IndexStore`.
 code do not reach into `IndexStore` independently.
 
 **Acceptance criteria:**
-- [ ] Service exposes a stats function with `repo`, `since_days`, and all-time options.
-- [ ] Service exposes an analyze function with `repo` and `since_days`.
-- [ ] Service errors use `LociError` where appropriate.
-- [ ] Existing CLI behavior can call these functions rather than duplicating store logic.
+- [x] Service exposes a stats function with `repo`, `since_days`, and all-time options.
+- [x] Service exposes an analyze function with `repo` and `since_days`.
+- [x] Service errors use `LociError` where appropriate.
+- [x] Existing CLI behavior can call these functions rather than duplicating store logic.
 
 **Verification:**
 - [ ] `.venv/bin/python -m pytest tests/test_service.py`
@@ -117,11 +122,11 @@ agent diagnostic; `loci_stats` gives the agent a lightweight usage readout and p
 alignment.
 
 **Acceptance criteria:**
-- [ ] MCP exposes `loci_stats`.
-- [ ] MCP exposes `loci_analyze`.
-- [ ] Outputs are structured JSON objects, no pretty formatting.
-- [ ] MCP tests verify both tools through a real stdio client.
-- [ ] `loci_analyze` findings are suitable for an agent to act on without reading CLI docs.
+- [x] MCP exposes `loci_stats`.
+- [x] MCP exposes `loci_analyze`.
+- [x] Outputs are structured JSON objects, no pretty formatting.
+- [x] MCP tests verify both tools through a real stdio client.
+- [x] `loci_analyze` findings are suitable for an agent to act on without reading CLI docs.
 
 **Verification:**
 - [ ] `.venv/bin/python -m pytest tests/test_mcp_server.py`
@@ -145,11 +150,11 @@ alignment.
 delete it.
 
 **Acceptance criteria:**
-- [ ] Count how many indexed symbols currently have non-empty `summary`.
-- [ ] Confirm whether search ranking uses `summary` and how much weight it contributes.
-- [ ] Run before/after examples where summaries should help ambiguous search.
-- [ ] Check whether outline summaries materially help choose a symbol without fetching it.
-- [ ] Record a recommendation: keep, rebuild, or delete.
+- [x] Count how many indexed symbols currently have non-empty `summary`.
+- [x] Confirm whether search ranking uses `summary` and how much weight it contributes.
+- [x] Run before/after examples where summaries should help ambiguous search.
+- [x] Check whether outline summaries materially help choose a symbol without fetching it.
+- [x] Record a recommendation: delete.
 
 **Verification:**
 - [ ] Add or run focused tests around search ranking with summaries.
@@ -200,14 +205,14 @@ the authoritative implementation.
 not spend effort maintaining dead machinery.
 
 **Acceptance criteria:**
-- [ ] CLI `summarize` command is removed.
-- [ ] Summary-specific tests/docs/skill instructions are removed or rewritten.
-- [ ] Search ranking no longer gives misleading weight to missing summaries.
-- [ ] Existing indexes with `summary` fields remain harmless when loaded.
+- [x] CLI `summarize` command is removed.
+- [x] Summary-specific tests/docs/skill instructions are removed or rewritten.
+- [x] Search ranking no longer gives misleading weight to missing summaries.
+- [x] Existing indexes with `summary` fields remain harmless when loaded.
 
 **Verification:**
-- [ ] Full test suite passes.
-- [ ] `rg "summarize|summarizer|apply_summaries"` returns only intentional historical docs or no hits.
+- [x] Full test suite passes.
+- [x] `rg "summarize|summarizer|apply_summaries"` returns only intentional historical docs or no hits.
 
 **Dependencies:** Task 5 with a "delete" decision
 
@@ -326,15 +331,15 @@ accident.
 
 ### Checkpoint A: Store and diagnostics
 
-- [ ] `loci stats --pretty` reads the intended MCP store by default.
-- [ ] `loci_stats` and `loci_analyze` work through MCP.
+- [x] `loci stats --pretty` reads the intended MCP store by default.
+- [x] `loci_stats` and `loci_analyze` work through MCP.
 - [ ] Full test suite passes.
 
 ### Checkpoint B: Summarize decision
 
-- [ ] Evidence supports keeping or deleting `summarize`.
-- [ ] The chosen path has a task-level implementation plan.
-- [ ] No summarize work begins before the decision is explicit.
+- [x] Evidence supports keeping or deleting `summarize`.
+- [x] The chosen path has a task-level implementation plan.
+- [x] No summarize work begins before the decision is explicit.
 
 ### Checkpoint C: CLI retirement
 
@@ -357,4 +362,3 @@ accident.
 - Should `loci stats --reset` remain, or should reset require an explicit store path to avoid wiping the wrong session log?
 - Should `invalidate` exist as MCP, CLI, both, or neither? It is cache-destructive but useful for store-aware cleanup.
 - If summarize is kept, should the generated summaries be considered cache metadata or part of an index format contract?
-

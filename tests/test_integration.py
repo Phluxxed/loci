@@ -58,28 +58,10 @@ def test_full_pipeline(tmp_path: Path, fixtures_dir: Path):
     inc_data = json.loads(r.stdout)
     assert inc_data["files_skipped"] >= 1
 
-    # 6. Summarize — returns unsummarized symbols
-    r = run_loci("summarize", str(repo), env=env)
-    assert r.returncode == 0
-    pending = json.loads(r.stdout)
-    assert len(pending) > 0
-
-    # 7. Apply fake summaries
-    summaries = [{"id": s["id"], "summary": "A test summary."} for s in pending]
-    summaries_file = tmp_path / "summaries.json"
-    summaries_file.write_text(json.dumps(summaries))
-    r = run_loci("summarize", str(repo), "--apply", str(summaries_file), env=env)
-    assert r.returncode == 0
-
-    # 8. Verify no unsummarized symbols remain
-    r = run_loci("summarize", str(repo), env=env)
-    remaining = json.loads(r.stdout)
-    assert len(remaining) == 0
-
-    # 9. Invalidate
+    # 6. Invalidate
     r = run_loci("invalidate", str(repo), env=env)
     assert r.returncode == 0
 
-    # 10. After invalidation, get should fail (repo no longer indexed)
+    # 7. After invalidation, get should fail (repo no longer indexed)
     r = run_loci("get", multiply["id"], "--repo", str(repo), env=env)
     assert r.returncode != 0

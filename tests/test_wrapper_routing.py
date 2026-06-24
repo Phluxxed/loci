@@ -1,11 +1,10 @@
 """Per-host base-dir routing in .shared/loci wrapper scripts.
 
-The CLI and MCP wrappers pick LOCI_BASE_DIR only when the caller did not set
-one. Claude Code gets ~/.claude/loci-index. A bare terminal gets the neutral
-~/.codeindex store; Codex must pass ~/.codex/loci-index explicitly via MCP
-config or hooks. The split is a security boundary (Codex's sandbox denies some
-host paths and must not inherit a terminal-populated index), so these tests pin
-the routing down.
+The CLI and MCP wrappers pick LOCI_BASE_DIR only for host-specific routing.
+Claude Code gets ~/.claude/loci-index. A bare terminal leaves LOCI_BASE_DIR
+unset so the Python resolver can prefer configured MCP stores and fall back
+safely. These tests pin the wrapper behavior down so shell defaults do not
+override the service resolver.
 
 The real wrappers resolve their repo root from their own location and exec
 `<repo>/.venv/bin/loci*`. We reproduce that layout under tmp_path with fake
@@ -77,20 +76,17 @@ def test_claude_code_routes_to_claude_store(
 
 
 @pytest.mark.parametrize(("wrapper_name", "entrypoint_name"), WRAPPERS)
-def test_non_claude_routes_to_neutral_store(
+def test_non_claude_leaves_store_resolution_to_python(
     tmp_path: Path, wrapper_name: str, entrypoint_name: str
 ):
     wrapper = _build_fake_repo(tmp_path, wrapper_name, entrypoint_name)
     home = tmp_path / "home"
     home.mkdir()
 
-    # CLAUDECODE unset and no explicit agent config -> neutral user store.
+    # CLAUDECODE unset and no explicit store -> Python resolver decides.
     out = _run_wrapper(wrapper, home, {})
 
-    assert out == str(home / ".codeindex")
-    # Agent-owned stores must only be selected by explicit agent config/hooks.
-    assert str(home / ".claude") not in out
-    assert str(home / ".codex") not in out
+    assert out == ""
 
 
 @pytest.mark.parametrize(("wrapper_name", "entrypoint_name"), WRAPPERS)
