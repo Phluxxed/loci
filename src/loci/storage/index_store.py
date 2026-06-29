@@ -248,6 +248,7 @@ class IndexStore:
         by_file_code: dict[str, dict] = {}   # code gets only, per file
         by_repo_code: dict[str, dict] = {}   # code gets only, per repo
         by_doc: dict[str, dict] = {}         # markdown gets only, per file
+        by_repo_doc: dict[str, dict] = {}    # markdown gets only, per repo
 
         def _accum(mapping: dict[str, dict], key: str, sb: int, fb: int, ts: Optional[float]) -> None:
             d = mapping.get(key)
@@ -307,6 +308,7 @@ class IndexStore:
                 _accum(by_repo, repo_key, sb, fb, ts)
                 if is_doc:
                     _accum(by_doc, file_key, sb, fb, ts)
+                    _accum(by_repo_doc, repo_key, sb, fb, ts)
                 else:
                     _accum(by_file_code, file_key, sb, fb, ts)
                     _accum(by_repo_code, repo_key, sb, fb, ts)
@@ -358,6 +360,7 @@ class IndexStore:
             "by_file_code": _make_rows(by_file_code),
             "by_repo_code": _make_rows(by_repo_code),
             "by_doc": _make_rows(by_doc),
+            "by_repo_doc": _make_rows(by_repo_doc),
         }
 
     def reset_session(self) -> Optional[Path]:

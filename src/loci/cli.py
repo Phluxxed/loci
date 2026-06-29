@@ -290,11 +290,17 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
             + "Last"
         )
 
-    def _render_nested(out: list, heading: str, repo_rows: list, file_rows: list) -> None:
+    def _render_nested(
+        out: list,
+        heading: str,
+        repo_rows: list,
+        file_rows: list,
+        empty_label: str,
+    ) -> None:
         out.append(_cyan(heading, use_color))
         out.append("─" * W)
         if not repo_rows:
-            out.append(_dim("(no code gets yet)", use_color))
+            out.append(_dim(f"(no {empty_label} gets yet)", use_color))
             out.append("─" * W)
             return
 
@@ -359,9 +365,22 @@ def _format_stats_pretty(stats: dict, repo_filter: str = "", use_color: bool = T
     _summary(right, "Markdown", docs)
     if repo_filter:
         _render_table(left, "By File (code)", stats.get("by_file_code", []))
+        _render_table(right, "By File (markdown)", stats.get("by_doc", []))
     else:
-        _render_nested(left, "By Repo (code)", stats.get("by_repo_code", []), stats.get("by_file_code", []))
-    _render_table(right, "By Doc (markdown)", stats.get("by_doc", []))
+        _render_nested(
+            left,
+            "By Repo (code)",
+            stats.get("by_repo_code", []),
+            stats.get("by_file_code", []),
+            "code",
+        )
+        _render_nested(
+            right,
+            "By Repo (markdown)",
+            stats.get("by_repo_doc", []),
+            stats.get("by_doc", []),
+            "markdown",
+        )
 
     for i in range(max(len(left), len(right))):
         l = left[i] if i < len(left) else ""
