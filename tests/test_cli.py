@@ -480,6 +480,22 @@ def test_stats_splits_code_and_docs(indexed_repo_with_docs):
     assert any("sample.py" in r["name"] for r in data["by_file_code"])
 
 
+def test_stats_groups_markdown_by_repo(indexed_repo_with_docs):
+    repo, base = indexed_repo_with_docs
+    _code_id, doc_id = _get_one_code_and_doc(repo, base)
+    run_loci("get", doc_id, "--repo", str(repo), env_extra={"LOCI_BASE_DIR": base})
+
+    data = json.loads(run_loci("stats", env_extra={"LOCI_BASE_DIR": base}).stdout)
+
+    assert data["by_repo_doc"] == [{
+        "name": str(repo),
+        "gets": 1,
+        "saved_bytes": data["by_doc"][0]["saved_bytes"],
+        "ratio_pct": data["by_doc"][0]["ratio_pct"],
+        "last_ts": data["by_doc"][0]["last_ts"],
+    }]
+
+
 def test_stats_outlines_split_by_language(indexed_repo_with_docs):
     repo, base = indexed_repo_with_docs
     # A whole-repo outline surfaces both python and markdown symbols, so it
@@ -508,7 +524,8 @@ def test_stats_pretty_shows_doc_lane(indexed_repo_with_docs):
 
     out = run_loci("stats", "--pretty", env_extra={"LOCI_BASE_DIR": base}).stdout
     assert "Code" in out and "Markdown" in out
-    assert "By Doc" in out
+    assert "By Repo (markdown)" in out
+    assert repo.name in out
     assert "README.md" in out
 
 
