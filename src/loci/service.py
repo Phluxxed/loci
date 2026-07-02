@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+import time
 import uuid
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -28,6 +30,7 @@ SKIP_EXTENSIONS = {
     ".pyc", ".pyo", ".so", ".dylib", ".dll", ".exe",
     ".bin", ".pem", ".key", ".p12",
 }
+REFRESH_LOCK_POLL_SECONDS = 0.05
 
 
 @dataclass
@@ -81,24 +84,13 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
     existing_symbols: list[dict[str, Any]] = existing.get("symbols", []) if existing else []
 
     all_symbols: list[Symbol] = []
-    new_file_hashes: dict[str, str] = dict(existing_hashes)
+    new_file_hashes: dict[str, str] = {}
     files_skipped = 0
     language_counts: dict[str, int] = defaultdict(int)
     zero_symbol_warnings: list[dict[str, Any]] = []
-    gitignore = _load_gitignore(repo_path)
 
-    for src_file in sorted(repo_path.rglob("*")):
-        if not src_file.is_file():
-            continue
-        if any(part in SKIP_DIRS for part in src_file.parts):
-            continue
-        if _should_skip_file(src_file):
-            continue
-
-        rel_path = str(src_file.relative_to(repo_path))
-        if gitignore and gitignore.match_file(rel_path):
-            continue
-        file_hash = store.hash_file(src_file)
+    for src_file, rel_path, file_hash in _iter_indexable_files(repo_path, store):
+        new_file_hashes[rel_path] = file_hash
 
         if incremental and existing_hashes.get(rel_path) == file_hash:
             kept = [Symbol.from_dict(s) for s in existing_symbols if s["file_path"] == rel_path]
@@ -113,7 +105,6 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
             sym.file_path = rel_path
             sym.id = f"{rel_path}::{sym.qualified_name}#{sym.kind}"
         all_symbols.extend(symbols)
-        new_file_hashes[rel_path] = file_hash
         lang = EXTENSION_MAP.get(src_file.suffix, "unknown")
         if symbols:
             language_counts[lang] += 1
@@ -147,16 +138,45 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
     return output
 
 
-def outline_repo(path: str | Path, file: str | None = None) -> list[dict[str, Any]]:
+def ensure_fresh_index(repo: str | Path) -> dict[str, Any]:
+    repo_path = Path(repo).resolve()
+    store = get_store()
+    index = _load_required_index(store, repo_path)
+    _validate_repo_path(repo_path)
+    if not _index_is_stale(repo_path, store, index):
+        return {"repo": str(repo_path), "refreshed": False}
+
+    lock_path = store.refresh_lock_path(repo_path)
+    timeout = float(os.environ.get("LOCI_REFRESH_LOCK_TIMEOUT", "10"))
+    _acquire_refresh_lock(lock_path, timeout=timeout)
+    try:
+        index = _load_required_index(store, repo_path)
+        if not _index_is_stale(repo_path, store, index):
+            return {"repo": str(repo_path), "refreshed": False}
+        result = index_repo(repo_path, incremental=True)
+        return {"repo": str(repo_path), "refreshed": True, "index": result}
+    except LociError:
+        raise
+    except Exception as exc:
+        raise LociError(
+            "STALE_INDEX_REFRESH_FAILED",
+            "Failed to refresh stale index",
+            {"repo": str(repo_path), "error": str(exc)},
+        ) from exc
+    finally:
+        lock_path.unlink(missing_ok=True)
+
+
+def outline_repo(
+    path: str | Path,
+    file: str | None = None,
+    ensure_fresh: bool = False,
+) -> list[dict[str, Any]]:
     repo_path = Path(path).resolve()
     store = get_store()
-    index = store.load(repo_path)
-    if index is None:
-        raise LociError(
-            "REPO_NOT_INDEXED",
-            "Repository is not indexed",
-            {"repo": str(repo_path)},
-        )
+    if ensure_fresh:
+        ensure_fresh_index(repo_path)
+    index = _load_required_index(store, repo_path)
 
     grouped: dict[str, list[dict[str, Any]]] = {}
     languages: set[str] = set()
@@ -190,7 +210,12 @@ def outline_repo(path: str | Path, file: str | None = None) -> list[dict[str, An
     return result
 
 
-def get_symbols(repo: str | Path, symbol_ids: list[str], context: int = 0) -> list[dict[str, Any]]:
+def get_symbols(
+    repo: str | Path,
+    symbol_ids: list[str],
+    context: int = 0,
+    ensure_fresh: bool = False,
+) -> list[dict[str, Any]]:
     repo_path = Path(repo).resolve()
     if not symbol_ids:
         raise LociError(
@@ -206,13 +231,9 @@ def get_symbols(repo: str | Path, symbol_ids: list[str], context: int = 0) -> li
         )
 
     store = get_store()
-    index = store.load(repo_path)
-    if index is None:
-        raise LociError(
-            "REPO_NOT_INDEXED",
-            "Repository is not indexed",
-            {"repo": str(repo_path)},
-        )
+    if ensure_fresh:
+        ensure_fresh_index(repo_path)
+    index = _load_required_index(store, repo_path)
 
     return [_get_symbol(repo_path, store, index, symbol_id, context) for symbol_id in symbol_ids]
 
@@ -223,6 +244,7 @@ def search_symbols(
     kind: str | None = None,
     lang: str | None = None,
     limit: int = 20,
+    ensure_fresh: bool = False,
 ) -> list[dict[str, Any]]:
     repo_path = Path(repo).resolve()
     if limit < 1:
@@ -233,12 +255,9 @@ def search_symbols(
         )
 
     store = get_store()
-    if store.load(repo_path) is None:
-        raise LociError(
-            "REPO_NOT_INDEXED",
-            "Repository is not indexed",
-            {"repo": str(repo_path)},
-        )
+    if ensure_fresh:
+        ensure_fresh_index(repo_path)
+    _load_required_index(store, repo_path)
 
     results = store.search(repo_path, query, kind=kind, lang=lang, limit=limit)
     if results:
@@ -254,15 +273,13 @@ def get_cached_file(
     file_path: str,
     start_line: int | None = None,
     end_line: int | None = None,
+    ensure_fresh: bool = False,
 ) -> dict[str, Any]:
     repo_path = Path(repo).resolve()
     store = get_store()
-    if store.load(repo_path) is None:
-        raise LociError(
-            "REPO_NOT_INDEXED",
-            "Repository is not indexed",
-            {"repo": str(repo_path)},
-        )
+    if ensure_fresh:
+        ensure_fresh_index(repo_path)
+    _load_required_index(store, repo_path)
 
     result = store.get_file_content(
         repo_path,
@@ -290,15 +307,16 @@ def get_cached_file(
     return result
 
 
-def grep_repo(repo: str | Path, pattern: str) -> list[dict[str, Any]]:
+def grep_repo(
+    repo: str | Path,
+    pattern: str,
+    ensure_fresh: bool = False,
+) -> list[dict[str, Any]]:
     repo_path = Path(repo).resolve()
     store = get_store()
-    if store.load(repo_path) is None:
-        raise LociError(
-            "REPO_NOT_INDEXED",
-            "Repository is not indexed",
-            {"repo": str(repo_path)},
-        )
+    if ensure_fresh:
+        ensure_fresh_index(repo_path)
+    _load_required_index(store, repo_path)
 
     try:
         return store.grep_files(repo_path, pattern)
@@ -371,6 +389,81 @@ def analyze_usage(
     result = store.analyze(since_days=since_days, repo_filter=repo_filter)
     result["store"] = resolution.to_dict()
     return result
+
+
+def _validate_repo_path(repo_path: Path) -> None:
+    if not repo_path.exists():
+        raise LociError(
+            "PATH_NOT_FOUND",
+            "Path not found",
+            {"path": str(repo_path)},
+        )
+    if not repo_path.is_dir():
+        raise LociError(
+            "INVALID_INPUT",
+            "Path is not a directory",
+            {"path": str(repo_path)},
+        )
+
+
+def _load_required_index(store: IndexStore, repo_path: Path) -> dict[str, Any]:
+    index = store.load(repo_path)
+    if index is None:
+        raise LociError(
+            "REPO_NOT_INDEXED",
+            "Repository is not indexed",
+            {"repo": str(repo_path)},
+        )
+    return index
+
+
+def _index_is_stale(repo_path: Path, store: IndexStore, index: dict[str, Any]) -> bool:
+    current_hashes = {
+        rel_path: file_hash
+        for _, rel_path, file_hash in _iter_indexable_files(repo_path, store)
+    }
+    indexed_hashes = index.get("file_hashes", {})
+    return current_hashes != indexed_hashes
+
+
+def _acquire_refresh_lock(lock_path: Path, timeout: float) -> None:
+    deadline = time.monotonic() + timeout
+    while True:
+        try:
+            fd = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        except FileExistsError:
+            if time.monotonic() >= deadline:
+                raise LociError(
+                    "STALE_INDEX_REFRESH_FAILED",
+                    "Timed out waiting for stale index refresh lock",
+                    {"lock": str(lock_path), "timeout_seconds": timeout},
+                )
+            time.sleep(REFRESH_LOCK_POLL_SECONDS)
+            continue
+        with os.fdopen(fd, "w") as f:
+            f.write(str(os.getpid()))
+        return
+
+
+def _iter_indexable_files(
+    repo_path: Path,
+    store: IndexStore,
+) -> list[tuple[Path, str, str]]:
+    gitignore = _load_gitignore(repo_path)
+    files: list[tuple[Path, str, str]] = []
+    for src_file in sorted(repo_path.rglob("*")):
+        if not src_file.is_file():
+            continue
+        if any(part in SKIP_DIRS for part in src_file.parts):
+            continue
+        if _should_skip_file(src_file):
+            continue
+
+        rel_path = str(src_file.relative_to(repo_path))
+        if gitignore and gitignore.match_file(rel_path):
+            continue
+        files.append((src_file, rel_path, store.hash_file(src_file)))
+    return files
 
 
 def _get_symbol(

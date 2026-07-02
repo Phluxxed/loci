@@ -55,6 +55,11 @@ class IndexStore:
     def _sources_dir(self, repo_path: Path) -> Path:
         return self._repo_dir(repo_path) / "sources"
 
+    def refresh_lock_path(self, repo_path: Path) -> Path:
+        repo_dir = self._repo_dir(repo_path)
+        repo_dir.mkdir(parents=True, exist_ok=True)
+        return repo_dir / "refresh.lock"
+
     def hash_file(self, path: Path) -> str:
         h = hashlib.sha256()
         h.update(path.read_bytes())
@@ -71,12 +76,19 @@ class IndexStore:
 
         # Mirror source files
         sources_dir = self._sources_dir(repo_path)
+        tmp_sources_dir = sources_dir.with_name(f"{sources_dir.name}.tmp")
+        if tmp_sources_dir.exists():
+            shutil.rmtree(tmp_sources_dir)
+        tmp_sources_dir.mkdir(parents=True, exist_ok=True)
         for sym in symbols:
             src = repo_path / sym.file_path
             if src.exists():
-                dest = sources_dir / sym.file_path
+                dest = tmp_sources_dir / sym.file_path
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(src, dest)
+        if sources_dir.exists():
+            shutil.rmtree(sources_dir)
+        tmp_sources_dir.replace(sources_dir)
 
         # Atomic write: temp file + rename
         index_data = {

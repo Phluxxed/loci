@@ -158,6 +158,11 @@ back to `~/.codeindex`.
 
 ### MCP Tools
 
+MCP read tools refresh stale indexes before returning cached data. `loci_index`
+still performs explicit indexing, while `loci_outline`, `loci_search`,
+`loci_get`, `loci_file`, and `loci_grep` first check the indexed file hashes
+against the current repository and run a locked incremental refresh if needed.
+
 | Tool | Purpose |
 |---|---|
 | `loci_index` | Index a local repo path, optionally incrementally |

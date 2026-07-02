@@ -68,6 +68,18 @@ def test_mcp_errors_include_loci_error_data(tmp_path: Path):
     assert error_data["details"]["repo"] == str((tmp_path / "repo").resolve())
 
 
+def test_mcp_search_refreshes_stale_index(tmp_path: Path):
+    result = asyncio.run(_search_after_repo_change(tmp_path / "repo", tmp_path / ".codeindex"))
+
+    assert any(symbol["name"] == "fresh_symbol" for symbol in result["symbols"])
+
+
+def test_mcp_grep_refresh_removes_deleted_files(tmp_path: Path):
+    result = asyncio.run(_grep_after_indexed_file_deleted(tmp_path / "repo", tmp_path / ".codeindex"))
+
+    assert result["matches"] == []
+
+
 async def _round_trip(
     repo: Path,
     cache_dir: Path,
@@ -162,6 +174,66 @@ async def _round_trip(
         "analyze": analyze.structuredContent,
         "invalid_grep": invalid_grep.structuredContent,
     }
+
+
+async def _search_after_repo_change(repo: Path, cache_dir: Path) -> dict[str, Any]:
+    repo.mkdir()
+    source = repo / "sample.py"
+    source.write_text("def old_symbol():\n    return 1\n")
+
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["PYTHONPATH"] = str(Path.cwd() / "src")
+    server_params = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "loci.mcp_server"],
+        env=env,
+        cwd=Path.cwd(),
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            await session.call_tool(
+                "loci_index",
+                arguments={"path": str(repo), "incremental": False},
+            )
+            source.write_text("def fresh_symbol():\n    return 2\n")
+            search = await session.call_tool(
+                "loci_search",
+                arguments={"repo": str(repo), "query": "fresh_symbol"},
+            )
+            return search.structuredContent
+
+
+async def _grep_after_indexed_file_deleted(repo: Path, cache_dir: Path) -> dict[str, Any]:
+    repo.mkdir()
+    source = repo / "sample.py"
+    source.write_text("def deleted_symbol():\n    return 1\n")
+
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["PYTHONPATH"] = str(Path.cwd() / "src")
+    server_params = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "loci.mcp_server"],
+        env=env,
+        cwd=Path.cwd(),
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            await session.call_tool(
+                "loci_index",
+                arguments={"path": str(repo), "incremental": False},
+            )
+            source.unlink()
+            grep = await session.call_tool(
+                "loci_grep",
+                arguments={"repo": str(repo), "pattern": "deleted_symbol"},
+            )
+            return grep.structuredContent
 
 
 async def _outline_missing_repo(cache_dir: Path, repo: Path) -> dict[str, Any]:
