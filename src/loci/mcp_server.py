@@ -37,13 +37,22 @@ def create_server() -> FastMCP:
     @mcp.tool()
     def loci_outline(path: str, file: str | None = None) -> CallToolResult:
         """Return indexed symbols grouped by file."""
-        return _handle_loci_error(lambda: {"files": outline_repo(path, file=file)})
+        return _handle_loci_error(
+            lambda: {"files": outline_repo(path, file=file, ensure_fresh=True)}
+        )
 
     @mcp.tool()
     def loci_get(repo: str, symbol_ids: list[str], context: int = 0) -> CallToolResult:
         """Return exact source for one or more indexed symbol ids."""
         return _handle_loci_error(
-            lambda: {"symbols": get_symbols(repo, symbol_ids, context=context)}
+            lambda: {
+                "symbols": get_symbols(
+                    repo,
+                    symbol_ids,
+                    context=context,
+                    ensure_fresh=True,
+                )
+            }
         )
 
     @mcp.tool()
@@ -63,6 +72,7 @@ def create_server() -> FastMCP:
                     kind=kind,
                     lang=lang,
                     limit=limit,
+                    ensure_fresh=True,
                 )
             }
         )
@@ -81,13 +91,16 @@ def create_server() -> FastMCP:
                 file_path,
                 start_line=start_line,
                 end_line=end_line,
+                ensure_fresh=True,
             )
         )
 
     @mcp.tool()
     def loci_grep(repo: str, pattern: str) -> CallToolResult:
         """Regex-search cached files."""
-        return _handle_loci_error(lambda: {"matches": grep_repo(repo, pattern)})
+        return _handle_loci_error(
+            lambda: {"matches": grep_repo(repo, pattern, ensure_fresh=True)}
+        )
 
     @mcp.tool()
     def loci_verify(path: str) -> CallToolResult:
