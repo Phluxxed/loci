@@ -18,6 +18,11 @@ loci_get(repo, symbol_ids)
 loci_analyze(repo) when diagnostics are needed
 ```
 
+MCP read tools (`loci_outline`, `loci_search`, `loci_get`, `loci_file`, and
+`loci_grep`) refresh stale indexes before returning cached data. `loci_index`
+is still required for a repo that has never been indexed, and remains useful for
+explicit rebuilds or after large changes.
+
 If MCP tools are not configured in the current agent runtime, configure MCP first. Do not quietly continue with the CLI as the steady-state path.
 
 For Claude Code, run:
@@ -39,7 +44,7 @@ If `loci-mcp` is not on `PATH`, fix the install or wrapper symlink first. For th
 After adding MCP, tell the user a fresh agent session may be required before the new `loci_*` tools are visible. Use CLI fallback only as a temporary bridge when MCP was just configured but the current runtime cannot see the new tools yet, when MCP configuration fails, or when the user explicitly asks to continue without restarting.
 
 ```bash
-loci index <path> --incremental
+loci index <path> [--incremental]
 loci outline <path>
 loci get <id> [<id> ...] --repo <path>
 ```
@@ -54,7 +59,7 @@ Choose `<path>` as the actual repository or workspace being changed, not automat
 
 Use `outline -> get` first for non-trivial code work. Use `search -> get` when you know the concept or symbol name but not the file. Do not ask the user to operate loci for you.
 
-1. Run `loci_index` for the target repo, or `loci index` as CLI fallback.
+1. Run `loci_index` for an unindexed target repo, or `loci index` as CLI fallback.
 2. Run `loci_outline` or `loci_search` to get symbol IDs.
 3. Fetch only relevant symbols with `loci_get`, or `loci get` as CLI fallback.
 4. Use `loci_file` only for targeted non-symbol reads after loci identifies the relevant file/range.
@@ -65,7 +70,7 @@ If loci is unavailable, fails, or the task is a standalone doc/config check wher
 
 | Tool | Use when |
 | --- | --- |
-| `loci_index` | Starting work, or after edits |
+| `loci_index` | First indexing, explicit rebuilds, or large changes |
 | `loci_outline` | Getting symbols and IDs by repo or file |
 | `loci_search` | Finding symbols by name or concept |
 | `loci_get` | Fetching exact symbol source |
@@ -80,7 +85,7 @@ If loci is unavailable, fails, or the task is a standalone doc/config check wher
 
 | Command | Use when MCP is unavailable |
 | --- | --- |
-| `loci index <path> [--incremental]` | Starting work, or after edits |
+| `loci index <path> [--incremental]` | First indexing or explicit CLI refresh |
 | `loci outline <path> [--file <rel>]` | Getting symbols and IDs |
 | `loci get <id> [<id> ...] --repo <path> [--context N]` | Fetching symbol source |
 | `loci search <query> --repo <path> [--kind K] [--lang L]` | Finding symbols by name or concept |

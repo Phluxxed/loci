@@ -181,7 +181,7 @@ against the current repository and run a locked incremental refresh if needed.
 The CLI is retained as legacy/debug tooling. New production agent workflows should use MCP.
 
 ```bash
-# Index a repo (run once, then --incremental after edits)
+# First index or explicit CLI refresh
 loci index /path/to/repo
 loci index /path/to/repo --incremental
 
@@ -263,7 +263,7 @@ tools are visible. Use `loci` CLI fallback only as a temporary bridge.
 
 ## Claude Code integration
 
-loci is most useful inside Claude Code, where it auto-indexes your repo at session start and injects context into subagent prompts. The hooks live in `.claude/`; the reusable skill lives in `skills/loci/` and is symlinked into Claude.
+loci is most useful inside Claude Code when the MCP server is available. The SessionStart hook can seed an uncached repo and inject context, but MCP read tools are the freshness guarantee. The hooks live in `.claude/`; the reusable skill lives in `skills/loci/` and is symlinked into Claude.
 
 The Claude hooks do not silently mutate Claude MCP config during session start. They keep CLI bridge tooling available, and they instruct Claude to configure MCP first when the `loci_*` tools are not visible.
 
@@ -279,7 +279,7 @@ This symlinks the hooks and skill files into `~/.claude/` and patches `~/.claude
 
 | Component | Location | Effect |
 |---|---|---|
-| `loci-session-start.sh` | `~/.claude/hooks/` | Runs `loci index --incremental` on session open/resume |
+| `loci-session-start.sh` | `~/.claude/hooks/` | Reports an existing index, or runs bounded initial `loci index --incremental` when no cache exists |
 | `loci-agent-inject.sh` | `~/.claude/hooks/` | Injects the skill into subagent prompts before `Agent` tool calls |
 | `SKILL.md` | `~/.claude/skills/loci/` | The agent workflow guide Claude loads via the `loci` skill |
 
@@ -292,7 +292,7 @@ codex mcp add --env LOCI_BASE_DIR="$HOME/.codex/loci-index" loci -- loci-mcp
 codex mcp get --json loci
 ```
 
-The older Codex hooks in `.codex/` can still auto-index repos and inject a context line, but they are now optional CLI-era compatibility tooling.
+The older Codex hooks in `.codex/` can still seed uncached repos and inject a context line, but they are now optional CLI-era compatibility tooling. MCP reads enforce freshness when Codex actually uses the index.
 
 **Prerequisites**
 
@@ -314,7 +314,7 @@ The session-start hook sources the shared root direnv Python environment before 
 
 | Component | Location | Effect |
 |---|---|---|
-| `loci-session-start.sh` | `~/.codex/hooks/` | Runs CLI `loci index --incremental` and injects a context line telling Codex the repo is indexed |
+| `loci-session-start.sh` | `~/.codex/hooks/` | Reports an existing index, or runs bounded initial CLI `loci index --incremental` when no cache exists |
 
 ## Development
 

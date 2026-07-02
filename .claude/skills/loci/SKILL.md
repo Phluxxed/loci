@@ -15,7 +15,13 @@ Prefer the local MCP server when its tools are available:
 loci_index(path, incremental=true)
 loci_outline(path) or loci_search(repo, query)
 loci_get(repo, symbol_ids)
+loci_analyze(repo) when diagnostics are needed
 ```
+
+MCP read tools (`loci_outline`, `loci_search`, `loci_get`, `loci_file`, and
+`loci_grep`) refresh stale indexes before returning cached data. `loci_index`
+is still required for a repo that has never been indexed, and remains useful for
+explicit rebuilds or after large changes.
 
 If MCP tools are not configured in Claude Code, configure MCP first. Do not quietly continue with the CLI as the steady-state path.
 
@@ -29,7 +35,7 @@ If `loci-mcp` is not on `PATH`, fix the install or wrapper symlink first. For th
 After adding MCP, tell the user a fresh Claude session may be required before the new `loci_*` tools are visible. Use CLI fallback only as a temporary bridge when MCP was just configured but the current Claude session cannot see the new tools yet, when MCP configuration fails, or when the user explicitly asks to continue without restarting.
 
 ```
-loci index <path>                    # index once (or --incremental after edits)
+loci index <path> [--incremental]    # first index or explicit CLI refresh
 loci outline <path>                  # get ALL symbols + IDs in one call
 loci get ID1 ID2 ...  --repo <path>  # fetch specific symbol source by ID
 ```
@@ -46,7 +52,7 @@ loci MCP is not configured in this Claude session; I am adding it as a local std
 
 | Tool | Use when |
 |---------|----------|
-| `loci_index` | Starting work, or after edits |
+| `loci_index` | First indexing, explicit rebuilds, or large changes |
 | `loci_outline` | Getting the full symbol map |
 | `loci_search` | Finding symbols by name/concept |
 | `loci_get` | Fetching symbol source |
@@ -54,20 +60,20 @@ loci MCP is not configured in this Claude session; I am adding it as a local std
 | `loci_grep` | Hunting string literals, error messages, config keys |
 | `loci_verify` | Checking index integrity + content drift |
 | `loci_list` | Listing indexed repos |
+| `loci_stats` | Reading structured usage and savings stats |
+| `loci_analyze` | Finding search or extraction blind spots |
 
 ## CLI Fallback
 
 | Command | Use when MCP is unavailable |
 |---------|----------|
-| `loci index <path> [--incremental]` | Starting work, or after edits |
+| `loci index <path> [--incremental]` | First indexing or explicit CLI refresh |
 | `loci outline <path> [--file <rel>]` | Getting the full symbol map |
 | `loci get ID1 [ID2 ...] --repo <path> [--context N]` | Fetching symbol source |
 | `loci search <query> --repo <path> [--kind K] [--lang L]` | Finding symbols by name/concept |
 | `loci file <rel_path> --repo <path> [--start N] [--end N]` | Reading non-symbol files (config, docs) |
 | `loci grep <pattern> --repo <path>` | Hunting string literals, error messages, config keys |
 | `loci verify <path>` | Checking index integrity + content drift |
-| `loci summarize <path>` | Check for unsummarized symbols (run after every index) |
-| `loci summarize <path> --apply <file>` | Write generated summaries back (used by Summaries Workflow) |
 | `loci stats [--repo <path>] [--pretty]` | Checking token savings |
 | `loci list` | Listing indexed repos |
 | `loci invalidate <path>` | Clearing stale cache |
@@ -109,36 +115,11 @@ MCP tool errors are structured under `structuredContent.error` with `code`, `mes
 - **Need surrounding file context** -> `loci_get` with `context` or `loci_file`
 - **Non-code file** (JSON, YAML, Markdown) -> `loci_file`
 
-## Summaries Workflow (mandatory after index)
+## Diagnostics
 
-After every `loci_index` or CLI `loci index`, run the CLI maintenance command:
-
-```bash
-loci summarize <path>
-```
-
-If the output is a non-empty JSON array, summarization is **required** — not optional:
-
-1. Split the array into chunks of 200 symbols
-2. For each chunk: dispatch a Haiku subagent using `summarizer-prompt.md` in this skills directory, passing the chunk as inline JSON. Use `Agent` tool with `subagent_type=general-purpose`, `model=haiku` (model ID: `claude-haiku-4-5-20251001`)
-3. Strip any markdown fences from the subagent response (` ```json ` / ` ``` `) before parsing. If still malformed after stripping: retry once with the reminder "Return only a raw JSON object, no markdown". If still malformed: skip the chunk and continue
-4. Merge all chunk results into a single dict
-5. Write to `/tmp/loci-summaries-<pid>.json`
-6. Run: `loci summarize <path> --apply /tmp/loci-summaries-<pid>.json`
-7. Delete the temp file
-
-If `loci summarize` returns an empty array (all symbols already summarized), skip all the above steps.
-
-## Self-Improvement with analyze
-
-Run `loci analyze` periodically or when asked to improve the tool.
-
-```
-loci analyze [--repo <path>] [--since DAYS]   # JSON output (default)
-loci analyze --pretty                          # human-readable
-```
-
-Read the `findings[]` array; act on each `suggestion` directly:
+Use `loci_analyze` when search misses, poor ranking, repeated refetches, or
+extraction quality look suspect. Treat findings as diagnostics to inspect, not
+orders to follow blindly.
 
 | type | severity | action |
 |------|----------|--------|
@@ -153,6 +134,9 @@ Output schema:
 ```json
 {"repo": "...", "period_days": 7, "findings": [{"type": "...", "severity": "high|medium|low", "data": {}, "suggestion": "..."}]}
 ```
+
+Use CLI `loci stats --pretty` only for a human-readable shell/tmux savings
+view. Agents should prefer `loci_stats` for structured stats.
 
 ## loci vs Other Tools
 
