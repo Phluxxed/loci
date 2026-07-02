@@ -52,8 +52,8 @@ loci_session_compute() {
 
     # SessionStart is latency-sensitive. If the repo is already indexed, do
     # not run an incremental index synchronously; large generated trees can
-    # turn a "fast no-op" into a startup timeout. Agents can refresh explicitly
-    # with `loci index <repo> --incremental` when they need fresh symbols.
+    # turn a "fast no-op" into a startup timeout. MCP read tools handle
+    # freshness after session start; CLI users can still invoke index manually.
     local listed
     listed="$(_loci_cached_symbol_count "$loci" "$repo_root")"
     if [[ -n "$listed" ]]; then
