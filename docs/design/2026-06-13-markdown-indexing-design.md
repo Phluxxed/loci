@@ -2,9 +2,13 @@
 
 **Goal:** Make markdown files first-class citizens in the loci index — `outline`, `get`, `search`, and `grep` work on `.md`/`.markdown` exactly as they do on code — so the repo's growing pile of design docs, specs, and notes becomes navigable instead of invisible.
 
-**Architecture:** Add a *parallel* markdown extraction path (`parse_markdown()`) alongside the existing tree-sitter code path in `parser/extractor.py`. It returns the existing `Symbol` dataclass unchanged, so storage, the sources mirror, and every read command work with **zero downstream changes**. Markdown's unit is the **section** (a heading plus everything beneath it until the next same-or-higher heading), nested by heading level. Inclusion is a two-line touch: register `.md`/`.markdown` in `EXTENSION_MAP` and dispatch on suffix in `parse_file`.
+**Architecture:** Add a *parallel* markdown extraction path (`parse_markdown()`) alongside the existing tree-sitter code path in `parser/extractor.py`. It returns normal `Symbol` records with one additive `metadata` field, so storage, the sources mirror, and every read command keep the same shape while markdown page roots can carry YAML frontmatter. Markdown's unit is the **section** (a heading plus everything beneath it until the next same-or-higher heading), nested by heading level. Inclusion is a two-line touch: register `.md`/`.markdown` in `EXTENSION_MAP` and dispatch on suffix in `parse_file`.
 
-**Tech Stack:** Python (existing). Parsing = `tree-sitter-language-pack`'s bundled `markdown` grammar — **no new dependency** (verified available; see Current state). Only the block grammar (`markdown`) is needed; the `markdown_inline` grammar is *not* required, because heading text is recovered by byte-slicing the `inline` child.
+**Tech Stack:** Python (existing). Block parsing = `tree-sitter-language-pack`'s bundled `markdown` grammar. YAML frontmatter parsing = PyYAML via `yaml.safe_load`. Only the block grammar (`markdown`) is needed; the `markdown_inline` grammar is *not* required, because heading text is recovered by byte-slicing the `inline` child.
+
+**2026-07-07 update:** The original v1 shipped heading-section symbols first. Wiki usage showed that llm-wiki/Brain-style repositories route through YAML frontmatter, so loci now preserves frontmatter as searchable metadata on page-root markdown symbols. Frontmatter is still not emitted as its own symbol.
+
+**2026-07-07 section-aware retrieval update:** Page-root markdown symbols remain exact byte-range retrieval units, but they can be expensive because an H1 spans the whole page subtree. Markdown symbols now carry `metadata.markdown` hierarchy and retrieval-cost fields, and search/outline expose `file_bytes`, `saved_pct`, and `span_kind` so agents can choose efficient child sections when appropriate. Search can surface child sections via `inherited_page_frontmatter.*` match scopes without copying frontmatter ownership onto those children.
 
 ---
 
@@ -103,7 +107,9 @@ def parse_file(path: Path) -> list[Symbol]:
 | `line` / `end_line` | derived from byte offsets, same as code path |
 | `docstring` | first non-empty paragraph of the section body, truncated (orientation aid in `outline`) |
 | `content_hash` | `sha256` of the section bytes — reused for incremental change tracking |
-| `keywords` | prose tokenisation of the heading text (split on non-alphanumeric, lowercase, drop len≤1) — *not* `_name_words`, which is camel/snake-oriented |
+| `keywords` | prose tokenisation of the heading text plus page-root frontmatter words (split on non-alphanumeric, lowercase, drop len≤1) — *not* `_name_words`, which is camel/snake-oriented |
+| `summary` | frontmatter `description` for page-root markdown symbols when present |
+| `metadata` | normalized page-root `frontmatter` plus `metadata.markdown` hierarchy/cost fields |
 | `decorators` / `param`/`return` | empty (default) |
 
 ### Heading-path separator: ` > `, not `.`
@@ -112,11 +118,42 @@ Code symbols use `.` (`MyClass.method`). Markdown headings contain dots and spac
 
 ### Edge cases (decided)
 
-- **Frontmatter (`minus_metadata`):** not emitted as a symbol. If it contains a `title:`, we *may* use it as the `name` of a synthetic file-level section when the doc has no H1 (deferred — see Open questions).
+- **Frontmatter (`minus_metadata`):** not emitted as a symbol. Parsed with PyYAML and attached to page-root markdown symbols as `metadata.frontmatter`; searchable fields include `title`, `type`, `category`, `status`, `source`, `description`, `tags`, and timestamp/date fields.
 - **Preamble** (content before the first heading): emitted as a single `section` named `"(preamble)"` only if it contains non-trivial text; otherwise skipped. Keeps lead-in prose reachable without polluting the outline.
-- **No-heading file** (flat notes): the whole file becomes one `section`, named from the frontmatter `title` if present, else the filename stem.
+- **No-heading file** (flat notes): the whole file becomes one `section`, named from the filename stem. Frontmatter is attached as metadata, not used as the synthetic section name.
 - **Duplicate headings** (two `## Overview` under the same parent): identical `qualified_name` → identical id → existing `_disambiguate` appends `~N`. Reuse, no new logic.
 - **Inline markup in headings** (`## The \`code\` thing`): `name` keeps the raw inline text (backticks included). Stripping is deferred; raw is unambiguous and cheap.
+
+### Section-aware metadata and search diagnostics
+
+Every markdown symbol has `metadata.markdown`:
+
+| Field | Meaning |
+|---|---|
+| `heading_level` | ATX heading level; `0` for preamble and flat no-heading pages |
+| `parent_id` | parent section id, or `""` when there is no parent |
+| `root_id` | page-root section id, or the symbol's own id for roots, preambles, and flat pages |
+| `page_root` | true for top-level page sections and flat no-heading pages |
+| `synthetic_name` | true for preamble and no-heading fallback names |
+| `file_bytes` | full source file size in bytes |
+| `saved_pct` | integer percentage of the file not loaded when retrieving this symbol |
+| `span_kind` | `page_root`, `section`, `preamble`, or `flat_page` |
+
+`loci_outline` and `loci_search` copy `file_bytes`, `saved_pct`, and
+`span_kind` onto markdown rows for ergonomics. Search results additionally emit
+`match_scope` so a caller can distinguish direct section matches from page
+metadata matches:
+
+- `section_heading`, `section_summary`, `section_keywords`
+- `page_frontmatter.title`, `page_frontmatter.tags`, `page_frontmatter.category`, `page_frontmatter.type`, `page_frontmatter.source`, `page_frontmatter.status`, `page_frontmatter.description`
+- `inherited_page_frontmatter.*` when a child section is surfaced because its page root matched frontmatter
+
+Search ranking stays conservative: exact page-title queries keep the root page
+prominent, low-savings page roots receive a modest penalty for metadata-only
+queries, and high-savings child sections receive a boost only when inherited
+page metadata is paired with a local section signal. `loci_get` remains exact:
+it returns the requested symbol's byte range and never substitutes a child
+section, generated summary, or context pack.
 
 ### Scope: which files
 
@@ -149,8 +186,8 @@ This lands the **node substrate** for markdown ahead of the in-flight graph laye
 
 - **Nesting:** H1>H2>H3 produces three sections with the correct ` > ` qualified-name paths and parent/child byte containment.
 - **Byte spans:** a section's `get` body runs from its heading through the end of its deepest subsection, and stops at the next same-or-higher heading.
-- **Edge cases:** frontmatter skipped; preamble captured/skipped per rule; no-heading file → one section named from title/stem; duplicate sibling headings → `~N` disambiguation.
-- **Field mapping:** `kind="section"`, `language="markdown"`, `signature` = raw heading line, `docstring` = first paragraph, `keywords` prose-tokenised.
+- **Edge cases:** frontmatter parsed as metadata; preamble captured/skipped per rule; no-heading file → one section named from the filename stem; duplicate sibling headings → `~N` disambiguation.
+- **Field mapping:** `kind="section"`, `language="markdown"`, `signature` = raw heading line, `docstring` = first paragraph, `summary` = frontmatter description on page roots, `keywords` prose-tokenised.
 - **Integration:** index a fixture repo with a `.md`, assert `outline`/`get`/`search --kind section` round-trip the section and its body.
 - **Determinism:** re-indexing an unchanged `.md` yields identical `content_hash` (incremental path is a no-op).
 
@@ -159,22 +196,22 @@ TDD: failing tests first, then `parse_markdown`.
 ## Boundaries
 
 **Always:**
-- Return the existing `Symbol` dataclass unchanged — no schema changes for markdown.
+- Keep markdown on the existing `Symbol` record shape with only additive fields.
 - Keep the code extraction path untouched; markdown is a parallel branch.
 - Respect existing file filters (`.gitignore`, `SKIP_DIRS`, `SKIP_FILES`).
 
 **Ask first:**
-- Adding any new `Symbol` field for markdown (e.g. heading level as a first-class field).
+- Adding any markdown-only `Symbol` field beyond generic additive metadata.
 - Indexing markdown link targets as edges (belongs to the graph-layer doc, not here).
 - Any change to `outline`/`get` output shape.
 
 **Never:**
-- Pull in `markdown_inline` or any new dependency for this feature.
+- Pull in `markdown_inline` or any new dependency beyond PyYAML for frontmatter.
 - Emit a section whose byte span doesn't round-trip through `get`.
 - Special-case the generic `_walk`/`LanguageSpec` machinery for markdown.
 
 ## Open questions (for review)
 
 1. **`docstring` = first paragraph** — useful orientation in `outline`, or noise? Alternative: leave empty and let `signature` (the heading line) carry it.
-2. **Frontmatter `title`** — worth surfacing as a synthetic file-level section when no H1 exists, or ignore frontmatter entirely?
+2. **Frontmatter `title`** — resolved 2026-07-07: store it in `metadata.frontmatter`; do not use it as a synthetic no-heading section name.
 3. **Setext headings** (`===`/`---` underlines) — the grammar emits `setext_heading`; handle alongside `atx_heading`, or ATX-only for v1? (Repo docs are ATX throughout, so ATX-only is low-risk.)

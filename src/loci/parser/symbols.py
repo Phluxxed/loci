@@ -19,6 +19,7 @@ class Symbol:
     content_hash: str = ""  # SHA-256 of symbol bytes at index time; "" for old indexes
     decorators: list[str] = field(default_factory=list)  # decorator/attribute names
     keywords: list[str] = field(default_factory=list)    # name words for search
+    metadata: dict[str, Any] = field(default_factory=dict)
     line: int = 0      # 1-indexed start line
     end_line: int = 0  # 1-indexed end line
 
@@ -38,6 +39,7 @@ class Symbol:
             "content_hash": self.content_hash,
             "decorators": self.decorators,
             "keywords": self.keywords,
+            "metadata": self.metadata,
             "line": self.line,
             "end_line": self.end_line,
         }
@@ -59,6 +61,7 @@ class Symbol:
             content_hash=data.get("content_hash", ""),
             decorators=data.get("decorators", []),
             keywords=data.get("keywords", []),
+            metadata=data.get("metadata", {}),
             line=data.get("line", 0),
             end_line=data.get("end_line", 0),
         )

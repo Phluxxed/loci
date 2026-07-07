@@ -4,7 +4,7 @@ import time
 import time as time_module
 from pathlib import Path
 from loci.parser.symbols import Symbol
-from loci.storage.index_store import IndexStore
+from loci.storage.index_store import EXTRACTOR_VERSION, INDEX_SCHEMA_VERSION, IndexStore
 
 
 @pytest.fixture
@@ -109,6 +109,19 @@ def test_store_atomic_write(store: IndexStore, tmp_path: Path, sample_symbols):
     # Verify it's valid JSON (not partial)
     data = json.loads(index_file.read_text())
     assert "symbols" in data
+
+
+def test_store_write_persists_index_versions(store: IndexStore, tmp_path: Path, sample_symbols):
+    source_path = tmp_path / "repo"
+    source_path.mkdir()
+    (source_path / "src").mkdir()
+    (source_path / "src" / "auth.py").write_text("def login(): pass")
+
+    store.write(source_path, sample_symbols, file_hashes={})
+
+    data = json.loads(store._index_path(source_path).read_text())
+    assert data["schema_version"] == INDEX_SCHEMA_VERSION
+    assert data["extractor_version"] == EXTRACTOR_VERSION
 
 
 def test_get_symbol_content_returns_source(store: IndexStore, tmp_path: Path):
@@ -245,6 +258,297 @@ def test_search_empty_query_returns_all(store_with_data):
     store, path = store_with_data
     results = store.search(path, "")
     assert len(results) == 3
+
+
+def test_search_tokenizes_hyphenated_query_words(store: IndexStore, tmp_path: Path):
+    source_path = tmp_path / "repo"
+    source_path.mkdir()
+    (source_path / "ideas.md").write_text("# Governed Pipeline\n")
+    symbols = [
+        Symbol(
+            id="ideas.md::Governed Pipeline#section",
+            name="Governed Pipeline",
+            qualified_name="Governed Pipeline",
+            kind="section",
+            language="markdown",
+            file_path="ideas.md",
+            byte_offset=0,
+            byte_length=20,
+            keywords=["retrieval", "governance"],
+        )
+    ]
+    store.write(source_path, symbols, file_hashes={})
+
+    results = store.search(source_path, "retrieval-governance", lang="markdown")
+
+    assert [r["id"] for r in results] == ["ideas.md::Governed Pipeline#section"]
+
+
+def test_search_matches_markdown_frontmatter_metadata(store: IndexStore, tmp_path: Path):
+    source_path = tmp_path / "repo"
+    source_path.mkdir()
+    (source_path / "ideas.md").write_text("# Governed Pipeline\n")
+    symbols = [
+        Symbol(
+            id="ideas.md::Governed Pipeline#section",
+            name="Governed Pipeline",
+            qualified_name="Governed Pipeline",
+            kind="section",
+            language="markdown",
+            file_path="ideas.md",
+            byte_offset=0,
+            byte_length=20,
+            metadata={
+                "frontmatter": {
+                    "type": "ideas",
+                    "category": "Retrieval Governance",
+                    "description": "Build bounded graph/vector context packs.",
+                    "tags": ["retrieval-governance"],
+                }
+            },
+        )
+    ]
+    store.write(source_path, symbols, file_hashes={})
+
+    tag_results = store.search(source_path, "retrieval-governance", lang="markdown")
+    category_results = store.search(source_path, "Retrieval Governance", lang="markdown")
+    description_results = store.search(source_path, "context packs", lang="markdown")
+
+    assert [r["id"] for r in tag_results] == ["ideas.md::Governed Pipeline#section"]
+    assert [r["id"] for r in category_results] == ["ideas.md::Governed Pipeline#section"]
+    assert [r["id"] for r in description_results] == ["ideas.md::Governed Pipeline#section"]
+    assert "page_frontmatter.tags" in tag_results[0]["match_scope"]
+
+
+def test_search_downranks_markdown_templates_for_metadata_query(store: IndexStore, tmp_path: Path):
+    source_path = tmp_path / "repo"
+    source_path.mkdir()
+    (source_path / "_templates").mkdir()
+    (source_path / "ideas").mkdir()
+    (source_path / "_templates" / "idea.md").write_text("# Idea Template\n")
+    (source_path / "ideas" / "governed.md").write_text("# Governed Pipeline\n")
+    metadata = {
+        "frontmatter": {
+            "category": "Retrieval Governance",
+            "tags": ["retrieval-governance"],
+        }
+    }
+    symbols = [
+        Symbol(
+            id="_templates/idea.md::Idea Template#section",
+            name="Idea Template",
+            qualified_name="Idea Template",
+            kind="section",
+            language="markdown",
+            file_path="_templates/idea.md",
+            byte_offset=0,
+            byte_length=20,
+            metadata=metadata,
+        ),
+        Symbol(
+            id="ideas/governed.md::Governed Pipeline#section",
+            name="Governed Pipeline",
+            qualified_name="Governed Pipeline",
+            kind="section",
+            language="markdown",
+            file_path="ideas/governed.md",
+            byte_offset=0,
+            byte_length=20,
+            metadata=metadata,
+        ),
+    ]
+    store.write(source_path, symbols, file_hashes={})
+
+    results = store.search(source_path, "retrieval-governance", lang="markdown")
+
+    assert results[0]["id"] == "ideas/governed.md::Governed Pipeline#section"
+
+
+def test_search_exposes_markdown_retrieval_cost_fields(store: IndexStore, tmp_path: Path):
+    source_path = tmp_path / "repo"
+    source_path.mkdir()
+    (source_path / "ideas.md").write_text("# Governed Pipeline\n\n## Proposed Graph Move\n\nBody.\n")
+    symbols = [
+        Symbol(
+            id="ideas.md::Governed Pipeline#section",
+            name="Governed Pipeline",
+            qualified_name="Governed Pipeline",
+            kind="section",
+            language="markdown",
+            file_path="ideas.md",
+            byte_offset=0,
+            byte_length=900,
+            metadata={
+                "markdown": {
+                    "page_root": True,
+                    "synthetic_name": False,
+                    "heading_level": 1,
+                    "parent_id": "",
+                    "root_id": "ideas.md::Governed Pipeline#section",
+                    "file_bytes": 1000,
+                    "saved_pct": 10,
+                    "span_kind": "page_root",
+                }
+            },
+        )
+    ]
+    store.write(source_path, symbols, file_hashes={})
+
+    results = store.search(source_path, "governed", lang="markdown")
+
+    assert results[0]["file_bytes"] == 1000
+    assert results[0]["saved_pct"] == 10
+    assert results[0]["span_kind"] == "page_root"
+    assert results[0]["match_scope"] == ["section_heading"]
+
+
+def test_search_surfaces_inherited_markdown_metadata_child_candidates(
+    store: IndexStore,
+    tmp_path: Path,
+):
+    source_path = tmp_path / "repo"
+    source_path.mkdir()
+    (source_path / "ideas.md").write_text(
+        "# Governed Hybrid Retrieval Pipeline\n\n"
+        "Root body.\n\n"
+        "## Proposed Graph Move\n\n"
+        "Use page-level governance metadata to route bounded context.\n"
+    )
+    root_id = "ideas.md::Governed Hybrid Retrieval Pipeline#section"
+    child_id = "ideas.md::Governed Hybrid Retrieval Pipeline > Proposed Graph Move#section"
+    symbols = [
+        Symbol(
+            id=root_id,
+            name="Governed Hybrid Retrieval Pipeline",
+            qualified_name="Governed Hybrid Retrieval Pipeline",
+            kind="section",
+            language="markdown",
+            file_path="ideas.md",
+            byte_offset=0,
+            byte_length=950,
+            metadata={
+                "frontmatter": {
+                    "title": "Governed Hybrid Retrieval Pipeline",
+                    "category": "Retrieval Governance",
+                    "tags": ["retrieval-governance"],
+                    "description": "Build bounded context packs.",
+                },
+                "markdown": {
+                    "page_root": True,
+                    "synthetic_name": False,
+                    "heading_level": 1,
+                    "parent_id": "",
+                    "root_id": root_id,
+                    "file_bytes": 1000,
+                    "saved_pct": 5,
+                    "span_kind": "page_root",
+                },
+            },
+        ),
+        Symbol(
+            id=child_id,
+            name="Proposed Graph Move",
+            qualified_name="Governed Hybrid Retrieval Pipeline > Proposed Graph Move",
+            kind="section",
+            language="markdown",
+            file_path="ideas.md",
+            byte_offset=40,
+            byte_length=180,
+            docstring="Use page-level governance metadata to route bounded context.",
+            metadata={
+                "markdown": {
+                    "page_root": False,
+                    "synthetic_name": False,
+                    "heading_level": 2,
+                    "parent_id": root_id,
+                    "root_id": root_id,
+                    "file_bytes": 1000,
+                    "saved_pct": 82,
+                    "span_kind": "section",
+                },
+            },
+        ),
+    ]
+    store.write(source_path, symbols, file_hashes={})
+
+    results = store.search(source_path, "retrieval-governance", lang="markdown")
+
+    assert [r["id"] for r in results[:2]] == [child_id, root_id]
+    assert "section_summary" in results[0]["match_scope"]
+    assert "inherited_page_frontmatter.tags" in results[0]["match_scope"]
+    assert results[0]["saved_pct"] == 82
+    assert "page_frontmatter.tags" in results[1]["match_scope"]
+
+
+def test_search_exact_markdown_page_title_keeps_root_first(store: IndexStore, tmp_path: Path):
+    source_path = tmp_path / "repo"
+    source_path.mkdir()
+    (source_path / "ideas.md").write_text(
+        "# Governed Hybrid Retrieval Pipeline\n\n"
+        "Root body.\n\n"
+        "## Proposed Graph Move\n\n"
+        "Governed Hybrid Retrieval Pipeline local text.\n"
+    )
+    root_id = "ideas.md::Governed Hybrid Retrieval Pipeline#section"
+    child_id = "ideas.md::Governed Hybrid Retrieval Pipeline > Proposed Graph Move#section"
+    metadata = {
+        "frontmatter": {
+            "title": "Governed Hybrid Retrieval Pipeline",
+            "tags": ["retrieval-governance"],
+        },
+        "markdown": {
+            "page_root": True,
+            "synthetic_name": False,
+            "heading_level": 1,
+            "parent_id": "",
+            "root_id": root_id,
+            "file_bytes": 1000,
+            "saved_pct": 5,
+            "span_kind": "page_root",
+        },
+    }
+    symbols = [
+        Symbol(
+            id=root_id,
+            name="Governed Hybrid Retrieval Pipeline",
+            qualified_name="Governed Hybrid Retrieval Pipeline",
+            kind="section",
+            language="markdown",
+            file_path="ideas.md",
+            byte_offset=0,
+            byte_length=950,
+            metadata=metadata,
+        ),
+        Symbol(
+            id=child_id,
+            name="Proposed Graph Move",
+            qualified_name="Governed Hybrid Retrieval Pipeline > Proposed Graph Move",
+            kind="section",
+            language="markdown",
+            file_path="ideas.md",
+            byte_offset=40,
+            byte_length=180,
+            docstring="Governed Hybrid Retrieval Pipeline local text.",
+            metadata={
+                "markdown": {
+                    "page_root": False,
+                    "synthetic_name": False,
+                    "heading_level": 2,
+                    "parent_id": root_id,
+                    "root_id": root_id,
+                    "file_bytes": 1000,
+                    "saved_pct": 82,
+                    "span_kind": "section",
+                },
+            },
+        ),
+    ]
+    store.write(source_path, symbols, file_hashes={})
+
+    results = store.search(source_path, "Governed Hybrid Retrieval Pipeline", lang="markdown")
+
+    assert results[0]["id"] == root_id
+    assert "page_frontmatter.title" in results[0]["match_scope"]
 
 
 def test_log_retrieval_includes_kind_and_language(tmp_path):

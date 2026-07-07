@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import time
 import uuid
 from collections import defaultdict
@@ -13,7 +14,7 @@ import pathspec
 from loci.parser.extractor import parse_file
 from loci.parser.languages import EXTENSION_MAP, MARKDOWN_SUFFIXES
 from loci.parser.symbols import Symbol
-from loci.storage.index_store import IndexStore
+from loci.storage.index_store import IndexStore, index_versions_current
 from loci.storage.store_resolver import StoreResolution, resolve_store_base_dir
 
 SKIP_DIRS = {
@@ -80,6 +81,8 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
 
     store = get_store()
     existing = store.load(repo_path) if incremental else None
+    if existing is not None and not index_versions_current(existing):
+        existing = None
     existing_hashes: dict[str, str] = existing.get("file_hashes", {}) if existing else {}
     existing_symbols: list[dict[str, Any]] = existing.get("symbols", []) if existing else []
 
@@ -101,9 +104,16 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
             continue
 
         symbols = parse_file(src_file)
+        id_map: dict[str, str] = {}
         for sym in symbols:
+            old_id = sym.id
             sym.file_path = rel_path
-            sym.id = f"{rel_path}::{sym.qualified_name}#{sym.kind}"
+            suffix_match = re.search(r"~\d+$", old_id)
+            suffix = suffix_match.group(0) if suffix_match else ""
+            sym.id = f"{rel_path}::{sym.qualified_name}#{sym.kind}{suffix}"
+            id_map[old_id] = sym.id
+        for sym in symbols:
+            _remap_markdown_hierarchy_ids(sym, id_map)
         all_symbols.extend(symbols)
         lang = EXTENSION_MAP.get(src_file.suffix, "unknown")
         if symbols:
@@ -195,6 +205,7 @@ def outline_repo(
         }
         if symbol.get("decorators"):
             entry["decorators"] = symbol["decorators"]
+        _add_markdown_retrieval_fields(entry, symbol)
         grouped.setdefault(file_path, []).append(entry)
         if symbol.get("language"):
             languages.add(symbol["language"])
@@ -418,6 +429,8 @@ def _load_required_index(store: IndexStore, repo_path: Path) -> dict[str, Any]:
 
 
 def _index_is_stale(repo_path: Path, store: IndexStore, index: dict[str, Any]) -> bool:
+    if not index_versions_current(index):
+        return True
     current_hashes = {
         rel_path: file_hash
         for _, rel_path, file_hash in _iter_indexable_files(repo_path, store)
@@ -530,6 +543,27 @@ def _get_symbol(
             result["context_before"] = symbol_context["context_before"]
             result["context_after"] = symbol_context["context_after"]
     return result
+
+
+def _remap_markdown_hierarchy_ids(sym: Symbol, id_map: dict[str, str]) -> None:
+    metadata = sym.metadata if isinstance(sym.metadata, dict) else {}
+    markdown = metadata.get("markdown")
+    if not isinstance(markdown, dict):
+        return
+    for key in ("parent_id", "root_id"):
+        value = markdown.get(key)
+        if isinstance(value, str) and value:
+            markdown[key] = id_map.get(value, value)
+
+
+def _add_markdown_retrieval_fields(entry: dict[str, Any], symbol: dict[str, Any]) -> None:
+    metadata = symbol.get("metadata")
+    markdown = metadata.get("markdown") if isinstance(metadata, dict) else None
+    if not isinstance(markdown, dict):
+        return
+    for key in ("file_bytes", "saved_pct", "span_kind"):
+        if key in markdown:
+            entry[key] = markdown[key]
 
 
 def _load_gitignore(repo_path: Path) -> "pathspec.PathSpec | None":

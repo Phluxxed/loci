@@ -80,6 +80,20 @@ def test_mcp_grep_refresh_removes_deleted_files(tmp_path: Path):
     assert result["matches"] == []
 
 
+def test_mcp_markdown_search_and_outline_include_retrieval_cost(tmp_path: Path):
+    result = asyncio.run(_markdown_search_and_outline(tmp_path / "repo", tmp_path / ".codeindex"))
+
+    outline_symbols = result["outline"]["files"][0]["symbols"]
+    usage = next(symbol for symbol in outline_symbols if symbol["name"] == "Usage")
+    search_symbol = result["search"]["symbols"][0]
+
+    assert usage["span_kind"] == "section"
+    assert usage["saved_pct"] > 0
+    assert search_symbol["span_kind"] in {"page_root", "section"}
+    assert search_symbol["file_bytes"] > 0
+    assert search_symbol["match_scope"]
+
+
 async def _round_trip(
     repo: Path,
     cache_dir: Path,
@@ -234,6 +248,56 @@ async def _grep_after_indexed_file_deleted(repo: Path, cache_dir: Path) -> dict[
                 arguments={"repo": str(repo), "pattern": "deleted_symbol"},
             )
             return grep.structuredContent
+
+
+async def _markdown_search_and_outline(repo: Path, cache_dir: Path) -> dict[str, Any]:
+    repo.mkdir()
+    (repo / "README.md").write_text(
+        "---\n"
+        "title: Markdown Manual\n"
+        "tags: [retrieval-governance]\n"
+        "---\n\n"
+        "# Markdown Manual\n\n"
+        "Root body.\n\n"
+        "## Usage\n\n"
+        "Use retrieval governance for bounded section context.\n",
+        encoding="utf-8",
+    )
+
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["PYTHONPATH"] = str(Path.cwd() / "src")
+    server_params = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "loci.mcp_server"],
+        env=env,
+        cwd=Path.cwd(),
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            await session.call_tool(
+                "loci_index",
+                arguments={"path": str(repo), "incremental": False},
+            )
+            outline = await session.call_tool(
+                "loci_outline",
+                arguments={"path": str(repo), "file": "README.md"},
+            )
+            search = await session.call_tool(
+                "loci_search",
+                arguments={
+                    "repo": str(repo),
+                    "query": "retrieval-governance",
+                    "lang": "markdown",
+                    "limit": 5,
+                },
+            )
+            return {
+                "outline": outline.structuredContent,
+                "search": search.structuredContent,
+            }
 
 
 async def _outline_missing_repo(cache_dir: Path, repo: Path) -> dict[str, Any]:
