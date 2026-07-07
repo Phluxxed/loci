@@ -1,13 +1,28 @@
 from __future__ import annotations
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 import ast
 import hashlib
 import re
 import textwrap
+import yaml
 
 from .symbols import Symbol, make_symbol_id
 from .languages import get_language_spec, EXTENSION_MAP, MARKDOWN_SUFFIXES, LanguageSpec
+
+
+FRONTMATTER_SCALAR_FIELDS = (
+    "title",
+    "type",
+    "category",
+    "status",
+    "source",
+    "description",
+    "created",
+    "last_reviewed",
+    "timestamp",
+)
+FRONTMATTER_LIST_FIELDS = ("tags",)
 
 
 def parse_file(path: Path) -> list[Symbol]:
@@ -664,13 +679,28 @@ def parse_markdown(path: Path) -> list[Symbol]:
 
     parser = Parser(get_language("markdown"))
     tree = parser.parse(source)
+    frontmatter = _parse_frontmatter(source, path)
+    frontmatter_keywords = _frontmatter_keywords(frontmatter)
+    file_bytes = len(source)
 
     sections = [c for c in tree.root_node.children if c.type == "section"]
     has_heading = any(_md_heading_node(sec) is not None for sec in sections)
 
     symbols: list[Symbol] = []
     for sec in sections:
-        _walk_md_section(sec, source, rel_path, parent_path=[], out=symbols, emit_preamble=has_heading)
+        _walk_md_section(
+            sec,
+            source,
+            rel_path,
+            parent_path=[],
+            parent_index=None,
+            root_index=None,
+            out=symbols,
+            emit_preamble=has_heading,
+            frontmatter=frontmatter,
+            frontmatter_keywords=frontmatter_keywords,
+            file_bytes=file_bytes,
+        )
 
     if not has_heading and source.strip():
         # No headings anywhere — index the whole file as a single section named
@@ -680,9 +710,21 @@ def parse_markdown(path: Path) -> list[Symbol]:
             name=path.stem, qualified_name=path.stem,
             signature=path.stem, start=0, end=len(source),
             docstring=_md_first_paragraph(tree.root_node, source),
+            summary=frontmatter.get("description", ""),
+            keywords=frontmatter_keywords,
+            metadata=_markdown_metadata(
+                frontmatter,
+                page_root=True,
+                synthetic_name=True,
+                heading_level=0,
+                span_kind="flat_page",
+                file_bytes=file_bytes,
+                byte_length=len(source),
+            ),
         )
 
     _disambiguate(symbols)
+    _finalize_markdown_hierarchy(symbols)
     return symbols
 
 
@@ -691,8 +733,13 @@ def _walk_md_section(
     source: bytes,
     rel_path: str,
     parent_path: list[str],
+    parent_index: int | None,
+    root_index: int | None,
     out: list[Symbol],
     emit_preamble: bool,
+    frontmatter: dict[str, Any],
+    frontmatter_keywords: set[str],
+    file_bytes: int,
 ) -> None:
     heading = _md_heading_node(node)
 
@@ -705,6 +752,15 @@ def _walk_md_section(
                 name="(preamble)", qualified_name="(preamble)",
                 signature="(preamble)", start=node.start_byte, end=node.end_byte,
                 docstring=_md_first_paragraph(node, source),
+                metadata=_markdown_metadata(
+                    None,
+                    page_root=False,
+                    synthetic_name=True,
+                    heading_level=0,
+                    span_kind="preamble",
+                    file_bytes=file_bytes,
+                    byte_length=node.end_byte - node.start_byte,
+                ),
             )
         return
 
@@ -713,18 +769,46 @@ def _walk_md_section(
         return
     path_parts = [*parent_path, name]
     qualified_name = " > ".join(path_parts)
+    is_page_root = not parent_path
+    heading_level = _md_heading_level(heading, source)
 
-    _append_md_symbol(
+    current_index = _append_md_symbol(
         source, rel_path, out=out,
         name=name, qualified_name=qualified_name,
         signature=_md_heading_line(heading, source),
         start=node.start_byte, end=node.end_byte,
         docstring=_md_first_paragraph(node, source),
+        summary=frontmatter.get("description", "") if is_page_root else "",
+        keywords=frontmatter_keywords if is_page_root else None,
+        metadata=_markdown_metadata(
+            frontmatter if is_page_root else None,
+            page_root=is_page_root,
+            synthetic_name=False,
+            heading_level=heading_level,
+            span_kind="page_root" if is_page_root else "section",
+            file_bytes=file_bytes,
+            byte_length=node.end_byte - node.start_byte,
+            parent_index=parent_index,
+            root_index=None if is_page_root else root_index,
+        ),
     )
 
+    child_root_index = current_index if is_page_root else root_index
     for child in node.children:
         if child.type == "section":
-            _walk_md_section(child, source, rel_path, path_parts, out, emit_preamble=False)
+            _walk_md_section(
+                child,
+                source,
+                rel_path,
+                path_parts,
+                parent_index=current_index,
+                root_index=child_root_index,
+                out=out,
+                emit_preamble=False,
+                frontmatter=frontmatter,
+                frontmatter_keywords=frontmatter_keywords,
+                file_bytes=file_bytes,
+            )
 
 
 def _append_md_symbol(
@@ -737,9 +821,15 @@ def _append_md_symbol(
     start: int,
     end: int,
     docstring: str,
-) -> None:
+    summary: str = "",
+    keywords: set[str] | None = None,
+    metadata: dict[str, Any] | None = None,
+) -> int:
     line = source[:start].count(b"\n") + 1
     end_line = source[:end].count(b"\n") + 1
+    symbol_keywords = _prose_words(name)
+    if keywords:
+        symbol_keywords.update(keywords)
     out.append(Symbol(
         id=make_symbol_id(rel_path, qualified_name, "section"),
         name=name,
@@ -751,11 +841,142 @@ def _append_md_symbol(
         byte_length=end - start,
         signature=signature,
         docstring=docstring,
+        summary=summary,
         content_hash=hashlib.sha256(source[start:end]).hexdigest(),
-        keywords=sorted(_prose_words(name)),
+        keywords=sorted(symbol_keywords),
+        metadata=metadata or {},
         line=line,
         end_line=end_line,
     ))
+    return len(out) - 1
+
+
+def _parse_frontmatter(source: bytes, path: Path) -> dict[str, Any]:
+    text = _frontmatter_text(source)
+    if text is None:
+        return {}
+
+    try:
+        loaded = yaml.safe_load(text) or {}
+    except yaml.YAMLError as exc:
+        raise ValueError(f"Invalid markdown frontmatter in {path}: {exc}") from exc
+
+    if not isinstance(loaded, dict):
+        return {}
+
+    metadata: dict[str, Any] = {}
+    for field in FRONTMATTER_SCALAR_FIELDS:
+        value = loaded.get(field)
+        if _is_metadata_scalar(value):
+            metadata[field] = str(value).strip()
+
+    for field in FRONTMATTER_LIST_FIELDS:
+        value = loaded.get(field)
+        normalized = _metadata_string_list(value)
+        if normalized:
+            metadata[field] = normalized
+
+    return metadata
+
+
+def _frontmatter_text(source: bytes) -> str | None:
+    lines = source.splitlines(keepends=True)
+    if not lines or lines[0].strip() != b"---":
+        return None
+
+    body: list[bytes] = []
+    for line in lines[1:]:
+        if line.strip() == b"---":
+            return b"".join(body).decode("utf-8", errors="replace")
+        body.append(line)
+    return None
+
+
+def _is_metadata_scalar(value: Any) -> bool:
+    return value is not None and not isinstance(value, (dict, list, tuple, set))
+
+
+def _metadata_string_list(value: Any) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, str):
+        items = [value]
+    elif isinstance(value, (list, tuple, set)):
+        items = list(value)
+    else:
+        items = [value]
+    return [text for item in items if (text := str(item).strip())]
+
+
+def _frontmatter_keywords(frontmatter: dict[str, Any]) -> set[str]:
+    keywords: set[str] = set()
+    for value in frontmatter.values():
+        if isinstance(value, list):
+            for item in value:
+                keywords.update(_prose_words(item))
+        else:
+            keywords.update(_prose_words(str(value)))
+    return keywords
+
+
+def _markdown_metadata(
+    frontmatter: dict[str, Any] | None,
+    *,
+    page_root: bool,
+    synthetic_name: bool,
+    heading_level: int,
+    span_kind: str,
+    file_bytes: int,
+    byte_length: int,
+    parent_index: int | None = None,
+    root_index: int | None = None,
+) -> dict[str, Any]:
+    metadata: dict[str, Any] = {}
+    if frontmatter:
+        metadata["frontmatter"] = {
+            key: list(value) if isinstance(value, list) else value
+            for key, value in frontmatter.items()
+        }
+    saved_pct = int((file_bytes - byte_length) / file_bytes * 100) if file_bytes > 0 else 0
+    saved_pct = max(0, min(100, saved_pct))
+    markdown: dict[str, Any] = {
+        "page_root": page_root,
+        "synthetic_name": synthetic_name,
+        "heading_level": heading_level,
+        "parent_id": "",
+        "root_id": "",
+        "file_bytes": file_bytes,
+        "saved_pct": saved_pct,
+        "span_kind": span_kind,
+    }
+    if parent_index is not None:
+        markdown["_parent_index"] = parent_index
+    if root_index is not None:
+        markdown["_root_index"] = root_index
+    metadata["markdown"] = markdown
+    return metadata
+
+
+def _finalize_markdown_hierarchy(symbols: list[Symbol]) -> None:
+    """Resolve temporary parent/root indexes after duplicate IDs are final."""
+    for sym in symbols:
+        metadata = sym.metadata if isinstance(sym.metadata, dict) else {}
+        markdown = metadata.get("markdown")
+        if not isinstance(markdown, dict):
+            continue
+
+        parent_index = markdown.pop("_parent_index", None)
+        root_index = markdown.pop("_root_index", None)
+        markdown["parent_id"] = (
+            symbols[parent_index].id
+            if isinstance(parent_index, int) and 0 <= parent_index < len(symbols)
+            else ""
+        )
+        markdown["root_id"] = (
+            symbols[root_index].id
+            if isinstance(root_index, int) and 0 <= root_index < len(symbols)
+            else sym.id
+        )
 
 
 def _md_heading_node(section_node):
@@ -778,6 +999,12 @@ def _md_heading_line(heading_node, source: bytes) -> str:
     """The raw heading line including markers, e.g. '### Details'."""
     text = source[heading_node.start_byte:heading_node.end_byte].decode("utf-8", errors="replace")
     return text.split("\n")[0].strip()
+
+
+def _md_heading_level(heading_node, source: bytes) -> int:
+    """Return the ATX heading marker depth, e.g. '### Details' -> 3."""
+    line = _md_heading_line(heading_node, source).lstrip()
+    return len(line) - len(line.lstrip("#"))
 
 
 def _md_first_paragraph(node, source: bytes) -> str:

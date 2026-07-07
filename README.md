@@ -18,7 +18,7 @@ The CLI still exists for debugging, scripts, and migration safety, but MCP is th
 
 ## Supported languages
 
-Python, TypeScript, JavaScript, Go, Rust
+Python, TypeScript, JavaScript, Go, Rust, Markdown
 
 ## Install
 
@@ -217,7 +217,13 @@ loci stats --repo /path/to/repo
 
 ## Symbol fields
 
-Every symbol carries: `id`, `name`, `qualified_name`, `kind`, `language`, `file_path`, `byte_offset`, `byte_length`, `line`, `end_line`, `signature`, `docstring`, `summary`, `keywords`, `decorators`, `content_hash`.
+Every symbol carries: `id`, `name`, `qualified_name`, `kind`, `language`, `file_path`, `byte_offset`, `byte_length`, `line`, `end_line`, `signature`, `docstring`, `summary`, `keywords`, `decorators`, `metadata`, `content_hash`.
+
+Markdown files are indexed as `kind="section"` symbols. YAML frontmatter is parsed with PyYAML and attached to page-root markdown symbols under `metadata.frontmatter`; frontmatter fields such as `tags`, `category`, `type`, `source`, and `description` contribute to search. Frontmatter is metadata only, not a separate symbol.
+
+Markdown symbols also carry hierarchy and retrieval-cost data under `metadata.markdown`: `heading_level`, `parent_id`, `root_id`, `page_root`, `synthetic_name`, `file_bytes`, `saved_pct`, and `span_kind`. `loci_outline` and `loci_search` copy `file_bytes`, `saved_pct`, and `span_kind` to the top level for markdown rows so agents can see when a page root is valid but expensive and a child section is the better retrieval target.
+
+Markdown search results include `match_scope`, for example `section_heading`, `page_frontmatter.tags`, or `inherited_page_frontmatter.tags`. Child sections do not own page frontmatter; inherited scopes only explain why search surfaced that section from its page's metadata. `loci_get` still returns the exact requested byte range.
 
 ## Analytics
 

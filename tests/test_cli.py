@@ -156,6 +156,94 @@ def test_search_filters_by_kind(indexed_repo):
     assert all(r["kind"] == "class" for r in data)
 
 
+def test_search_finds_markdown_frontmatter_tag(tmp_path: Path):
+    repo = tmp_path / "wiki_repo"
+    repo.mkdir()
+    (repo / "ideas").mkdir()
+    (repo / "_templates").mkdir()
+    (repo / "ideas" / "governed-hybrid-retrieval-pipeline.md").write_text(
+        "---\n"
+        "title: Governed Hybrid Retrieval Pipeline\n"
+        "type: ideas\n"
+        "category: Retrieval Governance\n"
+        "description: Build bounded graph/vector context packs.\n"
+        "tags:\n"
+        "  - retrieval-governance\n"
+        "  - context-packs\n"
+        "---\n\n"
+        "# Governed Hybrid Retrieval Pipeline\n\n"
+        "Body.\n",
+        encoding="utf-8",
+    )
+    (repo / "_templates" / "idea.md").write_text(
+        "---\n"
+        "title: Idea Template\n"
+        "category: Retrieval Governance\n"
+        "tags: [retrieval-governance]\n"
+        "---\n\n"
+        "# Idea Template\n\n"
+        "Template body.\n",
+        encoding="utf-8",
+    )
+    base = str(tmp_path / ".codeindex")
+
+    index = run_loci("index", str(repo), env_extra={"LOCI_BASE_DIR": base})
+    result = run_loci(
+        "search",
+        "retrieval-governance",
+        "--repo",
+        str(repo),
+        "--lang",
+        "markdown",
+        env_extra={"LOCI_BASE_DIR": base},
+    )
+    data = json.loads(result.stdout)
+
+    assert index.returncode == 0, index.stderr
+    assert result.returncode == 0, result.stderr
+    assert data[0]["file_path"] == "ideas/governed-hybrid-retrieval-pipeline.md"
+    assert data[0]["metadata"]["frontmatter"]["tags"] == [
+        "retrieval-governance",
+        "context-packs",
+    ]
+    assert data[0]["span_kind"] == "page_root"
+    assert data[0]["saved_pct"] >= 0
+    assert data[0]["file_bytes"] > 0
+    assert "page_frontmatter.tags" in data[0]["match_scope"]
+
+
+def test_outline_exposes_markdown_retrieval_cost(tmp_path: Path):
+    repo = tmp_path / "wiki_repo"
+    repo.mkdir()
+    (repo / "README.md").write_text(
+        "# Title\n\n"
+        "Intro.\n\n"
+        "## Usage\n\n"
+        "Use bounded section retrieval.\n",
+        encoding="utf-8",
+    )
+    base = str(tmp_path / ".codeindex")
+
+    index = run_loci("index", str(repo), env_extra={"LOCI_BASE_DIR": base})
+    result = run_loci(
+        "outline",
+        str(repo),
+        "--file",
+        "README.md",
+        env_extra={"LOCI_BASE_DIR": base},
+    )
+    data = json.loads(result.stdout)
+    symbols = data[0]["symbols"]
+    root = next(s for s in symbols if s["name"] == "Title")
+    usage = next(s for s in symbols if s["name"] == "Usage")
+
+    assert index.returncode == 0, index.stderr
+    assert result.returncode == 0, result.stderr
+    assert root["span_kind"] == "page_root"
+    assert usage["span_kind"] == "section"
+    assert usage["saved_pct"] > root["saved_pct"]
+
+
 def test_get_returns_source(indexed_repo):
     repo, base = indexed_repo
     search_result = run_loci("search", "add", "--repo", str(repo), env_extra={"LOCI_BASE_DIR": base})
@@ -741,6 +829,32 @@ def test_verify_clean_repo_passes(indexed_repo: tuple[Path, str]):
     assert data["failed"] == []
     assert data["passed"] == data["checked"]
     assert data["repo"] == str(repo)
+
+
+def test_verify_valid_markdown_synthetic_sections_pass(tmp_path: Path):
+    repo = tmp_path / "markdown_repo"
+    repo.mkdir()
+    (repo / "doc.md").write_text(
+        "---\n"
+        "title: Markdown Doc\n"
+        "---\n\n"
+        "Preamble before the first heading.\n\n"
+        "# Real Heading\n\n"
+        "Body.\n",
+        encoding="utf-8",
+    )
+    (repo / "flat.md").write_text(
+        "A headingless markdown note whose content does not name the file.\n",
+        encoding="utf-8",
+    )
+    base = str(tmp_path / ".codeindex")
+    run_loci("index", str(repo), env_extra={"LOCI_BASE_DIR": base})
+
+    result = run_loci("verify", str(repo), env_extra={"LOCI_BASE_DIR": base})
+    data = json.loads(result.stdout)
+
+    assert result.returncode == 0, result.stderr
+    assert data["failed"] == []
 
 
 def test_verify_unindexed_repo_errors(tmp_path: Path):

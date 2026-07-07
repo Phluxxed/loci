@@ -26,6 +26,7 @@ def test_symbol_id_field_matches():
     assert sym.summary == ""
     assert sym.docstring == ""
     assert sym.signature == ""
+    assert sym.metadata == {}
 
 
 def test_symbol_to_dict():
@@ -41,11 +42,13 @@ def test_symbol_to_dict():
         signature="def login(username: str) -> bool",
         docstring="Authenticate a user.",
         summary="",
+        metadata={"frontmatter": {"tags": ["auth"]}},
     )
     d = sym.to_dict()
     assert d["id"] == "src/auth.py::login#function"
     assert d["byte_offset"] == 100
     assert d["signature"] == "def login(username: str) -> bool"
+    assert d["metadata"] == {"frontmatter": {"tags": ["auth"]}}
 
 
 def test_symbol_from_dict():
@@ -65,3 +68,32 @@ def test_symbol_from_dict():
     sym = Symbol.from_dict(data)
     assert sym.id == "src/auth.py::login#function"
     assert sym.byte_offset == 100
+    assert sym.metadata == {}
+
+
+def test_symbol_from_dict_loads_metadata():
+    data = {
+        "id": "docs/page.md::Page#section",
+        "name": "Page",
+        "qualified_name": "Page",
+        "kind": "section",
+        "language": "markdown",
+        "file_path": "docs/page.md",
+        "byte_offset": 0,
+        "byte_length": 200,
+        "metadata": {
+            "frontmatter": {
+                "type": "ideas",
+                "tags": ["retrieval-governance"],
+            }
+        },
+    }
+
+    sym = Symbol.from_dict(data)
+
+    assert sym.metadata == {
+        "frontmatter": {
+            "type": "ideas",
+            "tags": ["retrieval-governance"],
+        }
+    }

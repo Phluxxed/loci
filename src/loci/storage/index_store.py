@@ -10,6 +10,8 @@ from typing import Any, Optional
 from loci.parser.symbols import Symbol
 
 LAST_SEARCH_TTL = 300  # 5 minutes
+INDEX_SCHEMA_VERSION = 3
+EXTRACTOR_VERSION = 3
 
 
 def _resolve_worktree_root(path: str) -> str:
@@ -28,6 +30,13 @@ def _resolve_worktree_root(path: str) -> str:
         main_git = gitdir.parent.parent  # the main .git dir
         return str(main_git.parent)
     return path
+
+
+def index_versions_current(index: dict[str, Any]) -> bool:
+    return (
+        index.get("schema_version") == INDEX_SCHEMA_VERSION
+        and index.get("extractor_version") == EXTRACTOR_VERSION
+    )
 
 
 class IndexStore:
@@ -92,6 +101,8 @@ class IndexStore:
 
         # Atomic write: temp file + rename
         index_data = {
+            "schema_version": INDEX_SCHEMA_VERSION,
+            "extractor_version": EXTRACTOR_VERSION,
             "symbols": [s.to_dict() for s in symbols],
             "file_hashes": file_hashes,
             "repo_path": str(repo_path.resolve()),
@@ -171,24 +182,46 @@ class IndexStore:
         if index is None:
             return []
 
-        q = query.lower()
-        q_words = set(q.split()) if q else set()
-        scored: list[tuple[float, dict]] = []
+        q = query.lower().strip()
+        q_words = _query_words(q)
+        scored: list[tuple[float, dict, list[str]]] = []
+        symbols_by_id = {
+            sym.get("id", ""): sym
+            for sym in index["symbols"]
+            if sym.get("id")
+        }
 
         for sym in index["symbols"]:
             if kind and sym.get("kind") != kind:
                 continue
             if lang and sym.get("language") != lang:
                 continue
-            score = _score_symbol(sym, q, q_words)
-            scored.append((score, sym))
+            score, match_scope, exact_page_title = _score_symbol_detail(sym, q, q_words)
+            if sym.get("language") == "markdown" and q:
+                inherited_score, inherited_scopes = _score_inherited_markdown_metadata(
+                    sym,
+                    symbols_by_id,
+                    q,
+                    q_words,
+                )
+                if inherited_score and _has_markdown_local_signal(sym, q, q_words, match_scope):
+                    score += inherited_score * 0.55
+                    match_scope.extend(inherited_scopes)
+            if score > 0 and sym.get("language") == "markdown":
+                score = _adjust_markdown_score(sym, score, q_words, match_scope, exact_page_title)
+            if score > 0 and _is_template_symbol(sym):
+                score *= 0.5
+            scored.append((score, sym, match_scope))
 
         scored.sort(key=lambda x: x[0], reverse=True)
         results = []
-        for score, sym in scored[:limit]:
+        for score, sym, match_scope in scored[:limit]:
             if not q or score > 0:
                 entry = dict(sym)
                 entry["score"] = round(score, 2)
+                _add_markdown_result_fields(entry, sym)
+                if sym.get("language") == "markdown":
+                    entry["match_scope"] = _unique_scopes(match_scope)
                 results.append(entry)
 
         return results
@@ -530,13 +563,24 @@ class IndexStore:
                 })
                 continue
 
-            if name and name not in text:
+            if _should_verify_name_in_bytes(sym) and name and name not in text:
                 failed.append({
                     "id": sym_id,
                     "name": name,
                     "kind": kind,
                     "file": file_path,
                     "issue": "name_not_in_bytes",
+                })
+                continue
+
+            signature = sym.get("signature", "")
+            if _should_verify_markdown_signature(sym) and signature not in text:
+                failed.append({
+                    "id": sym_id,
+                    "name": name,
+                    "kind": kind,
+                    "file": file_path,
+                    "issue": "signature_not_in_bytes",
                 })
                 continue
 
@@ -881,6 +925,11 @@ def _name_words(name: str) -> set[str]:
     return {p for p in parts if len(p) > 1}  # skip single-char fragments
 
 
+def _query_words(text: str) -> set[str]:
+    """Tokenise natural-language queries and metadata values for search."""
+    return {w for w in re.split(r"[^A-Za-z0-9]+", text.lower()) if len(w) > 1}
+
+
 _KIND_WEIGHTS: dict[str, dict[str, float]] = {
     "python": {
         "function": 10, "method": 10, "class": 3, "constant": -5,
@@ -909,58 +958,333 @@ def _kind_weight(kind: str, language: str) -> float:
 
 
 def _score_symbol(sym: dict[str, Any], q: str, q_words: set[str]) -> float:
+    score, _match_scope, _exact_page_title = _score_symbol_detail(sym, q, q_words)
+    if score > 0 and _is_template_symbol(sym):
+        score *= 0.5
+    return score
+
+
+def _score_symbol_detail(
+    sym: dict[str, Any],
+    q: str,
+    q_words: set[str],
+) -> tuple[float, list[str], bool]:
     if not q:
-        return 0.0
+        return 0.0, [], False
 
     score = 0.0
+    match_scope: list[str] = []
     name = sym.get("name", "").lower()
     qualified = sym.get("qualified_name", "").lower()
     sig = sym.get("signature", "").lower()
     summary = sym.get("summary", "").lower()
     docstring = sym.get("docstring", "").lower()
 
-    # Exact and substring matches on qualified name (highest signal)
     if qualified == q:
         score += 25
+        match_scope.append("section_heading")
     elif q in qualified:
         score += 12
+        match_scope.append("section_heading")
 
-    # Exact and substring matches on bare name
     if name == q:
         score += 20
+        match_scope.append("section_heading")
     elif q in name:
         score += 10
+        match_scope.append("section_heading")
 
-    # Name word overlap: "get user" matches getUserById
     name_words = _name_words(sym.get("name", ""))
     for word in q_words:
         if word in name_words:
             score += 5
+            match_scope.append("section_heading")
 
     if q in sig:
         score += 8
+        match_scope.append("section_heading")
     else:
         for word in q_words:
             if word in sig:
                 score += 2
+                match_scope.append("section_heading")
 
     if summary:
         if q in summary:
             score += 5
+            match_scope.append("section_summary")
         else:
             for word in q_words:
                 if word in summary:
                     score += 1
+                    match_scope.append("section_summary")
 
     for word in q_words:
         if word in docstring:
             score += 1
+            match_scope.append("section_summary")
 
-    # Keyword match (+3 per matching keyword)
-    keywords = set(sym.get("keywords", []))
-    score += len(q_words & keywords) * 3
+    keywords = {str(k).lower() for k in sym.get("keywords", [])}
+    keyword_hits = q_words & keywords
+    if keyword_hits:
+        score += len(keyword_hits) * 3
+        match_scope.append("section_keywords")
+
+    metadata_score, metadata_scopes, exact_page_title = _score_frontmatter(
+        _frontmatter_metadata(sym),
+        q,
+        q_words,
+        prefix="page_frontmatter",
+    )
+    score += metadata_score
+    match_scope.extend(metadata_scopes)
 
     if score <= 0:
-        return 0.0
+        return 0.0, [], False
 
-    return score + _kind_weight(sym.get("kind", ""), sym.get("language", ""))
+    score += _kind_weight(sym.get("kind", ""), sym.get("language", ""))
+    return score, _unique_scopes(match_scope), exact_page_title
+
+
+def _score_metadata(sym: dict[str, Any], q: str, q_words: set[str]) -> float:
+    score, _scopes, _exact_page_title = _score_frontmatter(
+        _frontmatter_metadata(sym),
+        q,
+        q_words,
+        prefix="page_frontmatter",
+    )
+    return score
+
+
+def _score_frontmatter(
+    frontmatter: dict[str, Any],
+    q: str,
+    q_words: set[str],
+    *,
+    prefix: str,
+) -> tuple[float, list[str], bool]:
+    if not frontmatter:
+        return 0.0, [], False
+
+    score = 0.0
+    match_scope: list[str] = []
+    exact_page_title = False
+
+    for tag in _metadata_list(frontmatter.get("tags")):
+        tag_lower = tag.lower()
+        tag_score = 0.0
+        if tag_lower == q:
+            tag_score += 16
+        elif q and q in tag_lower:
+            tag_score += 10
+        tag_score += len(q_words & _query_words(tag)) * 4
+        if tag_score:
+            score += tag_score
+            match_scope.append(f"{prefix}.tags")
+
+    title = _metadata_scalar(frontmatter.get("title"))
+    if title:
+        field_score = _score_metadata_text(title, q, q_words, exact=8, word=2)
+        if field_score:
+            score += field_score
+            match_scope.append(f"{prefix}.title")
+            exact_page_title = title.lower() == q
+
+    for field in ("category", "type", "source", "status"):
+        value = _metadata_scalar(frontmatter.get(field))
+        if value:
+            field_score = _score_metadata_text(value, q, q_words, exact=7, word=2)
+            if field_score:
+                score += field_score
+                match_scope.append(f"{prefix}.{field}")
+
+    description = _metadata_scalar(frontmatter.get("description"))
+    if description:
+        field_score = _score_metadata_text(description, q, q_words, exact=5, word=1)
+        if field_score:
+            score += field_score
+            match_scope.append(f"{prefix}.description")
+
+    return score, _unique_scopes(match_scope), exact_page_title
+
+
+def _score_inherited_markdown_metadata(
+    sym: dict[str, Any],
+    symbols_by_id: dict[str, dict[str, Any]],
+    q: str,
+    q_words: set[str],
+) -> tuple[float, list[str]]:
+    markdown = _markdown_metadata_block(sym)
+    if not markdown:
+        return 0.0, []
+    root_id = str(markdown.get("root_id") or "")
+    if not root_id or root_id == sym.get("id"):
+        return 0.0, []
+    root = symbols_by_id.get(root_id)
+    if not root:
+        return 0.0, []
+    score, scopes, _exact_page_title = _score_frontmatter(
+        _frontmatter_metadata(root),
+        q,
+        q_words,
+        prefix="inherited_page_frontmatter",
+    )
+    return score, scopes
+
+
+_ACTIONABLE_MARKDOWN_HEADINGS = {
+    "problem signal",
+    "proposed graph move",
+    "evidence to gather",
+    "next experiment",
+    "risks and failure modes",
+    "query",
+    "usage",
+    "operations",
+    "frontmatter",
+}
+
+_PAGE_LEVEL_QUERY_WORDS = {"overview", "manual", "page", "document", "doc", "readme", "guide"}
+
+
+def _has_markdown_local_signal(
+    sym: dict[str, Any],
+    q: str,
+    q_words: set[str],
+    match_scope: list[str],
+) -> bool:
+    if any(scope.startswith("section_") for scope in match_scope):
+        return True
+    heading = str(sym.get("name", "")).lower()
+    if heading in _ACTIONABLE_MARKDOWN_HEADINGS:
+        return True
+    local_text = " ".join(
+        str(sym.get(field, ""))
+        for field in ("name", "qualified_name", "summary", "docstring")
+    ).lower()
+    return bool(q and q in local_text) or bool(q_words & _query_words(local_text))
+
+
+def _adjust_markdown_score(
+    sym: dict[str, Any],
+    score: float,
+    q_words: set[str],
+    match_scope: list[str],
+    exact_page_title: bool,
+) -> float:
+    markdown = _markdown_metadata_block(sym)
+    if not markdown:
+        return score
+
+    saved_pct = _markdown_saved_pct(sym)
+    span_kind = markdown.get("span_kind")
+    inherited = any(scope.startswith("inherited_page_frontmatter.") for scope in match_scope)
+    local = any(scope.startswith("section_") for scope in match_scope)
+
+    if span_kind == "page_root" and saved_pct < 25 and not exact_page_title:
+        if not (q_words & _PAGE_LEVEL_QUERY_WORDS):
+            score *= 0.5
+    elif span_kind == "section" and saved_pct >= 50 and inherited and local:
+        score += 8
+    return score
+
+
+def _add_markdown_result_fields(entry: dict[str, Any], sym: dict[str, Any]) -> None:
+    markdown = _markdown_metadata_block(sym)
+    if not markdown:
+        return
+    for key in ("file_bytes", "saved_pct", "span_kind"):
+        if key in markdown:
+            entry[key] = markdown[key]
+
+
+def _markdown_metadata_block(sym: dict[str, Any]) -> dict[str, Any]:
+    metadata = sym.get("metadata")
+    if not isinstance(metadata, dict):
+        return {}
+    markdown = metadata.get("markdown")
+    return markdown if isinstance(markdown, dict) else {}
+
+
+def _markdown_saved_pct(sym: dict[str, Any]) -> int:
+    markdown = _markdown_metadata_block(sym)
+    try:
+        return int(markdown.get("saved_pct", 0))
+    except (TypeError, ValueError):
+        return 0
+
+
+def _unique_scopes(scopes: list[str]) -> list[str]:
+    unique: list[str] = []
+    seen: set[str] = set()
+    for scope in scopes:
+        if scope and scope not in seen:
+            unique.append(scope)
+            seen.add(scope)
+    return unique
+
+
+def _frontmatter_metadata(sym: dict[str, Any]) -> dict[str, Any]:
+    metadata = sym.get("metadata")
+    if not isinstance(metadata, dict):
+        return {}
+    frontmatter = metadata.get("frontmatter")
+    return frontmatter if isinstance(frontmatter, dict) else {}
+
+
+def _metadata_scalar(value: Any) -> str:
+    if value is None or isinstance(value, (dict, list, tuple, set)):
+        return ""
+    return str(value)
+
+
+def _metadata_list(value: Any) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, str):
+        items = [value]
+    elif isinstance(value, (list, tuple, set)):
+        items = list(value)
+    else:
+        items = [value]
+    return [text for item in items if (text := str(item).strip())]
+
+
+def _score_metadata_text(text: str, q: str, q_words: set[str], *, exact: float, word: float) -> float:
+    text_lower = text.lower()
+    score = exact if q and q in text_lower else 0.0
+    score += len(q_words & _query_words(text)) * word
+    return score
+
+
+def _is_template_symbol(sym: dict[str, Any]) -> bool:
+    parts = Path(sym.get("file_path", "")).parts
+    return "_templates" in parts
+
+
+def _should_verify_name_in_bytes(sym: dict[str, Any]) -> bool:
+    return not _is_synthetic_markdown_name(sym)
+
+
+def _is_synthetic_markdown_name(sym: dict[str, Any]) -> bool:
+    if sym.get("language") != "markdown":
+        return False
+    if sym.get("name") == "(preamble)":
+        return True
+
+    metadata = sym.get("metadata")
+    markdown = metadata.get("markdown") if isinstance(metadata, dict) else None
+    if isinstance(markdown, dict) and markdown.get("synthetic_name"):
+        return True
+
+    signature = str(sym.get("signature", ""))
+    name = str(sym.get("name", ""))
+    return bool(name and signature == name and not _is_markdown_heading_signature(signature))
+
+
+def _should_verify_markdown_signature(sym: dict[str, Any]) -> bool:
+    return sym.get("language") == "markdown" and _is_markdown_heading_signature(str(sym.get("signature", "")))
+
+
+def _is_markdown_heading_signature(signature: str) -> bool:
+    return signature.lstrip().startswith("#")
