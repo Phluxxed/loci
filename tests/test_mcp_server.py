@@ -22,7 +22,12 @@ def test_mcp_index_outline_get_round_trip(tmp_path: Path, fixtures_dir: Path):
         "loci_analyze",
         "loci_file",
         "loci_get",
+        "loci_graph_anchors",
+        "loci_graph_health",
         "loci_graph_neighbors",
+        "loci_graph_paths",
+        "loci_graph_retrieve",
+        "loci_graph_traverse_neighbors",
         "loci_grep",
         "loci_index",
         "loci_list",
@@ -36,7 +41,13 @@ def test_mcp_index_outline_get_round_trip(tmp_path: Path, fixtures_dir: Path):
     assert "def add" in result["get"]["symbols"][0]["source"]
     assert "def add" in result["file"]["content"]
     assert result["grep"]["matches"][0]["file"] == "sample.py"
+    assert result["anchors"]["selection"] == "inferred"
+    assert result["anchors"]["anchors"][0]["node"]["id"] == (
+        result["get"]["symbols"][0]["id"]
+    )
     assert result["graph"]["results"][0]["neighbors"] == []
+    assert result["health"]["status"] == "healthy"
+    assert result["health"]["counts"]["profiles"] == 0
     assert result["verify"]["failed"] == []
     assert any(entry["path"] == str(repo.resolve()) for entry in result["list"]["repos"])
     assert result["stats"]["total_gets"] >= 1
@@ -126,6 +137,61 @@ def test_mcp_graph_neighbors_returns_structured_error(tmp_path: Path):
     ]
 
 
+def test_mcp_graph_health_survives_fresh_process_with_diagnostics(
+    tmp_path: Path,
+    fixtures_dir: Path,
+):
+    result = asyncio.run(_graph_health_after_restart(
+        tmp_path / "repo",
+        tmp_path / ".codeindex",
+        fixtures_dir,
+    ))
+
+    assert result["status"] == "degraded"
+    assert result["profiles"][0]["namespace"] == "example"
+    assert result["counts"]["contributions"] == 1
+    assert result["diagnostics"][0]["code"] == "INVALID_GRAPH_CONTRIBUTION"
+
+
+def test_mcp_graph_anchors_survives_fresh_process_and_refreshes(
+    tmp_path: Path,
+):
+    result = asyncio.run(
+        _graph_anchors_after_restart(
+            tmp_path / "repo",
+            tmp_path / ".codeindex",
+        )
+    )
+
+    assert result["inferred"]["selection"] == "inferred"
+    assert result["inferred"]["anchors"][0]["matched_symbol_id"] == (
+        "guide.md::Guide > Query Aware Traversal#section"
+    )
+    assert result["explicit"]["selection"] == "explicit"
+    assert result["explicit"]["anchors"][0]["node"]["id"] == (
+        "guide.md::Guide > Install#section"
+    )
+    assert result["invalid"]["error"]["code"] == "GRAPH_ENDPOINT_NOT_FOUND"
+
+
+def test_mcp_graph_paths_and_retrieve_survive_fresh_process(tmp_path: Path):
+    result = asyncio.run(
+        _graph_paths_after_restart(
+            tmp_path / "repo",
+            tmp_path / ".codeindex",
+        )
+    )
+
+    assert result["paths"]["support_kind"] == "edge_sequence"
+    assert result["paths"]["paths"][0]["steps"][0]["evidence_span"]["content"]
+    assert result["retrieve"]["paths"][0]["support_kind"] == "direct_authored_edge"
+    assert result["neighbors"]["results"][0]["neighbors"][0]["traversed"] == "forward"
+    schemas = result["schemas"]
+    assert "max_evidence_bytes" in schemas["loci_graph_paths"]["properties"]
+    assert "question" in schemas["loci_graph_retrieve"]["required"]
+    assert "direction" in schemas["loci_graph_traverse_neighbors"]["properties"]
+
+
 async def _round_trip(
     repo: Path,
     cache_dir: Path,
@@ -191,6 +257,14 @@ async def _round_trip(
                 "loci_graph_neighbors",
                 arguments={"repo": str(repo), "seed_ids": [symbol_id]},
             )
+            anchors = await session.call_tool(
+                "loci_graph_anchors",
+                arguments={"repo": str(repo), "question": "add"},
+            )
+            health = await session.call_tool(
+                "loci_graph_health",
+                arguments={"repo": str(repo)},
+            )
             verify = await session.call_tool(
                 "loci_verify",
                 arguments={"path": str(repo)},
@@ -218,7 +292,9 @@ async def _round_trip(
         "search": search.structuredContent,
         "file": file_result.structuredContent,
         "grep": grep.structuredContent,
+        "anchors": anchors.structuredContent,
         "graph": graph.structuredContent,
+        "health": health.structuredContent,
         "verify": verify.structuredContent,
         "list": repos.structuredContent,
         "stats": stats.structuredContent,
@@ -273,6 +349,190 @@ async def _graph_neighbors_after_restart(repo: Path, cache_dir: Path) -> dict[st
             return {
                 "valid": valid.structuredContent,
                 "invalid": invalid.structuredContent,
+            }
+
+
+async def _graph_health_after_restart(
+    repo: Path,
+    cache_dir: Path,
+    fixtures_dir: Path,
+) -> dict[str, Any]:
+    profile_dir = repo / ".loci" / "graph" / "profiles"
+    contribution_dir = repo / ".loci" / "graph" / "contributions"
+    profile_dir.mkdir(parents=True)
+    contribution_dir.mkdir(parents=True)
+    (profile_dir / "generic.json").write_text(
+        (fixtures_dir / "graph_profiles" / "generic.json").read_text()
+    )
+    (contribution_dir / "invalid.json").write_text('{"schema_version": 1,')
+    (repo / "guide.md").write_text("# Guide\n", encoding="utf-8")
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["PYTHONPATH"] = str(Path.cwd() / "src")
+    server_params = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "loci.mcp_server"],
+        env=env,
+        cwd=Path.cwd(),
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            await session.call_tool(
+                "loci_index",
+                arguments={"path": str(repo), "incremental": False},
+            )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            health = await session.call_tool(
+                "loci_graph_health",
+                arguments={"repo": str(repo)},
+            )
+            return health.structuredContent
+
+
+async def _graph_anchors_after_restart(
+    repo: Path,
+    cache_dir: Path,
+) -> dict[str, Any]:
+    repo.mkdir()
+    guide = repo / "guide.md"
+    guide.write_text(
+        "# Guide\n\n## Install\n\nInstall locally.\n",
+        encoding="utf-8",
+    )
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["PYTHONPATH"] = str(Path.cwd() / "src")
+    server_params = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "loci.mcp_server"],
+        env=env,
+        cwd=Path.cwd(),
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            await session.call_tool(
+                "loci_index",
+                arguments={"path": str(repo), "incremental": False},
+            )
+
+    guide.write_text(
+        "# Guide\n\n"
+        "## Install\n\nInstall locally.\n\n"
+        "## Query Aware Traversal\n\nUse bounded graph anchors.\n",
+        encoding="utf-8",
+    )
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            inferred = await session.call_tool(
+                "loci_graph_anchors",
+                arguments={
+                    "repo": str(repo),
+                    "question": "query aware traversal anchors",
+                },
+            )
+            explicit = await session.call_tool(
+                "loci_graph_anchors",
+                arguments={
+                    "repo": str(repo),
+                    "question": "",
+                    "seed_ids": ["guide.md::Guide > Install#section"],
+                },
+            )
+            invalid = await session.call_tool(
+                "loci_graph_anchors",
+                arguments={
+                    "repo": str(repo),
+                    "question": "",
+                    "seed_ids": ["guide.md::Missing#section"],
+                },
+            )
+            assert invalid.isError is True
+            return {
+                "inferred": inferred.structuredContent,
+                "explicit": explicit.structuredContent,
+                "invalid": invalid.structuredContent,
+            }
+
+
+async def _graph_paths_after_restart(
+    repo: Path,
+    cache_dir: Path,
+) -> dict[str, Any]:
+    repo.mkdir()
+    (repo / "guide.md").write_text(
+        "# Guide\n\n## Install\n\nInstall locally.\n",
+        encoding="utf-8",
+    )
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["PYTHONPATH"] = str(Path.cwd() / "src")
+    server_params = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "loci.mcp_server"],
+        env=env,
+        cwd=Path.cwd(),
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            await session.call_tool(
+                "loci_index",
+                arguments={"path": str(repo), "incremental": False},
+            )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            tools = await session.list_tools()
+            schemas = {tool.name: tool.inputSchema for tool in tools.tools}
+            root_id = "guide.md::Guide#section"
+            child_id = "guide.md::Guide > Install#section"
+            paths = await session.call_tool(
+                "loci_graph_paths",
+                arguments={
+                    "repo": str(repo),
+                    "source_ids": [root_id],
+                    "target_ids": [child_id],
+                    "namespaces": ["loci"],
+                    "edge_types": ["contains"],
+                    "resolutions": ["exact"],
+                },
+            )
+            retrieve = await session.call_tool(
+                "loci_graph_retrieve",
+                arguments={
+                    "repo": str(repo),
+                    "question": "How are Guide and Install related?",
+                    "seed_ids": [root_id, child_id],
+                    "namespaces": ["loci"],
+                    "edge_types": ["contains"],
+                    "resolutions": ["exact"],
+                },
+            )
+            neighbors = await session.call_tool(
+                "loci_graph_traverse_neighbors",
+                arguments={
+                    "repo": str(repo),
+                    "seed_ids": [root_id],
+                    "namespaces": ["loci"],
+                    "edge_types": ["contains"],
+                    "resolutions": ["exact"],
+                },
+            )
+            return {
+                "paths": paths.structuredContent,
+                "retrieve": retrieve.structuredContent,
+                "neighbors": neighbors.structuredContent,
+                "schemas": schemas,
             }
 
 

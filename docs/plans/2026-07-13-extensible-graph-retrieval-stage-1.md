@@ -1,6 +1,6 @@
 # Plan: Extensible Graph Retrieval Stage 1
 
-**Status:** implemented; Stage 1 review approval pending
+**Status:** implemented and approved; Stage 2 may begin
 
 **Date:** 2026-07-13
 
@@ -685,7 +685,8 @@ The review must inspect:
 - the unchanged frozen benchmark checksum;
 - the complete diff for scope creep.
 
-Stage 2 remains blocked until the reviewer gives explicit approval.
+Stage 1 was approved by the project owner on 2026-07-13. Stage 2 may proceed,
+subject to its own design decisions and implementation plan.
 
 ## Baseline Evidence Before Implementation
 

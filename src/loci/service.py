@@ -6,18 +6,27 @@ import time
 import uuid
 from collections import defaultdict
 from dataclasses import dataclass, field
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 import pathspec
 
-from loci.graph.builtins import extract_markdown_contains_edges
 from loci.graph.contracts import (
     GRAPH_SCHEMA_VERSION,
     GraphContractError,
     GraphNodeRef,
     validate_graph_edges,
 )
+from loci.graph.anchors import select_graph_anchors
+from loci.graph.materialize import load_graph_extensions, materialize_graph
+from loci.graph.profiles import required_frontmatter_fields
+from loci.graph.state import GraphIndexState
+from loci.graph.retrieval import (
+    retrieve_graph_neighbors,
+    retrieve_graph_paths,
+    retrieve_graph_question,
+)
+from loci.graph.traversal import GraphDirection
 from loci.parser.extractor import parse_file
 from loci.parser.languages import EXTENSION_MAP, MARKDOWN_SUFFIXES
 from loci.parser.symbols import Symbol
@@ -90,8 +99,27 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
     existing = store.load(repo_path) if incremental else None
     if existing is not None and not index_versions_current(existing):
         existing = None
+    previous_graph: GraphIndexState | None = None
+    if existing is not None:
+        graph_value = existing.get("graph")
+        if not isinstance(graph_value, dict):
+            existing = None
+        else:
+            try:
+                previous_graph = GraphIndexState.from_dict(graph_value)
+            except GraphContractError:
+                existing = None
     existing_hashes: dict[str, str] = existing.get("file_hashes", {}) if existing else {}
     existing_symbols: list[dict[str, Any]] = existing.get("symbols", []) if existing else []
+    extension_load = load_graph_extensions(
+        repo_path,
+        previous_graph=previous_graph,
+    )
+    profile_fields = required_frontmatter_fields(extension_load.profiles)
+    previous_profile_fields = required_frontmatter_fields(
+        previous_graph.profiles if previous_graph is not None else ()
+    )
+    profile_fields_changed = profile_fields != previous_profile_fields
 
     all_symbols: list[Symbol] = []
     new_file_hashes: dict[str, str] = {}
@@ -102,7 +130,15 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
     for src_file, rel_path, file_hash in _iter_indexable_files(repo_path, store):
         new_file_hashes[rel_path] = file_hash
 
-        if incremental and existing_hashes.get(rel_path) == file_hash:
+        requires_profile_reparse = (
+            profile_fields_changed
+            and src_file.suffix.lower() in MARKDOWN_SUFFIXES
+        )
+        if (
+            incremental
+            and not requires_profile_reparse
+            and existing_hashes.get(rel_path) == file_hash
+        ):
             kept = [Symbol.from_dict(s) for s in existing_symbols if s["file_path"] == rel_path]
             all_symbols.extend(kept)
             files_skipped += 1
@@ -110,7 +146,13 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
             language_counts[lang] += 1
             continue
 
-        symbols = parse_file(src_file)
+        if profile_fields and src_file.suffix.lower() in MARKDOWN_SUFFIXES:
+            symbols = parse_file(
+                src_file,
+                markdown_frontmatter_fields=profile_fields,
+            )
+        else:
+            symbols = parse_file(src_file)
         id_map: dict[str, str] = {}
         for sym in symbols:
             old_id = sym.id
@@ -142,13 +184,21 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
                     "reason": "0 symbols extracted",
                 })
 
-    graph_edges = extract_markdown_contains_edges(all_symbols)
+    graph_state = materialize_graph(
+        repo_path,
+        all_symbols,
+        new_file_hashes,
+        extension_load.profiles,
+        extension_load.contributions,
+        input_hashes=extension_load.input_hashes,
+        diagnostics=extension_load.diagnostics,
+    )
     try:
         store.write(
             repo_path,
             all_symbols,
             file_hashes=new_file_hashes,
-            graph_edges=graph_edges,
+            graph_state=graph_state,
         )
     except GraphContractError as exc:
         raise LociError(exc.code, exc.message, exc.details) from exc
@@ -156,7 +206,15 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
     output: dict[str, Any] = {
         "path": str(repo_path),
         "symbols_indexed": len(all_symbols),
-        "graph_edges_indexed": len(graph_edges),
+        "graph_profiles_loaded": len(graph_state.profiles),
+        "graph_contributions_loaded": len(graph_state.contributions),
+        "graph_contributions_reused": extension_load.contributions_reused,
+        "graph_node_overlays_indexed": len(graph_state.nodes),
+        "graph_edges_indexed": len(graph_state.edges),
+        "graph_status": _graph_status(graph_state),
+        "graph_diagnostics": [
+            diagnostic.to_dict() for diagnostic in graph_state.diagnostics
+        ],
         "files_skipped": files_skipped,
         "languages": dict(language_counts),
     }
@@ -356,6 +414,83 @@ def grep_repo(
         ) from exc
 
 
+def graph_anchors(
+    repo: str | Path,
+    question: str,
+    seed_ids: list[str] | None = None,
+    *,
+    max_anchors: int = 10,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    repo_path = Path(repo).resolve()
+    store = get_store()
+    if ensure_fresh:
+        ensure_fresh_index(repo_path)
+    index = _load_required_index(store, repo_path)
+    symbol_values = index.get("symbols", [])
+    indexed_nodes = {
+        symbol["id"]: symbol
+        for symbol in symbol_values
+        if isinstance(symbol, dict) and isinstance(symbol.get("id"), str)
+    }
+    graph_value = index.get("graph")
+    if not isinstance(graph_value, dict):
+        raise LociError(
+            "INVALID_GRAPH_SCHEMA",
+            "Persisted graph state is missing",
+            {"repo": str(repo_path)},
+        )
+    try:
+        graph_state = GraphIndexState.from_dict(graph_value)
+        selection = select_graph_anchors(
+            tuple(indexed_nodes.values()),
+            question,
+            seed_ids if seed_ids is not None else [],
+            max_anchors=max_anchors,
+        )
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+    reason_kind = "explicit_seed" if selection.mode == "explicit" else "inferred"
+    anchors = []
+    for anchor in selection.anchors:
+        node = indexed_nodes[anchor.node_id]
+        anchors.append({
+            "node": _graph_node_ref(node),
+            "matched_symbol_id": anchor.matched_symbol_id,
+            "name": anchor.name,
+            "score": anchor.score,
+            "reason": {
+                "kind": reason_kind,
+                "matched_terms": list(anchor.matched_terms),
+                "match_scope": list(anchor.match_scope),
+            },
+        })
+    return {
+        "schema_version": GRAPH_SCHEMA_VERSION,
+        "repo": str(repo_path),
+        "question": question,
+        "selection": selection.mode,
+        "question_terms": list(selection.question_terms),
+        "anchors": anchors,
+        "counts": {
+            "indexed_nodes": len(indexed_nodes),
+            "eligible_units": selection.eligible_units,
+            "qualified_candidates": selection.qualified_candidates,
+            "collapsed_symbols": selection.collapsed_symbols,
+            "returned_anchors": len(anchors),
+            "omitted_candidates": selection.omitted_candidates,
+        },
+        "budget": {
+            "requested_max_anchors": selection.requested_max_anchors,
+            "effective_max_anchors": selection.effective_max_anchors,
+        },
+        "diagnostics": [
+            diagnostic.to_dict() for diagnostic in graph_state.diagnostics
+        ],
+    }
+
+
 def graph_neighbors(
     repo: str | Path,
     seed_ids: list[str],
@@ -396,7 +531,16 @@ def graph_neighbors(
         )
 
     try:
-        edges = store.get_graph_edges(repo_path)
+        edges = [
+            edge
+            for edge in store.get_graph_edges(repo_path)
+            if (
+                edge.namespace == "loci"
+                and edge.type == "contains"
+                and edge.directed is True
+                and edge.resolution == "exact"
+            )
+        ]
         validate_graph_edges(edges, indexed_nodes=indexed_nodes)
     except GraphContractError as exc:
         raise LociError(exc.code, exc.message, exc.details) from exc
@@ -427,6 +571,188 @@ def graph_neighbors(
         "repo": str(repo_path),
         "results": results,
         "diagnostics": [],
+    }
+
+
+def graph_traverse_neighbors(
+    repo: str | Path,
+    seed_ids: list[str],
+    *,
+    namespaces: list[str] | None = None,
+    edge_types: list[str] | None = None,
+    resolutions: list[str] | None = None,
+    direction: GraphDirection = "outgoing",
+    max_neighbors: int = 64,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    repo_path = Path(repo).resolve()
+    _store, indexed_nodes, graph_state = _load_graph_context(
+        repo_path,
+        ensure_fresh=ensure_fresh,
+    )
+    try:
+        return retrieve_graph_neighbors(
+            repo_path,
+            indexed_nodes,
+            graph_state,
+            seed_ids,
+            namespaces=namespaces,
+            edge_types=edge_types,
+            resolutions=resolutions,
+            direction=direction,
+            max_neighbors=max_neighbors,
+        )
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+
+def graph_paths(
+    repo: str | Path,
+    source_ids: list[str],
+    target_ids: list[str],
+    *,
+    namespaces: list[str] | None = None,
+    edge_types: list[str] | None = None,
+    resolutions: list[str] | None = None,
+    direction: GraphDirection = "outgoing",
+    max_hops: int = 3,
+    max_nodes: int = 64,
+    max_paths: int = 8,
+    path_offset: int = 0,
+    max_evidence_bytes: int = 32_768,
+    max_estimated_tokens: int = 8_192,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    repo_path = Path(repo).resolve()
+    store, indexed_nodes, graph_state = _load_graph_context(
+        repo_path,
+        ensure_fresh=ensure_fresh,
+    )
+    try:
+        return retrieve_graph_paths(
+            repo_path,
+            store,
+            indexed_nodes,
+            graph_state,
+            source_ids,
+            target_ids,
+            namespaces=namespaces,
+            edge_types=edge_types,
+            resolutions=resolutions,
+            direction=direction,
+            max_hops=max_hops,
+            max_nodes=max_nodes,
+            max_paths=max_paths,
+            path_offset=path_offset,
+            max_evidence_bytes=max_evidence_bytes,
+            max_estimated_tokens=max_estimated_tokens,
+        )
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+
+def graph_retrieve(
+    repo: str | Path,
+    question: str,
+    seed_ids: list[str] | None = None,
+    *,
+    namespaces: list[str] | None = None,
+    edge_types: list[str] | None = None,
+    resolutions: list[str] | None = None,
+    direction: GraphDirection = "either",
+    max_anchors: int = 10,
+    max_hops: int = 3,
+    max_nodes: int = 64,
+    max_paths: int = 8,
+    path_offset: int = 0,
+    max_evidence_bytes: int = 32_768,
+    max_estimated_tokens: int = 8_192,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    repo_path = Path(repo).resolve()
+    store, indexed_nodes, graph_state = _load_graph_context(
+        repo_path,
+        ensure_fresh=ensure_fresh,
+    )
+    try:
+        return retrieve_graph_question(
+            repo_path,
+            store,
+            indexed_nodes,
+            graph_state,
+            question,
+            seed_ids,
+            namespaces=namespaces,
+            edge_types=edge_types,
+            resolutions=resolutions,
+            direction=direction,
+            max_anchors=max_anchors,
+            max_hops=max_hops,
+            max_nodes=max_nodes,
+            max_paths=max_paths,
+            path_offset=path_offset,
+            max_evidence_bytes=max_evidence_bytes,
+            max_estimated_tokens=max_estimated_tokens,
+        )
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+
+def graph_health(
+    repo: str | Path,
+    *,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    repo_path = Path(repo).resolve()
+    store = get_store()
+    if ensure_fresh:
+        ensure_fresh_index(repo_path)
+    index = _load_required_index(store, repo_path)
+    graph_value = index.get("graph")
+    if not isinstance(graph_value, dict):
+        raise LociError(
+            "INVALID_GRAPH_SCHEMA",
+            "Persisted graph state is missing",
+            {"repo": str(repo_path)},
+        )
+    try:
+        state = GraphIndexState.from_dict(graph_value)
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+    profiles = []
+    for loaded in state.profiles:
+        profile = loaded.profile
+        node_attributes = sorted({
+            attribute.name
+            for rule in profile.node_rules
+            for attribute in rule.attributes
+        })
+        profiles.append({
+            "namespace": profile.namespace,
+            "source": loaded.source,
+            "content_hash": loaded.content_hash,
+            "node_attributes": node_attributes,
+            "edge_types": [
+                edge_type.to_dict() for edge_type in profile.edge_types
+            ],
+        })
+    diagnostic_values = [
+        diagnostic.to_dict() for diagnostic in state.diagnostics
+    ]
+    return {
+        "schema_version": GRAPH_SCHEMA_VERSION,
+        "repo": str(repo_path),
+        "status": _graph_status(state),
+        "profiles": profiles,
+        "counts": {
+            "profiles": len(state.profiles),
+            "node_overlays": len(state.nodes),
+            "edges": len(state.edges),
+            "contributions": len(state.contributions),
+            "diagnostics": len(state.diagnostics),
+        },
+        "diagnostics": diagnostic_values,
     }
 
 
@@ -527,7 +853,111 @@ def _index_is_stale(repo_path: Path, store: IndexStore, index: dict[str, Any]) -
         for _, rel_path, file_hash in _iter_indexable_files(repo_path, store)
     }
     indexed_hashes = index.get("file_hashes", {})
-    return current_hashes != indexed_hashes
+    if current_hashes != indexed_hashes:
+        return True
+    current_graph_hashes = load_graph_extensions(repo_path).input_hashes
+    graph = index.get("graph")
+    if not isinstance(graph, dict):
+        return True
+    try:
+        persisted_graph = GraphIndexState.from_dict(graph)
+    except GraphContractError:
+        return True
+    indexed_graph_hashes = persisted_graph.input_hashes
+    if current_graph_hashes != indexed_graph_hashes:
+        return True
+    return not _active_graph_paths_are_safe(repo_path, index)
+
+
+def _active_graph_paths_are_safe(
+    repo_path: Path,
+    index: dict[str, Any],
+) -> bool:
+    graph = index.get("graph")
+    edge_values = graph.get("edges", []) if isinstance(graph, dict) else []
+    symbols = {
+        symbol.get("id"): symbol
+        for symbol in index.get("symbols", [])
+        if isinstance(symbol, dict) and isinstance(symbol.get("id"), str)
+    }
+    paths: set[str] = set()
+    node_values = graph.get("nodes", []) if isinstance(graph, dict) else []
+    for node in node_values:
+        if not isinstance(node, dict):
+            continue
+        symbol = symbols.get(node.get("id"))
+        if isinstance(symbol, dict) and isinstance(symbol.get("file_path"), str):
+            paths.add(symbol["file_path"])
+    for edge in edge_values:
+        if not isinstance(edge, dict) or edge.get("namespace") == "loci":
+            continue
+        evidence = edge.get("evidence")
+        if isinstance(evidence, dict) and isinstance(evidence.get("file"), str):
+            paths.add(evidence["file"])
+        for endpoint in (edge.get("from"), edge.get("to")):
+            symbol = symbols.get(endpoint)
+            if isinstance(symbol, dict) and isinstance(symbol.get("file_path"), str):
+                paths.add(symbol["file_path"])
+    return all(_repository_file_path_is_safe(repo_path, path) for path in paths)
+
+
+def _repository_file_path_is_safe(repo_path: Path, value: str) -> bool:
+    path = PurePosixPath(value)
+    if (
+        not value
+        or "\\" in value
+        or path.is_absolute()
+        or ".." in path.parts
+        or path.as_posix() != value
+    ):
+        return False
+    candidate = repo_path / value
+    if candidate.is_symlink():
+        return False
+    try:
+        resolved = candidate.resolve(strict=True)
+        resolved.relative_to(repo_path)
+    except (OSError, ValueError):
+        return False
+    return resolved.is_file()
+
+
+def _load_graph_context(
+    repo_path: Path,
+    *,
+    ensure_fresh: bool,
+) -> tuple[IndexStore, dict[str, dict[str, Any]], GraphIndexState]:
+    store = get_store()
+    if ensure_fresh:
+        ensure_fresh_index(repo_path)
+    index = _load_required_index(store, repo_path)
+    indexed_nodes = {
+        symbol["id"]: symbol
+        for symbol in index.get("symbols", [])
+        if isinstance(symbol, dict) and isinstance(symbol.get("id"), str)
+    }
+    graph_value = index.get("graph")
+    if not isinstance(graph_value, dict):
+        raise LociError(
+            "INVALID_GRAPH_SCHEMA",
+            "Persisted graph state is missing",
+            {"repo": str(repo_path)},
+        )
+    try:
+        state = GraphIndexState.from_dict(graph_value)
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+    return store, indexed_nodes, state
+
+
+
+def _graph_status(graph_state: GraphIndexState) -> str:
+    if any(
+        diagnostic.severity in {"warning", "error"}
+        for diagnostic in graph_state.diagnostics
+    ):
+        return "degraded"
+    return "healthy"
 
 
 def _acquire_refresh_lock(lock_path: Path, timeout: float) -> None:
