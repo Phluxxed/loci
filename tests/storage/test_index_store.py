@@ -3,6 +3,12 @@ import json
 import time
 import time as time_module
 from pathlib import Path
+from loci.graph.contracts import (
+    GRAPH_SCHEMA_VERSION,
+    GraphContractError,
+    GraphEdge,
+    GraphEvidence,
+)
 from loci.parser.symbols import Symbol
 from loci.storage.index_store import EXTRACTOR_VERSION, INDEX_SCHEMA_VERSION, IndexStore
 
@@ -41,6 +47,59 @@ def sample_symbols() -> list[Symbol]:
     ]
 
 
+def _markdown_symbols() -> list[Symbol]:
+    parent_id = "guide.md::Guide#section"
+    child_id = "guide.md::Guide > Install#section"
+    return [
+        Symbol(
+            id=parent_id,
+            name="Guide",
+            qualified_name="Guide",
+            kind="section",
+            language="markdown",
+            file_path="guide.md",
+            byte_offset=0,
+            byte_length=40,
+            content_hash="a" * 64,
+            line=1,
+            end_line=7,
+            metadata={"markdown": {"parent_id": "", "root_id": parent_id}},
+        ),
+        Symbol(
+            id=child_id,
+            name="Install",
+            qualified_name="Guide > Install",
+            kind="section",
+            language="markdown",
+            file_path="guide.md",
+            byte_offset=10,
+            byte_length=30,
+            content_hash="b" * 64,
+            line=5,
+            end_line=7,
+            metadata={"markdown": {"parent_id": parent_id, "root_id": parent_id}},
+        ),
+    ]
+
+
+def _contains_edge(**overrides) -> GraphEdge:
+    values = {
+        "from_id": "guide.md::Guide#section",
+        "to_id": "guide.md::Guide > Install#section",
+        "type": "contains",
+        "directed": True,
+        "namespace": "loci",
+        "resolution": "exact",
+        "evidence": GraphEvidence(
+            file="guide.md",
+            line=5,
+            content_hash="b" * 64,
+        ),
+    }
+    values.update(overrides)
+    return GraphEdge(**values)
+
+
 def test_store_write_creates_index_file(store: IndexStore, tmp_path: Path, sample_symbols):
     source_path = tmp_path / "repo"
     source_path.mkdir()
@@ -66,6 +125,87 @@ def test_store_write_load_roundtrip(store: IndexStore, tmp_path: Path, sample_sy
     assert len(loaded["symbols"]) == 2
     assert loaded["symbols"][0]["id"] == "src/auth.py::login#function"
     assert loaded["file_hashes"]["src/auth.py"] == "abc123"
+
+
+def test_store_write_load_round_trips_graph_envelope(store: IndexStore, tmp_path: Path):
+    source_path = tmp_path / "repo"
+    source_path.mkdir()
+    (source_path / "guide.md").write_text("# Guide\n\n## Install\n\nBody.\n")
+    symbols = _markdown_symbols()
+    edge = _contains_edge()
+
+    store.write(
+        source_path,
+        symbols,
+        file_hashes={"guide.md": "abc123"},
+        graph_edges=[edge],
+    )
+    loaded = store.load(source_path)
+
+    assert loaded is not None
+    assert loaded["graph"]["schema_version"] == GRAPH_SCHEMA_VERSION
+    assert loaded["graph"]["edges"] == [edge.to_dict()]
+    assert store.get_graph_edges(source_path) == [edge]
+
+
+def test_store_rejects_invalid_graph_endpoint(store: IndexStore, tmp_path: Path):
+    source_path = tmp_path / "repo"
+    source_path.mkdir()
+    (source_path / "guide.md").write_text("# Guide\n")
+    symbols = _markdown_symbols()[:1]
+
+    with pytest.raises(GraphContractError) as exc_info:
+        store.write(
+            source_path,
+            symbols,
+            file_hashes={"guide.md": "abc123"},
+            graph_edges=[_contains_edge()],
+        )
+
+    assert exc_info.value.code == "GRAPH_ENDPOINT_NOT_FOUND"
+    assert not store._index_path(source_path).exists()
+
+
+def test_store_rejects_invalid_graph_evidence(store: IndexStore, tmp_path: Path):
+    source_path = tmp_path / "repo"
+    source_path.mkdir()
+    (source_path / "guide.md").write_text("# Guide\n\n## Install\n")
+    invalid_edge = _contains_edge(evidence=GraphEvidence(
+        file="guide.md",
+        line=5,
+        content_hash="c" * 64,
+    ))
+
+    with pytest.raises(GraphContractError) as exc_info:
+        store.write(
+            source_path,
+            _markdown_symbols(),
+            file_hashes={"guide.md": "abc123"},
+            graph_edges=[invalid_edge],
+        )
+
+    assert exc_info.value.code == "GRAPH_EVIDENCE_INVALID"
+    assert not store._index_path(source_path).exists()
+
+
+def test_store_writes_empty_graph_for_repo_without_edges(
+    store: IndexStore,
+    tmp_path: Path,
+    sample_symbols,
+):
+    source_path = tmp_path / "repo"
+    source_path.mkdir()
+    (source_path / "src").mkdir()
+    (source_path / "src" / "auth.py").write_text("def login(): pass\n")
+
+    store.write(source_path, sample_symbols, file_hashes={})
+    loaded = store.load(source_path)
+
+    assert loaded is not None
+    assert loaded["graph"] == {
+        "schema_version": GRAPH_SCHEMA_VERSION,
+        "edges": [],
+    }
 
 
 def test_store_load_returns_none_if_missing(store: IndexStore, tmp_path: Path):

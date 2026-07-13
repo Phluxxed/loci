@@ -22,6 +22,7 @@ def test_mcp_index_outline_get_round_trip(tmp_path: Path, fixtures_dir: Path):
         "loci_analyze",
         "loci_file",
         "loci_get",
+        "loci_graph_neighbors",
         "loci_grep",
         "loci_index",
         "loci_list",
@@ -35,6 +36,7 @@ def test_mcp_index_outline_get_round_trip(tmp_path: Path, fixtures_dir: Path):
     assert "def add" in result["get"]["symbols"][0]["source"]
     assert "def add" in result["file"]["content"]
     assert result["grep"]["matches"][0]["file"] == "sample.py"
+    assert result["graph"]["results"][0]["neighbors"] == []
     assert result["verify"]["failed"] == []
     assert any(entry["path"] == str(repo.resolve()) for entry in result["list"]["repos"])
     assert result["stats"]["total_gets"] >= 1
@@ -92,6 +94,36 @@ def test_mcp_markdown_search_and_outline_include_retrieval_cost(tmp_path: Path):
     assert search_symbol["span_kind"] in {"page_root", "section"}
     assert search_symbol["file_bytes"] > 0
     assert search_symbol["match_scope"]
+
+
+def test_mcp_graph_neighbors_survives_fresh_process(tmp_path: Path):
+    result = asyncio.run(
+        _graph_neighbors_after_restart(
+            tmp_path / "repo",
+            tmp_path / ".codeindex",
+        )
+    )
+
+    neighbor = result["valid"]["results"][0]["neighbors"][0]
+    assert neighbor["node"]["id"] == "guide.md::Guide > Install#section"
+    assert neighbor["edge"]["type"] == "contains"
+    assert neighbor["edge"]["resolution"] == "exact"
+    assert neighbor["edge"]["evidence"]["file"] == "guide.md"
+    assert len(neighbor["edge"]["evidence"]["content_hash"]) == 64
+
+
+def test_mcp_graph_neighbors_returns_structured_error(tmp_path: Path):
+    result = asyncio.run(
+        _graph_neighbors_after_restart(
+            tmp_path / "repo",
+            tmp_path / ".codeindex",
+        )
+    )
+
+    assert result["invalid"]["error"]["code"] == "GRAPH_ENDPOINT_NOT_FOUND"
+    assert result["invalid"]["error"]["details"]["missing_ids"] == [
+        "guide.md::Missing#section"
+    ]
 
 
 async def _round_trip(
@@ -155,6 +187,10 @@ async def _round_trip(
                 "loci_grep",
                 arguments={"repo": str(repo), "pattern": r"def add"},
             )
+            graph = await session.call_tool(
+                "loci_graph_neighbors",
+                arguments={"repo": str(repo), "seed_ids": [symbol_id]},
+            )
             verify = await session.call_tool(
                 "loci_verify",
                 arguments={"path": str(repo)},
@@ -182,12 +218,62 @@ async def _round_trip(
         "search": search.structuredContent,
         "file": file_result.structuredContent,
         "grep": grep.structuredContent,
+        "graph": graph.structuredContent,
         "verify": verify.structuredContent,
         "list": repos.structuredContent,
         "stats": stats.structuredContent,
         "analyze": analyze.structuredContent,
         "invalid_grep": invalid_grep.structuredContent,
     }
+
+
+async def _graph_neighbors_after_restart(repo: Path, cache_dir: Path) -> dict[str, Any]:
+    repo.mkdir()
+    (repo / "guide.md").write_text(
+        "# Guide\n\n## Install\n\nInstall locally.\n",
+        encoding="utf-8",
+    )
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["PYTHONPATH"] = str(Path.cwd() / "src")
+    server_params = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "loci.mcp_server"],
+        env=env,
+        cwd=Path.cwd(),
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            indexed = await session.call_tool(
+                "loci_index",
+                arguments={"path": str(repo), "incremental": False},
+            )
+            assert indexed.structuredContent["graph_edges_indexed"] == 1
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            valid = await session.call_tool(
+                "loci_graph_neighbors",
+                arguments={
+                    "repo": str(repo),
+                    "seed_ids": ["guide.md::Guide#section"],
+                },
+            )
+            invalid = await session.call_tool(
+                "loci_graph_neighbors",
+                arguments={
+                    "repo": str(repo),
+                    "seed_ids": ["guide.md::Missing#section"],
+                },
+            )
+            assert invalid.isError is True
+            return {
+                "valid": valid.structuredContent,
+                "invalid": invalid.structuredContent,
+            }
 
 
 async def _search_after_repo_change(repo: Path, cache_dir: Path) -> dict[str, Any]:

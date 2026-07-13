@@ -5,12 +5,18 @@ import re
 import shutil
 import time
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Mapping, Optional, Sequence
 
+from loci.graph.contracts import (
+    GRAPH_SCHEMA_VERSION,
+    GraphContractError,
+    GraphEdge,
+    validate_graph_edges,
+)
 from loci.parser.symbols import Symbol
 
 LAST_SEARCH_TTL = 300  # 5 minutes
-INDEX_SCHEMA_VERSION = 3
+INDEX_SCHEMA_VERSION = 4
 EXTRACTOR_VERSION = 3
 
 
@@ -79,7 +85,13 @@ class IndexStore:
         repo_path: Path,
         symbols: list[Symbol],
         file_hashes: dict[str, str],
+        *,
+        graph_edges: Sequence[GraphEdge] = (),
     ) -> None:
+        persisted_edges = list(graph_edges)
+        indexed_nodes = {symbol.id: symbol.to_dict() for symbol in symbols}
+        validate_graph_edges(persisted_edges, indexed_nodes=indexed_nodes)
+
         repo_dir = self._repo_dir(repo_path)
         repo_dir.mkdir(parents=True, exist_ok=True)
 
@@ -106,6 +118,10 @@ class IndexStore:
             "symbols": [s.to_dict() for s in symbols],
             "file_hashes": file_hashes,
             "repo_path": str(repo_path.resolve()),
+            "graph": {
+                "schema_version": GRAPH_SCHEMA_VERSION,
+                "edges": [edge.to_dict() for edge in persisted_edges],
+            },
         }
         index_path = self._index_path(repo_path)
         tmp_path = index_path.with_suffix(".tmp")
@@ -117,6 +133,42 @@ class IndexStore:
         if not index_path.exists():
             return None
         return json.loads(index_path.read_text())
+
+    def get_graph_edges(self, repo_path: Path) -> list[GraphEdge]:
+        index = self.load(repo_path)
+        if index is None:
+            return []
+        graph = index.get("graph")
+        if not isinstance(graph, Mapping):
+            raise GraphContractError(
+                "INVALID_GRAPH_SCHEMA",
+                "Index does not contain a graph envelope",
+                {},
+            )
+        schema_version = graph.get("schema_version")
+        if schema_version != GRAPH_SCHEMA_VERSION:
+            raise GraphContractError(
+                "INVALID_GRAPH_SCHEMA",
+                "Unsupported graph schema version",
+                {"schema_version": schema_version},
+            )
+        edge_values = graph.get("edges")
+        if not isinstance(edge_values, list):
+            raise GraphContractError(
+                "INVALID_GRAPH_SCHEMA",
+                "Graph edges must be a list",
+                {"field": "edges"},
+            )
+        edges: list[GraphEdge] = []
+        for edge_value in edge_values:
+            if not isinstance(edge_value, Mapping):
+                raise GraphContractError(
+                    "INVALID_GRAPH_EDGE",
+                    "Graph edge must be an object",
+                    {},
+                )
+            edges.append(GraphEdge.from_dict(edge_value))
+        return edges
 
     def get_symbol_content(self, repo_path: Path, symbol_id: str) -> Optional[str]:
         index = self.load(repo_path)

@@ -8,6 +8,7 @@ from mcp.types import CallToolResult, TextContent
 from loci.service import (
     LociError,
     analyze_usage,
+    graph_neighbors,
     get_cached_file,
     get_symbols,
     grep_repo,
@@ -25,7 +26,8 @@ def create_server() -> FastMCP:
         "loci",
         instructions=(
             "Local code navigation server. Index local repositories, inspect symbol "
-            "outlines, and retrieve exact symbol source from the loci cache."
+            "outlines, retrieve exact symbol source, and inspect exact graph "
+            "neighbours from the loci cache."
         ),
     )
 
@@ -53,6 +55,16 @@ def create_server() -> FastMCP:
                     ensure_fresh=True,
                 )
             }
+        )
+
+    @mcp.tool()
+    def loci_graph_neighbors(
+        repo: str,
+        seed_ids: list[str],
+    ) -> CallToolResult:
+        """Return exact outgoing one-hop graph neighbours for indexed seed nodes."""
+        return _handle_loci_error(
+            lambda: graph_neighbors(repo, seed_ids, ensure_fresh=True)
         )
 
     @mcp.tool()

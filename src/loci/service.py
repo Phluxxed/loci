@@ -11,6 +11,13 @@ from typing import Any
 
 import pathspec
 
+from loci.graph.builtins import extract_markdown_contains_edges
+from loci.graph.contracts import (
+    GRAPH_SCHEMA_VERSION,
+    GraphContractError,
+    GraphNodeRef,
+    validate_graph_edges,
+)
 from loci.parser.extractor import parse_file
 from loci.parser.languages import EXTENSION_MAP, MARKDOWN_SUFFIXES
 from loci.parser.symbols import Symbol
@@ -135,11 +142,21 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
                     "reason": "0 symbols extracted",
                 })
 
-    store.write(repo_path, all_symbols, file_hashes=new_file_hashes)
+    graph_edges = extract_markdown_contains_edges(all_symbols)
+    try:
+        store.write(
+            repo_path,
+            all_symbols,
+            file_hashes=new_file_hashes,
+            graph_edges=graph_edges,
+        )
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
 
     output: dict[str, Any] = {
         "path": str(repo_path),
         "symbols_indexed": len(all_symbols),
+        "graph_edges_indexed": len(graph_edges),
         "files_skipped": files_skipped,
         "languages": dict(language_counts),
     }
@@ -337,6 +354,80 @@ def grep_repo(
             str(exc),
             {"repo": str(repo_path), "pattern": pattern},
         ) from exc
+
+
+def graph_neighbors(
+    repo: str | Path,
+    seed_ids: list[str],
+    *,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    repo_path = Path(repo).resolve()
+    if not seed_ids:
+        raise LociError(
+            "INVALID_INPUT",
+            "At least one graph seed is required",
+            {"repo": str(repo_path)},
+        )
+    if any(not isinstance(seed_id, str) or not seed_id for seed_id in seed_ids):
+        raise LociError(
+            "INVALID_INPUT",
+            "Graph seeds must be non-empty strings",
+            {"repo": str(repo_path)},
+        )
+    unique_seed_ids = list(dict.fromkeys(seed_ids))
+
+    store = get_store()
+    if ensure_fresh:
+        ensure_fresh_index(repo_path)
+    index = _load_required_index(store, repo_path)
+    symbol_values = index.get("symbols", [])
+    indexed_nodes = {
+        symbol["id"]: symbol
+        for symbol in symbol_values
+        if isinstance(symbol, dict) and isinstance(symbol.get("id"), str)
+    }
+    missing_ids = [seed_id for seed_id in unique_seed_ids if seed_id not in indexed_nodes]
+    if missing_ids:
+        raise LociError(
+            "GRAPH_ENDPOINT_NOT_FOUND",
+            "Graph seed is not indexed",
+            {"repo": str(repo_path), "missing_ids": missing_ids},
+        )
+
+    try:
+        edges = store.get_graph_edges(repo_path)
+        validate_graph_edges(edges, indexed_nodes=indexed_nodes)
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+    outgoing: dict[str, list] = {}
+    for edge in sorted(
+        edges,
+        key=lambda item: (item.namespace, item.type, item.from_id, item.to_id),
+    ):
+        outgoing.setdefault(edge.from_id, []).append(edge)
+
+    results = []
+    for seed_id in unique_seed_ids:
+        neighbors = [
+            {
+                "node": _graph_node_ref(indexed_nodes[edge.to_id]),
+                "edge": edge.to_dict(),
+            }
+            for edge in outgoing.get(seed_id, [])
+        ]
+        results.append({
+            "seed": _graph_node_ref(indexed_nodes[seed_id]),
+            "neighbors": neighbors,
+        })
+
+    return {
+        "schema_version": GRAPH_SCHEMA_VERSION,
+        "repo": str(repo_path),
+        "results": results,
+        "diagnostics": [],
+    }
 
 
 def verify_repo(path: str | Path) -> dict[str, Any]:
@@ -564,6 +655,20 @@ def _add_markdown_retrieval_fields(entry: dict[str, Any], symbol: dict[str, Any]
     for key in ("file_bytes", "saved_pct", "span_kind"):
         if key in markdown:
             entry[key] = markdown[key]
+
+
+def _graph_node_ref(symbol: dict[str, Any]) -> dict[str, Any]:
+    return GraphNodeRef(
+        id=symbol["id"],
+        namespace="loci",
+        kind=symbol["kind"],
+        attributes={
+            "language": symbol["language"],
+            "file": symbol["file_path"],
+            "line": symbol.get("line", 0),
+            "end_line": symbol.get("end_line", 0),
+        },
+    ).to_dict()
 
 
 def _load_gitignore(repo_path: Path) -> "pathspec.PathSpec | None":

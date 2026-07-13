@@ -160,8 +160,9 @@ back to `~/.codeindex`.
 
 MCP read tools refresh stale indexes before returning cached data. `loci_index`
 still performs explicit indexing, while `loci_outline`, `loci_search`,
-`loci_get`, `loci_file`, and `loci_grep` first check the indexed file hashes
-against the current repository and run a locked incremental refresh if needed.
+`loci_get`, `loci_file`, `loci_grep`, and `loci_graph_neighbors` first check the
+indexed file hashes against the current repository and run a locked incremental
+refresh if needed.
 
 | Tool | Purpose |
 |---|---|
@@ -171,6 +172,7 @@ against the current repository and run a locked incremental refresh if needed.
 | `loci_get` | Return exact source for one or more symbol IDs |
 | `loci_file` | Return cached file content with optional line range |
 | `loci_grep` | Regex-search cached files |
+| `loci_graph_neighbors` | Return exact outgoing one-hop neighbours for indexed seed nodes |
 | `loci_verify` | Verify index integrity and content drift |
 | `loci_list` | List indexed repos |
 | `loci_stats` | Return structured retrieval savings stats |

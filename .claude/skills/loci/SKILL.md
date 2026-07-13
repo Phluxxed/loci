@@ -58,6 +58,7 @@ loci MCP is not configured in this Claude session; I am adding it as a local std
 | `loci_get` | Fetching symbol source |
 | `loci_file` | Reading targeted non-symbol files |
 | `loci_grep` | Hunting string literals, error messages, config keys |
+| `loci_graph_neighbors` | Reading exact outgoing one-hop neighbours from explicit seed IDs |
 | `loci_verify` | Checking index integrity + content drift |
 | `loci_list` | Listing indexed repos |
 | `loci_stats` | Reading structured usage and savings stats |
