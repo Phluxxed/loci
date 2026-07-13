@@ -94,6 +94,36 @@ def test_graph_contract_rejects_unknown_schema_version():
     assert exc_info.value.details["schema_version"] == GRAPH_SCHEMA_VERSION + 1
 
 
+def test_graph_node_rejects_non_finite_attribute():
+    with pytest.raises(GraphContractError) as exc_info:
+        GraphNodeRef.from_dict({
+            "id": PARENT_ID,
+            "namespace": "loci",
+            "kind": "section",
+            "attributes": {"score": float("nan")},
+        })
+
+    assert exc_info.value.code == "INVALID_GRAPH_SCHEMA"
+
+
+def test_graph_contribution_rejects_record_limit():
+    node = {
+        "id": PARENT_ID,
+        "namespace": "loci",
+        "kind": "section",
+        "attributes": {},
+    }
+    with pytest.raises(GraphContractError) as exc_info:
+        GraphContribution.from_dict({
+            "schema_version": GRAPH_SCHEMA_VERSION,
+            "namespace": "loci",
+            "nodes": [node] * 10_001,
+            "edges": [],
+        })
+
+    assert exc_info.value.code == "INVALID_GRAPH_SCHEMA"
+
+
 def test_graph_edge_rejects_unknown_resolution():
     payload = _edge().to_dict()
     payload["resolution"] = "probable"

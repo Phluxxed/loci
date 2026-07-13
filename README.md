@@ -11,7 +11,7 @@ loci uses [tree-sitter](https://tree-sitter.github.io/tree-sitter/) to parse sou
 The MCP workflow replaces 15–20 iterative Read/Grep calls with a small tool chain:
 
 ```text
-loci_index -> loci_outline/loci_search/loci_grep -> loci_get/loci_file -> loci_verify
+loci_index -> loci_outline/loci_search/loci_graph_anchors -> loci_get/loci_graph_retrieve/loci_file -> loci_verify
 ```
 
 The CLI still exists for debugging, scripts, and migration safety, but MCP is the production interface.
@@ -160,9 +160,11 @@ back to `~/.codeindex`.
 
 MCP read tools refresh stale indexes before returning cached data. `loci_index`
 still performs explicit indexing, while `loci_outline`, `loci_search`,
-`loci_get`, `loci_file`, `loci_grep`, and `loci_graph_neighbors` first check the
-indexed file hashes against the current repository and run a locked incremental
-refresh if needed.
+`loci_get`, `loci_file`, `loci_grep`, `loci_graph_anchors`,
+`loci_graph_neighbors`, `loci_graph_traverse_neighbors`, `loci_graph_paths`,
+`loci_graph_retrieve`, and
+`loci_graph_health` first check indexed source, profile, and contribution hashes
+against the current repository and run a locked incremental refresh if needed.
 
 | Tool | Purpose |
 |---|---|
@@ -172,7 +174,12 @@ refresh if needed.
 | `loci_get` | Return exact source for one or more symbol IDs |
 | `loci_file` | Return cached file content with optional line range |
 | `loci_grep` | Regex-search cached files |
+| `loci_graph_anchors` | Select a bounded, explained set of graph start nodes from a question or exact seeds |
 | `loci_graph_neighbors` | Return exact outgoing one-hop neighbours for indexed seed nodes |
+| `loci_graph_traverse_neighbors` | Return filtered one-hop neighbours with explicit traversal orientation and omissions |
+| `loci_graph_paths` | Find bounded, evidence-backed paths between exact endpoint IDs |
+| `loci_graph_retrieve` | Rank question-shaped paths and expose rejected semantic or hub shortcuts |
+| `loci_graph_health` | Report loaded graph profiles, active record counts, and diagnostics |
 | `loci_verify` | Verify index integrity and content drift |
 | `loci_list` | List indexed repos |
 | `loci_stats` | Return structured retrieval savings stats |
@@ -226,6 +233,39 @@ Markdown files are indexed as `kind="section"` symbols. YAML frontmatter is pars
 Markdown symbols also carry hierarchy and retrieval-cost data under `metadata.markdown`: `heading_level`, `parent_id`, `root_id`, `page_root`, `synthetic_name`, `file_bytes`, `saved_pct`, and `span_kind`. `loci_outline` and `loci_search` copy `file_bytes`, `saved_pct`, and `span_kind` to the top level for markdown rows so agents can see when a page root is valid but expensive and a child section is the better retrieval target.
 
 Markdown search results include `match_scope`, for example `section_heading`, `page_frontmatter.tags`, or `inherited_page_frontmatter.tags`. Child sections do not own page frontmatter; inherited scopes only explain why search surfaced that section from its page's metadata. `loci_get` still returns the exact requested byte range.
+
+## Graph extensions
+
+Repositories may declare bounded graph profiles in
+`.loci/graph/profiles/*.json` and contribution documents in
+`.loci/graph/contributions/*.json`. Profiles can select explicit Markdown
+frontmatter fields for page-root node overlays and declared domain edges.
+Invalid, stale, or conflicting extension records are excluded from the active
+graph and reported by `loci_graph_health`; they do not hide an otherwise valid
+symbol index.
+
+`loci_graph_neighbors` remains compatibility-stable and exact-only: it returns
+directed `loci:contains` edges and never mixes in declared domain edges.
+`loci_graph_traverse_neighbors` is the additive filtered form: callers choose
+namespaces, edge types, resolution tiers, and direction, and every result keeps
+the stored edge plus `traversed: forward|reverse`.
+
+Use `loci_graph_anchors` when only the graph starts are needed. It collapses
+inferred Markdown matches to one anchor per file, explains matched indexed
+fields, and lets exact seed IDs bypass inference. Use `loci_graph_paths` when
+both endpoint sets are known; its `support_kind: edge_sequence` means every
+edge and cached evidence line exists, not that the composed path proves an
+unstated claim. Use `loci_graph_retrieve` for a relationship question. It
+ranks bounded paths and returns unsupported compositions under
+`rejected_paths` with stable reasons such as `SEMANTIC_BRIDGE_MISSING` and
+`HUB_SHORTCUT`.
+
+Traversal defaults to the categorical `exact` and `declared` resolution tiers;
+heuristic edges are not admitted implicitly. Hop, node, path, offset, evidence
+byte, and estimated-token budgets are validated and reported. Graph retrieval
+never returns an `answerable` or `sufficient` decision. Anchor and retrieval
+scores rank observable evidence only. Use `loci_graph_health` to inspect the
+persisted extension state and any excluded records.
 
 ## Analytics
 

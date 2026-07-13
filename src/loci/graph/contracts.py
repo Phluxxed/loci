@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import re
 from dataclasses import dataclass
 from pathlib import PurePosixPath
@@ -23,6 +24,7 @@ ResolutionTier: TypeAlias = Literal[
 ]
 
 GRAPH_SCHEMA_VERSION = 1
+MAX_GRAPH_CONTRIBUTION_RECORDS = 10_000
 RESOLUTION_TIERS = frozenset({
     "exact",
     "declared",
@@ -263,6 +265,12 @@ class GraphContribution:
                 "Graph contribution nodes and edges must be lists",
                 {},
             )
+        if len(node_values) + len(edge_values) > MAX_GRAPH_CONTRIBUTION_RECORDS:
+            raise GraphContractError(
+                "INVALID_GRAPH_SCHEMA",
+                "Graph contribution exceeds the record limit",
+                {"limit": MAX_GRAPH_CONTRIBUTION_RECORDS},
+            )
         nodes = tuple(
             GraphNodeRef.from_dict(_mapping(item, "node")) for item in node_values
         )
@@ -448,7 +456,9 @@ def _validate_evidence(
 
 
 def _is_json_value(value: Any) -> bool:
-    if value is None or isinstance(value, (bool, int, float, str)):
+    if isinstance(value, float):
+        return math.isfinite(value)
+    if value is None or isinstance(value, (bool, int, str)):
         return True
     if isinstance(value, list):
         return all(_is_json_value(item) for item in value)

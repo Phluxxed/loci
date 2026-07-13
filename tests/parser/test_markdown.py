@@ -232,6 +232,126 @@ def test_parse_markdown_invalid_frontmatter_fails_loudly(tmp_path: Path):
         parse_file(p)
 
 
+def test_parse_markdown_retains_only_requested_profile_fields(tmp_path: Path):
+    p = tmp_path / "profiled.md"
+    p.write_text(
+        "---\n"
+        "title: Profiled Page\n"
+        "knowledge_state: current\n"
+        "mentioned_in:\n"
+        "  - concepts/overview.md\n"
+        "private_note: do not retain\n"
+        "---\n\n"
+        "# Profiled Page\n\n"
+        "Body.\n",
+        encoding="utf-8",
+    )
+
+    default_root = parse_file(p)[0]
+    profiled_root = parse_file(
+        p,
+        markdown_frontmatter_fields={"knowledge_state", "mentioned_in"},
+    )[0]
+
+    assert default_root.metadata["frontmatter"] == {"title": "Profiled Page"}
+    assert profiled_root.metadata["frontmatter"] == {
+        "title": "Profiled Page",
+        "knowledge_state": "current",
+        "mentioned_in": ["concepts/overview.md"],
+    }
+    assert profiled_root.metadata["frontmatter_lines"] == {
+        "knowledge_state": 3,
+        "mentioned_in": 4,
+    }
+    assert "private_note" not in profiled_root.metadata["frontmatter"]
+
+
+def test_parse_markdown_reports_invalid_requested_profile_values(tmp_path: Path):
+    p = tmp_path / "invalid-profiled.md"
+    p.write_text(
+        "---\n"
+        "knowledge_state: 42\n"
+        "mentioned_in: [concepts/overview.md, 7]\n"
+        "status: '   '\n"
+        "settings:\n"
+        "  nested: value\n"
+        "---\n\n"
+        "# Invalid Profiled Page\n",
+        encoding="utf-8",
+    )
+
+    root = parse_file(
+        p,
+        markdown_frontmatter_fields={
+            "knowledge_state",
+            "mentioned_in",
+            "settings",
+            "status",
+        },
+    )[0]
+
+    assert "frontmatter" not in root.metadata
+    assert root.metadata["frontmatter_invalid"] == [
+        {"field": "knowledge_state", "line": 2, "reason": "expected string or string list"},
+        {"field": "mentioned_in", "line": 3, "reason": "expected string or string list"},
+        {"field": "settings", "line": 5, "reason": "expected string or string list"},
+        {"field": "status", "line": 4, "reason": "expected string or string list"},
+    ]
+
+
+def test_parse_markdown_rejects_duplicate_alias_and_merge_profile_values(tmp_path: Path):
+    p = tmp_path / "yaml-features.md"
+    p.write_text(
+        "---\n"
+        "refs: &refs [concepts/overview.md]\n"
+        "mentioned_in: *refs\n"
+        "knowledge_state: current\n"
+        "knowledge_state: historical\n"
+        "defaults: &defaults {status: current}\n"
+        "<<: *defaults\n"
+        "---\n\n"
+        "# YAML Features\n",
+        encoding="utf-8",
+    )
+
+    root = parse_file(
+        p,
+        markdown_frontmatter_fields={"knowledge_state", "mentioned_in", "status"},
+    )[0]
+
+    assert "frontmatter" not in root.metadata
+    assert root.metadata["frontmatter_invalid"] == [
+        {"field": "knowledge_state", "line": 4, "reason": "duplicate yaml key"},
+        {"field": "mentioned_in", "line": 3, "reason": "yaml alias is not allowed"},
+        {"field": "status", "line": 7, "reason": "yaml merge is not allowed"},
+    ]
+
+
+def test_parse_markdown_rejects_alias_inside_block_list(tmp_path: Path):
+    p = tmp_path / "block-alias.md"
+    p.write_text(
+        "---\n"
+        "target: &target concepts/overview.md\n"
+        "mentioned_in:\n"
+        "  - *target\n"
+        "---\n\n"
+        "# Block Alias\n",
+        encoding="utf-8",
+    )
+
+    root = parse_file(
+        p,
+        markdown_frontmatter_fields={"mentioned_in"},
+    )[0]
+
+    assert "frontmatter" not in root.metadata
+    assert root.metadata["frontmatter_invalid"] == [{
+        "field": "mentioned_in",
+        "line": 3,
+        "reason": "yaml alias is not allowed",
+    }]
+
+
 def test_parse_markdown_duplicate_headings_disambiguated(sample_md: Path):
     symbols = parse_file(sample_md)
     goals = [s for s in symbols if s.qualified_name == "Overview > Goals"]

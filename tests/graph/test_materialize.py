@@ -1,0 +1,452 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from loci.graph.contracts import (
+    GraphContribution,
+    GraphEdge,
+    GraphEvidence,
+    GraphNodeRef,
+)
+from loci.graph.materialize import load_graph_extensions, materialize_graph
+from loci.graph.profiles import GraphProfile, LoadedGraphProfile
+from loci.graph.state import LoadedGraphContribution
+from loci.parser.symbols import Symbol
+
+
+FIXTURES = Path(__file__).parents[1] / "fixtures"
+
+
+def _profile(name: str) -> LoadedGraphProfile:
+    path = FIXTURES / "graph_profiles" / name
+    return LoadedGraphProfile(
+        source=f".loci/graph/profiles/{name}",
+        content_hash="f" * 64,
+        profile=GraphProfile.from_dict(json.loads(path.read_text())),
+    )
+
+
+def _page(
+    file_path: str,
+    name: str,
+    *,
+    frontmatter: dict | None = None,
+    lines: dict | None = None,
+) -> Symbol:
+    symbol_id = f"{file_path}::{name}#section"
+    metadata = {
+        "markdown": {
+            "page_root": True,
+            "parent_id": "",
+            "root_id": symbol_id,
+        },
+    }
+    if frontmatter:
+        metadata["frontmatter"] = frontmatter
+    if lines:
+        metadata["frontmatter_lines"] = lines
+    return Symbol(
+        id=symbol_id,
+        name=name,
+        qualified_name=name,
+        kind="section",
+        language="markdown",
+        file_path=file_path,
+        byte_offset=0,
+        byte_length=20,
+        content_hash="d" * 64,
+        metadata=metadata,
+        line=1,
+        end_line=3,
+    )
+
+
+def test_extension_loader_excludes_all_duplicate_namespace_profiles(tmp_path: Path):
+    profile_dir = tmp_path / ".loci" / "graph" / "profiles"
+    profile_dir.mkdir(parents=True)
+    content = (FIXTURES / "graph_profiles" / "generic.json").read_text()
+    (profile_dir / "first.json").write_text(content)
+    (profile_dir / "second.json").write_text(content)
+
+    loaded = load_graph_extensions(tmp_path)
+
+    assert loaded.profiles == ()
+    assert [item.code for item in loaded.diagnostics] == [
+        "GRAPH_PROFILE_NAMESPACE_DUPLICATE",
+        "GRAPH_PROFILE_NAMESPACE_DUPLICATE",
+    ]
+
+
+def test_extension_loader_keeps_valid_sibling_of_invalid_symlink(tmp_path: Path):
+    profile_dir = tmp_path / ".loci" / "graph" / "profiles"
+    profile_dir.mkdir(parents=True)
+    content = (FIXTURES / "graph_profiles" / "generic.json").read_text()
+    valid = profile_dir / "valid.json"
+    valid.write_text(content)
+    (profile_dir / "linked.json").symlink_to(valid)
+
+    loaded = load_graph_extensions(tmp_path)
+
+    assert [item.profile.namespace for item in loaded.profiles] == ["example"]
+    assert loaded.diagnostics[0].code == "INVALID_GRAPH_PROFILE"
+
+
+def test_generic_profile_materializes_overlay_and_forward_edge(tmp_path: Path):
+    guide = _page(
+        "guide.md",
+        "Guide",
+        frontmatter={"status": "current", "related": ["other.md"]},
+        lines={"status": 2, "related": 3},
+    )
+    other = _page("other.md", "Other")
+    (tmp_path / "guide.md").write_text("---\nstatus: current\nrelated: [other.md]\n---\n# Guide\n")
+    (tmp_path / "other.md").write_text("# Other\n")
+
+    state = materialize_graph(
+        tmp_path,
+        [guide, other],
+        {"guide.md": "a" * 64, "other.md": "b" * 64},
+        [_profile("generic.json")],
+        [],
+    )
+
+    assert state.nodes == (GraphNodeRef(
+        id=guide.id,
+        namespace="example",
+        kind="section",
+        attributes={"status": "current"},
+    ),)
+    assert state.edges == (GraphEdge(
+        from_id=guide.id,
+        to_id=other.id,
+        type="related_to",
+        directed=True,
+        namespace="example",
+        resolution="declared",
+        evidence=GraphEvidence(file="guide.md", line=3, content_hash="a" * 64),
+    ),)
+    assert state.diagnostics == ()
+
+
+def test_llm_wiki_profile_materializes_reverse_mentioned_in_edge(tmp_path: Path):
+    overview = _page("concepts/overview.md", "Overview")
+    detail = _page(
+        "concepts/detail.md",
+        "Detail",
+        frontmatter={
+            "knowledge_state": "current",
+            "mentioned_in": ["concepts/overview.md"],
+        },
+        lines={"knowledge_state": 2, "mentioned_in": 3},
+    )
+    (tmp_path / "concepts").mkdir()
+    (tmp_path / "concepts" / "overview.md").write_text("# Overview\n")
+    (tmp_path / "concepts" / "detail.md").write_text("# Detail\n")
+
+    state = materialize_graph(
+        tmp_path,
+        [overview, detail],
+        {"concepts/overview.md": "a" * 64, "concepts/detail.md": "b" * 64},
+        [_profile("llm-wiki.json")],
+        [],
+    )
+
+    assert state.nodes[0].attributes == {"knowledge_state": "current"}
+    assert state.edges[0].from_id == overview.id
+    assert state.edges[0].to_id == detail.id
+    assert state.edges[0].evidence.file == "concepts/detail.md"
+
+
+def test_ambiguous_page_root_reference_is_diagnostic(tmp_path: Path):
+    guide = _page(
+        "guide.md",
+        "Guide",
+        frontmatter={"related": ["other.md"]},
+        lines={"related": 2},
+    )
+    first = _page("other.md", "First")
+    second = _page("other.md", "Second")
+
+    state = materialize_graph(
+        tmp_path,
+        [guide, first, second],
+        {"guide.md": "a" * 64, "other.md": "b" * 64},
+        [_profile("generic.json")],
+        [],
+    )
+
+    assert state.edges == ()
+    assert state.diagnostics[0].code == "GRAPH_REFERENCE_AMBIGUOUS"
+
+
+def test_unresolved_page_root_reference_is_diagnostic(tmp_path: Path):
+    guide = _page(
+        "guide.md",
+        "Guide",
+        frontmatter={"related": ["missing.md"]},
+        lines={"related": 2},
+    )
+
+    state = materialize_graph(
+        tmp_path,
+        [guide],
+        {"guide.md": "a" * 64},
+        [_profile("generic.json")],
+        [],
+    )
+
+    assert state.edges == ()
+    assert state.diagnostics[0].code == "GRAPH_REFERENCE_UNRESOLVED"
+
+
+def test_profile_reference_rejects_symlinked_target(tmp_path: Path):
+    guide = _page(
+        "guide.md",
+        "Guide",
+        frontmatter={"related": ["other.md"]},
+        lines={"related": 2},
+    )
+    other = _page("other.md", "Other")
+    outside = tmp_path.parent / "outside.md"
+    outside.write_text("# Outside\n")
+    (tmp_path / "other.md").symlink_to(outside)
+
+    state = materialize_graph(
+        tmp_path,
+        [guide, other],
+        {"guide.md": "a" * 64, "other.md": "b" * 64},
+        [_profile("generic.json")],
+        [],
+    )
+
+    assert state.edges == ()
+    assert state.diagnostics[0].code == "GRAPH_REFERENCE_UNRESOLVED"
+
+
+def test_stale_contribution_edge_is_excluded_with_diagnostic(tmp_path: Path):
+    guide = _page("guide.md", "Guide")
+    other = _page("other.md", "Other")
+    contribution = GraphContribution(
+        schema_version=1,
+        namespace="example",
+        nodes=(),
+        edges=(GraphEdge(
+            from_id=guide.id,
+            to_id=other.id,
+            type="related_to",
+            directed=True,
+            namespace="example",
+            resolution="declared",
+            evidence=GraphEvidence(
+                file="guide.md",
+                line=1,
+                content_hash="0" * 64,
+            ),
+        ),),
+    )
+
+    state = materialize_graph(
+        tmp_path,
+        [guide, other],
+        {"guide.md": "a" * 64, "other.md": "b" * 64},
+        [_profile("generic.json")],
+        [LoadedGraphContribution(
+            source=".loci/graph/contributions/example.json",
+            content_hash="c" * 64,
+            contribution=contribution,
+        )],
+    )
+
+    assert state.edges == ()
+    assert state.diagnostics[0].code == "GRAPH_EVIDENCE_STALE"
+
+
+def test_valid_contribution_records_are_active(tmp_path: Path):
+    guide = _page("guide.md", "Guide")
+    other = _page("other.md", "Other")
+    (tmp_path / "guide.md").write_text("# Guide\nEvidence\n")
+    (tmp_path / "other.md").write_text("# Other\n")
+    payload = json.loads(
+        (FIXTURES / "graph_contributions" / "example-valid.json").read_text()
+    )
+    contribution = GraphContribution.from_dict(payload)
+
+    state = materialize_graph(
+        tmp_path,
+        [guide, other],
+        {"guide.md": "a" * 64, "other.md": "b" * 64},
+        [_profile("generic.json")],
+        [LoadedGraphContribution(
+            source=".loci/graph/contributions/example.json",
+            content_hash="c" * 64,
+            contribution=contribution,
+        )],
+    )
+
+    assert state.nodes[0].id == other.id
+    assert state.edges[0].from_id == guide.id
+    assert state.diagnostics == ()
+
+
+def test_llm_wiki_contribution_fixture_is_active(tmp_path: Path):
+    overview = _page("concepts/overview.md", "Overview")
+    detail = _page("concepts/detail.md", "Detail")
+    (tmp_path / "concepts").mkdir()
+    (tmp_path / "concepts" / "overview.md").write_text("# Overview\n")
+    (tmp_path / "concepts" / "detail.md").write_text("# Detail\nEvidence\n")
+    payload = json.loads(
+        (FIXTURES / "graph_contributions" / "llm-wiki-valid.json").read_text()
+    )
+
+    state = materialize_graph(
+        tmp_path,
+        [overview, detail],
+        {"concepts/overview.md": "a" * 64, "concepts/detail.md": "b" * 64},
+        [_profile("llm-wiki.json")],
+        [LoadedGraphContribution(
+            source=".loci/graph/contributions/llm-wiki.json",
+            content_hash="c" * 64,
+            contribution=GraphContribution.from_dict(payload),
+        )],
+    )
+
+    assert state.nodes[0].attributes == {"knowledge_state": "current"}
+    assert state.edges[0].from_id == overview.id
+    assert state.edges[0].to_id == detail.id
+    assert state.diagnostics == ()
+
+
+def test_contribution_missing_endpoint_is_excluded(tmp_path: Path):
+    guide = _page("guide.md", "Guide")
+    contribution = GraphContribution(
+        schema_version=1,
+        namespace="example",
+        nodes=(GraphNodeRef(
+            id="missing.md::Missing#section",
+            namespace="example",
+            kind="section",
+            attributes={"status": "current"},
+        ),),
+        edges=(),
+    )
+
+    state = materialize_graph(
+        tmp_path,
+        [guide],
+        {"guide.md": "a" * 64},
+        [_profile("generic.json")],
+        [LoadedGraphContribution(
+            source=".loci/graph/contributions/example.json",
+            content_hash="c" * 64,
+            contribution=contribution,
+        )],
+    )
+
+    assert state.nodes == ()
+    assert state.diagnostics[0].code == "GRAPH_ENDPOINT_NOT_FOUND"
+
+
+def test_contribution_unsupported_edge_policy_is_excluded(tmp_path: Path):
+    guide = _page("guide.md", "Guide")
+    other = _page("other.md", "Other")
+    contribution = GraphContribution(
+        schema_version=1,
+        namespace="example",
+        nodes=(),
+        edges=(GraphEdge(
+            from_id=guide.id,
+            to_id=other.id,
+            type="imports",
+            directed=True,
+            namespace="example",
+            resolution="declared",
+            evidence=GraphEvidence(file="guide.md", line=1, content_hash="a" * 64),
+        ),),
+    )
+
+    state = materialize_graph(
+        tmp_path,
+        [guide, other],
+        {"guide.md": "a" * 64, "other.md": "b" * 64},
+        [_profile("generic.json")],
+        [LoadedGraphContribution(
+            source=".loci/graph/contributions/example.json",
+            content_hash="c" * 64,
+            contribution=contribution,
+        )],
+    )
+
+    assert state.edges == ()
+    assert state.diagnostics[0].code == "GRAPH_EDGE_TYPE_UNSUPPORTED"
+
+
+def test_contribution_invalid_evidence_line_is_excluded(tmp_path: Path):
+    guide = _page("guide.md", "Guide")
+    other = _page("other.md", "Other")
+    (tmp_path / "guide.md").write_text("# Guide\n")
+    contribution = GraphContribution(
+        schema_version=1,
+        namespace="example",
+        nodes=(),
+        edges=(GraphEdge(
+            from_id=guide.id,
+            to_id=other.id,
+            type="related_to",
+            directed=True,
+            namespace="example",
+            resolution="declared",
+            evidence=GraphEvidence(file="guide.md", line=2, content_hash="a" * 64),
+        ),),
+    )
+
+    state = materialize_graph(
+        tmp_path,
+        [guide, other],
+        {"guide.md": "a" * 64, "other.md": "b" * 64},
+        [_profile("generic.json")],
+        [LoadedGraphContribution(
+            source=".loci/graph/contributions/example.json",
+            content_hash="c" * 64,
+            contribution=contribution,
+        )],
+    )
+
+    assert state.edges == ()
+    assert state.diagnostics[0].code == "GRAPH_EVIDENCE_LINE_INVALID"
+
+
+def test_contribution_attribute_conflict_retains_profile_value(tmp_path: Path):
+    guide = _page(
+        "guide.md",
+        "Guide",
+        frontmatter={"status": "current"},
+        lines={"status": 2},
+    )
+    contribution = GraphContribution(
+        schema_version=1,
+        namespace="example",
+        nodes=(GraphNodeRef(
+            id=guide.id,
+            namespace="example",
+            kind="section",
+            attributes={"status": "historical"},
+        ),),
+        edges=(),
+    )
+    (tmp_path / "guide.md").write_text("# Guide\n")
+
+    state = materialize_graph(
+        tmp_path,
+        [guide],
+        {"guide.md": "a" * 64},
+        [_profile("generic.json")],
+        [LoadedGraphContribution(
+            source=".loci/graph/contributions/example.json",
+            content_hash="c" * 64,
+            contribution=contribution,
+        )],
+    )
+
+    assert state.nodes[0].attributes == {"status": "current"}
+    assert state.diagnostics[0].code == "GRAPH_NODE_ATTRIBUTE_CONFLICT"

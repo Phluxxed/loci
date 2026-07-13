@@ -1,4 +1,5 @@
 from pathlib import Path
+import hashlib
 import json
 
 import pytest
@@ -8,7 +9,13 @@ from loci.graph.contracts import GRAPH_SCHEMA_VERSION
 from loci.service import (
     LociError,
     analyze_usage,
+    ensure_fresh_index,
+    graph_anchors,
+    graph_health,
     graph_neighbors,
+    graph_paths,
+    graph_retrieve,
+    graph_traverse_neighbors,
     get_cached_file,
     get_symbols,
     grep_repo,
@@ -20,6 +27,66 @@ from loci.service import (
     verify_repo,
 )
 from loci.storage.index_store import IndexStore
+
+
+def _domain_graph_repo(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    pages: dict[str, tuple[str, list[str]]],
+    edges: list[tuple[str, str, int]],
+) -> tuple[Path, dict[str, str]]:
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "graph-repo"
+    repo.mkdir()
+    ids: dict[str, str] = {}
+    for file_path, (title, lines) in pages.items():
+        path = repo / file_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("\n".join([f"# {title}", *lines]) + "\n", encoding="utf-8")
+        ids[file_path] = f"{file_path}::{title}#section"
+    index_repo(repo, incremental=False)
+
+    profile_dir = repo / ".loci" / "graph" / "profiles"
+    contribution_dir = repo / ".loci" / "graph" / "contributions"
+    profile_dir.mkdir(parents=True)
+    contribution_dir.mkdir(parents=True)
+    (profile_dir / "test.json").write_text(json.dumps({
+        "schema_version": 1,
+        "namespace": "test",
+        "node_rules": [],
+        "edge_types": [{
+            "type": "links",
+            "directed": True,
+            "allowed_resolutions": ["declared"],
+        }],
+        "edge_rules": [],
+    }))
+    records = []
+    for source, target, line in edges:
+        records.append({
+            "from": ids[source],
+            "to": ids[target],
+            "type": "links",
+            "directed": True,
+            "namespace": "test",
+            "resolution": "declared",
+            "evidence": {
+                "file": source,
+                "line": line,
+                "content_hash": hashlib.sha256((repo / source).read_bytes()).hexdigest(),
+            },
+        })
+    (contribution_dir / "test.json").write_text(json.dumps({
+        "schema_version": 1,
+        "namespace": "test",
+        "nodes": [],
+        "edges": records,
+    }))
+    indexed = index_repo(repo, incremental=True)
+    assert indexed["graph_status"] == "healthy"
+    return repo, ids
 
 
 @pytest.fixture
@@ -204,6 +271,30 @@ def test_service_schema_upgrade_rebuilds_graph(
     assert len(loaded["graph"]["edges"]) == 1
 
 
+def test_service_refresh_repairs_invalid_current_graph_state(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "guide.md").write_text("# Guide\n", encoding="utf-8")
+    index_repo(repo, incremental=False)
+    store = IndexStore(base_dir=base)
+    index_path = store._index_path(repo.resolve())
+    corrupted = json.loads(index_path.read_text())
+    corrupted["graph"]["input_hashes"] = {"../outside": "bad"}
+    index_path.write_text(json.dumps(corrupted))
+
+    refreshed = ensure_fresh_index(repo)
+    loaded = store.load(repo.resolve())
+
+    assert refreshed["refreshed"] is True
+    assert loaded is not None
+    assert loaded["graph"]["input_hashes"] == {}
+
+
 def test_service_incremental_reindex_recomputes_contains_edges(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -232,6 +323,300 @@ def test_service_incremental_reindex_recomputes_contains_edges(
     assert [edge["to"] for edge in edges] == [
         "guide.md::Guide > Configure#section"
     ]
+
+
+def test_service_materializes_profile_without_leaking_declared_neighbors(
+    tmp_path: Path,
+    fixtures_dir: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    profile_dir = repo / ".loci" / "graph" / "profiles"
+    profile_dir.mkdir(parents=True)
+    (profile_dir / "generic.json").write_text(
+        (fixtures_dir / "graph_profiles" / "generic.json").read_text()
+    )
+    (repo / "guide.md").write_text(
+        "---\nstatus: current\nrelated: [other.md]\n---\n"
+        "# Guide\n\n## Child\n\nBody.\n",
+        encoding="utf-8",
+    )
+    (repo / "other.md").write_text("# Other\n", encoding="utf-8")
+
+    indexed = index_repo(repo, incremental=False)
+    loaded = IndexStore(base_dir=base).load(repo.resolve())
+    neighbors = graph_neighbors(repo, ["guide.md::Guide#section"])
+
+    assert indexed["graph_profiles_loaded"] == 1
+    assert indexed["graph_node_overlays_indexed"] == 1
+    assert indexed["graph_status"] == "healthy"
+    assert loaded is not None
+    guide = next(
+        symbol for symbol in loaded["symbols"]
+        if symbol["id"] == "guide.md::Guide#section"
+    )
+    assert guide["metadata"]["frontmatter"]["status"] == "current"
+    assert loaded["graph"]["nodes"][0]["attributes"] == {"status": "current"}
+    assert {edge["type"] for edge in loaded["graph"]["edges"]} == {
+        "contains",
+        "related_to",
+    }
+    returned_types = {
+        neighbor["edge"]["type"]
+        for neighbor in neighbors["results"][0]["neighbors"]
+    }
+    assert returned_types == {"contains"}
+    health = graph_health(repo)
+    assert health == {
+        "schema_version": GRAPH_SCHEMA_VERSION,
+        "repo": str(repo.resolve()),
+        "status": "healthy",
+        "profiles": [{
+            "namespace": "example",
+            "source": ".loci/graph/profiles/generic.json",
+            "content_hash": loaded["graph"]["profiles"][0]["content_hash"],
+            "node_attributes": ["status"],
+            "edge_types": [{
+                "type": "related_to",
+                "directed": True,
+                "allowed_resolutions": ["declared"],
+            }],
+        }],
+        "counts": {
+            "profiles": 1,
+            "node_overlays": 1,
+            "edges": 2,
+            "contributions": 0,
+            "diagnostics": 0,
+        },
+        "diagnostics": [],
+    }
+
+
+def test_service_profile_addition_triggers_freshness_refresh(
+    tmp_path: Path,
+    fixtures_dir: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "guide.md").write_text(
+        "---\nstatus: current\n---\n# Guide\n",
+        encoding="utf-8",
+    )
+    index_repo(repo, incremental=False)
+    profile_dir = repo / ".loci" / "graph" / "profiles"
+    profile_dir.mkdir(parents=True)
+    (profile_dir / "generic.json").write_text(
+        (fixtures_dir / "graph_profiles" / "generic.json").read_text()
+    )
+
+    refreshed = ensure_fresh_index(repo)
+    loaded = IndexStore(base_dir=base).load(repo.resolve())
+
+    assert refreshed["refreshed"] is True
+    assert loaded is not None
+    assert loaded["graph"]["nodes"][0]["attributes"] == {"status": "current"}
+
+
+def test_service_reference_symlink_drift_triggers_refresh(
+    tmp_path: Path,
+    fixtures_dir: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    profile_dir = repo / ".loci" / "graph" / "profiles"
+    profile_dir.mkdir(parents=True)
+    (profile_dir / "generic.json").write_text(
+        (fixtures_dir / "graph_profiles" / "generic.json").read_text()
+    )
+    (repo / "guide.md").write_text(
+        "---\nrelated: [other.md]\n---\n# Guide\n",
+        encoding="utf-8",
+    )
+    other = repo / "other.md"
+    other.write_text("# Other\n", encoding="utf-8")
+    index_repo(repo, incremental=False)
+    outside = tmp_path / "outside.md"
+    outside.write_text("# Other\n", encoding="utf-8")
+    other.unlink()
+    other.symlink_to(outside)
+
+    refreshed = ensure_fresh_index(repo)
+    loaded = IndexStore(base_dir=base).load(repo.resolve())
+
+    assert refreshed["refreshed"] is True
+    assert loaded is not None
+    assert loaded["graph"]["edges"] == []
+    assert loaded["graph"]["diagnostics"][0]["code"] == "GRAPH_REFERENCE_UNRESOLVED"
+
+
+def test_service_reuses_unchanged_contribution_but_revalidates_it(
+    tmp_path: Path,
+    fixtures_dir: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    profile_dir = repo / ".loci" / "graph" / "profiles"
+    contribution_dir = repo / ".loci" / "graph" / "contributions"
+    profile_dir.mkdir(parents=True)
+    contribution_dir.mkdir(parents=True)
+    (profile_dir / "generic.json").write_text(
+        (fixtures_dir / "graph_profiles" / "generic.json").read_text()
+    )
+    guide = repo / "guide.md"
+    guide.write_text("# Guide\nEvidence\n", encoding="utf-8")
+    (repo / "other.md").write_text("# Other\n", encoding="utf-8")
+    payload = json.loads(
+        (fixtures_dir / "graph_contributions" / "example-valid.json").read_text()
+    )
+    payload["edges"][0]["evidence"]["content_hash"] = hashlib.sha256(
+        guide.read_bytes()
+    ).hexdigest()
+    (contribution_dir / "example.json").write_text(json.dumps(payload))
+    index_repo(repo, incremental=False)
+
+    indexed = index_repo(repo, incremental=True)
+
+    assert indexed["graph_contributions_loaded"] == 1
+    assert indexed["graph_contributions_reused"] == 1
+    assert indexed["graph_status"] == "healthy"
+
+    guide.write_text("# Guide\nChanged evidence\n", encoding="utf-8")
+    reindexed = index_repo(repo, incremental=True)
+    loaded = IndexStore(base_dir=base).load(repo.resolve())
+
+    assert reindexed["graph_contributions_reused"] == 1
+    assert reindexed["graph_status"] == "degraded"
+    assert reindexed["graph_diagnostics"][0]["code"] == "GRAPH_EVIDENCE_STALE"
+    assert loaded is not None
+    assert loaded["graph"]["edges"] == []
+
+    guide.unlink()
+    deleted_evidence = index_repo(repo, incremental=True)
+
+    assert deleted_evidence["graph_contributions_reused"] == 1
+    assert deleted_evidence["graph_status"] == "degraded"
+    assert deleted_evidence["graph_diagnostics"][0]["code"] == "GRAPH_ENDPOINT_NOT_FOUND"
+
+
+def test_service_profile_policy_change_revalidates_reused_contribution(
+    tmp_path: Path,
+    fixtures_dir: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    profile_dir = repo / ".loci" / "graph" / "profiles"
+    contribution_dir = repo / ".loci" / "graph" / "contributions"
+    profile_dir.mkdir(parents=True)
+    contribution_dir.mkdir(parents=True)
+    profile_path = profile_dir / "generic.json"
+    profile = json.loads(
+        (fixtures_dir / "graph_profiles" / "generic.json").read_text()
+    )
+    profile_path.write_text(json.dumps(profile))
+    (repo / "other.md").write_text("# Other\n", encoding="utf-8")
+    contribution = {
+        "schema_version": 1,
+        "namespace": "example",
+        "nodes": [{
+            "id": "other.md::Other#section",
+            "namespace": "example",
+            "kind": "section",
+            "attributes": {"status": "historical"},
+        }],
+        "edges": [],
+    }
+    (contribution_dir / "example.json").write_text(json.dumps(contribution))
+    index_repo(repo, incremental=False)
+    profile["node_rules"][0]["attributes"][0]["allowed_values"] = ["current"]
+    profile_path.write_text(json.dumps(profile))
+
+    indexed = index_repo(repo, incremental=True)
+    loaded = IndexStore(base_dir=base).load(repo.resolve())
+
+    assert indexed["graph_contributions_reused"] == 1
+    assert indexed["graph_status"] == "degraded"
+    assert indexed["graph_diagnostics"][0]["code"] == "GRAPH_NODE_ATTRIBUTE_INVALID"
+    assert loaded is not None
+    assert loaded["graph"]["nodes"] == []
+
+
+def test_service_extension_deletions_trigger_refresh(
+    tmp_path: Path,
+    fixtures_dir: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    profile_dir = repo / ".loci" / "graph" / "profiles"
+    contribution_dir = repo / ".loci" / "graph" / "contributions"
+    profile_dir.mkdir(parents=True)
+    contribution_dir.mkdir(parents=True)
+    profile_path = profile_dir / "generic.json"
+    contribution_path = contribution_dir / "example.json"
+    profile_path.write_text(
+        (fixtures_dir / "graph_profiles" / "generic.json").read_text()
+    )
+    (repo / "other.md").write_text("# Other\n", encoding="utf-8")
+    contribution_path.write_text(json.dumps({
+        "schema_version": 1,
+        "namespace": "example",
+        "nodes": [{
+            "id": "other.md::Other#section",
+            "namespace": "example",
+            "kind": "section",
+            "attributes": {"status": "current"},
+        }],
+        "edges": [],
+    }))
+    index_repo(repo, incremental=False)
+
+    contribution_path.unlink()
+    contribution_refresh = ensure_fresh_index(repo)
+    profile_path.unlink()
+    profile_refresh = ensure_fresh_index(repo)
+    loaded = IndexStore(base_dir=base).load(repo.resolve())
+
+    assert contribution_refresh["refreshed"] is True
+    assert profile_refresh["refreshed"] is True
+    assert loaded is not None
+    assert loaded["graph"]["profiles"] == []
+    assert loaded["graph"]["contributions"] == []
+
+
+def test_service_invalid_profile_degrades_graph_without_hiding_symbols(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    profile_dir = repo / ".loci" / "graph" / "profiles"
+    profile_dir.mkdir(parents=True)
+    (profile_dir / "bad.json").write_text('{"schema_version": 1,')
+    (repo / "guide.md").write_text("# Guide\n", encoding="utf-8")
+
+    indexed = index_repo(repo, incremental=False)
+    loaded = IndexStore(base_dir=base).load(repo.resolve())
+
+    assert indexed["symbols_indexed"] == 1
+    assert indexed["graph_status"] == "degraded"
+    assert indexed["graph_diagnostics"][0]["code"] == "INVALID_GRAPH_PROFILE"
+    assert loaded is not None
+    assert loaded["graph"]["profiles"] == []
+    assert graph_health(repo)["status"] == "degraded"
 
 
 def test_graph_neighbors_returns_seeded_one_hop_with_evidence(
@@ -345,6 +730,446 @@ def test_graph_neighbors_empty_neighbors_is_success(
     result = graph_neighbors(repo, ["guide.md::Guide#section"])
 
     assert result["results"][0]["neighbors"] == []
+
+
+def test_graph_anchors_returns_bounded_explained_inferred_envelope(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "guide.md").write_text(
+        "# Retrieval Guide\n\n"
+        "## Query Aware Traversal\n\n"
+        "Use a bounded graph walk.\n",
+        encoding="utf-8",
+    )
+    index_repo(repo, incremental=False)
+
+    result = graph_anchors(repo, "How should query aware traversal stay bounded?")
+
+    assert set(result) == {
+        "schema_version",
+        "repo",
+        "question",
+        "selection",
+        "question_terms",
+        "anchors",
+        "counts",
+        "budget",
+        "diagnostics",
+    }
+    assert result["schema_version"] == GRAPH_SCHEMA_VERSION
+    assert result["repo"] == str(repo.resolve())
+    assert result["selection"] == "inferred"
+    assert result["question_terms"] == ["query", "aware", "traversal", "stay", "bounded"]
+    assert len(result["anchors"]) == 1
+    anchor = result["anchors"][0]
+    assert anchor["node"]["id"] == "guide.md::Retrieval Guide#section"
+    assert anchor["matched_symbol_id"] == (
+        "guide.md::Retrieval Guide > Query Aware Traversal#section"
+    )
+    assert anchor["reason"]["kind"] == "inferred"
+    assert set(anchor["reason"]["matched_terms"]) >= {"query", "aware", "traversal"}
+    assert "symbol_name" in anchor["reason"]["match_scope"]
+    assert result["counts"] == {
+        "indexed_nodes": 2,
+        "eligible_units": 1,
+        "qualified_candidates": 1,
+        "collapsed_symbols": 1,
+        "returned_anchors": 1,
+        "omitted_candidates": 0,
+    }
+    assert result["budget"] == {
+        "requested_max_anchors": 10,
+        "effective_max_anchors": 1,
+    }
+    assert result["diagnostics"] == []
+    assert "sufficient" not in result
+    assert "answerable" not in result
+
+
+def test_graph_anchors_explicit_seed_overrides_question_and_remains_exact(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "guide.md").write_text(
+        "# Retrieval Guide\n\n## Install\n\nInstall locally.\n",
+        encoding="utf-8",
+    )
+    index_repo(repo, incremental=False)
+    section_id = "guide.md::Retrieval Guide > Install#section"
+
+    result = graph_anchors(
+        repo,
+        "retrieval guide",
+        [section_id, section_id],
+        max_anchors=1,
+    )
+
+    assert result["selection"] == "explicit"
+    assert result["question_terms"] == []
+    assert [anchor["node"]["id"] for anchor in result["anchors"]] == [section_id]
+    assert result["anchors"][0]["matched_symbol_id"] == section_id
+    assert result["anchors"][0]["score"] is None
+    assert result["anchors"][0]["reason"] == {
+        "kind": "explicit_seed",
+        "matched_terms": [],
+        "match_scope": [],
+    }
+
+
+def test_graph_anchors_translates_missing_seed_error(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "guide.md").write_text("# Guide\n", encoding="utf-8")
+    index_repo(repo, incremental=False)
+
+    with pytest.raises(LociError) as raised:
+        graph_anchors(repo, "", ["guide.md::Missing#section"])
+
+    assert raised.value.code == "GRAPH_ENDPOINT_NOT_FOUND"
+    assert raised.value.details["missing_ids"] == ["guide.md::Missing#section"]
+
+
+def test_graph_anchors_preserves_degraded_graph_diagnostics(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    profiles = repo / ".loci" / "graph" / "profiles"
+    profiles.mkdir(parents=True)
+    (profiles / "bad.json").write_text("{}", encoding="utf-8")
+    (repo / "guide.md").write_text("# Graph Guide\n", encoding="utf-8")
+    indexed = index_repo(repo, incremental=False)
+
+    result = graph_anchors(repo, "graph guide")
+
+    assert indexed["graph_status"] == "degraded"
+    assert result["anchors"]
+    assert result["diagnostics"]
+    assert result["diagnostics"][0]["code"] == "INVALID_GRAPH_PROFILE"
+
+
+def test_graph_traverse_neighbors_filters_direction_and_reports_omissions(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    repo, ids = _domain_graph_repo(
+        tmp_path,
+        monkeypatch,
+        pages={
+            "a.md": ("Alpha", ["Alpha links to two pages."]),
+            "b.md": ("Beta", ["Beta body."]),
+            "c.md": ("Gamma", ["Gamma body."]),
+        },
+        edges=[("a.md", "b.md", 2), ("a.md", "c.md", 2)],
+    )
+
+    outgoing = graph_traverse_neighbors(
+        repo,
+        [ids["a.md"]],
+        namespaces=["test"],
+        edge_types=["links"],
+        resolutions=["declared"],
+        max_neighbors=1,
+    )
+    incoming = graph_traverse_neighbors(
+        repo,
+        [ids["b.md"]],
+        namespaces=["test"],
+        edge_types=["links"],
+        resolutions=["declared"],
+        direction="incoming",
+    )
+
+    assert outgoing["results"][0]["neighbors"][0]["node"]["id"] == ids["b.md"]
+    assert outgoing["results"][0]["neighbors"][0]["traversed"] == "forward"
+    assert outgoing["results"][0]["returned"] == 1
+    assert outgoing["results"][0]["omitted"] == 1
+    assert incoming["results"][0]["neighbors"][0]["node"]["id"] == ids["a.md"]
+    assert incoming["results"][0]["neighbors"][0]["traversed"] == "reverse"
+    assert incoming["results"][0]["neighbors"][0]["edge"]["from"] == ids["a.md"]
+    assert incoming["filters"]["direction"] == "incoming"
+
+
+def test_graph_paths_hydrates_evidence_and_preserves_reverse_direction(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    repo, ids = _domain_graph_repo(
+        tmp_path,
+        monkeypatch,
+        pages={
+            "a.md": ("Alpha", ["Alpha explicitly links Beta."]),
+            "b.md": ("Beta", ["Beta body."]),
+        },
+        edges=[("a.md", "b.md", 2)],
+    )
+
+    result = graph_paths(
+        repo,
+        [ids["b.md"]],
+        [ids["a.md"]],
+        namespaces=["test"],
+        edge_types=["links"],
+        resolutions=["declared"],
+        direction="either",
+    )
+
+    assert result["support_kind"] == "edge_sequence"
+    assert len(result["paths"]) == 1
+    step = result["paths"][0]["steps"][0]
+    assert step["traversed"] == "reverse"
+    assert step["edge"]["from"] == ids["a.md"]
+    assert step["edge"]["to"] == ids["b.md"]
+    assert step["evidence_span"] == {
+        "file": "a.md",
+        "start_line": 2,
+        "end_line": 2,
+        "content": "Alpha explicitly links Beta.\n",
+    }
+    assert result["budget"]["evidence_bytes"] > 0
+    assert "sufficient" not in result
+
+
+def test_graph_paths_rejects_whole_path_when_evidence_budget_is_exceeded(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    long_line = "bridge " + ("x" * 1_100)
+    repo, ids = _domain_graph_repo(
+        tmp_path,
+        monkeypatch,
+        pages={
+            "a.md": ("Alpha", [long_line]),
+            "b.md": ("Beta", ["Beta body."]),
+        },
+        edges=[("a.md", "b.md", 2)],
+    )
+
+    result = graph_paths(
+        repo,
+        [ids["a.md"]],
+        [ids["b.md"]],
+        namespaces=["test"],
+        max_evidence_bytes=1_024,
+    )
+
+    assert result["paths"] == []
+    assert result["rejected_paths"][0]["reason"] == "EVIDENCE_BUDGET_EXCEEDED"
+    assert result["budget"]["evidence_bytes"] == 0
+
+
+def test_graph_paths_reports_all_missing_endpoints(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    repo, ids = _domain_graph_repo(
+        tmp_path,
+        monkeypatch,
+        pages={"a.md": ("Alpha", ["Body."])},
+        edges=[],
+    )
+
+    with pytest.raises(LociError) as raised:
+        graph_paths(repo, [ids["a.md"], "missing-source"], ["missing-target"])
+
+    assert raised.value.code == "GRAPH_ENDPOINT_NOT_FOUND"
+    assert raised.value.details["missing_ids"] == ["missing-source", "missing-target"]
+
+
+def test_graph_retrieve_selects_direct_authored_edge_without_claiming_sufficiency(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    repo, ids = _domain_graph_repo(
+        tmp_path,
+        monkeypatch,
+        pages={
+            "source.md": ("Faithful Source", ["Faithful Source supports Sparse Rule."]),
+            "rule.md": ("Sparse Rule", ["Sparse Rule body."]),
+        },
+        edges=[("source.md", "rule.md", 2)],
+    )
+
+    result = graph_retrieve(
+        repo,
+        "What source supports the Faithful Source and Sparse Rule relationship?",
+        [ids["source.md"], ids["rule.md"]],
+        namespaces=["test"],
+        edge_types=["links"],
+        resolutions=["declared"],
+    )
+
+    assert result["routing"]["kind"] == "relationship"
+    assert result["paths"][0]["support_kind"] == "direct_authored_edge"
+    assert result["paths"][0]["semantic_bridge"]["required"] is False
+    assert result["paths"][0]["steps"][0]["evidence_span"]["content"]
+    assert result["counts"]["duplicate_paths"] >= 1
+    assert "sufficient" not in result
+    assert "answerable" not in result
+
+
+def test_graph_retrieve_accepts_meaningful_multi_hop_bridge(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    repo, ids = _domain_graph_repo(
+        tmp_path,
+        monkeypatch,
+        pages={
+            "idea.md": ("AI Graph Ideas", ["Incubating ideas through the bridge."]),
+            "bridge.md": ("Maintenance Bridge", ["Bridge to durable maintenance."]),
+            "brain.md": ("Brain Steward Handoff", ["Handoff body."]),
+        },
+        edges=[("idea.md", "bridge.md", 2), ("bridge.md", "brain.md", 2)],
+    )
+
+    result = graph_retrieve(
+        repo,
+        "How can incubated AI Graph Ideas become durable Brain Steward maintenance?",
+        [ids["idea.md"], ids["brain.md"]],
+        namespaces=["test"],
+        direction="outgoing",
+    )
+
+    selected = next(path for path in result["paths"] if len(path["steps"]) == 2)
+    assert selected["support_kind"] == "semantic_bridge"
+    assert selected["semantic_bridge"]["matched_terms"]
+    assert selected["nodes"][1]["id"] == ids["bridge.md"]
+
+
+def test_graph_retrieve_does_not_use_endpoint_name_as_bridge_evidence(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    repo, ids = _domain_graph_repo(
+        tmp_path,
+        monkeypatch,
+        pages={
+            "source.md": ("Support Bridge", ["Support Bridge links Middle."]),
+            "middle.md": ("Middle", ["Middle links Target."]),
+            "target.md": ("Target", ["Target body."]),
+        },
+        edges=[("source.md", "middle.md", 2), ("middle.md", "target.md", 2)],
+    )
+
+    result = graph_retrieve(
+        repo,
+        "How does Support Bridge support Target?",
+        [ids["source.md"], ids["target.md"]],
+        namespaces=["test"],
+        direction="outgoing",
+    )
+
+    assert result["paths"] == []
+    assert result["rejected_paths"][0]["reason"] == "SEMANTIC_BRIDGE_MISSING"
+
+
+def test_graph_retrieve_rejects_unsupported_hub_shortcut(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    pages = {
+        "source.md": ("Code Graph RAG", ["Code Graph RAG links Generic Hub."]),
+        "hub.md": ("Generic Hub", ["Generic Hub links Recall Traversal."]),
+        "target.md": ("Recall Efficient Wiki Traversal", ["Target body."]),
+        **{
+            f"extra-{index}.md": (f"Extra {index}", [f"Extra {index} body."])
+            for index in range(4)
+        },
+    }
+    edges = [
+        ("source.md", "hub.md", 2),
+        ("hub.md", "target.md", 2),
+        *[("hub.md", f"extra-{index}.md", 2) for index in range(4)],
+    ]
+    repo, ids = _domain_graph_repo(
+        tmp_path,
+        monkeypatch,
+        pages=pages,
+        edges=edges,
+    )
+
+    result = graph_retrieve(
+        repo,
+        "What evidence shows Code Graph RAG improved Recall Efficient Wiki Traversal?",
+        [ids["source.md"], ids["target.md"]],
+        namespaces=["test"],
+        direction="outgoing",
+    )
+
+    assert result["paths"] == []
+    assert result["rejected_paths"][0]["reason"] == "HUB_SHORTCUT"
+    assert result["rejected_paths"][0]["nodes"] == [
+        ids["source.md"],
+        ids["hub.md"],
+        ids["target.md"],
+    ]
+
+
+def test_graph_retrieve_suppresses_inferred_measurement_question(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    repo, _ids = _domain_graph_repo(
+        tmp_path,
+        monkeypatch,
+        pages={
+            "result.md": ("Traversal Result", ["A measured result."]),
+            "other.md": ("Other", ["Other body."]),
+        },
+        edges=[("result.md", "other.md", 2)],
+    )
+
+    result = graph_retrieve(
+        repo,
+        "What measured recall improvement did traversal produce?",
+        namespaces=["test"],
+    )
+
+    assert result["routing"] == {
+        "kind": "suppressed",
+        "reason": "attribute_or_measurement_question",
+    }
+    assert result["paths"] == []
+    assert result["rejected_paths"] == []
+
+
+def test_graph_retrieve_does_not_treat_which_as_measurement_by_itself(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    repo, _ids = _domain_graph_repo(
+        tmp_path,
+        monkeypatch,
+        pages={
+            "alpha.md": ("Alpha", ["Alpha connects Beta."]),
+            "beta.md": ("Beta", ["Beta body."]),
+        },
+        edges=[("alpha.md", "beta.md", 2)],
+    )
+
+    result = graph_retrieve(
+        repo,
+        "Which page connects Alpha and Beta?",
+        namespaces=["test"],
+    )
+
+    assert result["routing"] == {
+        "kind": "relationship",
+        "reason": "relationship_intent",
+    }
 
 
 def test_service_markdown_search_exposes_match_scope_and_cost(

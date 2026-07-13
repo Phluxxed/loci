@@ -1,6 +1,6 @@
 from __future__ import annotations
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Collection, Optional
 import ast
 import hashlib
 import re
@@ -25,11 +25,18 @@ FRONTMATTER_SCALAR_FIELDS = (
 FRONTMATTER_LIST_FIELDS = ("tags",)
 
 
-def parse_file(path: Path) -> list[Symbol]:
+def parse_file(
+    path: Path,
+    *,
+    markdown_frontmatter_fields: Collection[str] = (),
+) -> list[Symbol]:
     """Parse a source file and return all symbols with byte offsets."""
     suffix = path.suffix.lower()
     if suffix in MARKDOWN_SUFFIXES:
-        return parse_markdown(path)
+        return parse_markdown(
+            path,
+            markdown_frontmatter_fields=markdown_frontmatter_fields,
+        )
 
     language = EXTENSION_MAP.get(suffix)
     if language is None:
@@ -660,7 +667,11 @@ def _name_words(name: str) -> set[str]:
     return {p for p in parts if len(p) > 1}
 
 
-def parse_markdown(path: Path) -> list[Symbol]:
+def parse_markdown(
+    path: Path,
+    *,
+    markdown_frontmatter_fields: Collection[str] = (),
+) -> list[Symbol]:
     """Parse a markdown file into one Symbol per heading section.
 
     Each section spans its heading through the end of its nested subtree, nested
@@ -679,8 +690,17 @@ def parse_markdown(path: Path) -> list[Symbol]:
 
     parser = Parser(get_language("markdown"))
     tree = parser.parse(source)
-    frontmatter = _parse_frontmatter(source, path)
-    frontmatter_keywords = _frontmatter_keywords(frontmatter)
+    frontmatter, frontmatter_lines, frontmatter_invalid = _parse_frontmatter(
+        source,
+        path,
+        extra_fields=markdown_frontmatter_fields,
+    )
+    builtin_frontmatter = {
+        field: value
+        for field, value in frontmatter.items()
+        if field in FRONTMATTER_SCALAR_FIELDS or field in FRONTMATTER_LIST_FIELDS
+    }
+    frontmatter_keywords = _frontmatter_keywords(builtin_frontmatter)
     file_bytes = len(source)
 
     sections = [c for c in tree.root_node.children if c.type == "section"]
@@ -698,6 +718,8 @@ def parse_markdown(path: Path) -> list[Symbol]:
             out=symbols,
             emit_preamble=has_heading,
             frontmatter=frontmatter,
+            frontmatter_lines=frontmatter_lines,
+            frontmatter_invalid=frontmatter_invalid,
             frontmatter_keywords=frontmatter_keywords,
             file_bytes=file_bytes,
         )
@@ -714,6 +736,8 @@ def parse_markdown(path: Path) -> list[Symbol]:
             keywords=frontmatter_keywords,
             metadata=_markdown_metadata(
                 frontmatter,
+                frontmatter_lines=frontmatter_lines,
+                frontmatter_invalid=frontmatter_invalid,
                 page_root=True,
                 synthetic_name=True,
                 heading_level=0,
@@ -738,6 +762,8 @@ def _walk_md_section(
     out: list[Symbol],
     emit_preamble: bool,
     frontmatter: dict[str, Any],
+    frontmatter_lines: dict[str, int],
+    frontmatter_invalid: list[dict[str, Any]],
     frontmatter_keywords: set[str],
     file_bytes: int,
 ) -> None:
@@ -782,6 +808,8 @@ def _walk_md_section(
         keywords=frontmatter_keywords if is_page_root else None,
         metadata=_markdown_metadata(
             frontmatter if is_page_root else None,
+            frontmatter_lines=frontmatter_lines if is_page_root else None,
+            frontmatter_invalid=frontmatter_invalid if is_page_root else None,
             page_root=is_page_root,
             synthetic_name=False,
             heading_level=heading_level,
@@ -806,6 +834,8 @@ def _walk_md_section(
                 out=out,
                 emit_preamble=False,
                 frontmatter=frontmatter,
+                frontmatter_lines=frontmatter_lines,
+                frontmatter_invalid=frontmatter_invalid,
                 frontmatter_keywords=frontmatter_keywords,
                 file_bytes=file_bytes,
             )
@@ -851,10 +881,15 @@ def _append_md_symbol(
     return len(out) - 1
 
 
-def _parse_frontmatter(source: bytes, path: Path) -> dict[str, Any]:
+def _parse_frontmatter(
+    source: bytes,
+    path: Path,
+    *,
+    extra_fields: Collection[str] = (),
+) -> tuple[dict[str, Any], dict[str, int], list[dict[str, Any]]]:
     text = _frontmatter_text(source)
     if text is None:
-        return {}
+        return {}, {}, []
 
     try:
         loaded = yaml.safe_load(text) or {}
@@ -862,7 +897,7 @@ def _parse_frontmatter(source: bytes, path: Path) -> dict[str, Any]:
         raise ValueError(f"Invalid markdown frontmatter in {path}: {exc}") from exc
 
     if not isinstance(loaded, dict):
-        return {}
+        return {}, {}, []
 
     metadata: dict[str, Any] = {}
     for field in FRONTMATTER_SCALAR_FIELDS:
@@ -876,7 +911,99 @@ def _parse_frontmatter(source: bytes, path: Path) -> dict[str, Any]:
         if normalized:
             metadata[field] = normalized
 
-    return metadata
+    selected, lines, invalid = _selected_frontmatter_metadata(
+        text,
+        loaded,
+        extra_fields,
+    )
+    for item in invalid:
+        metadata.pop(item["field"], None)
+    metadata.update(selected)
+    return metadata, lines, invalid
+
+
+def _selected_frontmatter_metadata(
+    text: str,
+    loaded: dict[str, Any],
+    fields: Collection[str],
+) -> tuple[dict[str, Any], dict[str, int], list[dict[str, Any]]]:
+    selected: dict[str, Any] = {}
+    selected_lines: dict[str, int] = {}
+    invalid: list[dict[str, Any]] = []
+    source_lines = text.splitlines()
+    top_level_key_lines = [
+        index
+        for index, line in enumerate(source_lines, start=2)
+        if re.match(r"^[^\s#][^:]*\s*:", line)
+    ]
+    yaml_reference_lines = {
+        token.start_mark.line + 2
+        for token in yaml.scan(text)
+        if token.__class__.__name__ in {"AliasToken", "AnchorToken"}
+    }
+    merge_lines = [
+        index
+        for index, line in enumerate(source_lines, start=2)
+        if re.match(r"^<<\s*:", line)
+    ]
+
+    for field in sorted(set(fields)):
+        occurrences = [
+            (index, line)
+            for index, line in enumerate(source_lines, start=2)
+            if re.match(rf"^{re.escape(field)}\s*:", line)
+        ]
+        if len(occurrences) > 1:
+            invalid.append({
+                "field": field,
+                "line": occurrences[0][0],
+                "reason": "duplicate yaml key",
+            })
+            continue
+        if not occurrences:
+            if field in loaded and merge_lines:
+                invalid.append({
+                    "field": field,
+                    "line": merge_lines[0],
+                    "reason": "yaml merge is not allowed",
+                })
+            continue
+
+        line_number, _ = occurrences[0]
+        next_key_line = next(
+            (line for line in top_level_key_lines if line > line_number),
+            len(source_lines) + 2,
+        )
+        if any(
+            line_number <= line < next_key_line
+            for line in yaml_reference_lines
+        ):
+            invalid.append({
+                "field": field,
+                "line": line_number,
+                "reason": "yaml alias is not allowed",
+            })
+            continue
+
+        value = loaded.get(field)
+        if isinstance(value, str):
+            normalized = value.strip()
+            if normalized:
+                selected[field] = normalized
+                selected_lines[field] = line_number
+                continue
+        if isinstance(value, list) and value and all(
+            isinstance(item, str) and item.strip() for item in value
+        ):
+            selected[field] = [item.strip() for item in value]
+            selected_lines[field] = line_number
+            continue
+        invalid.append({
+            "field": field,
+            "line": line_number,
+            "reason": "expected string or string list",
+        })
+    return selected, selected_lines, invalid
 
 
 def _frontmatter_text(source: bytes) -> str | None:
@@ -922,6 +1049,8 @@ def _frontmatter_keywords(frontmatter: dict[str, Any]) -> set[str]:
 def _markdown_metadata(
     frontmatter: dict[str, Any] | None,
     *,
+    frontmatter_lines: dict[str, int] | None = None,
+    frontmatter_invalid: list[dict[str, Any]] | None = None,
     page_root: bool,
     synthetic_name: bool,
     heading_level: int,
@@ -937,6 +1066,10 @@ def _markdown_metadata(
             key: list(value) if isinstance(value, list) else value
             for key, value in frontmatter.items()
         }
+    if frontmatter_lines:
+        metadata["frontmatter_lines"] = dict(frontmatter_lines)
+    if frontmatter_invalid:
+        metadata["frontmatter_invalid"] = [dict(item) for item in frontmatter_invalid]
     saved_pct = int((file_bytes - byte_length) / file_bytes * 100) if file_bytes > 0 else 0
     saved_pct = max(0, min(100, saved_pct))
     markdown: dict[str, Any] = {

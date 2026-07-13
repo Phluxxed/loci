@@ -8,7 +8,12 @@ from mcp.types import CallToolResult, TextContent
 from loci.service import (
     LociError,
     analyze_usage,
+    graph_anchors,
+    graph_health,
     graph_neighbors,
+    graph_paths,
+    graph_retrieve,
+    graph_traverse_neighbors,
     get_cached_file,
     get_symbols,
     grep_repo,
@@ -26,8 +31,9 @@ def create_server() -> FastMCP:
         "loci",
         instructions=(
             "Local code navigation server. Index local repositories, inspect symbol "
-            "outlines, retrieve exact symbol source, and inspect exact graph "
-            "neighbours from the loci cache."
+            "outlines, retrieve exact symbol source, select explained graph anchors, "
+            "inspect exact or filtered graph neighbours, retrieve evidence-backed "
+            "paths, and report graph-extension health from the loci cache."
         ),
     )
 
@@ -58,6 +64,24 @@ def create_server() -> FastMCP:
         )
 
     @mcp.tool()
+    def loci_graph_anchors(
+        repo: str,
+        question: str,
+        seed_ids: list[str] | None = None,
+        max_anchors: int = 10,
+    ) -> CallToolResult:
+        """Select a small, explained set of graph anchors for a question."""
+        return _handle_loci_error(
+            lambda: graph_anchors(
+                repo,
+                question,
+                seed_ids,
+                max_anchors=max_anchors,
+                ensure_fresh=True,
+            )
+        )
+
+    @mcp.tool()
     def loci_graph_neighbors(
         repo: str,
         seed_ids: list[str],
@@ -65,6 +89,111 @@ def create_server() -> FastMCP:
         """Return exact outgoing one-hop graph neighbours for indexed seed nodes."""
         return _handle_loci_error(
             lambda: graph_neighbors(repo, seed_ids, ensure_fresh=True)
+        )
+
+    @mcp.tool()
+    def loci_graph_traverse_neighbors(
+        repo: str,
+        seed_ids: list[str],
+        namespaces: list[str] | None = None,
+        edge_types: list[str] | None = None,
+        resolutions: list[str] | None = None,
+        direction: str = "outgoing",
+        max_neighbors: int = 64,
+    ) -> CallToolResult:
+        """Return filtered one-hop graph neighbours without widening exact reads."""
+        return _handle_loci_error(
+            lambda: graph_traverse_neighbors(
+                repo,
+                seed_ids,
+                namespaces=namespaces,
+                edge_types=edge_types,
+                resolutions=resolutions,
+                direction=direction,
+                max_neighbors=max_neighbors,
+                ensure_fresh=True,
+            )
+        )
+
+    @mcp.tool()
+    def loci_graph_paths(
+        repo: str,
+        source_ids: list[str],
+        target_ids: list[str],
+        namespaces: list[str] | None = None,
+        edge_types: list[str] | None = None,
+        resolutions: list[str] | None = None,
+        direction: str = "outgoing",
+        max_hops: int = 3,
+        max_nodes: int = 64,
+        max_paths: int = 8,
+        path_offset: int = 0,
+        max_evidence_bytes: int = 32_768,
+        max_estimated_tokens: int = 8_192,
+    ) -> CallToolResult:
+        """Find bounded endpoint paths with exact edge evidence."""
+        return _handle_loci_error(
+            lambda: graph_paths(
+                repo,
+                source_ids,
+                target_ids,
+                namespaces=namespaces,
+                edge_types=edge_types,
+                resolutions=resolutions,
+                direction=direction,
+                max_hops=max_hops,
+                max_nodes=max_nodes,
+                max_paths=max_paths,
+                path_offset=path_offset,
+                max_evidence_bytes=max_evidence_bytes,
+                max_estimated_tokens=max_estimated_tokens,
+                ensure_fresh=True,
+            )
+        )
+
+    @mcp.tool()
+    def loci_graph_retrieve(
+        repo: str,
+        question: str,
+        seed_ids: list[str] | None = None,
+        namespaces: list[str] | None = None,
+        edge_types: list[str] | None = None,
+        resolutions: list[str] | None = None,
+        direction: str = "either",
+        max_anchors: int = 10,
+        max_hops: int = 3,
+        max_nodes: int = 64,
+        max_paths: int = 8,
+        path_offset: int = 0,
+        max_evidence_bytes: int = 32_768,
+        max_estimated_tokens: int = 8_192,
+    ) -> CallToolResult:
+        """Retrieve bounded question-shaped graph evidence and rejected paths."""
+        return _handle_loci_error(
+            lambda: graph_retrieve(
+                repo,
+                question,
+                seed_ids,
+                namespaces=namespaces,
+                edge_types=edge_types,
+                resolutions=resolutions,
+                direction=direction,
+                max_anchors=max_anchors,
+                max_hops=max_hops,
+                max_nodes=max_nodes,
+                max_paths=max_paths,
+                path_offset=path_offset,
+                max_evidence_bytes=max_evidence_bytes,
+                max_estimated_tokens=max_estimated_tokens,
+                ensure_fresh=True,
+            )
+        )
+
+    @mcp.tool()
+    def loci_graph_health(repo: str) -> CallToolResult:
+        """Inspect loaded graph profiles, active record counts, and diagnostics."""
+        return _handle_loci_error(
+            lambda: graph_health(repo, ensure_fresh=True)
         )
 
     @mcp.tool()

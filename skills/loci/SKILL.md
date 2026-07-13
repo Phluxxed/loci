@@ -18,10 +18,13 @@ loci_get(repo, symbol_ids)
 loci_analyze(repo) when diagnostics are needed
 ```
 
-MCP read tools (`loci_outline`, `loci_search`, `loci_get`, `loci_file`, and
-`loci_grep`) refresh stale indexes before returning cached data. `loci_index`
-is still required for a repo that has never been indexed, and remains useful for
-explicit rebuilds or after large changes.
+MCP read tools (`loci_outline`, `loci_search`, `loci_get`, `loci_file`,
+`loci_grep`, `loci_graph_anchors`, `loci_graph_neighbors`,
+`loci_graph_traverse_neighbors`, `loci_graph_paths`, `loci_graph_retrieve`, and
+`loci_graph_health`) refresh stale indexes before returning cached data.
+Freshness includes repository-local graph profiles and contributions.
+`loci_index` is still required for a repo that has never been indexed, and
+remains useful for explicit rebuilds or after large changes.
 
 If MCP tools are not configured in the current agent runtime, configure MCP first. Do not quietly continue with the CLI as the steady-state path.
 
@@ -76,7 +79,12 @@ If loci is unavailable, fails, or the task is a standalone doc/config check wher
 | `loci_get` | Fetching exact symbol source |
 | `loci_file` | Reading targeted non-symbol file content |
 | `loci_grep` | Hunting string literals, errors, or config keys |
+| `loci_graph_anchors` | Selecting bounded, explained graph starts from a question or exact seed IDs |
 | `loci_graph_neighbors` | Reading exact outgoing one-hop neighbours from explicit seed IDs |
+| `loci_graph_traverse_neighbors` | Reading filtered one-hop neighbours with explicit direction and omissions |
+| `loci_graph_paths` | Finding bounded evidence-backed paths between exact endpoint IDs |
+| `loci_graph_retrieve` | Retrieving and ranking question-shaped paths with inspected rejections |
+| `loci_graph_health` | Inspecting loaded graph profiles, active counts, and degraded diagnostics |
 | `loci_verify` | Checking index integrity and content drift |
 | `loci_list` | Listing indexed repos |
 | `loci_stats` | Reading structured usage and savings stats |
@@ -123,6 +131,26 @@ If loci is unavailable, fails, or the task is a standalone doc/config check wher
 {"matches":[{"file":"...","line":42,"match":"...","context_before":[],"context_after":[]}]}
 ```
 
+`loci_graph_anchors` returns inferred or explicit graph starts without
+traversal or answerability claims:
+
+```json
+{"schema_version":1,"repo":"...","question":"...","selection":"inferred|explicit","question_terms":[],"anchors":[{"node":{"id":"...","namespace":"loci","kind":"section","attributes":{"language":"markdown","file":"guide.md","line":1,"end_line":20}},"matched_symbol_id":"...","name":"Guide","score":12.3,"reason":{"kind":"inferred","matched_terms":["guide"],"match_scope":["file_basename"]}}],"counts":{"indexed_nodes":1,"eligible_units":1,"qualified_candidates":1,"collapsed_symbols":0,"returned_anchors":1,"omitted_candidates":0},"budget":{"requested_max_anchors":10,"effective_max_anchors":1},"diagnostics":[]}
+```
+
+`loci_graph_health` returns persisted extension status and diagnostics:
+
+```json
+{"schema_version":1,"repo":"...","status":"healthy|degraded","profiles":[],"counts":{"profiles":0,"node_overlays":0,"edges":0,"contributions":0,"diagnostics":0},"diagnostics":[]}
+```
+
+`loci_graph_paths` returns `support_kind: "edge_sequence"`, ordered nodes,
+stored edges, exact cached evidence lines, counts, and enforced budgets. Treat
+that as evidenced reachability only. `loci_graph_retrieve` adds retrieval
+scores and semantic bridge checks; inspect both `paths` and `rejected_paths`.
+Neither tool decides whether the user's question is answerable or sufficient.
+Filters default to the safe `exact` and `declared` resolution tiers.
+
 MCP tool errors are structured under `structuredContent.error` with `code`, `message`, and `details`.
 
 ## Selection Rules
@@ -131,6 +159,14 @@ MCP tool errors are structured under `structuredContent.error` with `code`, `mes
 - Know the symbol name: `loci_search`, then `loci_get`.
 - Know the symbol ID from outline: `loci_get` directly.
 - Hunting string literals or error text: `loci_grep`.
+- Need graph start nodes for a question: `loci_graph_anchors`; pass exact
+  `seed_ids` to bypass inference.
+- Need one filtered hop: `loci_graph_traverse_neighbors`; set namespace, edge
+  type, resolution, and direction explicitly when the domain is known.
+- Know both endpoint sets: `loci_graph_paths`; interpret the result as an
+  evidenced edge sequence, not semantic proof.
+- Need relationship-shaped evidence: `loci_graph_retrieve`; inspect rejected
+  semantic bridges and hub shortcuts as well as selected paths.
 - Need exact surrounding context: `loci_get` with `context` or `loci_file`.
 - Non-code file such as JSON, YAML, TOML, or Markdown: `loci_file` or a normal targeted read.
 

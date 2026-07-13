@@ -9,6 +9,7 @@ from loci.graph.contracts import (
     GraphEdge,
     GraphEvidence,
 )
+from loci.graph.state import GraphIndexState
 from loci.parser.symbols import Symbol
 from loci.storage.index_store import EXTRACTOR_VERSION, INDEX_SCHEMA_VERSION, IndexStore
 
@@ -138,13 +139,14 @@ def test_store_write_load_round_trips_graph_envelope(store: IndexStore, tmp_path
         source_path,
         symbols,
         file_hashes={"guide.md": "abc123"},
-        graph_edges=[edge],
+        graph_state=GraphIndexState.empty(edges=[edge]),
     )
     loaded = store.load(source_path)
 
     assert loaded is not None
     assert loaded["graph"]["schema_version"] == GRAPH_SCHEMA_VERSION
     assert loaded["graph"]["edges"] == [edge.to_dict()]
+    assert store.get_graph_state(source_path) == GraphIndexState.empty(edges=[edge])
     assert store.get_graph_edges(source_path) == [edge]
 
 
@@ -159,7 +161,7 @@ def test_store_rejects_invalid_graph_endpoint(store: IndexStore, tmp_path: Path)
             source_path,
             symbols,
             file_hashes={"guide.md": "abc123"},
-            graph_edges=[_contains_edge()],
+            graph_state=GraphIndexState.empty(edges=[_contains_edge()]),
         )
 
     assert exc_info.value.code == "GRAPH_ENDPOINT_NOT_FOUND"
@@ -181,7 +183,7 @@ def test_store_rejects_invalid_graph_evidence(store: IndexStore, tmp_path: Path)
             source_path,
             _markdown_symbols(),
             file_hashes={"guide.md": "abc123"},
-            graph_edges=[invalid_edge],
+            graph_state=GraphIndexState.empty(edges=[invalid_edge]),
         )
 
     assert exc_info.value.code == "GRAPH_EVIDENCE_INVALID"
@@ -202,10 +204,7 @@ def test_store_writes_empty_graph_for_repo_without_edges(
     loaded = store.load(source_path)
 
     assert loaded is not None
-    assert loaded["graph"] == {
-        "schema_version": GRAPH_SCHEMA_VERSION,
-        "edges": [],
-    }
+    assert loaded["graph"] == GraphIndexState.empty().to_dict()
 
 
 def test_store_load_returns_none_if_missing(store: IndexStore, tmp_path: Path):

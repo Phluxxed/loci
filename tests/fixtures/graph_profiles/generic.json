@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "namespace": "example",
+  "node_rules": [
+    {
+      "selector": {"language": "markdown", "page_root": true},
+      "attributes": [
+        {
+          "name": "status",
+          "source": "frontmatter.status",
+          "value_type": "string",
+          "allowed_values": ["current", "historical"]
+        }
+      ]
+    }
+  ],
+  "edge_types": [
+    {
+      "type": "related_to",
+      "directed": true,
+      "allowed_resolutions": ["declared"]
+    }
+  ],
+  "edge_rules": [
+    {
+      "selector": {"language": "markdown", "page_root": true},
+      "source": "frontmatter.related",
+      "type": "related_to",
+      "direction": "source_to_reference",
+      "resolution": "declared"
+    }
+  ]
+}

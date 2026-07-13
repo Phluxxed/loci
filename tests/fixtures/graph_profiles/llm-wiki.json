@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "namespace": "llm-wiki",
+  "node_rules": [
+    {
+      "selector": {"language": "markdown", "page_root": true},
+      "attributes": [
+        {
+          "name": "knowledge_state",
+          "source": "frontmatter.knowledge_state",
+          "value_type": "string",
+          "allowed_values": [
+            "current",
+            "provisional",
+            "historical",
+            "superseded",
+            "contradicted",
+            "unspecified"
+          ]
+        }
+      ]
+    }
+  ],
+  "edge_types": [
+    {
+      "type": "mentioned_in",
+      "directed": true,
+      "allowed_resolutions": ["declared"]
+    }
+  ],
+  "edge_rules": [
+    {
+      "selector": {"language": "markdown", "page_root": true},
+      "source": "frontmatter.mentioned_in",
+      "type": "mentioned_in",
+      "direction": "reference_to_source",
+      "resolution": "declared"
+    }
+  ]
+}
