@@ -4,9 +4,11 @@ import json
 import pytest
 
 import loci.service as service_module
+from loci.graph.contracts import GRAPH_SCHEMA_VERSION
 from loci.service import (
     LociError,
     analyze_usage,
+    graph_neighbors,
     get_cached_file,
     get_symbols,
     grep_repo,
@@ -141,6 +143,208 @@ def test_service_markdown_outline_exposes_retrieval_cost_and_repo_relative_ids(
     loaded_child = next(s for s in loaded["symbols"] if s["name"] == "Proposed Graph Move")
     assert loaded_child["metadata"]["markdown"]["parent_id"] == root["id"]
     assert loaded_child["metadata"]["markdown"]["root_id"] == root["id"]
+
+
+def test_service_indexes_markdown_contains_edge(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "guide.md").write_text(
+        "# Guide\n\n## Install\n\nInstall locally.\n",
+        encoding="utf-8",
+    )
+
+    indexed = index_repo(repo, incremental=False)
+    loaded = IndexStore(base_dir=base).load(repo.resolve())
+
+    assert indexed["graph_edges_indexed"] == 1
+    assert loaded is not None
+    assert loaded["graph"]["schema_version"] == GRAPH_SCHEMA_VERSION
+    edge = loaded["graph"]["edges"][0]
+    assert edge["from"] == "guide.md::Guide#section"
+    assert edge["to"] == "guide.md::Guide > Install#section"
+    assert edge["type"] == "contains"
+    assert edge["resolution"] == "exact"
+    assert edge["evidence"]["file"] == "guide.md"
+    assert edge["evidence"]["line"] == 3
+
+
+def test_service_schema_upgrade_rebuilds_graph(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "guide.md").write_text(
+        "# Guide\n\n## Install\n\nInstall locally.\n",
+        encoding="utf-8",
+    )
+    index_repo(repo, incremental=False)
+
+    store = IndexStore(base_dir=base)
+    index_path = store._index_path(repo.resolve())
+    old_index = json.loads(index_path.read_text())
+    old_index["schema_version"] = 3
+    old_index.pop("graph")
+    index_path.write_text(json.dumps(old_index))
+
+    indexed = index_repo(repo, incremental=True)
+    loaded = store.load(repo.resolve())
+
+    assert indexed["files_skipped"] == 0
+    assert indexed["graph_edges_indexed"] == 1
+    assert loaded is not None
+    assert loaded["graph"]["schema_version"] == GRAPH_SCHEMA_VERSION
+    assert len(loaded["graph"]["edges"]) == 1
+
+
+def test_service_incremental_reindex_recomputes_contains_edges(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    guide = repo / "guide.md"
+    guide.write_text(
+        "# Guide\n\n## Install\n\nInstall locally.\n",
+        encoding="utf-8",
+    )
+    index_repo(repo, incremental=False)
+
+    guide.write_text(
+        "# Guide\n\n## Configure\n\nConfigure locally.\n",
+        encoding="utf-8",
+    )
+    indexed = index_repo(repo, incremental=True)
+    loaded = IndexStore(base_dir=base).load(repo.resolve())
+
+    assert indexed["graph_edges_indexed"] == 1
+    assert loaded is not None
+    edges = loaded["graph"]["edges"]
+    assert [edge["to"] for edge in edges] == [
+        "guide.md::Guide > Configure#section"
+    ]
+
+
+def test_graph_neighbors_returns_seeded_one_hop_with_evidence(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "guide.md").write_text(
+        "# Guide\n\n## Install\n\nInstall locally.\n",
+        encoding="utf-8",
+    )
+    index_repo(repo, incremental=False)
+
+    result = graph_neighbors(repo, ["guide.md::Guide#section"])
+
+    assert result["schema_version"] == GRAPH_SCHEMA_VERSION
+    assert result["repo"] == str(repo.resolve())
+    assert result["diagnostics"] == []
+    seed_result = result["results"][0]
+    assert seed_result["seed"] == {
+        "id": "guide.md::Guide#section",
+        "namespace": "loci",
+        "kind": "section",
+        "attributes": {
+            "language": "markdown",
+            "file": "guide.md",
+            "line": 1,
+            "end_line": 6,
+        },
+    }
+    neighbor = seed_result["neighbors"][0]
+    assert neighbor["node"]["id"] == "guide.md::Guide > Install#section"
+    assert neighbor["edge"]["from"] == "guide.md::Guide#section"
+    assert neighbor["edge"]["to"] == "guide.md::Guide > Install#section"
+    assert neighbor["edge"]["evidence"]["file"] == "guide.md"
+    assert neighbor["edge"]["evidence"]["line"] == 3
+    assert len(neighbor["edge"]["evidence"]["content_hash"]) == 64
+
+
+def test_graph_neighbors_requires_seed(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+
+    with pytest.raises(LociError) as exc_info:
+        graph_neighbors(tmp_path / "repo", [])
+
+    assert exc_info.value.code == "INVALID_INPUT"
+
+
+def test_graph_neighbors_rejects_unknown_seed(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "guide.md").write_text("# Guide\n", encoding="utf-8")
+    index_repo(repo, incremental=False)
+
+    with pytest.raises(LociError) as exc_info:
+        graph_neighbors(
+            repo,
+            ["guide.md::Guide#section", "guide.md::Missing#section"],
+        )
+
+    assert exc_info.value.code == "GRAPH_ENDPOINT_NOT_FOUND"
+    assert exc_info.value.details["missing_ids"] == [
+        "guide.md::Missing#section"
+    ]
+
+
+def test_graph_neighbors_preserves_seed_order_and_deduplicates(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "guide.md").write_text(
+        "# Guide\n\n## Install\n\nInstall locally.\n",
+        encoding="utf-8",
+    )
+    index_repo(repo, incremental=False)
+    parent_id = "guide.md::Guide#section"
+    child_id = "guide.md::Guide > Install#section"
+
+    result = graph_neighbors(repo, [child_id, parent_id, child_id])
+
+    assert [entry["seed"]["id"] for entry in result["results"]] == [
+        child_id,
+        parent_id,
+    ]
+    assert result["results"][0]["neighbors"] == []
+    assert len(result["results"][1]["neighbors"]) == 1
+
+
+def test_graph_neighbors_empty_neighbors_is_success(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "guide.md").write_text("# Guide\n", encoding="utf-8")
+    index_repo(repo, incremental=False)
+
+    result = graph_neighbors(repo, ["guide.md::Guide#section"])
+
+    assert result["results"][0]["neighbors"] == []
 
 
 def test_service_markdown_search_exposes_match_scope_and_cost(

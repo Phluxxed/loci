@@ -76,6 +76,7 @@ If loci is unavailable, fails, or the task is a standalone doc/config check wher
 | `loci_get` | Fetching exact symbol source |
 | `loci_file` | Reading targeted non-symbol file content |
 | `loci_grep` | Hunting string literals, errors, or config keys |
+| `loci_graph_neighbors` | Reading exact outgoing one-hop neighbours from explicit seed IDs |
 | `loci_verify` | Checking index integrity and content drift |
 | `loci_list` | Listing indexed repos |
 | `loci_stats` | Reading structured usage and savings stats |
