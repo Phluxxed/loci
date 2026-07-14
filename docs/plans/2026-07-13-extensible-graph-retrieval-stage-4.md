@@ -1,6 +1,6 @@
 # Plan: Extensible Graph Retrieval Stage 4
 
-**Status:** implemented; technical review gate passed; Stage 5 ready for owner review
+**Status:** implemented; technical review gate passed; Stage 5 consumer integration gate passed with explicit rollback retained
 
 **Date:** 2026-07-13
 
@@ -921,6 +921,46 @@ boundedness, provenance, compatibility, and benchmark behavior all meet this
 plan. This verdict does not authorize Stage 5 automatically. Stage 5 changes
 the `llm-wiki` runtime provider, so the owner reviews this evidence and the
 legacy-provider rollback boundary before that cross-repository integration.
+
+## Stage 5 Consumer Integration Result
+
+The llm-wiki consumer integration technical gate passed on 2026-07-14 without
+changing Loci production code. The Context Compiler now uses
+`loci_graph_retrieve` as its default `graph` implementation through an external
+read-only mirror; `graph_backend = "legacy"` remains the explicit rollback and
+there is no silent fallback.
+
+llm-wiki validates paths and exact authored evidence at its own boundary. For
+inferred relationship questions, only paths crossing Loci's distinct explained
+anchor clusters carry the compiler's `bridge` role. Accepted paths confined to
+one subject cluster remain inspectable support and cannot establish a different
+relationship. This preserves the Stage 4 boundary: Loci returns retrieval
+evidence, while llm-wiki owns candidate roles, coverage, answerability,
+sufficiency, stop semantics, and final budgets.
+
+The unchanged frozen contract checksum is
+`c52def1bdf592ad735149d199910f74183598eccd9ccf8064335fa0cd0e84e27`.
+Two stable final runs produced the same timing-excluded Stage 5 digest,
+`a8fe96152358f2d4cb3a5e163a5c9402f9581bc776148523defea85ce047d2e2`.
+The current compiler achieved 0.944 mean endpoint recall, 1.0 required-path
+completion, 1.0 bridge-evidence completion, 1.0 refusal readiness, 1.0 exact
+literal recall, and 0.0 unsupported-shortcut rate. The runner now records
+corpus content digests and refuses a run if either live corpus changes during
+measurement.
+
+Both false-hub and both cannot-answer fixtures stopped insufficient with the
+semantic `candidate_exhausted` reason. Normal rejected-path diagnostics remain
+inspectable without misreporting the provider as degraded.
+
+Review evidence was `322 passed, 2 skipped, 14 subtests passed` in llm-wiki,
+`381 passed` in Loci, successful Python compilation, successful offline source
+and wheel builds, clean Loci index/verification, and clean diff checks. The
+detailed consumer plan and evidence remain in
+`/Users/brummerv/llm-wiki/docs/superpowers/plans/2026-07-13-extensible-graph-retrieval-stage-5.md`.
+
+This result makes Stage 5 ready for owner review. It does not authorize removal
+of the legacy provider; that still requires later rollout evidence and an owner
+decision.
 
 ## Stage 4 Review Gate
 
