@@ -101,6 +101,8 @@ def _import_record(*, raw: RawImport | None = None, **overrides) -> ImportRecord
         "raw": raw or _raw_import(),
         "source_id": SOURCE_ID,
         "target_file": "src/target.py",
+        "target_package": None,
+        "target_kind": "file",
         "target_id": TARGET_ID,
         "status": "resolved",
         "unresolved_reason": None,
