@@ -16,6 +16,7 @@ from .state import GraphIndexState
 from .traversal import (
     MAX_GRAPH_ESTIMATED_TOKENS,
     MAX_GRAPH_EVIDENCE_BYTES,
+    SAFE_GRAPH_RESOLUTIONS,
     GraphDirection,
     GraphPath,
     GraphTraversalResult,
@@ -666,7 +667,7 @@ def _graph_filter_envelope(
         "resolutions": (
             list(dict.fromkeys(resolutions))
             if resolutions is not None
-            else ["exact", "declared"]
+            else list(SAFE_GRAPH_RESOLUTIONS)
         ),
         "direction": direction,
     }

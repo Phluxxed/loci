@@ -39,7 +39,7 @@ def _edge(
     })
 
 
-def test_filter_defaults_exclude_heuristic_edges():
+def test_filter_defaults_include_trusted_tiers_and_exclude_heuristic_edges():
     edges = [
         _edge("a", "b", resolution="exact"),
         _edge("b", "c", resolution="declared"),
@@ -54,7 +54,11 @@ def test_filter_defaults_exclude_heuristic_edges():
         resolutions=None,
     )
 
-    assert [edge.resolution for edge in filtered] == ["exact", "declared"]
+    assert [edge.resolution for edge in filtered] == [
+        "exact",
+        "declared",
+        "import-resolved",
+    ]
 
 
 def test_filter_applies_all_allow_lists_and_deduplicates_values():
@@ -63,6 +67,13 @@ def test_filter_applies_all_allow_lists_and_deduplicates_values():
         keep,
         _edge("b", "c", namespace="code", edge_type="supports"),
         _edge("c", "d", namespace="wiki", edge_type="mentions"),
+        _edge(
+            "d",
+            "e",
+            namespace="wiki",
+            edge_type="supports",
+            resolution="import-resolved",
+        ),
     ]
 
     filtered = filter_graph_edges(
