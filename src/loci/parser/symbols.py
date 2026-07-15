@@ -1,6 +1,13 @@
 from __future__ import annotations
+
+import re
 from dataclasses import dataclass, field
+from pathlib import PurePosixPath
 from typing import Any
+
+
+FILE_NODE_QUALIFIED_NAME = "__file__"
+_FILE_KEYWORD_RE = re.compile(r"[A-Za-z0-9]+")
 
 
 @dataclass
@@ -8,7 +15,7 @@ class Symbol:
     id: str
     name: str
     qualified_name: str
-    kind: str  # function | class | method | type | constant
+    kind: str  # function | class | method | type | constant | file
     language: str
     file_path: str
     byte_offset: int
@@ -69,3 +76,35 @@ class Symbol:
 
 def make_symbol_id(file_path: str, qualified_name: str, kind: str) -> str:
     return f"{file_path}::{qualified_name}#{kind}"
+
+
+def make_file_symbol(
+    relative_path: str,
+    *,
+    language: str,
+    content_hash: str,
+) -> Symbol:
+    path = PurePosixPath(relative_path)
+    keyword_parts = path.with_suffix("").parts
+    keywords = sorted({
+        word.lower()
+        for part in keyword_parts
+        for word in _FILE_KEYWORD_RE.findall(part)
+        if word.lower() != "src"
+    })
+    return Symbol(
+        id=make_symbol_id(relative_path, FILE_NODE_QUALIFIED_NAME, "file"),
+        name=path.name,
+        qualified_name=FILE_NODE_QUALIFIED_NAME,
+        kind="file",
+        language=language,
+        file_path=relative_path,
+        byte_offset=0,
+        byte_length=0,
+        signature=relative_path,
+        content_hash=content_hash,
+        keywords=keywords,
+        metadata={"loci": {"file_node": True}},
+        line=1,
+        end_line=1,
+    )

@@ -1,4 +1,9 @@
-from loci.parser.symbols import Symbol, make_symbol_id
+from loci.parser.symbols import (
+    FILE_NODE_QUALIFIED_NAME,
+    Symbol,
+    make_file_symbol,
+    make_symbol_id,
+)
 
 
 def test_make_symbol_id_function():
@@ -9,6 +14,35 @@ def test_make_symbol_id_function():
 def test_make_symbol_id_method():
     sid = make_symbol_id("src/auth.py", "User.login", "method")
     assert sid == "src/auth.py::User.login#method"
+
+
+def test_make_file_symbol_has_stable_zero_width_shape():
+    symbol = make_file_symbol(
+        "src/loci/service.py",
+        language="python",
+        content_hash="a" * 64,
+    )
+
+    assert FILE_NODE_QUALIFIED_NAME == "__file__"
+    assert symbol.to_dict() == {
+        "id": "src/loci/service.py::__file__#file",
+        "name": "service.py",
+        "qualified_name": "__file__",
+        "kind": "file",
+        "language": "python",
+        "file_path": "src/loci/service.py",
+        "byte_offset": 0,
+        "byte_length": 0,
+        "signature": "src/loci/service.py",
+        "docstring": "",
+        "summary": "",
+        "content_hash": "a" * 64,
+        "decorators": [],
+        "keywords": ["loci", "service"],
+        "metadata": {"loci": {"file_node": True}},
+        "line": 1,
+        "end_line": 1,
+    }
 
 
 def test_symbol_id_field_matches():
