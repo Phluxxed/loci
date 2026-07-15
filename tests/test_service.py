@@ -729,6 +729,8 @@ def test_service_import_state_survives_fresh_process_read(
         "source_id": "consumer.py::__file__#file",
         "status": "resolved",
         "target_file": "target.py",
+        "target_kind": "file",
+        "target_package": None,
         "target_id": "target.py::__file__#file",
         "unresolved_reason": None,
     }]
