@@ -20,7 +20,7 @@ from loci.graph.contracts import (
 from loci.graph.anchors import select_graph_anchors
 from loci.graph.materialize import load_graph_extensions, materialize_graph
 from loci.graph.profiles import required_frontmatter_fields
-from loci.graph.state import GraphIndexState
+from loci.graph.state import GraphDiagnostic, GraphIndexState
 from loci.graph.retrieval import (
     retrieve_graph_neighbors,
     retrieve_graph_paths,
@@ -28,8 +28,9 @@ from loci.graph.retrieval import (
 )
 from loci.graph.traversal import GraphDirection
 from loci.parser.extractor import parse_file
+from loci.parser.imports import ImportExtractionError, RawImport, extract_imports
 from loci.parser.languages import EXTENSION_MAP, MARKDOWN_SUFFIXES
-from loci.parser.symbols import Symbol
+from loci.parser.symbols import Symbol, make_file_symbol
 from loci.storage.index_store import IndexStore, index_versions_current
 from loci.storage.store_resolver import StoreResolution, resolve_store_base_dir
 
@@ -111,6 +112,17 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
                 existing = None
     existing_hashes: dict[str, str] = existing.get("file_hashes", {}) if existing else {}
     existing_symbols: list[dict[str, Any]] = existing.get("symbols", []) if existing else []
+    previous_imports: dict[str, list[RawImport]] = defaultdict(list)
+    previous_import_diagnostics: dict[str, list[GraphDiagnostic]] = defaultdict(list)
+    if previous_graph is not None:
+        for record in previous_graph.imports:
+            previous_imports[record.raw.source_file].append(record.raw)
+        for diagnostic in previous_graph.diagnostics:
+            if (
+                diagnostic.code == "GRAPH_IMPORT_EXTRACTION_FAILED"
+                and diagnostic.source is not None
+            ):
+                previous_import_diagnostics[diagnostic.source].append(diagnostic)
     extension_load = load_graph_extensions(
         repo_path,
         previous_graph=previous_graph,
@@ -126,6 +138,8 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
     files_skipped = 0
     language_counts: dict[str, int] = defaultdict(int)
     zero_symbol_warnings: list[dict[str, Any]] = []
+    raw_imports: list[RawImport] = []
+    import_diagnostics: list[GraphDiagnostic] = []
 
     for src_file, rel_path, file_hash in _iter_indexable_files(repo_path, store):
         new_file_hashes[rel_path] = file_hash
@@ -141,6 +155,10 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
         ):
             kept = [Symbol.from_dict(s) for s in existing_symbols if s["file_path"] == rel_path]
             all_symbols.extend(kept)
+            raw_imports.extend(previous_imports.get(rel_path, ()))
+            import_diagnostics.extend(
+                previous_import_diagnostics.get(rel_path, ())
+            )
             files_skipped += 1
             lang = EXTENSION_MAP.get(src_file.suffix, "unknown")
             language_counts[lang] += 1
@@ -183,6 +201,27 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
                     "lines": line_count,
                     "reason": "0 symbols extracted",
                 })
+        if src_file.suffix.lower() not in MARKDOWN_SUFFIXES:
+            all_symbols.append(make_file_symbol(
+                rel_path,
+                language=lang,
+                content_hash=file_hash,
+            ))
+            try:
+                raw_imports.extend(extract_imports(
+                    src_file,
+                    source_file=rel_path,
+                    language=lang,
+                    source_hash=file_hash,
+                ))
+            except ImportExtractionError as exc:
+                import_diagnostics.append(GraphDiagnostic(
+                    severity="warning",
+                    code="GRAPH_IMPORT_EXTRACTION_FAILED",
+                    message="Import observations could not be extracted",
+                    source=rel_path,
+                    details={"reason": str(exc)},
+                ))
 
     graph_state = materialize_graph(
         repo_path,
@@ -190,8 +229,9 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
         new_file_hashes,
         extension_load.profiles,
         extension_load.contributions,
+        raw_imports=raw_imports,
         input_hashes=extension_load.input_hashes,
-        diagnostics=extension_load.diagnostics,
+        diagnostics=(*extension_load.diagnostics, *import_diagnostics),
     )
     try:
         store.write(
@@ -211,6 +251,16 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
         "graph_contributions_reused": extension_load.contributions_reused,
         "graph_node_overlays_indexed": len(graph_state.nodes),
         "graph_edges_indexed": len(graph_state.edges),
+        "graph_file_nodes_indexed": sum(
+            symbol.kind == "file" for symbol in all_symbols
+        ),
+        "graph_imports_indexed": len(graph_state.imports),
+        "graph_imports_resolved": sum(
+            record.status == "resolved" for record in graph_state.imports
+        ),
+        "graph_imports_unresolved": sum(
+            record.status == "unresolved" for record in graph_state.imports
+        ),
         "graph_status": _graph_status(graph_state),
         "graph_diagnostics": [
             diagnostic.to_dict() for diagnostic in graph_state.diagnostics
