@@ -27,6 +27,7 @@ GoModuleProblemCode = Literal[
 _MODULE_ELEMENT_RE = re.compile(r"[A-Za-z0-9._~-]+")
 _VERSION_RE = re.compile(r"[^\s/()]+")
 _GO_VERSION_RE = re.compile(r"[1-9][0-9]*\.[0-9]+(?:\.[0-9]+)?")
+_KEYWORD_RE = re.compile(r"[a-z][a-z0-9]*")
 _WINDOWS_RESERVED_RE = re.compile(r"(?:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])", re.I)
 _WINDOWS_SHORT_NAME_RE = re.compile(r".*~[0-9]+", re.I)
 
@@ -97,6 +98,11 @@ class _Directive:
     keyword: str
     entries: tuple[tuple[str, ...], ...]
     line: int
+    is_block: bool
+
+
+class _QuotedToken(str):
+    pass
 
 
 class _GoControlError(ValueError):
@@ -119,6 +125,7 @@ def load_go_module_context(
     repo_path: Path,
     control_candidates: Sequence[Path],
 ) -> GoModuleLoad:
+    """Parse bounded repository Go controls without executing the Go toolchain."""
     root = repo_path.resolve(strict=True)
     modules: list[GoModule] = []
     workspaces: list[GoWorkspace] = []
@@ -194,11 +201,17 @@ def _read_control_candidate(root: Path, path: Path) -> tuple[bytes, str]:
     try:
         return read_contained_file(
             root,
-            resolved,
+            lexical,
             record="Go control file",
             max_bytes=MAX_GO_CONTROL_BYTES,
         )
     except GraphContractError as exc:
+        if exc.details.get("limit") == MAX_GO_CONTROL_BYTES:
+            raise _GoControlError(
+                "control_file_too_large",
+                limit=MAX_GO_CONTROL_BYTES,
+                limit_error=True,
+            ) from exc
         raise _GoControlError("unsafe_or_unreadable") from exc
 
 
@@ -219,7 +232,10 @@ def _parse_directives(data: bytes) -> tuple[_Directive, ...]:
         if tokens[0] == ")":
             raise _GoControlError("unexpected_block_close", line=line)
         keyword = tokens[0]
+        if isinstance(keyword, _QuotedToken) or not _KEYWORD_RE.fullmatch(keyword):
+            raise _GoControlError("invalid_directive_keyword", line=line)
         if len(tokens) == 2 and tokens[1] == "(":
+            is_block = True
             entries: list[tuple[str, ...]] = []
             closed = False
             while index < len(token_lines):
@@ -236,6 +252,7 @@ def _parse_directives(data: bytes) -> tuple[_Directive, ...]:
             if not closed:
                 raise _GoControlError("unterminated_block", line=line)
         else:
+            is_block = False
             if "(" in tokens or ")" in tokens:
                 raise _GoControlError("malformed_directive", line=line)
             entries = [tokens[1:]]
@@ -247,13 +264,13 @@ def _parse_directives(data: bytes) -> tuple[_Directive, ...]:
                 limit=MAX_GO_DIRECTIVES_PER_FILE,
                 limit_error=True,
             )
-        directives.append(_Directive(keyword, tuple(entries), line))
+        directives.append(_Directive(keyword, tuple(entries), line, is_block))
     return tuple(directives)
 
 
 def _tokenize_lines(text: str) -> list[tuple[int, tuple[str, ...]]]:
     lines: list[tuple[int, tuple[str, ...]]] = []
-    for line_number, line in enumerate(text.splitlines(), start=1):
+    for line_number, line in enumerate(text.split("\n"), start=1):
         tokens: list[str] = []
         index = 0
         while index < len(line):
@@ -298,7 +315,7 @@ def _quoted_token(line: str, start: int, line_number: int) -> tuple[str, int]:
     while index < len(line):
         char = line[index]
         if char == quote:
-            return "".join(value), index + 1
+            return _QuotedToken("".join(value)), index + 1
         if quote == '"' and char == "\\":
             index += 1
             if index >= len(line):
@@ -372,10 +389,12 @@ def _parse_workspace(
         if directive.keyword in {"module", "require", "exclude"}:
             raise _GoControlError("module_directive_in_go_work", line=directive.line)
         if directive.keyword == "go":
+            if directive.is_block:
+                raise _GoControlError("invalid_go_version", line=directive.line)
             for entry in directive.entries:
                 if len(entry) != 1 or not _GO_VERSION_RE.fullmatch(entry[0]):
                     raise _GoControlError("invalid_go_version", line=directive.line)
-                go_versions.append(entry[0])
+                go_versions.append(str(entry[0]))
         elif directive.keyword == "use":
             for entry in directive.entries:
                 if len(entry) != 1:
@@ -470,13 +489,13 @@ def _module_path(value: str, line: int) -> str:
         prefix = element.split(".", 1)[0]
         if _WINDOWS_RESERVED_RE.fullmatch(prefix) or _WINDOWS_SHORT_NAME_RE.fullmatch(prefix):
             raise _GoControlError("invalid_module_path", line=line)
-    return value
+    return str(value)
 
 
 def _version(value: str, line: int) -> str:
     if not value or not _VERSION_RE.fullmatch(value):
         raise _GoControlError("invalid_version", line=line)
-    return value
+    return str(value)
 
 
 def _contained_local_root(
@@ -535,7 +554,7 @@ def _candidate_source(root: Path, path: Path) -> str:
     try:
         return Path(os.path.abspath(candidate)).relative_to(root).as_posix()
     except ValueError:
-        return path.name
+        return f"@outside/{path.name}"
 
 
 def _sentinel_hash(kind: str, reason: str) -> str:
