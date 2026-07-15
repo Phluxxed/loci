@@ -299,13 +299,17 @@ target on 2026-07-15. Stage 7 will design how current extract-and-report Go
 observations become deterministic in-repository edges using Go module semantics
 without guessing from string or filename similarity.
 
+Detailed implementation plan:
+`docs/plans/2026-07-15-extensible-graph-retrieval-stage-7-go-import-resolution.md`.
+
 Rust import resolution remains deferred because there is no current Rust
 consumer. Rust observations continue to be extracted and reported as unresolved;
 they must not produce trusted edges.
 
-Stage 7 implementation has not started. Its next deliverable is a detailed plan
-with exact module-resolution rules, APIs, files, fixtures, compatibility checks,
-rollback behavior, and an owner review gate.
+Stage 7 implementation has not started. Its detailed plan is proposed for owner
+review and freezes exact module-resolution rules, package-node semantics, APIs,
+files, fixtures, compatibility checks, rollback behavior, and an owner review
+gate.
 
 After Go resolution, the approved roadmap order is:
 
