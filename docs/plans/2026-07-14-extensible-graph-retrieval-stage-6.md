@@ -1,6 +1,6 @@
 # Plan: Extensible Graph Retrieval Stage 6
 
-**Status:** approved 2026-07-15; Task 1 implemented and locally verified
+**Status:** implemented, reviewed, and owner-accepted 2026-07-15
 
 **Date:** 2026-07-14
 
@@ -1215,16 +1215,22 @@ import graph:
 | Default trusted tiers widen unexpectedly | Medium | Add only reserved `import-resolved`; keep heuristic excluded; explicit compatibility tests |
 | Stage 6 perturbs llm-wiki benchmark behavior | Medium | No Markdown file nodes; llm-wiki explicit filters; focused compatibility tests first |
 
-## Deferred Roadmap
+## Post-Stage-6 Roadmap Decision
 
-After Stage 6 is approved, the next possible code-graph work requires a new
-design and review gate. Candidate order is:
+The owner accepted Stage 6 on 2026-07-15 and selected the following roadmap
+direction:
 
-1. module-aware Go and Rust import resolution, if a real consumer requires it;
+1. Stage 7 detailed design for module-aware Go import resolution;
 2. resolved symbol references that follow definite imports;
 3. cross-file calls only where both binding and import resolution are definite;
 4. heuristic candidates as opt-in diagnostics, never trusted defaults; and
 5. graph orientation or architecture analysis after the underlying edges have
    enough real-repository evidence.
 
-None of those are authorized by this plan.
+Rust import resolution is explicitly deferred until a real Rust consumer exists.
+The existing extract-and-report behavior remains the honest Rust contract.
+
+This decision authorizes Stage 7 planning, not implementation. The Stage 7 plan
+must define exact Go module-resolution semantics, APIs, files, tests,
+compatibility evidence, rollback behavior, and its own owner review gate before
+code changes begin.

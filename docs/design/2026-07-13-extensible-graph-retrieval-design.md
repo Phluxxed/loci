@@ -1,6 +1,7 @@
-# loci: Extensible Graph Retrieval Layer — Proposed Design
+# loci: Extensible Graph Retrieval Layer — Design
 
-**Status:** Stages 1-5 implemented and reviewed; Stage 6 implementation complete and awaiting its final review gate
+**Status:** Stages 1-6 implemented, reviewed, and accepted; Stage 7 Go
+import-resolution design pending
 
 **Date:** 2026-07-13
 
@@ -282,14 +283,37 @@ CLI command. Resolution uses language-aware path rules only. It never performs
 a bare-name repository search or silently manufactures a dependency.
 
 Resolved symbol references, cross-file calls, module-aware Go/Rust resolution,
-heuristic diagnostics, and architecture analysis remain deferred. Each requires
-a new design and review gate; Stage 6 does not authorize them.
+heuristic diagnostics, and architecture analysis were outside Stage 6. Each
+requires its own design and review gate.
 
 Review evidence: language-specific resolution fixtures, same-name collision
 tests, bounded unresolved-record inspection, fresh-process and incremental
-proofs, and agent navigation examples over a code repository. The
-implementation is not declared accepted until the final Stage 6 review packet
-is approved.
+proofs, and agent navigation examples over a code repository. The owner accepted
+the [final Stage 6 review packet](../reviews/2026-07-15-extensible-graph-retrieval-stage-6-final-review.md)
+on 2026-07-15.
+
+### Stage 7: Module-aware Go import resolution
+
+The owner selected module-aware Go import resolution as the next graph-roadmap
+target on 2026-07-15. Stage 7 will design how current extract-and-report Go
+observations become deterministic in-repository edges using Go module semantics
+without guessing from string or filename similarity.
+
+Rust import resolution remains deferred because there is no current Rust
+consumer. Rust observations continue to be extracted and reported as unresolved;
+they must not produce trusted edges.
+
+Stage 7 implementation has not started. Its next deliverable is a detailed plan
+with exact module-resolution rules, APIs, files, fixtures, compatibility checks,
+rollback behavior, and an owner review gate.
+
+After Go resolution, the approved roadmap order is:
+
+1. resolved symbol references that follow definite imports;
+2. cross-file calls only where binding and import resolution are definite;
+3. heuristic candidates as opt-in diagnostics, never trusted defaults; and
+4. graph orientation or architecture analysis after the underlying edges have
+   enough real-repository evidence.
 
 ## Technical Fit
 
