@@ -7,7 +7,7 @@ import uuid
 from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
-from typing import Any
+from typing import Any, Literal
 
 import pathspec
 
@@ -748,6 +748,127 @@ def graph_retrieve(
         raise LociError(exc.code, exc.message, exc.details) from exc
 
 
+def graph_imports(
+    repo: str | Path,
+    *,
+    file: str | None = None,
+    status: Literal["all", "resolved", "unresolved"] = "all",
+    offset: int = 0,
+    limit: int = 100,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    if file is not None:
+        valid_file = isinstance(file, str) and bool(file) and "\\" not in file
+        if valid_file:
+            file_path = PurePosixPath(file)
+            valid_file = (
+                not file_path.is_absolute()
+                and ".." not in file_path.parts
+                and file_path.as_posix() == file
+            )
+        if not valid_file:
+            raise LociError(
+                "INVALID_INPUT",
+                "File must be a normalized repository-relative path",
+                {"field": "file", "value": file},
+            )
+    if (
+        not isinstance(status, str)
+        or status not in {"all", "resolved", "unresolved"}
+    ):
+        raise LociError(
+            "INVALID_INPUT",
+            "Status must be all, resolved, or unresolved",
+            {
+                "field": "status",
+                "value": status,
+                "allowed": ["all", "resolved", "unresolved"],
+            },
+        )
+    if not isinstance(offset, int) or isinstance(offset, bool) or offset < 0:
+        raise LociError(
+            "INVALID_INPUT",
+            "Offset must be greater than or equal to 0",
+            {"field": "offset", "value": offset, "minimum": 0},
+        )
+    if (
+        not isinstance(limit, int)
+        or isinstance(limit, bool)
+        or not 1 <= limit <= 500
+    ):
+        raise LociError(
+            "INVALID_INPUT",
+            "Limit must be between 1 and 500",
+            {"field": "limit", "value": limit, "minimum": 1, "maximum": 500},
+        )
+
+    repo_path = Path(repo).resolve()
+    _, _, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
+    records = [
+        record
+        for record in state.imports
+        if file is None or record.raw.source_file == file
+    ]
+    records.sort(key=lambda record: (
+        record.raw.source_file,
+        record.raw.line,
+        record.raw.specifier,
+        record.raw.imported_name or "",
+        record.target_file or "",
+    ))
+    resolved_count = sum(record.status == "resolved" for record in records)
+    unresolved_count = sum(record.status == "unresolved" for record in records)
+    filtered = (
+        records
+        if status == "all"
+        else [record for record in records if record.status == status]
+    )
+    page = filtered[offset:offset + limit]
+    items = []
+    for record in page:
+        raw = record.raw
+        items.append({
+            "source_file": raw.source_file,
+            "source_id": record.source_id,
+            "target_file": record.target_file,
+            "target_id": record.target_id,
+            "specifier": raw.specifier,
+            "imported_name": raw.imported_name,
+            "language": raw.language,
+            "line": raw.line,
+            "text": raw.text,
+            "type_only": raw.type_only,
+            "is_reexport": raw.is_reexport,
+            "status": record.status,
+            "resolution": (
+                "import-resolved" if record.status == "resolved" else None
+            ),
+            "unresolved_reason": record.unresolved_reason,
+        })
+    next_offset = offset + len(page)
+    if next_offset >= len(filtered):
+        next_offset = None
+
+    return {
+        "schema_version": GRAPH_SCHEMA_VERSION,
+        "repo": str(repo_path),
+        "file": file,
+        "status": status,
+        "items": items,
+        "counts": {
+            "total": len(records),
+            "resolved": resolved_count,
+            "unresolved": unresolved_count,
+            "returned": len(items),
+        },
+        "pagination": {
+            "offset": offset,
+            "limit": limit,
+            "next_offset": next_offset,
+        },
+    }
+
+
 def graph_health(
     repo: str | Path,
     *,
@@ -801,6 +922,17 @@ def graph_health(
             "edges": len(state.edges),
             "contributions": len(state.contributions),
             "diagnostics": len(state.diagnostics),
+            "graph_file_nodes_indexed": sum(
+                isinstance(symbol, dict) and symbol.get("kind") == "file"
+                for symbol in index.get("symbols", [])
+            ),
+            "graph_imports_indexed": len(state.imports),
+            "graph_imports_resolved": sum(
+                record.status == "resolved" for record in state.imports
+            ),
+            "graph_imports_unresolved": sum(
+                record.status == "unresolved" for record in state.imports
+            ),
         },
         "diagnostics": diagnostic_values,
     }
