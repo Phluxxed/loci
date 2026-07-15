@@ -17,6 +17,10 @@ from loci.graph.contracts import (
     GraphNodeRef,
     JSONValue,
 )
+from loci.graph.imports import (
+    materialize_import_edges,
+    resolve_imports,
+)
 from loci.graph.profiles import (
     GraphNodeAttributeRule,
     GraphProfile,
@@ -33,6 +37,7 @@ from loci.graph.state import (
     GraphIndexState,
     LoadedGraphContribution,
 )
+from loci.parser.imports import RawImport
 from loci.parser.symbols import Symbol
 
 
@@ -208,6 +213,7 @@ def materialize_graph(
     profiles: Sequence[LoadedGraphProfile],
     contributions: Sequence[LoadedGraphContribution],
     *,
+    raw_imports: Sequence[RawImport] = (),
     input_hashes: Mapping[str, str] | None = None,
     diagnostics: Sequence[GraphDiagnostic] = (),
 ) -> GraphIndexState:
@@ -220,7 +226,26 @@ def materialize_graph(
     ))
     active_contributions = tuple(sorted(contributions, key=lambda item: item.source))
 
+    file_nodes = {
+        symbol.file_path: symbol
+        for symbol in symbols
+        if symbol.kind == "file"
+    }
+    import_records = tuple(sorted(
+        resolve_imports(raw_imports, file_nodes=file_nodes),
+        key=lambda record: (
+            record.raw.source_file,
+            record.raw.line,
+            record.raw.specifier,
+            record.raw.imported_name or "",
+            record.target_file or "",
+        ),
+    ))
     active_edges = list(extract_markdown_contains_edges(symbols))
+    active_edges.extend(materialize_import_edges(
+        import_records,
+        file_nodes=file_nodes,
+    ))
     overlay_values: dict[tuple[str, str], dict[str, JSONValue]] = {}
     overlay_kinds: dict[tuple[str, str], str] = {}
     materialization_diagnostics = list(diagnostics)
@@ -628,7 +653,7 @@ def materialize_graph(
         profiles=active_profiles,
         nodes=nodes,
         edges=edges,
-        imports=(),
+        imports=import_records,
         contributions=active_contributions,
         input_hashes=dict(sorted(resolved_input_hashes.items())),
         diagnostics=sorted_diagnostics,

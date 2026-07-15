@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -12,7 +13,8 @@ from loci.graph.contracts import (
 from loci.graph.materialize import load_graph_extensions, materialize_graph
 from loci.graph.profiles import GraphProfile, LoadedGraphProfile
 from loci.graph.state import LoadedGraphContribution
-from loci.parser.symbols import Symbol
+from loci.parser.imports import extract_imports
+from loci.parser.symbols import Symbol, make_file_symbol
 
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
@@ -450,3 +452,117 @@ def test_contribution_attribute_conflict_retains_profile_value(tmp_path: Path):
 
     assert state.nodes[0].attributes == {"status": "current"}
     assert state.diagnostics[0].code == "GRAPH_NODE_ATTRIBUTE_CONFLICT"
+
+
+def test_python_import_materialization_is_directed_and_evidenced(tmp_path: Path):
+    consumer_path = tmp_path / "consumer.py"
+    target_path = tmp_path / "target.py"
+    consumer_path.write_text("import target\n", encoding="utf-8")
+    target_path.write_text("VALUE = 1\n", encoding="utf-8")
+    consumer_hash = hashlib.sha256(consumer_path.read_bytes()).hexdigest()
+    target_hash = hashlib.sha256(target_path.read_bytes()).hexdigest()
+    file_nodes = [
+        make_file_symbol(
+            "consumer.py",
+            language="python",
+            content_hash=consumer_hash,
+        ),
+        make_file_symbol(
+            "target.py",
+            language="python",
+            content_hash=target_hash,
+        ),
+    ]
+    raw_imports = extract_imports(
+        consumer_path,
+        source_file="consumer.py",
+        language="python",
+        source_hash=consumer_hash,
+    )
+
+    state = materialize_graph(
+        tmp_path,
+        file_nodes,
+        {"consumer.py": consumer_hash, "target.py": target_hash},
+        [],
+        [],
+        raw_imports=raw_imports,
+    )
+
+    assert len(state.imports) == 1
+    assert state.imports[0].status == "resolved"
+    assert state.edges == (GraphEdge(
+        from_id=file_nodes[0].id,
+        to_id=file_nodes[1].id,
+        type="imports",
+        directed=True,
+        namespace="loci",
+        resolution="import-resolved",
+        evidence=GraphEvidence(
+            file="consumer.py",
+            line=1,
+            content_hash=consumer_hash,
+        ),
+    ),)
+
+
+def test_materialization_retains_duplicate_import_records_and_one_edge(tmp_path: Path):
+    source = tmp_path / "consumer.py"
+    target = tmp_path / "target.py"
+    source.write_text("import target\nimport target\n", encoding="utf-8")
+    target.write_text("VALUE = 1\n", encoding="utf-8")
+    source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
+    target_hash = hashlib.sha256(target.read_bytes()).hexdigest()
+    file_nodes = [
+        make_file_symbol("consumer.py", language="python", content_hash=source_hash),
+        make_file_symbol("target.py", language="python", content_hash=target_hash),
+    ]
+    raw_imports = extract_imports(
+        source,
+        source_file="consumer.py",
+        language="python",
+        source_hash=source_hash,
+    )
+
+    state = materialize_graph(
+        tmp_path,
+        file_nodes,
+        {"consumer.py": source_hash, "target.py": target_hash},
+        [],
+        [],
+        raw_imports=list(reversed(raw_imports)),
+    )
+
+    assert len(state.imports) == 2
+    assert len(state.edges) == 1
+    assert state.edges[0].evidence.line == 1
+
+
+def test_missing_python_import_is_retained_without_an_edge(tmp_path: Path):
+    source = tmp_path / "consumer.py"
+    source.write_text("import missing\n", encoding="utf-8")
+    source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
+    file_node = make_file_symbol(
+        "consumer.py",
+        language="python",
+        content_hash=source_hash,
+    )
+    raw_imports = extract_imports(
+        source,
+        source_file="consumer.py",
+        language="python",
+        source_hash=source_hash,
+    )
+
+    state = materialize_graph(
+        tmp_path,
+        [file_node],
+        {"consumer.py": source_hash},
+        [],
+        [],
+        raw_imports=raw_imports,
+    )
+
+    assert state.edges == ()
+    assert state.imports[0].status == "unresolved"
+    assert state.imports[0].unresolved_reason == "not_indexed"
