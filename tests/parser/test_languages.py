@@ -1,6 +1,28 @@
 from loci.parser.languages import get_language_spec, EXTENSION_MAP
 
 
+def test_import_node_types_match_supported_language_grammars():
+    assert get_language_spec("python").import_node_types == (
+        "import_statement",
+        "import_from_statement",
+    )
+    assert get_language_spec("typescript").import_node_types == (
+        "import_statement",
+        "export_statement",
+    )
+    assert get_language_spec("javascript").import_node_types == (
+        "import_statement",
+        "export_statement",
+    )
+    assert get_language_spec("go").import_node_types == ("import_spec",)
+    assert get_language_spec("rust").import_node_types == ("use_declaration",)
+
+
+def test_unused_tsx_spec_does_not_duplicate_import_configuration():
+    assert EXTENSION_MAP[".tsx"] == "typescript"
+    assert get_language_spec("tsx").import_node_types == ()
+
+
 def test_python_spec_exists():
     spec = get_language_spec("python")
     assert spec is not None
