@@ -46,7 +46,35 @@ def _resolved_import() -> ImportRecord:
         raw=_raw_import(),
         source_id="src/example.py::__file__#file",
         target_file="src/package/target.py",
+        target_package=None,
+        target_kind="file",
         target_id="src/package/target.py::__file__#file",
+        status="resolved",
+        unresolved_reason=None,
+    )
+
+
+def _resolved_go_import() -> ImportRecord:
+    raw = RawImport(
+        source_file="cmd/server/main.go",
+        language="go",
+        line=4,
+        text='import "example.com/project/internal/store"',
+        specifier="example.com/project/internal/store",
+        imported_name=None,
+        type_only=False,
+        is_reexport=False,
+        source_hash="e" * 64,
+    )
+    return ImportRecord(
+        raw=raw,
+        source_id="cmd/server/main.go::__file__#file",
+        target_file=None,
+        target_package="example.com/project/internal/store",
+        target_kind="package",
+        target_id=(
+            "internal/store::example.com/project/internal/store#package"
+        ),
         status="resolved",
         unresolved_reason=None,
     )
@@ -139,6 +167,8 @@ def test_import_record_round_trip_is_exact_and_stable():
         },
         "source_id": "src/example.py::__file__#file",
         "target_file": "src/package/target.py",
+        "target_package": None,
+        "target_kind": "file",
         "target_id": "src/package/target.py::__file__#file",
         "status": "resolved",
         "unresolved_reason": None,
@@ -147,6 +177,8 @@ def test_import_record_round_trip_is_exact_and_stable():
         "raw",
         "source_id",
         "target_file",
+        "target_package",
+        "target_kind",
         "target_id",
         "status",
         "unresolved_reason",
@@ -165,7 +197,21 @@ def test_import_record_round_trip_is_exact_and_stable():
     assert ImportRecord.from_dict(serialized) == record
 
 
-@pytest.mark.parametrize("field", ["status", "source_id"])
+def test_package_import_record_round_trip_preserves_package_identity():
+    record = _resolved_go_import()
+
+    serialized = record.to_dict()
+
+    assert serialized["target_file"] is None
+    assert serialized["target_package"] == "example.com/project/internal/store"
+    assert serialized["target_kind"] == "package"
+    assert ImportRecord.from_dict(serialized) == record
+
+
+@pytest.mark.parametrize(
+    "field",
+    ["status", "source_id", "target_package", "target_kind"],
+)
 def test_import_record_rejects_missing_fields(field: str):
     payload = _resolved_import().to_dict()
     del payload[field]
@@ -191,14 +237,18 @@ def test_import_record_rejects_unknown_raw_fields():
 @pytest.mark.parametrize(
     ("changes", "message"),
     [
-        ({"target_file": None}, "Resolved import requires a target file and ID"),
-        ({"target_id": None}, "Resolved import requires a target file and ID"),
+        ({"target_file": None}, "Resolved file import requires a target file and ID"),
+        ({"target_id": None}, "Resolved file import requires a target file and ID"),
+        ({"target_package": "example.com/pkg"}, "Resolved file import cannot have a target package"),
+        ({"target_kind": None}, "Resolved import requires a target kind"),
+        ({"target_kind": "package"}, "Resolved package import cannot have a target file"),
         ({"unresolved_reason": "external"}, "Resolved import cannot have an unresolved reason"),
-        ({"status": "unresolved"}, "Unresolved import cannot have a target file or ID"),
+        ({"status": "unresolved"}, "Unresolved import cannot have a target"),
         (
             {
                 "status": "unresolved",
                 "target_file": None,
+                "target_kind": None,
                 "target_id": None,
             },
             "Unresolved import requires an unresolved reason",
@@ -211,6 +261,24 @@ def test_import_record_rejects_impossible_status_combinations(
 ):
     payload = _resolved_import().to_dict()
     payload.update(changes)
+
+    with pytest.raises(GraphContractError, match=message):
+        ImportRecord.from_dict(payload)
+
+
+@pytest.mark.parametrize(
+    ("record", "message"),
+    [
+        (_resolved_import, "Go imports must target packages"),
+        (_resolved_go_import, "Only Go imports may target packages"),
+    ],
+)
+def test_import_record_rejects_language_target_mismatches(record, message: str):
+    payload = record().to_dict()
+    if payload["target_kind"] == "file":
+        payload["raw"]["language"] = "go"
+    else:
+        payload["raw"]["language"] = "python"
 
     with pytest.raises(GraphContractError, match=message):
         ImportRecord.from_dict(payload)
@@ -231,10 +299,9 @@ def test_empty_graph_state_has_complete_envelope():
     }
 
 
-def test_graph_state_rejects_schema_version_one_as_stale():
+def test_graph_state_rejects_schema_version_two_as_stale():
     payload = _state().to_dict()
-    payload["schema_version"] = 1
-    del payload["imports"]
+    payload["schema_version"] = 2
 
     with pytest.raises(GraphContractError) as exc_info:
         GraphIndexState.from_dict(payload)
@@ -242,14 +309,27 @@ def test_graph_state_rejects_schema_version_one_as_stale():
     assert exc_info.value.code == "INVALID_GRAPH_SCHEMA"
     assert exc_info.value.details == {
         "field": "schema_version",
-        "schema_version": 1,
+        "schema_version": 2,
     }
+
+
+def test_graph_state_schema_three_rejects_old_import_record_shape():
+    payload = _state().to_dict()
+    del payload["imports"][0]["target_package"]
+    del payload["imports"][0]["target_kind"]
+
+    with pytest.raises(GraphContractError) as exc_info:
+        GraphIndexState.from_dict(payload)
+
+    assert exc_info.value.code == "INVALID_GRAPH_SCHEMA"
+    assert exc_info.value.details["missing"] == ["target_kind", "target_package"]
 
 
 @pytest.mark.parametrize(
     ("field", "value"),
     [
         ("status", []),
+        ("target_kind", []),
         ("unresolved_reason", []),
     ],
 )

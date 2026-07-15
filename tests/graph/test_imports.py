@@ -189,6 +189,8 @@ def test_reports_duplicate_valid_package_roots_as_ambiguous():
         raw=_raw("pkg"),
         source_id=file_nodes["consumer.py"].id,
         target_file=None,
+        target_package=None,
+        target_kind=None,
         target_id=None,
         status="unresolved",
         unresolved_reason="ambiguous",

@@ -18,13 +18,16 @@ from .contracts import (
 
 
 ImportStatus: TypeAlias = Literal["resolved", "unresolved"]
+ImportTargetKind: TypeAlias = Literal["file", "package"]
 _IMPORT_STATUSES = frozenset({"resolved", "unresolved"})
+_IMPORT_TARGET_KINDS = frozenset({"file", "package"})
 _UNRESOLVED_REASONS = frozenset({
     "external",
     "not_indexed",
     "ambiguous",
     "unsupported_language",
     "invalid_specifier",
+    "inaccessible",
 })
 _RAW_IMPORT_FIELDS = {
     "source_file",
@@ -41,6 +44,8 @@ _IMPORT_RECORD_FIELDS = {
     "raw",
     "source_id",
     "target_file",
+    "target_package",
+    "target_kind",
     "target_id",
     "status",
     "unresolved_reason",
@@ -55,6 +60,8 @@ class ImportRecord:
     raw: RawImport
     source_id: str
     target_file: str | None
+    target_package: str | None
+    target_kind: ImportTargetKind | None
     target_id: str | None
     status: ImportStatus
     unresolved_reason: ImportUnresolvedReason | None
@@ -64,6 +71,16 @@ class ImportRecord:
         _nonempty_string(self.source_id, "source_id")
         if self.target_file is not None:
             _relative_path(self.target_file, "target_file")
+        if self.target_package is not None:
+            _nonempty_string(self.target_package, "target_package")
+        if (
+            self.target_kind is not None
+            and (
+                not isinstance(self.target_kind, str)
+                or self.target_kind not in _IMPORT_TARGET_KINDS
+            )
+        ):
+            raise _error("Invalid import target kind", field="target_kind")
         if self.target_id is not None:
             _nonempty_string(self.target_id, "target_id")
         if not isinstance(self.status, str) or self.status not in _IMPORT_STATUSES:
@@ -80,13 +97,36 @@ class ImportRecord:
                 field="unresolved_reason",
             )
         if self.status == "resolved":
-            if self.target_file is None or self.target_id is None:
-                raise _error("Resolved import requires a target file and ID")
+            if self.target_kind is None:
+                raise _error("Resolved import requires a target kind")
+            if self.target_kind == "file":
+                if self.target_file is None or self.target_id is None:
+                    raise _error("Resolved file import requires a target file and ID")
+                if self.target_package is not None:
+                    raise _error("Resolved file import cannot have a target package")
+                if self.raw.language == "go":
+                    raise _error("Go imports must target packages")
+            else:
+                if self.target_file is not None:
+                    raise _error("Resolved package import cannot have a target file")
+                if self.target_package is None or self.target_id is None:
+                    raise _error(
+                        "Resolved package import requires a target package and ID"
+                    )
+                if self.raw.language != "go":
+                    raise _error("Only Go imports may target packages")
+            if self.raw.language == "rust":
+                raise _error("Rust imports cannot be resolved")
             if self.unresolved_reason is not None:
                 raise _error("Resolved import cannot have an unresolved reason")
         else:
-            if self.target_file is not None or self.target_id is not None:
-                raise _error("Unresolved import cannot have a target file or ID")
+            if any((
+                self.target_file is not None,
+                self.target_package is not None,
+                self.target_kind is not None,
+                self.target_id is not None,
+            )):
+                raise _error("Unresolved import cannot have a target")
             if self.unresolved_reason is None:
                 raise _error("Unresolved import requires an unresolved reason")
 
@@ -95,6 +135,8 @@ class ImportRecord:
             "raw": _raw_import_to_dict(self.raw),
             "source_id": self.source_id,
             "target_file": self.target_file,
+            "target_package": self.target_package,
+            "target_kind": self.target_kind,
             "target_id": self.target_id,
             "status": self.status,
             "unresolved_reason": self.unresolved_reason,
@@ -107,6 +149,16 @@ class ImportRecord:
         if not isinstance(raw_value, Mapping):
             raise _error("Import raw observation must be an object", field="raw")
         target_file = _optional_relative_path(value["target_file"], "target_file")
+        target_package = _optional_nonempty_string(
+            value["target_package"],
+            "target_package",
+        )
+        target_kind = value["target_kind"]
+        if target_kind is not None and (
+            not isinstance(target_kind, str)
+            or target_kind not in _IMPORT_TARGET_KINDS
+        ):
+            raise _error("Invalid import target kind", field="target_kind")
         target_id = _optional_nonempty_string(value["target_id"], "target_id")
         status = value["status"]
         if not isinstance(status, str) or status not in _IMPORT_STATUSES:
@@ -124,6 +176,8 @@ class ImportRecord:
             raw=_raw_import_from_dict(raw_value),
             source_id=_nonempty_string(value["source_id"], "source_id"),
             target_file=target_file,
+            target_package=target_package,
+            target_kind=cast(ImportTargetKind | None, target_kind),
             target_id=target_id,
             status=cast(ImportStatus, status),
             unresolved_reason=cast(ImportUnresolvedReason | None, unresolved_reason),
@@ -191,6 +245,8 @@ def _resolve_import(
         raw=raw,
         source_id=source.id,
         target_file=target_file,
+        target_package=None,
+        target_kind="file",
         target_id=target.id,
         status="resolved",
         unresolved_reason=None,
@@ -459,6 +515,8 @@ def _unresolved(
         raw=raw,
         source_id=source_id,
         target_file=None,
+        target_package=None,
+        target_kind=None,
         target_id=None,
         status="unresolved",
         unresolved_reason=reason,
