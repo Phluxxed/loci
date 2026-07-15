@@ -306,10 +306,11 @@ Rust import resolution remains deferred because there is no current Rust
 consumer. Rust observations continue to be extracted and reported as unresolved;
 they must not produce trusted edges.
 
-Stage 7 implementation has not started. Its detailed plan is proposed for owner
-review and freezes exact module-resolution rules, package-node semantics, APIs,
-files, fixtures, compatibility checks, rollback behavior, and an owner review
-gate.
+The owner accepted the detailed Stage 7 plan on 2026-07-16. Implementation is
+authorized in its task order, beginning with the bounded control-file parser.
+The accepted plan freezes exact module-resolution rules, package-node semantics,
+APIs, files, fixtures, compatibility checks, rollback behavior, and the final
+implementation review gate.
 
 After Go resolution, the approved roadmap order is:
 
