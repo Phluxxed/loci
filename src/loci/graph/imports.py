@@ -46,6 +46,8 @@ _IMPORT_RECORD_FIELDS = {
     "unresolved_reason",
 }
 _SHA256_RE = re.compile(r"[0-9a-f]{64}")
+_JAVASCRIPT_LANGUAGES = frozenset({"javascript", "typescript"})
+_JAVASCRIPT_EXTENSIONS = (".ts", ".tsx", ".js")
 
 
 @dataclass(frozen=True, slots=True)
@@ -142,15 +144,17 @@ def resolve_imports(
     *,
     file_nodes: Mapping[str, Symbol],
 ) -> list[ImportRecord]:
-    """Resolve a batch while deriving the indexed Python layout only once."""
-    indexed_files = _indexed_python_files(file_nodes)
-    package_roots = _python_package_roots(indexed_files)
+    """Resolve a batch while deriving indexed language layouts only once."""
+    indexed_python_files = _indexed_python_files(file_nodes)
+    python_package_roots = _python_package_roots(indexed_python_files)
+    indexed_javascript_files = _indexed_javascript_files(file_nodes)
     return [
         _resolve_import(
             raw,
             file_nodes=file_nodes,
-            indexed_files=indexed_files,
-            package_roots=package_roots,
+            indexed_python_files=indexed_python_files,
+            python_package_roots=python_package_roots,
+            indexed_javascript_files=indexed_javascript_files,
         )
         for raw in raw_imports
     ]
@@ -160,19 +164,25 @@ def _resolve_import(
     raw: RawImport,
     *,
     file_nodes: Mapping[str, Symbol],
-    indexed_files: frozenset[str],
-    package_roots: tuple[PurePosixPath, ...],
+    indexed_python_files: frozenset[str],
+    python_package_roots: tuple[PurePosixPath, ...],
+    indexed_javascript_files: frozenset[str],
 ) -> ImportRecord:
     _validate_raw_import(raw)
     source = _require_file_node(file_nodes, raw.source_file, field="source_file")
-    if raw.language != "python":
+    if raw.language == "python":
+        target_file, unresolved_reason = _resolve_python_target(
+            raw,
+            indexed_python_files,
+            python_package_roots,
+        )
+    elif raw.language in _JAVASCRIPT_LANGUAGES:
+        target_file, unresolved_reason = _resolve_javascript_target(
+            raw,
+            indexed_javascript_files,
+        )
+    else:
         return _unresolved(raw, source.id, "unsupported_language")
-
-    target_file, unresolved_reason = _resolve_python_target(
-        raw,
-        indexed_files,
-        package_roots,
-    )
     if target_file is None:
         return _unresolved(raw, source.id, unresolved_reason)
 
@@ -302,6 +312,70 @@ def _indexed_python_files(file_nodes: Mapping[str, Symbol]) -> frozenset[str]:
             and path.endswith(".py")
         )
     )
+
+
+def _indexed_javascript_files(file_nodes: Mapping[str, Symbol]) -> frozenset[str]:
+    return frozenset(
+        path
+        for path, node in file_nodes.items()
+        if (
+            path == node.file_path
+            and node.kind == "file"
+            and node.language in _JAVASCRIPT_LANGUAGES
+            and path.endswith(_JAVASCRIPT_EXTENSIONS)
+        )
+    )
+
+
+def _resolve_javascript_target(
+    raw: RawImport,
+    indexed_files: frozenset[str],
+) -> tuple[str | None, ImportUnresolvedReason]:
+    specifier = raw.specifier
+    if not specifier or "\\" in specifier or specifier.startswith("/"):
+        return None, "invalid_specifier"
+    if not specifier.startswith(("./", "../")):
+        return None, "external"
+
+    base = _relative_javascript_base(raw.source_file, specifier)
+    if base is None:
+        return None, "invalid_specifier"
+
+    base_path = base.as_posix()
+    candidates = (
+        f"{base_path}.ts",
+        f"{base_path}.tsx",
+        f"{base_path}.js",
+        (base / "index.ts").as_posix(),
+        (base / "index.tsx").as_posix(),
+        (base / "index.js").as_posix(),
+    )
+    target = next(
+        (candidate for candidate in candidates if candidate in indexed_files),
+        None,
+    )
+    if target is None:
+        return None, "not_indexed"
+    return target, "not_indexed"
+
+
+def _relative_javascript_base(
+    source_file: str,
+    specifier: str,
+) -> PurePosixPath | None:
+    parts = [*PurePosixPath(source_file).parent.parts]
+    for part in specifier.split("/"):
+        if part in {"", "."}:
+            continue
+        if part == "..":
+            if not parts:
+                return None
+            parts.pop()
+        else:
+            parts.append(part)
+    if not parts:
+        return None
+    return PurePosixPath(*parts)
 
 
 def _python_package_roots(indexed_files: frozenset[str]) -> tuple[PurePosixPath, ...]:

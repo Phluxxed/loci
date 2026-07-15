@@ -566,3 +566,57 @@ def test_missing_python_import_is_retained_without_an_edge(tmp_path: Path):
     assert state.edges == ()
     assert state.imports[0].status == "unresolved"
     assert state.imports[0].unresolved_reason == "not_indexed"
+
+
+def test_typescript_imports_preserve_reexports_and_separate_type_edges(
+    tmp_path: Path,
+):
+    source = tmp_path / "index.ts"
+    types = tmp_path / "types.ts"
+    runtime = tmp_path / "runtime.ts"
+    source.write_text(
+        'import type {Shape} from "./types";\n'
+        'export {run} from "./runtime";\n',
+        encoding="utf-8",
+    )
+    types.write_text("export type Shape = string;\n", encoding="utf-8")
+    runtime.write_text("export const run = () => 1;\n", encoding="utf-8")
+    source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
+    types_hash = hashlib.sha256(types.read_bytes()).hexdigest()
+    runtime_hash = hashlib.sha256(runtime.read_bytes()).hexdigest()
+    file_nodes = [
+        make_file_symbol("index.ts", language="typescript", content_hash=source_hash),
+        make_file_symbol("types.ts", language="typescript", content_hash=types_hash),
+        make_file_symbol("runtime.ts", language="typescript", content_hash=runtime_hash),
+    ]
+    raw_imports = extract_imports(
+        source,
+        source_file="index.ts",
+        language="typescript",
+        source_hash=source_hash,
+    )
+
+    state = materialize_graph(
+        tmp_path,
+        file_nodes,
+        {
+            "index.ts": source_hash,
+            "types.ts": types_hash,
+            "runtime.ts": runtime_hash,
+        },
+        [],
+        [],
+        raw_imports=raw_imports,
+    )
+
+    assert {
+        record.target_file: (record.raw.type_only, record.raw.is_reexport)
+        for record in state.imports
+    } == {
+        "types.ts": (True, False),
+        "runtime.ts": (False, True),
+    }
+    assert {edge.to_id: edge.type for edge in state.edges} == {
+        file_nodes[1].id: "imports_type",
+        file_nodes[2].id: "imports",
+    }
