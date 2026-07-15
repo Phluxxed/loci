@@ -1,6 +1,6 @@
 # Plan: Extensible Graph Retrieval Stage 7 — Module-aware Go Import Resolution
 
-- **Status:** proposed for owner review; implementation has not started
+- **Status:** accepted by the owner on 2026-07-16; implementation authorized
 - **Date:** 2026-07-15
 - **Repository:** `/Users/brummerv/loci`
 - **Governing design:** `docs/design/2026-07-13-extensible-graph-retrieval-design.md`
