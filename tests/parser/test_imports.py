@@ -4,7 +4,14 @@ from pathlib import Path
 
 import pytest
 
-from loci.parser.imports import ImportExtractionError, RawImport, extract_imports
+from loci.parser.imports import (
+    GoPackageDeclaration,
+    ImportExtractionBatch,
+    ImportExtractionError,
+    RawImport,
+    extract_import_batch,
+    extract_imports,
+)
 
 
 SOURCE_HASH = "a" * 64
@@ -21,6 +28,24 @@ def _extract(
     path = tmp_path / name
     path.write_text(source, encoding="utf-8")
     return extract_imports(
+        path,
+        source_file=source_file or f"src/{name}",
+        language=language,
+        source_hash=SOURCE_HASH,
+    )
+
+
+def _extract_batch(
+    tmp_path: Path,
+    *,
+    name: str,
+    source: str,
+    language: str,
+    source_file: str | None = None,
+) -> ImportExtractionBatch:
+    path = tmp_path / name
+    path.write_text(source, encoding="utf-8")
+    return extract_import_batch(
         path,
         source_file=source_file or f"src/{name}",
         language=language,
@@ -178,6 +203,59 @@ def test_extracts_grouped_go_import_specs_recursively(tmp_path: Path):
         (6, '_ "example.com/project/sideeffects"', "example.com/project/sideeffects", None),
     ]
     assert all(item.source_hash == SOURCE_HASH for item in imports)
+
+
+def test_go_batch_extracts_imports_and_exact_package_clause_from_one_parse(
+    tmp_path: Path,
+):
+    batch = _extract_batch(
+        tmp_path,
+        name="reader.go",
+        language="go",
+        source=(
+            "// generated\n"
+            "package store\n\n"
+            "import (\n"
+            '    "fmt"\n'
+            '    "example.com/project/model"\n'
+            ")\n"
+        ),
+    )
+
+    assert batch.go_package == GoPackageDeclaration(name="store", line=2)
+    assert [item.specifier for item in batch.imports] == [
+        "fmt",
+        "example.com/project/model",
+    ]
+    assert extract_imports(
+        tmp_path / "reader.go",
+        source_file="src/reader.go",
+        language="go",
+        source_hash=SOURCE_HASH,
+    ) == list(batch.imports)
+
+
+def test_import_batch_has_no_go_package_for_other_languages(tmp_path: Path):
+    batch = _extract_batch(
+        tmp_path,
+        name="consumer.py",
+        language="python",
+        source="import package\n",
+    )
+
+    assert batch.go_package is None
+    assert [item.specifier for item in batch.imports] == ["package"]
+
+
+def test_go_batch_returns_no_declaration_for_comment_only_source(tmp_path: Path):
+    batch = _extract_batch(
+        tmp_path,
+        name="empty.go",
+        language="go",
+        source="// no package declaration\n",
+    )
+
+    assert batch == ImportExtractionBatch(imports=(), go_package=None)
 
 
 def test_extracts_rust_use_declarations_without_claiming_resolution(tmp_path: Path):

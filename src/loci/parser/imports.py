@@ -29,6 +29,18 @@ class RawImport:
     source_hash: str
 
 
+@dataclass(frozen=True, slots=True)
+class GoPackageDeclaration:
+    name: str
+    line: int
+
+
+@dataclass(frozen=True, slots=True)
+class ImportExtractionBatch:
+    imports: tuple[RawImport, ...]
+    go_package: GoPackageDeclaration | None
+
+
 class ImportExtractionError(RuntimeError):
     """Import observations could not be extracted reliably from a source file."""
 
@@ -41,6 +53,24 @@ def extract_imports(
     source_hash: str,
 ) -> list[RawImport]:
     """Extract deterministic import observations without changing symbol parsing."""
+    return list(
+        extract_import_batch(
+            path,
+            source_file=source_file,
+            language=language,
+            source_hash=source_hash,
+        ).imports
+    )
+
+
+def extract_import_batch(
+    path: Path,
+    *,
+    source_file: str,
+    language: str,
+    source_hash: str,
+) -> ImportExtractionBatch:
+    """Extract imports and a Go package declaration from one source parse."""
     spec = get_language_spec(language)
     if spec is None or not spec.import_node_types:
         raise ImportExtractionError(f"unsupported language: {language}")
@@ -66,7 +96,10 @@ def extract_imports(
         )
 
     imports: list[RawImport] = []
+    go_packages: list[GoPackageDeclaration] = []
     for node in _walk_nodes(tree.root_node):
+        if language == "go" and node.type == "package_clause":
+            go_packages.append(_extract_go_package(node, source))
         if node.type not in spec.import_node_types:
             continue
         imports.extend(
@@ -78,7 +111,14 @@ def extract_imports(
                 source_hash=source_hash,
             )
         )
-    return imports
+    if len(go_packages) > 1:
+        raise ImportExtractionError(
+            f"{source_file} has multiple Go package declarations"
+        )
+    return ImportExtractionBatch(
+        imports=tuple(imports),
+        go_package=go_packages[0] if go_packages else None,
+    )
 
 
 def _walk_nodes(node):
@@ -191,6 +231,18 @@ def _extract_go_import(node, source: bytes, common: dict) -> list[RawImport]:
             is_reexport=False,
         )
     ]
+
+
+def _extract_go_package(node, source: bytes) -> GoPackageDeclaration:
+    identifiers = [
+        child for child in node.named_children if child.type == "package_identifier"
+    ]
+    if len(identifiers) != 1:
+        raise ImportExtractionError("Go package clause has no package identifier")
+    return GoPackageDeclaration(
+        name=_node_text(identifiers[0], source),
+        line=node.start_point[0] + 1,
+    )
 
 
 def _extract_rust_import(node, source: bytes, common: dict) -> list[RawImport]:
