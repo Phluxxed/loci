@@ -162,7 +162,7 @@ MCP read tools refresh stale indexes before returning cached data. `loci_index`
 still performs explicit indexing, while `loci_outline`, `loci_search`,
 `loci_get`, `loci_file`, `loci_grep`, `loci_graph_anchors`,
 `loci_graph_neighbors`, `loci_graph_traverse_neighbors`, `loci_graph_paths`,
-`loci_graph_retrieve`, and
+`loci_graph_retrieve`, `loci_graph_imports`, and
 `loci_graph_health` first check indexed source, profile, and contribution hashes
 against the current repository and run a locked incremental refresh if needed.
 
@@ -179,6 +179,7 @@ against the current repository and run a locked incremental refresh if needed.
 | `loci_graph_traverse_neighbors` | Return filtered one-hop neighbours with explicit traversal orientation and omissions |
 | `loci_graph_paths` | Find bounded, evidence-backed paths between exact endpoint IDs |
 | `loci_graph_retrieve` | Rank question-shaped paths and expose rejected semantic or hub shortcuts |
+| `loci_graph_imports` | Inspect bounded resolved and unresolved built-in import records |
 | `loci_graph_health` | Report loaded graph profiles, active record counts, and diagnostics |
 | `loci_verify` | Verify index integrity and content drift |
 | `loci_list` | List indexed repos |
@@ -245,10 +246,11 @@ graph and reported by `loci_graph_health`; they do not hide an otherwise valid
 symbol index.
 
 `loci_graph_neighbors` remains compatibility-stable and exact-only: it returns
-directed `loci:contains` edges and never mixes in declared domain edges.
-`loci_graph_traverse_neighbors` is the additive filtered form: callers choose
-namespaces, edge types, resolution tiers, and direction, and every result keeps
-the stored edge plus `traversed: forward|reverse`.
+directed `loci:contains` edges and never mixes in declared domain or built-in
+import edges. Use `loci_graph_traverse_neighbors` for dependencies. It is the
+additive filtered form: callers choose namespaces, edge types, resolution
+tiers, and direction, and every result keeps the stored edge plus
+`traversed: forward|reverse`.
 
 Use `loci_graph_anchors` when only the graph starts are needed. It collapses
 inferred Markdown matches to one anchor per file, explains matched indexed
@@ -260,12 +262,70 @@ ranks bounded paths and returns unsupported compositions under
 `rejected_paths` with stable reasons such as `SEMANTIC_BRIDGE_MISSING` and
 `HUB_SHORTCUT`.
 
-Traversal defaults to the categorical `exact` and `declared` resolution tiers;
-heuristic edges are not admitted implicitly. Hop, node, path, offset, evidence
-byte, and estimated-token budgets are validated and reported. Graph retrieval
-never returns an `answerable` or `sufficient` decision. Anchor and retrieval
-scores rank observable evidence only. Use `loci_graph_health` to inspect the
-persisted extension state and any excluded records.
+Traversal defaults to the categorical `exact`, `declared`, and
+`import-resolved` resolution tiers; heuristic edges are not admitted
+implicitly. Hop, node, path, offset, evidence byte, and estimated-token budgets
+are validated and reported. Graph retrieval never returns an `answerable` or
+`sufficient` decision. Anchor and retrieval scores rank observable evidence
+only. Use `loci_graph_health` to inspect the persisted extension state and any
+excluded records.
+
+### Built-in import relationships
+
+Every indexed Python, JavaScript, TypeScript, TSX, Go, and Rust source file has
+a stable, zero-width `kind="file"` graph node. Its ID is the normalized
+repository-relative path followed by `::__file__#file`, for example
+`src/loci/mcp_server.py::__file__#file`. Markdown keeps its existing page and
+section nodes and does not receive a duplicate file node.
+
+Resolved Python imports and relative JavaScript/TypeScript imports become
+directed `namespace="loci"` edges from importer to imported file. Runtime
+dependencies use `type="imports"`; type-only TypeScript dependencies use
+`type="imports_type"`; both use `resolution="import-resolved"` and retain the
+exact source statement as evidence. Re-exports remain distinguishable on the
+diagnostic record.
+
+Use the MCP diagnostic read to inspect observations, including imports that did
+not become graph edges:
+
+```text
+loci_graph_imports(
+  repo="/path/to/repo",
+  file="src/loci/mcp_server.py",
+  status="all",
+  offset=0,
+  limit=100,
+)
+```
+
+Use generic traversal for the dependency graph. The outgoing call answers
+"what does this file import?"; changing `direction` to `incoming` answers
+"which files import this file?" without reversing the stored edge:
+
+```text
+loci_graph_traverse_neighbors(
+  repo="/path/to/repo",
+  seed_ids=["src/loci/mcp_server.py::__file__#file"],
+  namespaces=["loci"],
+  edge_types=["imports", "imports_type"],
+  resolutions=["import-resolved"],
+  direction="outgoing",
+)
+```
+
+`loci_graph_paths` can use the same filters for bounded, evidence-backed
+dependency chains. Do not use `loci_graph_neighbors` for imports; that tool is
+intentionally pinned to exact outgoing containment for compatibility.
+
+Unresolved, ambiguous, external, and unsupported-language observations remain
+bounded records with an explicit `unresolved_reason`. They are visible through
+`loci_graph_imports`, do not become edges, and do not degrade graph health when
+they are normal resolution outcomes. `loci_graph_health` reports
+`graph_file_nodes_indexed`, `graph_imports_indexed`,
+`graph_imports_resolved`, and `graph_imports_unresolved`; extraction or
+persistence failures still appear as diagnostics. Loci never falls back to a
+repository-wide name guess. There is no import CLI command or separate
+top-level import store.
 
 ## Analytics
 

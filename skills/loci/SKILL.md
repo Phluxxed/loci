@@ -20,9 +20,10 @@ loci_analyze(repo) when diagnostics are needed
 
 MCP read tools (`loci_outline`, `loci_search`, `loci_get`, `loci_file`,
 `loci_grep`, `loci_graph_anchors`, `loci_graph_neighbors`,
-`loci_graph_traverse_neighbors`, `loci_graph_paths`, `loci_graph_retrieve`, and
-`loci_graph_health`) refresh stale indexes before returning cached data.
-Freshness includes repository-local graph profiles and contributions.
+`loci_graph_traverse_neighbors`, `loci_graph_paths`, `loci_graph_retrieve`,
+`loci_graph_imports`, and `loci_graph_health`) refresh stale indexes before
+returning cached data. Freshness includes repository-local graph profiles,
+contributions, and built-in import records.
 `loci_index` is still required for a repo that has never been indexed, and
 remains useful for explicit rebuilds or after large changes.
 
@@ -84,6 +85,7 @@ If loci is unavailable, fails, or the task is a standalone doc/config check wher
 | `loci_graph_traverse_neighbors` | Reading filtered one-hop neighbours with explicit direction and omissions |
 | `loci_graph_paths` | Finding bounded evidence-backed paths between exact endpoint IDs |
 | `loci_graph_retrieve` | Retrieving and ranking question-shaped paths with inspected rejections |
+| `loci_graph_imports` | Inspecting bounded resolved and unresolved built-in import records |
 | `loci_graph_health` | Inspecting loaded graph profiles, active counts, and degraded diagnostics |
 | `loci_verify` | Checking index integrity and content drift |
 | `loci_list` | Listing indexed repos |
@@ -104,6 +106,9 @@ If loci is unavailable, fails, or the task is a standalone doc/config check wher
 | `loci stats [--repo <path>] [--pretty]` | Checking token savings |
 | `loci list` | Listing indexed repos |
 | `loci invalidate <path>` | Clearing stale cache |
+
+There is no CLI import command. Use `loci_graph_imports` through MCP for import
+diagnostics and the generic graph MCP tools for dependency traversal.
 
 ## Output Schemas
 
@@ -141,7 +146,13 @@ traversal or answerability claims:
 `loci_graph_health` returns persisted extension status and diagnostics:
 
 ```json
-{"schema_version":1,"repo":"...","status":"healthy|degraded","profiles":[],"counts":{"profiles":0,"node_overlays":0,"edges":0,"contributions":0,"diagnostics":0},"diagnostics":[]}
+{"schema_version":1,"repo":"...","status":"healthy|degraded","profiles":[],"counts":{"profiles":0,"node_overlays":0,"edges":0,"contributions":0,"diagnostics":0,"graph_file_nodes_indexed":0,"graph_imports_indexed":0,"graph_imports_resolved":0,"graph_imports_unresolved":0},"diagnostics":[]}
+```
+
+`loci_graph_imports` returns a bounded diagnostic page:
+
+```json
+{"schema_version":1,"repo":"...","file":null,"status":"all","items":[{"source_file":"src/a.py","source_id":"src/a.py::__file__#file","target_file":"src/b.py","target_id":"src/b.py::__file__#file","specifier":"b","imported_name":null,"language":"python","line":1,"text":"import b","type_only":false,"is_reexport":false,"status":"resolved","resolution":"import-resolved","unresolved_reason":null}],"counts":{"total":1,"resolved":1,"unresolved":0,"returned":1},"pagination":{"offset":0,"limit":100,"next_offset":null}}
 ```
 
 `loci_graph_paths` returns `support_kind: "edge_sequence"`, ordered nodes,
@@ -149,9 +160,60 @@ stored edges, exact cached evidence lines, counts, and enforced budgets. Treat
 that as evidenced reachability only. `loci_graph_retrieve` adds retrieval
 scores and semantic bridge checks; inspect both `paths` and `rejected_paths`.
 Neither tool decides whether the user's question is answerable or sufficient.
-Filters default to the safe `exact` and `declared` resolution tiers.
+Filters default to the safe `exact`, `declared`, and `import-resolved`
+resolution tiers. `heuristic` is never admitted implicitly.
 
 MCP tool errors are structured under `structuredContent.error` with `code`, `message`, and `details`.
+
+## Built-in Import Relationships
+
+Indexed code files are stable zero-width `kind="file"` graph nodes. Build the
+ID as `<normalized-repository-relative-path>::__file__#file`, for example
+`src/loci/mcp_server.py::__file__#file`. Markdown uses its existing page and
+section nodes and does not receive a duplicate file node.
+
+Use `loci_graph_imports` to inspect all import observations, including
+unresolved records:
+
+```text
+loci_graph_imports(
+  repo="/path/to/repo",
+  file="src/loci/mcp_server.py",
+  status="all",
+  offset=0,
+  limit=100,
+)
+```
+
+Use `loci_graph_traverse_neighbors` for dependencies. Resolved runtime imports
+have `namespace="loci"`, `type="imports"`, and
+`resolution="import-resolved"`; type-only TypeScript imports use
+`type="imports_type"`:
+
+```text
+loci_graph_traverse_neighbors(
+  repo="/path/to/repo",
+  seed_ids=["src/loci/mcp_server.py::__file__#file"],
+  namespaces=["loci"],
+  edge_types=["imports", "imports_type"],
+  resolutions=["import-resolved"],
+  direction="outgoing",
+)
+```
+
+Use `direction="incoming"` to find importers; the returned stored edge still
+points from importer to imported file and reports reverse traversal. Use
+`loci_graph_paths` with the same filters for bounded dependency chains.
+
+Do not use `loci_graph_neighbors` for imports. It intentionally returns only
+exact outgoing `loci:contains` edges for compatibility.
+
+Unresolved, ambiguous, external, and unsupported-language observations remain
+bounded records with an explicit `unresolved_reason`. They never become graph
+edges and normal unresolved outcomes do not degrade graph health. Inspect
+aggregate file-node and import counts with `loci_graph_health`. Loci does not
+guess targets by bare name, maintain a separate top-level import store, or
+expose an import CLI command.
 
 ## Selection Rules
 
@@ -163,6 +225,11 @@ MCP tool errors are structured under `structuredContent.error` with `code`, `mes
   `seed_ids` to bypass inference.
 - Need one filtered hop: `loci_graph_traverse_neighbors`; set namespace, edge
   type, resolution, and direction explicitly when the domain is known.
+- Need import observations or unresolved reasons: `loci_graph_imports`; filter
+  by normalized repository-relative `file` and `status` when useful.
+- Need code dependencies: start from exact file-node IDs and use
+  `loci_graph_traverse_neighbors` or `loci_graph_paths`, never
+  `loci_graph_neighbors`.
 - Know both endpoint sets: `loci_graph_paths`; interpret the result as an
   evidenced edge sequence, not semantic proof.
 - Need relationship-shaped evidence: `loci_graph_retrieve`; inspect rejected

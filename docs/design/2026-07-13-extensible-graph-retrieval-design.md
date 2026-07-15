@@ -1,6 +1,6 @@
 # loci: Extensible Graph Retrieval Layer — Proposed Design
 
-**Status:** Stages 1-5 implemented and reviewed; Stage 6 approved and Task 1 implemented
+**Status:** Stages 1-5 implemented and reviewed; Stage 6 implementation complete and awaiting its final review gate
 
 **Date:** 2026-07-13
 
@@ -78,7 +78,7 @@ code / markdown / llm-wiki profile
 | Concern | Owner |
 | --- | --- |
 | Symbol, file, page-root, and section indexing | loci |
-| Generic `contains`, Markdown-link, import, and resolved-reference edges | loci built-ins |
+| Generic `contains`, Markdown-link, and import edges; later resolved-reference edges | loci built-ins |
 | Wiki relation names and knowledge-state attributes | llm-wiki profile |
 | Edge validation, storage, freshness, traversal, and ranking | loci |
 | Whether retrieved evidence is sufficient to answer | llm-wiki |
@@ -249,16 +249,47 @@ compatibility and rollback behaviour are approved.
 
 ### Stage 6: Built-in code relationships
 
-Fold trustworthy import/dependency extraction and later resolved references
-into the same graph substrate, using the existing import plan as research. This
-proves that the layer benefits ordinary repositories rather than only wikis.
+Stage 6 has folded trustworthy file-level import/dependency extraction into the
+same graph substrate, using the existing import plan as research. It proves
+that the layer benefits ordinary repositories rather than only wikis.
 
 Implementation plan:
 `docs/plans/2026-07-14-extensible-graph-retrieval-stage-6.md`.
 
+The implemented operational contract is:
+
+- indexed Python, JavaScript, TypeScript, TSX, Go, and Rust files receive stable
+  zero-width `kind="file"` nodes with IDs such as
+  `src/loci/service.py::__file__#file`; Markdown retains its existing page and
+  section nodes without duplicate file nodes;
+- exact in-repository Python imports and relative JavaScript/TypeScript imports
+  emit directed `namespace="loci"`, `type="imports"|"imports_type"`,
+  `resolution="import-resolved"` edges with source evidence;
+- `loci_graph_imports` exposes paginated resolved and unresolved observations,
+  while `loci_graph_traverse_neighbors`, `loci_graph_paths`, and
+  `loci_graph_retrieve` consume the standard graph edges;
+- safe unfiltered traversal includes `exact`, `declared`, and
+  `import-resolved`, but never `heuristic`;
+- `loci_graph_neighbors` remains the compatibility operation for exact outgoing
+  `loci:contains` only and is not an import traversal API; and
+- normal unresolved, ambiguous, external, or unsupported-language imports stay
+  inspectable with an explicit reason, never become asserted edges, and do not
+  degrade graph health.
+
+Import observations and their resolved records persist inside
+`index.json.graph`; there is no separate top-level import store and no import
+CLI command. Resolution uses language-aware path rules only. It never performs
+a bare-name repository search or silently manufactures a dependency.
+
+Resolved symbol references, cross-file calls, module-aware Go/Rust resolution,
+heuristic diagnostics, and architecture analysis remain deferred. Each requires
+a new design and review gate; Stage 6 does not authorize them.
+
 Review evidence: language-specific resolution fixtures, same-name collision
-tests, unresolved-edge diagnostics, and agent navigation examples over a code
-repository.
+tests, bounded unresolved-record inspection, fresh-process and incremental
+proofs, and agent navigation examples over a code repository. The
+implementation is not declared accepted until the final Stage 6 review packet
+is approved.
 
 ## Technical Fit
 
@@ -379,16 +410,19 @@ The layer is complete only when:
 Benchmark targets are provisional until the design review confirms that the
 gold fixtures and thresholds represent the intended user experience.
 
-## Open Questions for Review
+## Resolved Review Decisions
 
-1. Should a graph profile live inside each repository, be registered externally
-   by the consumer, or support both with an explicit precedence rule?
-2. Should contribution documents be read from a file path, supplied through a
-   service call, or both?
-3. Which edge resolution tiers are sufficient across code and declared wiki
-   relationships without collapsing provenance into a misleading number?
-4. Should Stage 6 code-import extraction follow immediately after the substrate
-   or wait until the llm-wiki benchmark proves the query path?
+The staged implementation and its approved plans resolved the design questions:
 
-These questions must be resolved during architecture review. No implementation
-plan or code work begins before then.
+1. profiles and contribution documents are repository-local under
+   `.loci/graph/`; loci validates their data and does not execute domain code;
+2. contribution ingress is file-based in the current contract rather than a
+   mutable service call;
+3. the resolution vocabulary is `exact`, `declared`, `import-resolved`, and
+   `heuristic`, with the first three trusted by default and `heuristic`
+   opt-in only; and
+4. Stage 6 followed the reviewed Stage 5 llm-wiki integration and reused the
+   same graph contracts rather than creating an import-specific subsystem.
+
+Future resolved-reference or call work is a new proposal, not an unanswered
+part of this design.
