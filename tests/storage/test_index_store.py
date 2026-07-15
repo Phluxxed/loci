@@ -2,6 +2,7 @@ import pytest
 import json
 import time
 import time as time_module
+from dataclasses import replace
 from pathlib import Path
 from loci.graph.contracts import (
     GRAPH_STATE_SCHEMA_VERSION,
@@ -9,7 +10,9 @@ from loci.graph.contracts import (
     GraphEdge,
     GraphEvidence,
 )
+from loci.graph.imports import ImportRecord
 from loci.graph.state import GraphIndexState
+from loci.parser.imports import RawImport
 from loci.parser.symbols import Symbol, make_file_symbol
 from loci.storage.index_store import (
     EXTRACTOR_VERSION,
@@ -106,6 +109,59 @@ def _contains_edge(**overrides) -> GraphEdge:
     return GraphEdge(**values)
 
 
+def _import_graph(
+    source_hash: str,
+    target_hash: str,
+) -> tuple[list[Symbol], GraphEdge, ImportRecord, GraphIndexState]:
+    source = make_file_symbol(
+        "src/source.py",
+        language="python",
+        content_hash=source_hash,
+    )
+    target = make_file_symbol(
+        "src/target.py",
+        language="python",
+        content_hash=target_hash,
+    )
+    raw = RawImport(
+        source_file="src/source.py",
+        language="python",
+        line=1,
+        text="from target import value",
+        specifier="target",
+        imported_name="value",
+        type_only=False,
+        is_reexport=False,
+        source_hash=source_hash,
+    )
+    record = ImportRecord(
+        raw=raw,
+        source_id=source.id,
+        target_file="src/target.py",
+        target_id=target.id,
+        status="resolved",
+        unresolved_reason=None,
+    )
+    edge = GraphEdge(
+        from_id=source.id,
+        to_id=target.id,
+        type="imports",
+        directed=True,
+        namespace="loci",
+        resolution="import-resolved",
+        evidence=GraphEvidence(
+            file="src/source.py",
+            line=1,
+            content_hash=source_hash,
+        ),
+    )
+    graph_state = replace(
+        GraphIndexState.empty(edges=[edge]),
+        imports=(record,),
+    )
+    return [source, target], edge, record, graph_state
+
+
 def test_store_write_creates_index_file(store: IndexStore, tmp_path: Path, sample_symbols):
     source_path = tmp_path / "repo"
     source_path.mkdir()
@@ -192,6 +248,105 @@ def test_store_rejects_invalid_graph_evidence(store: IndexStore, tmp_path: Path)
         )
 
     assert exc_info.value.code == "GRAPH_EVIDENCE_INVALID"
+    assert not store._index_path(source_path).exists()
+
+
+def test_store_write_load_round_trips_valid_import_edge(
+    store: IndexStore,
+    tmp_path: Path,
+):
+    source_path = tmp_path / "repo"
+    (source_path / "src").mkdir(parents=True)
+    source_file = source_path / "src" / "source.py"
+    target_file = source_path / "src" / "target.py"
+    source_file.write_text("from target import value\n")
+    target_file.write_text("value = 1\n")
+    source_hash = store.hash_file(source_file)
+    target_hash = store.hash_file(target_file)
+    symbols, edge, record, graph_state = _import_graph(source_hash, target_hash)
+
+    store.write(
+        source_path,
+        symbols,
+        file_hashes={
+            "src/source.py": source_hash,
+            "src/target.py": target_hash,
+        },
+        graph_state=graph_state,
+    )
+
+    loaded = store.get_graph_state(source_path)
+    assert loaded.edges == (edge,)
+    assert loaded.imports == (record,)
+
+
+def test_store_rejects_import_edge_without_matching_target_record(
+    store: IndexStore,
+    tmp_path: Path,
+):
+    source_path = tmp_path / "repo"
+    (source_path / "src").mkdir(parents=True)
+    source_file = source_path / "src" / "source.py"
+    target_file = source_path / "src" / "target.py"
+    source_file.write_text("from target import value\n")
+    target_file.write_text("value = 1\n")
+    source_hash = store.hash_file(source_file)
+    target_hash = store.hash_file(target_file)
+    symbols, _, record, graph_state = _import_graph(source_hash, target_hash)
+    corrupt_state = replace(
+        graph_state,
+        imports=(replace(record, target_id="src/other.py::__file__#file"),),
+    )
+
+    with pytest.raises(GraphContractError) as exc_info:
+        store.write(
+            source_path,
+            symbols,
+            file_hashes={
+                "src/source.py": source_hash,
+                "src/target.py": target_hash,
+            },
+            graph_state=corrupt_state,
+        )
+
+    assert exc_info.value.code == "GRAPH_EVIDENCE_INVALID"
+    assert exc_info.value.details["field"] == "import_record"
+    assert not store._index_path(source_path).exists()
+
+
+def test_store_rejects_extension_namespace_using_reserved_import_type(
+    store: IndexStore,
+    tmp_path: Path,
+):
+    source_path = tmp_path / "repo"
+    (source_path / "src").mkdir(parents=True)
+    source_file = source_path / "src" / "source.py"
+    target_file = source_path / "src" / "target.py"
+    source_file.write_text("from target import value\n")
+    target_file.write_text("value = 1\n")
+    source_hash = store.hash_file(source_file)
+    target_hash = store.hash_file(target_file)
+    symbols, edge, _, graph_state = _import_graph(source_hash, target_hash)
+    reserved_edge = replace(
+        edge,
+        namespace="llm-wiki",
+        resolution="declared",
+    )
+    corrupt_state = replace(graph_state, edges=(reserved_edge,))
+
+    with pytest.raises(GraphContractError) as exc_info:
+        store.write(
+            source_path,
+            symbols,
+            file_hashes={
+                "src/source.py": source_hash,
+                "src/target.py": target_hash,
+            },
+            graph_state=corrupt_state,
+        )
+
+    assert exc_info.value.code == "GRAPH_EDGE_TYPE_UNSUPPORTED"
+    assert exc_info.value.details["namespace"] == "llm-wiki"
     assert not store._index_path(source_path).exists()
 
 

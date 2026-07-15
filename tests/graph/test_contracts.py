@@ -11,11 +11,16 @@ from loci.graph.contracts import (
     GraphNodeRef,
     validate_graph_edges,
 )
+from loci.graph.imports import ImportRecord
+from loci.parser.imports import RawImport
 
 
 PARENT_ID = "guide.md::Guide#section"
 CHILD_ID = "guide.md::Guide > Install#section"
 CHILD_HASH = "a" * 64
+SOURCE_ID = "src/source.py::__file__#file"
+TARGET_ID = "src/target.py::__file__#file"
+SOURCE_HASH = "c" * 64
 
 
 def _edge(**overrides) -> GraphEdge:
@@ -53,6 +58,76 @@ def _indexed_nodes() -> dict[str, dict]:
             "file_path": "guide.md",
             "line": 5,
             "content_hash": CHILD_HASH,
+        },
+    }
+
+
+def _import_edge(**overrides) -> GraphEdge:
+    values = {
+        "from_id": SOURCE_ID,
+        "to_id": TARGET_ID,
+        "type": "imports",
+        "directed": True,
+        "namespace": "loci",
+        "resolution": "import-resolved",
+        "evidence": GraphEvidence(
+            file="src/source.py",
+            line=3,
+            content_hash=SOURCE_HASH,
+        ),
+    }
+    values.update(overrides)
+    return GraphEdge(**values)
+
+
+def _raw_import(**overrides) -> RawImport:
+    values = {
+        "source_file": "src/source.py",
+        "language": "python",
+        "line": 3,
+        "text": "from target import value",
+        "specifier": "target",
+        "imported_name": "value",
+        "type_only": False,
+        "is_reexport": False,
+        "source_hash": SOURCE_HASH,
+    }
+    values.update(overrides)
+    return RawImport(**values)
+
+
+def _import_record(*, raw: RawImport | None = None, **overrides) -> ImportRecord:
+    values = {
+        "raw": raw or _raw_import(),
+        "source_id": SOURCE_ID,
+        "target_file": "src/target.py",
+        "target_id": TARGET_ID,
+        "status": "resolved",
+        "unresolved_reason": None,
+    }
+    values.update(overrides)
+    return ImportRecord(**values)
+
+
+def _import_nodes() -> dict[str, dict]:
+    return {
+        SOURCE_ID: {
+            "id": SOURCE_ID,
+            "name": "source.py",
+            "kind": "file",
+            "language": "python",
+            "file_path": "src/source.py",
+            "line": 1,
+            "content_hash": SOURCE_HASH,
+        },
+        TARGET_ID: {
+            "id": TARGET_ID,
+            "name": "target.py",
+            "kind": "file",
+            "language": "python",
+            "file_path": "src/target.py",
+            "line": 1,
+            "content_hash": "d" * 64,
         },
     }
 
@@ -205,3 +280,155 @@ def test_contains_edge_must_be_directed_and_exact():
             indexed_nodes=_indexed_nodes(),
         )
     assert resolution_error.value.code == "GRAPH_RESOLUTION_UNSUPPORTED"
+
+
+def test_import_edges_accept_runtime_and_type_only_records():
+    nodes = _import_nodes()
+    file_hashes = {"src/source.py": SOURCE_HASH}
+
+    validate_graph_edges(
+        [_import_edge()],
+        indexed_nodes=nodes,
+        file_hashes=file_hashes,
+        imports=[_import_record()],
+    )
+    validate_graph_edges(
+        [_import_edge(type="imports_type")],
+        indexed_nodes=nodes,
+        file_hashes=file_hashes,
+        imports=[_import_record(raw=_raw_import(type_only=True))],
+    )
+
+
+@pytest.mark.parametrize(
+    ("edge", "code", "field"),
+    [
+        (_import_edge(directed=False), "INVALID_GRAPH_EDGE", "directed"),
+        (
+            _import_edge(resolution="exact"),
+            "GRAPH_RESOLUTION_UNSUPPORTED",
+            None,
+        ),
+        (
+            _import_edge(evidence=GraphEvidence(
+                file="src/target.py",
+                line=3,
+                content_hash=SOURCE_HASH,
+            )),
+            "GRAPH_EVIDENCE_INVALID",
+            "file",
+        ),
+        (
+            _import_edge(evidence=GraphEvidence(
+                file="src/source.py",
+                line=4,
+                content_hash=SOURCE_HASH,
+            )),
+            "GRAPH_EVIDENCE_INVALID",
+            "line",
+        ),
+        (
+            _import_edge(evidence=GraphEvidence(
+                file="src/source.py",
+                line=3,
+                content_hash="e" * 64,
+            )),
+            "GRAPH_EVIDENCE_INVALID",
+            "content_hash",
+        ),
+    ],
+)
+def test_import_edge_rejects_corrupt_contract_fields(
+    edge: GraphEdge,
+    code: str,
+    field: str | None,
+):
+    with pytest.raises(GraphContractError) as exc_info:
+        validate_graph_edges(
+            [edge],
+            indexed_nodes=_import_nodes(),
+            file_hashes={"src/source.py": SOURCE_HASH},
+            imports=[_import_record()],
+        )
+
+    assert exc_info.value.code == code
+    if field is not None:
+        assert exc_info.value.details["field"] == field
+    else:
+        assert exc_info.value.details["resolution"] == "exact"
+
+
+def test_import_edge_rejects_non_file_endpoint_even_with_same_name():
+    symbol_id = "src/target.py::target#function"
+    nodes = _import_nodes()
+    nodes[symbol_id] = {
+        "id": symbol_id,
+        "name": "target.py",
+        "kind": "function",
+        "language": "python",
+        "file_path": "src/target.py",
+        "line": 1,
+        "content_hash": "d" * 64,
+    }
+
+    with pytest.raises(GraphContractError) as exc_info:
+        validate_graph_edges(
+            [_import_edge(to_id=symbol_id)],
+            indexed_nodes=nodes,
+            file_hashes={"src/source.py": SOURCE_HASH},
+            imports=[_import_record(target_id=symbol_id)],
+        )
+
+    assert exc_info.value.code == "INVALID_GRAPH_EDGE"
+    assert exc_info.value.details["field"] == "endpoints"
+
+
+def test_import_edge_rejects_same_named_file_that_is_not_the_record_target():
+    wrong_target_id = "src/other/target.py::__file__#file"
+    nodes = _import_nodes()
+    nodes[wrong_target_id] = {
+        "id": wrong_target_id,
+        "name": "target.py",
+        "kind": "file",
+        "language": "python",
+        "file_path": "src/other/target.py",
+        "line": 1,
+        "content_hash": "e" * 64,
+    }
+
+    with pytest.raises(GraphContractError) as exc_info:
+        validate_graph_edges(
+            [_import_edge(to_id=wrong_target_id)],
+            indexed_nodes=nodes,
+            file_hashes={"src/source.py": SOURCE_HASH},
+            imports=[_import_record()],
+        )
+
+    assert exc_info.value.code == "GRAPH_EVIDENCE_INVALID"
+    assert exc_info.value.details["field"] == "import_record"
+
+
+def test_reserved_import_type_requires_loci_namespace():
+    with pytest.raises(GraphContractError) as exc_info:
+        validate_graph_edges(
+            [_import_edge(namespace="llm-wiki")],
+            indexed_nodes=_import_nodes(),
+            file_hashes={"src/source.py": SOURCE_HASH},
+            imports=[_import_record()],
+        )
+
+    assert exc_info.value.code == "GRAPH_EDGE_TYPE_UNSUPPORTED"
+    assert exc_info.value.details["namespace"] == "llm-wiki"
+
+
+def test_import_edge_requires_matching_resolved_record():
+    with pytest.raises(GraphContractError) as exc_info:
+        validate_graph_edges(
+            [_import_edge()],
+            indexed_nodes=_import_nodes(),
+            file_hashes={"src/source.py": SOURCE_HASH},
+            imports=[_import_record(target_id="src/other.py::__file__#file")],
+        )
+
+    assert exc_info.value.code == "GRAPH_EVIDENCE_INVALID"
+    assert exc_info.value.details["field"] == "import_record"
