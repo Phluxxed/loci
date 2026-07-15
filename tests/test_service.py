@@ -6,6 +6,7 @@ import pytest
 
 import loci.service as service_module
 from loci.graph.contracts import GRAPH_SCHEMA_VERSION, GRAPH_STATE_SCHEMA_VERSION
+from loci.parser.imports import ImportExtractionError
 from loci.service import (
     LociError,
     analyze_usage,
@@ -271,6 +272,32 @@ def test_service_schema_upgrade_rebuilds_graph(
     assert len(loaded["graph"]["edges"]) == 1
 
 
+def test_service_graph_state_upgrade_forces_full_reindex(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "consumer.py").write_text("import missing\n", encoding="utf-8")
+    index_repo(repo, incremental=False)
+
+    store = IndexStore(base_dir=base)
+    index_path = store._index_path(repo.resolve())
+    old_index = json.loads(index_path.read_text())
+    old_index["graph"]["schema_version"] = GRAPH_STATE_SCHEMA_VERSION - 1
+    index_path.write_text(json.dumps(old_index))
+
+    indexed = index_repo(repo, incremental=True)
+    loaded = store.load(repo.resolve())
+
+    assert indexed["files_skipped"] == 0
+    assert indexed["graph_imports_unresolved"] == 1
+    assert loaded is not None
+    assert loaded["graph"]["schema_version"] == GRAPH_STATE_SCHEMA_VERSION
+
+
 def test_service_refresh_repairs_invalid_current_graph_state(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -323,6 +350,213 @@ def test_service_incremental_reindex_recomputes_contains_edges(
     assert [edge["to"] for edge in edges] == [
         "guide.md::Guide > Configure#section"
     ]
+
+
+def test_service_indexes_file_nodes_imports_and_additive_counts(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "consumer.py").write_text("import target\n", encoding="utf-8")
+    (repo / "target.py").write_text("VALUE = 1\n", encoding="utf-8")
+
+    indexed = index_repo(repo, incremental=False)
+    loaded = IndexStore(base_dir=base).load(repo.resolve())
+
+    assert indexed["graph_file_nodes_indexed"] == 2
+    assert indexed["graph_imports_indexed"] == 1
+    assert indexed["graph_imports_resolved"] == 1
+    assert indexed["graph_imports_unresolved"] == 0
+    assert loaded is not None
+    assert {
+        symbol["id"]
+        for symbol in loaded["symbols"]
+        if symbol["kind"] == "file"
+    } == {
+        "consumer.py::__file__#file",
+        "target.py::__file__#file",
+    }
+    assert loaded["graph"]["imports"][0]["target_file"] == "target.py"
+    assert loaded["graph"]["edges"] == [{
+        "from": "consumer.py::__file__#file",
+        "to": "target.py::__file__#file",
+        "type": "imports",
+        "directed": True,
+        "namespace": "loci",
+        "resolution": "import-resolved",
+        "evidence": {
+            "file": "consumer.py",
+            "line": 1,
+            "content_hash": hashlib.sha256(
+                (repo / "consumer.py").read_bytes()
+            ).hexdigest(),
+        },
+    }]
+
+
+def test_service_file_nodes_do_not_suppress_zero_symbol_warnings(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "empty.py").write_text("# comment\n" * 11, encoding="utf-8")
+    monkeypatch.setattr(service_module, "parse_file", lambda path: [])
+
+    indexed = index_repo(repo, incremental=False)
+    loaded = IndexStore(base_dir=base).load(repo.resolve())
+
+    assert indexed["warnings"] == [{
+        "file": "empty.py",
+        "lines": 11,
+        "reason": "0 symbols extracted",
+    }]
+    assert indexed["graph_file_nodes_indexed"] == 1
+    assert indexed["symbols_indexed"] == 1
+    assert loaded is not None
+    assert loaded["symbols"][0]["id"] == "empty.py::__file__#file"
+
+
+def test_service_incremental_addition_resolves_unchanged_source_import(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "consumer.py").write_text("import target\n", encoding="utf-8")
+
+    initial = index_repo(repo, incremental=False)
+    (repo / "target.py").write_text("VALUE = 1\n", encoding="utf-8")
+    updated = index_repo(repo, incremental=True)
+    loaded = IndexStore(base_dir=base).load(repo.resolve())
+
+    assert initial["graph_imports_unresolved"] == 1
+    assert updated["files_skipped"] == 1
+    assert updated["graph_imports_resolved"] == 1
+    assert updated["graph_imports_unresolved"] == 0
+    assert loaded is not None
+    assert loaded["graph"]["imports"][0]["target_file"] == "target.py"
+    assert [edge["type"] for edge in loaded["graph"]["edges"]] == ["imports"]
+
+
+def test_service_incremental_target_deletion_unresolves_retained_import(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "consumer.py").write_text("import target\n", encoding="utf-8")
+    target = repo / "target.py"
+    target.write_text("VALUE = 1\n", encoding="utf-8")
+    index_repo(repo, incremental=False)
+
+    target.unlink()
+    updated = index_repo(repo, incremental=True)
+    loaded = IndexStore(base_dir=base).load(repo.resolve())
+
+    assert updated["files_skipped"] == 1
+    assert updated["graph_file_nodes_indexed"] == 1
+    assert updated["graph_imports_resolved"] == 0
+    assert updated["graph_imports_unresolved"] == 1
+    assert loaded is not None
+    assert loaded["graph"]["edges"] == []
+    assert loaded["graph"]["imports"][0]["target_file"] is None
+    assert loaded["graph"]["imports"][0]["unresolved_reason"] == "not_indexed"
+
+
+def test_service_incremental_source_change_replaces_then_deletion_drops_imports(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    consumer = repo / "consumer.py"
+    consumer.write_text("import first\n", encoding="utf-8")
+    (repo / "first.py").write_text("VALUE = 1\n", encoding="utf-8")
+    (repo / "second.py").write_text("VALUE = 2\n", encoding="utf-8")
+    index_repo(repo, incremental=False)
+
+    consumer.write_text("import second\n", encoding="utf-8")
+    changed = index_repo(repo, incremental=True)
+    store = IndexStore(base_dir=base)
+    changed_graph = store.load(repo.resolve())["graph"]
+
+    assert changed["files_skipped"] == 2
+    assert changed["graph_imports_indexed"] == 1
+    assert changed_graph["imports"][0]["raw"]["specifier"] == "second"
+    assert changed_graph["imports"][0]["target_file"] == "second.py"
+    assert changed_graph["edges"][0]["evidence"]["content_hash"] == hashlib.sha256(
+        consumer.read_bytes()
+    ).hexdigest()
+
+    consumer.unlink()
+    deleted = index_repo(repo, incremental=True)
+    deleted_graph = store.load(repo.resolve())["graph"]
+
+    assert deleted["graph_file_nodes_indexed"] == 2
+    assert deleted["graph_imports_indexed"] == 0
+    assert deleted_graph["imports"] == []
+    assert deleted_graph["edges"] == []
+
+
+def test_service_retains_import_extraction_warning_for_unchanged_source(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "consumer.py").write_text(
+        "def keep_navigation():\n    return True\n",
+        encoding="utf-8",
+    )
+    extraction_calls = 0
+
+    def fail_extraction(*args, **kwargs):
+        nonlocal extraction_calls
+        extraction_calls += 1
+        raise ImportExtractionError("broken import parse")
+
+    monkeypatch.setattr(
+        service_module,
+        "extract_imports",
+        fail_extraction,
+        raising=False,
+    )
+
+    initial = index_repo(repo, incremental=False)
+    incremental = index_repo(repo, incremental=True)
+    loaded = IndexStore(base_dir=base).load(repo.resolve())
+
+    assert extraction_calls == 1
+    assert initial["graph_status"] == "degraded"
+    assert incremental["files_skipped"] == 1
+    assert incremental["graph_status"] == "degraded"
+    assert incremental["graph_diagnostics"] == [{
+        "severity": "warning",
+        "code": "GRAPH_IMPORT_EXTRACTION_FAILED",
+        "message": "Import observations could not be extracted",
+        "source": "consumer.py",
+        "details": {"reason": "broken import parse"},
+    }]
+    assert loaded is not None
+    assert any(
+        symbol["name"] == "keep_navigation"
+        for symbol in loaded["symbols"]
+    )
+    assert loaded["graph"]["imports"] == []
 
 
 def test_service_materializes_profile_without_leaking_declared_neighbors(

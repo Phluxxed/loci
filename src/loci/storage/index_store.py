@@ -17,7 +17,7 @@ from loci.parser.symbols import Symbol
 
 LAST_SEARCH_TTL = 300  # 5 minutes
 INDEX_SCHEMA_VERSION = 5
-EXTRACTOR_VERSION = 4
+EXTRACTOR_VERSION = 5
 
 
 def _resolve_worktree_root(path: str) -> str:
@@ -91,12 +91,12 @@ class IndexStore:
         persisted_graph = graph_state or GraphIndexState.empty()
         persisted_graph = GraphIndexState.from_dict(persisted_graph.to_dict())
         indexed_nodes = {symbol.id: symbol.to_dict() for symbol in symbols}
-        builtin_edges = [
+        containment_edges = [
             edge
             for edge in persisted_graph.edges
-            if edge.namespace == "loci"
+            if edge.namespace == "loci" and edge.type == "contains"
         ]
-        validate_graph_edges(builtin_edges, indexed_nodes=indexed_nodes)
+        validate_graph_edges(containment_edges, indexed_nodes=indexed_nodes)
 
         repo_dir = self._repo_dir(repo_path)
         repo_dir.mkdir(parents=True, exist_ok=True)
@@ -625,9 +625,12 @@ class IndexStore:
                 live_file = repo_path / file_path
                 if live_file.exists():
                     try:
-                        with open(live_file, "rb") as lf:
-                            lf.seek(byte_offset)
-                            live_raw = lf.read(byte_length)
+                        if kind == "file":
+                            live_raw = live_file.read_bytes()
+                        else:
+                            with open(live_file, "rb") as lf:
+                                lf.seek(byte_offset)
+                                live_raw = lf.read(byte_length)
                         live_hash = hashlib.sha256(live_raw).hexdigest()
                         if live_hash != stored_hash:
                             failed.append({
@@ -1298,7 +1301,7 @@ def _is_template_symbol(sym: dict[str, Any]) -> bool:
 
 
 def _should_verify_name_in_bytes(sym: dict[str, Any]) -> bool:
-    return not _is_synthetic_markdown_name(sym)
+    return sym.get("kind") != "file" and not _is_synthetic_markdown_name(sym)
 
 
 def _is_synthetic_markdown_name(sym: dict[str, Any]) -> bool:

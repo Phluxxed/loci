@@ -10,8 +10,13 @@ from loci.graph.contracts import (
     GraphEvidence,
 )
 from loci.graph.state import GraphIndexState
-from loci.parser.symbols import Symbol
-from loci.storage.index_store import EXTRACTOR_VERSION, INDEX_SCHEMA_VERSION, IndexStore
+from loci.parser.symbols import Symbol, make_file_symbol
+from loci.storage.index_store import (
+    EXTRACTOR_VERSION,
+    INDEX_SCHEMA_VERSION,
+    IndexStore,
+    index_versions_current,
+)
 
 
 @pytest.fixture
@@ -261,6 +266,47 @@ def test_store_write_persists_index_versions(store: IndexStore, tmp_path: Path, 
     data = json.loads(store._index_path(source_path).read_text())
     assert data["schema_version"] == INDEX_SCHEMA_VERSION
     assert data["extractor_version"] == EXTRACTOR_VERSION
+
+
+def test_index_versions_rejects_old_extractor_version():
+    assert EXTRACTOR_VERSION == 5
+    assert index_versions_current({
+        "schema_version": INDEX_SCHEMA_VERSION,
+        "extractor_version": EXTRACTOR_VERSION - 1,
+    }) is False
+
+
+def test_verify_index_uses_whole_file_hash_for_file_nodes(
+    store: IndexStore,
+    tmp_path: Path,
+):
+    source_path = tmp_path / "repo"
+    source_path.mkdir()
+    source_file = source_path / "module.py"
+    source_file.write_text("VALUE = 1\n", encoding="utf-8")
+    content_hash = store.hash_file(source_file)
+    file_node = make_file_symbol(
+        "module.py",
+        language="python",
+        content_hash=content_hash,
+    )
+    store.write(
+        source_path,
+        [file_node],
+        file_hashes={"module.py": content_hash},
+    )
+
+    assert store.verify_index(source_path)["failed"] == []
+
+    source_file.write_text("VALUE = 2\n", encoding="utf-8")
+
+    assert store.verify_index(source_path)["failed"] == [{
+        "id": "module.py::__file__#file",
+        "name": "module.py",
+        "kind": "file",
+        "file": "module.py",
+        "issue": "content_drift",
+    }]
 
 
 def test_get_symbol_content_returns_source(store: IndexStore, tmp_path: Path):
