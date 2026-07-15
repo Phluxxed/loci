@@ -91,12 +91,20 @@ class IndexStore:
         persisted_graph = graph_state or GraphIndexState.empty()
         persisted_graph = GraphIndexState.from_dict(persisted_graph.to_dict())
         indexed_nodes = {symbol.id: symbol.to_dict() for symbol in symbols}
-        containment_edges = [
+        built_in_edge_candidates = [
             edge
             for edge in persisted_graph.edges
-            if edge.namespace == "loci" and edge.type == "contains"
+            if (
+                edge.namespace == "loci"
+                or edge.type in {"imports", "imports_type"}
+            )
         ]
-        validate_graph_edges(containment_edges, indexed_nodes=indexed_nodes)
+        validate_graph_edges(
+            built_in_edge_candidates,
+            indexed_nodes=indexed_nodes,
+            file_hashes=file_hashes,
+            imports=persisted_graph.imports,
+        )
 
         repo_dir = self._repo_dir(repo_path)
         repo_dir.mkdir(parents=True, exist_ok=True)

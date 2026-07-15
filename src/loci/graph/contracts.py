@@ -2,9 +2,13 @@ from __future__ import annotations
 
 import math
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import PurePosixPath
-from typing import Any, Literal, Mapping, TypeAlias, cast
+from typing import TYPE_CHECKING, Any, Literal, Mapping, TypeAlias, cast
+
+if TYPE_CHECKING:
+    from .imports import ImportRecord
 
 
 JSONValue: TypeAlias = (
@@ -304,6 +308,8 @@ def validate_graph_edges(
     edges: list[GraphEdge],
     *,
     indexed_nodes: Mapping[str, Mapping[str, Any]],
+    file_hashes: Mapping[str, str] | None = None,
+    imports: Sequence[ImportRecord] = (),
 ) -> None:
     for edge_index, edge in enumerate(edges):
         _validate_evidence(edge.evidence, edge_index=edge_index)
@@ -313,7 +319,25 @@ def validate_graph_edges(
                 "Graph edge endpoints must be different",
                 {"edge_index": edge_index},
             )
-        if edge.namespace != "loci" or edge.type != "contains":
+        edge_kind = (edge.namespace, edge.type)
+        if edge_kind == ("loci", "contains"):
+            _validate_contains_edge(
+                edge,
+                edge_index=edge_index,
+                indexed_nodes=indexed_nodes,
+            )
+        elif edge_kind in {
+            ("loci", "imports"),
+            ("loci", "imports_type"),
+        }:
+            _validate_import_edge(
+                edge,
+                edge_index=edge_index,
+                indexed_nodes=indexed_nodes,
+                file_hashes=file_hashes,
+                imports=imports,
+            )
+        else:
             raise GraphContractError(
                 "GRAPH_EDGE_TYPE_UNSUPPORTED",
                 "Unsupported graph edge type",
@@ -323,61 +347,203 @@ def validate_graph_edges(
                     "type": edge.type,
                 },
             )
-        if edge.resolution != "exact":
+
+
+def _validate_contains_edge(
+    edge: GraphEdge,
+    *,
+    edge_index: int,
+    indexed_nodes: Mapping[str, Mapping[str, Any]],
+) -> None:
+    if edge.resolution != "exact":
+        raise GraphContractError(
+            "GRAPH_RESOLUTION_UNSUPPORTED",
+            "Resolution tier is not permitted for this graph edge type",
+            {"edge_index": edge_index, "resolution": edge.resolution},
+        )
+    if edge.directed is not True:
+        raise GraphContractError(
+            "INVALID_GRAPH_EDGE",
+            "Contains edges must be directed",
+            {"edge_index": edge_index, "field": "directed"},
+        )
+
+    parent, child = _indexed_edge_endpoints(
+        edge,
+        edge_index=edge_index,
+        indexed_nodes=indexed_nodes,
+    )
+    if (
+        parent.get("language") != "markdown"
+        or child.get("language") != "markdown"
+        or parent.get("file_path") != child.get("file_path")
+    ):
+        raise GraphContractError(
+            "INVALID_GRAPH_EDGE",
+            "Contains edge endpoints must be Markdown symbols in the same file",
+            {"edge_index": edge_index},
+        )
+    expected_evidence = {
+        "file": child.get("file_path"),
+        "line": child.get("line"),
+        "content_hash": child.get("content_hash"),
+    }
+    actual_evidence = edge.evidence.to_dict()
+    for field, expected in expected_evidence.items():
+        if actual_evidence[field] != expected:
             raise GraphContractError(
-                "GRAPH_RESOLUTION_UNSUPPORTED",
-                "Resolution tier is not permitted for this graph edge type",
-                {"edge_index": edge_index, "resolution": edge.resolution},
-            )
-        if edge.directed is not True:
-            raise GraphContractError(
-                "INVALID_GRAPH_EDGE",
-                "Contains edges must be directed",
-                {"edge_index": edge_index, "field": "directed"},
+                "GRAPH_EVIDENCE_INVALID",
+                "Graph evidence does not identify the target node",
+                {
+                    "edge_index": edge_index,
+                    "field": field,
+                    "expected": cast(JSONValue, expected),
+                    "actual": actual_evidence[field],
+                },
             )
 
-        missing_ids = [
-            node_id
-            for node_id in (edge.from_id, edge.to_id)
-            if node_id not in indexed_nodes
-        ]
-        if missing_ids:
-            raise GraphContractError(
-                "GRAPH_ENDPOINT_NOT_FOUND",
-                "Graph edge endpoint is not indexed",
-                {"edge_index": edge_index, "missing_ids": missing_ids},
-            )
 
-        parent = indexed_nodes[edge.from_id]
-        child = indexed_nodes[edge.to_id]
+def _validate_import_edge(
+    edge: GraphEdge,
+    *,
+    edge_index: int,
+    indexed_nodes: Mapping[str, Mapping[str, Any]],
+    file_hashes: Mapping[str, str] | None,
+    imports: Sequence[ImportRecord],
+) -> None:
+    if edge.resolution != "import-resolved":
+        raise GraphContractError(
+            "GRAPH_RESOLUTION_UNSUPPORTED",
+            "Resolution tier is not permitted for this graph edge type",
+            {"edge_index": edge_index, "resolution": edge.resolution},
+        )
+    if edge.directed is not True:
+        raise GraphContractError(
+            "INVALID_GRAPH_EDGE",
+            "Import edges must be directed",
+            {"edge_index": edge_index, "field": "directed"},
+        )
+
+    source, target = _indexed_edge_endpoints(
+        edge,
+        edge_index=edge_index,
+        indexed_nodes=indexed_nodes,
+    )
+    source_file = source.get("file_path")
+    target_file = target.get("file_path")
+    if (
+        source.get("kind") != "file"
+        or target.get("kind") != "file"
+        or not isinstance(source_file, str)
+        or not isinstance(target_file, str)
+    ):
+        raise GraphContractError(
+            "INVALID_GRAPH_EDGE",
+            "Import edge endpoints must be indexed file nodes",
+            {
+                "edge_index": edge_index,
+                "field": "endpoints",
+                "source_kind": cast(JSONValue, source.get("kind")),
+                "target_kind": cast(JSONValue, target.get("kind")),
+            },
+        )
+
+    if edge.evidence.file != source_file:
+        _raise_import_evidence_error(
+            edge_index,
+            "file",
+            expected=source_file,
+            actual=edge.evidence.file,
+        )
+
+    current_hash = file_hashes.get(source_file) if file_hashes is not None else None
+    if edge.evidence.content_hash != current_hash:
+        _raise_import_evidence_error(
+            edge_index,
+            "content_hash",
+            expected=current_hash,
+            actual=edge.evidence.content_hash,
+        )
+
+    record_type_only = edge.type == "imports_type"
+    candidates = [
+        record
+        for record in imports
         if (
-            parent.get("language") != "markdown"
-            or child.get("language") != "markdown"
-            or parent.get("file_path") != child.get("file_path")
-        ):
-            raise GraphContractError(
-                "INVALID_GRAPH_EDGE",
-                "Contains edge endpoints must be Markdown symbols in the same file",
-                {"edge_index": edge_index},
-            )
-        expected_evidence = {
-            "file": child.get("file_path"),
-            "line": child.get("line"),
-            "content_hash": child.get("content_hash"),
-        }
-        actual_evidence = edge.evidence.to_dict()
-        for field, expected in expected_evidence.items():
-            if actual_evidence[field] != expected:
-                raise GraphContractError(
-                    "GRAPH_EVIDENCE_INVALID",
-                    "Graph evidence does not identify the target node",
-                    {
-                        "edge_index": edge_index,
-                        "field": field,
-                        "expected": cast(JSONValue, expected),
-                        "actual": actual_evidence[field],
-                    },
-                )
+            record.status == "resolved"
+            and record.source_id == edge.from_id
+            and record.target_id == edge.to_id
+            and record.target_file == target_file
+            and record.raw.source_file == source_file
+            and record.raw.type_only is record_type_only
+        )
+    ]
+    if not candidates:
+        raise GraphContractError(
+            "GRAPH_EVIDENCE_INVALID",
+            "Import edge is not backed by a matching resolved import record",
+            {"edge_index": edge_index, "field": "import_record"},
+        )
+
+    line_candidates = [
+        record for record in candidates if record.raw.line == edge.evidence.line
+    ]
+    if not line_candidates:
+        _raise_import_evidence_error(
+            edge_index,
+            "line",
+            expected=sorted({record.raw.line for record in candidates}),
+            actual=edge.evidence.line,
+        )
+    if not any(
+        record.raw.source_hash == edge.evidence.content_hash
+        for record in line_candidates
+    ):
+        _raise_import_evidence_error(
+            edge_index,
+            "content_hash",
+            expected=sorted({record.raw.source_hash for record in line_candidates}),
+            actual=edge.evidence.content_hash,
+        )
+
+
+def _indexed_edge_endpoints(
+    edge: GraphEdge,
+    *,
+    edge_index: int,
+    indexed_nodes: Mapping[str, Mapping[str, Any]],
+) -> tuple[Mapping[str, Any], Mapping[str, Any]]:
+    missing_ids = [
+        node_id
+        for node_id in (edge.from_id, edge.to_id)
+        if node_id not in indexed_nodes
+    ]
+    if missing_ids:
+        raise GraphContractError(
+            "GRAPH_ENDPOINT_NOT_FOUND",
+            "Graph edge endpoint is not indexed",
+            {"edge_index": edge_index, "missing_ids": missing_ids},
+        )
+    return indexed_nodes[edge.from_id], indexed_nodes[edge.to_id]
+
+
+def _raise_import_evidence_error(
+    edge_index: int,
+    field: str,
+    *,
+    expected: JSONValue,
+    actual: JSONValue,
+) -> None:
+    raise GraphContractError(
+        "GRAPH_EVIDENCE_INVALID",
+        "Graph evidence does not identify the resolved import",
+        {
+            "edge_index": edge_index,
+            "field": field,
+            "expected": expected,
+            "actual": actual,
+        },
+    )
 
 
 def _mapping(value: Any, record: str) -> Mapping[str, Any]:
