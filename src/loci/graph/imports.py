@@ -1,13 +1,20 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import PurePosixPath
 from typing import Any, Literal, Mapping, TypeAlias, cast
 
 from loci.parser.imports import ImportUnresolvedReason, RawImport
+from loci.parser.symbols import Symbol
 
-from .contracts import GraphContractError, JSONValue
+from .contracts import (
+    GraphContractError,
+    GraphEdge,
+    GraphEvidence,
+    JSONValue,
+)
 
 
 ImportStatus: TypeAlias = Literal["resolved", "unresolved"]
@@ -119,6 +126,285 @@ class ImportRecord:
             status=cast(ImportStatus, status),
             unresolved_reason=cast(ImportUnresolvedReason | None, unresolved_reason),
         )
+
+
+def resolve_import(
+    raw: RawImport,
+    *,
+    file_nodes: Mapping[str, Symbol],
+) -> ImportRecord:
+    """Resolve one raw import against deterministic indexed file nodes."""
+    return resolve_imports((raw,), file_nodes=file_nodes)[0]
+
+
+def resolve_imports(
+    raw_imports: Sequence[RawImport],
+    *,
+    file_nodes: Mapping[str, Symbol],
+) -> list[ImportRecord]:
+    """Resolve a batch while deriving the indexed Python layout only once."""
+    indexed_files = _indexed_python_files(file_nodes)
+    package_roots = _python_package_roots(indexed_files)
+    return [
+        _resolve_import(
+            raw,
+            file_nodes=file_nodes,
+            indexed_files=indexed_files,
+            package_roots=package_roots,
+        )
+        for raw in raw_imports
+    ]
+
+
+def _resolve_import(
+    raw: RawImport,
+    *,
+    file_nodes: Mapping[str, Symbol],
+    indexed_files: frozenset[str],
+    package_roots: tuple[PurePosixPath, ...],
+) -> ImportRecord:
+    _validate_raw_import(raw)
+    source = _require_file_node(file_nodes, raw.source_file, field="source_file")
+    if raw.language != "python":
+        return _unresolved(raw, source.id, "unsupported_language")
+
+    target_file, unresolved_reason = _resolve_python_target(
+        raw,
+        indexed_files,
+        package_roots,
+    )
+    if target_file is None:
+        return _unresolved(raw, source.id, unresolved_reason)
+
+    target = _require_file_node(file_nodes, target_file, field="target_file")
+    return ImportRecord(
+        raw=raw,
+        source_id=source.id,
+        target_file=target_file,
+        target_id=target.id,
+        status="resolved",
+        unresolved_reason=None,
+    )
+
+
+def materialize_import_edges(
+    records: Sequence[ImportRecord],
+    *,
+    file_nodes: Mapping[str, Symbol],
+) -> list[GraphEdge]:
+    """Build one deterministic evidence-backed edge per resolved dependency."""
+    edges: dict[tuple[str, str, str, str], GraphEdge] = {}
+    evidence_ranks: dict[tuple[str, str, str, str], tuple[int, str, str, str]] = {}
+
+    for record in records:
+        source = _require_file_node(
+            file_nodes,
+            record.raw.source_file,
+            field="source_file",
+        )
+        if source.id != record.source_id:
+            raise _error(
+                "Import record source does not match its file node",
+                field="source_id",
+                source_id=record.source_id,
+            )
+        if record.status != "resolved":
+            continue
+        if record.target_file is None or record.target_id is None:
+            raise _error("Resolved import requires a target file and ID")
+        target = _require_file_node(
+            file_nodes,
+            record.target_file,
+            field="target_file",
+        )
+        if target.id != record.target_id:
+            raise _error(
+                "Import record target does not match its file node",
+                field="target_id",
+                target_id=record.target_id,
+            )
+        if source.id == target.id:
+            continue
+
+        edge_type = "imports_type" if record.raw.type_only else "imports"
+        edge = GraphEdge(
+            from_id=source.id,
+            to_id=target.id,
+            type=edge_type,
+            directed=True,
+            namespace="loci",
+            resolution="import-resolved",
+            evidence=GraphEvidence(
+                file=record.raw.source_file,
+                line=record.raw.line,
+                content_hash=record.raw.source_hash,
+            ),
+        )
+        key = (edge.namespace, edge.type, edge.from_id, edge.to_id)
+        rank = (
+            record.raw.line,
+            record.raw.text,
+            record.raw.specifier,
+            record.raw.imported_name or "",
+        )
+        if key not in evidence_ranks or rank < evidence_ranks[key]:
+            edges[key] = edge
+            evidence_ranks[key] = rank
+
+    return [edges[key] for key in sorted(edges)]
+
+
+def _resolve_python_target(
+    raw: RawImport,
+    indexed_files: frozenset[str],
+    package_roots: tuple[PurePosixPath, ...],
+) -> tuple[str | None, ImportUnresolvedReason]:
+    imported_name = raw.imported_name
+    if imported_name is not None and not imported_name.isidentifier():
+        return None, "invalid_specifier"
+
+    specifier = raw.specifier
+    if specifier.startswith("."):
+        base = _relative_python_base(raw.source_file, specifier)
+        if base is None:
+            return None, "invalid_specifier"
+        bases = (base,)
+    else:
+        parts = _dotted_parts(specifier)
+        if parts is None:
+            return None, "invalid_specifier"
+        bases = tuple(
+            root.joinpath(*parts)
+            for root in package_roots
+        )
+
+    targets = {
+        target
+        for base in bases
+        if (target := _resolve_python_base(base, imported_name, indexed_files))
+        is not None
+    }
+    if not targets:
+        return None, "not_indexed"
+    if len(targets) > 1:
+        return None, "ambiguous"
+    return targets.pop(), "not_indexed"
+
+
+def _indexed_python_files(file_nodes: Mapping[str, Symbol]) -> frozenset[str]:
+    return frozenset(
+        path
+        for path, node in file_nodes.items()
+        if (
+            path == node.file_path
+            and node.kind == "file"
+            and node.language == "python"
+            and path.endswith(".py")
+        )
+    )
+
+
+def _python_package_roots(indexed_files: frozenset[str]) -> tuple[PurePosixPath, ...]:
+    package_dirs = {
+        PurePosixPath(path).parent
+        for path in indexed_files
+        if PurePosixPath(path).name == "__init__.py"
+    }
+    roots = {PurePosixPath(".")}
+    roots.update(
+        directory.parent
+        for directory in package_dirs
+        if directory.parent not in package_dirs
+    )
+    return tuple(sorted(roots, key=lambda path: path.as_posix()))
+
+
+def _relative_python_base(
+    source_file: str,
+    specifier: str,
+) -> PurePosixPath | None:
+    dot_count = len(specifier) - len(specifier.lstrip("."))
+    remainder = specifier[dot_count:]
+    parts = _dotted_parts(remainder, allow_empty=True)
+    if parts is None:
+        return None
+
+    base = PurePosixPath(source_file).parent
+    for _ in range(dot_count - 1):
+        if base == PurePosixPath("."):
+            return None
+        base = base.parent
+    return base.joinpath(*parts)
+
+
+def _dotted_parts(
+    value: str,
+    *,
+    allow_empty: bool = False,
+) -> tuple[str, ...] | None:
+    if not value:
+        return () if allow_empty else None
+    parts = tuple(value.split("."))
+    if any(not part or not part.isidentifier() for part in parts):
+        return None
+    return parts
+
+
+def _resolve_python_base(
+    base: PurePosixPath,
+    imported_name: str | None,
+    indexed_files: frozenset[str],
+) -> str | None:
+    if imported_name is not None:
+        submodule = _indexed_python_module(base / imported_name, indexed_files)
+        if submodule is not None:
+            return submodule
+    return _indexed_python_module(base, indexed_files)
+
+
+def _indexed_python_module(
+    base: PurePosixPath,
+    indexed_files: frozenset[str],
+) -> str | None:
+    candidates: list[str] = []
+    if base != PurePosixPath("."):
+        candidates.append(f"{base.as_posix()}.py")
+    candidates.append((base / "__init__.py").as_posix())
+    return next(
+        (candidate for candidate in candidates if candidate in indexed_files),
+        None,
+    )
+
+
+def _unresolved(
+    raw: RawImport,
+    source_id: str,
+    reason: ImportUnresolvedReason,
+) -> ImportRecord:
+    return ImportRecord(
+        raw=raw,
+        source_id=source_id,
+        target_file=None,
+        target_id=None,
+        status="unresolved",
+        unresolved_reason=reason,
+    )
+
+
+def _require_file_node(
+    file_nodes: Mapping[str, Symbol],
+    path: str,
+    *,
+    field: str,
+) -> Symbol:
+    node = file_nodes.get(path)
+    if node is None or node.kind != "file" or node.file_path != path:
+        raise _error(
+            "Import path does not identify an indexed file node",
+            field=field,
+            path=path,
+        )
+    return node
 
 
 def _raw_import_to_dict(raw: RawImport) -> dict[str, JSONValue]:
