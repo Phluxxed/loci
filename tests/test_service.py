@@ -5,7 +5,7 @@ import json
 import pytest
 
 import loci.service as service_module
-from loci.graph.contracts import GRAPH_SCHEMA_VERSION
+from loci.graph.contracts import GRAPH_SCHEMA_VERSION, GRAPH_STATE_SCHEMA_VERSION
 from loci.service import (
     LociError,
     analyze_usage,
@@ -230,7 +230,7 @@ def test_service_indexes_markdown_contains_edge(
 
     assert indexed["graph_edges_indexed"] == 1
     assert loaded is not None
-    assert loaded["graph"]["schema_version"] == GRAPH_SCHEMA_VERSION
+    assert loaded["graph"]["schema_version"] == GRAPH_STATE_SCHEMA_VERSION
     edge = loaded["graph"]["edges"][0]
     assert edge["from"] == "guide.md::Guide#section"
     assert edge["to"] == "guide.md::Guide > Install#section"
@@ -267,7 +267,7 @@ def test_service_schema_upgrade_rebuilds_graph(
     assert indexed["files_skipped"] == 0
     assert indexed["graph_edges_indexed"] == 1
     assert loaded is not None
-    assert loaded["graph"]["schema_version"] == GRAPH_SCHEMA_VERSION
+    assert loaded["graph"]["schema_version"] == GRAPH_STATE_SCHEMA_VERSION
     assert len(loaded["graph"]["edges"]) == 1
 
 

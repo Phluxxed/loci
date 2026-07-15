@@ -7,13 +7,14 @@ from pathlib import PurePosixPath
 from typing import Any, Literal, Mapping, Sequence, cast
 
 from .contracts import (
-    GRAPH_SCHEMA_VERSION,
+    GRAPH_STATE_SCHEMA_VERSION,
     GraphContractError,
     GraphContribution,
     GraphEdge,
     GraphNodeRef,
     JSONValue,
 )
+from .imports import ImportRecord
 from .profiles import LoadedGraphProfile
 
 
@@ -112,6 +113,7 @@ class GraphIndexState:
     profiles: tuple[LoadedGraphProfile, ...]
     nodes: tuple[GraphNodeRef, ...]
     edges: tuple[GraphEdge, ...]
+    imports: tuple[ImportRecord, ...]
     contributions: tuple[LoadedGraphContribution, ...]
     input_hashes: dict[str, str]
     diagnostics: tuple[GraphDiagnostic, ...]
@@ -122,6 +124,7 @@ class GraphIndexState:
             "profiles": [profile.to_dict() for profile in self.profiles],
             "nodes": [node.to_dict() for node in self.nodes],
             "edges": [edge.to_dict() for edge in self.edges],
+            "imports": [record.to_dict() for record in self.imports],
             "contributions": [
                 contribution.to_dict() for contribution in self.contributions
             ],
@@ -136,10 +139,11 @@ class GraphIndexState:
         edges: Sequence[GraphEdge] = (),
     ) -> GraphIndexState:
         return cls(
-            schema_version=GRAPH_SCHEMA_VERSION,
+            schema_version=GRAPH_STATE_SCHEMA_VERSION,
             profiles=(),
             nodes=(),
             edges=tuple(edges),
+            imports=(),
             contributions=(),
             input_hashes={},
             diagnostics=(),
@@ -147,6 +151,15 @@ class GraphIndexState:
 
     @classmethod
     def from_dict(cls, value: Mapping[str, Any]) -> GraphIndexState:
+        if (
+            "schema_version" in value
+            and value["schema_version"] != GRAPH_STATE_SCHEMA_VERSION
+        ):
+            raise _error(
+                "Unsupported graph state schema version",
+                field="schema_version",
+                schema_version=cast(Any, value["schema_version"]),
+            )
         _require_keys(
             value,
             {
@@ -154,18 +167,13 @@ class GraphIndexState:
                 "profiles",
                 "nodes",
                 "edges",
+                "imports",
                 "contributions",
                 "input_hashes",
                 "diagnostics",
             },
             "state",
         )
-        if value["schema_version"] != GRAPH_SCHEMA_VERSION:
-            raise _error(
-                "Unsupported graph state schema version",
-                field="schema_version",
-                schema_version=cast(Any, value["schema_version"]),
-            )
         profiles = tuple(
             LoadedGraphProfile.from_dict(_mapping(item, "loaded profile"))
             for item in _list(value["profiles"], "profiles")
@@ -177,6 +185,10 @@ class GraphIndexState:
         edges = tuple(
             GraphEdge.from_dict(_mapping(item, "edge"))
             for item in _list(value["edges"], "edges")
+        )
+        imports = tuple(
+            ImportRecord.from_dict(_mapping(item, "import record"))
+            for item in _list(value["imports"], "imports")
         )
         contributions = tuple(
             LoadedGraphContribution.from_dict(
@@ -203,10 +215,11 @@ class GraphIndexState:
             for item in _list(value["diagnostics"], "diagnostics")
         )
         return cls(
-            schema_version=GRAPH_SCHEMA_VERSION,
+            schema_version=GRAPH_STATE_SCHEMA_VERSION,
             profiles=profiles,
             nodes=nodes,
             edges=edges,
+            imports=imports,
             contributions=contributions,
             input_hashes=dict(sorted(input_hashes.items())),
             diagnostics=diagnostics,

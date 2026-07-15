@@ -9,7 +9,7 @@ from typing import Any, cast
 
 from loci.graph.builtins import extract_markdown_contains_edges
 from loci.graph.contracts import (
-    GRAPH_SCHEMA_VERSION,
+    GRAPH_STATE_SCHEMA_VERSION,
     GraphContractError,
     GraphContribution,
     GraphEdge,
@@ -624,10 +624,11 @@ def materialize_graph(
         key=_diagnostic_sort_key,
     ))
     return GraphIndexState(
-        schema_version=GRAPH_SCHEMA_VERSION,
+        schema_version=GRAPH_STATE_SCHEMA_VERSION,
         profiles=active_profiles,
         nodes=nodes,
         edges=edges,
+        imports=(),
         contributions=active_contributions,
         input_hashes=dict(sorted(resolved_input_hashes.items())),
         diagnostics=sorted_diagnostics,

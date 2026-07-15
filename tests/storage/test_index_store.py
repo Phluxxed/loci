@@ -4,7 +4,7 @@ import time
 import time as time_module
 from pathlib import Path
 from loci.graph.contracts import (
-    GRAPH_SCHEMA_VERSION,
+    GRAPH_STATE_SCHEMA_VERSION,
     GraphContractError,
     GraphEdge,
     GraphEvidence,
@@ -144,7 +144,7 @@ def test_store_write_load_round_trips_graph_envelope(store: IndexStore, tmp_path
     loaded = store.load(source_path)
 
     assert loaded is not None
-    assert loaded["graph"]["schema_version"] == GRAPH_SCHEMA_VERSION
+    assert loaded["graph"]["schema_version"] == GRAPH_STATE_SCHEMA_VERSION
     assert loaded["graph"]["edges"] == [edge.to_dict()]
     assert store.get_graph_state(source_path) == GraphIndexState.empty(edges=[edge])
     assert store.get_graph_edges(source_path) == [edge]
