@@ -902,12 +902,23 @@ def test_builder_rejects_disagreeing_workspace_replacement_versions():
     )
 
 
-def test_builder_reports_invalid_go_file_nodes_without_exposing_absolute_paths():
-    node = _go_file("safe.go", "safe")
+@pytest.mark.parametrize(
+    "invalid_path",
+    [
+        "/private/outside.go",
+        "nested\\outside.go",
+        "nested//outside.go",
+        "nested/\x01.go",
+    ],
+)
+def test_builder_reports_invalid_go_file_nodes_without_exposing_paths(
+    invalid_path: str,
+):
+    node = _go_file(invalid_path, "safe")
 
     built = build_go_package_index(
         GoModuleContext(modules=(_module(),), workspaces=()),
-        file_nodes={"/private/outside.go": node},
+        file_nodes={invalid_path: node},
     )
 
     assert built.index.package_nodes == ()
@@ -915,4 +926,4 @@ def test_builder_reports_invalid_go_file_nodes_without_exposing_absolute_paths()
     assert built.problems[0].code == "GRAPH_GO_PACKAGE_INVALID"
     assert built.problems[0].source == "@invalid/go-file"
     assert built.problems[0].details == {"reason": "invalid_go_file_node"}
-    assert "/private/outside.go" not in str(built.problems[0])
+    assert invalid_path not in str(built.problems[0])
