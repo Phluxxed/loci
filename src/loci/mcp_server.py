@@ -10,6 +10,7 @@ from loci.service import (
     analyze_usage,
     graph_anchors,
     graph_health,
+    graph_imports,
     graph_neighbors,
     graph_paths,
     graph_retrieve,
@@ -194,6 +195,26 @@ def create_server() -> FastMCP:
         """Inspect loaded graph profiles, active record counts, and diagnostics."""
         return _handle_loci_error(
             lambda: graph_health(repo, ensure_fresh=True)
+        )
+
+    @mcp.tool()
+    def loci_graph_imports(
+        repo: str,
+        file: str | None = None,
+        status: str = "all",
+        offset: int = 0,
+        limit: int = 100,
+    ) -> CallToolResult:
+        """Inspect bounded resolved and unresolved built-in import records."""
+        return _handle_loci_error(
+            lambda: graph_imports(
+                repo,
+                file=file,
+                status=status,
+                offset=offset,
+                limit=limit,
+                ensure_fresh=True,
+            )
         )
 
     @mcp.tool()
