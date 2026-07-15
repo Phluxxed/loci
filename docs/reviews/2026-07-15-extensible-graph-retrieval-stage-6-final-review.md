@@ -1,10 +1,12 @@
 # Extensible Graph Retrieval Stage 6 Final Review
 
-**Status:** Pending owner approval
+**Status:** Accepted
 
 **Recommendation:** Accept
 
 **Review date:** 2026-07-15
+
+**Owner approval date:** 2026-07-15
 
 **Repository:** `/Users/brummerv/loci`
 
@@ -14,9 +16,10 @@
 
 **Canonical plan:** [Extensible Graph Retrieval Stage 6](../plans/2026-07-14-extensible-graph-retrieval-stage-6.md)
 
-## Decision requested
+## Decision recorded
 
-Approve Stage 6 as shipped through `b17adba74b2b8b026a575135c923ccedeb024e0a`.
+The owner accepted Stage 6 as shipped through
+`b17adba74b2b8b026a575135c923ccedeb024e0a`.
 
 The review found no critical or required changes. The implementation meets the
 approved Stage 6 contract: Loci extracts and persists import observations,
@@ -25,8 +28,8 @@ materializes only evidence-backed file dependency edges, exposes bounded import
 records, and includes trusted resolved imports in opt-in graph traversal. Existing
 exact-navigation and graph-extension behavior remains compatible.
 
-Approval closes Stage 6. It does **not** authorize resolved-reference or call-graph
-work; either capability requires its own design and review boundary.
+This approval closes Stage 6. It does **not** authorize resolved-reference or
+call-graph work; either capability requires its own design and review boundary.
 
 ## Scope under review
 
@@ -357,12 +360,12 @@ and declared graph-extension behavior remains the rollback boundary.
 
 ## Owner review gate
 
-- [ ] Owner accepts the Stage 6 implementation and this evidence packet.
-- [ ] Any requested revision is recorded with an exact failing contract or
-  reproducible case.
-- [ ] If accepted, Stage 6 is marked complete before any next-stage design begins.
+- [x] Owner accepted the Stage 6 implementation and this evidence packet.
+- [x] No revisions were requested.
+- [x] Stage 6 is marked complete before any next-stage design begins.
 
 ## Final verdict
 
-**Recommend ACCEPT.** Stage 6 is complete at the implementation and verification
-level. It is awaiting only the explicit owner approval required by the plan.
+**ACCEPTED.** Stage 6 is complete at the implementation, verification, and owner
+review levels. Any later graph-retrieval stage requires a separately approved
+design.
