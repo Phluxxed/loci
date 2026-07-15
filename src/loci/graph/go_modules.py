@@ -580,7 +580,10 @@ def _normalized_go_source_path(path: str, node: Symbol) -> PurePosixPath | None:
     candidate = PurePosixPath(path)
     if (
         path != node.file_path
+        or candidate.as_posix() != path
         or candidate.is_absolute()
+        or "\\" in path
+        or any(ord(char) < 32 for char in path)
         or any(part in {"", ".", ".."} for part in candidate.parts)
         or candidate.suffix != ".go"
     ):
