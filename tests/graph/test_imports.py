@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from loci.graph.contracts import GraphEdge, GraphEvidence
 from loci.graph.imports import ImportRecord, materialize_import_edges, resolve_import
 from loci.parser.imports import RawImport
@@ -7,6 +9,14 @@ from loci.parser.symbols import Symbol, make_file_symbol
 
 
 SOURCE_HASH = "a" * 64
+JAVASCRIPT_CANDIDATES = (
+    "module.ts",
+    "module.tsx",
+    "module.js",
+    "module/index.ts",
+    "module/index.tsx",
+    "module/index.js",
+)
 
 
 def _raw(
@@ -39,6 +49,42 @@ def _file_nodes(*paths: str) -> dict[str, Symbol]:
         path: make_file_symbol(
             path,
             language="python",
+            content_hash=SOURCE_HASH,
+        )
+        for path in paths
+    }
+
+
+def _javascript_raw(
+    specifier: str,
+    *,
+    source_file: str = "src/consumer.ts",
+    language: str = "typescript",
+    type_only: bool = False,
+    is_reexport: bool = False,
+) -> RawImport:
+    return RawImport(
+        source_file=source_file,
+        language=language,
+        line=1,
+        text=f'import {{value}} from "{specifier}";',
+        specifier=specifier,
+        imported_name=None,
+        type_only=type_only,
+        is_reexport=is_reexport,
+        source_hash=SOURCE_HASH,
+    )
+
+
+def _javascript_file_nodes(*paths: str) -> dict[str, Symbol]:
+    return {
+        path: make_file_symbol(
+            path,
+            language=(
+                "javascript"
+                if path.endswith((".js", ".jsx"))
+                else "typescript"
+            ),
             content_hash=SOURCE_HASH,
         )
         for path in paths
@@ -182,3 +228,115 @@ def test_materializes_one_directed_edge_with_earliest_evidence():
             content_hash=SOURCE_HASH,
         ),
     )]
+
+
+@pytest.mark.parametrize(
+    "winner_index",
+    range(len(JAVASCRIPT_CANDIDATES)),
+)
+def test_javascript_relative_import_uses_fixed_candidate_order(
+    winner_index: int,
+):
+    available = JAVASCRIPT_CANDIDATES[winner_index:]
+    expected = JAVASCRIPT_CANDIDATES[winner_index]
+    file_nodes = _javascript_file_nodes(
+        "src/consumer.ts",
+        *(f"src/{path}" for path in available),
+    )
+
+    record = resolve_import(
+        _javascript_raw("./module"),
+        file_nodes=file_nodes,
+    )
+
+    assert record.status == "resolved"
+    assert record.target_file == f"src/{expected}"
+    assert record.target_id == file_nodes[f"src/{expected}"].id
+
+
+def test_javascript_relative_import_resolves_parent_directory():
+    file_nodes = _javascript_file_nodes(
+        "src/ui/consumer.tsx",
+        "src/shared.ts",
+    )
+
+    record = resolve_import(
+        _javascript_raw(
+            "../shared",
+            source_file="src/ui/consumer.tsx",
+        ),
+        file_nodes=file_nodes,
+    )
+
+    assert record.target_file == "src/shared.ts"
+
+
+@pytest.mark.parametrize(
+    ("specifier", "language"),
+    [("react", "javascript"), ("@scope/package", "typescript")],
+)
+def test_javascript_bare_package_is_external(
+    specifier: str,
+    language: str,
+):
+    source_file = "src/consumer.js" if language == "javascript" else "src/consumer.ts"
+    file_nodes = _javascript_file_nodes(source_file)
+
+    record = resolve_import(
+        _javascript_raw(
+            specifier,
+            source_file=source_file,
+            language=language,
+        ),
+        file_nodes=file_nodes,
+    )
+
+    assert record.status == "unresolved"
+    assert record.unresolved_reason == "external"
+
+
+def test_javascript_relative_import_cannot_escape_repository_root():
+    file_nodes = _javascript_file_nodes("src/consumer.ts")
+
+    record = resolve_import(
+        _javascript_raw("../../outside"),
+        file_nodes=file_nodes,
+    )
+
+    assert record.status == "unresolved"
+    assert record.unresolved_reason == "invalid_specifier"
+
+
+def test_javascript_relative_import_ignores_unsupported_extensions():
+    file_nodes = _javascript_file_nodes(
+        "src/consumer.ts",
+        "src/module.jsx",
+    )
+
+    record = resolve_import(
+        _javascript_raw("./module"),
+        file_nodes=file_nodes,
+    )
+
+    assert record.status == "unresolved"
+    assert record.unresolved_reason == "not_indexed"
+
+
+def test_javascript_reexport_preserves_record_flag():
+    file_nodes = _javascript_file_nodes(
+        "src/index.ts",
+        "src/runtime.ts",
+    )
+
+    record = resolve_import(
+        _javascript_raw(
+            "./runtime",
+            source_file="src/index.ts",
+            is_reexport=True,
+        ),
+        file_nodes=file_nodes,
+    )
+
+    assert record.status == "resolved"
+    assert record.target_file == "src/runtime.ts"
+    assert record.raw.is_reexport is True
