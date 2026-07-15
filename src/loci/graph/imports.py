@@ -15,6 +15,7 @@ from .contracts import (
     GraphEvidence,
     JSONValue,
 )
+from .go_modules import GoModule, GoPackageBinding, GoPackageIndex
 
 
 ImportStatus: TypeAlias = Literal["resolved", "unresolved"]
@@ -184,24 +185,46 @@ class ImportRecord:
         )
 
 
+@dataclass(frozen=True, slots=True)
+class _GoResolverIndex:
+    packages: GoPackageIndex
+    modules_by_root: Mapping[str, tuple[GoModule, ...]]
+    modules_by_path: Mapping[str, tuple[GoModule, ...]]
+    bindings_by_source_module: Mapping[
+        str,
+        Mapping[str, tuple[GoPackageBinding, ...]],
+    ]
+
+
 def resolve_import(
     raw: RawImport,
     *,
     file_nodes: Mapping[str, Symbol],
+    go_packages: GoPackageIndex | None = None,
 ) -> ImportRecord:
-    """Resolve one raw import against deterministic indexed file nodes."""
-    return resolve_imports((raw,), file_nodes=file_nodes)[0]
+    """Resolve one raw import against deterministic indexed file/package targets."""
+    return resolve_imports(
+        (raw,),
+        file_nodes=file_nodes,
+        go_packages=go_packages,
+    )[0]
 
 
 def resolve_imports(
     raw_imports: Sequence[RawImport],
     *,
     file_nodes: Mapping[str, Symbol],
+    go_packages: GoPackageIndex | None = None,
 ) -> list[ImportRecord]:
     """Resolve a batch while deriving indexed language layouts only once."""
     indexed_python_files = _indexed_python_files(file_nodes)
     python_package_roots = _python_package_roots(indexed_python_files)
     indexed_javascript_files = _indexed_javascript_files(file_nodes)
+    go_resolver = (
+        _build_go_resolver_index(go_packages)
+        if go_packages is not None
+        else None
+    )
     return [
         _resolve_import(
             raw,
@@ -209,6 +232,7 @@ def resolve_imports(
             indexed_python_files=indexed_python_files,
             python_package_roots=python_package_roots,
             indexed_javascript_files=indexed_javascript_files,
+            go_resolver=go_resolver,
         )
         for raw in raw_imports
     ]
@@ -221,6 +245,7 @@ def _resolve_import(
     indexed_python_files: frozenset[str],
     python_package_roots: tuple[PurePosixPath, ...],
     indexed_javascript_files: frozenset[str],
+    go_resolver: _GoResolverIndex | None,
 ) -> ImportRecord:
     _validate_raw_import(raw)
     source = _require_file_node(file_nodes, raw.source_file, field="source_file")
@@ -234,6 +259,25 @@ def _resolve_import(
         target_file, unresolved_reason = _resolve_javascript_target(
             raw,
             indexed_javascript_files,
+        )
+    elif raw.language == "go":
+        if go_resolver is None:
+            return _unresolved(raw, source.id, "unsupported_language")
+        target_package, unresolved_reason = _resolve_go_target(
+            raw,
+            go_resolver,
+        )
+        if target_package is None:
+            return _unresolved(raw, source.id, unresolved_reason)
+        return ImportRecord(
+            raw=raw,
+            source_id=source.id,
+            target_file=None,
+            target_package=target_package.qualified_name,
+            target_kind="package",
+            target_id=target_package.id,
+            status="resolved",
+            unresolved_reason=None,
         )
     else:
         return _unresolved(raw, source.id, "unsupported_language")
@@ -413,6 +457,224 @@ def _resolve_javascript_target(
     if target is None:
         return None, "not_indexed"
     return target, "not_indexed"
+
+
+def _resolve_go_target(
+    raw: RawImport,
+    resolver: _GoResolverIndex,
+) -> tuple[Symbol | None, ImportUnresolvedReason]:
+    specifier = raw.specifier
+    if not _valid_go_import_specifier(specifier):
+        return None, "invalid_specifier"
+    if specifier == "C":
+        return None, "external"
+
+    source_module = _go_source_module(raw.source_file, resolver.modules_by_root)
+    if source_module is None:
+        return None, "external"
+    # Go package paths are a module prefix joined with the package subdirectory.
+    # Source: https://go.dev/ref/mod
+    bindings_by_prefix = resolver.bindings_by_source_module.get(
+        source_module.root,
+        {},
+    )
+    longest = next(
+        (
+            bindings_by_prefix[prefix]
+            for prefix in _go_import_prefixes(specifier)
+            if prefix in bindings_by_prefix
+        ),
+        (),
+    )
+    if not longest:
+        return None, "external"
+
+    if _more_specific_go_module_is_ineligible(
+        specifier,
+        longest,
+        resolver.modules_by_path,
+    ):
+        return None, "external"
+    candidates = tuple(
+        (
+            binding,
+            _go_binding_directory(binding, specifier),
+            resolver.packages.packages_by_binding.get(
+                (binding.module_root, specifier)
+            ),
+        )
+        for binding in longest
+    )
+    if len({directory for _, directory, _ in candidates}) > 1:
+        return None, "ambiguous"
+    target_ids = {target.id for _, _, target in candidates if target is not None}
+    if len(target_ids) > 1:
+        return None, "ambiguous"
+
+    binding, _, target = candidates[0]
+    key = (binding.module_root, specifier)
+    if key in resolver.packages.command_packages:
+        return None, "inaccessible"
+    if target is None:
+        return None, "not_indexed"
+    _validate_go_package_target(target, specifier)
+    if not _go_internal_import_allowed(raw.source_file, source_module, specifier):
+        return None, "inaccessible"
+    return target, "not_indexed"
+
+
+def _valid_go_import_specifier(specifier: str) -> bool:
+    if (
+        not specifier
+        or "\\" in specifier
+        or specifier.startswith(("./", "../"))
+        or any(
+            ord(character) < 32 or ord(character) == 127
+            for character in specifier
+        )
+    ):
+        return False
+    path = PurePosixPath(specifier)
+    parts = specifier.split("/")
+    return (
+        not path.is_absolute()
+        and path.as_posix() == specifier
+        and all(part not in {"", ".", ".."} for part in parts)
+    )
+
+
+def _go_source_module(
+    source_file: str,
+    modules_by_root: Mapping[str, tuple[GoModule, ...]],
+) -> GoModule | None:
+    directory = PurePosixPath(source_file).parent.as_posix()
+    while True:
+        owners = modules_by_root.get(directory, ())
+        if owners:
+            if len({module.module_path for module in owners}) != 1:
+                return None
+            return min(owners, key=lambda module: module.source)
+        if directory == ".":
+            return None
+        directory = PurePosixPath(directory).parent.as_posix()
+
+
+def _more_specific_go_module_is_ineligible(
+    specifier: str,
+    eligible_bindings: Sequence[GoPackageBinding],
+    modules_by_path: Mapping[str, tuple[GoModule, ...]],
+) -> bool:
+    eligible_prefix_length = len(eligible_bindings[0].import_prefix)
+    for prefix in _go_import_prefixes(specifier):
+        if len(prefix) <= eligible_prefix_length:
+            return False
+        for module in modules_by_path.get(prefix, ()):
+            for binding in eligible_bindings:
+                relative = _relative_directory(module.root, binding.module_root)
+                if relative not in {None, ""}:
+                    return True
+    return False
+
+
+def _go_binding_directory(binding: GoPackageBinding, specifier: str) -> str:
+    suffix = specifier[len(binding.import_prefix):].removeprefix("/")
+    if not suffix:
+        return binding.module_root
+    return (PurePosixPath(binding.module_root) / suffix).as_posix()
+
+
+def _go_import_prefixes(specifier: str) -> tuple[str, ...]:
+    parts = specifier.split("/")
+    return tuple(
+        "/".join(parts[:end])
+        for end in range(len(parts), 0, -1)
+    )
+
+
+def _build_go_resolver_index(go_packages: GoPackageIndex) -> _GoResolverIndex:
+    modules_by_root: dict[str, list[GoModule]] = {}
+    modules_by_path: dict[str, list[GoModule]] = {}
+    for module in go_packages.modules:
+        modules_by_root.setdefault(module.root, []).append(module)
+        modules_by_path.setdefault(module.module_path, []).append(module)
+
+    bindings_by_source: dict[
+        str,
+        dict[str, tuple[GoPackageBinding, ...]],
+    ] = {}
+    for source_root, bindings in go_packages.bindings_by_source_module.items():
+        grouped: dict[str, list[GoPackageBinding]] = {}
+        for binding in bindings:
+            grouped.setdefault(binding.import_prefix, []).append(binding)
+        bindings_by_source[source_root] = {
+            prefix: tuple(matches)
+            for prefix, matches in grouped.items()
+        }
+
+    return _GoResolverIndex(
+        packages=go_packages,
+        modules_by_root={
+            root: tuple(modules)
+            for root, modules in modules_by_root.items()
+        },
+        modules_by_path={
+            path: tuple(modules)
+            for path, modules in modules_by_path.items()
+        },
+        bindings_by_source_module=bindings_by_source,
+    )
+
+
+def _go_internal_import_allowed(
+    source_file: str,
+    source_module: GoModule,
+    target_import_path: str,
+) -> bool:
+    target_parts = target_import_path.split("/")
+    internal_positions = [
+        index for index, part in enumerate(target_parts) if part == "internal"
+    ]
+    if not internal_positions:
+        return True
+
+    # Go limits internal packages to importers beneath the parent import path.
+    # Source: https://go.dev/cmd/go/#hdr-Internal_Directories
+    parent_prefix = "/".join(target_parts[:internal_positions[-1]])
+    importer_directory = PurePosixPath(source_file).parent.as_posix()
+    relative = _relative_directory(importer_directory, source_module.root)
+    if relative is None:
+        return False
+    importer_path = source_module.module_path
+    if relative:
+        importer_path = f"{importer_path}/{relative}"
+    return (
+        not parent_prefix
+        or importer_path == parent_prefix
+        or importer_path.startswith(f"{parent_prefix}/")
+    )
+
+
+def _validate_go_package_target(target: Symbol, import_path: str) -> None:
+    if (
+        target.kind != "package"
+        or target.language != "go"
+        or target.qualified_name != import_path
+    ):
+        raise _error(
+            "Go package index target is invalid",
+            field="target_id",
+            target_id=target.id,
+        )
+
+
+def _relative_directory(directory: str, root: str) -> str | None:
+    if root == ".":
+        return "" if directory == "." else directory
+    try:
+        relative = PurePosixPath(directory).relative_to(PurePosixPath(root))
+    except ValueError:
+        return None
+    return "" if relative == PurePosixPath(".") else relative.as_posix()
 
 
 def _relative_javascript_base(
