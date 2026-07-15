@@ -24,6 +24,7 @@ def test_mcp_index_outline_get_round_trip(tmp_path: Path, fixtures_dir: Path):
         "loci_get",
         "loci_graph_anchors",
         "loci_graph_health",
+        "loci_graph_imports",
         "loci_graph_neighbors",
         "loci_graph_paths",
         "loci_graph_retrieve",
@@ -69,7 +70,7 @@ def test_mcp_loci_mcp_command_round_trip(tmp_path: Path, fixtures_dir: Path):
         _round_trip(repo, tmp_path / ".codeindex", command="loci-mcp", args=[])
     )
 
-    assert "loci_index" in result["tools"]
+    assert "loci_graph_imports" in result["tools"]
     assert result["indexed"]["symbols_indexed"] > 0
     assert result["verify"]["failed"] == []
 
@@ -190,6 +191,64 @@ def test_mcp_graph_paths_and_retrieve_survive_fresh_process(tmp_path: Path):
     assert "max_evidence_bytes" in schemas["loci_graph_paths"]["properties"]
     assert "question" in schemas["loci_graph_retrieve"]["required"]
     assert "direction" in schemas["loci_graph_traverse_neighbors"]["properties"]
+
+
+def test_mcp_graph_imports_contract_survives_fresh_process(tmp_path: Path):
+    result = asyncio.run(
+        _graph_imports_after_restart(
+            tmp_path / "repo",
+            tmp_path / ".codeindex",
+        )
+    )
+
+    schema = result["schema"]
+    properties = schema["properties"]
+    assert schema["required"] == ["repo"]
+    assert properties["repo"]["type"] == "string"
+    assert properties["file"]["anyOf"] == [
+        {"type": "string"},
+        {"type": "null"},
+    ]
+    assert properties["file"]["default"] is None
+    assert properties["status"]["type"] == "string"
+    assert properties["status"]["default"] == "all"
+    assert properties["offset"]["type"] == "integer"
+    assert properties["offset"]["default"] == 0
+    assert properties["limit"]["type"] == "integer"
+    assert properties["limit"]["default"] == 100
+
+    imports = result["imports"]
+    assert imports["counts"] == {
+        "total": 2,
+        "resolved": 1,
+        "unresolved": 1,
+        "returned": 2,
+    }
+    assert [item["specifier"] for item in imports["items"]] == [
+        "target",
+        "missing",
+    ]
+    assert imports["items"][0]["target_id"] == "target.py::__file__#file"
+    assert imports["items"][1]["unresolved_reason"] == "not_indexed"
+
+    neighbor = result["neighbors"]["results"][0]["neighbors"][0]
+    assert neighbor["node"]["id"] == "target.py::__file__#file"
+    assert neighbor["edge"]["type"] == "imports"
+    assert neighbor["edge"]["resolution"] == "import-resolved"
+    assert neighbor["traversed"] == "forward"
+
+    assert {
+        field: error["error"]["details"]["field"]
+        for field, error in result["errors"].items()
+    } == {
+        "status": "status",
+        "offset": "offset",
+        "limit": "limit",
+    }
+    assert all(
+        error["error"]["code"] == "INVALID_INPUT"
+        for error in result["errors"].values()
+    )
 
 
 async def _round_trip(
@@ -533,6 +592,80 @@ async def _graph_paths_after_restart(
                 "retrieve": retrieve.structuredContent,
                 "neighbors": neighbors.structuredContent,
                 "schemas": schemas,
+            }
+
+
+async def _graph_imports_after_restart(
+    repo: Path,
+    cache_dir: Path,
+) -> dict[str, Any]:
+    repo.mkdir()
+    (repo / "consumer.py").write_text(
+        "import target\nimport missing\n",
+        encoding="utf-8",
+    )
+    (repo / "target.py").write_text("VALUE = 1\n", encoding="utf-8")
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["PYTHONPATH"] = str(Path.cwd() / "src")
+    server_params = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "loci.mcp_server"],
+        env=env,
+        cwd=Path.cwd(),
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            indexed = await session.call_tool(
+                "loci_index",
+                arguments={"path": str(repo), "incremental": False},
+            )
+            assert indexed.structuredContent["graph_imports_resolved"] == 1
+            assert indexed.structuredContent["graph_imports_unresolved"] == 1
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            tools = await session.list_tools()
+            schema = next(
+                tool.inputSchema
+                for tool in tools.tools
+                if tool.name == "loci_graph_imports"
+            )
+            imports = await session.call_tool(
+                "loci_graph_imports",
+                arguments={"repo": str(repo)},
+            )
+            neighbors = await session.call_tool(
+                "loci_graph_traverse_neighbors",
+                arguments={
+                    "repo": str(repo),
+                    "seed_ids": ["consumer.py::__file__#file"],
+                    "namespaces": ["loci"],
+                    "edge_types": ["imports"],
+                    "resolutions": ["import-resolved"],
+                },
+            )
+            errors = {}
+            for field, arguments in (
+                ("status", {"status": "invalid"}),
+                ("offset", {"offset": -1}),
+                ("limit", {"limit": 501}),
+            ):
+                error = await session.call_tool(
+                    "loci_graph_imports",
+                    arguments={"repo": str(repo), **arguments},
+                )
+                assert error.isError is True
+                errors[field] = error.structuredContent
+
+            return {
+                "schema": schema,
+                "imports": imports.structuredContent,
+                "neighbors": neighbors.structuredContent,
+                "errors": errors,
             }
 
 
