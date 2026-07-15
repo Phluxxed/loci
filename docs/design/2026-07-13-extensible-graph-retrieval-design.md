@@ -1,6 +1,6 @@
 # loci: Extensible Graph Retrieval Layer — Proposed Design
 
-**Status:** proposed; architecture review required before implementation
+**Status:** Stages 1-5 implemented and reviewed; Stage 6 approved and Task 1 implemented
 
 **Date:** 2026-07-13
 
@@ -252,6 +252,9 @@ compatibility and rollback behaviour are approved.
 Fold trustworthy import/dependency extraction and later resolved references
 into the same graph substrate, using the existing import plan as research. This
 proves that the layer benefits ordinary repositories rather than only wikis.
+
+Implementation plan:
+`docs/plans/2026-07-14-extensible-graph-retrieval-stage-6.md`.
 
 Review evidence: language-specific resolution fixtures, same-name collision
 tests, unresolved-edge diagnostics, and agent navigation examples over a code

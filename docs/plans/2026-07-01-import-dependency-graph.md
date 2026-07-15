@@ -1,6 +1,11 @@
 # Plan: import / dependency graph capability for loci
 
-**Status:** ready to action · **For:** a fresh session in `~/loci`, end-to-end · **Date:** 2026-07-01 (v2 — rewritten after an adversarial review against the real source caught a repo-wide breaking change, an incoherent extraction recipe, a Go nesting miss, a hand-waved resolver, and a stale-index trap).
+**Status:** superseded for implementation by `docs/plans/2026-07-14-extensible-graph-retrieval-stage-6.md`; retained as extractor and resolver research · **Date:** 2026-07-01 (v2 — rewritten after an adversarial review against the real source caught a repo-wide breaking change, an incoherent extraction recipe, a Go nesting miss, a hand-waved resolver, and a stale-index trap).
+
+> Do not implement this document's top-level `imports` store, standalone
+> `loci_imports`/CLI surface, or implicit file-path endpoints. Stage 6
+> reconciles the useful language research below with the generic graph
+> contracts that shipped afterward.
 
 Self-contained. TDD — mirror the existing per-language extractor + service + MCP + CLI test patterns. Run `pytest -q` after each layer; the suite must stay green. This adds a **resolved, in-repo import/dependency graph** to loci, extracted from tree-sitter parse trees (not text grep), exposed via service + MCP + CLI.
 
