@@ -9,10 +9,52 @@ import loci.graph.go_modules as go_modules
 from loci.graph.contracts import GraphContractError
 from loci.graph.go_modules import (
     GoExclusion,
+    GoModule,
+    GoModuleContext,
+    GoPackageBinding,
     GoReplacement,
     GoRequirement,
+    GoWorkspace,
+    build_go_package_index,
     load_go_module_context,
 )
+from loci.parser.symbols import Symbol, make_file_symbol
+
+
+def _go_file(
+    path: str,
+    package: str | None,
+    *,
+    content_hash: str | None = None,
+    line: int = 1,
+) -> Symbol:
+    node = make_file_symbol(
+        path,
+        language="go",
+        content_hash=content_hash or hashlib.sha256(path.encode()).hexdigest(),
+    )
+    if package is not None:
+        node.metadata["loci"]["go_package"] = {"name": package, "line": line}
+    return node
+
+
+def _module(
+    *,
+    root: str = ".",
+    module_path: str = "example.com/project",
+    requirements: tuple[GoRequirement, ...] = (),
+    exclusions: tuple[GoExclusion, ...] = (),
+    replacements: tuple[GoReplacement, ...] = (),
+) -> GoModule:
+    source = "go.mod" if root == "." else f"{root}/go.mod"
+    return GoModule(
+        source=source,
+        root=root,
+        module_path=module_path,
+        requirements=requirements,
+        exclusions=exclusions,
+        replacements=replacements,
+    )
 
 
 def test_loader_parses_go_mod_directives_and_blocks(tmp_path: Path):
@@ -391,3 +433,486 @@ def test_outside_candidate_cannot_shadow_contained_control(tmp_path: Path):
         ("@outside/go.mod", "outside_repository"),
     ]
     assert list(loaded.input_hashes) == ["@outside/go.mod", "go.mod"]
+
+
+def test_builder_creates_stable_same_module_root_and_subpackage_nodes():
+    module = _module()
+    root_file = _go_file("root.go", "project", content_hash="1" * 64)
+    store_z = _go_file("internal/store/z.go", "store", content_hash="2" * 64)
+    store_a = _go_file(
+        "internal/store/a.go",
+        "store",
+        content_hash="3" * 64,
+        line=4,
+    )
+    file_nodes = {
+        node.file_path: node
+        for node in (root_file, store_z, store_a)
+    }
+
+    built = build_go_package_index(
+        GoModuleContext(modules=(module,), workspaces=()),
+        file_nodes=file_nodes,
+    )
+
+    assert built.problems == ()
+    assert built.index.modules == (module,)
+    assert built.index.bindings_by_source_module == {
+        ".": (
+            GoPackageBinding(
+                import_prefix="example.com/project",
+                module_root=".",
+                declared_module_path="example.com/project",
+                source="go.mod",
+            ),
+        ),
+    }
+    assert [node.id for node in built.index.package_nodes] == [
+        ".::example.com/project#package",
+        "internal/store::example.com/project/internal/store#package",
+    ]
+    store = built.index.packages_by_binding[
+        (".", "example.com/project/internal/store")
+    ]
+    assert store.id == "internal/store::example.com/project/internal/store#package"
+    assert store.name == "store"
+    assert store.qualified_name == "example.com/project/internal/store"
+    assert store.kind == "package"
+    assert store.language == "go"
+    assert store.file_path == "internal/store/a.go"
+    assert store.byte_offset == 0
+    assert store.byte_length == 0
+    assert store.signature == "example.com/project/internal/store"
+    assert store.content_hash == "3" * 64
+    assert store.keywords == ["example", "com", "project", "internal", "store"]
+    assert store.metadata == {
+        "loci": {
+            "go_package_node": True,
+            "directory": "internal/store",
+            "import_path": "example.com/project/internal/store",
+            "package_name": "store",
+            "module_root": ".",
+            "declared_module_path": "example.com/project",
+        }
+    }
+    assert (store.line, store.end_line) == (1, 1)
+
+    rebuilt = build_go_package_index(
+        GoModuleContext(modules=(module,), workspaces=()),
+        file_nodes={
+            root_file.file_path: root_file,
+            store_z.file_path: store_z,
+        },
+    )
+    moved = rebuilt.index.packages_by_binding[
+        (".", "example.com/project/internal/store")
+    ]
+    assert moved.id == store.id
+    assert moved.file_path == "internal/store/z.go"
+    assert moved.content_hash == "2" * 64
+
+
+def test_builder_uses_nearest_workspace_and_keeps_nested_module_ownership():
+    app = _module(root="work/app", module_path="example.com/app")
+    lib = _module(root="work/lib", module_path="example.com/lib")
+    other = _module(root="other", module_path="example.com/other")
+    context = GoModuleContext(
+        modules=(other, lib, app),
+        workspaces=(
+            GoWorkspace(
+                source="go.work",
+                root=".",
+                go_version="1.23",
+                use_roots=("other", "work/app"),
+                replacements=(),
+            ),
+            GoWorkspace(
+                source="work/go.work",
+                root="work",
+                go_version="1.23",
+                use_roots=("work/app", "work/lib"),
+                replacements=(),
+            ),
+        ),
+    )
+    file_nodes = {
+        node.file_path: node
+        for node in (
+            _go_file("work/app/app.go", "app"),
+            _go_file("work/app/nested/parent.go", "nested"),
+            _go_file("work/lib/lib.go", "lib"),
+            _go_file("other/other.go", "other"),
+        )
+    }
+
+    built = build_go_package_index(context, file_nodes=file_nodes)
+
+    assert [
+        (binding.import_prefix, binding.module_root, binding.source)
+        for binding in built.index.bindings_by_source_module["work/app"]
+    ] == [
+        ("example.com/app", "work/app", "work/app/go.mod"),
+        ("example.com/lib", "work/lib", "work/go.work"),
+    ]
+    assert [
+        binding.import_prefix
+        for binding in built.index.bindings_by_source_module["other"]
+    ] == ["example.com/app", "example.com/other"]
+    assert "work/lib::example.com/lib#package" in {
+        node.id for node in built.index.package_nodes
+    }
+    assert "work/lib::example.com/app/lib#package" not in {
+        node.id for node in built.index.package_nodes
+    }
+
+
+def test_builder_does_not_fall_back_past_nearest_workspace_that_omits_module():
+    extra = _module(root="work/extra", module_path="example.com/extra")
+    app = _module(root="work/app", module_path="example.com/app")
+    context = GoModuleContext(
+        modules=(extra, app),
+        workspaces=(
+            GoWorkspace(
+                source="go.work",
+                root=".",
+                go_version="1.23",
+                use_roots=("work/extra", "work/app"),
+                replacements=(),
+            ),
+            GoWorkspace(
+                source="work/go.work",
+                root="work",
+                go_version="1.23",
+                use_roots=("work/app",),
+                replacements=(),
+            ),
+        ),
+    )
+
+    built = build_go_package_index(
+        context,
+        file_nodes={"work/extra/extra.go": _go_file("work/extra/extra.go", "extra")},
+    )
+
+    assert built.index.bindings_by_source_module["work/extra"] == (
+        GoPackageBinding(
+            import_prefix="example.com/extra",
+            module_root="work/extra",
+            declared_module_path="example.com/extra",
+            source="work/extra/go.mod",
+        ),
+    )
+
+
+def test_builder_adds_required_local_replacement_as_distinct_package_identity():
+    app = _module(
+        root="app",
+        module_path="example.com/app",
+        requirements=(GoRequirement("example.com/dep", "v1.0.0"),),
+        replacements=(
+            GoReplacement("example.com/dep", None, "local/dep", None, None),
+            GoReplacement("example.com/unused", None, "local/dep", None, None),
+            GoReplacement("example.com/remote", None, None, "example.com/fork", "v1.0.0"),
+        ),
+    )
+    dependency = _module(
+        root="local/dep",
+        module_path="example.com/local-dep",
+    )
+    package = _go_file("local/dep/pkg/dep.go", "dep")
+
+    built = build_go_package_index(
+        GoModuleContext(modules=(app, dependency), workspaces=()),
+        file_nodes={package.file_path: package},
+    )
+
+    assert built.problems == ()
+    assert built.index.bindings_by_source_module["app"] == (
+        GoPackageBinding(
+            import_prefix="example.com/app",
+            module_root="app",
+            declared_module_path="example.com/app",
+            source="app/go.mod",
+        ),
+        GoPackageBinding(
+            import_prefix="example.com/dep",
+            module_root="local/dep",
+            declared_module_path="example.com/local-dep",
+            source="app/go.mod",
+        ),
+    )
+    assert {
+        node.id for node in built.index.package_nodes
+    } == {
+        "local/dep/pkg::example.com/dep/pkg#package",
+        "local/dep/pkg::example.com/local-dep/pkg#package",
+    }
+
+
+def test_workspace_replacement_overrides_module_replacement():
+    app = _module(
+        root="app",
+        module_path="example.com/app",
+        requirements=(GoRequirement("example.com/dep", "v1.0.0"),),
+        replacements=(
+            GoReplacement("example.com/dep", None, "local/module-dep", None, None),
+        ),
+    )
+    module_dep = _module(
+        root="local/module-dep",
+        module_path="example.com/module-dep",
+    )
+    workspace_dep = _module(
+        root="local/workspace-dep",
+        module_path="example.com/workspace-dep",
+    )
+    workspace = GoWorkspace(
+        source="go.work",
+        root=".",
+        go_version="1.23",
+        use_roots=("app",),
+        replacements=(
+            GoReplacement(
+                "example.com/dep",
+                None,
+                "local/workspace-dep",
+                None,
+                None,
+            ),
+        ),
+    )
+
+    built = build_go_package_index(
+        GoModuleContext(
+            modules=(app, module_dep, workspace_dep),
+            workspaces=(workspace,),
+        ),
+        file_nodes={},
+    )
+
+    dep_bindings = [
+        binding
+        for binding in built.index.bindings_by_source_module["app"]
+        if binding.import_prefix == "example.com/dep"
+    ]
+    assert dep_bindings == [
+        GoPackageBinding(
+            import_prefix="example.com/dep",
+            module_root="local/workspace-dep",
+            declared_module_path="example.com/workspace-dep",
+            source="go.work",
+        )
+    ]
+
+
+def test_builder_records_commands_and_rejects_invalid_package_directories():
+    module = _module()
+    file_nodes = {
+        node.file_path: node
+        for node in (
+            _go_file("cmd/tool/main.go", "main"),
+            _go_file("conflict/a.go", "alpha"),
+            _go_file("conflict/b.go", "beta"),
+            _go_file("missing/missing.go", None),
+            _go_file("vendor/hidden/hidden.go", "hidden"),
+            _go_file("testonly/only_test.go", "testonly"),
+        )
+    }
+
+    built = build_go_package_index(
+        GoModuleContext(modules=(module,), workspaces=()),
+        file_nodes=file_nodes,
+    )
+
+    assert built.index.package_nodes == ()
+    assert built.index.command_packages == frozenset({
+        (".", "example.com/project/cmd/tool"),
+    })
+    assert [(problem.source, problem.details["reason"]) for problem in built.problems] == [
+        ("conflict", "conflicting_package_declarations"),
+        ("missing", "missing_package_declaration"),
+    ]
+
+
+@pytest.mark.parametrize(
+    ("limit_name", "expected_reason"),
+    [
+        ("MAX_GO_PACKAGE_BINDINGS", "binding_limit_exceeded"),
+        ("MAX_GO_PACKAGE_NODES", "package_node_limit_exceeded"),
+    ],
+)
+def test_builder_rejects_limits_without_partial_index(
+    monkeypatch: pytest.MonkeyPatch,
+    limit_name: str,
+    expected_reason: str,
+):
+    monkeypatch.setattr(go_modules, limit_name, 0)
+    module = _module()
+    node = _go_file("store/store.go", "store")
+
+    built = build_go_package_index(
+        GoModuleContext(modules=(module,), workspaces=()),
+        file_nodes={node.file_path: node},
+    )
+
+    assert built.index.modules == ()
+    assert built.index.package_nodes == ()
+    assert built.index.bindings_by_source_module == {}
+    assert built.index.packages_by_binding == {}
+    assert built.index.command_packages == frozenset()
+    assert len(built.problems) == 1
+    assert built.problems[0].code == "GRAPH_GO_INDEX_LIMIT_EXCEEDED"
+    assert built.problems[0].details == {
+        "reason": expected_reason,
+        "limit": 0,
+    }
+
+
+def test_builder_never_lets_parent_binding_claim_nested_module_packages():
+    root = _module(module_path="example.com/root")
+    nested = _module(root="nested", module_path="example.com/nested")
+    package = _go_file("nested/pkg/pkg.go", "pkg")
+
+    built = build_go_package_index(
+        GoModuleContext(modules=(root, nested), workspaces=()),
+        file_nodes={package.file_path: package},
+    )
+
+    assert {node.id for node in built.index.package_nodes} == {
+        "nested/pkg::example.com/nested/pkg#package",
+    }
+    assert (
+        ".",
+        "example.com/root/nested/pkg",
+    ) not in built.index.packages_by_binding
+
+
+def test_builder_only_admits_required_non_excluded_local_replacements():
+    app = _module(
+        root="app",
+        module_path="example.com/app",
+        requirements=(
+            GoRequirement("example.com/excluded", "v1.0.0"),
+            GoRequirement("example.com/outside", "v1.0.0"),
+            GoRequirement("example.com/remote", "v1.0.0"),
+        ),
+        exclusions=(GoExclusion("example.com/excluded", "v1.0.0"),),
+        replacements=(
+            GoReplacement("example.com/excluded", None, "local/dep", None, None),
+            GoReplacement("example.com/outside", None, None, None, None),
+            GoReplacement(
+                "example.com/remote",
+                None,
+                None,
+                "example.com/fork",
+                "v1.0.1",
+            ),
+        ),
+    )
+    dependency = _module(root="local/dep", module_path="example.com/local")
+
+    built = build_go_package_index(
+        GoModuleContext(modules=(app, dependency), workspaces=()),
+        file_nodes={},
+    )
+
+    assert [
+        binding.import_prefix
+        for binding in built.index.bindings_by_source_module["app"]
+    ] == ["example.com/app"]
+    assert built.problems == ()
+
+
+def test_builder_reports_missing_and_conflicting_local_replacement_modules():
+    app = _module(
+        root="app",
+        module_path="example.com/app",
+        requirements=(
+            GoRequirement("example.com/conflict", "v1.0.0"),
+            GoRequirement("example.com/missing", "v1.0.0"),
+        ),
+        replacements=(
+            GoReplacement("example.com/conflict", None, "local/a", None, None),
+            GoReplacement("example.com/conflict", None, "local/b", None, None),
+            GoReplacement("example.com/missing", None, "local/missing", None, None),
+        ),
+    )
+    local_a = _module(root="local/a", module_path="example.com/a")
+    local_b = _module(root="local/b", module_path="example.com/b")
+
+    built = build_go_package_index(
+        GoModuleContext(modules=(app, local_a, local_b), workspaces=()),
+        file_nodes={},
+    )
+
+    assert [
+        binding.import_prefix
+        for binding in built.index.bindings_by_source_module["app"]
+    ] == ["example.com/app"]
+    assert [problem.details["reason"] for problem in built.problems] == [
+        "conflicting_local_replacements",
+        "replacement_module_missing",
+    ]
+    assert all("/Users/" not in str(problem.details) for problem in built.problems)
+
+
+def test_builder_rejects_disagreeing_workspace_replacement_versions():
+    app = _module(
+        root="app",
+        module_path="example.com/app",
+        requirements=(GoRequirement("example.com/dep", "v1.0.0"),),
+    )
+    worker = _module(
+        root="worker",
+        module_path="example.com/worker",
+        requirements=(GoRequirement("example.com/dep", "v2.0.0"),),
+    )
+    dependency = _module(root="local/dep", module_path="example.com/local-dep")
+    workspace = GoWorkspace(
+        source="go.work",
+        root=".",
+        go_version="1.23",
+        use_roots=("app", "worker"),
+        replacements=(
+            GoReplacement(
+                "example.com/dep",
+                "v1.0.0",
+                "local/dep",
+                None,
+                None,
+            ),
+        ),
+    )
+
+    built = build_go_package_index(
+        GoModuleContext(
+            modules=(app, worker, dependency),
+            workspaces=(workspace,),
+        ),
+        file_nodes={},
+    )
+
+    assert not any(
+        binding.import_prefix == "example.com/dep"
+        for binding in built.index.bindings_by_source_module["app"]
+    )
+    assert any(
+        problem.details["reason"] == "workspace_requirement_version_conflict"
+        for problem in built.problems
+    )
+
+
+def test_builder_reports_invalid_go_file_nodes_without_exposing_absolute_paths():
+    node = _go_file("safe.go", "safe")
+
+    built = build_go_package_index(
+        GoModuleContext(modules=(_module(),), workspaces=()),
+        file_nodes={"/private/outside.go": node},
+    )
+
+    assert built.index.package_nodes == ()
+    assert len(built.problems) == 1
+    assert built.problems[0].code == "GRAPH_GO_PACKAGE_INVALID"
+    assert built.problems[0].source == "@invalid/go-file"
+    assert built.problems[0].details == {"reason": "invalid_go_file_node"}
+    assert "/private/outside.go" not in str(built.problems[0])
