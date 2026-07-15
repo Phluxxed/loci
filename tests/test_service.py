@@ -1490,6 +1490,71 @@ def test_graph_traverse_neighbors_filters_direction_and_reports_omissions(
     assert incoming["filters"]["direction"] == "incoming"
 
 
+def test_import_edges_join_generic_defaults_without_widening_exact_neighbors(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "consumer.py").write_text("import target\n", encoding="utf-8")
+    (repo / "target.py").write_text("VALUE = 1\n", encoding="utf-8")
+    index_repo(repo, incremental=False)
+    consumer_id = "consumer.py::__file__#file"
+    target_id = "target.py::__file__#file"
+
+    outgoing = graph_traverse_neighbors(repo, [consumer_id])
+    incoming = graph_traverse_neighbors(
+        repo,
+        [target_id],
+        direction="incoming",
+    )
+    exact_only = graph_traverse_neighbors(
+        repo,
+        [consumer_id],
+        resolutions=["exact"],
+    )
+    paths = graph_paths(repo, [consumer_id], [target_id])
+    compatibility = graph_neighbors(repo, [consumer_id])
+
+    assert outgoing["filters"]["resolutions"] == [
+        "exact",
+        "declared",
+        "import-resolved",
+    ]
+    outgoing_neighbor = outgoing["results"][0]["neighbors"][0]
+    assert outgoing_neighbor["node"]["id"] == target_id
+    assert outgoing_neighbor["traversed"] == "forward"
+    assert outgoing_neighbor["edge"]["type"] == "imports"
+    assert outgoing_neighbor["edge"]["resolution"] == "import-resolved"
+
+    incoming_neighbor = incoming["results"][0]["neighbors"][0]
+    assert incoming_neighbor["node"]["id"] == consumer_id
+    assert incoming_neighbor["traversed"] == "reverse"
+    assert incoming_neighbor["edge"]["from"] == consumer_id
+    assert incoming_neighbor["edge"]["to"] == target_id
+
+    assert exact_only["filters"]["resolutions"] == ["exact"]
+    assert exact_only["results"][0]["neighbors"] == []
+
+    assert paths["filters"]["resolutions"] == [
+        "exact",
+        "declared",
+        "import-resolved",
+    ]
+    step = paths["paths"][0]["steps"][0]
+    assert step["edge"]["type"] == "imports"
+    assert step["edge"]["resolution"] == "import-resolved"
+    assert step["evidence_span"] == {
+        "file": "consumer.py",
+        "start_line": 1,
+        "end_line": 1,
+        "content": "import target\n",
+    }
+
+    assert compatibility["results"][0]["neighbors"] == []
+
+
 def test_graph_paths_hydrates_evidence_and_preserves_reverse_direction(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

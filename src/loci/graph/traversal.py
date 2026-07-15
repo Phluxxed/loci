@@ -24,7 +24,7 @@ MAX_GRAPH_ESTIMATED_TOKENS = 65_536
 GraphDirection = Literal["outgoing", "incoming", "either"]
 TraversalOrientation = Literal["forward", "reverse"]
 
-_SAFE_RESOLUTIONS = ("exact", "declared")
+SAFE_GRAPH_RESOLUTIONS = ("exact", "declared", "import-resolved")
 _DIRECTIONS = frozenset({"outgoing", "incoming", "either"})
 _TOKEN_RE = re.compile(r"[a-z0-9]+")
 _QUESTION_STOP_WORDS = frozenset({
@@ -120,7 +120,7 @@ def filter_graph_edges(
     namespace_values = _filter_values(namespaces, "namespaces")
     edge_type_values = _filter_values(edge_types, "edge_types")
     resolution_values = _filter_values(
-        resolutions if resolutions is not None else _SAFE_RESOLUTIONS,
+        resolutions if resolutions is not None else SAFE_GRAPH_RESOLUTIONS,
         "resolutions",
     )
     assert resolution_values is not None
