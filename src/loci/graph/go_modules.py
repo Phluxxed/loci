@@ -229,36 +229,32 @@ def build_go_package_index(
             MAX_GO_PACKAGE_BINDINGS,
         )
 
+    directories_by_root = _group_package_directories_by_module(
+        directories,
+        modules,
+    )
     package_nodes: dict[str, Symbol] = {}
     packages_by_binding: dict[tuple[str, str], Symbol] = {}
     command_packages: set[tuple[str, str]] = set()
-    for _, bindings in sorted(bindings_by_source.items()):
-        for binding in bindings:
-            for package in directories:
-                if _owning_module_root(package.directory, modules) != binding.module_root:
-                    continue
-                suffix = _relative_package_suffix(
-                    package.directory,
-                    binding.module_root,
-                )
-                if suffix is None:
-                    continue
-                import_path = binding.import_prefix
-                if suffix:
-                    import_path = f"{import_path}/{suffix}"
-                key = (binding.module_root, import_path)
-                if package.name == "main":
-                    command_packages.add(key)
-                    continue
+    for binding in _unique_package_bindings(bindings_by_source):
+        for package in directories_by_root.get(binding.module_root, ()):
+            suffix = _relative_package_suffix(package.directory, binding.module_root)
+            assert suffix is not None
+            import_path = binding.import_prefix
+            if suffix:
+                import_path = f"{import_path}/{suffix}"
+            key = (binding.module_root, import_path)
+            if package.name == "main":
+                command_packages.add(key)
+            else:
                 node = _make_go_package_symbol(package, binding, import_path)
                 package_nodes[node.id] = node
                 packages_by_binding[key] = node
-
-    if len(package_nodes) > MAX_GO_PACKAGE_NODES:
-        return _rejected_go_package_build(
-            "package_node_limit_exceeded",
-            MAX_GO_PACKAGE_NODES,
-        )
+            if len(package_nodes) + len(command_packages) > MAX_GO_PACKAGE_NODES:
+                return _rejected_go_package_build(
+                    "package_node_limit_exceeded",
+                    MAX_GO_PACKAGE_NODES,
+                )
 
     return GoPackageBuild(
         index=GoPackageIndex(
@@ -273,6 +269,38 @@ def build_go_package_index(
             key=lambda item: (item.source, item.code, item.message),
         )),
     )
+
+
+def _group_package_directories_by_module(
+    directories: Sequence[_GoPackageDirectory],
+    modules: Sequence[GoModule],
+) -> dict[str, tuple[_GoPackageDirectory, ...]]:
+    grouped: dict[str, list[_GoPackageDirectory]] = {}
+    for package in directories:
+        owner = _owning_module_root(package.directory, modules)
+        if owner is not None:
+            grouped.setdefault(owner, []).append(package)
+    return {
+        root: tuple(packages)
+        for root, packages in sorted(grouped.items())
+    }
+
+
+def _unique_package_bindings(
+    bindings_by_source: Mapping[str, Sequence[GoPackageBinding]],
+) -> tuple[GoPackageBinding, ...]:
+    unique: dict[tuple[str, str, str], GoPackageBinding] = {}
+    for bindings in bindings_by_source.values():
+        for binding in bindings:
+            key = (
+                binding.import_prefix,
+                binding.module_root,
+                binding.declared_module_path,
+            )
+            previous = unique.get(key)
+            if previous is None or _binding_sort_key(binding) < _binding_sort_key(previous):
+                unique[key] = binding
+    return tuple(sorted(unique.values(), key=_binding_sort_key))
 
 
 def _build_go_package_bindings(
