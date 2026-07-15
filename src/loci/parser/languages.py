@@ -15,6 +15,7 @@ class LanguageSpec:
     constant_name_pattern: str = ""          # regex; if set, only extract constants whose name matches
     decorator_child_type: str = ""           # child node type that represents a decorator/attribute
     decorator_sibling_type: str = ""         # preceding-sibling node type for decorators (e.g. Rust attribute_item)
+    import_node_types: tuple[str, ...] = ()   # AST node types that represent import observations
 
 
 _SPECS: dict[str, LanguageSpec] = {
@@ -34,6 +35,7 @@ _SPECS: dict[str, LanguageSpec] = {
         container_node_types=["class_definition"],
         constant_name_pattern=r"^[A-Z][A-Z0-9_]*$",
         decorator_child_type="decorator",
+        import_node_types=("import_statement", "import_from_statement"),
     ),
     "typescript": LanguageSpec(
         ts_language="typescript",
@@ -52,6 +54,7 @@ _SPECS: dict[str, LanguageSpec] = {
         container_node_types=["class_declaration", "class_body"],
         constant_name_pattern=r"^[A-Z][A-Z0-9_]*$",
         decorator_child_type="decorator",
+        import_node_types=("import_statement", "export_statement"),
     ),
     "tsx": LanguageSpec(
         ts_language="tsx",
@@ -84,6 +87,7 @@ _SPECS: dict[str, LanguageSpec] = {
         return_type_fields=["result"],
         docstring_strategy="preceding_comment",
         container_node_types=[],
+        import_node_types=("import_spec",),
     ),
     "rust": LanguageSpec(
         ts_language="rust",
@@ -102,6 +106,7 @@ _SPECS: dict[str, LanguageSpec] = {
         docstring_strategy="preceding_comment",
         container_node_types=["impl_item"],
         decorator_sibling_type="attribute_item",
+        import_node_types=("use_declaration",),
     ),
     "javascript": LanguageSpec(
         ts_language="javascript",
@@ -118,6 +123,7 @@ _SPECS: dict[str, LanguageSpec] = {
         container_node_types=["class_declaration", "class_body"],
         constant_name_pattern=r"^[A-Z][A-Z0-9_]*$",
         decorator_child_type="decorator",
+        import_node_types=("import_statement", "export_statement"),
     ),
 }
 
