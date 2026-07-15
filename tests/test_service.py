@@ -15,6 +15,7 @@ from loci.service import (
     ensure_fresh_index,
     graph_anchors,
     graph_health,
+    graph_imports,
     graph_neighbors,
     graph_paths,
     graph_retrieve,
@@ -41,6 +42,30 @@ def _run_python_json(source: str, *args: Path) -> dict:
         timeout=30,
     )
     return json.loads(completed.stdout)
+
+
+def _import_read_repo(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> Path:
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "import-repo"
+    repo.mkdir()
+    (repo / "a.py").write_text(
+        "import local_target\nimport missing\n",
+        encoding="utf-8",
+    )
+    (repo / "local_target.py").write_text("VALUE = 1\n", encoding="utf-8")
+    (repo / "main.go").write_text(
+        'package main\nimport "fmt"\nfunc main() {}\n',
+        encoding="utf-8",
+    )
+    (repo / "z.ts").write_text(
+        'import React from "react";\n',
+        encoding="utf-8",
+    )
+    index_repo(repo, incremental=False)
+    return repo
 
 
 def _domain_graph_repo(
@@ -410,6 +435,177 @@ def test_service_indexes_file_nodes_imports_and_additive_counts(
     }]
 
 
+def test_graph_imports_returns_stable_sorted_bounded_records(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    repo = _import_read_repo(tmp_path, monkeypatch)
+
+    result = graph_imports(repo, limit=2)
+
+    assert result == {
+        "schema_version": GRAPH_SCHEMA_VERSION,
+        "repo": str(repo.resolve()),
+        "file": None,
+        "status": "all",
+        "items": [
+            {
+                "source_file": "a.py",
+                "source_id": "a.py::__file__#file",
+                "target_file": "local_target.py",
+                "target_id": "local_target.py::__file__#file",
+                "specifier": "local_target",
+                "imported_name": None,
+                "language": "python",
+                "line": 1,
+                "text": "import local_target",
+                "type_only": False,
+                "is_reexport": False,
+                "status": "resolved",
+                "resolution": "import-resolved",
+                "unresolved_reason": None,
+            },
+            {
+                "source_file": "a.py",
+                "source_id": "a.py::__file__#file",
+                "target_file": None,
+                "target_id": None,
+                "specifier": "missing",
+                "imported_name": None,
+                "language": "python",
+                "line": 2,
+                "text": "import missing",
+                "type_only": False,
+                "is_reexport": False,
+                "status": "unresolved",
+                "resolution": None,
+                "unresolved_reason": "not_indexed",
+            },
+        ],
+        "counts": {
+            "total": 4,
+            "resolved": 1,
+            "unresolved": 3,
+            "returned": 2,
+        },
+        "pagination": {
+            "offset": 0,
+            "limit": 2,
+            "next_offset": 2,
+        },
+    }
+
+
+def test_graph_imports_filters_before_counts_status_and_pagination(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    repo = _import_read_repo(tmp_path, monkeypatch)
+
+    result = graph_imports(
+        repo,
+        file="a.py",
+        status="unresolved",
+        offset=0,
+        limit=1,
+    )
+    middle = graph_imports(repo, status="unresolved", offset=1, limit=1)
+    final = graph_imports(repo, status="unresolved", offset=2, limit=1)
+    empty = graph_imports(repo, file="not-indexed.py", status="resolved")
+
+    assert [item["specifier"] for item in result["items"]] == ["missing"]
+    assert result["counts"] == {
+        "total": 2,
+        "resolved": 1,
+        "unresolved": 1,
+        "returned": 1,
+    }
+    assert result["pagination"] == {
+        "offset": 0,
+        "limit": 1,
+        "next_offset": None,
+    }
+    assert [item["specifier"] for item in middle["items"]] == ["fmt"]
+    assert middle["pagination"]["next_offset"] == 2
+    assert [item["specifier"] for item in final["items"]] == ["react"]
+    assert final["pagination"]["next_offset"] is None
+    assert empty["counts"] == {
+        "total": 0,
+        "resolved": 0,
+        "unresolved": 0,
+        "returned": 0,
+    }
+    assert empty["items"] == []
+    assert empty["pagination"]["next_offset"] is None
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "field"),
+    [
+        ({"file": ""}, "file"),
+        ({"file": "../a.py"}, "file"),
+        ({"file": "./a.py"}, "file"),
+        ({"file": "/a.py"}, "file"),
+        ({"file": "a\\b.py"}, "file"),
+        ({"file": 1}, "file"),
+        ({"status": "RESOLVED"}, "status"),
+        ({"status": None}, "status"),
+        ({"status": []}, "status"),
+        ({"offset": -1}, "offset"),
+        ({"offset": True}, "offset"),
+        ({"offset": "0"}, "offset"),
+        ({"limit": 0}, "limit"),
+        ({"limit": 501}, "limit"),
+        ({"limit": True}, "limit"),
+        ({"limit": "1"}, "limit"),
+    ],
+)
+def test_graph_imports_rejects_invalid_filters_and_pagination(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    kwargs: dict[str, object],
+    field: str,
+):
+    repo = _import_read_repo(tmp_path, monkeypatch)
+
+    with pytest.raises(LociError) as exc_info:
+        graph_imports(repo, **kwargs)
+
+    assert exc_info.value.code == "INVALID_INPUT"
+    assert exc_info.value.details["field"] == field
+
+
+def test_graph_health_counts_imports_without_degrading_normal_unresolved_records(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    repo = _import_read_repo(tmp_path, monkeypatch)
+
+    health = graph_health(repo)
+    unresolved = graph_imports(repo, status="unresolved")
+
+    assert health["status"] == "healthy"
+    assert health["counts"] == {
+        "profiles": 0,
+        "node_overlays": 0,
+        "edges": 1,
+        "contributions": 0,
+        "diagnostics": 0,
+        "graph_file_nodes_indexed": 4,
+        "graph_imports_indexed": 4,
+        "graph_imports_resolved": 1,
+        "graph_imports_unresolved": 3,
+    }
+    assert health["diagnostics"] == []
+    assert {
+        item["unresolved_reason"] for item in unresolved["items"]
+    } == {"external", "not_indexed", "unsupported_language"}
+    assert all(
+        item["target_id"] is None and item["resolution"] is None
+        for item in unresolved["items"]
+    )
+
+
 def test_service_full_and_incremental_import_digests_match(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -694,6 +890,7 @@ def test_service_retains_import_extraction_warning_for_unchanged_source(
     incremental = index_repo(repo, incremental=True)
     loaded = IndexStore(base_dir=base).load(repo.resolve())
     navigation = search_symbols(repo, "keep_navigation")
+    health = graph_health(repo)
 
     assert extraction_calls == 1
     assert initial["graph_status"] == "degraded"
@@ -708,6 +905,7 @@ def test_service_retains_import_extraction_warning_for_unchanged_source(
     }]
     assert loaded is not None
     assert [symbol["name"] for symbol in navigation] == ["keep_navigation"]
+    assert health["status"] == "degraded"
     assert loaded["graph"]["imports"] == []
 
 
@@ -776,6 +974,10 @@ def test_service_materializes_profile_without_leaking_declared_neighbors(
             "edges": 2,
             "contributions": 0,
             "diagnostics": 0,
+            "graph_file_nodes_indexed": 0,
+            "graph_imports_indexed": 0,
+            "graph_imports_resolved": 0,
+            "graph_imports_unresolved": 0,
         },
         "diagnostics": [],
     }
