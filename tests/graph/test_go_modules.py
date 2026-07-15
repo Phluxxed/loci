@@ -927,3 +927,46 @@ def test_builder_reports_invalid_go_file_nodes_without_exposing_paths(
     assert built.problems[0].source == "@invalid/go-file"
     assert built.problems[0].details == {"reason": "invalid_go_file_node"}
     assert invalid_path not in str(built.problems[0])
+
+
+def test_builder_classifies_directories_once_and_materializes_unique_bindings_once(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    app = _module(root="app", module_path="example.com/app")
+    lib = _module(root="lib", module_path="example.com/lib")
+    workspace = GoWorkspace(
+        source="go.work",
+        root=".",
+        go_version="1.23",
+        use_roots=("app", "lib"),
+        replacements=(),
+    )
+    file_nodes = {
+        "app/app.go": _go_file("app/app.go", "app"),
+        "lib/lib.go": _go_file("lib/lib.go", "lib"),
+    }
+    owner_calls = 0
+    materialize_calls = 0
+    original_owner = go_modules._owning_module_root
+    original_materialize = go_modules._make_go_package_symbol
+
+    def count_owner(*args: object, **kwargs: object) -> str | None:
+        nonlocal owner_calls
+        owner_calls += 1
+        return original_owner(*args, **kwargs)
+
+    def count_materialize(*args: object, **kwargs: object) -> Symbol:
+        nonlocal materialize_calls
+        materialize_calls += 1
+        return original_materialize(*args, **kwargs)
+
+    monkeypatch.setattr(go_modules, "_owning_module_root", count_owner)
+    monkeypatch.setattr(go_modules, "_make_go_package_symbol", count_materialize)
+
+    built = build_go_package_index(
+        GoModuleContext(modules=(app, lib), workspaces=(workspace,)),
+        file_nodes=file_nodes,
+    )
+
+    assert owner_calls == len(file_nodes)
+    assert materialize_calls == len(built.index.package_nodes)
