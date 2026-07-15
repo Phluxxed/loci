@@ -1,6 +1,8 @@
 from pathlib import Path
 import hashlib
 import json
+import subprocess
+import sys
 
 import pytest
 
@@ -28,6 +30,17 @@ from loci.service import (
     verify_repo,
 )
 from loci.storage.index_store import IndexStore
+
+
+def _run_python_json(source: str, *args: Path) -> dict:
+    completed = subprocess.run(
+        [sys.executable, "-c", source, *(str(arg) for arg in args)],
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    return json.loads(completed.stdout)
 
 
 def _domain_graph_repo(
@@ -397,6 +410,147 @@ def test_service_indexes_file_nodes_imports_and_additive_counts(
     }]
 
 
+def test_service_full_and_incremental_import_digests_match(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "consumer.py").write_text(
+        "from target import VALUE\n",
+        encoding="utf-8",
+    )
+    (repo / "target.py").write_text("VALUE = 1\n", encoding="utf-8")
+    store = IndexStore(base_dir=base)
+
+    full = index_repo(repo, incremental=False)
+    full_index = store.load(repo.resolve())
+    incremental = index_repo(repo, incremental=True)
+    incremental_index = store.load(repo.resolve())
+
+    assert full_index is not None
+    assert incremental_index is not None
+    assert incremental["files_skipped"] == 2
+
+    def import_digest(indexed: dict, loaded: dict) -> str:
+        graph = loaded["graph"]
+        payload = {
+            "counts": {
+                key: indexed[key]
+                for key in (
+                    "graph_file_nodes_indexed",
+                    "graph_imports_indexed",
+                    "graph_imports_resolved",
+                    "graph_imports_unresolved",
+                )
+            },
+            "imports": graph["imports"],
+            "edges": [
+                edge
+                for edge in graph["edges"]
+                if edge["namespace"] == "loci"
+                and edge["type"] in {"imports", "imports_type"}
+            ],
+        }
+        canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+        return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+    assert import_digest(full, full_index) == import_digest(
+        incremental,
+        incremental_index,
+    )
+
+
+def test_service_import_state_survives_fresh_process_read(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    source = repo / "consumer.py"
+    source.write_text("import target\n", encoding="utf-8")
+    (repo / "target.py").write_text("VALUE = 1\n", encoding="utf-8")
+
+    indexed = _run_python_json(
+        "import json, sys; "
+        "from loci.service import index_repo; "
+        "print(json.dumps(index_repo(sys.argv[1], incremental=False), "
+        "sort_keys=True))",
+        repo,
+    )
+    reloaded = _run_python_json(
+        "import json, sys; "
+        "from pathlib import Path; "
+        "from loci.storage.index_store import IndexStore; "
+        "loaded = IndexStore(base_dir=Path(sys.argv[2])).load("
+        "Path(sys.argv[1]).resolve()); "
+        "assert loaded is not None; "
+        "graph = loaded['graph']; "
+        "imports = graph['imports']; "
+        "edges = [edge for edge in graph['edges'] "
+        "if edge['namespace'] == 'loci' "
+        "and edge['type'] in {'imports', 'imports_type'}]; "
+        "file_nodes = [symbol for symbol in loaded['symbols'] "
+        "if symbol['kind'] == 'file']; "
+        "print(json.dumps({'counts': {"
+        "'graph_file_nodes_indexed': len(file_nodes), "
+        "'graph_imports_indexed': len(imports), "
+        "'graph_imports_resolved': sum(record['status'] == 'resolved' "
+        "for record in imports), "
+        "'graph_imports_unresolved': sum(record['status'] == 'unresolved' "
+        "for record in imports)}, 'imports': imports, 'edges': edges}, "
+        "sort_keys=True))",
+        repo,
+        base,
+    )
+
+    expected_counts = {
+        key: indexed[key]
+        for key in (
+            "graph_file_nodes_indexed",
+            "graph_imports_indexed",
+            "graph_imports_resolved",
+            "graph_imports_unresolved",
+        )
+    }
+    assert reloaded["counts"] == expected_counts
+    assert reloaded["imports"] == [{
+        "raw": {
+            "source_file": "consumer.py",
+            "language": "python",
+            "line": 1,
+            "text": "import target",
+            "specifier": "target",
+            "imported_name": None,
+            "type_only": False,
+            "is_reexport": False,
+            "source_hash": hashlib.sha256(source.read_bytes()).hexdigest(),
+        },
+        "source_id": "consumer.py::__file__#file",
+        "status": "resolved",
+        "target_file": "target.py",
+        "target_id": "target.py::__file__#file",
+        "unresolved_reason": None,
+    }]
+    assert reloaded["edges"] == [{
+        "from": "consumer.py::__file__#file",
+        "to": "target.py::__file__#file",
+        "type": "imports",
+        "directed": True,
+        "namespace": "loci",
+        "resolution": "import-resolved",
+        "evidence": {
+            "file": "consumer.py",
+            "line": 1,
+            "content_hash": hashlib.sha256(source.read_bytes()).hexdigest(),
+        },
+    }]
+
+
 def test_service_file_nodes_do_not_suppress_zero_symbol_warnings(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -539,6 +693,7 @@ def test_service_retains_import_extraction_warning_for_unchanged_source(
     initial = index_repo(repo, incremental=False)
     incremental = index_repo(repo, incremental=True)
     loaded = IndexStore(base_dir=base).load(repo.resolve())
+    navigation = search_symbols(repo, "keep_navigation")
 
     assert extraction_calls == 1
     assert initial["graph_status"] == "degraded"
@@ -552,10 +707,7 @@ def test_service_retains_import_extraction_warning_for_unchanged_source(
         "details": {"reason": "broken import parse"},
     }]
     assert loaded is not None
-    assert any(
-        symbol["name"] == "keep_navigation"
-        for symbol in loaded["symbols"]
-    )
+    assert [symbol["name"] for symbol in navigation] == ["keep_navigation"]
     assert loaded["graph"]["imports"] == []
 
 
