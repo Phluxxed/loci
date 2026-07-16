@@ -14,7 +14,6 @@ import pathspec
 from loci.graph.contracts import (
     GRAPH_SCHEMA_VERSION,
     GraphContractError,
-    GraphNodeRef,
     validate_graph_edges,
 )
 from loci.graph.go_modules import (
@@ -27,6 +26,7 @@ from loci.graph.materialize import load_graph_extensions, materialize_graph
 from loci.graph.profiles import required_frontmatter_fields
 from loci.graph.state import GraphDiagnostic, GraphIndexState
 from loci.graph.retrieval import (
+    _graph_node_ref,
     retrieve_graph_neighbors,
     retrieve_graph_paths,
     retrieve_graph_question,
@@ -321,6 +321,7 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
         "graph_file_nodes_indexed": sum(
             symbol.kind == "file" for symbol in all_symbols
         ),
+        "graph_go_packages_indexed": len(go_package_build.index.package_nodes),
         "graph_imports_indexed": len(graph_state.imports),
         "graph_imports_resolved": sum(
             record.status == "resolved" for record in graph_state.imports
@@ -898,6 +899,8 @@ def graph_imports(
             "source_file": raw.source_file,
             "source_id": record.source_id,
             "target_file": record.target_file,
+            "target_package": record.target_package,
+            "target_kind": record.target_kind,
             "target_id": record.target_id,
             "specifier": raw.specifier,
             "imported_name": raw.imported_name,
@@ -991,6 +994,10 @@ def graph_health(
             "diagnostics": len(state.diagnostics),
             "graph_file_nodes_indexed": sum(
                 isinstance(symbol, dict) and symbol.get("kind") == "file"
+                for symbol in index.get("symbols", [])
+            ),
+            "graph_go_packages_indexed": sum(
+                isinstance(symbol, dict) and symbol.get("kind") == "package"
                 for symbol in index.get("symbols", [])
             ),
             "graph_imports_indexed": len(state.imports),
@@ -1354,20 +1361,6 @@ def _add_markdown_retrieval_fields(entry: dict[str, Any], symbol: dict[str, Any]
     for key in ("file_bytes", "saved_pct", "span_kind"):
         if key in markdown:
             entry[key] = markdown[key]
-
-
-def _graph_node_ref(symbol: dict[str, Any]) -> dict[str, Any]:
-    return GraphNodeRef(
-        id=symbol["id"],
-        namespace="loci",
-        kind=symbol["kind"],
-        attributes={
-            "language": symbol["language"],
-            "file": symbol["file_path"],
-            "line": symbol.get("line", 0),
-            "end_line": symbol.get("end_line", 0),
-        },
-    ).to_dict()
 
 
 def _load_gitignore(repo_path: Path) -> "pathspec.PathSpec | None":

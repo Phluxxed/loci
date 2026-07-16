@@ -204,6 +204,7 @@ def test_mcp_graph_imports_contract_survives_fresh_process(tmp_path: Path):
     schema = result["schema"]
     properties = schema["properties"]
     assert schema["required"] == ["repo"]
+    assert set(properties) == {"repo", "file", "status", "offset", "limit"}
     assert properties["repo"]["type"] == "string"
     assert properties["file"]["anyOf"] == [
         {"type": "string"},
@@ -229,7 +230,11 @@ def test_mcp_graph_imports_contract_survives_fresh_process(tmp_path: Path):
         "missing",
     ]
     assert imports["items"][0]["target_id"] == "target.py::__file__#file"
+    assert imports["items"][0]["target_kind"] == "file"
+    assert imports["items"][0]["target_package"] is None
     assert imports["items"][1]["unresolved_reason"] == "not_indexed"
+    assert imports["items"][1]["target_kind"] is None
+    assert imports["items"][1]["target_package"] is None
 
     neighbor = result["neighbors"]["results"][0]["neighbors"][0]
     assert neighbor["node"]["id"] == "target.py::__file__#file"
@@ -249,6 +254,60 @@ def test_mcp_graph_imports_contract_survives_fresh_process(tmp_path: Path):
         error["error"]["code"] == "INVALID_INPUT"
         for error in result["errors"].values()
     )
+
+
+def test_mcp_go_package_target_survives_fresh_process(tmp_path: Path):
+    result = asyncio.run(
+        _go_package_target_after_restart(
+            tmp_path / "repo",
+            tmp_path / ".codeindex",
+        )
+    )
+
+    source_id = "cmd/server/main.go::__file__#file"
+    package_id = "internal/store::example.com/project/internal/store#package"
+    assert result["tool_names"].count("loci_graph_imports") == 1
+    assert set(result["imports_schema"]["properties"]) == {
+        "repo",
+        "file",
+        "status",
+        "offset",
+        "limit",
+    }
+    assert result["indexed"]["graph_go_packages_indexed"] == 1
+    assert result["health"]["counts"]["graph_go_packages_indexed"] == 1
+
+    item = result["imports"]["items"][0]
+    assert item["target_file"] is None
+    assert item["target_kind"] == "package"
+    assert item["target_package"] == "example.com/project/internal/store"
+    assert item["target_id"] == package_id
+
+    outgoing = result["outgoing"]["results"][0]["neighbors"][0]
+    assert outgoing["node"] == {
+        "id": package_id,
+        "namespace": "loci",
+        "kind": "package",
+        "attributes": {
+            "language": "go",
+            "file": "internal/store/store.go",
+            "line": 1,
+            "end_line": 1,
+            "import_path": "example.com/project/internal/store",
+            "package_name": "store",
+            "directory": "internal/store",
+        },
+    }
+    assert outgoing["traversed"] == "forward"
+    assert outgoing["edge"]["from"] == source_id
+    assert outgoing["edge"]["to"] == package_id
+
+    incoming = result["incoming"]["results"][0]["neighbors"][0]
+    assert incoming["node"]["id"] == source_id
+    assert incoming["traversed"] == "reverse"
+    assert incoming["edge"]["from"] == source_id
+    assert incoming["edge"]["to"] == package_id
+    assert result["compatibility"]["results"][0]["neighbors"] == []
 
 
 async def _round_trip(
@@ -666,6 +725,95 @@ async def _graph_imports_after_restart(
                 "imports": imports.structuredContent,
                 "neighbors": neighbors.structuredContent,
                 "errors": errors,
+            }
+
+
+async def _go_package_target_after_restart(
+    repo: Path,
+    cache_dir: Path,
+) -> dict[str, Any]:
+    source = repo / "cmd" / "server" / "main.go"
+    target = repo / "internal" / "store" / "store.go"
+    source.parent.mkdir(parents=True)
+    target.parent.mkdir(parents=True)
+    (repo / "go.mod").write_text(
+        "module example.com/project\n\ngo 1.23\n",
+        encoding="utf-8",
+    )
+    source.write_text(
+        'package main\n\nimport "example.com/project/internal/store"\n',
+        encoding="utf-8",
+    )
+    target.write_text("package store\n", encoding="utf-8")
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["PYTHONPATH"] = str(Path.cwd() / "src")
+    server_params = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "loci.mcp_server"],
+        env=env,
+        cwd=Path.cwd(),
+    )
+    source_id = "cmd/server/main.go::__file__#file"
+    package_id = "internal/store::example.com/project/internal/store#package"
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            indexed = await session.call_tool(
+                "loci_index",
+                arguments={"path": str(repo), "incremental": False},
+            )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            tools = await session.list_tools()
+            imports_tool = next(
+                tool for tool in tools.tools if tool.name == "loci_graph_imports"
+            )
+            imports = await session.call_tool(
+                "loci_graph_imports",
+                arguments={"repo": str(repo)},
+            )
+            health = await session.call_tool(
+                "loci_graph_health",
+                arguments={"repo": str(repo)},
+            )
+            outgoing = await session.call_tool(
+                "loci_graph_traverse_neighbors",
+                arguments={
+                    "repo": str(repo),
+                    "seed_ids": [source_id],
+                    "namespaces": ["loci"],
+                    "edge_types": ["imports"],
+                    "resolutions": ["import-resolved"],
+                },
+            )
+            incoming = await session.call_tool(
+                "loci_graph_traverse_neighbors",
+                arguments={
+                    "repo": str(repo),
+                    "seed_ids": [package_id],
+                    "namespaces": ["loci"],
+                    "edge_types": ["imports"],
+                    "resolutions": ["import-resolved"],
+                    "direction": "incoming",
+                },
+            )
+            compatibility = await session.call_tool(
+                "loci_graph_neighbors",
+                arguments={"repo": str(repo), "seed_ids": [source_id]},
+            )
+            return {
+                "indexed": indexed.structuredContent,
+                "tool_names": [tool.name for tool in tools.tools],
+                "imports_schema": imports_tool.inputSchema,
+                "imports": imports.structuredContent,
+                "health": health.structuredContent,
+                "outgoing": outgoing.structuredContent,
+                "incoming": incoming.structuredContent,
+                "compatibility": compatibility.structuredContent,
             }
 
 
