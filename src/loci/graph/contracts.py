@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 import re
+import unicodedata
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import PurePosixPath
@@ -37,6 +38,12 @@ RESOLUTION_TIERS = frozenset({
     "heuristic",
 })
 _SHA256_RE = re.compile(r"[0-9a-f]{64}")
+_GO_KEYWORDS = frozenset({
+    "break", "default", "func", "interface", "select", "case", "defer",
+    "go", "map", "struct", "chan", "else", "goto", "package", "switch",
+    "const", "fallthrough", "if", "range", "type", "continue", "for",
+    "import", "return", "var",
+})
 
 
 class GraphContractError(ValueError):
@@ -430,22 +437,21 @@ def _validate_import_edge(
         indexed_nodes=indexed_nodes,
     )
     source_file = source.get("file_path")
-    target_file = target.get("file_path")
-    if (
-        source.get("kind") != "file"
-        or target.get("kind") != "file"
-        or not isinstance(source_file, str)
-        or not isinstance(target_file, str)
-    ):
+    if source.get("kind") != "file" or not isinstance(source_file, str):
         raise GraphContractError(
             "INVALID_GRAPH_EDGE",
-            "Import edge endpoints must be indexed file nodes",
+            "Import edge source must be an indexed file node",
             {
                 "edge_index": edge_index,
                 "field": "endpoints",
                 "source_kind": cast(JSONValue, source.get("kind")),
-                "target_kind": cast(JSONValue, target.get("kind")),
             },
+        )
+    if target.get("kind") == "package" and edge.type != "imports":
+        raise GraphContractError(
+            "INVALID_GRAPH_EDGE",
+            "Go package imports cannot use the type-only edge type",
+            {"edge_index": edge_index, "field": "type"},
         )
 
     if edge.evidence.file != source_file:
@@ -473,11 +479,59 @@ def _validate_import_edge(
             record.status == "resolved"
             and record.source_id == edge.from_id
             and record.target_id == edge.to_id
-            and record.target_file == target_file
             and record.raw.source_file == source_file
             and record.raw.type_only is record_type_only
         )
     ]
+    if not candidates:
+        raise GraphContractError(
+            "GRAPH_EVIDENCE_INVALID",
+            "Import edge is not backed by a matching resolved import record",
+            {"edge_index": edge_index, "field": "import_record"},
+        )
+
+    target_kinds = {record.target_kind for record in candidates}
+    if target_kinds == {"file"}:
+        target_file = target.get("file_path")
+        if target.get("kind") != "file" or not isinstance(target_file, str):
+            raise GraphContractError(
+                "INVALID_GRAPH_EDGE",
+                "File import target must be an indexed file node",
+                {
+                    "edge_index": edge_index,
+                    "field": "endpoints",
+                    "target_kind": cast(JSONValue, target.get("kind")),
+                },
+            )
+        candidates = [
+            record
+            for record in candidates
+            if record.target_file == target_file and record.target_package is None
+        ]
+    elif target_kinds == {"package"}:
+        package_paths = {
+            record.target_package
+            for record in candidates
+            if record.target_file is None and record.target_package is not None
+        }
+        if len(package_paths) != 1:
+            raise GraphContractError(
+                "GRAPH_EVIDENCE_INVALID",
+                "Import edge has inconsistent package target records",
+                {"edge_index": edge_index, "field": "import_record"},
+            )
+        _validate_go_package_endpoint(
+            target,
+            package_path=next(iter(package_paths)),
+            edge_index=edge_index,
+        )
+    else:
+        raise GraphContractError(
+            "GRAPH_EVIDENCE_INVALID",
+            "Import edge has inconsistent target kinds",
+            {"edge_index": edge_index, "field": "import_record"},
+        )
+
     if not candidates:
         raise GraphContractError(
             "GRAPH_EVIDENCE_INVALID",
@@ -505,6 +559,49 @@ def _validate_import_edge(
             expected=sorted({record.raw.source_hash for record in line_candidates}),
             actual=edge.evidence.content_hash,
         )
+
+
+def _validate_go_package_endpoint(
+    target: Mapping[str, Any],
+    *,
+    package_path: str,
+    edge_index: int,
+) -> None:
+    metadata = target.get("metadata")
+    loci = metadata.get("loci") if isinstance(metadata, Mapping) else None
+    package_name = loci.get("package_name") if isinstance(loci, Mapping) else None
+    if (
+        target.get("kind") != "package"
+        or target.get("language") != "go"
+        or target.get("qualified_name") != package_path
+        or not isinstance(loci, Mapping)
+        or loci.get("go_package_node") is not True
+        or loci.get("import_path") != package_path
+        or not isinstance(package_name, str)
+        or target.get("name") != package_name
+        or package_name == "main"
+        or not _valid_go_identifier(package_name)
+    ):
+        raise GraphContractError(
+            "INVALID_GRAPH_EDGE",
+            "Go import target must be the matching indexed package node",
+            {
+                "edge_index": edge_index,
+                "field": "target",
+                "target_id": cast(JSONValue, target.get("id")),
+            },
+        )
+
+
+def _valid_go_identifier(value: str) -> bool:
+    if not value or value == "_" or value in _GO_KEYWORDS:
+        return False
+    for index, char in enumerate(value):
+        category = unicodedata.category(char)
+        is_letter = char == "_" or category.startswith("L")
+        if not is_letter and not (index > 0 and category == "Nd"):
+            return False
+    return True
 
 
 def _indexed_edge_endpoints(

@@ -21,6 +21,7 @@ from loci.graph.imports import (
     materialize_import_edges,
     resolve_imports,
 )
+from loci.graph.go_modules import GoPackageIndex
 from loci.graph.profiles import (
     GraphNodeAttributeRule,
     GraphProfile,
@@ -214,6 +215,7 @@ def materialize_graph(
     contributions: Sequence[LoadedGraphContribution],
     *,
     raw_imports: Sequence[RawImport] = (),
+    go_packages: GoPackageIndex | None = None,
     input_hashes: Mapping[str, str] | None = None,
     diagnostics: Sequence[GraphDiagnostic] = (),
 ) -> GraphIndexState:
@@ -232,19 +234,25 @@ def materialize_graph(
         if symbol.kind == "file"
     }
     import_records = tuple(sorted(
-        resolve_imports(raw_imports, file_nodes=file_nodes),
+        resolve_imports(
+            raw_imports,
+            file_nodes=file_nodes,
+            go_packages=go_packages,
+        ),
         key=lambda record: (
             record.raw.source_file,
             record.raw.line,
             record.raw.specifier,
             record.raw.imported_name or "",
             record.target_file or "",
+            record.target_package or "",
         ),
     ))
     active_edges = list(extract_markdown_contains_edges(symbols))
     active_edges.extend(materialize_import_edges(
         import_records,
         file_nodes=file_nodes,
+        go_packages=go_packages,
     ))
     overlay_values: dict[tuple[str, str], dict[str, JSONValue]] = {}
     overlay_kinds: dict[tuple[str, str], str] = {}
