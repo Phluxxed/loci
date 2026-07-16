@@ -763,7 +763,17 @@ def test_service_indexes_go_package_nodes_records_and_edges(
         [package_id],
         direction="incoming",
     )
+    paths = graph_paths(
+        repo,
+        [source_id],
+        [package_id],
+        max_hops=1,
+        max_nodes=2,
+        max_paths=1,
+    )
     compatibility = graph_neighbors(repo, [source_id])
+    outline = outline_repo(repo, file="internal/store/store.go")
+    package_source = get_symbols(repo, [package_id])[0]
 
     assert imports["items"][0]["target_file"] is None
     assert imports["items"][0]["target_kind"] == "package"
@@ -796,7 +806,33 @@ def test_service_indexes_go_package_nodes_records_and_edges(
     assert importing_neighbor["traversed"] == "reverse"
     assert importing_neighbor["edge"]["from"] == source_id
     assert importing_neighbor["edge"]["to"] == package_id
+
+    path = paths["paths"][0]
+    assert [node["id"] for node in path["nodes"]] == [source_id, package_id]
+    assert path["steps"][0]["edge"] == package_neighbor["edge"]
+    assert path["steps"][0]["evidence_span"]["content"] == (
+        'import "example.com/project/internal/store"\n'
+    )
     assert compatibility["results"][0]["neighbors"] == []
+
+    outlined_package = next(
+        symbol
+        for symbol in outline[0]["symbols"]
+        if symbol["kind"] == "package"
+    )
+    assert outlined_package == {
+        "id": package_id,
+        "name": "store",
+        "kind": "package",
+        "line": 1,
+        "end_line": 1,
+        "signature": "example.com/project/internal/store",
+        "summary": "",
+    }
+    assert package_source["id"] == package_id
+    assert package_source["kind"] == "package"
+    assert package_source["source"] == ""
+    assert package_source["byte_length"] == 0
 
 
 def test_service_go_control_change_reresolves_unchanged_imports(
@@ -875,6 +911,20 @@ def test_service_full_and_incremental_go_digests_match(
         symbol["kind"] == "package" for symbol in incremental["symbols"]
     ) == 1
 
+    package_id = "store::example.com/project/store#package"
+    target.unlink()
+    moved_result = index_repo(repo, incremental=True)
+    moved = store.load(repo.resolve())
+
+    assert moved_result["graph_imports_resolved"] == 1
+    assert moved is not None
+    package = next(
+        symbol for symbol in moved["symbols"] if symbol["kind"] == "package"
+    )
+    assert package["id"] == package_id
+    assert package["file_path"] == "store/second.go"
+    assert moved["graph"]["edges"][0]["to"] == package_id
+
 
 def test_service_go_package_addition_and_deletion_reresolve_unchanged_import(
     tmp_path: Path,
@@ -938,6 +988,138 @@ def test_service_go_control_add_change_delete_drives_freshness(
     module.unlink()
     assert ensure_fresh_index(repo)["refreshed"] is True
     assert ensure_fresh_index(repo) == {"repo": str(repo.resolve()), "refreshed": False}
+
+
+def test_service_nested_module_add_delete_reassigns_unchanged_package(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    target = repo / "nested" / "pkg" / "pkg.go"
+    target.parent.mkdir(parents=True)
+    (repo / "go.mod").write_text(
+        "module example.com/root\n\ngo 1.23\n",
+        encoding="utf-8",
+    )
+    (repo / "main.go").write_text(
+        'package main\n\nimport "example.com/root/nested/pkg"\n',
+        encoding="utf-8",
+    )
+    target.write_text("package pkg\n", encoding="utf-8")
+    nested_module = repo / "nested" / "go.mod"
+
+    initial = index_repo(repo, incremental=False)
+    nested_module.write_text(
+        "module example.com/nested\n\ngo 1.23\n",
+        encoding="utf-8",
+    )
+    nested = index_repo(repo, incremental=True)
+    nested_module.unlink()
+    restored = index_repo(repo, incremental=True)
+    loaded = IndexStore(base_dir=base).load(repo.resolve())
+
+    package_id = "nested/pkg::example.com/root/nested/pkg#package"
+    assert initial["graph_imports_resolved"] == 1
+    assert nested["files_skipped"] == 2
+    assert nested["graph_imports_unresolved"] == 1
+    assert restored["files_skipped"] == 2
+    assert restored["graph_imports_resolved"] == 1
+    assert loaded is not None
+    assert loaded["graph"]["imports"][0]["target_id"] == package_id
+    assert loaded["graph"]["edges"][0]["to"] == package_id
+
+
+def test_service_workspace_use_add_remove_reresolves_unchanged_import(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    app = repo / "app"
+    lib = repo / "lib"
+    app.mkdir(parents=True)
+    (lib / "pkg").mkdir(parents=True)
+    (app / "go.mod").write_text(
+        "module example.com/app\n\ngo 1.23\n",
+        encoding="utf-8",
+    )
+    (lib / "go.mod").write_text(
+        "module example.com/lib\n\ngo 1.23\n",
+        encoding="utf-8",
+    )
+    (app / "main.go").write_text(
+        'package main\n\nimport "example.com/lib/pkg"\n',
+        encoding="utf-8",
+    )
+    (lib / "pkg" / "pkg.go").write_text("package pkg\n", encoding="utf-8")
+    workspace = repo / "go.work"
+    workspace.write_text(
+        "go 1.23\n\nuse (\n\t./app\n\t./lib\n)\n",
+        encoding="utf-8",
+    )
+
+    initial = index_repo(repo, incremental=False)
+    workspace.write_text("go 1.23\n\nuse ./app\n", encoding="utf-8")
+    removed = index_repo(repo, incremental=True)
+    workspace.write_text(
+        "go 1.23\n\nuse (\n\t./app\n\t./lib\n)\n",
+        encoding="utf-8",
+    )
+    restored = index_repo(repo, incremental=True)
+
+    assert initial["graph_imports_resolved"] == 1
+    assert removed["files_skipped"] == 2
+    assert removed["graph_imports_unresolved"] == 1
+    assert restored["files_skipped"] == 2
+    assert restored["graph_imports_resolved"] == 1
+
+
+def test_service_local_replacement_add_remove_reresolves_unchanged_import(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    app = repo / "app"
+    dep = repo / "dep"
+    app.mkdir(parents=True)
+    (dep / "client").mkdir(parents=True)
+    app_module = app / "go.mod"
+    module_without_replacement = (
+        "module example.com/app\n\n"
+        "go 1.23\n\n"
+        "require example.com/dep v1.0.0\n"
+    )
+    app_module.write_text(module_without_replacement, encoding="utf-8")
+    (dep / "go.mod").write_text(
+        "module example.com/dep\n\ngo 1.23\n",
+        encoding="utf-8",
+    )
+    (app / "main.go").write_text(
+        'package main\n\nimport "example.com/dep/client"\n',
+        encoding="utf-8",
+    )
+    (dep / "client" / "client.go").write_text(
+        "package client\n",
+        encoding="utf-8",
+    )
+
+    initial = index_repo(repo, incremental=False)
+    app_module.write_text(
+        module_without_replacement + "replace example.com/dep => ../dep\n",
+        encoding="utf-8",
+    )
+    added = index_repo(repo, incremental=True)
+    app_module.write_text(module_without_replacement, encoding="utf-8")
+    removed = index_repo(repo, incremental=True)
+
+    assert initial["graph_imports_unresolved"] == 1
+    assert added["files_skipped"] == 2
+    assert added["graph_imports_resolved"] == 1
+    assert removed["files_skipped"] == 2
+    assert removed["graph_imports_unresolved"] == 1
 
 
 def test_service_invalid_go_control_is_stable_and_keeps_navigation(

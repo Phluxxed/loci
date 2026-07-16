@@ -466,6 +466,56 @@ def test_verify_index_uses_whole_file_hash_for_file_nodes(
     }]
 
 
+def test_verify_index_uses_anchor_file_hash_for_go_package_nodes(
+    store: IndexStore,
+    tmp_path: Path,
+):
+    source_path = tmp_path / "repo"
+    source_file = source_path / "store" / "store.go"
+    source_file.parent.mkdir(parents=True)
+    source_file.write_text("package store\n", encoding="utf-8")
+    content_hash = store.hash_file(source_file)
+    package_node = Symbol(
+        id="store::example.com/project/store#package",
+        name="store",
+        qualified_name="example.com/project/store",
+        kind="package",
+        language="go",
+        file_path="store/store.go",
+        byte_offset=0,
+        byte_length=0,
+        signature="example.com/project/store",
+        content_hash=content_hash,
+        metadata={
+            "loci": {
+                "go_package_node": True,
+                "directory": "store",
+                "import_path": "example.com/project/store",
+                "package_name": "store",
+            }
+        },
+        line=1,
+        end_line=1,
+    )
+    store.write(
+        source_path,
+        [package_node],
+        file_hashes={"store/store.go": content_hash},
+    )
+
+    assert store.verify_index(source_path)["failed"] == []
+
+    source_file.write_text("package store\n\nconst Changed = true\n", encoding="utf-8")
+
+    assert store.verify_index(source_path)["failed"] == [{
+        "id": "store::example.com/project/store#package",
+        "name": "store",
+        "kind": "package",
+        "file": "store/store.go",
+        "issue": "content_drift",
+    }]
+
+
 def test_get_symbol_content_returns_source(store: IndexStore, tmp_path: Path):
     source_path = tmp_path / "repo"
     source_path.mkdir()

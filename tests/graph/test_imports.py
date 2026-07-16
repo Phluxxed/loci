@@ -345,6 +345,7 @@ def test_materializes_one_go_package_edge_with_earliest_evidence():
     file_nodes = _go_file_nodes(
         ("cmd/server/main.go", "main"),
         ("internal/store/store.go", "store"),
+        ("unrelated/store/store.go", "store"),
     )
     go_packages = _go_package_index(
         file_nodes,
@@ -561,6 +562,10 @@ def test_go_same_module_import_resolves_package_target():
         "internal/store",
         "example.com/project/internal/store",
     )
+    assert record.target_id != make_go_package_id(
+        "unrelated/store",
+        "example.com/project/unrelated/store",
+    )
 
 
 def test_go_workspace_import_resolves_used_module_package():
@@ -632,6 +637,57 @@ def test_go_local_replacement_resolves_under_required_import_path():
         "third_party/dep/client",
         "example.com/dep/client",
     )
+
+
+@pytest.mark.parametrize(
+    ("required_version", "expected_status", "expected_reason"),
+    [
+        ("v1.2.0", "resolved", None),
+        ("v1.3.0", "unresolved", "external"),
+    ],
+)
+def test_go_version_specific_local_replacement_requires_exact_version(
+    required_version: str,
+    expected_status: str,
+    expected_reason: str | None,
+):
+    replacement = GoReplacement(
+        module_path="example.com/dep",
+        version="v1.2.0",
+        local_root="third_party/dep",
+        remote_path=None,
+        remote_version=None,
+    )
+    file_nodes = _go_file_nodes(
+        ("app/main.go", "main"),
+        ("third_party/dep/client/client.go", "client"),
+    )
+    go_packages = _go_package_index(
+        file_nodes,
+        _go_module(
+            "app",
+            "example.com/app",
+            requirements=(GoRequirement("example.com/dep", required_version),),
+            replacements=(replacement,),
+        ),
+        _go_module("third_party/dep", "local.invalid/dep"),
+    )
+
+    record = resolve_import(
+        _go_raw("example.com/dep/client", source_file="app/main.go"),
+        file_nodes=file_nodes,
+        go_packages=go_packages,
+    )
+
+    assert record.status == expected_status
+    assert record.unresolved_reason == expected_reason
+    if expected_status == "resolved":
+        assert record.target_id == make_go_package_id(
+            "third_party/dep/client",
+            "example.com/dep/client",
+        )
+    else:
+        assert record.target_id is None
 
 
 @pytest.mark.parametrize(
