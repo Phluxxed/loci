@@ -17,7 +17,7 @@ from loci.parser.symbols import Symbol
 
 LAST_SEARCH_TTL = 300  # 5 minutes
 INDEX_SCHEMA_VERSION = 5
-EXTRACTOR_VERSION = 5
+EXTRACTOR_VERSION = 6
 
 
 def _resolve_worktree_root(path: str) -> str:

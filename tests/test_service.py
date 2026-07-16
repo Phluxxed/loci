@@ -217,6 +217,28 @@ def test_service_incremental_reindexes_old_version_metadata(
     assert markdown_symbols[0]["metadata"]["markdown"]["span_kind"] == "page_root"
 
 
+def test_service_extractor_5_cache_forces_full_reindex(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "module.py").write_text("VALUE = 1\n", encoding="utf-8")
+    index_repo(repo, incremental=False)
+    store = IndexStore(base_dir=base)
+    index_path = store._index_path(repo.resolve())
+    old_index = json.loads(index_path.read_text())
+    old_index["extractor_version"] = 5
+    index_path.write_text(json.dumps(old_index))
+
+    indexed = index_repo(repo, incremental=True)
+
+    assert indexed["files_skipped"] == 0
+    assert store.load(repo.resolve())["extractor_version"] == 6
+
+
 def test_service_markdown_outline_exposes_retrieval_cost_and_repo_relative_ids(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -599,7 +621,7 @@ def test_graph_health_counts_imports_without_degrading_normal_unresolved_records
     assert health["diagnostics"] == []
     assert {
         item["unresolved_reason"] for item in unresolved["items"]
-    } == {"external", "not_indexed", "unsupported_language"}
+    } == {"external", "not_indexed"}
     assert all(
         item["target_id"] is None and item["resolution"] is None
         for item in unresolved["items"]
@@ -657,6 +679,319 @@ def test_service_full_and_incremental_import_digests_match(
         incremental,
         incremental_index,
     )
+
+
+def test_service_indexes_go_package_nodes_records_and_edges(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    source = repo / "cmd" / "server" / "main.go"
+    target = repo / "internal" / "store" / "store.go"
+    source.parent.mkdir(parents=True)
+    target.parent.mkdir(parents=True)
+    (repo / "go.mod").write_text(
+        "module example.com/project\n\ngo 1.23\n",
+        encoding="utf-8",
+    )
+    source.write_text(
+        'package main\n\nimport "example.com/project/internal/store"\n',
+        encoding="utf-8",
+    )
+    target.write_text("package store\n", encoding="utf-8")
+
+    indexed = index_repo(repo, incremental=False)
+    loaded = IndexStore(base_dir=base).load(repo.resolve())
+
+    assert loaded is not None
+    file_nodes = {
+        symbol["file_path"]: symbol
+        for symbol in loaded["symbols"]
+        if symbol["kind"] == "file"
+    }
+    package_nodes = [
+        symbol for symbol in loaded["symbols"] if symbol["kind"] == "package"
+    ]
+    assert file_nodes["cmd/server/main.go"]["metadata"]["loci"]["go_package"] == {
+        "name": "main",
+        "line": 1,
+    }
+    assert file_nodes["internal/store/store.go"]["metadata"]["loci"][
+        "go_package"
+    ] == {"name": "store", "line": 1}
+    assert [node["id"] for node in package_nodes] == [
+        "internal/store::example.com/project/internal/store#package"
+    ]
+    assert indexed["graph_imports_resolved"] == 1
+    assert loaded["graph"]["imports"][0]["target_kind"] == "package"
+    assert loaded["graph"]["imports"][0]["target_package"] == (
+        "example.com/project/internal/store"
+    )
+    assert loaded["graph"]["edges"] == [{
+        "from": "cmd/server/main.go::__file__#file",
+        "to": "internal/store::example.com/project/internal/store#package",
+        "type": "imports",
+        "directed": True,
+        "namespace": "loci",
+        "resolution": "import-resolved",
+        "evidence": {
+            "file": "cmd/server/main.go",
+            "line": 3,
+            "content_hash": hashlib.sha256(source.read_bytes()).hexdigest(),
+        },
+    }]
+    assert loaded["graph"]["diagnostics"] == []
+
+
+def test_service_go_control_change_reresolves_unchanged_imports(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    module = repo / "go.mod"
+    module.write_text("module example.com/old\n\ngo 1.23\n", encoding="utf-8")
+    (repo / "main.go").write_text(
+        'package main\n\nimport "example.com/old/store"\n',
+        encoding="utf-8",
+    )
+    store_file = repo / "store" / "store.go"
+    store_file.parent.mkdir()
+    store_file.write_text("package store\n", encoding="utf-8")
+    store = IndexStore(base_dir=base)
+
+    initial = index_repo(repo, incremental=False)
+    module.write_text("module example.com/new\n\ngo 1.23\n", encoding="utf-8")
+    updated = index_repo(repo, incremental=True)
+    loaded = store.load(repo.resolve())
+
+    assert initial["graph_imports_resolved"] == 1
+    assert updated["files_skipped"] == 2
+    assert updated["graph_imports_resolved"] == 0
+    assert updated["graph_imports_unresolved"] == 1
+    assert loaded is not None
+    assert loaded["graph"]["imports"][0]["unresolved_reason"] == "external"
+    assert loaded["graph"]["edges"] == []
+    assert [
+        symbol["id"]
+        for symbol in loaded["symbols"]
+        if symbol["kind"] == "package"
+    ] == ["store::example.com/new/store#package"]
+
+
+def test_service_full_and_incremental_go_digests_match(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "go.mod").write_text(
+        "module example.com/project\n\ngo 1.23\n",
+        encoding="utf-8",
+    )
+    (repo / "main.go").write_text(
+        'package main\n\nimport "example.com/project/store"\n',
+        encoding="utf-8",
+    )
+    target = repo / "store" / "first.go"
+    target.parent.mkdir()
+    target.write_text("package store\n", encoding="utf-8")
+    (target.parent / "second.go").write_text(
+        "package store\n",
+        encoding="utf-8",
+    )
+    store = IndexStore(base_dir=base)
+
+    index_repo(repo, incremental=False)
+    full = store.load(repo.resolve())
+    incremental_result = index_repo(repo, incremental=True)
+    incremental = store.load(repo.resolve())
+
+    assert full is not None
+    assert incremental is not None
+    assert incremental_result["files_skipped"] == 3
+    assert full == incremental
+    assert sum(
+        symbol["kind"] == "package" for symbol in incremental["symbols"]
+    ) == 1
+
+
+def test_service_go_package_addition_and_deletion_reresolve_unchanged_import(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "go.mod").write_text(
+        "module example.com/project\n\ngo 1.23\n",
+        encoding="utf-8",
+    )
+    (repo / "main.go").write_text(
+        'package main\n\nimport "example.com/project/store"\n',
+        encoding="utf-8",
+    )
+
+    initial = index_repo(repo, incremental=False)
+    target = repo / "store" / "store.go"
+    target.parent.mkdir()
+    target.write_text("package store\n", encoding="utf-8")
+    added = index_repo(repo, incremental=True)
+    target.unlink()
+    removed = index_repo(repo, incremental=True)
+    loaded = IndexStore(base_dir=base).load(repo.resolve())
+
+    assert initial["graph_imports_unresolved"] == 1
+    assert added["files_skipped"] == 1
+    assert added["graph_imports_resolved"] == 1
+    assert removed["files_skipped"] == 1
+    assert removed["graph_imports_resolved"] == 0
+    assert removed["graph_imports_unresolved"] == 1
+    assert loaded is not None
+    assert loaded["graph"]["imports"][0]["unresolved_reason"] == "not_indexed"
+    assert not any(
+        symbol["kind"] == "package" for symbol in loaded["symbols"]
+    )
+
+
+def test_service_go_control_add_change_delete_drives_freshness(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "pkg.go").write_text("package pkg\n", encoding="utf-8")
+    index_repo(repo, incremental=False)
+    module = repo / "go.mod"
+
+    module.write_text("module example.com/one\n\ngo 1.23\n", encoding="utf-8")
+    assert ensure_fresh_index(repo)["refreshed"] is True
+    assert ensure_fresh_index(repo) == {"repo": str(repo.resolve()), "refreshed": False}
+
+    module.write_text("module example.com/two\n\ngo 1.23\n", encoding="utf-8")
+    assert ensure_fresh_index(repo)["refreshed"] is True
+    assert ensure_fresh_index(repo) == {"repo": str(repo.resolve()), "refreshed": False}
+
+    module.unlink()
+    assert ensure_fresh_index(repo)["refreshed"] is True
+    assert ensure_fresh_index(repo) == {"repo": str(repo.resolve()), "refreshed": False}
+
+
+def test_service_invalid_go_control_is_stable_and_keeps_navigation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "go.mod").write_text("module\n", encoding="utf-8")
+    (repo / "pkg.go").write_text(
+        "package pkg\n\nfunc Navigate() {}\n",
+        encoding="utf-8",
+    )
+
+    indexed = index_repo(repo, incremental=False)
+    freshness = ensure_fresh_index(repo)
+    results = search_symbols(repo, "Navigate")
+
+    assert indexed["graph_status"] == "degraded"
+    assert [item["code"] for item in indexed["graph_diagnostics"]] == [
+        "GRAPH_GO_MODULE_INVALID"
+    ]
+    assert freshness == {"repo": str(repo.resolve()), "refreshed": False}
+    assert [item["name"] for item in results] == ["Navigate"]
+
+
+def test_service_conflicting_go_packages_degrade_without_package_node(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "go.mod").write_text(
+        "module example.com/project\n\ngo 1.23\n",
+        encoding="utf-8",
+    )
+    (repo / "first.go").write_text("package first\n", encoding="utf-8")
+    (repo / "second.go").write_text("package second\n", encoding="utf-8")
+
+    indexed = index_repo(repo, incremental=False)
+    loaded = IndexStore(base_dir=base).load(repo.resolve())
+
+    assert indexed["graph_status"] == "degraded"
+    assert [item["code"] for item in indexed["graph_diagnostics"]] == [
+        "GRAPH_GO_PACKAGE_INVALID"
+    ]
+    assert loaded is not None
+    assert not any(
+        symbol["kind"] == "package" for symbol in loaded["symbols"]
+    )
+
+
+def test_service_missing_go_package_declaration_is_diagnostic(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "go.mod").write_text(
+        "module example.com/project\n\ngo 1.23\n",
+        encoding="utf-8",
+    )
+    (repo / "broken.go").write_text("func Broken() {}\n", encoding="utf-8")
+
+    indexed = index_repo(repo, incremental=False)
+    loaded = IndexStore(base_dir=base).load(repo.resolve())
+
+    assert "GRAPH_GO_PACKAGE_INVALID" in {
+        item["code"] for item in indexed["graph_diagnostics"]
+    }
+    assert loaded is not None
+    assert not any(
+        symbol["kind"] == "package" for symbol in loaded["symbols"]
+    )
+
+
+def test_service_uses_one_root_scan_for_source_and_go_controls(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "go.mod").write_text(
+        "module example.com/project\n\ngo 1.23\n",
+        encoding="utf-8",
+    )
+    (repo / "pkg.go").write_text("package pkg\n", encoding="utf-8")
+    original_rglob = Path.rglob
+    root_scans = 0
+
+    def count_root_scan(path: Path, pattern: str):
+        nonlocal root_scans
+        if path == repo:
+            root_scans += 1
+        return original_rglob(path, pattern)
+
+    monkeypatch.setattr(Path, "rglob", count_root_scan)
+
+    index_repo(repo, incremental=False)
+
+    assert root_scans == 1
 
 
 def test_service_import_state_survives_fresh_process_read(

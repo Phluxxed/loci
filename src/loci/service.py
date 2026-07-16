@@ -17,6 +17,11 @@ from loci.graph.contracts import (
     GraphNodeRef,
     validate_graph_edges,
 )
+from loci.graph.go_modules import (
+    GoModuleProblem,
+    build_go_package_index,
+    load_go_module_context,
+)
 from loci.graph.anchors import select_graph_anchors
 from loci.graph.materialize import load_graph_extensions, materialize_graph
 from loci.graph.profiles import required_frontmatter_fields
@@ -28,7 +33,12 @@ from loci.graph.retrieval import (
 )
 from loci.graph.traversal import GraphDirection
 from loci.parser.extractor import parse_file
-from loci.parser.imports import ImportExtractionError, RawImport, extract_imports
+from loci.parser.imports import (
+    ImportExtractionError,
+    RawImport,
+    extract_import_batch,
+    extract_imports,
+)
 from loci.parser.languages import EXTENSION_MAP, MARKDOWN_SUFFIXES
 from loci.parser.symbols import Symbol, make_file_symbol
 from loci.storage.index_store import IndexStore, index_versions_current
@@ -49,6 +59,12 @@ SKIP_EXTENSIONS = {
     ".bin", ".pem", ".key", ".p12",
 }
 REFRESH_LOCK_POLL_SECONDS = 0.05
+
+
+@dataclass(frozen=True, slots=True)
+class RepositoryScan:
+    indexable_files: tuple[tuple[Path, str, str], ...]
+    go_control_candidates: tuple[Path, ...]
 
 
 @dataclass
@@ -123,6 +139,11 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
                 and diagnostic.source is not None
             ):
                 previous_import_diagnostics[diagnostic.source].append(diagnostic)
+    repository_scan = _scan_repository_files(repo_path, store)
+    go_module_load = load_go_module_context(
+        repo_path,
+        repository_scan.go_control_candidates,
+    )
     extension_load = load_graph_extensions(
         repo_path,
         previous_graph=previous_graph,
@@ -141,7 +162,7 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
     raw_imports: list[RawImport] = []
     import_diagnostics: list[GraphDiagnostic] = []
 
-    for src_file, rel_path, file_hash in _iter_indexable_files(repo_path, store):
+    for src_file, rel_path, file_hash in repository_scan.indexable_files:
         new_file_hashes[rel_path] = file_hash
 
         requires_profile_reparse = (
@@ -153,7 +174,14 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
             and not requires_profile_reparse
             and existing_hashes.get(rel_path) == file_hash
         ):
-            kept = [Symbol.from_dict(s) for s in existing_symbols if s["file_path"] == rel_path]
+            kept = [
+                Symbol.from_dict(symbol)
+                for symbol in existing_symbols
+                if (
+                    symbol["file_path"] == rel_path
+                    and symbol["kind"] != "package"
+                )
+            ]
             all_symbols.extend(kept)
             raw_imports.extend(previous_imports.get(rel_path, ()))
             import_diagnostics.extend(
@@ -202,18 +230,32 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
                     "reason": "0 symbols extracted",
                 })
         if src_file.suffix.lower() not in MARKDOWN_SUFFIXES:
-            all_symbols.append(make_file_symbol(
+            file_node = make_file_symbol(
                 rel_path,
                 language=lang,
                 content_hash=file_hash,
-            ))
+            )
             try:
-                raw_imports.extend(extract_imports(
-                    src_file,
-                    source_file=rel_path,
-                    language=lang,
-                    source_hash=file_hash,
-                ))
+                if lang == "go":
+                    batch = extract_import_batch(
+                        src_file,
+                        source_file=rel_path,
+                        language=lang,
+                        source_hash=file_hash,
+                    )
+                    raw_imports.extend(batch.imports)
+                    if batch.go_package is not None:
+                        file_node.metadata["loci"]["go_package"] = {
+                            "name": batch.go_package.name,
+                            "line": batch.go_package.line,
+                        }
+                else:
+                    raw_imports.extend(extract_imports(
+                        src_file,
+                        source_file=rel_path,
+                        language=lang,
+                        source_hash=file_hash,
+                    ))
             except ImportExtractionError as exc:
                 import_diagnostics.append(GraphDiagnostic(
                     severity="warning",
@@ -222,6 +264,26 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
                     source=rel_path,
                     details={"reason": str(exc)},
                 ))
+            all_symbols.append(file_node)
+
+    file_nodes = {
+        symbol.file_path: symbol
+        for symbol in all_symbols
+        if symbol.kind == "file"
+    }
+    go_package_build = build_go_package_index(
+        go_module_load.context,
+        file_nodes=file_nodes,
+    )
+    all_symbols.extend(go_package_build.index.package_nodes)
+    go_diagnostics = tuple(
+        _go_problem_diagnostic(problem)
+        for problem in (*go_module_load.problems, *go_package_build.problems)
+    )
+    graph_input_hashes = {
+        **extension_load.input_hashes,
+        **go_module_load.input_hashes,
+    }
 
     graph_state = materialize_graph(
         repo_path,
@@ -230,8 +292,13 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
         extension_load.profiles,
         extension_load.contributions,
         raw_imports=raw_imports,
-        input_hashes=extension_load.input_hashes,
-        diagnostics=(*extension_load.diagnostics, *import_diagnostics),
+        go_packages=go_package_build.index,
+        input_hashes=graph_input_hashes,
+        diagnostics=(
+            *extension_load.diagnostics,
+            *import_diagnostics,
+            *go_diagnostics,
+        ),
     )
     try:
         store.write(
@@ -1030,14 +1097,21 @@ def _load_required_index(store: IndexStore, repo_path: Path) -> dict[str, Any]:
 def _index_is_stale(repo_path: Path, store: IndexStore, index: dict[str, Any]) -> bool:
     if not index_versions_current(index):
         return True
+    repository_scan = _scan_repository_files(repo_path, store)
     current_hashes = {
         rel_path: file_hash
-        for _, rel_path, file_hash in _iter_indexable_files(repo_path, store)
+        for _, rel_path, file_hash in repository_scan.indexable_files
     }
     indexed_hashes = index.get("file_hashes", {})
     if current_hashes != indexed_hashes:
         return True
-    current_graph_hashes = load_graph_extensions(repo_path).input_hashes
+    current_graph_hashes = {
+        **load_graph_extensions(repo_path).input_hashes,
+        **load_go_module_context(
+            repo_path,
+            repository_scan.go_control_candidates,
+        ).input_hashes,
+    }
     graph = index.get("graph")
     if not isinstance(graph, dict):
         return True
@@ -1161,25 +1235,38 @@ def _acquire_refresh_lock(lock_path: Path, timeout: float) -> None:
         return
 
 
-def _iter_indexable_files(
+def _scan_repository_files(
     repo_path: Path,
     store: IndexStore,
-) -> list[tuple[Path, str, str]]:
+) -> RepositoryScan:
     gitignore = _load_gitignore(repo_path)
     files: list[tuple[Path, str, str]] = []
-    for src_file in sorted(repo_path.rglob("*")):
-        if not src_file.is_file():
+    go_controls: list[Path] = []
+    for candidate in sorted(repo_path.rglob("*")):
+        if any(part in SKIP_DIRS for part in candidate.parts):
             continue
-        if any(part in SKIP_DIRS for part in src_file.parts):
-            continue
-        if _should_skip_file(src_file):
-            continue
-
-        rel_path = str(src_file.relative_to(repo_path))
+        rel_path = str(candidate.relative_to(repo_path))
         if gitignore and gitignore.match_file(rel_path):
             continue
-        files.append((src_file, rel_path, store.hash_file(src_file)))
-    return files
+        if candidate.name in {"go.mod", "go.work"}:
+            go_controls.append(candidate)
+        if not candidate.is_file() or _should_skip_file(candidate):
+            continue
+        files.append((candidate, rel_path, store.hash_file(candidate)))
+    return RepositoryScan(
+        indexable_files=tuple(files),
+        go_control_candidates=tuple(go_controls),
+    )
+
+
+def _go_problem_diagnostic(problem: GoModuleProblem) -> GraphDiagnostic:
+    return GraphDiagnostic(
+        severity="warning",
+        code=problem.code,
+        message=problem.message,
+        source=problem.source,
+        details=problem.details,
+    )
 
 
 def _get_symbol(

@@ -426,7 +426,7 @@ def test_store_write_persists_index_versions(store: IndexStore, tmp_path: Path, 
 
 
 def test_index_versions_rejects_old_extractor_version():
-    assert EXTRACTOR_VERSION == 5
+    assert EXTRACTOR_VERSION == 6
     assert index_versions_current({
         "schema_version": INDEX_SCHEMA_VERSION,
         "extractor_version": EXTRACTOR_VERSION - 1,
