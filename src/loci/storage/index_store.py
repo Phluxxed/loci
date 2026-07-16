@@ -555,13 +555,13 @@ class IndexStore:
             shutil.rmtree(repo_dir)
 
     def verify_index(self, repo_path: Path) -> dict[str, Any]:
-        """Check that every symbol's byte offset points to text containing its name.
+        """Check indexed symbol spans and synthetic-node anchor hashes.
 
         Returns a dict with 'repo', 'checked', 'passed', 'failed'. Each failure
         has the symbol id, name, kind, file, and the issue description.
 
-        Note: uses name-in-bytes check (not a full re-parse). Catches byte offset
-        corruption and wrong-node-type extraction.
+        Ordinary symbols use a name-in-bytes check. File and validated Go
+        package nodes use their whole anchor-file hash instead.
         """
         index = self.load(repo_path)
         if index is None:
@@ -633,7 +633,7 @@ class IndexStore:
                 live_file = repo_path / file_path
                 if live_file.exists():
                     try:
-                        if kind == "file":
+                        if kind == "file" or _is_go_package_node(sym):
                             live_raw = live_file.read_bytes()
                         else:
                             with open(live_file, "rb") as lf:
@@ -1309,7 +1309,38 @@ def _is_template_symbol(sym: dict[str, Any]) -> bool:
 
 
 def _should_verify_name_in_bytes(sym: dict[str, Any]) -> bool:
-    return sym.get("kind") != "file" and not _is_synthetic_markdown_name(sym)
+    return (
+        sym.get("kind") != "file"
+        and not _is_go_package_node(sym)
+        and not _is_synthetic_markdown_name(sym)
+    )
+
+
+def _is_go_package_node(sym: dict[str, Any]) -> bool:
+    if sym.get("kind") != "package" or sym.get("language") != "go":
+        return False
+    metadata = sym.get("metadata")
+    loci_metadata = metadata.get("loci") if isinstance(metadata, dict) else None
+    if not (
+        isinstance(loci_metadata, dict)
+        and loci_metadata.get("go_package_node") is True
+        and sym.get("byte_offset") == 0
+        and sym.get("byte_length") == 0
+    ):
+        return False
+    directory = loci_metadata.get("directory")
+    import_path = loci_metadata.get("import_path")
+    package_name = loci_metadata.get("package_name")
+    return (
+        isinstance(directory, str)
+        and bool(directory)
+        and isinstance(import_path, str)
+        and bool(import_path)
+        and isinstance(package_name, str)
+        and bool(package_name)
+        and sym.get("qualified_name") == import_path
+        and sym.get("name") == package_name
+    )
 
 
 def _is_synthetic_markdown_name(sym: dict[str, Any]) -> bool:

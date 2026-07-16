@@ -70,8 +70,12 @@ require (
     `example.com/a` `v1.0.0`
 )
 exclude example.com/z v1.1.0
+exclude (
+    example.com/a v0.9.0
+)
 replace (
     example.com/a => ./local/a
+    example.com/local v1.2.3 => ./local/versioned
     example.com/z v1.2.0 => "example.com/fork/z" "v1.2.1"
 )
 toolchain go1.23.0
@@ -94,12 +98,22 @@ toolchain go1.23.0
         GoRequirement("example.com/a", "v1.0.0"),
         GoRequirement("example.com/z", "v1.2.0"),
     )
-    assert module.exclusions == (GoExclusion("example.com/z", "v1.1.0"),)
+    assert module.exclusions == (
+        GoExclusion("example.com/a", "v0.9.0"),
+        GoExclusion("example.com/z", "v1.1.0"),
+    )
     assert module.replacements == (
         GoReplacement(
             module_path="example.com/a",
             version=None,
             local_root="local/a",
+            remote_path=None,
+            remote_version=None,
+        ),
+        GoReplacement(
+            module_path="example.com/local",
+            version="v1.2.3",
+            local_root="local/versioned",
             remote_path=None,
             remote_version=None,
         ),
