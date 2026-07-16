@@ -1013,17 +1013,46 @@ def _graph_retrieve_envelope(
 
 
 def _graph_node_ref(symbol: dict[str, Any]) -> dict[str, Any]:
+    attributes = {
+        "language": symbol["language"],
+        "file": symbol["file_path"],
+        "line": symbol.get("line", 0),
+        "end_line": symbol.get("end_line", 0),
+    }
+    _add_go_package_node_attributes(attributes, symbol)
     return GraphNodeRef(
         id=symbol["id"],
         namespace="loci",
         kind=symbol["kind"],
-        attributes={
-            "language": symbol["language"],
-            "file": symbol["file_path"],
-            "line": symbol.get("line", 0),
-            "end_line": symbol.get("end_line", 0),
-        },
+        attributes=attributes,
     ).to_dict()
+
+
+def _add_go_package_node_attributes(
+    attributes: dict[str, Any],
+    symbol: dict[str, Any],
+) -> None:
+    metadata = symbol.get("metadata")
+    loci_metadata = metadata.get("loci") if isinstance(metadata, dict) else None
+    if not (
+        symbol.get("kind") == "package"
+        and symbol.get("language") == "go"
+        and isinstance(loci_metadata, dict)
+        and loci_metadata.get("go_package_node") is True
+    ):
+        return
+    values = {
+        key: loci_metadata.get(key)
+        for key in ("import_path", "package_name", "directory")
+    }
+    if not all(isinstance(value, str) and value for value in values.values()):
+        return
+    if (
+        symbol.get("qualified_name") != values["import_path"]
+        or symbol.get("name") != values["package_name"]
+    ):
+        return
+    attributes.update(values)
 
 
 def _invalid(message: str, **details: object) -> GraphContractError:

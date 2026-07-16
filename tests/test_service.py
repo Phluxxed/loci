@@ -475,6 +475,8 @@ def test_graph_imports_returns_stable_sorted_bounded_records(
                 "source_file": "a.py",
                 "source_id": "a.py::__file__#file",
                 "target_file": "local_target.py",
+                "target_package": None,
+                "target_kind": "file",
                 "target_id": "local_target.py::__file__#file",
                 "specifier": "local_target",
                 "imported_name": None,
@@ -491,6 +493,8 @@ def test_graph_imports_returns_stable_sorted_bounded_records(
                 "source_file": "a.py",
                 "source_id": "a.py::__file__#file",
                 "target_file": None,
+                "target_package": None,
+                "target_kind": None,
                 "target_id": None,
                 "specifier": "missing",
                 "imported_name": None,
@@ -614,6 +618,7 @@ def test_graph_health_counts_imports_without_degrading_normal_unresolved_records
         "contributions": 0,
         "diagnostics": 0,
         "graph_file_nodes_indexed": 4,
+        "graph_go_packages_indexed": 0,
         "graph_imports_indexed": 4,
         "graph_imports_resolved": 1,
         "graph_imports_unresolved": 3,
@@ -623,7 +628,10 @@ def test_graph_health_counts_imports_without_degrading_normal_unresolved_records
         item["unresolved_reason"] for item in unresolved["items"]
     } == {"external", "not_indexed"}
     assert all(
-        item["target_id"] is None and item["resolution"] is None
+        item["target_id"] is None
+        and item["target_kind"] is None
+        and item["target_package"] is None
+        and item["resolution"] is None
         for item in unresolved["items"]
     )
 
@@ -724,6 +732,7 @@ def test_service_indexes_go_package_nodes_records_and_edges(
     assert [node["id"] for node in package_nodes] == [
         "internal/store::example.com/project/internal/store#package"
     ]
+    assert indexed["graph_go_packages_indexed"] == 1
     assert indexed["graph_imports_resolved"] == 1
     assert loaded["graph"]["imports"][0]["target_kind"] == "package"
     assert loaded["graph"]["imports"][0]["target_package"] == (
@@ -743,6 +752,51 @@ def test_service_indexes_go_package_nodes_records_and_edges(
         },
     }]
     assert loaded["graph"]["diagnostics"] == []
+
+    imports = graph_imports(repo)
+    health = graph_health(repo)
+    source_id = "cmd/server/main.go::__file__#file"
+    package_id = "internal/store::example.com/project/internal/store#package"
+    outgoing = graph_traverse_neighbors(repo, [source_id])
+    incoming = graph_traverse_neighbors(
+        repo,
+        [package_id],
+        direction="incoming",
+    )
+    compatibility = graph_neighbors(repo, [source_id])
+
+    assert imports["items"][0]["target_file"] is None
+    assert imports["items"][0]["target_kind"] == "package"
+    assert imports["items"][0]["target_package"] == (
+        "example.com/project/internal/store"
+    )
+    assert health["counts"]["graph_go_packages_indexed"] == 1
+
+    package_neighbor = outgoing["results"][0]["neighbors"][0]
+    assert package_neighbor["node"] == {
+        "id": package_id,
+        "namespace": "loci",
+        "kind": "package",
+        "attributes": {
+            "language": "go",
+            "file": "internal/store/store.go",
+            "line": 1,
+            "end_line": 1,
+            "import_path": "example.com/project/internal/store",
+            "package_name": "store",
+            "directory": "internal/store",
+        },
+    }
+    assert package_neighbor["traversed"] == "forward"
+    assert package_neighbor["edge"]["from"] == source_id
+    assert package_neighbor["edge"]["to"] == package_id
+
+    importing_neighbor = incoming["results"][0]["neighbors"][0]
+    assert importing_neighbor["node"]["id"] == source_id
+    assert importing_neighbor["traversed"] == "reverse"
+    assert importing_neighbor["edge"]["from"] == source_id
+    assert importing_neighbor["edge"]["to"] == package_id
+    assert compatibility["results"][0]["neighbors"] == []
 
 
 def test_service_go_control_change_reresolves_unchanged_imports(
@@ -1312,6 +1366,7 @@ def test_service_materializes_profile_without_leaking_declared_neighbors(
             "contributions": 0,
             "diagnostics": 0,
             "graph_file_nodes_indexed": 0,
+            "graph_go_packages_indexed": 0,
             "graph_imports_indexed": 0,
             "graph_imports_resolved": 0,
             "graph_imports_unresolved": 0,
