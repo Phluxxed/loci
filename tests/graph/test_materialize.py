@@ -9,6 +9,13 @@ from loci.graph.contracts import (
     GraphEdge,
     GraphEvidence,
     GraphNodeRef,
+    validate_graph_edges,
+)
+from loci.graph.go_modules import (
+    GoModule,
+    GoModuleContext,
+    build_go_package_index,
+    make_go_package_id,
 )
 from loci.graph.materialize import load_graph_extensions, materialize_graph
 from loci.graph.profiles import GraphProfile, LoadedGraphProfile
@@ -504,8 +511,6 @@ def test_python_import_materialization_is_directed_and_evidenced(tmp_path: Path)
             content_hash=consumer_hash,
         ),
     ),)
-
-
 def test_materialization_retains_duplicate_import_records_and_one_edge(tmp_path: Path):
     source = tmp_path / "consumer.py"
     target = tmp_path / "target.py"
@@ -566,6 +571,105 @@ def test_missing_python_import_is_retained_without_an_edge(tmp_path: Path):
     assert state.edges == ()
     assert state.imports[0].status == "unresolved"
     assert state.imports[0].unresolved_reason == "not_indexed"
+
+
+def test_materialize_graph_threads_go_package_index_into_import_edges(
+    tmp_path: Path,
+):
+    source = tmp_path / "cmd" / "server" / "main.go"
+    target = tmp_path / "internal" / "store" / "store.go"
+    source.parent.mkdir(parents=True)
+    target.parent.mkdir(parents=True)
+    source.write_text(
+        'package main\n\nimport "example.com/project/internal/store"\n',
+        encoding="utf-8",
+    )
+    target.write_text("package store\n", encoding="utf-8")
+    source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
+    target_hash = hashlib.sha256(target.read_bytes()).hexdigest()
+    source_node = make_file_symbol(
+        "cmd/server/main.go",
+        language="go",
+        content_hash=source_hash,
+    )
+    source_node.metadata["loci"]["go_package"] = {"name": "main", "line": 1}
+    target_node = make_file_symbol(
+        "internal/store/store.go",
+        language="go",
+        content_hash=target_hash,
+    )
+    target_node.metadata["loci"]["go_package"] = {"name": "store", "line": 1}
+    file_nodes = {
+        source_node.file_path: source_node,
+        target_node.file_path: target_node,
+    }
+    package_build = build_go_package_index(
+        GoModuleContext(
+            modules=(GoModule(
+                source="go.mod",
+                root=".",
+                module_path="example.com/project",
+                requirements=(),
+                exclusions=(),
+                replacements=(),
+            ),),
+            workspaces=(),
+        ),
+        file_nodes=file_nodes,
+    )
+    assert package_build.problems == ()
+    raw_imports = extract_imports(
+        source,
+        source_file=source_node.file_path,
+        language="go",
+        source_hash=source_hash,
+    )
+
+    state = materialize_graph(
+        tmp_path,
+        [source_node, target_node, *package_build.index.package_nodes],
+        {
+            source_node.file_path: source_hash,
+            target_node.file_path: target_hash,
+        },
+        [],
+        [],
+        raw_imports=raw_imports,
+        go_packages=package_build.index,
+    )
+
+    assert len(state.imports) == 1
+    assert state.imports[0].target_kind == "package"
+    assert state.imports[0].target_package == "example.com/project/internal/store"
+    assert state.edges == (GraphEdge(
+        from_id=source_node.id,
+        to_id=make_go_package_id(
+            "internal/store",
+            "example.com/project/internal/store",
+        ),
+        type="imports",
+        directed=True,
+        namespace="loci",
+        resolution="import-resolved",
+        evidence=GraphEvidence(
+            file=source_node.file_path,
+            line=3,
+            content_hash=source_hash,
+        ),
+    ),)
+    validate_graph_edges(
+        list(state.edges),
+        indexed_nodes={
+            symbol.id: symbol.to_dict()
+            for symbol in [
+                source_node,
+                target_node,
+                *package_build.index.package_nodes,
+            ]
+        },
+        file_hashes={source_node.file_path: source_hash},
+        imports=state.imports,
+    )
 
 
 def test_typescript_imports_preserve_reexports_and_separate_type_edges(

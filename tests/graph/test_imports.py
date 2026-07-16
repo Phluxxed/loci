@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from loci.graph.contracts import GraphEdge, GraphEvidence
+from loci.graph.contracts import GraphContractError, GraphEdge, GraphEvidence
 from loci.graph.go_modules import (
     GoModule,
     GoModuleContext,
@@ -111,11 +111,12 @@ def _go_raw(
     specifier: str,
     *,
     source_file: str = "cmd/server/main.go",
+    line: int = 4,
 ) -> RawImport:
     return RawImport(
         source_file=source_file,
         language="go",
-        line=4,
+        line=line,
         text=f'import "{specifier}"',
         specifier=specifier,
         imported_name=None,
@@ -338,6 +339,77 @@ def test_materializes_one_directed_edge_with_earliest_evidence():
             content_hash=SOURCE_HASH,
         ),
     )]
+
+
+def test_materializes_one_go_package_edge_with_earliest_evidence():
+    file_nodes = _go_file_nodes(
+        ("cmd/server/main.go", "main"),
+        ("internal/store/store.go", "store"),
+    )
+    go_packages = _go_package_index(
+        file_nodes,
+        _go_module(".", "example.com/project"),
+    )
+    later = resolve_import(
+        _go_raw("example.com/project/internal/store", line=8),
+        file_nodes=file_nodes,
+        go_packages=go_packages,
+    )
+    earlier = resolve_import(
+        _go_raw("example.com/project/internal/store", line=2),
+        file_nodes=file_nodes,
+        go_packages=go_packages,
+    )
+
+    edges = materialize_import_edges(
+        [later, earlier],
+        file_nodes=file_nodes,
+        go_packages=go_packages,
+    )
+
+    assert edges == [GraphEdge(
+        from_id=file_nodes["cmd/server/main.go"].id,
+        to_id=make_go_package_id(
+            "internal/store",
+            "example.com/project/internal/store",
+        ),
+        type="imports",
+        directed=True,
+        namespace="loci",
+        resolution="import-resolved",
+        evidence=GraphEvidence(
+            file="cmd/server/main.go",
+            line=2,
+            content_hash=SOURCE_HASH,
+        ),
+    )]
+
+
+def test_go_package_edge_rejects_invalid_package_metadata():
+    file_nodes = _go_file_nodes(
+        ("cmd/server/main.go", "main"),
+        ("internal/store/store.go", "store"),
+    )
+    go_packages = _go_package_index(
+        file_nodes,
+        _go_module(".", "example.com/project"),
+    )
+    record = resolve_import(
+        _go_raw("example.com/project/internal/store"),
+        file_nodes=file_nodes,
+        go_packages=go_packages,
+    )
+    go_packages.package_nodes[0].metadata["loci"]["package_name"] = "main"
+
+    with pytest.raises(GraphContractError) as exc_info:
+        materialize_import_edges(
+            [record],
+            file_nodes=file_nodes,
+            go_packages=go_packages,
+        )
+
+    assert exc_info.value.code == "INVALID_GRAPH_SCHEMA"
+    assert exc_info.value.details["field"] == "target_id"
 
 
 @pytest.mark.parametrize(

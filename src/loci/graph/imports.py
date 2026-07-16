@@ -15,7 +15,12 @@ from .contracts import (
     GraphEvidence,
     JSONValue,
 )
-from .go_modules import GoModule, GoPackageBinding, GoPackageIndex
+from .go_modules import (
+    GoModule,
+    GoPackageBinding,
+    GoPackageIndex,
+    _valid_go_identifier,
+)
 
 
 ImportStatus: TypeAlias = Literal["resolved", "unresolved"]
@@ -301,10 +306,15 @@ def materialize_import_edges(
     records: Sequence[ImportRecord],
     *,
     file_nodes: Mapping[str, Symbol],
+    go_packages: GoPackageIndex | None = None,
 ) -> list[GraphEdge]:
     """Build one deterministic evidence-backed edge per resolved dependency."""
     edges: dict[tuple[str, str, str, str], GraphEdge] = {}
     evidence_ranks: dict[tuple[str, str, str, str], tuple[int, str, str, str]] = {}
+    package_nodes = {
+        node.id: node
+        for node in (go_packages.package_nodes if go_packages is not None else ())
+    }
 
     for record in records:
         source = _require_file_node(
@@ -320,19 +330,41 @@ def materialize_import_edges(
             )
         if record.status != "resolved":
             continue
-        if record.target_file is None or record.target_id is None:
-            raise _error("Resolved import requires a target file and ID")
-        target = _require_file_node(
-            file_nodes,
-            record.target_file,
-            field="target_file",
-        )
-        if target.id != record.target_id:
-            raise _error(
-                "Import record target does not match its file node",
-                field="target_id",
-                target_id=record.target_id,
+        if record.target_id is None:
+            raise _error("Resolved import requires a target ID")
+        if record.target_kind == "file":
+            if record.target_file is None:
+                raise _error("Resolved file import requires a target file")
+            target = _require_file_node(
+                file_nodes,
+                record.target_file,
+                field="target_file",
             )
+            if target.id != record.target_id:
+                raise _error(
+                    "Import record target does not match its file node",
+                    field="target_id",
+                    target_id=record.target_id,
+                )
+        elif record.target_kind == "package":
+            if record.raw.type_only:
+                raise _error(
+                    "Go package imports cannot be type-only",
+                    field="target_id",
+                    target_id=record.target_id,
+                )
+            if record.target_package is None:
+                raise _error("Resolved package import requires a target package")
+            target = package_nodes.get(record.target_id)
+            if target is None:
+                raise _error(
+                    "Import record target is not present in the Go package index",
+                    field="target_id",
+                    target_id=record.target_id,
+                )
+            _validate_go_package_target(target, record.target_package)
+        else:
+            raise _error("Resolved import requires a supported target kind")
         if source.id == target.id:
             continue
 
@@ -655,10 +687,19 @@ def _go_internal_import_allowed(
 
 
 def _validate_go_package_target(target: Symbol, import_path: str) -> None:
+    loci = target.metadata.get("loci")
+    package_name = loci.get("package_name") if isinstance(loci, Mapping) else None
     if (
         target.kind != "package"
         or target.language != "go"
         or target.qualified_name != import_path
+        or not isinstance(loci, Mapping)
+        or loci.get("go_package_node") is not True
+        or loci.get("import_path") != import_path
+        or not isinstance(package_name, str)
+        or target.name != package_name
+        or package_name == "main"
+        or not _valid_go_identifier(package_name)
     ):
         raise _error(
             "Go package index target is invalid",

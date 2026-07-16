@@ -21,6 +21,9 @@ CHILD_HASH = "a" * 64
 SOURCE_ID = "src/source.py::__file__#file"
 TARGET_ID = "src/target.py::__file__#file"
 SOURCE_HASH = "c" * 64
+GO_SOURCE_ID = "cmd/server/main.go::__file__#file"
+GO_TARGET_ID = "internal/store::example.com/project/internal/store#package"
+GO_IMPORT_PATH = "example.com/project/internal/store"
 
 
 def _edge(**overrides) -> GraphEdge:
@@ -131,6 +134,86 @@ def _import_nodes() -> dict[str, dict]:
             "line": 1,
             "content_hash": "d" * 64,
         },
+    }
+
+
+def _go_import_edge(**overrides) -> GraphEdge:
+    values = {
+        "from_id": GO_SOURCE_ID,
+        "to_id": GO_TARGET_ID,
+        "type": "imports",
+        "directed": True,
+        "namespace": "loci",
+        "resolution": "import-resolved",
+        "evidence": GraphEvidence(
+            file="cmd/server/main.go",
+            line=4,
+            content_hash=SOURCE_HASH,
+        ),
+    }
+    values.update(overrides)
+    return GraphEdge(**values)
+
+
+def _go_import_record(**overrides) -> ImportRecord:
+    raw_values = {
+        "source_file": "cmd/server/main.go",
+        "language": "go",
+        "line": 4,
+        "text": f'import "{GO_IMPORT_PATH}"',
+        "specifier": GO_IMPORT_PATH,
+        "imported_name": None,
+        "type_only": False,
+        "is_reexport": False,
+        "source_hash": SOURCE_HASH,
+    }
+    values = {
+        "raw": RawImport(**raw_values),
+        "source_id": GO_SOURCE_ID,
+        "target_file": None,
+        "target_package": GO_IMPORT_PATH,
+        "target_kind": "package",
+        "target_id": GO_TARGET_ID,
+        "status": "resolved",
+        "unresolved_reason": None,
+    }
+    values.update(overrides)
+    return ImportRecord(**values)
+
+
+def _go_import_nodes(**target_overrides) -> dict[str, dict]:
+    target = {
+        "id": GO_TARGET_ID,
+        "name": "store",
+        "qualified_name": GO_IMPORT_PATH,
+        "kind": "package",
+        "language": "go",
+        "file_path": "internal/store/store.go",
+        "line": 1,
+        "content_hash": "d" * 64,
+        "metadata": {
+            "loci": {
+                "go_package_node": True,
+                "directory": "internal/store",
+                "import_path": GO_IMPORT_PATH,
+                "package_name": "store",
+            }
+        },
+    }
+    target.update(target_overrides)
+    return {
+        GO_SOURCE_ID: {
+            "id": GO_SOURCE_ID,
+            "name": "main.go",
+            "qualified_name": "main.go",
+            "kind": "file",
+            "language": "go",
+            "file_path": "cmd/server/main.go",
+            "line": 1,
+            "content_hash": SOURCE_HASH,
+            "metadata": {},
+        },
+        GO_TARGET_ID: target,
     }
 
 
@@ -300,6 +383,109 @@ def test_import_edges_accept_runtime_and_type_only_records():
         file_hashes=file_hashes,
         imports=[_import_record(raw=_raw_import(type_only=True))],
     )
+
+
+def test_import_edge_accepts_go_package_target():
+    validate_graph_edges(
+        [_go_import_edge()],
+        indexed_nodes=_go_import_nodes(),
+        file_hashes={"cmd/server/main.go": SOURCE_HASH},
+        imports=[_go_import_record()],
+    )
+
+
+@pytest.mark.parametrize(
+    ("target_overrides", "metadata_overrides"),
+    [
+        ({"kind": "file"}, {}),
+        ({"language": "python"}, {}),
+        ({"name": "wrong"}, {}),
+        ({"qualified_name": "example.com/project/wrong"}, {}),
+        ({}, {"go_package_node": False}),
+        ({}, {"import_path": "example.com/project/wrong"}),
+        ({}, {"package_name": "main"}),
+        ({}, {"package_name": "123invalid"}),
+    ],
+)
+def test_import_edge_rejects_invalid_go_package_target(
+    target_overrides: dict,
+    metadata_overrides: dict,
+):
+    nodes = _go_import_nodes(**target_overrides)
+    nodes[GO_TARGET_ID]["metadata"]["loci"].update(metadata_overrides)
+
+    with pytest.raises(GraphContractError) as exc_info:
+        validate_graph_edges(
+            [_go_import_edge()],
+            indexed_nodes=nodes,
+            file_hashes={"cmd/server/main.go": SOURCE_HASH},
+            imports=[_go_import_record()],
+        )
+
+    assert exc_info.value.code == "INVALID_GRAPH_EDGE"
+    assert exc_info.value.details["field"] == "target"
+
+
+@pytest.mark.parametrize(
+    ("edge", "record", "field"),
+    [
+        (
+            _go_import_edge(evidence=GraphEvidence(
+                file="cmd/server/main.go",
+                line=5,
+                content_hash=SOURCE_HASH,
+            )),
+            _go_import_record(),
+            "line",
+        ),
+        (
+            _go_import_edge(evidence=GraphEvidence(
+                file="cmd/server/main.go",
+                line=4,
+                content_hash="e" * 64,
+            )),
+            _go_import_record(),
+            "content_hash",
+        ),
+        (
+            _go_import_edge(),
+            _go_import_record(target_id="other#package"),
+            "import_record",
+        ),
+        (
+            _go_import_edge(),
+            _go_import_record(target_package="example.com/project/wrong"),
+            "target",
+        ),
+    ],
+)
+def test_go_package_import_edge_rejects_mismatched_provenance(
+    edge: GraphEdge,
+    record: ImportRecord,
+    field: str,
+):
+    with pytest.raises(GraphContractError) as exc_info:
+        validate_graph_edges(
+            [edge],
+            indexed_nodes=_go_import_nodes(),
+            file_hashes={"cmd/server/main.go": SOURCE_HASH},
+            imports=[record],
+        )
+
+    assert exc_info.value.details["field"] == field
+
+
+def test_go_package_import_edge_rejects_type_only_edge():
+    with pytest.raises(GraphContractError) as exc_info:
+        validate_graph_edges(
+            [_go_import_edge(type="imports_type")],
+            indexed_nodes=_go_import_nodes(),
+            file_hashes={"cmd/server/main.go": SOURCE_HASH},
+            imports=[_go_import_record()],
+        )
+
+    assert exc_info.value.code == "INVALID_GRAPH_EDGE"
+    assert exc_info.value.details["field"] == "type"
 
 
 @pytest.mark.parametrize(
