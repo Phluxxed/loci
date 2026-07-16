@@ -285,6 +285,17 @@ dependencies use `type="imports"`; type-only TypeScript dependencies use
 exact source statement as evidence. Re-exports remain distinguishable on the
 diagnostic record.
 
+Resolved Go imports target one stable `kind="package"` node, never an arbitrary
+`.go` file. A package node ID combines its repository-relative directory and
+effective import path, for example
+`internal/store::example.com/project/internal/store#package`. The node is
+anchored to a deterministic indexed non-test Go file for outline and retrieval,
+but has a zero-width span and exposes validated `directory`, `import_path`, and
+`package_name` attributes. An import record distinguishes this package target
+with `target_kind="package"`, `target_package`, and `target_file=null`.
+Resolved Python and JavaScript/TypeScript records instead use
+`target_kind="file"`, `target_file`, and `target_package=null`.
+
 Use the MCP diagnostic read to inspect observations, including imports that did
 not become graph edges:
 
@@ -300,7 +311,7 @@ loci_graph_imports(
 
 Use generic traversal for the dependency graph. The outgoing call answers
 "what does this file import?"; changing `direction` to `incoming` answers
-"which files import this file?" without reversing the stored edge:
+"which files import this file or package?" without reversing the stored edge:
 
 ```text
 loci_graph_traverse_neighbors(
@@ -317,11 +328,26 @@ loci_graph_traverse_neighbors(
 dependency chains. Do not use `loci_graph_neighbors` for imports; that tool is
 intentionally pinned to exact outgoing containment for compatibility.
 
+Go resolution is repository-contained and conservative. Loci parses bounded,
+regular, non-symlink `go.mod` and `go.work` files without running Go or
+repository code. It resolves same-module packages, explicitly active contained
+workspace modules, and contained local replacements backed by direct,
+unambiguous requirements. It enforces nested-module ownership and Go
+`internal` visibility, excludes `vendor`, test-only directories, invalid or
+conflicting package declarations, and `package main` commands as targets, and
+never guesses by package name.
+
+Loci deliberately does not download modules, inspect Go caches or environment
+workspace settings, implement minimal version selection, follow remote
+replacements, model vendoring, or evaluate build, platform, architecture, or
+cgo constraints. Those cases remain explicit unresolved observations. Rust
+imports remain extract-and-report only and do not produce trusted edges.
+
 Unresolved, ambiguous, external, and unsupported-language observations remain
 bounded records with an explicit `unresolved_reason`. They are visible through
 `loci_graph_imports`, do not become edges, and do not degrade graph health when
 they are normal resolution outcomes. `loci_graph_health` reports
-`graph_file_nodes_indexed`, `graph_imports_indexed`,
+`graph_file_nodes_indexed`, `graph_go_packages_indexed`, `graph_imports_indexed`,
 `graph_imports_resolved`, and `graph_imports_unresolved`; extraction or
 persistence failures still appear as diagnostics. Loci never falls back to a
 repository-wide name guess. There is no import CLI command or separate

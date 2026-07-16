@@ -1,7 +1,6 @@
 # loci: Extensible Graph Retrieval Layer — Design
 
-**Status:** Stages 1-6 implemented, reviewed, and accepted; Stage 7 Go
-import-resolution design pending
+**Status:** Stages 1-7 implemented, reviewed, and accepted
 
 **Date:** 2026-07-13
 
@@ -294,23 +293,41 @@ on 2026-07-15.
 
 ### Stage 7: Module-aware Go import resolution
 
-The owner selected module-aware Go import resolution as the next graph-roadmap
-target on 2026-07-15. Stage 7 will design how current extract-and-report Go
-observations become deterministic in-repository edges using Go module semantics
-without guessing from string or filename similarity.
+The owner selected module-aware Go import resolution on 2026-07-15 and accepted
+the detailed implementation plan on 2026-07-16. Stage 7 is implemented and
+accepted as of 2026-07-17. Go observations now become deterministic
+repository-local edges when the contained module evidence is sufficient,
+without guessing from string, filename, or package-name similarity.
 
 Detailed implementation plan:
 `docs/plans/2026-07-15-extensible-graph-retrieval-stage-7-go-import-resolution.md`.
 
-Rust import resolution remains deferred because there is no current Rust
-consumer. Rust observations continue to be extracted and reported as unresolved;
-they must not produce trusted edges.
+The implemented contract adds stable zero-width Go `kind="package"` nodes and
+directed `loci:imports` / `import-resolved` edges from importer file nodes to
+those package nodes. `loci_graph_imports` distinguishes package targets with
+`target_kind="package"`, `target_package`, and `target_file=null`; existing
+Python and JavaScript/TypeScript targets remain file-shaped. Generic filtered
+traversal exposes package `directory`, `import_path`, and `package_name`
+attributes. `loci_graph_neighbors` remains containment-only.
 
-The owner accepted the detailed Stage 7 plan on 2026-07-16. Implementation is
-authorized in its task order, beginning with the bounded control-file parser.
+Resolution supports same-module packages, explicitly active contained
+workspace modules, and conservative contained local replacements backed by
+direct unambiguous requirements. It is a pure, bounded read of repository
+controls: indexing does not run Go or repository code, use the network, inherit
+an ambient workspace, inspect module caches, implement minimal version
+selection, follow remote replacements, model vendor mode, or evaluate build or
+platform constraints. Nested-module ownership and Go `internal` visibility are
+enforced; invalid, ambiguous, external, missing, inaccessible, or deliberately
+unsupported cases remain inspectable records without trusted edges.
+
+Rust import resolution remains deferred because there is no current Rust
+consumer. Rust observations continue to be extracted and reported as unresolved
+and must not produce trusted edges.
+
 The accepted plan freezes exact module-resolution rules, package-node semantics,
 APIs, files, fixtures, compatibility checks, rollback behavior, and the final
-implementation review gate.
+implementation review gate. The final review packet records the completed gate:
+`docs/reviews/2026-07-15-extensible-graph-retrieval-stage-7-final-review.md`.
 
 After Go resolution, the approved roadmap order is:
 

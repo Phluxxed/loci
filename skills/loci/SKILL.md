@@ -146,13 +146,13 @@ traversal or answerability claims:
 `loci_graph_health` returns persisted extension status and diagnostics:
 
 ```json
-{"schema_version":1,"repo":"...","status":"healthy|degraded","profiles":[],"counts":{"profiles":0,"node_overlays":0,"edges":0,"contributions":0,"diagnostics":0,"graph_file_nodes_indexed":0,"graph_imports_indexed":0,"graph_imports_resolved":0,"graph_imports_unresolved":0},"diagnostics":[]}
+{"schema_version":1,"repo":"...","status":"healthy|degraded","profiles":[],"counts":{"profiles":0,"node_overlays":0,"edges":0,"contributions":0,"diagnostics":0,"graph_file_nodes_indexed":0,"graph_go_packages_indexed":0,"graph_imports_indexed":0,"graph_imports_resolved":0,"graph_imports_unresolved":0},"diagnostics":[]}
 ```
 
 `loci_graph_imports` returns a bounded diagnostic page:
 
 ```json
-{"schema_version":1,"repo":"...","file":null,"status":"all","items":[{"source_file":"src/a.py","source_id":"src/a.py::__file__#file","target_file":"src/b.py","target_id":"src/b.py::__file__#file","specifier":"b","imported_name":null,"language":"python","line":1,"text":"import b","type_only":false,"is_reexport":false,"status":"resolved","resolution":"import-resolved","unresolved_reason":null}],"counts":{"total":1,"resolved":1,"unresolved":0,"returned":1},"pagination":{"offset":0,"limit":100,"next_offset":null}}
+{"schema_version":1,"repo":"...","file":null,"status":"all","items":[{"source_file":"src/a.py","source_id":"src/a.py::__file__#file","target_file":"src/b.py","target_package":null,"target_kind":"file","target_id":"src/b.py::__file__#file","specifier":"b","imported_name":null,"language":"python","line":1,"text":"import b","type_only":false,"is_reexport":false,"status":"resolved","resolution":"import-resolved","unresolved_reason":null}],"counts":{"total":1,"resolved":1,"unresolved":0,"returned":1},"pagination":{"offset":0,"limit":100,"next_offset":null}}
 ```
 
 `loci_graph_paths` returns `support_kind: "edge_sequence"`, ordered nodes,
@@ -171,6 +171,15 @@ Indexed code files are stable zero-width `kind="file"` graph nodes. Build the
 ID as `<normalized-repository-relative-path>::__file__#file`, for example
 `src/loci/mcp_server.py::__file__#file`. Markdown uses its existing page and
 section nodes and does not receive a duplicate file node.
+
+Resolved Python and JavaScript/TypeScript imports target file nodes and report
+`target_kind="file"`, `target_file`, and `target_package=null`. Resolved Go
+imports target one stable zero-width `kind="package"` node and report
+`target_kind="package"`, `target_package`, and `target_file=null`. Go package
+IDs have the form `<directory>::<effective-import-path>#package`; node refs
+expose validated `directory`, `import_path`, and `package_name` attributes.
+Treat the node as the imported package even though a deterministic non-test Go
+file anchors it for outline and retrieval.
 
 Use `loci_graph_imports` to inspect all import observations, including
 unresolved records:
@@ -207,6 +216,17 @@ points from importer to imported file and reports reverse traversal. Use
 
 Do not use `loci_graph_neighbors` for imports. It intentionally returns only
 exact outgoing `loci:contains` edges for compatibility.
+
+Go resolution is intentionally bounded and repository-contained. It supports
+same-module packages, explicitly active contained workspace modules, and
+contained local replacements backed by direct unambiguous requirements. It
+enforces nested-module ownership and `internal` visibility, rejects command
+packages as targets, and excludes vendor, test-only, missing, invalid, or
+conflicting package directories. It never runs Go or repository code, reads an
+ambient workspace, downloads modules, implements minimal version selection,
+follows remote replacements, models vendoring, or evaluates build/platform/cgo
+constraints. Unsupported cases remain inspectable unresolved records rather
+than guessed edges. Rust remains extract-and-report only.
 
 Unresolved, ambiguous, external, and unsupported-language observations remain
 bounded records with an explicit `unresolved_reason`. They never become graph
