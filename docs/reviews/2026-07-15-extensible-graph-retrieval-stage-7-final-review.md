@@ -524,5 +524,11 @@ extension contribution requires migration.
 
 **ACCEPTED.** Stage 7 is complete at the implementation, compatibility,
 security, documentation, real-repository, and delegated owner-review levels.
-The next graph-roadmap item is resolved symbol references that follow definite
-imports; it requires its own design and review boundary.
+
+Post-acceptance note, 2026-07-18: the acceptance verdict and Stage 7 evidence
+remain unchanged. The owner later superseded the recorded follow-on order after
+identifying Anvil as a definite Rust consumer. The next graph-roadmap item is
+now completion of deterministic JavaScript/TypeScript repository-local
+dependency resolution, followed by Cargo-aware Rust dependency resolution.
+Resolved symbol references follow those dependency-layer stages. Each requires
+its own design and review boundary.
