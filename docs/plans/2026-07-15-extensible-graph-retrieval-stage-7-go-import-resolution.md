@@ -1488,15 +1488,30 @@ During implementation, failures must not leave a valid-looking partial graph:
 
 ## Deliberately Deferred
 
-After Stage 7 acceptance, the approved roadmap remains:
+At Stage 7 acceptance, resolved symbols, calls, heuristics, architecture
+analysis, and Cargo-aware Rust resolution were all deliberately outside this
+plan. Rust remained extract-and-report because no current consumer had yet been
+identified.
 
-1. resolved symbol references that follow definite imports;
-2. cross-file calls only when binding and import resolution are definite;
-3. heuristic candidates as opt-in diagnostics, never trusted defaults; and
-4. graph orientation or architecture analysis after enough real edges exist.
+### Post-acceptance roadmap correction — 2026-07-18
 
-Rust remains extract-and-report until a real Rust consumer justifies Cargo-aware
-design.
+The owner subsequently identified Anvil as a definite near-term Rust consumer
+and required dependency-layer language parity before higher semantic graph
+work. This does not change Stage 7's accepted implementation or evidence. It
+supersedes only the follow-on order:
+
+1. complete deterministic JavaScript/TypeScript repository-local dependency
+   resolution beyond the current relative-import subset;
+2. implement deterministic Cargo-aware Rust dependency resolution;
+3. add resolved symbol references that follow definite imports;
+4. add cross-file calls only when binding and import resolution are definite;
+5. expose heuristic candidates as opt-in diagnostics, never trusted defaults;
+   and
+6. add graph orientation or architecture analysis after enough real edges
+   exist.
+
+Each item requires its own bounded design and review gate. Until the Rust stage
+lands, current Rust behavior remains extract-and-report with no trusted edge.
 
 ## Open Questions
 

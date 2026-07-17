@@ -320,22 +320,39 @@ platform constraints. Nested-module ownership and Go `internal` visibility are
 enforced; invalid, ambiguous, external, missing, inaccessible, or deliberately
 unsupported cases remain inspectable records without trusted edges.
 
-Rust import resolution remains deferred because there is no current Rust
-consumer. Rust observations continue to be extracted and reported as unresolved
-and must not produce trusted edges.
+At Stage 7 acceptance, Rust import resolution remained deferred because no
+current Rust consumer had been identified. That rationale was superseded on
+2026-07-18: Anvil now has an explicit near-term Rust requirement, so Cargo-aware
+Rust resolution is a committed dependency-layer stage. Until that stage lands,
+Rust observations continue to be extracted and reported as unresolved and must
+not produce trusted edges.
 
 The accepted plan freezes exact module-resolution rules, package-node semantics,
 APIs, files, fixtures, compatibility checks, rollback behavior, and the final
 implementation review gate. The final review packet records the completed gate:
 `docs/reviews/2026-07-15-extensible-graph-retrieval-stage-7-final-review.md`.
 
-After Go resolution, the approved roadmap order is:
+The owner corrected the post-Stage-7 roadmap on 2026-07-18. Dependency
+resolution must be trustworthy across the language portfolio before higher
+semantic layers depend on it. The approved order is now:
 
-1. resolved symbol references that follow definite imports;
-2. cross-file calls only where binding and import resolution are definite;
-3. heuristic candidates as opt-in diagnostics, never trusted defaults; and
-4. graph orientation or architecture analysis after the underlying edges have
-   enough real-repository evidence.
+1. complete deterministic JavaScript/TypeScript repository-local dependency
+   resolution beyond the current relative-import subset, with the exact
+   supported package, workspace, and compiler-configuration semantics frozen by
+   a separate design and review gate;
+2. implement deterministic Cargo-aware Rust dependency resolution, with crate,
+   package, workspace, module, feature, and visibility boundaries scoped by a
+   separate design and review gate;
+3. add resolved symbol references that follow definite imports;
+4. add cross-file calls only where binding and import resolution are definite;
+5. expose heuristic candidates as opt-in diagnostics, never trusted defaults;
+   and
+6. add graph orientation or architecture analysis after the underlying edges
+   have enough real-repository evidence.
+
+"Complete" here means complete for an explicitly documented, bounded static
+resolution contract. It does not authorize executing repository tools or code,
+using the network, or silently approximating every runtime loader behavior.
 
 ## Technical Fit
 
