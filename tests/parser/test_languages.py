@@ -15,7 +15,11 @@ def test_import_node_types_match_supported_language_grammars():
         "export_statement",
     )
     assert get_language_spec("go").import_node_types == ("import_spec",)
-    assert get_language_spec("rust").import_node_types == ("use_declaration",)
+    assert get_language_spec("rust").import_node_types == (
+        "use_declaration",
+        "extern_crate_declaration",
+        "mod_item",
+    )
 
 
 def test_unused_tsx_spec_does_not_duplicate_import_configuration():
