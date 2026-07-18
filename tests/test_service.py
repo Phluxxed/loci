@@ -30,7 +30,7 @@ from loci.service import (
     session_stats,
     verify_repo,
 )
-from loci.storage.index_store import IndexStore
+from loci.storage.index_store import EXTRACTOR_VERSION, IndexStore
 
 
 def _run_python_json(source: str, *args: Path) -> dict:
@@ -236,7 +236,7 @@ def test_service_old_extractor_cache_forces_full_reindex(
     indexed = index_repo(repo, incremental=True)
 
     assert indexed["files_skipped"] == 0
-    assert store.load(repo.resolve())["extractor_version"] == 7
+    assert store.load(repo.resolve())["extractor_version"] == EXTRACTOR_VERSION
 
 
 def test_service_markdown_outline_exposes_retrieval_cost_and_repo_relative_ids(
