@@ -23,7 +23,8 @@ MCP read tools (`loci_outline`, `loci_search`, `loci_get`, `loci_file`,
 `loci_graph_traverse_neighbors`, `loci_graph_paths`, `loci_graph_retrieve`,
 `loci_graph_imports`, and `loci_graph_health`) refresh stale indexes before
 returning cached data. Freshness includes repository-local graph profiles,
-contributions, and built-in import records.
+contributions, built-in import records, Go module/workspace controls, and
+JavaScript/TypeScript package, workspace, and project controls.
 `loci_index` is still required for a repo that has never been indexed, and
 remains useful for explicit rebuilds or after large changes.
 
@@ -152,7 +153,7 @@ traversal or answerability claims:
 `loci_graph_imports` returns a bounded diagnostic page:
 
 ```json
-{"schema_version":1,"repo":"...","file":null,"status":"all","items":[{"source_file":"src/a.py","source_id":"src/a.py::__file__#file","target_file":"src/b.py","target_package":null,"target_kind":"file","target_id":"src/b.py::__file__#file","specifier":"b","imported_name":null,"language":"python","line":1,"text":"import b","type_only":false,"is_reexport":false,"status":"resolved","resolution":"import-resolved","unresolved_reason":null}],"counts":{"total":1,"resolved":1,"unresolved":0,"returned":1},"pagination":{"offset":0,"limit":100,"next_offset":null}}
+{"schema_version":1,"repo":"...","file":null,"status":"all","items":[{"source_file":"src/a.py","source_id":"src/a.py::__file__#file","target_file":"src/b.py","target_package":null,"target_kind":"file","target_id":"src/b.py::__file__#file","specifier":"b","imported_name":null,"language":"python","line":1,"text":"import b","type_only":false,"is_reexport":false,"status":"resolved","resolution":"import-resolved","unresolved_reason":null,"resolution_basis":null,"resolution_control_files":[]}],"counts":{"total":1,"resolved":1,"unresolved":0,"returned":1},"pagination":{"offset":0,"limit":100,"next_offset":null}}
 ```
 
 `loci_graph_paths` returns `support_kind: "edge_sequence"`, ordered nodes,
@@ -180,6 +181,23 @@ IDs have the form `<directory>::<effective-import-path>#package`; node refs
 expose validated `directory`, `import_path`, and `package_name` attributes.
 Treat the node as the imported package even though a deterministic non-test Go
 file anchors it for outline and retrieval.
+
+For JavaScript/TypeScript, inspect `resolution_basis` and
+`resolution_control_files` before explaining why a file target was selected.
+Supported sources are `.ts`, `.tsx`, `.mts`, `.cts`, `.js`, `.jsx`, `.mjs`,
+and `.cjs`. The bounded resolver can use relative paths, standard
+`tsconfig.json`/`jsconfig.json` controls, declared package-json or pnpm
+workspaces, package `exports`/`imports`, self-references, and conservative
+legacy entries. Workspace edges require a unique active package and an
+explicit dependency declaration by the importing package.
+
+Treat an unresolved result as evidence that Loci did not prove a repository
+edge. Never compensate with a repository-wide filename or package-name guess.
+Loci intentionally does not inspect installs or lockfiles, execute toolchains
+or repository code, use the network, model custom loaders/bundler aliases, or
+resolve dynamic `import()` and shadowable `require()` calls. Invalid controls
+degrade graph health; normal missing, external, inaccessible, ambiguous, and
+unsupported-configuration routes remain inspectable without becoming edges.
 
 Use `loci_graph_imports` to inspect all import observations, including
 unresolved records:

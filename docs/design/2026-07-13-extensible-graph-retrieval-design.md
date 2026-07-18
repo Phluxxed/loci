@@ -1,6 +1,7 @@
 # loci: Extensible Graph Retrieval Layer — Design
 
-**Status:** Stages 1-7 implemented, reviewed, and accepted
+**Status:** Stages 1-7 implemented, reviewed, and accepted; Stage 8 implemented
+and awaiting final owner review
 
 **Date:** 2026-07-13
 
@@ -332,22 +333,45 @@ APIs, files, fixtures, compatibility checks, rollback behavior, and the final
 implementation review gate. The final review packet records the completed gate:
 `docs/reviews/2026-07-15-extensible-graph-retrieval-stage-7-final-review.md`.
 
+### Stage 8: Deterministic JavaScript/TypeScript import resolution
+
+The owner approved the bounded Stage 8 contract on 2026-07-18. The
+implementation is complete and awaiting its final evidence packet and explicit
+owner acceptance. Until that gate is approved, the design status remains
+Stages 1-7 accepted.
+
+Detailed implementation plan:
+`docs/plans/2026-07-18-extensible-graph-retrieval-stage-8-javascript-typescript-import-resolution.md`.
+
+Stage 8 extends file-level JavaScript/TypeScript resolution across `.ts`,
+`.tsx`, `.mts`, `.cts`, `.js`, `.jsx`, `.mjs`, and `.cjs`. It uses contained,
+bounded repository evidence from standard TypeScript/JavaScript project
+configs, package manifests, declared package-json or pnpm workspaces, package
+maps, self-references, and conservative legacy entries. Resolved observations
+retain exact file targets and add a resolution basis plus the controls that
+justified the result. Control hashes participate in freshness, so an unchanged
+source import is re-resolved when its project or package configuration changes.
+
+The resolver does not inspect installed dependencies or lockfiles, execute a
+runtime, compiler, package manager, script, bundler, generator, or repository
+code, or use the network. Dynamic imports, shadowable `require()` calls,
+custom loaders, bundler aliases, and missing generated output remain outside
+the trusted static contract. Unsupported or insufficient evidence stays an
+inspectable unresolved observation and never becomes an edge.
+
 The owner corrected the post-Stage-7 roadmap on 2026-07-18. Dependency
 resolution must be trustworthy across the language portfolio before higher
-semantic layers depend on it. The approved order is now:
+semantic layers depend on it. With Stage 8 implemented pending final
+acceptance, the remaining approved order is:
 
-1. complete deterministic JavaScript/TypeScript repository-local dependency
-   resolution beyond the current relative-import subset, with the exact
-   supported package, workspace, and compiler-configuration semantics frozen by
-   a separate design and review gate;
-2. implement deterministic Cargo-aware Rust dependency resolution, with crate,
+1. implement deterministic Cargo-aware Rust dependency resolution, with crate,
    package, workspace, module, feature, and visibility boundaries scoped by a
    separate design and review gate;
-3. add resolved symbol references that follow definite imports;
-4. add cross-file calls only where binding and import resolution are definite;
-5. expose heuristic candidates as opt-in diagnostics, never trusted defaults;
+2. add resolved symbol references that follow definite imports;
+3. add cross-file calls only where binding and import resolution are definite;
+4. expose heuristic candidates as opt-in diagnostics, never trusted defaults;
    and
-6. add graph orientation or architecture analysis after the underlying edges
+5. add graph orientation or architecture analysis after the underlying edges
    have enough real-repository evidence.
 
 "Complete" here means complete for an explicitly documented, bounded static

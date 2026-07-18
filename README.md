@@ -272,15 +272,17 @@ excluded records.
 
 ### Built-in import relationships
 
-Every indexed Python, JavaScript, TypeScript, TSX, Go, and Rust source file has
-a stable, zero-width `kind="file"` graph node. Its ID is the normalized
-repository-relative path followed by `::__file__#file`, for example
-`src/loci/mcp_server.py::__file__#file`. Markdown keeps its existing page and
-section nodes and does not receive a duplicate file node.
+Every indexed Python, Go, Rust, and supported JavaScript/TypeScript source file
+has a stable, zero-width `kind="file"` graph node. The JavaScript/TypeScript
+family is `.ts`, `.tsx`, `.mts`, `.cts`, `.js`, `.jsx`, `.mjs`, and `.cjs`.
+A file-node ID is the normalized repository-relative path followed by
+`::__file__#file`, for example `src/loci/mcp_server.py::__file__#file`.
+Markdown keeps its existing page and section nodes and does not receive a
+duplicate file node.
 
-Resolved Python imports and relative JavaScript/TypeScript imports become
-directed `namespace="loci"` edges from importer to imported file. Runtime
-dependencies use `type="imports"`; type-only TypeScript dependencies use
+Resolved Python and JavaScript/TypeScript imports become directed
+`namespace="loci"` edges from importer to imported file. Runtime dependencies
+use `type="imports"`; type-only TypeScript dependencies use
 `type="imports_type"`; both use `resolution="import-resolved"` and retain the
 exact source statement as evidence. Re-exports remain distinguishable on the
 diagnostic record.
@@ -295,6 +297,26 @@ but has a zero-width span and exposes validated `directory`, `import_path`, and
 with `target_kind="package"`, `target_package`, and `target_file=null`.
 Resolved Python and JavaScript/TypeScript records instead use
 `target_kind="file"`, `target_file`, and `target_package=null`.
+
+JavaScript/TypeScript resolution is static, deterministic, and contained in
+the indexed repository. Loci understands relative imports, bounded
+`tsconfig.json`/`jsconfig.json` options (`paths`, `baseUrl`, `rootDirs`,
+`moduleSuffixes`, local `extends`, and the package-map switches), package-json
+workspaces, restricted `pnpm-workspace.yaml` membership, package `exports` and
+private `imports`, self-references, and conservative legacy package entries.
+Workspace imports require both a unique active package and an explicit source
+package dependency declaration. Each diagnostic import item reports
+`resolution_basis` and the repository-relative `resolution_control_files` that
+justify the result.
+
+Loci does not inspect `node_modules`, lockfiles, package-manager stores, custom
+loader or bundler aliases, package-based TypeScript config inheritance, or
+generated files that are absent from the index. It does not execute Node,
+TypeScript, package managers, scripts, bundlers, generators, or repository
+code, and it does not use the network. Dynamic `import()` and shadowable
+`require()` calls are outside this static observation contract. Missing,
+ambiguous, inaccessible, or unsupported routes remain explicit unresolved
+records rather than guessed source links.
 
 Use the MCP diagnostic read to inspect observations, including imports that did
 not become graph edges:
@@ -343,10 +365,11 @@ replacements, model vendoring, or evaluate build, platform, architecture, or
 cgo constraints. Those cases remain explicit unresolved observations. Rust
 imports remain extract-and-report only and do not produce trusted edges.
 
-Unresolved, ambiguous, external, and unsupported-language observations remain
-bounded records with an explicit `unresolved_reason`. They are visible through
-`loci_graph_imports`, do not become edges, and do not degrade graph health when
-they are normal resolution outcomes. `loci_graph_health` reports
+Unresolved, ambiguous, external, inaccessible, unsupported-configuration, and
+unsupported-language observations remain bounded records with an explicit
+`unresolved_reason`. They are visible through `loci_graph_imports`, do not
+become edges, and do not degrade graph health when they are normal resolution
+outcomes. `loci_graph_health` reports
 `graph_file_nodes_indexed`, `graph_go_packages_indexed`, `graph_imports_indexed`,
 `graph_imports_resolved`, and `graph_imports_unresolved`; extraction or
 persistence failures still appear as diagnostics. Loci never falls back to a
