@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from pathlib import Path
 
 import pytest
@@ -8,8 +9,12 @@ import pytest
 import loci.graph.javascript_modules as javascript_modules
 from loci.graph.javascript_modules import (
     JavaScriptModuleContext,
+    build_javascript_resolution_index,
     load_javascript_module_context,
+    resolve_javascript_import,
 )
+from loci.parser.imports import RawImport
+from loci.parser.symbols import Symbol, make_file_symbol
 
 
 def test_loader_parses_strict_packages_jsonc_configs_and_pnpm_workspace(
@@ -320,3 +325,431 @@ def test_loader_problem_details_are_bounded_and_do_not_echo_control_values(
     assert secret not in problem.message
     assert secret not in repr(problem.details)
     assert str(tmp_path) not in repr(problem)
+
+
+def _javascript_file(path: str) -> Symbol:
+    suffix = Path(path).suffix
+    language = "typescript" if suffix in {".ts", ".tsx", ".mts", ".cts"} else "javascript"
+    return make_file_symbol(
+        path,
+        language=language,
+        content_hash=hashlib.sha256(path.encode()).hexdigest(),
+    )
+
+
+def _raw(
+    source_file: str,
+    specifier: str,
+    *,
+    type_only: bool = False,
+) -> RawImport:
+    return RawImport(
+        source_file=source_file,
+        language=(
+            "typescript"
+            if Path(source_file).suffix in {".ts", ".tsx", ".mts", ".cts"}
+            else "javascript"
+        ),
+        line=1,
+        text=f'import value from "{specifier}";',
+        specifier=specifier,
+        imported_name=None,
+        type_only=type_only,
+        is_reexport=False,
+        source_hash="a" * 64,
+    )
+
+
+def _resolution_index(
+    tmp_path: Path,
+    files: list[str],
+    controls: list[Path] | None = None,
+    *,
+    allow_problems: bool = False,
+):
+    loaded = load_javascript_module_context(tmp_path, controls or [])
+    assert loaded.problems == ()
+    file_nodes = {path: _javascript_file(path) for path in files}
+    built = build_javascript_resolution_index(loaded.context, file_nodes=file_nodes)
+    if not allow_problems:
+        assert built.problems == ()
+    return built.index
+
+
+@pytest.mark.parametrize(
+    ("specifier", "target"),
+    [
+        ("./runtime.js", "src/runtime.ts"),
+        ("./module.mjs", "src/module.mts"),
+        ("./legacy.cjs", "src/legacy.cts"),
+        ("./component.jsx", "src/component.tsx"),
+    ],
+)
+def test_resolver_applies_explicit_output_extension_substitution(
+    tmp_path: Path,
+    specifier: str,
+    target: str,
+):
+    source = "src/consumer.ts"
+    index = _resolution_index(tmp_path, [source, target])
+
+    resolved = resolve_javascript_import(_raw(source, specifier), index)
+
+    assert resolved.target_file == target
+    assert resolved.basis == "relative_path"
+    assert resolved.control_files == ()
+    assert resolved.unresolved_reason is None
+
+
+def test_resolver_preserves_legacy_extensionless_order_and_type_declarations(
+    tmp_path: Path,
+):
+    source = "src/consumer.ts"
+    index = _resolution_index(
+        tmp_path,
+        [source, "src/value.ts", "src/value.d.ts", "src/value.js", "src/value.jsx"],
+    )
+
+    runtime = resolve_javascript_import(_raw(source, "./value"), index)
+    type_index = _resolution_index(
+        tmp_path,
+        [source, "src/value.d.ts", "src/value.js"],
+    )
+    type_only = resolve_javascript_import(
+        _raw(source, "./value.js", type_only=True),
+        type_index,
+    )
+
+    assert runtime.target_file == "src/value.ts"
+    assert type_only.target_file == "src/value.d.ts"
+
+
+def test_resolver_enforces_node_esm_extensions_but_substitutes_explicit_js(
+    tmp_path: Path,
+):
+    package = tmp_path / "package.json"
+    package.write_text('{"name":"app","type":"module"}', encoding="utf-8")
+    config = tmp_path / "tsconfig.json"
+    config.write_text('{"compilerOptions":{"module":"nodenext"}}', encoding="utf-8")
+    source = "src/consumer.ts"
+    index = _resolution_index(
+        tmp_path,
+        [source, "src/value.ts"],
+        [package, config],
+    )
+
+    extensionless = resolve_javascript_import(_raw(source, "./value"), index)
+    explicit = resolve_javascript_import(_raw(source, "./value.js"), index)
+
+    assert extensionless.target_file is None
+    assert extensionless.unresolved_reason == "not_indexed"
+    assert explicit.target_file == "src/value.ts"
+    assert explicit.control_files == ("package.json", "tsconfig.json")
+
+
+def test_resolver_uses_module_suffixes_then_root_dirs(tmp_path: Path):
+    config = tmp_path / "tsconfig.json"
+    config.write_text(
+        """
+{
+  "compilerOptions": {
+    "moduleResolution": "bundler",
+    "rootDirs": ["src", "generated"],
+    "moduleSuffixes": [".native", ""]
+  }
+}
+""".lstrip(),
+        encoding="utf-8",
+    )
+    source = "src/views/page.ts"
+    index = _resolution_index(
+        tmp_path,
+        [source, "generated/shared/item.native.ts"],
+        [config],
+    )
+
+    resolved = resolve_javascript_import(_raw(source, "../shared/item"), index)
+
+    assert resolved.target_file == "generated/shared/item.native.ts"
+    assert resolved.basis == "compiler_root_dirs"
+    assert resolved.control_files == ("tsconfig.json",)
+
+
+def test_resolver_applies_paths_before_base_url(tmp_path: Path):
+    config = tmp_path / "tsconfig.json"
+    config.write_text(
+        """
+{
+  "compilerOptions": {
+    "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "paths": {"@app/*": ["mapped/*", "fallback/*"]}
+  }
+}
+""".lstrip(),
+        encoding="utf-8",
+    )
+    source = "src/consumer.ts"
+    index = _resolution_index(
+        tmp_path,
+        [source, "mapped/value.ts", "@app/value.ts"],
+        [config],
+    )
+
+    resolved = resolve_javascript_import(_raw(source, "@app/value"), index)
+
+    assert resolved.target_file == "mapped/value.ts"
+    assert resolved.basis == "compiler_paths"
+    assert resolved.control_files == ("tsconfig.json",)
+
+
+def test_builder_selects_deepest_owning_config_and_jsconfig_preference(
+    tmp_path: Path,
+):
+    root_config = tmp_path / "tsconfig.json"
+    root_config.write_text(
+        '{"compilerOptions":{"allowJs":true,"baseUrl":"root"}}',
+        encoding="utf-8",
+    )
+    nested = tmp_path / "apps" / "web"
+    nested.mkdir(parents=True)
+    nested_ts = nested / "tsconfig.json"
+    nested_ts.write_text(
+        '{"compilerOptions":{"allowJs":true,"baseUrl":"ts"}}',
+        encoding="utf-8",
+    )
+    nested_js = nested / "jsconfig.json"
+    nested_js.write_text(
+        '{"compilerOptions":{"baseUrl":"js"}}',
+        encoding="utf-8",
+    )
+    source = "apps/web/src/page.js"
+    index = _resolution_index(
+        tmp_path,
+        [source, "apps/web/js/value.js", "apps/web/ts/value.js", "root/value.js"],
+        [root_config, nested_ts, nested_js],
+    )
+
+    resolved = resolve_javascript_import(_raw(source, "value"), index)
+
+    assert resolved.target_file == "apps/web/js/value.js"
+    assert resolved.basis == "compiler_base_url"
+    assert resolved.control_files == ("apps/web/jsconfig.json",)
+
+
+def _write_workspace_controls(tmp_path: Path, *, target_exports: object) -> list[Path]:
+    root = tmp_path / "package.json"
+    root.write_text(
+        '{"name":"root","workspaces":["apps/*","packages/*"]}',
+        encoding="utf-8",
+    )
+    app_dir = tmp_path / "apps" / "web"
+    app_dir.mkdir(parents=True)
+    app = app_dir / "package.json"
+    app.write_text(
+        '{"name":"@repo/web","dependencies":{"@repo/core":"workspace:*"}}',
+        encoding="utf-8",
+    )
+    core_dir = tmp_path / "packages" / "core"
+    core_dir.mkdir(parents=True)
+    core = core_dir / "package.json"
+    core.write_text(
+        json.dumps({"name": "@repo/core", "exports": target_exports}),
+        encoding="utf-8",
+    )
+    return [root, app, core]
+
+
+def test_resolver_uses_declared_workspace_exports_with_control_provenance(
+    tmp_path: Path,
+):
+    controls = _write_workspace_controls(
+        tmp_path,
+        target_exports={"./format": "./src/format.ts"},
+    )
+    source = "apps/web/src/page.ts"
+    target = "packages/core/src/format.ts"
+    index = _resolution_index(tmp_path, [source, target], controls)
+
+    resolved = resolve_javascript_import(_raw(source, "@repo/core/format"), index)
+
+    assert resolved.target_file == target
+    assert resolved.basis == "workspace_exports"
+    assert resolved.control_files == (
+        "apps/web/package.json",
+        "package.json",
+        "packages/core/package.json",
+    )
+
+
+def test_resolver_does_not_guess_missing_workspace_build_output(tmp_path: Path):
+    controls = _write_workspace_controls(
+        tmp_path,
+        target_exports={".": "./dist/index.js"},
+    )
+    source = "apps/web/src/page.ts"
+    index = _resolution_index(
+        tmp_path,
+        [source, "packages/core/src/index.ts"],
+        controls,
+        allow_problems=True,
+    )
+
+    resolved = resolve_javascript_import(_raw(source, "@repo/core"), index)
+
+    assert resolved.target_file is None
+    assert resolved.unresolved_reason == "not_indexed"
+    assert resolved.control_files == (
+        "apps/web/package.json",
+        "package.json",
+        "packages/core/package.json",
+    )
+
+
+def test_resolver_requires_workspace_dependency_and_unique_package_name(tmp_path: Path):
+    controls = _write_workspace_controls(tmp_path, target_exports="./src/index.ts")
+    app = controls[1]
+    app.write_text('{"name":"@repo/web"}', encoding="utf-8")
+    duplicate_dir = tmp_path / "packages" / "duplicate"
+    duplicate_dir.mkdir()
+    duplicate = duplicate_dir / "package.json"
+    duplicate.write_text('{"name":"@repo/core"}', encoding="utf-8")
+    controls.append(duplicate)
+    source = "apps/web/src/page.ts"
+    index = _resolution_index(
+        tmp_path,
+        [source, "packages/core/src/index.ts"],
+        controls,
+        allow_problems=True,
+    )
+
+    undeclared = resolve_javascript_import(_raw(source, "@repo/core"), index)
+
+    assert undeclared.target_file is None
+    assert undeclared.unresolved_reason == "external"
+
+    app.write_text(
+        '{"name":"@repo/web","dependencies":{"@repo/core":"*"}}',
+        encoding="utf-8",
+    )
+    ambiguous_index = _resolution_index(
+        tmp_path,
+        [source, "packages/core/src/index.ts"],
+        controls,
+        allow_problems=True,
+    )
+    ambiguous = resolve_javascript_import(
+        _raw(source, "@repo/core"), ambiguous_index
+    )
+    assert ambiguous.unresolved_reason == "ambiguous"
+
+
+def test_resolver_supports_private_imports_and_self_output_remapping(tmp_path: Path):
+    package = tmp_path / "package.json"
+    package.write_text(
+        """
+{
+  "name": "@repo/core",
+  "type": "module",
+  "exports": {".": "./dist/index.js"},
+  "imports": {"#internal": "./dist/internal.js"}
+}
+""".lstrip(),
+        encoding="utf-8",
+    )
+    config = tmp_path / "tsconfig.json"
+    config.write_text(
+        '{"compilerOptions":{"module":"nodenext","rootDir":"src","outDir":"dist"}}',
+        encoding="utf-8",
+    )
+    source = "src/consumer.ts"
+    index = _resolution_index(
+        tmp_path,
+        [source, "src/index.ts", "src/internal.ts"],
+        [package, config],
+    )
+
+    private = resolve_javascript_import(_raw(source, "#internal"), index)
+    self_reference = resolve_javascript_import(_raw(source, "@repo/core"), index)
+
+    assert private.target_file == "src/internal.ts"
+    assert private.basis == "package_imports"
+    assert self_reference.target_file == "src/index.ts"
+    assert self_reference.basis == "package_self_reference"
+
+
+def test_resolver_honours_package_conditions_and_reports_unknown_mode_ambiguity(
+    tmp_path: Path,
+):
+    controls = _write_workspace_controls(
+        tmp_path,
+        target_exports={
+            ".": {
+                "types": "./src/index.d.ts",
+                "import": "./src/index.ts",
+                "require": "./src/index.cts",
+                "default": "./src/fallback.ts",
+            }
+        },
+    )
+    source = "apps/web/src/page.ts"
+    files = [
+        source,
+        "packages/core/src/index.d.ts",
+        "packages/core/src/index.ts",
+        "packages/core/src/index.cts",
+        "packages/core/src/fallback.ts",
+    ]
+    index = _resolution_index(tmp_path, files, controls)
+
+    type_only = resolve_javascript_import(
+        _raw(source, "@repo/core", type_only=True), index
+    )
+    runtime = resolve_javascript_import(_raw(source, "@repo/core"), index)
+
+    assert type_only.target_file == "packages/core/src/index.d.ts"
+    assert runtime.target_file is None
+    assert runtime.unresolved_reason == "ambiguous"
+
+
+@pytest.mark.parametrize(
+    ("specifier", "reason"),
+    [
+        ("../../escape", "invalid_specifier"),
+        (".\\value", "invalid_specifier"),
+        ("./bad%2Fvalue", "invalid_specifier"),
+        ("https://example.com/mod.js", "external"),
+        ("node:fs", "external"),
+        ("fs", "external"),
+    ],
+)
+def test_resolver_keeps_invalid_and_external_specifiers_as_non_edges(
+    tmp_path: Path,
+    specifier: str,
+    reason: str,
+):
+    source = "src/consumer.ts"
+    index = _resolution_index(tmp_path, [source])
+
+    resolved = resolve_javascript_import(_raw(source, specifier), index)
+
+    assert resolved.target_file is None
+    assert resolved.unresolved_reason == reason
+
+
+def test_resolver_fails_closed_for_unsupported_package_map_arrays(tmp_path: Path):
+    controls = _write_workspace_controls(
+        tmp_path,
+        target_exports={".": ["./src/index.ts", "./src/fallback.ts"]},
+    )
+    source = "apps/web/src/page.ts"
+    index = _resolution_index(
+        tmp_path,
+        [source, "packages/core/src/index.ts", "packages/core/src/fallback.ts"],
+        controls,
+    )
+
+    resolved = resolve_javascript_import(_raw(source, "@repo/core"), index)
+
+    assert resolved.target_file is None
+    assert resolved.unresolved_reason == "unsupported_configuration"
