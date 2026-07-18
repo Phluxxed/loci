@@ -172,6 +172,8 @@ def test_import_record_round_trip_is_exact_and_stable():
         "target_id": "src/package/target.py::__file__#file",
         "status": "resolved",
         "unresolved_reason": None,
+        "resolution_basis": None,
+        "resolution_control_files": [],
     }
     assert list(serialized) == [
         "raw",
@@ -182,6 +184,8 @@ def test_import_record_round_trip_is_exact_and_stable():
         "target_id",
         "status",
         "unresolved_reason",
+        "resolution_basis",
+        "resolution_control_files",
     ]
     assert list(serialized["raw"]) == [
         "source_file",
@@ -208,9 +212,76 @@ def test_package_import_record_round_trip_preserves_package_identity():
     assert ImportRecord.from_dict(serialized) == record
 
 
+def test_javascript_import_record_round_trip_preserves_resolution_provenance():
+    raw = RawImport(
+        source_file="apps/web/src/page.ts",
+        language="typescript",
+        line=1,
+        text='import {format} from "@repo/core/format";',
+        specifier="@repo/core/format",
+        imported_name=None,
+        type_only=False,
+        is_reexport=False,
+        source_hash="f" * 64,
+    )
+    record = ImportRecord(
+        raw=raw,
+        source_id="apps/web/src/page.ts::__file__#file",
+        target_file="packages/core/src/format.ts",
+        target_package=None,
+        target_kind="file",
+        target_id="packages/core/src/format.ts::__file__#file",
+        status="resolved",
+        unresolved_reason=None,
+        resolution_basis="workspace_exports",
+        resolution_control_files=(
+            "apps/web/package.json",
+            "package.json",
+            "packages/core/package.json",
+        ),
+    )
+
+    serialized = record.to_dict()
+
+    assert serialized["resolution_basis"] == "workspace_exports"
+    assert serialized["resolution_control_files"] == [
+        "apps/web/package.json",
+        "package.json",
+        "packages/core/package.json",
+    ]
+    assert ImportRecord.from_dict(serialized) == record
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("resolution_basis", "guessed"),
+        ("resolution_control_files", ["../outside.json"]),
+        ("resolution_control_files", ["z.json", "a.json"]),
+        ("resolution_control_files", ["package.json", "package.json"]),
+    ],
+)
+def test_import_record_rejects_invalid_resolution_provenance(
+    field: str,
+    value: object,
+):
+    payload = _resolved_import().to_dict()
+    payload[field] = value
+
+    with pytest.raises(GraphContractError):
+        ImportRecord.from_dict(payload)
+
+
 @pytest.mark.parametrize(
     "field",
-    ["status", "source_id", "target_package", "target_kind"],
+    [
+        "status",
+        "source_id",
+        "target_package",
+        "target_kind",
+        "resolution_basis",
+        "resolution_control_files",
+    ],
 )
 def test_import_record_rejects_missing_fields(field: str):
     payload = _resolved_import().to_dict()

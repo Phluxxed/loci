@@ -1302,9 +1302,11 @@ def test_service_import_state_survives_fresh_process_read(
         "target_file": "target.py",
         "target_kind": "file",
         "target_package": None,
-        "target_id": "target.py::__file__#file",
-        "unresolved_reason": None,
-    }]
+            "target_id": "target.py::__file__#file",
+            "unresolved_reason": None,
+            "resolution_basis": None,
+            "resolution_control_files": [],
+        }]
     assert reloaded["edges"] == [{
         "from": "consumer.py::__file__#file",
         "to": "target.py::__file__#file",
