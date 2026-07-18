@@ -1,6 +1,6 @@
 # Plan: Extensible Graph Retrieval Stage 9 — Cargo-aware Rust Dependency Resolution
 
-- **Status:** owner-approved; implementation in progress (Task 1 complete)
+- **Status:** owner-approved; implementation in progress (Tasks 1–2 complete)
 - **Date:** 2026-07-18
 - **Repository:** `/Users/brummerv/loci`
 - **Governing design:** `docs/design/2026-07-13-extensible-graph-retrieval-design.md`
@@ -1095,6 +1095,10 @@ uv lock --check
 ~~~
 
 ### Task 2 — Rust dependency observation extraction
+
+**Implementation status:** complete on 2026-07-18; 82 focused tests and all
+692 repository tests passed, the package and lock verified, Loci integrity and
+graph health passed, and the frozen-benchmark checksum remained unchanged.
 
 Files:
 
