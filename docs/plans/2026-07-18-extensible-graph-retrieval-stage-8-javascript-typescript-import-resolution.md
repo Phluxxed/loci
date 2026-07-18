@@ -1,6 +1,6 @@
 # Plan: Extensible Graph Retrieval Stage 8 — Deterministic JavaScript/TypeScript Import Resolution
 
-- **Status:** approved for implementation by owner on 2026-07-18
+- **Status:** implemented, reviewed, and accepted by owner on 2026-07-18
 - **Date:** 2026-07-18
 - **Repository:** `/Users/brummerv/loci`
 - **Governing design:** `docs/design/2026-07-13-extensible-graph-retrieval-design.md`

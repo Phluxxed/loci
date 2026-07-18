@@ -1,7 +1,6 @@
 # loci: Extensible Graph Retrieval Layer — Design
 
-**Status:** Stages 1-7 implemented, reviewed, and accepted; Stage 8 implemented
-and awaiting final owner review
+**Status:** Stages 1-8 implemented, reviewed, and accepted
 
 **Date:** 2026-07-13
 
@@ -335,13 +334,14 @@ implementation review gate. The final review packet records the completed gate:
 
 ### Stage 8: Deterministic JavaScript/TypeScript import resolution
 
-The owner approved the bounded Stage 8 contract on 2026-07-18. The
-implementation is complete and awaiting its final evidence packet and explicit
-owner acceptance. Until that gate is approved, the design status remains
-Stages 1-7 accepted.
+The owner approved the bounded Stage 8 contract and explicitly accepted the
+completed final evidence packet on 2026-07-18. Stage 8 is implemented,
+reviewed, and accepted.
 
 Detailed implementation plan:
 `docs/plans/2026-07-18-extensible-graph-retrieval-stage-8-javascript-typescript-import-resolution.md`.
+Final review packet:
+`docs/reviews/2026-07-18-extensible-graph-retrieval-stage-8-final-review.md`.
 
 Stage 8 extends file-level JavaScript/TypeScript resolution across `.ts`,
 `.tsx`, `.mts`, `.cts`, `.js`, `.jsx`, `.mjs`, and `.cjs`. It uses contained,
@@ -361,8 +361,8 @@ inspectable unresolved observation and never becomes an edge.
 
 The owner corrected the post-Stage-7 roadmap on 2026-07-18. Dependency
 resolution must be trustworthy across the language portfolio before higher
-semantic layers depend on it. With Stage 8 implemented pending final
-acceptance, the remaining approved order is:
+semantic layers depend on it. With Stage 8 accepted, the remaining approved
+order is:
 
 1. implement deterministic Cargo-aware Rust dependency resolution, with crate,
    package, workspace, module, feature, and visibility boundaries scoped by a
