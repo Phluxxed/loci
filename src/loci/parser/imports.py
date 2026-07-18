@@ -16,6 +16,24 @@ ImportUnresolvedReason: TypeAlias = Literal[
     "inaccessible",
     "unsupported_configuration",
 ]
+RustObservationKind: TypeAlias = Literal["use", "module", "extern_crate"]
+RustConfiguration: TypeAlias = Literal[
+    "unconditional",
+    "conditional",
+    "unsupported",
+]
+
+MAX_RUST_USE_LEAVES_PER_DECLARATION = 1_024
+
+
+@dataclass(frozen=True, slots=True)
+class RustImportContext:
+    kind: RustObservationKind
+    lexical_module_path: tuple[str, ...]
+    visibility: str
+    module_level: bool
+    configuration: RustConfiguration
+    path_override: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -29,6 +47,7 @@ class RawImport:
     type_only: bool
     is_reexport: bool
     source_hash: str
+    rust: RustImportContext | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -72,7 +91,7 @@ def extract_import_batch(
     language: str,
     source_hash: str,
 ) -> ImportExtractionBatch:
-    """Extract imports and a Go package declaration from one source parse."""
+    """Extract dependency observations and language metadata from one parse."""
     spec = get_language_spec(language)
     if spec is None or not spec.import_node_types:
         raise ImportExtractionError(f"unsupported language: {language}")
@@ -248,18 +267,118 @@ def _extract_go_package(node, source: bytes) -> GoPackageDeclaration:
 
 
 def _extract_rust_import(node, source: bytes, common: dict) -> list[RawImport]:
+    if node.type != "use_declaration":
+        return []
     argument = node.child_by_field_name("argument")
     if argument is None:
         return []
+    leaves: list[tuple[str, str | None]] = []
+    _expand_rust_use_tree(argument, source, prefix="", leaves=leaves)
+    context = RustImportContext(
+        kind="use",
+        lexical_module_path=(),
+        visibility="private",
+        module_level=True,
+        configuration="unconditional",
+    )
     return [
         RawImport(
             **common,
-            specifier=_node_text(argument, source),
-            imported_name=None,
+            specifier=specifier,
+            imported_name=imported_name,
             type_only=False,
             is_reexport=False,
+            rust=context,
         )
+        for specifier, imported_name in leaves
     ]
+
+
+def _expand_rust_use_tree(
+    node,
+    source: bytes,
+    *,
+    prefix: str,
+    leaves: list[tuple[str, str | None]],
+) -> None:
+    if node.type == "use_list":
+        for child in node.named_children:
+            if child.type in {"block_comment", "line_comment"}:
+                continue
+            _expand_rust_use_tree(child, source, prefix=prefix, leaves=leaves)
+        return
+
+    if node.type == "scoped_use_list":
+        path = node.child_by_field_name("path")
+        use_list = node.child_by_field_name("list")
+        if path is None or use_list is None:
+            raise ImportExtractionError("unsupported Rust use declaration")
+        _expand_rust_use_tree(
+            use_list,
+            source,
+            prefix=_join_rust_path(prefix, _normalized_rust_path(path, source)),
+            leaves=leaves,
+        )
+        return
+
+    if node.type == "use_as_clause":
+        path = node.child_by_field_name("path")
+        alias = node.child_by_field_name("alias")
+        if path is None or alias is None:
+            raise ImportExtractionError("unsupported Rust use declaration")
+        _append_rust_use_leaf(
+            leaves,
+            _join_rust_path(prefix, _normalized_rust_path(path, source)),
+            _node_text(alias, source),
+        )
+        return
+
+    if node.type == "use_wildcard":
+        wildcard = _normalized_rust_path(node, source)
+        _append_rust_use_leaf(leaves, _join_rust_path(prefix, wildcard), None)
+        return
+
+    if node.type in {"identifier", "scoped_identifier", "crate", "self", "super"}:
+        path = _join_rust_path(prefix, _normalized_rust_path(node, source))
+        path = _collapse_trailing_rust_self(path)
+        _append_rust_use_leaf(leaves, path, _rust_imported_name(path))
+        return
+
+    raise ImportExtractionError("unsupported Rust use declaration")
+
+
+def _append_rust_use_leaf(
+    leaves: list[tuple[str, str | None]],
+    specifier: str,
+    imported_name: str | None,
+) -> None:
+    if len(leaves) >= MAX_RUST_USE_LEAVES_PER_DECLARATION:
+        raise ImportExtractionError("Rust use declaration exceeds leaf limit")
+    leaves.append((specifier, imported_name))
+
+
+def _join_rust_path(prefix: str, suffix: str) -> str:
+    if not prefix or suffix.startswith("::"):
+        return suffix
+    if suffix == "self":
+        return prefix
+    return f"{prefix}::{suffix}"
+
+
+def _normalized_rust_path(node, source: bytes) -> str:
+    return "".join(_node_text(node, source).split())
+
+
+def _collapse_trailing_rust_self(path: str) -> str:
+    if path.endswith("::self"):
+        return path[:-6]
+    return path
+
+
+def _rust_imported_name(path: str) -> str | None:
+    if path.endswith("::*") or path == "*":
+        return None
+    return path.rsplit("::", 1)[-1]
 
 
 def _children_by_field_name(node, field_name: str) -> list:
