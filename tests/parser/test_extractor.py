@@ -157,6 +157,33 @@ def test_parse_typescript_no_duplicate_ids(sample_ts: Path):
     assert len(ids) == len(set(ids))
 
 
+@pytest.mark.parametrize(
+    ("suffix", "language"),
+    [
+        (".ts", "typescript"),
+        (".tsx", "typescript"),
+        (".mts", "typescript"),
+        (".cts", "typescript"),
+        (".js", "javascript"),
+        (".jsx", "javascript"),
+        (".mjs", "javascript"),
+        (".cjs", "javascript"),
+    ],
+)
+def test_parse_javascript_typescript_extension_family(
+    tmp_path: Path,
+    suffix: str,
+    language: str,
+):
+    source = tmp_path / f"module{suffix}"
+    source.write_text("export function extensionFamily() { return 1; }\n")
+
+    symbols = parse_file(source)
+
+    assert any(symbol.name == "extensionFamily" for symbol in symbols)
+    assert all(symbol.language == language for symbol in symbols)
+
+
 # ── Ground-truth fixture tests ──────────────────────────────────────────────
 
 FIXTURES_DIR = Path(__file__).parent.parent / "fixtures"
