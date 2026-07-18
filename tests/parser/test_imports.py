@@ -9,6 +9,7 @@ from loci.parser.imports import (
     ImportExtractionBatch,
     ImportExtractionError,
     RawImport,
+    RustImportContext,
     extract_import_batch,
     extract_imports,
 )
@@ -267,26 +268,73 @@ def test_go_batch_returns_no_declaration_for_comment_only_source(tmp_path: Path)
     assert batch == ImportExtractionBatch(imports=(), go_package=None)
 
 
-def test_extracts_rust_use_declarations_without_claiming_resolution(tmp_path: Path):
+def test_expands_rust_use_trees_into_strict_dependency_observations(tmp_path: Path):
     imports = _extract(
         tmp_path,
         name="lib.rs",
         language="rust",
         source=(
             "use std::collections::HashMap;\n"
-            "use crate::{alpha, beta::Thing};\n"
+            "use crate::{alpha, beta::{Thing as Alias, self, *}, empty::{}};\n"
+            "use crate::trailing::self;\n"
         ),
     )
 
+    expected_context = RustImportContext(
+        kind="use",
+        lexical_module_path=(),
+        visibility="private",
+        module_level=True,
+        configuration="unconditional",
+    )
     assert [
-        (item.line, item.text, item.specifier, item.imported_name)
+        (item.line, item.specifier, item.imported_name, item.rust)
         for item in imports
     ] == [
-        (1, "use std::collections::HashMap;", "std::collections::HashMap", None),
-        (2, "use crate::{alpha, beta::Thing};", "crate::{alpha, beta::Thing}", None),
+        (1, "std::collections::HashMap", "HashMap", expected_context),
+        (2, "crate::alpha", "alpha", expected_context),
+        (2, "crate::beta::Thing", "Alias", expected_context),
+        (2, "crate::beta", "beta", expected_context),
+        (2, "crate::beta::*", None, expected_context),
+        (3, "crate::trailing", "trailing", expected_context),
     ]
     assert all(item.type_only is False for item in imports)
     assert all(item.is_reexport is False for item in imports)
+    assert all(item.source_hash == SOURCE_HASH for item in imports)
+
+
+def test_expands_root_self_alias_and_glob_rust_use_forms(tmp_path: Path):
+    imports = _extract(
+        tmp_path,
+        name="forms.rs",
+        language="rust",
+        source=(
+            "use {alpha, beta as local_beta};\n"
+            "use ::external::Thing;\n"
+            "use self::local::*;\n"
+            "use crate as root;\n"
+        ),
+    )
+
+    assert [(item.specifier, item.imported_name) for item in imports] == [
+        ("alpha", "alpha"),
+        ("beta", "local_beta"),
+        ("::external::Thing", "Thing"),
+        ("self::local::*", None),
+        ("crate", "root"),
+    ]
+
+
+def test_non_rust_observations_keep_null_rust_context(tmp_path: Path):
+    imports = _extract(
+        tmp_path,
+        name="consumer.py",
+        language="python",
+        source="import package\n",
+    )
+
+    assert len(imports) == 1
+    assert imports[0].rust is None
 
 
 def test_ignores_supported_dynamic_import_syntax(tmp_path: Path):
