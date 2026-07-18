@@ -1,4 +1,5 @@
 import asyncio
+import json
 import os
 import shutil
 import sys
@@ -232,9 +233,13 @@ def test_mcp_graph_imports_contract_survives_fresh_process(tmp_path: Path):
     assert imports["items"][0]["target_id"] == "target.py::__file__#file"
     assert imports["items"][0]["target_kind"] == "file"
     assert imports["items"][0]["target_package"] is None
+    assert imports["items"][0]["resolution_basis"] is None
+    assert imports["items"][0]["resolution_control_files"] == []
     assert imports["items"][1]["unresolved_reason"] == "not_indexed"
     assert imports["items"][1]["target_kind"] is None
     assert imports["items"][1]["target_package"] is None
+    assert imports["items"][1]["resolution_basis"] is None
+    assert imports["items"][1]["resolution_control_files"] == []
 
     neighbor = result["neighbors"]["results"][0]["neighbors"][0]
     assert neighbor["node"]["id"] == "target.py::__file__#file"
@@ -254,6 +259,37 @@ def test_mcp_graph_imports_contract_survives_fresh_process(tmp_path: Path):
         error["error"]["code"] == "INVALID_INPUT"
         for error in result["errors"].values()
     )
+
+
+def test_mcp_javascript_workspace_resolution_survives_fresh_process(
+    tmp_path: Path,
+):
+    result = asyncio.run(
+        _javascript_workspace_import_after_restart(
+            tmp_path / "repo",
+            tmp_path / ".codeindex",
+        )
+    )
+
+    assert result["input_properties"] == {
+        "repo",
+        "file",
+        "status",
+        "offset",
+        "limit",
+    }
+    item = result["imports"]["items"][0]
+    assert item["target_file"] == "packages/core/src/format.ts"
+    assert item["target_id"] == "packages/core/src/format.ts::__file__#file"
+    assert item["resolution_basis"] == "workspace_exports"
+    assert item["resolution_control_files"] == [
+        "apps/web/package.json",
+        "package.json",
+        "packages/core/package.json",
+    ]
+    neighbor = result["neighbors"]["results"][0]["neighbors"][0]
+    assert neighbor["node"]["id"] == item["target_id"]
+    assert neighbor["edge"]["resolution"] == "import-resolved"
 
 
 def test_mcp_go_package_target_survives_fresh_process(tmp_path: Path):
@@ -734,6 +770,86 @@ async def _graph_imports_after_restart(
                 "imports": imports.structuredContent,
                 "neighbors": neighbors.structuredContent,
                 "errors": errors,
+            }
+
+
+async def _javascript_workspace_import_after_restart(
+    repo: Path,
+    cache_dir: Path,
+) -> dict[str, Any]:
+    source = repo / "apps" / "web" / "page.ts"
+    target = repo / "packages" / "core" / "src" / "format.ts"
+    source.parent.mkdir(parents=True)
+    target.parent.mkdir(parents=True)
+    (repo / "package.json").write_text(
+        json.dumps({"name": "root", "workspaces": ["apps/*", "packages/*"]}),
+        encoding="utf-8",
+    )
+    (source.parent / "package.json").write_text(
+        json.dumps({
+            "name": "@repo/web",
+            "dependencies": {"@repo/core": "workspace:*"},
+        }),
+        encoding="utf-8",
+    )
+    core_manifest = repo / "packages" / "core" / "package.json"
+    core_manifest.write_text(
+        json.dumps({
+            "name": "@repo/core",
+            "exports": {"./format": "./src/format.ts"},
+        }),
+        encoding="utf-8",
+    )
+    source.write_text(
+        'import {format} from "@repo/core/format";\n',
+        encoding="utf-8",
+    )
+    target.write_text("export const format = () => 'ok';\n", encoding="utf-8")
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["PYTHONPATH"] = str(Path.cwd() / "src")
+    server_params = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "loci.mcp_server"],
+        env=env,
+        cwd=Path.cwd(),
+    )
+    source_id = "apps/web/page.ts::__file__#file"
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            indexed = await session.call_tool(
+                "loci_index",
+                arguments={"path": str(repo), "incremental": False},
+            )
+            assert indexed.structuredContent["graph_imports_resolved"] == 1
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            tools = await session.list_tools()
+            imports_tool = next(
+                tool for tool in tools.tools if tool.name == "loci_graph_imports"
+            )
+            imports = await session.call_tool(
+                "loci_graph_imports",
+                arguments={"repo": str(repo)},
+            )
+            neighbors = await session.call_tool(
+                "loci_graph_traverse_neighbors",
+                arguments={
+                    "repo": str(repo),
+                    "seed_ids": [source_id],
+                    "namespaces": ["loci"],
+                    "edge_types": ["imports"],
+                    "resolutions": ["import-resolved"],
+                },
+            )
+            return {
+                "input_properties": set(imports_tool.inputSchema["properties"]),
+                "imports": imports.structuredContent,
+                "neighbors": neighbors.structuredContent,
             }
 
 
