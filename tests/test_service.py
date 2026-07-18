@@ -217,7 +217,7 @@ def test_service_incremental_reindexes_old_version_metadata(
     assert markdown_symbols[0]["metadata"]["markdown"]["span_kind"] == "page_root"
 
 
-def test_service_extractor_5_cache_forces_full_reindex(
+def test_service_old_extractor_cache_forces_full_reindex(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ):
@@ -236,7 +236,7 @@ def test_service_extractor_5_cache_forces_full_reindex(
     indexed = index_repo(repo, incremental=True)
 
     assert indexed["files_skipped"] == 0
-    assert store.load(repo.resolve())["extractor_version"] == 6
+    assert store.load(repo.resolve())["extractor_version"] == 7
 
 
 def test_service_markdown_outline_exposes_retrieval_cost_and_repo_relative_ids(

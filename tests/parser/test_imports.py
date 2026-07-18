@@ -157,9 +157,18 @@ def test_classifies_typescript_type_imports_and_reexports(tmp_path: Path):
 
 @pytest.mark.parametrize(
     ("name", "language"),
-    [("consumer.js", "javascript"), ("consumer.tsx", "typescript")],
+    [
+        ("consumer.ts", "typescript"),
+        ("consumer.tsx", "typescript"),
+        ("consumer.mts", "typescript"),
+        ("consumer.cts", "typescript"),
+        ("consumer.js", "javascript"),
+        ("consumer.jsx", "javascript"),
+        ("consumer.mjs", "javascript"),
+        ("consumer.cjs", "javascript"),
+    ],
 )
-def test_extracts_javascript_and_tsx_source_imports(
+def test_extracts_every_javascript_and_typescript_source_extension(
     tmp_path: Path,
     name: str,
     language: str,
