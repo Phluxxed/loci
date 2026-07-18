@@ -106,7 +106,11 @@ _SPECS: dict[str, LanguageSpec] = {
         docstring_strategy="preceding_comment",
         container_node_types=["impl_item"],
         decorator_sibling_type="attribute_item",
-        import_node_types=("use_declaration",),
+        import_node_types=(
+            "use_declaration",
+            "extern_crate_declaration",
+            "mod_item",
+        ),
     ),
     "javascript": LanguageSpec(
         ts_language="javascript",
