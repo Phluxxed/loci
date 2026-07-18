@@ -8,6 +8,7 @@ from loci.parser.imports import (
     GoPackageDeclaration,
     ImportExtractionBatch,
     ImportExtractionError,
+    MAX_RUST_USE_LEAVES_PER_DECLARATION,
     RawImport,
     RustImportContext,
     extract_import_batch,
@@ -313,6 +314,7 @@ def test_expands_root_self_alias_and_glob_rust_use_forms(tmp_path: Path):
             "use ::external::Thing;\n"
             "use self::local::*;\n"
             "use crate as root;\n"
+            "use crate::aliased::self as local_parent;\n"
         ),
     )
 
@@ -322,6 +324,7 @@ def test_expands_root_self_alias_and_glob_rust_use_forms(tmp_path: Path):
         ("::external::Thing", "Thing"),
         ("self::local::*", None),
         ("crate", "root"),
+        ("crate::aliased", "local_parent"),
     ]
 
 
@@ -335,6 +338,215 @@ def test_non_rust_observations_keep_null_rust_context(tmp_path: Path):
 
     assert len(imports) == 1
     assert imports[0].rust is None
+
+
+def test_extracts_rust_extern_crates_modules_and_lexical_scope(tmp_path: Path):
+    imports = _extract(
+        tmp_path,
+        name="scope.rs",
+        language="rust",
+        source=(
+            "extern crate actual as local;\n"
+            "extern crate self as current;\n"
+            "pub extern crate public_crate;\n"
+            "mod inline {\n"
+            "    #[path = r#\"nested/other.rs\"#]\n"
+            "    pub(in crate::inline) mod external;\n"
+            "    pub(super) use super::Thing;\n"
+            "    fn local() {\n"
+            "        use crate::local::Value;\n"
+            "        extern crate block_dep;\n"
+            "    }\n"
+            "}\n"
+            "mod inline_without_dependencies {}\n"
+        ),
+    )
+
+    assert [
+        (
+            item.specifier,
+            item.imported_name,
+            item.is_reexport,
+            item.rust,
+        )
+        for item in imports
+    ] == [
+        (
+            "actual",
+            "local",
+            False,
+            RustImportContext(
+                kind="extern_crate",
+                lexical_module_path=(),
+                visibility="private",
+                module_level=True,
+                configuration="unconditional",
+            ),
+        ),
+        (
+            "self",
+            "current",
+            False,
+            RustImportContext(
+                kind="extern_crate",
+                lexical_module_path=(),
+                visibility="private",
+                module_level=True,
+                configuration="unconditional",
+            ),
+        ),
+        (
+            "public_crate",
+            "public_crate",
+            True,
+            RustImportContext(
+                kind="extern_crate",
+                lexical_module_path=(),
+                visibility="pub",
+                module_level=True,
+                configuration="unconditional",
+            ),
+        ),
+        (
+            "external",
+            "external",
+            False,
+            RustImportContext(
+                kind="module",
+                lexical_module_path=("inline",),
+                visibility="pub(in crate::inline)",
+                module_level=True,
+                configuration="unconditional",
+                path_override="nested/other.rs",
+            ),
+        ),
+        (
+            "super::Thing",
+            "Thing",
+            True,
+            RustImportContext(
+                kind="use",
+                lexical_module_path=("inline",),
+                visibility="pub(super)",
+                module_level=True,
+                configuration="unconditional",
+            ),
+        ),
+        (
+            "crate::local::Value",
+            "Value",
+            False,
+            RustImportContext(
+                kind="use",
+                lexical_module_path=("inline",),
+                visibility="private",
+                module_level=False,
+                configuration="unconditional",
+            ),
+        ),
+        (
+            "block_dep",
+            "block_dep",
+            False,
+            RustImportContext(
+                kind="extern_crate",
+                lexical_module_path=("inline",),
+                visibility="private",
+                module_level=False,
+                configuration="unconditional",
+            ),
+        ),
+    ]
+
+
+def test_normalizes_every_supported_rust_visibility(tmp_path: Path):
+    imports = _extract(
+        tmp_path,
+        name="visibility.rs",
+        language="rust",
+        source=(
+            "use crate::private;\n"
+            "pub use crate::public;\n"
+            "pub(crate) use crate::crate_visible;\n"
+            "pub(self) use crate::self_visible;\n"
+            "pub(super) use crate::super_visible;\n"
+            "pub(in crate :: outer) use crate::restricted;\n"
+        ),
+    )
+
+    assert [item.rust.visibility for item in imports if item.rust is not None] == [
+        "private",
+        "pub",
+        "pub(crate)",
+        "pub(self)",
+        "pub(super)",
+        "pub(in crate::outer)",
+    ]
+    assert [item.is_reexport for item in imports] == [
+        False,
+        True,
+        True,
+        True,
+        True,
+        True,
+    ]
+
+
+def test_classifies_direct_rust_configuration_and_module_path_attributes(
+    tmp_path: Path,
+):
+    imports = _extract(
+        tmp_path,
+        name="configuration.rs",
+        language="rust",
+        source=(
+            "#[cfg(feature = \"optional\")]\n"
+            "use crate::conditional;\n"
+            "#[cfg_attr(unix, path = \"unix.rs\")]\n"
+            "#[cfg(unix)]\n"
+            "mod selected;\n"
+            "#[path = concat!(\"generated\", \".rs\")]\n"
+            "mod generated;\n"
+            "#[path = \"nested/literal.rs\"]\n"
+            "mod literal;\n"
+            "#[path = r###\"nested/raw.rs\"###]\n"
+            "mod raw_literal;\n"
+        ),
+    )
+
+    assert [
+        (item.specifier, item.rust.configuration, item.rust.path_override)
+        for item in imports
+        if item.rust is not None
+    ] == [
+        ("crate::conditional", "conditional", None),
+        ("selected", "unsupported", None),
+        ("generated", "unsupported", None),
+        ("literal", "unconditional", "nested/literal.rs"),
+        ("raw_literal", "unconditional", "nested/raw.rs"),
+    ]
+
+
+def test_rejects_rust_use_leaf_explosion_at_the_declaration_bound(tmp_path: Path):
+    at_limit = ", ".join(
+        f"item_{index}" for index in range(MAX_RUST_USE_LEAVES_PER_DECLARATION)
+    )
+    imports = _extract(
+        tmp_path,
+        name="bounded.rs",
+        language="rust",
+        source=f"use crate::{{{at_limit}}};\n",
+    )
+    assert len(imports) == MAX_RUST_USE_LEAVES_PER_DECLARATION
+
+    over_limit = f"{at_limit}, one_too_many"
+    with pytest.raises(ImportExtractionError, match="exceeds leaf limit"):
+        _extract(
+            tmp_path,
+            name="too_many.rs",
+            language="rust",
+            source=f"use crate::{{{over_limit}}};\n",
+        )
 
 
 def test_ignores_supported_dynamic_import_syntax(tmp_path: Path):

@@ -91,7 +91,7 @@ def extract_import_batch(
     language: str,
     source_hash: str,
 ) -> ImportExtractionBatch:
-    """Extract dependency observations and language metadata from one parse."""
+    """Extract import/dependency observations and language file metadata from one parse."""
     spec = get_language_spec(language)
     if spec is None or not spec.import_node_types:
         raise ImportExtractionError(f"unsupported language: {language}")
@@ -267,31 +267,212 @@ def _extract_go_package(node, source: bytes) -> GoPackageDeclaration:
 
 
 def _extract_rust_import(node, source: bytes, common: dict) -> list[RawImport]:
+    if node.type == "extern_crate_declaration":
+        return _extract_rust_extern_crate(node, source, common)
+    if node.type == "mod_item":
+        return _extract_rust_module(node, source, common)
     if node.type != "use_declaration":
-        return []
+        raise ImportExtractionError("unsupported Rust dependency declaration")
+
     argument = node.child_by_field_name("argument")
     if argument is None:
-        return []
+        raise ImportExtractionError("unsupported Rust use declaration")
     leaves: list[tuple[str, str | None]] = []
     _expand_rust_use_tree(argument, source, prefix="", leaves=leaves)
-    context = RustImportContext(
-        kind="use",
-        lexical_module_path=(),
-        visibility="private",
-        module_level=True,
-        configuration="unconditional",
-    )
+    context = _rust_context(node, source, kind="use")
     return [
         RawImport(
             **common,
             specifier=specifier,
             imported_name=imported_name,
             type_only=False,
-            is_reexport=False,
+            is_reexport=context.visibility != "private",
             rust=context,
         )
         for specifier, imported_name in leaves
     ]
+
+
+def _extract_rust_extern_crate(
+    node,
+    source: bytes,
+    common: dict,
+) -> list[RawImport]:
+    name = node.child_by_field_name("name")
+    alias = node.child_by_field_name("alias")
+    if name is None:
+        raise ImportExtractionError("unsupported Rust extern crate declaration")
+    specifier = _node_text(name, source)
+    imported_name = _node_text(alias, source) if alias is not None else specifier
+    context = _rust_context(node, source, kind="extern_crate")
+    return [
+        RawImport(
+            **common,
+            specifier=specifier,
+            imported_name=imported_name,
+            type_only=False,
+            is_reexport=context.visibility != "private",
+            rust=context,
+        )
+    ]
+
+
+def _extract_rust_module(node, source: bytes, common: dict) -> list[RawImport]:
+    if node.child_by_field_name("body") is not None:
+        return []
+    name = node.child_by_field_name("name")
+    if name is None:
+        raise ImportExtractionError("unsupported Rust module declaration")
+    specifier = _node_text(name, source)
+    context = _rust_context(node, source, kind="module")
+    return [
+        RawImport(
+            **common,
+            specifier=specifier,
+            imported_name=specifier,
+            type_only=False,
+            is_reexport=False,
+            rust=context,
+        )
+    ]
+
+
+def _rust_context(
+    node,
+    source: bytes,
+    *,
+    kind: RustObservationKind,
+) -> RustImportContext:
+    visibility, visibility_supported = _rust_visibility(node, source)
+    configuration, path_override = _rust_attributes(node, source, kind=kind)
+    if not visibility_supported:
+        configuration = "unsupported"
+    return RustImportContext(
+        kind=kind,
+        lexical_module_path=_rust_lexical_module_path(node, source),
+        visibility=visibility,
+        module_level=_rust_is_module_level(node),
+        configuration=configuration,
+        path_override=path_override,
+    )
+
+
+def _rust_visibility(node, source: bytes) -> tuple[str, bool]:
+    modifier = next(
+        (child for child in node.named_children if child.type == "visibility_modifier"),
+        None,
+    )
+    if modifier is None:
+        return "private", True
+    compact = "".join(_node_text(modifier, source).split())
+    if compact in {"pub", "pub(crate)", "pub(self)", "pub(super)"}:
+        return compact, True
+    if compact.startswith("pub(in") and compact.endswith(")"):
+        path = compact[len("pub(in") : -1]
+        if path and modifier.named_children:
+            return f"pub(in {path})", True
+    return "private", False
+
+
+def _rust_attributes(
+    node,
+    source: bytes,
+    *,
+    kind: RustObservationKind,
+) -> tuple[RustConfiguration, str | None]:
+    configuration: RustConfiguration = "unconditional"
+    path_values: list[str | None] = []
+    for attribute in _rust_outer_attributes(node):
+        body = next(
+            (child for child in attribute.named_children if child.type == "attribute"),
+            None,
+        )
+        if body is None or not body.named_children:
+            continue
+        name = _node_text(body.named_children[0], source)
+        if name == "cfg" and configuration != "unsupported":
+            configuration = "conditional"
+        elif name == "cfg_attr" and _rust_cfg_attr_changes_resolution(body, source):
+            configuration = "unsupported"
+        elif name == "path" and kind == "module":
+            path_values.append(_rust_path_attribute_value(body, source))
+
+    path_override: str | None = None
+    if path_values:
+        if len(path_values) != 1 or path_values[0] is None:
+            configuration = "unsupported"
+        else:
+            path_override = path_values[0]
+    return configuration, path_override
+
+
+def _rust_outer_attributes(node) -> list:
+    attributes = []
+    sibling = node.prev_named_sibling
+    while sibling is not None:
+        if sibling.type == "attribute_item":
+            attributes.append(sibling)
+        elif sibling.type not in {"block_comment", "line_comment"}:
+            break
+        sibling = sibling.prev_named_sibling
+    attributes.reverse()
+    return attributes
+
+
+def _rust_cfg_attr_changes_resolution(attribute, source: bytes) -> bool:
+    arguments = attribute.child_by_field_name("arguments")
+    if arguments is None:
+        return True
+    return any(
+        child.type == "identifier" and _node_text(child, source) in {"cfg", "path"}
+        for child in _walk_nodes(arguments)
+    )
+
+
+def _rust_path_attribute_value(attribute, source: bytes) -> str | None:
+    value = attribute.child_by_field_name("value")
+    if value is None or value.type not in {"string_literal", "raw_string_literal"}:
+        return None
+    if any(child.type == "escape_sequence" for child in _walk_nodes(value)):
+        return None
+    contents = [
+        _node_text(child, source)
+        for child in value.named_children
+        if child.type == "string_content"
+    ]
+    return "".join(contents)
+
+
+def _rust_lexical_module_path(node, source: bytes) -> tuple[str, ...]:
+    parts = []
+    ancestor = node.parent
+    while ancestor is not None:
+        if ancestor.type == "mod_item" and ancestor.child_by_field_name("body") is not None:
+            name = ancestor.child_by_field_name("name")
+            if name is not None:
+                parts.append(_node_text(name, source))
+        ancestor = ancestor.parent
+    parts.reverse()
+    return tuple(parts)
+
+
+def _rust_is_module_level(node) -> bool:
+    ancestor = node.parent
+    while ancestor is not None:
+        if ancestor.type == "source_file":
+            return True
+        if ancestor.type == "declaration_list":
+            parent = ancestor.parent
+            if (
+                parent is None
+                or parent.type != "mod_item"
+                or parent.child_by_field_name("body") != ancestor
+            ):
+                return False
+        elif ancestor.type != "mod_item" or ancestor.child_by_field_name("body") is None:
+            return False
+        ancestor = ancestor.parent
+    return False
 
 
 def _expand_rust_use_tree(
@@ -326,9 +507,10 @@ def _expand_rust_use_tree(
         alias = node.child_by_field_name("alias")
         if path is None or alias is None:
             raise ImportExtractionError("unsupported Rust use declaration")
+        specifier = _join_rust_path(prefix, _normalized_rust_path(path, source))
         _append_rust_use_leaf(
             leaves,
-            _join_rust_path(prefix, _normalized_rust_path(path, source)),
+            _collapse_trailing_rust_self(specifier),
             _node_text(alias, source),
         )
         return
