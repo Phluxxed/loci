@@ -1,6 +1,6 @@
 # Final Review: Extensible Graph Retrieval Stage 8 — JavaScript/TypeScript Import Resolution
 
-- **Status:** implementation complete; ready for explicit owner acceptance
+- **Status:** accepted by owner on 2026-07-18
 - **Date:** 2026-07-18
 - **Repository:** `/Users/brummerv/loci`
 - **Governing plan:** `docs/plans/2026-07-18-extensible-graph-retrieval-stage-8-javascript-typescript-import-resolution.md`
@@ -257,9 +257,8 @@ before and after.
 - [x] final code review, build, diff hygiene, and secret/execution scans are clean
 - [x] implementation and this review packet were committed and pushed directly;
       remote `master` was read back after publication
-- [ ] owner explicitly accepts this final review packet
+- [x] owner explicitly accepts this final review packet
 
-Stage 8 must remain “implemented, awaiting final owner review” until the final
-unchecked item is explicitly approved. After approval, update the governing
-design to Stages 1-8 accepted and begin the separately scoped Cargo-aware Rust
-design gate.
+The owner explicitly accepted this packet on 2026-07-18. The governing design
+now records Stages 1-8 as accepted. The next roadmap item is the separately
+scoped Cargo-aware Rust dependency-resolution design gate.
