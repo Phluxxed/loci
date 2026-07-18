@@ -22,6 +22,7 @@ from loci.graph.imports import (
     resolve_imports,
 )
 from loci.graph.go_modules import GoPackageIndex
+from loci.graph.javascript_modules import JavaScriptResolutionIndex
 from loci.graph.profiles import (
     GraphNodeAttributeRule,
     GraphProfile,
@@ -216,6 +217,7 @@ def materialize_graph(
     *,
     raw_imports: Sequence[RawImport] = (),
     go_packages: GoPackageIndex | None = None,
+    javascript_modules: JavaScriptResolutionIndex | None = None,
     input_hashes: Mapping[str, str] | None = None,
     diagnostics: Sequence[GraphDiagnostic] = (),
 ) -> GraphIndexState:
@@ -238,6 +240,7 @@ def materialize_graph(
             raw_imports,
             file_nodes=file_nodes,
             go_packages=go_packages,
+            javascript_modules=javascript_modules,
         ),
         key=lambda record: (
             record.raw.source_file,

@@ -18,6 +18,10 @@ from loci.graph.go_modules import (
     make_go_package_id,
 )
 from loci.graph.materialize import load_graph_extensions, materialize_graph
+from loci.graph.javascript_modules import (
+    build_javascript_resolution_index,
+    load_javascript_module_context,
+)
 from loci.graph.profiles import GraphProfile, LoadedGraphProfile
 from loci.graph.state import LoadedGraphContribution
 from loci.parser.imports import extract_imports
@@ -724,3 +728,101 @@ def test_typescript_imports_preserve_reexports_and_separate_type_edges(
         file_nodes[1].id: "imports_type",
         file_nodes[2].id: "imports",
     }
+
+
+def test_materialize_graph_threads_javascript_resolution_index_into_exact_edge(
+    tmp_path: Path,
+):
+    root = tmp_path / "package.json"
+    root.write_text(
+        json.dumps({"name": "root", "workspaces": ["apps/*", "packages/*"]}),
+        encoding="utf-8",
+    )
+    app_dir = tmp_path / "apps" / "web"
+    app_dir.mkdir(parents=True)
+    app = app_dir / "package.json"
+    app.write_text(
+        json.dumps({
+            "name": "@repo/web",
+            "dependencies": {"@repo/core": "workspace:*"},
+        }),
+        encoding="utf-8",
+    )
+    core_dir = tmp_path / "packages" / "core"
+    core_dir.mkdir(parents=True)
+    core = core_dir / "package.json"
+    core.write_text(
+        json.dumps({
+            "name": "@repo/core",
+            "exports": {"./format": "./src/format.ts"},
+        }),
+        encoding="utf-8",
+    )
+    source = app_dir / "src" / "page.ts"
+    source.parent.mkdir()
+    source.write_text(
+        'import {format} from "@repo/core/format";\n',
+        encoding="utf-8",
+    )
+    target = core_dir / "src" / "format.ts"
+    target.parent.mkdir()
+    target.write_text("export const format = () => 'ok';\n", encoding="utf-8")
+    source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
+    target_hash = hashlib.sha256(target.read_bytes()).hexdigest()
+    source_node = make_file_symbol(
+        "apps/web/src/page.ts",
+        language="typescript",
+        content_hash=source_hash,
+    )
+    target_node = make_file_symbol(
+        "packages/core/src/format.ts",
+        language="typescript",
+        content_hash=target_hash,
+    )
+    file_node_map = {
+        source_node.file_path: source_node,
+        target_node.file_path: target_node,
+    }
+    loaded = load_javascript_module_context(tmp_path, [root, app, core])
+    javascript_index = build_javascript_resolution_index(
+        loaded.context,
+        file_nodes=file_node_map,
+    ).index
+    raw_imports = extract_imports(
+        source,
+        source_file=source_node.file_path,
+        language="typescript",
+        source_hash=source_hash,
+    )
+
+    state = materialize_graph(
+        tmp_path,
+        [source_node, target_node],
+        {source_node.file_path: source_hash, target_node.file_path: target_hash},
+        [],
+        [],
+        raw_imports=raw_imports,
+        javascript_modules=javascript_index,
+        input_hashes=loaded.input_hashes,
+    )
+
+    assert state.imports[0].resolution_basis == "workspace_exports"
+    assert state.imports[0].resolution_control_files == (
+        "apps/web/package.json",
+        "package.json",
+        "packages/core/package.json",
+    )
+    assert state.edges == (GraphEdge(
+        from_id=source_node.id,
+        to_id=target_node.id,
+        type="imports",
+        directed=True,
+        namespace="loci",
+        resolution="import-resolved",
+        evidence=GraphEvidence(
+            file=source_node.file_path,
+            line=1,
+            content_hash=source_hash,
+        ),
+    ),)
+    assert state.input_hashes == loaded.input_hashes

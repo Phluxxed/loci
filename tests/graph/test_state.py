@@ -384,7 +384,20 @@ def test_graph_state_rejects_schema_version_two_as_stale():
     }
 
 
-def test_graph_state_schema_three_rejects_old_import_record_shape():
+def test_graph_state_rejects_schema_version_three_as_stale():
+    payload = _state().to_dict()
+    payload["schema_version"] = 3
+
+    with pytest.raises(GraphContractError) as exc_info:
+        GraphIndexState.from_dict(payload)
+
+    assert exc_info.value.details == {
+        "field": "schema_version",
+        "schema_version": 3,
+    }
+
+
+def test_graph_state_schema_four_rejects_old_import_record_shape():
     payload = _state().to_dict()
     del payload["imports"][0]["target_package"]
     del payload["imports"][0]["target_kind"]
