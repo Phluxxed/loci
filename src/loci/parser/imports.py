@@ -14,6 +14,7 @@ ImportUnresolvedReason: TypeAlias = Literal[
     "unsupported_language",
     "invalid_specifier",
     "inaccessible",
+    "unsupported_configuration",
 ]
 
 

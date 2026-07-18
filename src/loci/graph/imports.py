@@ -21,6 +21,13 @@ from .go_modules import (
     GoPackageIndex,
     _valid_go_identifier,
 )
+from .javascript_modules import (
+    JavaScriptResolutionBasis,
+    JavaScriptResolutionIndex,
+    JavaScriptModuleContext,
+    build_javascript_resolution_index,
+    resolve_javascript_import,
+)
 
 
 ImportStatus: TypeAlias = Literal["resolved", "unresolved"]
@@ -34,6 +41,7 @@ _UNRESOLVED_REASONS = frozenset({
     "unsupported_language",
     "invalid_specifier",
     "inaccessible",
+    "unsupported_configuration",
 })
 _RAW_IMPORT_FIELDS = {
     "source_file",
@@ -55,10 +63,24 @@ _IMPORT_RECORD_FIELDS = {
     "target_id",
     "status",
     "unresolved_reason",
+    "resolution_basis",
+    "resolution_control_files",
 }
 _SHA256_RE = re.compile(r"[0-9a-f]{64}")
 _JAVASCRIPT_LANGUAGES = frozenset({"javascript", "typescript"})
-_JAVASCRIPT_EXTENSIONS = (".ts", ".tsx", ".js")
+_JAVASCRIPT_EXTENSIONS = (
+    ".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs",
+)
+_JAVASCRIPT_RESOLUTION_BASES = frozenset({
+    "relative_path",
+    "compiler_paths",
+    "compiler_base_url",
+    "compiler_root_dirs",
+    "package_imports",
+    "package_self_reference",
+    "workspace_exports",
+    "workspace_legacy_entry",
+})
 
 
 @dataclass(frozen=True, slots=True)
@@ -71,6 +93,8 @@ class ImportRecord:
     target_id: str | None
     status: ImportStatus
     unresolved_reason: ImportUnresolvedReason | None
+    resolution_basis: JavaScriptResolutionBasis | None = None
+    resolution_control_files: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         _validate_raw_import(self.raw)
@@ -102,6 +126,22 @@ class ImportRecord:
                 "Invalid import unresolved reason",
                 field="unresolved_reason",
             )
+        if self.resolution_basis is not None and (
+            not isinstance(self.resolution_basis, str)
+            or self.resolution_basis not in _JAVASCRIPT_RESOLUTION_BASES
+        ):
+            raise _error(
+                "Invalid JavaScript resolution basis",
+                field="resolution_basis",
+            )
+        _validate_resolution_controls(self.resolution_control_files)
+        is_javascript = self.raw.language in _JAVASCRIPT_LANGUAGES
+        if not is_javascript and (
+            self.resolution_basis is not None or self.resolution_control_files
+        ):
+            raise _error(
+                "Only JavaScript imports may carry resolution provenance"
+            )
         if self.status == "resolved":
             if self.target_kind is None:
                 raise _error("Resolved import requires a target kind")
@@ -125,6 +165,8 @@ class ImportRecord:
                 raise _error("Rust imports cannot be resolved")
             if self.unresolved_reason is not None:
                 raise _error("Resolved import cannot have an unresolved reason")
+            if is_javascript and self.resolution_basis is None:
+                raise _error("Resolved JavaScript import requires a resolution basis")
         else:
             if any((
                 self.target_file is not None,
@@ -135,6 +177,8 @@ class ImportRecord:
                 raise _error("Unresolved import cannot have a target")
             if self.unresolved_reason is None:
                 raise _error("Unresolved import requires an unresolved reason")
+            if self.resolution_basis is not None:
+                raise _error("Unresolved import cannot have a resolution basis")
 
     def to_dict(self) -> dict[str, JSONValue]:
         return {
@@ -146,6 +190,8 @@ class ImportRecord:
             "target_id": self.target_id,
             "status": self.status,
             "unresolved_reason": self.unresolved_reason,
+            "resolution_basis": self.resolution_basis,
+            "resolution_control_files": list(self.resolution_control_files),
         }
 
     @classmethod
@@ -178,6 +224,18 @@ class ImportRecord:
                 "Invalid import unresolved reason",
                 field="unresolved_reason",
             )
+        resolution_basis = value["resolution_basis"]
+        if resolution_basis is not None and (
+            not isinstance(resolution_basis, str)
+            or resolution_basis not in _JAVASCRIPT_RESOLUTION_BASES
+        ):
+            raise _error(
+                "Invalid JavaScript resolution basis",
+                field="resolution_basis",
+            )
+        resolution_control_files = _resolution_controls(
+            value["resolution_control_files"]
+        )
         return cls(
             raw=_raw_import_from_dict(raw_value),
             source_id=_nonempty_string(value["source_id"], "source_id"),
@@ -187,6 +245,11 @@ class ImportRecord:
             target_id=target_id,
             status=cast(ImportStatus, status),
             unresolved_reason=cast(ImportUnresolvedReason | None, unresolved_reason),
+            resolution_basis=cast(
+                JavaScriptResolutionBasis | None,
+                resolution_basis,
+            ),
+            resolution_control_files=resolution_control_files,
         )
 
 
@@ -206,12 +269,14 @@ def resolve_import(
     *,
     file_nodes: Mapping[str, Symbol],
     go_packages: GoPackageIndex | None = None,
+    javascript_modules: JavaScriptResolutionIndex | None = None,
 ) -> ImportRecord:
     """Resolve one raw import against deterministic indexed file/package targets."""
     return resolve_imports(
         (raw,),
         file_nodes=file_nodes,
         go_packages=go_packages,
+        javascript_modules=javascript_modules,
     )[0]
 
 
@@ -220,11 +285,15 @@ def resolve_imports(
     *,
     file_nodes: Mapping[str, Symbol],
     go_packages: GoPackageIndex | None = None,
+    javascript_modules: JavaScriptResolutionIndex | None = None,
 ) -> list[ImportRecord]:
     """Resolve a batch while deriving indexed language layouts only once."""
     indexed_python_files = _indexed_python_files(file_nodes)
     python_package_roots = _python_package_roots(indexed_python_files)
-    indexed_javascript_files = _indexed_javascript_files(file_nodes)
+    javascript_resolver = javascript_modules or build_javascript_resolution_index(
+        JavaScriptModuleContext((), (), ()),
+        file_nodes=file_nodes,
+    ).index
     go_resolver = (
         _build_go_resolver_index(go_packages)
         if go_packages is not None
@@ -236,7 +305,7 @@ def resolve_imports(
             file_nodes=file_nodes,
             indexed_python_files=indexed_python_files,
             python_package_roots=python_package_roots,
-            indexed_javascript_files=indexed_javascript_files,
+            javascript_modules=javascript_resolver,
             go_resolver=go_resolver,
         )
         for raw in raw_imports
@@ -249,7 +318,7 @@ def _resolve_import(
     file_nodes: Mapping[str, Symbol],
     indexed_python_files: frozenset[str],
     python_package_roots: tuple[PurePosixPath, ...],
-    indexed_javascript_files: frozenset[str],
+    javascript_modules: JavaScriptResolutionIndex,
     go_resolver: _GoResolverIndex | None,
 ) -> ImportRecord:
     _validate_raw_import(raw)
@@ -261,9 +330,31 @@ def _resolve_import(
             python_package_roots,
         )
     elif raw.language in _JAVASCRIPT_LANGUAGES:
-        target_file, unresolved_reason = _resolve_javascript_target(
-            raw,
-            indexed_javascript_files,
+        resolution = resolve_javascript_import(raw, javascript_modules)
+        if resolution.target_file is None:
+            assert resolution.unresolved_reason is not None
+            return _unresolved(
+                raw,
+                source.id,
+                resolution.unresolved_reason,
+                resolution_control_files=resolution.control_files,
+            )
+        target = _require_file_node(
+            file_nodes,
+            resolution.target_file,
+            field="target_file",
+        )
+        return ImportRecord(
+            raw=raw,
+            source_id=source.id,
+            target_file=resolution.target_file,
+            target_package=None,
+            target_kind="file",
+            target_id=target.id,
+            status="resolved",
+            unresolved_reason=None,
+            resolution_basis=resolution.basis,
+            resolution_control_files=resolution.control_files,
         )
     elif raw.language == "go":
         if go_resolver is None:
@@ -813,6 +904,8 @@ def _unresolved(
     raw: RawImport,
     source_id: str,
     reason: ImportUnresolvedReason,
+    *,
+    resolution_control_files: tuple[str, ...] = (),
 ) -> ImportRecord:
     return ImportRecord(
         raw=raw,
@@ -823,7 +916,36 @@ def _unresolved(
         target_id=None,
         status="unresolved",
         unresolved_reason=reason,
+        resolution_control_files=resolution_control_files,
     )
+
+
+def _resolution_controls(value: Any) -> tuple[str, ...]:
+    if not isinstance(value, list):
+        raise _error(
+            "JavaScript resolution control files must be an array",
+            field="resolution_control_files",
+        )
+    controls = tuple(
+        _relative_path(item, "resolution_control_files") for item in value
+    )
+    _validate_resolution_controls(controls)
+    return controls
+
+
+def _validate_resolution_controls(controls: tuple[str, ...]) -> None:
+    if not isinstance(controls, tuple):
+        raise _error(
+            "JavaScript resolution control files must be a tuple",
+            field="resolution_control_files",
+        )
+    for control in controls:
+        _relative_path(control, "resolution_control_files")
+    if controls != tuple(sorted(set(controls))):
+        raise _error(
+            "JavaScript resolution control files must be unique and sorted",
+            field="resolution_control_files",
+        )
 
 
 def _require_file_node(

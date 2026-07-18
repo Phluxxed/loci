@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import pytest
 
 from loci.graph.contracts import GraphContractError, GraphEdge, GraphEvidence
@@ -19,6 +22,10 @@ from loci.graph.imports import (
     materialize_import_edges,
     resolve_import,
     resolve_imports,
+)
+from loci.graph.javascript_modules import (
+    build_javascript_resolution_index,
+    load_javascript_module_context,
 )
 from loci.parser.imports import RawImport
 from loci.parser.symbols import Symbol, make_file_symbol
@@ -436,6 +443,8 @@ def test_javascript_relative_import_uses_fixed_candidate_order(
     assert record.target_kind == "file"
     assert record.target_file == f"src/{expected}"
     assert record.target_id == file_nodes[f"src/{expected}"].id
+    assert record.resolution_basis == "relative_path"
+    assert record.resolution_control_files == ()
 
 
 def test_javascript_relative_import_resolves_parent_directory():
@@ -491,7 +500,7 @@ def test_javascript_relative_import_cannot_escape_repository_root():
     assert record.unresolved_reason == "invalid_specifier"
 
 
-def test_javascript_relative_import_ignores_unsupported_extensions():
+def test_javascript_relative_import_includes_jsx_in_extensionless_candidates():
     file_nodes = _javascript_file_nodes(
         "src/consumer.ts",
         "src/module.jsx",
@@ -502,8 +511,63 @@ def test_javascript_relative_import_ignores_unsupported_extensions():
         file_nodes=file_nodes,
     )
 
-    assert record.status == "unresolved"
-    assert record.unresolved_reason == "not_indexed"
+    assert record.status == "resolved"
+    assert record.target_file == "src/module.jsx"
+
+
+def test_javascript_control_resolution_threads_record_provenance(tmp_path: Path):
+    root = tmp_path / "package.json"
+    root.write_text(
+        json.dumps({"name": "root", "workspaces": ["apps/*", "packages/*"]}),
+        encoding="utf-8",
+    )
+    app_dir = tmp_path / "apps" / "web"
+    app_dir.mkdir(parents=True)
+    app = app_dir / "package.json"
+    app.write_text(
+        json.dumps({
+            "name": "@repo/web",
+            "dependencies": {"@repo/core": "workspace:*"},
+        }),
+        encoding="utf-8",
+    )
+    core_dir = tmp_path / "packages" / "core"
+    core_dir.mkdir(parents=True)
+    core = core_dir / "package.json"
+    core.write_text(
+        json.dumps({
+            "name": "@repo/core",
+            "exports": {"./format": "./src/format.ts"},
+        }),
+        encoding="utf-8",
+    )
+    file_nodes = _javascript_file_nodes(
+        "apps/web/src/page.ts",
+        "packages/core/src/format.ts",
+    )
+    loaded = load_javascript_module_context(tmp_path, [root, app, core])
+    javascript_index = build_javascript_resolution_index(
+        loaded.context,
+        file_nodes=file_nodes,
+    ).index
+
+    record = resolve_import(
+        _javascript_raw(
+            "@repo/core/format",
+            source_file="apps/web/src/page.ts",
+        ),
+        file_nodes=file_nodes,
+        javascript_modules=javascript_index,
+    )
+
+    assert record.status == "resolved"
+    assert record.target_file == "packages/core/src/format.ts"
+    assert record.resolution_basis == "workspace_exports"
+    assert record.resolution_control_files == (
+        "apps/web/package.json",
+        "package.json",
+        "packages/core/package.json",
+    )
 
 
 def test_javascript_reexport_preserves_record_flag():
