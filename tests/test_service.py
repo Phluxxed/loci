@@ -488,6 +488,8 @@ def test_graph_imports_returns_stable_sorted_bounded_records(
                 "status": "resolved",
                 "resolution": "import-resolved",
                 "unresolved_reason": None,
+                "resolution_basis": None,
+                "resolution_control_files": [],
             },
             {
                 "source_file": "a.py",
@@ -506,6 +508,8 @@ def test_graph_imports_returns_stable_sorted_bounded_records(
                 "status": "unresolved",
                 "resolution": None,
                 "unresolved_reason": "not_indexed",
+                "resolution_basis": None,
+                "resolution_control_files": [],
             },
         ],
         "counts": {
@@ -1202,7 +1206,7 @@ def test_service_missing_go_package_declaration_is_diagnostic(
     )
 
 
-def test_service_uses_one_root_scan_for_source_and_go_controls(
+def test_service_uses_one_root_scan_for_source_and_language_controls(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ):
@@ -1214,6 +1218,8 @@ def test_service_uses_one_root_scan_for_source_and_go_controls(
         encoding="utf-8",
     )
     (repo / "pkg.go").write_text("package pkg\n", encoding="utf-8")
+    (repo / "package.json").write_text('{"name":"repo"}', encoding="utf-8")
+    (repo / "tsconfig.json").write_text("{}", encoding="utf-8")
     original_rglob = Path.rglob
     root_scans = 0
 
@@ -1228,6 +1234,156 @@ def test_service_uses_one_root_scan_for_source_and_go_controls(
     index_repo(repo, incremental=False)
 
     assert root_scans == 1
+
+
+def _write_javascript_workspace_repo(repo: Path, *, export_target: str) -> tuple[Path, Path]:
+    (repo / "package.json").write_text(
+        json.dumps({"name": "root", "workspaces": ["apps/*", "packages/*"]}),
+        encoding="utf-8",
+    )
+    app = repo / "apps" / "web"
+    app.mkdir(parents=True)
+    (app / "package.json").write_text(
+        json.dumps({
+            "name": "@repo/web",
+            "dependencies": {"@repo/core": "workspace:*"},
+        }),
+        encoding="utf-8",
+    )
+    core = repo / "packages" / "core"
+    core.mkdir(parents=True)
+    (core / "package.json").write_text(
+        json.dumps({
+            "name": "@repo/core",
+            "exports": {"./format": export_target},
+        }),
+        encoding="utf-8",
+    )
+    source = app / "page.ts"
+    source.write_text(
+        'import {format} from "@repo/core/format";\n',
+        encoding="utf-8",
+    )
+    target = core / "src" / "format.ts"
+    target.parent.mkdir()
+    target.write_text("export const format = () => 'ok';\n", encoding="utf-8")
+    return source, target
+
+
+def test_service_resolves_workspace_import_and_exposes_control_provenance(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _write_javascript_workspace_repo(repo, export_target="./src/format.ts")
+
+    indexed = index_repo(repo, incremental=False)
+    imports = graph_imports(repo)
+
+    assert indexed["graph_imports_resolved"] == 1
+    assert indexed["graph_status"] == "healthy"
+    assert imports["items"][0]["target_file"] == "packages/core/src/format.ts"
+    assert imports["items"][0]["resolution_basis"] == "workspace_exports"
+    assert imports["items"][0]["resolution_control_files"] == [
+        "apps/web/package.json",
+        "package.json",
+        "packages/core/package.json",
+    ]
+
+
+def test_service_javascript_control_change_and_delete_reresolve_unchanged_source(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    source, _ = _write_javascript_workspace_repo(
+        repo,
+        export_target="./dist/format.js",
+    )
+    source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
+
+    initial = index_repo(repo, incremental=False)
+    core_manifest = repo / "packages" / "core" / "package.json"
+    core_manifest.write_text(
+        json.dumps({
+            "name": "@repo/core",
+            "exports": {"./format": "./src/format.ts"},
+        }),
+        encoding="utf-8",
+    )
+    changed = index_repo(repo, incremental=True)
+    changed_item = graph_imports(repo)["items"][0]
+    core_manifest.unlink()
+    deleted = index_repo(repo, incremental=True)
+    deleted_item = graph_imports(repo)["items"][0]
+
+    assert initial["graph_imports_unresolved"] == 1
+    assert changed["files_skipped"] == 2
+    assert changed["graph_imports_resolved"] == 1
+    assert changed_item["target_file"] == "packages/core/src/format.ts"
+    assert hashlib.sha256(source.read_bytes()).hexdigest() == source_hash
+    assert deleted["files_skipped"] == 2
+    assert deleted["graph_imports_unresolved"] == 1
+    assert deleted_item["target_file"] is None
+
+
+def test_service_invalid_typescript_control_is_stable_and_keeps_navigation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "tsconfig.json").write_text(
+        '{"compilerOptions":{},"compilerOptions":{}}',
+        encoding="utf-8",
+    )
+    (repo / "module.ts").write_text(
+        "export function Navigate() { return true; }\n",
+        encoding="utf-8",
+    )
+
+    indexed = index_repo(repo, incremental=False)
+    freshness = ensure_fresh_index(repo)
+    results = search_symbols(repo, "Navigate")
+
+    assert indexed["graph_status"] == "degraded"
+    assert indexed["graph_diagnostics"] == [{
+        "severity": "warning",
+        "code": "GRAPH_TYPESCRIPT_CONFIG_INVALID",
+        "message": "TypeScript project control file is invalid",
+        "source": "tsconfig.json",
+        "details": {"reason": "duplicate_key"},
+    }]
+    assert freshness == {"repo": str(repo.resolve()), "refreshed": False}
+    assert [item["name"] for item in results] == ["Navigate"]
+
+
+def test_service_javascript_full_and_incremental_graph_state_match(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _write_javascript_workspace_repo(repo, export_target="./src/format.ts")
+    store = IndexStore(base_dir=base)
+
+    index_repo(repo, incremental=False)
+    full_graph = store.load(repo.resolve())["graph"]
+    incremental = index_repo(repo, incremental=True)
+    incremental_graph = store.load(repo.resolve())["graph"]
+
+    assert incremental["files_skipped"] == 2
+    assert incremental_graph == full_graph
 
 
 def test_service_import_state_survives_fresh_process_read(
