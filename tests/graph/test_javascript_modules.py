@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 import loci.graph.javascript_modules as javascript_modules
+from loci.graph.contracts import GraphContractError
 from loci.graph.javascript_modules import (
     JavaScriptModuleContext,
     build_javascript_resolution_index,
@@ -262,6 +263,32 @@ def test_loader_rejects_symlink_outside_and_oversized_without_reading(
     assert all(len(value) == 64 for value in loaded.input_hashes.values())
 
 
+def test_loader_rejects_control_that_grows_after_lstat(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    package = tmp_path / "package.json"
+    package.write_text('{"name":"root"}', encoding="utf-8")
+
+    def report_growth(*args: object, **kwargs: object) -> tuple[bytes, str]:
+        raise GraphContractError(
+            "INVALID_GRAPH_EXTENSION",
+            "JavaScript control grew while reading",
+            {"limit": javascript_modules.MAX_JAVASCRIPT_CONTROL_BYTES},
+        )
+
+    monkeypatch.setattr(javascript_modules, "read_contained_file", report_growth)
+
+    loaded = load_javascript_module_context(tmp_path, [package])
+
+    assert loaded.context == JavaScriptModuleContext((), (), ())
+    assert loaded.problems[0].details == {
+        "reason": "control_file_too_large",
+        "limit": javascript_modules.MAX_JAVASCRIPT_CONTROL_BYTES,
+    }
+    assert len(loaded.input_hashes["package.json"]) == 64
+
+
 def test_loader_rejects_config_cycles_package_extends_and_escape(tmp_path: Path):
     first = tmp_path / "tsconfig.json"
     second = tmp_path / "base.json"
@@ -325,6 +352,40 @@ def test_loader_problem_details_are_bounded_and_do_not_echo_control_values(
     assert secret not in problem.message
     assert secret not in repr(problem.details)
     assert str(tmp_path) not in repr(problem)
+
+
+def test_loader_rejects_excessive_pnpm_yaml_depth(tmp_path: Path):
+    workspace = tmp_path / "pnpm-workspace.yaml"
+    workspace.write_text(
+        "packages: " + "[" * 65 + "'packages/*'" + "]" * 65,
+        encoding="utf-8",
+    )
+
+    loaded = load_javascript_module_context(tmp_path, [workspace])
+
+    assert loaded.context == JavaScriptModuleContext((), (), ())
+    assert loaded.problems[0].details == {
+        "reason": "yaml_depth_exceeded",
+        "limit": javascript_modules.MAX_JAVASCRIPT_JSON_DEPTH,
+    }
+
+
+def test_pnpm_workspace_exclusions_cannot_remove_root_package(tmp_path: Path):
+    root = tmp_path / "package.json"
+    root.write_text('{"name":"@repo/root"}', encoding="utf-8")
+    child = tmp_path / "packages" / "core" / "package.json"
+    child.parent.mkdir(parents=True)
+    child.write_text('{"name":"@repo/core"}', encoding="utf-8")
+    workspace = tmp_path / "pnpm-workspace.yaml"
+    workspace.write_text(
+        "packages:\n  - 'packages/*'\n  - '!**'\n",
+        encoding="utf-8",
+    )
+
+    loaded = load_javascript_module_context(tmp_path, [root, child, workspace])
+
+    assert loaded.problems == ()
+    assert loaded.context.workspaces[0].package_roots == (".",)
 
 
 def _javascript_file(path: str) -> Symbol:
@@ -475,6 +536,27 @@ def test_resolver_uses_module_suffixes_then_root_dirs(tmp_path: Path):
     assert resolved.control_files == ("tsconfig.json",)
 
 
+def test_resolver_applies_module_suffix_order_to_explicit_typescript_path(
+    tmp_path: Path,
+):
+    config = tmp_path / "tsconfig.json"
+    config.write_text(
+        '{"compilerOptions":{"moduleResolution":"bundler",'
+        '"moduleSuffixes":[".native",""]}}',
+        encoding="utf-8",
+    )
+    source = "src/consumer.ts"
+    index = _resolution_index(
+        tmp_path,
+        [source, "src/value.ts", "src/value.native.ts"],
+        [config],
+    )
+
+    resolved = resolve_javascript_import(_raw(source, "./value.ts"), index)
+
+    assert resolved.target_file == "src/value.native.ts"
+
+
 def test_resolver_applies_paths_before_base_url(tmp_path: Path):
     config = tmp_path / "tsconfig.json"
     config.write_text(
@@ -501,6 +583,38 @@ def test_resolver_applies_paths_before_base_url(tmp_path: Path):
     assert resolved.target_file == "mapped/value.ts"
     assert resolved.basis == "compiler_paths"
     assert resolved.control_files == ("tsconfig.json",)
+
+
+def test_resolver_uses_longest_paths_prefix_and_declared_target_fallback(
+    tmp_path: Path,
+):
+    config = tmp_path / "tsconfig.json"
+    config.write_text(
+        json.dumps({
+            "compilerOptions": {
+                "moduleResolution": "bundler",
+                "paths": {
+                    "@app/*": ["generic/*"],
+                    "@app/special/*": ["missing/*", "specific/*"],
+                },
+            }
+        }),
+        encoding="utf-8",
+    )
+    source = "src/consumer.ts"
+    index = _resolution_index(
+        tmp_path,
+        [source, "generic/special/value.ts", "specific/value.ts"],
+        [config],
+    )
+
+    resolved = resolve_javascript_import(
+        _raw(source, "@app/special/value"),
+        index,
+    )
+
+    assert resolved.target_file == "specific/value.ts"
+    assert resolved.basis == "compiler_paths"
 
 
 def test_builder_selects_deepest_owning_config_and_jsconfig_preference(
@@ -678,6 +792,57 @@ def test_resolver_supports_private_imports_and_self_output_remapping(tmp_path: P
     assert self_reference.basis == "package_self_reference"
 
 
+def test_resolver_rejects_string_sugar_for_private_imports(tmp_path: Path):
+    package = tmp_path / "package.json"
+    package.write_text(
+        '{"name":"@repo/core","imports":"./src/internal.ts"}',
+        encoding="utf-8",
+    )
+    source = "src/consumer.ts"
+    index = _resolution_index(
+        tmp_path,
+        [source, "src/internal.ts"],
+        [package],
+    )
+
+    resolved = resolve_javascript_import(_raw(source, "#internal"), index)
+
+    assert resolved.target_file is None
+    assert resolved.unresolved_reason == "unsupported_configuration"
+
+
+def test_resolver_node10_ignores_exports_and_uses_legacy_entry(tmp_path: Path):
+    controls = _write_workspace_controls(
+        tmp_path,
+        target_exports={".": "./dist/index.js"},
+    )
+    core = controls[2]
+    core.write_text(
+        json.dumps({
+            "name": "@repo/core",
+            "exports": {".": "./dist/index.js"},
+            "main": "./src/index.js",
+        }),
+        encoding="utf-8",
+    )
+    config = tmp_path / "tsconfig.json"
+    config.write_text(
+        '{"compilerOptions":{"moduleResolution":"node10"}}',
+        encoding="utf-8",
+    )
+    source = "apps/web/src/page.ts"
+    index = _resolution_index(
+        tmp_path,
+        [source, "packages/core/src/index.ts"],
+        [*controls, config],
+    )
+
+    resolved = resolve_javascript_import(_raw(source, "@repo/core"), index)
+
+    assert resolved.target_file == "packages/core/src/index.ts"
+    assert resolved.basis == "workspace_legacy_entry"
+
+
 def test_resolver_honours_package_conditions_and_reports_unknown_mode_ambiguity(
     tmp_path: Path,
 ):
@@ -710,6 +875,56 @@ def test_resolver_honours_package_conditions_and_reports_unknown_mode_ambiguity(
     assert type_only.target_file == "packages/core/src/index.d.ts"
     assert runtime.target_file is None
     assert runtime.unresolved_reason == "ambiguous"
+
+
+def test_resolver_supports_export_patterns_null_blocks_and_encapsulation(
+    tmp_path: Path,
+):
+    controls = _write_workspace_controls(
+        tmp_path,
+        target_exports={
+            "./features/*": "./src/features/*.ts",
+            "./private": None,
+        },
+    )
+    source = "apps/web/src/page.ts"
+    index = _resolution_index(
+        tmp_path,
+        [source, "packages/core/src/features/format.ts"],
+        controls,
+    )
+
+    exported = resolve_javascript_import(
+        _raw(source, "@repo/core/features/format"),
+        index,
+    )
+    blocked = resolve_javascript_import(_raw(source, "@repo/core/private"), index)
+    hidden = resolve_javascript_import(_raw(source, "@repo/core/internal"), index)
+
+    assert exported.target_file == "packages/core/src/features/format.ts"
+    assert blocked.unresolved_reason == "inaccessible"
+    assert hidden.unresolved_reason == "inaccessible"
+
+
+def test_resolver_candidate_limit_fails_closed(tmp_path: Path):
+    config = tmp_path / "tsconfig.json"
+    config.write_text(
+        json.dumps({
+            "compilerOptions": {
+                "moduleResolution": "bundler",
+                "moduleSuffixes": [f".variant{index}" for index in range(65)],
+            }
+        }),
+        encoding="utf-8",
+    )
+    source = "src/consumer.ts"
+    index = _resolution_index(tmp_path, [source], [config])
+
+    resolved = resolve_javascript_import(_raw(source, "./missing"), index)
+
+    assert resolved.target_file is None
+    assert resolved.unresolved_reason == "unsupported_configuration"
+    assert resolved.control_files == ("tsconfig.json",)
 
 
 @pytest.mark.parametrize(
