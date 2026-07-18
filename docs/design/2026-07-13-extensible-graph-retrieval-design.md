@@ -378,6 +378,31 @@ order is:
 resolution contract. It does not authorize executing repository tools or code,
 using the network, or silently approximating every runtime loader behavior.
 
+### Stage 9: Cargo-aware Rust dependency resolution (proposed)
+
+The owner selected Cargo-aware Rust resolution as the next dependency-layer
+stage on 2026-07-18. The detailed proposal is ready for review but is not yet
+approved for implementation:
+`docs/plans/2026-07-18-extensible-graph-retrieval-stage-9-cargo-aware-rust-dependency-resolution.md`.
+
+The proposal adds bounded Cargo package/workspace/target loading, stable Rust
+crate nodes, contained path and inherited workspace dependencies, explicit
+module-tree construction, edition-aware paths, definite module aliases and
+re-exports, and module visibility enforcement. It keeps registry/git
+dependencies external and never runs Cargo, rustc, build scripts, macros,
+repository code, or the network.
+
+Because feature, target, and `cfg` activation depend on an absent build
+invocation, the proposed graph is explicitly a declared-possible static
+dependency graph. Rust import records distinguish unconditional relationships
+from configuration-dependent relationships; divergent conditional endpoints
+remain unresolved. Terminal item/symbol resolution and calls stay in later
+stages.
+
+The governing status remains “Stages 1-8 implemented, reviewed, and accepted”
+until the Stage 9 implementation passes its separate final evidence packet and
+owner gate.
+
 ## Technical Fit
 
 ### Stack
