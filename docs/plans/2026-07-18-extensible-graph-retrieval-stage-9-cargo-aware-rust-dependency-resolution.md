@@ -1,6 +1,6 @@
 # Plan: Extensible Graph Retrieval Stage 9 — Cargo-aware Rust Dependency Resolution
 
-- **Status:** proposed for owner review; no implementation authorized yet
+- **Status:** owner-approved; implementation in progress (Task 1 complete)
 - **Date:** 2026-07-18
 - **Repository:** `/Users/brummerv/loci`
 - **Governing design:** `docs/design/2026-07-13-extensible-graph-retrieval-design.md`
@@ -86,10 +86,9 @@ crates, it becomes `unresolved/ambiguous`. None of those cases becomes an edge.
 ## Authorization and Review Posture
 
 The owner selected Cargo-aware Rust resolution as the next dependency-layer
-stage. This document freezes a proposed implementation boundary; it does not
-yet authorize implementation.
+stage and approved this implementation boundary on 2026-07-18.
 
-Approval of this plan will authorize:
+That approval authorizes:
 
 1. one conditional runtime dependency, `tomli`, for Python versions below 3.11;
 2. additive Rust observation, import-record, crate-node, service, and MCP result
@@ -811,9 +810,12 @@ def resolve_rust_import(
 ) -> RustImportResolution: ...
 ~~~
 
-`rust_crates.py` owns public models, bounded Cargo loading, validation, and thin
-public builder/resolver entry points. New `src/loci/graph/_rust_resolution.py`
-owns target discovery, module/alias construction, visibility evaluation, and
+`rust_crates.py` owns the public models, loader contract, validation policy,
+and thin public builder/resolver entry points. Private `_cargo_workspace.py`
+and `_cargo_targets.py` keep workspace membership and Cargo target-discovery
+mechanics out of that stable API module. New `src/loci/graph/_rust_resolution.py`
+owns crate/module index construction, alias construction, visibility
+evaluation, and
 per-import resolution so neither the public module nor generic import plumbing
 becomes a monolith. Alias/re-export tables remain private implementation
 structures. The public frozen index above contains every lookup the per-import
@@ -1033,6 +1035,8 @@ unchanged files.
 | `pyproject.toml` | Declare conditional Tomli runtime dependency |
 | `uv.lock` | Lock the explicit conditional dependency |
 | `src/loci/graph/rust_crates.py` | New bounded Cargo loader, public Rust models, and thin builder/resolver entry points |
+| `src/loci/graph/_cargo_workspace.py` | Private bounded Cargo workspace membership and path-member mechanics |
+| `src/loci/graph/_cargo_targets.py` | Private bounded Cargo target discovery and validation mechanics |
 | `src/loci/graph/_rust_resolution.py` | New private target/module/alias/visibility builder and pure per-import resolver |
 | `src/loci/parser/languages.py` | Register Rust `extern_crate_declaration` and `mod_item` dependency observations |
 | `src/loci/parser/imports.py` | Add strict Rust context, use-tree expansion, `extern crate`, `mod`, attributes, scope, visibility, and bounds |
@@ -1067,9 +1071,14 @@ implementation/test files at once.
 
 ### Task 1 — Cargo loader and safety shell
 
+**Implementation status:** complete on 2026-07-18; focused gate, full suite,
+build, lock, frozen-benchmark checksum, and Loci integrity checks passed.
+
 Files:
 
 - new `src/loci/graph/rust_crates.py`
+- new `src/loci/graph/_cargo_workspace.py`
+- new `src/loci/graph/_cargo_targets.py`
 - new `tests/graph/test_rust_crates.py`
 - `pyproject.toml`
 - `uv.lock`
