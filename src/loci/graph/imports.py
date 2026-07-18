@@ -68,9 +68,6 @@ _IMPORT_RECORD_FIELDS = {
 }
 _SHA256_RE = re.compile(r"[0-9a-f]{64}")
 _JAVASCRIPT_LANGUAGES = frozenset({"javascript", "typescript"})
-_JAVASCRIPT_EXTENSIONS = (
-    ".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs",
-)
 _JAVASCRIPT_RESOLUTION_BASES = frozenset({
     "relative_path",
     "compiler_paths",
@@ -537,51 +534,6 @@ def _indexed_python_files(file_nodes: Mapping[str, Symbol]) -> frozenset[str]:
     )
 
 
-def _indexed_javascript_files(file_nodes: Mapping[str, Symbol]) -> frozenset[str]:
-    return frozenset(
-        path
-        for path, node in file_nodes.items()
-        if (
-            path == node.file_path
-            and node.kind == "file"
-            and node.language in _JAVASCRIPT_LANGUAGES
-            and path.endswith(_JAVASCRIPT_EXTENSIONS)
-        )
-    )
-
-
-def _resolve_javascript_target(
-    raw: RawImport,
-    indexed_files: frozenset[str],
-) -> tuple[str | None, ImportUnresolvedReason]:
-    specifier = raw.specifier
-    if not specifier or "\\" in specifier or specifier.startswith("/"):
-        return None, "invalid_specifier"
-    if not specifier.startswith(("./", "../")):
-        return None, "external"
-
-    base = _relative_javascript_base(raw.source_file, specifier)
-    if base is None:
-        return None, "invalid_specifier"
-
-    base_path = base.as_posix()
-    candidates = (
-        f"{base_path}.ts",
-        f"{base_path}.tsx",
-        f"{base_path}.js",
-        (base / "index.ts").as_posix(),
-        (base / "index.tsx").as_posix(),
-        (base / "index.js").as_posix(),
-    )
-    target = next(
-        (candidate for candidate in candidates if candidate in indexed_files),
-        None,
-    )
-    if target is None:
-        return None, "not_indexed"
-    return target, "not_indexed"
-
-
 def _resolve_go_target(
     raw: RawImport,
     resolver: _GoResolverIndex,
@@ -807,25 +759,6 @@ def _relative_directory(directory: str, root: str) -> str | None:
     except ValueError:
         return None
     return "" if relative == PurePosixPath(".") else relative.as_posix()
-
-
-def _relative_javascript_base(
-    source_file: str,
-    specifier: str,
-) -> PurePosixPath | None:
-    parts = [*PurePosixPath(source_file).parent.parts]
-    for part in specifier.split("/"):
-        if part in {"", "."}:
-            continue
-        if part == "..":
-            if not parts:
-                return None
-            parts.pop()
-        else:
-            parts.append(part)
-    if not parts:
-        return None
-    return PurePosixPath(*parts)
 
 
 def _python_package_roots(indexed_files: frozenset[str]) -> tuple[PurePosixPath, ...]:
