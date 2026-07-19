@@ -166,6 +166,10 @@ class RustCrateIndex:
     dependencies_by_crate_alias: Mapping[
         tuple[str, str], tuple[RustDependencyBinding, ...]
     ]
+    module_failures_by_observation: Mapping[
+        tuple[str, str, int, tuple[str, ...], str],
+        ImportUnresolvedReason,
+    ]
 
 
 @dataclass(frozen=True, slots=True)

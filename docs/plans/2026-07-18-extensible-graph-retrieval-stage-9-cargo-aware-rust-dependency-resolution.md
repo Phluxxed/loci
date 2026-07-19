@@ -774,6 +774,10 @@ class RustCrateIndex:
     dependencies_by_crate_alias: Mapping[
         tuple[str, str], tuple[RustDependencyBinding, ...]
     ]
+    module_failures_by_observation: Mapping[
+        tuple[str, str, int, tuple[str, ...], str],
+        ImportUnresolvedReason,
+    ]
 
 @dataclass(frozen=True, slots=True)
 class RustCrateBuild:
@@ -1166,9 +1170,9 @@ edges.
 
 ### Task 4 — Import record and pure Rust resolution
 
-**Implementation status:** complete on 2026-07-19; 144 focused tests and all
-761 repository tests passed, the lock and package build verified, Loci
-re-indexed healthy with 1,715/1,715 symbols verified, and the frozen-benchmark
+**Implementation status:** complete on 2026-07-19; 145 focused tests and all
+762 repository tests passed, the lock and package build verified, Loci
+re-indexed healthy with 1,717/1,717 symbols verified, and the frozen-benchmark
 checksum remained unchanged. No judge was run.
 
 Files:
@@ -1197,6 +1201,13 @@ bindings for edition 2015; and `contracts.py` owns the schema-version constant.
 `_rust_import_schema.py` keeps strict Rust persistence validation out of the
 already-large generic resolver. Direct constructor and fresh-process service
 tests received only the mechanical schema-5 null fields.
+
+The frozen crate index retains bounded per-observation module failures because
+the resolver otherwise cannot distinguish a missing module source from the
+explicit two-candidate `foo.rs` versus `foo/mod.rs` ambiguity after index
+construction. This is evidence preservation, not a filename fallback: the
+builder records only failures from the exact declared-module candidates it
+already evaluated.
 
 The broad draft statement that every unresolved record has no controls was
 reconciled with accepted Stage 8 behavior: unresolved JavaScript/TypeScript
