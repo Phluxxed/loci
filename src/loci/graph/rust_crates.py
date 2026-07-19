@@ -17,6 +17,8 @@ except ModuleNotFoundError:  # pragma: no cover - exercised on Python 3.10
 
 from .contracts import GraphContractError, JSONValue
 from .profiles import read_contained_file
+from ..parser.imports import RawImport
+from ..parser.symbols import Symbol
 
 
 MAX_CARGO_CONTROL_BYTES = 1_048_576
@@ -124,6 +126,76 @@ class CargoLoad:
     context: CargoContext
     input_hashes: dict[str, str]
     problems: tuple[RustCrateProblem, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class RustCrate:
+    id: str
+    manifest: str
+    package_name: str
+    target: RustTarget
+
+
+@dataclass(frozen=True, slots=True)
+class RustDependencyBinding:
+    source_crate_id: str
+    alias: str
+    target_crate_id: str
+    basis: RustResolutionBasis
+    configuration: RustResolutionConfiguration
+    control_files: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class RustModuleBinding:
+    crate_id: str
+    module_path: tuple[str, ...]
+    source_file: str
+    visibility: str
+    configuration: RustResolutionConfiguration
+
+
+@dataclass(frozen=True, slots=True)
+class RustCrateIndex:
+    crate_nodes: tuple[Symbol, ...]
+    crates_by_id: Mapping[str, RustCrate]
+    crate_ids_by_source_file: Mapping[str, tuple[str, ...]]
+    modules_by_crate_path: Mapping[
+        tuple[str, tuple[str, ...]], tuple[RustModuleBinding, ...]
+    ]
+    dependencies_by_crate_alias: Mapping[
+        tuple[str, str], tuple[RustDependencyBinding, ...]
+    ]
+
+
+@dataclass(frozen=True, slots=True)
+class RustCrateBuild:
+    index: RustCrateIndex
+    problems: tuple[RustCrateProblem, ...]
+
+
+def make_rust_crate_id(
+    manifest: str,
+    target_kind: RustTargetKind,
+    crate_name: str,
+) -> str:
+    return f"{manifest}::{target_kind}:{crate_name}#crate"
+
+
+def build_rust_crate_index(
+    context: CargoContext,
+    *,
+    file_nodes: Mapping[str, Symbol],
+    observations: Sequence[RawImport],
+) -> RustCrateBuild:
+    """Build frozen crate, module, and Cargo-binding lookups without I/O."""
+    from ._rust_resolution import build_rust_crate_index as build_index
+
+    return build_index(
+        context,
+        file_nodes=file_nodes,
+        observations=observations,
+    )
 
 
 @dataclass(frozen=True, slots=True)
