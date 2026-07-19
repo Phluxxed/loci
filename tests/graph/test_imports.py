@@ -27,7 +27,7 @@ from loci.graph.javascript_modules import (
     build_javascript_resolution_index,
     load_javascript_module_context,
 )
-from loci.parser.imports import RawImport
+from loci.parser.imports import RawImport, RustImportContext
 from loci.parser.symbols import Symbol, make_file_symbol
 
 
@@ -141,6 +141,28 @@ def _go_file(path: str, package: str) -> Symbol:
 
 def _go_file_nodes(*files: tuple[str, str]) -> dict[str, Symbol]:
     return {path: _go_file(path, package) for path, package in files}
+
+
+def _rust_module_raw(*, inline: bool) -> RawImport:
+    return RawImport(
+        source_file="src/lib.rs",
+        language="rust",
+        line=1,
+        text="mod model {" if inline else "mod model;",
+        specifier="model",
+        imported_name=None,
+        type_only=False,
+        is_reexport=False,
+        source_hash=SOURCE_HASH,
+        rust=RustImportContext(
+            kind="module",
+            lexical_module_path=(),
+            visibility="private",
+            module_level=True,
+            configuration="unconditional",
+            inline=inline,
+        ),
+    )
 
 
 def _go_module(
@@ -1027,6 +1049,43 @@ def test_resolve_imports_indexes_go_bindings_once_per_batch():
 
     assert all(record.unresolved_reason == "external" for record in records)
     assert bindings.iterations == 1
+
+
+def test_resolve_imports_ignores_inline_rust_module_metadata():
+    file_nodes = {
+        "src/lib.rs": make_file_symbol(
+            "src/lib.rs",
+            language="rust",
+            content_hash=SOURCE_HASH,
+        )
+    }
+
+    records = resolve_imports(
+        (_rust_module_raw(inline=True), _rust_module_raw(inline=False)),
+        file_nodes=file_nodes,
+    )
+
+    assert len(records) == 1
+    assert records[0].raw.rust is not None
+    assert records[0].raw.rust.inline is False
+    assert records[0].status == "unresolved"
+    assert records[0].unresolved_reason == "unsupported_language"
+
+
+def test_resolve_import_rejects_inline_rust_module_metadata():
+    file_nodes = {
+        "src/lib.rs": make_file_symbol(
+            "src/lib.rs",
+            language="rust",
+            content_hash=SOURCE_HASH,
+        )
+    }
+
+    with pytest.raises(
+        GraphContractError,
+        match="inline Rust module observations are metadata, not imports",
+    ):
+        resolve_import(_rust_module_raw(inline=True), file_nodes=file_nodes)
 
 
 def test_rust_remains_unsupported_language():

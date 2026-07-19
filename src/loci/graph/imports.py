@@ -269,6 +269,11 @@ def resolve_import(
     javascript_modules: JavaScriptResolutionIndex | None = None,
 ) -> ImportRecord:
     """Resolve one raw import against deterministic indexed file/package targets."""
+    if _is_inline_rust_module(raw):
+        raise _error(
+            "inline Rust module observations are metadata, not imports",
+            source_file=raw.source_file,
+        )
     return resolve_imports(
         (raw,),
         file_nodes=file_nodes,
@@ -306,7 +311,17 @@ def resolve_imports(
             go_resolver=go_resolver,
         )
         for raw in raw_imports
+        if not _is_inline_rust_module(raw)
     ]
+
+
+def _is_inline_rust_module(raw: RawImport) -> bool:
+    return (
+        raw.language == "rust"
+        and raw.rust is not None
+        and raw.rust.kind == "module"
+        and raw.rust.inline
+    )
 
 
 def _resolve_import(
