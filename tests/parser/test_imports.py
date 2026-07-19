@@ -349,7 +349,8 @@ def test_extracts_rust_extern_crates_modules_and_lexical_scope(tmp_path: Path):
             "extern crate actual as local;\n"
             "extern crate self as current;\n"
             "pub extern crate public_crate;\n"
-            "mod inline {\n"
+            "#[cfg(unix)]\n"
+            "pub(crate) mod inline {\n"
             "    #[path = r#\"nested/other.rs\"#]\n"
             "    pub(in crate::inline) mod external;\n"
             "    pub(super) use super::Thing;\n"
@@ -414,6 +415,8 @@ def test_extracts_rust_extern_crates_modules_and_lexical_scope(tmp_path: Path):
             RustImportContext(
                 kind="module",
                 lexical_module_path=("inline",),
+                lexical_module_visibilities=("pub(crate)",),
+                lexical_module_configurations=("conditional",),
                 visibility="pub(in crate::inline)",
                 module_level=True,
                 configuration="unconditional",
@@ -427,6 +430,8 @@ def test_extracts_rust_extern_crates_modules_and_lexical_scope(tmp_path: Path):
             RustImportContext(
                 kind="use",
                 lexical_module_path=("inline",),
+                lexical_module_visibilities=("pub(crate)",),
+                lexical_module_configurations=("conditional",),
                 visibility="pub(super)",
                 module_level=True,
                 configuration="unconditional",
@@ -439,6 +444,8 @@ def test_extracts_rust_extern_crates_modules_and_lexical_scope(tmp_path: Path):
             RustImportContext(
                 kind="use",
                 lexical_module_path=("inline",),
+                lexical_module_visibilities=("pub(crate)",),
+                lexical_module_configurations=("conditional",),
                 visibility="private",
                 module_level=False,
                 configuration="unconditional",
@@ -451,6 +458,8 @@ def test_extracts_rust_extern_crates_modules_and_lexical_scope(tmp_path: Path):
             RustImportContext(
                 kind="extern_crate",
                 lexical_module_path=("inline",),
+                lexical_module_visibilities=("pub(crate)",),
+                lexical_module_configurations=("conditional",),
                 visibility="private",
                 module_level=False,
                 configuration="unconditional",

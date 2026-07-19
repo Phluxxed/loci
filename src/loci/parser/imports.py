@@ -34,6 +34,8 @@ class RustImportContext:
     module_level: bool
     configuration: RustConfiguration
     path_override: str | None = None
+    lexical_module_visibilities: tuple[str, ...] = ()
+    lexical_module_configurations: tuple[RustConfiguration, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -347,13 +349,20 @@ def _rust_context(
     configuration, path_override = _rust_attributes(node, source, kind=kind)
     if not visibility_supported:
         configuration = "unsupported"
+    (
+        lexical_module_path,
+        lexical_module_visibilities,
+        lexical_module_configurations,
+    ) = _rust_lexical_module_context(node, source)
     return RustImportContext(
         kind=kind,
-        lexical_module_path=_rust_lexical_module_path(node, source),
+        lexical_module_path=lexical_module_path,
         visibility=visibility,
         module_level=_rust_is_module_level(node),
         configuration=configuration,
         path_override=path_override,
+        lexical_module_visibilities=lexical_module_visibilities,
+        lexical_module_configurations=lexical_module_configurations,
     )
 
 
@@ -443,17 +452,34 @@ def _rust_path_attribute_value(attribute, source: bytes) -> str | None:
     return "".join(contents)
 
 
-def _rust_lexical_module_path(node, source: bytes) -> tuple[str, ...]:
-    parts = []
+def _rust_lexical_module_context(
+    node,
+    source: bytes,
+) -> tuple[tuple[str, ...], tuple[str, ...], tuple[RustConfiguration, ...]]:
+    modules = []
     ancestor = node.parent
     while ancestor is not None:
         if ancestor.type == "mod_item" and ancestor.child_by_field_name("body") is not None:
             name = ancestor.child_by_field_name("name")
             if name is not None:
-                parts.append(_node_text(name, source))
+                visibility, visibility_supported = _rust_visibility(ancestor, source)
+                configuration, _ = _rust_attributes(
+                    ancestor,
+                    source,
+                    kind="module",
+                )
+                if not visibility_supported:
+                    configuration = "unsupported"
+                modules.append(
+                    (_node_text(name, source), visibility, configuration)
+                )
         ancestor = ancestor.parent
-    parts.reverse()
-    return tuple(parts)
+    modules.reverse()
+    return (
+        tuple(name for name, _, _ in modules),
+        tuple(visibility for _, visibility, _ in modules),
+        tuple(configuration for _, _, configuration in modules),
+    )
 
 
 def _rust_is_module_level(node) -> bool:
