@@ -199,8 +199,12 @@ def build_rust_crate_index(
     modules: dict[
         tuple[str, tuple[str, ...]], list[rust.RustModuleBinding]
     ] = defaultdict(list)
+    module_failures: dict[
+        tuple[str, str, int, tuple[str, ...], str],
+        ImportUnresolvedReason,
+    ] = {}
     for crate in sorted(crates.values(), key=lambda item: item.id):
-        crate_modules, crate_problems = _build_crate_modules(
+        crate_modules, crate_problems, crate_failures = _build_crate_modules(
             crate,
             file_nodes=file_nodes,
             observations_by_source=observations_by_source,
@@ -208,6 +212,13 @@ def build_rust_crate_index(
         problems.extend(crate_problems)
         for key, bindings in crate_modules.items():
             modules[key].extend(bindings)
+        for key, reason in crate_failures.items():
+            existing = module_failures.get(key)
+            module_failures[key] = (
+                "ambiguous"
+                if existing is not None and existing != reason
+                else reason
+            )
 
     frozen_modules = {
         key: tuple(sorted(set(bindings), key=_module_binding_key))
@@ -252,6 +263,9 @@ def build_rust_crate_index(
         }),
         modules_by_crate_path=MappingProxyType(frozen_modules),
         dependencies_by_crate_alias=MappingProxyType(dependencies),
+        module_failures_by_observation=MappingProxyType(dict(sorted(
+            module_failures.items()
+        ))),
     )
     return rust.RustCrateBuild(
         index=index,
@@ -483,6 +497,15 @@ def _resolve_in_importer_context(
     controls = (crate.manifest,)
 
     if context.kind == "module":
+        failure = index.module_failures_by_observation.get(
+            _module_failure_key(
+                importer.crate_id,
+                raw,
+                importer.declaring.module_path,
+            )
+        )
+        if failure is not None:
+            return _unresolved_rust(failure)
         walk = _walk_module_route(
             importer.declaring,
             parts,
@@ -885,11 +908,19 @@ def _build_crate_modules(
 ) -> tuple[
     dict[tuple[str, tuple[str, ...]], list[rust.RustModuleBinding]],
     list[rust.RustCrateProblem],
+    dict[
+        tuple[str, str, int, tuple[str, ...], str],
+        ImportUnresolvedReason,
+    ],
 ]:
     modules: dict[
         tuple[str, tuple[str, ...]], list[rust.RustModuleBinding]
     ] = defaultdict(list)
     problems: list[rust.RustCrateProblem] = []
+    failures: dict[
+        tuple[str, str, int, tuple[str, ...], str],
+        ImportUnresolvedReason,
+    ] = {}
     root_configuration: rust.RustResolutionConfiguration = (
         "declared_possible" if crate.target.required_features else "unconditional"
     )
@@ -924,6 +955,11 @@ def _build_crate_modules(
                     raw.source_file,
                     "invalid_lexical_module_context",
                 ))
+                failures[_module_failure_key(
+                    crate.id,
+                    raw,
+                    (*owned.binding.module_path, *context.lexical_module_path),
+                )] = "unsupported_configuration"
                 continue
 
             declaring_path = owned.binding.module_path
@@ -962,6 +998,11 @@ def _build_crate_modules(
                     "module_depth_exceeded",
                     limit=rust.MAX_RUST_MODULE_DEPTH,
                 ))
+                failures[_module_failure_key(
+                    crate.id,
+                    raw,
+                    declaring_path,
+                )] = "unsupported_configuration"
                 continue
             child_configuration = merge_observed_configuration(
                 declaring_configuration,
@@ -973,6 +1014,11 @@ def _build_crate_modules(
                     raw.source_file,
                     "unsupported_module_configuration",
                 ))
+                failures[_module_failure_key(
+                    crate.id,
+                    raw,
+                    declaring_path,
+                )] = "unsupported_configuration"
                 continue
 
             if context.inline:
@@ -999,6 +1045,11 @@ def _build_crate_modules(
                     raw.source_file,
                     reason,
                 ))
+                failures[_module_failure_key(
+                    crate.id,
+                    raw,
+                    declaring_path,
+                )] = _module_unresolved_reason(reason)
                 continue
             if candidate in owned.ancestry:
                 problems.append(_problem(
@@ -1006,6 +1057,11 @@ def _build_crate_modules(
                     raw.source_file,
                     "cyclic_module_source",
                 ))
+                failures[_module_failure_key(
+                    crate.id,
+                    raw,
+                    declaring_path,
+                )] = "unsupported_configuration"
                 continue
             binding = rust.RustModuleBinding(
                 crate_id=crate.id,
@@ -1020,7 +1076,29 @@ def _build_crate_modules(
                     (*owned.ancestry, candidate),
                 ))
 
-    return dict(modules), problems
+    return dict(modules), problems, failures
+
+
+def _module_failure_key(
+    crate_id: str,
+    raw: RawImport,
+    declaring_path: tuple[str, ...],
+) -> tuple[str, str, int, tuple[str, ...], str]:
+    return (
+        crate_id,
+        raw.source_file,
+        raw.line,
+        declaring_path,
+        raw.specifier,
+    )
+
+
+def _module_unresolved_reason(reason: str) -> ImportUnresolvedReason:
+    if reason == "ambiguous_module_source":
+        return "ambiguous"
+    if reason == "module_source_not_indexed":
+        return "not_indexed"
+    return "invalid_specifier"
 
 
 def _build_dependency_bindings(
@@ -1353,6 +1431,7 @@ def _empty_index() -> rust.RustCrateIndex:
         crate_ids_by_source_file=MappingProxyType({}),
         modules_by_crate_path=MappingProxyType({}),
         dependencies_by_crate_alias=MappingProxyType({}),
+        module_failures_by_observation=MappingProxyType({}),
     )
 
 

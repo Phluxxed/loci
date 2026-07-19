@@ -1252,6 +1252,35 @@ def test_rust_external_module_missing_from_frozen_index_is_not_indexed():
     assert record.unresolved_reason == "not_indexed"
 
 
+def test_rust_external_module_preserves_ambiguous_source_outcome():
+    package = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+    )
+    raw = _rust_raw("duplicate", kind="module")
+    file_nodes = _rust_file_nodes(
+        "app/src/lib.rs",
+        "app/src/duplicate.rs",
+        "app/src/duplicate/mod.rs",
+    )
+    build = build_rust_crate_index(
+        CargoContext(packages=(package,), workspaces=()),
+        file_nodes=file_nodes,
+        observations=(raw,),
+    )
+
+    record = resolve_import(
+        raw,
+        file_nodes=file_nodes,
+        rust_crates=build.index,
+    )
+
+    assert build.problems[0].details["reason"] == "ambiguous_module_source"
+    assert record.unresolved_reason == "ambiguous"
+
+
 def test_rust_source_outside_crate_module_ownership_is_unsupported():
     package = _rust_package(
         source="app/Cargo.toml",
