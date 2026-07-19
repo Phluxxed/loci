@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -26,6 +27,15 @@ from loci.graph.imports import (
 from loci.graph.javascript_modules import (
     build_javascript_resolution_index,
     load_javascript_module_context,
+)
+from loci.graph.rust_crates import (
+    CargoContext,
+    CargoPackage,
+    RustDependency,
+    RustTarget,
+    build_rust_crate_index,
+    make_rust_crate_id,
+    resolve_rust_import,
 )
 from loci.parser.imports import RawImport, RustImportContext
 from loci.parser.symbols import Symbol, make_file_symbol
@@ -165,6 +175,99 @@ def _rust_module_raw(*, inline: bool) -> RawImport:
     )
 
 
+def _rust_raw(
+    specifier: str,
+    *,
+    source_file: str = "app/src/lib.rs",
+    kind: str = "use",
+    imported_name: str | None = None,
+    lexical_module_path: tuple[str, ...] = (),
+    visibility: str = "private",
+    configuration: str = "unconditional",
+    inline: bool = False,
+    module_level: bool = True,
+    is_reexport: bool = False,
+) -> RawImport:
+    return RawImport(
+        source_file=source_file,
+        language="rust",
+        line=3,
+        text=f"{kind} {specifier}",
+        specifier=specifier,
+        imported_name=imported_name,
+        type_only=False,
+        is_reexport=is_reexport,
+        source_hash=SOURCE_HASH,
+        rust=RustImportContext(
+            kind=kind,  # type: ignore[arg-type]
+            lexical_module_path=lexical_module_path,
+            visibility=visibility,
+            module_level=module_level,
+            configuration=configuration,  # type: ignore[arg-type]
+            lexical_module_visibilities=("private",) * len(lexical_module_path),
+            lexical_module_configurations=("unconditional",)
+            * len(lexical_module_path),
+            inline=inline,
+        ),
+    )
+
+
+def _rust_file_nodes(*paths: str) -> dict[str, Symbol]:
+    return {
+        path: make_file_symbol(
+            path,
+            language="rust",
+            content_hash=SOURCE_HASH,
+        )
+        for path in paths
+    }
+
+
+def _rust_package(
+    *,
+    source: str,
+    root: str,
+    name: str,
+    root_file: str,
+    edition: str = "2021",
+    dependencies: tuple[RustDependency, ...] = (),
+) -> CargoPackage:
+    return CargoPackage(
+        source=source,
+        root=root,
+        name=name,
+        workspace_source=None,
+        edition=edition,
+        features={},
+        dependencies=dependencies,
+        targets=(
+            RustTarget(
+                "lib",
+                name,
+                name.replace("-", "_"),
+                root_file,
+                edition,
+                (),
+            ),
+        ),
+    )
+
+
+def _rust_index(
+    packages: tuple[CargoPackage, ...],
+    *,
+    file_nodes: dict[str, Symbol],
+    observations: tuple[RawImport, ...] = (),
+):
+    build = build_rust_crate_index(
+        CargoContext(packages=packages, workspaces=()),
+        file_nodes=file_nodes,
+        observations=observations,
+    )
+    assert build.problems == ()
+    return build.index
+
+
 def _go_module(
     root: str,
     module_path: str,
@@ -225,6 +328,14 @@ class _CountingBindings(tuple[GoPackageBinding, ...]):
     def __iter__(self):
         self.iterations += 1
         return super().__iter__()
+
+
+class _CountingRustModules(dict):
+    item_iterations = 0
+
+    def items(self):
+        self.item_iterations += 1
+        return super().items()
 
 
 def test_resolves_absolute_module_before_same_named_package():
@@ -328,6 +439,7 @@ def test_reports_duplicate_valid_package_roots_as_ambiguous():
         source_id=file_nodes["consumer.py"].id,
         target_file=None,
         target_package=None,
+        target_crate=None,
         target_kind=None,
         target_id=None,
         status="unresolved",
@@ -1088,26 +1200,616 @@ def test_resolve_import_rejects_inline_rust_module_metadata():
         resolve_import(_rust_module_raw(inline=True), file_nodes=file_nodes)
 
 
-def test_rust_remains_unsupported_language():
-    raw = RawImport(
-        source_file="src/lib.rs",
-        language="rust",
-        line=1,
-        text="use crate::thing;",
-        specifier="crate::thing",
-        imported_name=None,
-        type_only=False,
-        is_reexport=False,
-        source_hash=SOURCE_HASH,
-    )
-    file_nodes = {
-        "src/lib.rs": make_file_symbol(
-            "src/lib.rs",
-            language="rust",
-            content_hash=SOURCE_HASH,
-        )
-    }
+def test_rust_without_crate_index_remains_unsupported_language():
+    raw = _rust_raw("crate::thing")
+    file_nodes = _rust_file_nodes("app/src/lib.rs")
 
     record = resolve_import(raw, file_nodes=file_nodes)
 
     assert record.unresolved_reason == "unsupported_language"
+
+
+def test_rust_external_module_declaration_resolves_exact_file():
+    package = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+    )
+    raw = _rust_raw("api", kind="module")
+    file_nodes = _rust_file_nodes("app/src/lib.rs", "app/src/api.rs")
+    index = _rust_index(
+        (package,),
+        file_nodes=file_nodes,
+        observations=(raw,),
+    )
+
+    resolution = resolve_rust_import(raw, index=index)
+    record = resolve_import(raw, file_nodes=file_nodes, rust_crates=index)
+
+    assert resolution.target_file == "app/src/api.rs"
+    assert resolution.basis == "rust_module_declaration"
+    assert record.target_kind == "file"
+    assert record.target_file == "app/src/api.rs"
+    assert record.target_id == file_nodes["app/src/api.rs"].id
+    assert record.resolution_configuration == "unconditional"
+    assert record.resolution_control_files == ("app/Cargo.toml",)
+
+
+def test_rust_external_module_missing_from_frozen_index_is_not_indexed():
+    package = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+    )
+    raw = _rust_raw("missing", kind="module")
+    file_nodes = _rust_file_nodes("app/src/lib.rs")
+    index = _rust_index((package,), file_nodes=file_nodes)
+
+    record = resolve_import(raw, file_nodes=file_nodes, rust_crates=index)
+
+    assert record.unresolved_reason == "not_indexed"
+
+
+def test_rust_source_outside_crate_module_ownership_is_unsupported():
+    package = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+    )
+    raw = _rust_raw("crate::Thing", source_file="loose.rs")
+    file_nodes = _rust_file_nodes("app/src/lib.rs", "loose.rs")
+    index = _rust_index((package,), file_nodes=file_nodes)
+
+    record = resolve_import(raw, file_nodes=file_nodes, rust_crates=index)
+
+    assert record.unresolved_reason == "unsupported_configuration"
+
+
+def test_rust_current_crate_terminal_item_targets_crate_node():
+    package = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+    )
+    raw = _rust_raw("crate::Thing")
+    file_nodes = _rust_file_nodes("app/src/lib.rs")
+    index = _rust_index((package,), file_nodes=file_nodes)
+
+    record = resolve_import(raw, file_nodes=file_nodes, rust_crates=index)
+
+    crate_id = make_rust_crate_id("app/Cargo.toml", "lib", "app")
+    assert record.target_kind == "crate"
+    assert record.target_file is None
+    assert record.target_crate == crate_id.removesuffix("#crate")
+    assert record.target_id == crate_id
+    assert record.resolution_basis == "rust_module_path"
+    assert record.resolution_configuration == "unconditional"
+
+
+def test_rust_path_dependency_resolves_deepest_public_module_file():
+    dependency = RustDependency(
+        alias="core_alias",
+        package_name="core",
+        kind="normal",
+        path="core",
+        optional=True,
+        default_features=True,
+        features=(),
+        target_condition=None,
+        inherited=False,
+        source="app/Cargo.toml",
+    )
+    app = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+        dependencies=(dependency,),
+    )
+    core = _rust_package(
+        source="core/Cargo.toml",
+        root="core",
+        name="core",
+        root_file="core/src/lib.rs",
+    )
+    module = _rust_raw(
+        "api",
+        source_file="core/src/lib.rs",
+        kind="module",
+        visibility="pub",
+    )
+    raw = _rust_raw("core_alias::api::Thing")
+    file_nodes = _rust_file_nodes(
+        "app/src/lib.rs",
+        "core/src/lib.rs",
+        "core/src/api.rs",
+    )
+    index = _rust_index(
+        (app, core),
+        file_nodes=file_nodes,
+        observations=(module,),
+    )
+
+    record = resolve_import(raw, file_nodes=file_nodes, rust_crates=index)
+
+    assert record.target_kind == "file"
+    assert record.target_file == "core/src/api.rs"
+    assert record.resolution_basis == "cargo_path_dependency"
+    assert record.resolution_control_files == (
+        "app/Cargo.toml",
+        "core/Cargo.toml",
+    )
+    assert record.resolution_configuration == "declared_possible"
+
+
+def test_rust_path_dependency_terminal_item_targets_dependency_crate():
+    dependency = RustDependency(
+        alias="core_alias",
+        package_name="core",
+        kind="normal",
+        path="core",
+        optional=False,
+        default_features=True,
+        features=(),
+        target_condition=None,
+        inherited=False,
+        source="app/Cargo.toml",
+    )
+    app = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+        dependencies=(dependency,),
+    )
+    core = _rust_package(
+        source="core/Cargo.toml",
+        root="core",
+        name="core",
+        root_file="core/src/lib.rs",
+    )
+    raw = _rust_raw("core_alias::Thing")
+    file_nodes = _rust_file_nodes("app/src/lib.rs", "core/src/lib.rs")
+    index = _rust_index((app, core), file_nodes=file_nodes)
+
+    record = resolve_import(raw, file_nodes=file_nodes, rust_crates=index)
+
+    core_id = make_rust_crate_id("core/Cargo.toml", "lib", "core")
+    assert record.target_kind == "crate"
+    assert record.target_crate == core_id.removesuffix("#crate")
+    assert record.target_id == core_id
+    assert record.resolution_basis == "cargo_path_dependency"
+
+
+def test_rust_dependency_private_module_is_inaccessible():
+    dependency = RustDependency(
+        alias="core_alias",
+        package_name="core",
+        kind="normal",
+        path="core",
+        optional=False,
+        default_features=True,
+        features=(),
+        target_condition=None,
+        inherited=False,
+        source="app/Cargo.toml",
+    )
+    app = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+        dependencies=(dependency,),
+    )
+    core = _rust_package(
+        source="core/Cargo.toml",
+        root="core",
+        name="core",
+        root_file="core/src/lib.rs",
+    )
+    private_module = _rust_raw(
+        "private_api",
+        source_file="core/src/lib.rs",
+        kind="module",
+    )
+    raw = _rust_raw("core_alias::private_api::Thing")
+    file_nodes = _rust_file_nodes(
+        "app/src/lib.rs",
+        "core/src/lib.rs",
+        "core/src/private_api.rs",
+    )
+    index = _rust_index(
+        (app, core),
+        file_nodes=file_nodes,
+        observations=(private_module,),
+    )
+
+    record = resolve_import(raw, file_nodes=file_nodes, rust_crates=index)
+
+    assert record.status == "unresolved"
+    assert record.unresolved_reason == "inaccessible"
+
+
+def test_rust_2015_dependency_requires_explicit_extern_crate_binding():
+    dependency = RustDependency(
+        alias="core_alias",
+        package_name="core",
+        kind="normal",
+        path="core",
+        optional=False,
+        default_features=True,
+        features=(),
+        target_condition=None,
+        inherited=False,
+        source="app/Cargo.toml",
+    )
+    app = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+        edition="2015",
+        dependencies=(dependency,),
+    )
+    core = _rust_package(
+        source="core/Cargo.toml",
+        root="core",
+        name="core",
+        root_file="core/src/lib.rs",
+    )
+    extern = _rust_raw(
+        "core_alias",
+        kind="extern_crate",
+        imported_name="external",
+    )
+    missing = _rust_raw("core_alias::Thing")
+    explicit = _rust_raw("external::Thing")
+    file_nodes = _rust_file_nodes("app/src/lib.rs", "core/src/lib.rs")
+    index = _rust_index(
+        (app, core),
+        file_nodes=file_nodes,
+        observations=(extern,),
+    )
+
+    missing_record = resolve_import(
+        missing,
+        file_nodes=file_nodes,
+        rust_crates=index,
+    )
+    explicit_record = resolve_import(
+        explicit,
+        file_nodes=file_nodes,
+        rust_crates=index,
+    )
+
+    assert missing_record.unresolved_reason == "external"
+    assert explicit_record.status == "resolved"
+    assert explicit_record.resolution_basis == "cargo_path_dependency"
+
+
+def test_rust_module_alias_resolves_through_canonical_module_route():
+    package = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+    )
+    module = _rust_raw("api", kind="module", visibility="pub")
+    alias = _rust_raw("crate::api", imported_name="facade")
+    raw = _rust_raw("facade::Thing")
+    file_nodes = _rust_file_nodes("app/src/lib.rs", "app/src/api.rs")
+    index = _rust_index(
+        (package,),
+        file_nodes=file_nodes,
+        observations=(module, alias),
+    )
+
+    record = resolve_import(raw, file_nodes=file_nodes, rust_crates=index)
+
+    assert record.target_file == "app/src/api.rs"
+    assert record.resolution_basis == "rust_module_path"
+
+
+def test_rust_2018_local_module_shadows_dependency_but_absolute_path_does_not():
+    dependency = RustDependency(
+        alias="api",
+        package_name="core",
+        kind="normal",
+        path="core",
+        optional=False,
+        default_features=True,
+        features=(),
+        target_condition=None,
+        inherited=False,
+        source="app/Cargo.toml",
+    )
+    app = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+        dependencies=(dependency,),
+    )
+    core = _rust_package(
+        source="core/Cargo.toml",
+        root="core",
+        name="core",
+        root_file="core/src/lib.rs",
+    )
+    local_module = _rust_raw("api", kind="module")
+    bare = _rust_raw("api::Thing")
+    absolute = _rust_raw("::api::Thing")
+    file_nodes = _rust_file_nodes(
+        "app/src/lib.rs",
+        "app/src/api.rs",
+        "core/src/lib.rs",
+    )
+    index = _rust_index(
+        (app, core),
+        file_nodes=file_nodes,
+        observations=(local_module,),
+    )
+
+    bare_record = resolve_import(bare, file_nodes=file_nodes, rust_crates=index)
+    absolute_record = resolve_import(
+        absolute,
+        file_nodes=file_nodes,
+        rust_crates=index,
+    )
+
+    assert bare_record.target_file == "app/src/api.rs"
+    assert bare_record.resolution_basis == "rust_module_path"
+    assert absolute_record.target_kind == "crate"
+    assert absolute_record.target_id == make_rust_crate_id(
+        "core/Cargo.toml",
+        "lib",
+        "core",
+    )
+    assert absolute_record.resolution_basis == "cargo_path_dependency"
+
+
+def test_rust_self_and_super_paths_use_exact_lexical_module_scope():
+    package = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+    )
+    outer = _rust_raw("outer", kind="module", inline=True)
+    child = _rust_raw(
+        "child",
+        kind="module",
+        lexical_module_path=("outer",),
+    )
+    self_raw = _rust_raw(
+        "self::child::Thing",
+        lexical_module_path=("outer",),
+    )
+    super_raw = _rust_raw(
+        "super::RootThing",
+        lexical_module_path=("outer",),
+    )
+    file_nodes = _rust_file_nodes(
+        "app/src/lib.rs",
+        "app/src/outer/child.rs",
+    )
+    index = _rust_index(
+        (package,),
+        file_nodes=file_nodes,
+        observations=(outer, child),
+    )
+
+    self_record = resolve_import(
+        self_raw,
+        file_nodes=file_nodes,
+        rust_crates=index,
+    )
+    super_record = resolve_import(
+        super_raw,
+        file_nodes=file_nodes,
+        rust_crates=index,
+    )
+
+    assert self_record.target_file == "app/src/outer/child.rs"
+    assert super_record.target_kind == "crate"
+    assert super_record.target_id == make_rust_crate_id(
+        "app/Cargo.toml",
+        "lib",
+        "app",
+    )
+
+
+def test_rust_shared_source_resolves_only_when_crate_contexts_converge():
+    package = CargoPackage(
+        source="Cargo.toml",
+        root=".",
+        name="shared",
+        workspace_source=None,
+        edition="2021",
+        features={},
+        dependencies=(),
+        targets=(
+            RustTarget("lib", "shared", "shared", "shared.rs", "2021", ()),
+            RustTarget("bin", "tool", "tool", "shared.rs", "2021", ()),
+        ),
+    )
+    module = _rust_raw(
+        "child",
+        source_file="shared.rs",
+        kind="module",
+    )
+    convergent = _rust_raw(
+        "crate::child::Thing",
+        source_file="shared.rs",
+    )
+    divergent = _rust_raw("crate::Thing", source_file="shared.rs")
+    file_nodes = _rust_file_nodes("shared.rs", "shared/child.rs")
+    index = _rust_index(
+        (package,),
+        file_nodes=file_nodes,
+        observations=(module,),
+    )
+
+    convergent_record = resolve_import(
+        convergent,
+        file_nodes=file_nodes,
+        rust_crates=index,
+    )
+    divergent_record = resolve_import(
+        divergent,
+        file_nodes=file_nodes,
+        rust_crates=index,
+    )
+
+    assert convergent_record.target_file == "shared/child.rs"
+    assert divergent_record.status == "unresolved"
+    assert divergent_record.unresolved_reason == "ambiguous"
+
+
+def test_rust_binary_uses_same_package_library_crate_binding():
+    package = CargoPackage(
+        source="Cargo.toml",
+        root=".",
+        name="app",
+        workspace_source=None,
+        edition="2021",
+        features={},
+        dependencies=(),
+        targets=(
+            RustTarget("lib", "app", "app", "src/lib.rs", "2021", ()),
+            RustTarget("bin", "app", "app", "src/main.rs", "2021", ()),
+        ),
+    )
+    raw = _rust_raw("app::Thing", source_file="src/main.rs")
+    file_nodes = _rust_file_nodes("src/lib.rs", "src/main.rs")
+    index = _rust_index((package,), file_nodes=file_nodes)
+
+    record = resolve_import(raw, file_nodes=file_nodes, rust_crates=index)
+
+    assert record.target_kind == "crate"
+    assert record.target_id == make_rust_crate_id("Cargo.toml", "lib", "app")
+    assert record.resolution_basis == "cargo_package_library"
+    assert record.resolution_control_files == ("Cargo.toml",)
+
+
+@pytest.mark.parametrize("specifier", ["std::fmt", "missing::Thing"])
+def test_rust_uncontained_or_standard_crates_are_external(specifier: str):
+    package = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+    )
+    raw = _rust_raw(specifier)
+    file_nodes = _rust_file_nodes("app/src/lib.rs")
+    index = _rust_index((package,), file_nodes=file_nodes)
+
+    record = resolve_import(raw, file_nodes=file_nodes, rust_crates=index)
+
+    assert record.unresolved_reason == "external"
+
+
+@pytest.mark.parametrize(
+    ("specifier", "configuration", "reason"),
+    [
+        ("crate::::Thing", "unconditional", "invalid_specifier"),
+        ("::crate::Thing", "unconditional", "invalid_specifier"),
+        ("crate::super::Thing", "unconditional", "invalid_specifier"),
+        ("super::Thing", "unconditional", "invalid_specifier"),
+        ("crate::Thing", "unsupported", "unsupported_configuration"),
+    ],
+)
+def test_rust_fail_closed_outcomes(
+    specifier: str,
+    configuration: str,
+    reason: str,
+):
+    package = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+    )
+    raw = _rust_raw(specifier, configuration=configuration)
+    file_nodes = _rust_file_nodes("app/src/lib.rs")
+    index = _rust_index((package,), file_nodes=file_nodes)
+
+    record = resolve_import(raw, file_nodes=file_nodes, rust_crates=index)
+
+    assert record.status == "unresolved"
+    assert record.unresolved_reason == reason
+
+
+def test_rust_import_path_depth_is_bounded(monkeypatch: pytest.MonkeyPatch):
+    package = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+    )
+    raw = _rust_raw("crate::one::two")
+    file_nodes = _rust_file_nodes("app/src/lib.rs")
+    index = _rust_index((package,), file_nodes=file_nodes)
+    monkeypatch.setattr("loci.graph.rust_crates.MAX_RUST_MODULE_DEPTH", 2)
+
+    record = resolve_import(raw, file_nodes=file_nodes, rust_crates=index)
+
+    assert record.unresolved_reason == "invalid_specifier"
+
+
+def test_resolve_imports_threads_rust_index_without_changing_python():
+    package = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+    )
+    file_nodes = {
+        **_file_nodes("consumer.py", "target.py"),
+        **_rust_file_nodes("app/src/lib.rs"),
+    }
+    index = _rust_index((package,), file_nodes=file_nodes)
+
+    python_record, rust_record = resolve_imports(
+        (_raw("target"), _rust_raw("crate::Thing")),
+        file_nodes=file_nodes,
+        rust_crates=index,
+    )
+
+    assert python_record.target_file == "target.py"
+    assert python_record.resolution_basis is None
+    assert rust_record.target_kind == "crate"
+    assert rust_record.resolution_basis == "rust_module_path"
+
+
+def test_resolve_imports_indexes_rust_source_ownership_once_per_batch():
+    package = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+    )
+    file_nodes = _rust_file_nodes("app/src/lib.rs")
+    index = _rust_index((package,), file_nodes=file_nodes)
+    counting_modules = _CountingRustModules(index.modules_by_crate_path)
+    counted_index = replace(
+        index,
+        modules_by_crate_path=counting_modules,
+    )
+    raw_imports = tuple(
+        _rust_raw(f"crate::Thing{number}")
+        for number in range(100)
+    )
+
+    records = resolve_imports(
+        raw_imports,
+        file_nodes=file_nodes,
+        rust_crates=counted_index,
+    )
+
+    assert all(record.status == "resolved" for record in records)
+    assert counting_modules.item_iterations == 1

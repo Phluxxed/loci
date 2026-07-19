@@ -17,7 +17,7 @@ except ModuleNotFoundError:  # pragma: no cover - exercised on Python 3.10
 
 from .contracts import GraphContractError, JSONValue
 from .profiles import read_contained_file
-from ..parser.imports import RawImport
+from ..parser.imports import ImportUnresolvedReason, RawImport
 from ..parser.symbols import Symbol
 
 
@@ -174,6 +174,17 @@ class RustCrateBuild:
     problems: tuple[RustCrateProblem, ...]
 
 
+@dataclass(frozen=True, slots=True)
+class RustImportResolution:
+    target_file: str | None
+    target_crate: str | None
+    target_id: str | None
+    basis: RustResolutionBasis | None
+    control_files: tuple[str, ...]
+    configuration: RustResolutionConfiguration | None
+    unresolved_reason: ImportUnresolvedReason | None
+
+
 def make_rust_crate_id(
     manifest: str,
     target_kind: RustTargetKind,
@@ -196,6 +207,17 @@ def build_rust_crate_index(
         file_nodes=file_nodes,
         observations=observations,
     )
+
+
+def resolve_rust_import(
+    raw: RawImport,
+    *,
+    index: RustCrateIndex,
+) -> RustImportResolution:
+    """Resolve one extracted Rust dependency observation without I/O."""
+    from ._rust_resolution import resolve_rust_import as resolve_import
+
+    return resolve_import(raw, index=index)
 
 
 @dataclass(frozen=True, slots=True)

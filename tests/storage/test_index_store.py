@@ -139,6 +139,7 @@ def _import_graph(
         source_id=source.id,
         target_file="src/target.py",
         target_package=None,
+        target_crate=None,
         target_kind="file",
         target_id=target.id,
         status="resolved",

@@ -881,8 +881,10 @@ Validation invariants:
   resolution basis;
 - resolved Rust records require resolution configuration and may carry Cargo
   control files;
-- unresolved records have no target, basis, controls, or resolution
-  configuration; and
+- unresolved records have no target, basis, or resolution configuration;
+- unresolved Rust records have no control files, while JavaScript/TypeScript
+  retain the accepted Stage 8 behavior of listing controls that explain a
+  failed resolution; and
 - Python/Go record bytes and behavior remain unchanged except for strict new
   null fields required by graph-state schema 5.
 
@@ -998,8 +1000,8 @@ paths, and retrieval consume crate endpoints through the standard graph.
 
 - bump `GRAPH_STATE_SCHEMA_VERSION` from 4 to 5 because `RawImport` and
   `ImportRecord` strict fields change;
-- bump `EXTRACTOR_VERSION` from 7 to 8 because Rust observations and synthetic
-  crate-node construction change;
+- bump `EXTRACTOR_VERSION` from 7 to 9 because Rust observations, inline-module
+  ancestry, and synthetic crate-node construction change;
 - keep `INDEX_SCHEMA_VERSION` at 5 and `GRAPH_SCHEMA_VERSION` at 1;
 - force a full rebuild for any old extractor/graph-state version; and
 - do not fabricate Rust scope, crate targets, provenance, or configuration for
@@ -1066,8 +1068,8 @@ repository, or generated output is modified.
 ## Incremental Implementation Tasks
 
 Every task begins with focused failing tests, ends green, and is committed and
-pushed only after its local gate passes. No task changes more than five
-implementation/test files at once.
+pushed only after its local gate passes. Tasks stay narrow by behavior; strict
+schema/API changes may also update mechanically affected compatibility tests.
 
 ### Task 1 — Cargo loader and safety shell
 
@@ -1164,17 +1166,44 @@ edges.
 
 ### Task 4 — Import record and pure Rust resolution
 
+**Implementation status:** complete on 2026-07-19; 144 focused tests and all
+761 repository tests passed, the lock and package build verified, Loci
+re-indexed healthy with 1,715/1,715 symbols verified, and the frozen-benchmark
+checksum remained unchanged. No judge was run.
+
 Files:
 
 - `src/loci/graph/imports.py`
+- new `src/loci/graph/_rust_import_schema.py`
 - `src/loci/graph/_rust_resolution.py`
+- `src/loci/graph/_rust_aliases.py`
+- `src/loci/graph/rust_crates.py`
+- `src/loci/graph/contracts.py`
 - `tests/graph/test_imports.py`
 - `tests/graph/test_state.py`
+- `tests/graph/test_contracts.py`
+- `tests/storage/test_index_store.py`
+- `tests/test_service.py`
 
 Add crate target fields, generalized bases, resolution configuration, schema-5
 record serialization, Rust path resolution, and strict invariants. Prove the
 existing `GraphIndexState` delegation needs no production edit and preserve
 exact Python/JavaScript/TypeScript/Go behavior.
+
+Implementation required three narrow corrections to the originally listed
+file boundary: `rust_crates.py` owns the approved public resolution model and
+thin entry point; `_rust_aliases.py` retains only proven `extern crate`
+bindings for edition 2015; and `contracts.py` owns the schema-version constant.
+`_rust_import_schema.py` keeps strict Rust persistence validation out of the
+already-large generic resolver. Direct constructor and fresh-process service
+tests received only the mechanical schema-5 null fields.
+
+The broad draft statement that every unresolved record has no controls was
+reconciled with accepted Stage 8 behavior: unresolved JavaScript/TypeScript
+records may still list the control files that explain failure. Rust unresolved
+records remain target-, basis-, control-, and configuration-free. Task 4 does
+not materialize Rust edges or wire Cargo discovery into the service; those
+remain Tasks 5 and 6.
 
 Gate:
 
@@ -1193,8 +1222,8 @@ Files:
 - `src/loci/graph/imports.py`
 
 Thread Rust context, materialize file/crate edges, validate crate endpoint
-metadata and record-backed evidence, suppress self-edges, and bump graph-state
-schema to 5.
+metadata and record-backed evidence, and suppress self-edges while consuming
+the schema-5 record shape established by Task 4.
 
 Gate:
 
@@ -1343,7 +1372,7 @@ Prove:
 
 Prove:
 
-1. schema 5 and extractor 8 force a full rebuild;
+1. schema 5 and extractor 9 force a full rebuild;
 2. Rust contexts, target shape, basis, controls, and configuration round-trip
    strictly through a fresh process;
 3. resolved module declarations/imports emit one directed file/crate edge with
@@ -1446,7 +1475,7 @@ cross-language regression blocks acceptance.
 ## Rollback
 
 Before final acceptance, rollback is the ordered revert of Stage 9 commits.
-Because graph-state 5 and extractor 8 force rebuilds, reverting returns Loci to
+Because graph-state 5 and extractor 9 force rebuilds, reverting returns Loci to
 the accepted Stage 8 behavior: Rust observations may still be extracted by the
 old parser but remain `unresolved/unsupported_language`, and no crate nodes or
 Rust edges survive a fresh index.

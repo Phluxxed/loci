@@ -7,22 +7,102 @@ from dataclasses import dataclass
 from pathlib import PurePosixPath
 from types import MappingProxyType
 
-from loci.parser.imports import RawImport, RustImportContext
-from loci.parser.symbols import Symbol
+from loci.parser.imports import ImportUnresolvedReason, RawImport, RustImportContext
+from loci.parser.symbols import FILE_NODE_QUALIFIED_NAME, Symbol, make_symbol_id
 
 from . import rust_crates as rust
 from ._rust_aliases import (
     AliasLimitError,
+    _route_is_visible,
     build_alias_routes,
     merge_dependency_bindings,
 )
-from ._rust_semantics import merge_observed_configuration
+from ._rust_semantics import merge_observed_configuration, widest_configuration
+
+
+_RUST_KEYWORDS = frozenset({
+    "Self",
+    "abstract",
+    "as",
+    "async",
+    "await",
+    "become",
+    "box",
+    "break",
+    "const",
+    "continue",
+    "crate",
+    "do",
+    "dyn",
+    "else",
+    "enum",
+    "extern",
+    "false",
+    "final",
+    "fn",
+    "for",
+    "gen",
+    "if",
+    "impl",
+    "in",
+    "let",
+    "loop",
+    "macro",
+    "match",
+    "mod",
+    "move",
+    "mut",
+    "override",
+    "priv",
+    "pub",
+    "ref",
+    "return",
+    "self",
+    "static",
+    "struct",
+    "super",
+    "trait",
+    "true",
+    "try",
+    "type",
+    "typeof",
+    "union",
+    "unsafe",
+    "unsized",
+    "use",
+    "virtual",
+    "where",
+    "while",
+    "yield",
+})
 
 
 @dataclass(frozen=True, slots=True)
 class _OwnedModuleFile:
     binding: rust.RustModuleBinding
     ancestry: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class _ImporterContext:
+    crate_id: str
+    declaring: rust.RustModuleBinding
+    configuration: rust.RustResolutionConfiguration
+
+
+@dataclass(frozen=True, slots=True)
+class _RouteWalk:
+    binding: rust.RustModuleBinding
+    matched_segments: int
+    configuration: rust.RustResolutionConfiguration
+    unresolved_reason: ImportUnresolvedReason | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class RustImportResolverIndex:
+    base_modules_by_source: Mapping[
+        tuple[str, str], tuple[rust.RustModuleBinding, ...]
+    ]
 
 
 def build_rust_crate_index(
@@ -176,6 +256,624 @@ def build_rust_crate_index(
     return rust.RustCrateBuild(
         index=index,
         problems=tuple(sorted(problems, key=_problem_key)),
+    )
+
+
+def resolve_rust_import(
+    raw: RawImport,
+    *,
+    index: rust.RustCrateIndex,
+    resolver_index: RustImportResolverIndex | None = None,
+) -> rust.RustImportResolution:
+    context = raw.rust
+    if raw.language != "rust" or context is None:
+        return _unresolved_rust("invalid_specifier")
+    parts = _rust_specifier_parts(raw)
+    if parts is None:
+        return _unresolved_rust("invalid_specifier")
+    if context.configuration == "unsupported":
+        return _unresolved_rust("unsupported_configuration")
+    if context.kind == "module" and context.inline:
+        return _unresolved_rust("invalid_specifier")
+
+    importer_contexts = _importer_contexts(
+        raw,
+        index=index,
+        resolver_index=(
+            resolver_index
+            or build_rust_import_resolver_index(index)
+        ),
+    )
+    if not importer_contexts:
+        return _unresolved_rust("unsupported_configuration")
+    if len(importer_contexts) > rust.MAX_RUST_RESOLUTION_CANDIDATES:
+        return _unresolved_rust("ambiguous")
+
+    candidates = tuple(
+        _resolve_in_importer_context(
+            raw,
+            parts=parts,
+            importer=item,
+            index=index,
+        )
+        for item in importer_contexts
+    )
+    return _merge_rust_resolutions(candidates)
+
+
+def build_rust_import_resolver_index(
+    index: rust.RustCrateIndex,
+) -> RustImportResolverIndex:
+    base_modules: dict[
+        tuple[str, str], list[rust.RustModuleBinding]
+    ] = defaultdict(list)
+    for (owner_crate_id, route_path), bindings in index.modules_by_crate_path.items():
+        for binding in bindings:
+            if (
+                binding.crate_id != owner_crate_id
+                or binding.module_path != route_path
+            ):
+                continue
+            parent_bindings = index.modules_by_crate_path.get(
+                (owner_crate_id, route_path[:-1]),
+                (),
+            )
+            if route_path and any(
+                parent.source_file == binding.source_file
+                for parent in parent_bindings
+            ):
+                continue
+            base_modules[(owner_crate_id, binding.source_file)].append(binding)
+    return RustImportResolverIndex(MappingProxyType({
+        key: tuple(sorted(set(bindings), key=_module_binding_key))
+        for key, bindings in sorted(base_modules.items())
+    }))
+
+
+def _rust_specifier_parts(raw: RawImport) -> tuple[str, ...] | None:
+    context = raw.rust
+    assert context is not None
+    specifier = raw.specifier
+    if (
+        not specifier
+        or any(character.isspace() or ord(character) < 32 for character in specifier)
+    ):
+        return None
+    absolute = specifier.startswith("::")
+    body = specifier[2:] if absolute else specifier
+    if not body or body.startswith(":") or body.endswith(":"):
+        return None
+    parts = tuple(body.split("::"))
+    if (
+        any(not part for part in parts)
+        or len(parts) > rust.MAX_RUST_MODULE_DEPTH
+    ):
+        return None
+    if context.kind == "module":
+        return parts if len(parts) == 1 and _valid_rust_identifier(parts[0]) else None
+    if context.kind == "extern_crate":
+        return (
+            parts
+            if len(parts) == 1
+            and (parts[0] == "self" or _valid_rust_identifier(parts[0]))
+            else None
+        )
+    special = {"crate", "self", "super"}
+    if absolute and any(part in special for part in parts):
+        return None
+    if not absolute:
+        if parts[0] in {"crate", "self"}:
+            if any(part in special for part in parts[1:]):
+                return None
+        elif parts[0] == "super":
+            offset = 0
+            while offset < len(parts) and parts[offset] == "super":
+                offset += 1
+            if any(part in special for part in parts[offset:]):
+                return None
+        elif any(part in special for part in parts):
+            return None
+    for index, part in enumerate(parts):
+        if part == "*":
+            if index != len(parts) - 1:
+                return None
+            continue
+        if part in {"crate", "self", "super"}:
+            continue
+        if not _valid_rust_identifier(part):
+            return None
+    return parts
+
+
+def _valid_rust_identifier(value: str) -> bool:
+    raw = value.startswith("r#")
+    identifier = value[2:] if raw else value
+    if not identifier or not identifier.isidentifier():
+        return False
+    if identifier in {"crate", "self", "super", "Self"}:
+        return False
+    if not raw and identifier in _RUST_KEYWORDS:
+        return False
+    return True
+
+
+def _importer_contexts(
+    raw: RawImport,
+    *,
+    index: rust.RustCrateIndex,
+    resolver_index: RustImportResolverIndex,
+) -> tuple[_ImporterContext, ...]:
+    context = raw.rust
+    assert context is not None
+    candidates: list[_ImporterContext] = []
+    owner_ids = frozenset(index.crate_ids_by_source_file.get(raw.source_file, ()))
+    if not owner_ids:
+        return ()
+    for owner_crate_id in sorted(owner_ids):
+        for binding in resolver_index.base_modules_by_source.get(
+            (owner_crate_id, raw.source_file),
+            (),
+        ):
+            route_path = binding.module_path
+            declaring_path = (*route_path, *context.lexical_module_path)
+            declaring = _canonical_source_binding(
+                index,
+                owner_crate_id=owner_crate_id,
+                module_path=declaring_path,
+                source_file=raw.source_file,
+            )
+            if declaring is None:
+                continue
+            configuration = merge_observed_configuration(
+                declaring.configuration,
+                context.configuration,
+            )
+            if configuration is None:
+                continue
+            candidates.append(_ImporterContext(
+                crate_id=owner_crate_id,
+                declaring=declaring,
+                configuration=configuration,
+            ))
+            if len(candidates) > rust.MAX_RUST_RESOLUTION_CANDIDATES:
+                return tuple(candidates)
+    return tuple(sorted(
+        set(candidates),
+        key=lambda item: (
+            item.crate_id,
+            item.declaring.module_path,
+            item.declaring.source_file,
+            item.configuration,
+        ),
+    ))
+
+
+def _canonical_source_binding(
+    index: rust.RustCrateIndex,
+    *,
+    owner_crate_id: str,
+    module_path: tuple[str, ...],
+    source_file: str,
+) -> rust.RustModuleBinding | None:
+    candidates = tuple(
+        binding
+        for binding in index.modules_by_crate_path.get(
+            (owner_crate_id, module_path),
+            (),
+        )
+        if binding.crate_id == owner_crate_id
+        and binding.module_path == module_path
+        and binding.source_file == source_file
+    )
+    if len(candidates) != 1:
+        return None
+    return candidates[0]
+
+
+def _resolve_in_importer_context(
+    raw: RawImport,
+    *,
+    parts: tuple[str, ...],
+    importer: _ImporterContext,
+    index: rust.RustCrateIndex,
+) -> rust.RustImportResolution:
+    context = raw.rust
+    assert context is not None
+    crate = index.crates_by_id[importer.crate_id]
+    controls = (crate.manifest,)
+
+    if context.kind == "module":
+        walk = _walk_module_route(
+            importer.declaring,
+            parts,
+            importer=importer,
+            index=index,
+        )
+        if walk.unresolved_reason is not None:
+            return _unresolved_rust(walk.unresolved_reason)
+        if walk.matched_segments != 1:
+            return _unresolved_rust("not_indexed")
+        return _resolved_from_walk(
+            walk,
+            basis="rust_module_declaration",
+            control_files=controls,
+            index=index,
+        )
+
+    if context.kind == "extern_crate":
+        if parts == ("self",):
+            return _resolved_crate(
+                importer.crate_id,
+                basis="rust_module_path",
+                control_files=controls,
+                configuration=importer.configuration,
+                index=index,
+            )
+        alias = raw.imported_name or parts[0]
+        return _resolve_dependency_route(
+            alias,
+            (),
+            importer=importer,
+            index=index,
+        )
+
+    absolute = raw.specifier.startswith("::")
+    if parts[0] == "crate":
+        root = _crate_root_binding(importer.crate_id, index=index)
+        return _resolve_local_route(
+            root,
+            parts[1:],
+            importer=importer,
+            index=index,
+        )
+    if parts[0] == "self":
+        return _resolve_local_route(
+            importer.declaring,
+            parts[1:],
+            importer=importer,
+            index=index,
+        )
+    if parts[0] == "super":
+        parent_path = list(importer.declaring.module_path)
+        offset = 0
+        while offset < len(parts) and parts[offset] == "super":
+            if not parent_path:
+                return _unresolved_rust("invalid_specifier")
+            parent_path.pop()
+            offset += 1
+        parent = _one_route_binding(
+            importer.crate_id,
+            tuple(parent_path),
+            importer=importer,
+            index=index,
+        )
+        if parent is None:
+            return _unresolved_rust("unsupported_configuration")
+        if isinstance(parent, str):
+            return _unresolved_rust(parent)
+        return _resolve_local_route(
+            parent,
+            parts[offset:],
+            importer=importer,
+            index=index,
+        )
+
+    if absolute and crate.target.edition == "2015":
+        return _resolve_local_route(
+            _crate_root_binding(importer.crate_id, index=index),
+            parts,
+            importer=importer,
+            index=index,
+        )
+
+    if not absolute:
+        local_start = (
+            _crate_root_binding(importer.crate_id, index=index)
+            if crate.target.edition == "2015"
+            else importer.declaring
+        )
+        local_walk = _walk_module_route(
+            local_start,
+            parts,
+            importer=importer,
+            index=index,
+        )
+        if local_walk.unresolved_reason is not None:
+            return _unresolved_rust(local_walk.unresolved_reason)
+        if local_walk.matched_segments:
+            return _resolved_from_walk(
+                local_walk,
+                basis="rust_module_path",
+                control_files=controls,
+                index=index,
+            )
+
+    return _resolve_dependency_route(
+        parts[0],
+        parts[1:],
+        importer=importer,
+        index=index,
+    )
+
+
+def _resolve_local_route(
+    start: rust.RustModuleBinding,
+    parts: tuple[str, ...],
+    *,
+    importer: _ImporterContext,
+    index: rust.RustCrateIndex,
+) -> rust.RustImportResolution:
+    walk = _walk_module_route(
+        start,
+        parts,
+        importer=importer,
+        index=index,
+    )
+    if walk.unresolved_reason is not None:
+        return _unresolved_rust(walk.unresolved_reason)
+    return _resolved_from_walk(
+        walk,
+        basis="rust_module_path",
+        control_files=(index.crates_by_id[importer.crate_id].manifest,),
+        index=index,
+    )
+
+
+def _resolve_dependency_route(
+    alias: str,
+    parts: tuple[str, ...],
+    *,
+    importer: _ImporterContext,
+    index: rust.RustCrateIndex,
+) -> rust.RustImportResolution:
+    bindings = index.dependencies_by_crate_alias.get((importer.crate_id, alias), ())
+    if not bindings:
+        return _unresolved_rust("external")
+    if len(bindings) > rust.MAX_RUST_RESOLUTION_CANDIDATES:
+        return _unresolved_rust("ambiguous")
+    target_ids = {binding.target_crate_id for binding in bindings}
+    if len(target_ids) != 1:
+        return _unresolved_rust("ambiguous")
+    binding = merge_dependency_bindings(bindings)
+    root = _crate_root_binding(binding.target_crate_id, index=index)
+    walk = _walk_module_route(
+        root,
+        parts,
+        importer=importer,
+        index=index,
+    )
+    if walk.unresolved_reason is not None:
+        return _unresolved_rust(walk.unresolved_reason)
+    configuration = widest_configuration(
+        importer.configuration,
+        binding.configuration,
+    )
+    walk = _RouteWalk(
+        binding=walk.binding,
+        matched_segments=walk.matched_segments,
+        configuration=widest_configuration(configuration, walk.configuration),
+    )
+    return _resolved_from_walk(
+        walk,
+        basis=binding.basis,
+        control_files=binding.control_files,
+        index=index,
+    )
+
+
+def _walk_module_route(
+    start: rust.RustModuleBinding,
+    parts: tuple[str, ...],
+    *,
+    importer: _ImporterContext,
+    index: rust.RustCrateIndex,
+) -> _RouteWalk:
+    current = start
+    configuration = widest_configuration(
+        importer.configuration,
+        start.configuration,
+    )
+    matched = 0
+    for part in parts:
+        if part == "*":
+            break
+        route_path = (*current.module_path, part)
+        next_binding = _one_route_binding(
+            current.crate_id,
+            route_path,
+            importer=importer,
+            index=index,
+        )
+        if next_binding is None:
+            break
+        if isinstance(next_binding, str):
+            return _RouteWalk(
+                binding=current,
+                matched_segments=matched,
+                configuration=configuration,
+                unresolved_reason=next_binding,
+            )
+        current = next_binding
+        configuration = widest_configuration(
+            configuration,
+            current.configuration,
+        )
+        matched += 1
+    return _RouteWalk(
+        binding=current,
+        matched_segments=matched,
+        configuration=configuration,
+    )
+
+
+def _one_route_binding(
+    owner_crate_id: str,
+    route_path: tuple[str, ...],
+    *,
+    importer: _ImporterContext,
+    index: rust.RustCrateIndex,
+) -> rust.RustModuleBinding | ImportUnresolvedReason | None:
+    bindings = index.modules_by_crate_path.get((owner_crate_id, route_path), ())
+    if not bindings:
+        return None
+    if len(bindings) > rust.MAX_RUST_RESOLUTION_CANDIDATES:
+        return "ambiguous"
+    visible = tuple(
+        binding
+        for binding in bindings
+        if _route_is_visible(
+            index.modules_by_crate_path,
+            owner_crate_id=owner_crate_id,
+            route_path=route_path,
+            importer_crate_id=importer.crate_id,
+            importer_path=importer.declaring.module_path,
+        )
+    )
+    if not visible:
+        return "inaccessible"
+    endpoints = {
+        (binding.crate_id, binding.module_path, binding.source_file)
+        for binding in visible
+    }
+    if len(endpoints) != 1:
+        return "ambiguous"
+    target = visible[0]
+    configuration = target.configuration
+    for binding in visible[1:]:
+        configuration = widest_configuration(
+            configuration,
+            binding.configuration,
+        )
+    return rust.RustModuleBinding(
+        crate_id=target.crate_id,
+        module_path=target.module_path,
+        source_file=target.source_file,
+        visibility=target.visibility,
+        configuration=configuration,
+    )
+
+
+def _crate_root_binding(
+    crate_id: str,
+    *,
+    index: rust.RustCrateIndex,
+) -> rust.RustModuleBinding:
+    bindings = index.modules_by_crate_path[(crate_id, ())]
+    return bindings[0]
+
+
+def _resolved_from_walk(
+    walk: _RouteWalk,
+    *,
+    basis: rust.RustResolutionBasis,
+    control_files: tuple[str, ...],
+    index: rust.RustCrateIndex,
+) -> rust.RustImportResolution:
+    if walk.binding.module_path:
+        return rust.RustImportResolution(
+            target_file=walk.binding.source_file,
+            target_crate=None,
+            target_id=make_symbol_id(
+                walk.binding.source_file,
+                FILE_NODE_QUALIFIED_NAME,
+                "file",
+            ),
+            basis=basis,
+            control_files=tuple(sorted(set(control_files))),
+            configuration=walk.configuration,
+            unresolved_reason=None,
+        )
+    return _resolved_crate(
+        walk.binding.crate_id,
+        basis=basis,
+        control_files=control_files,
+        configuration=walk.configuration,
+        index=index,
+    )
+
+
+def _resolved_crate(
+    crate_id: str,
+    *,
+    basis: rust.RustResolutionBasis,
+    control_files: tuple[str, ...],
+    configuration: rust.RustResolutionConfiguration,
+    index: rust.RustCrateIndex,
+) -> rust.RustImportResolution:
+    crate = index.crates_by_id[crate_id]
+    return rust.RustImportResolution(
+        target_file=None,
+        target_crate=crate.id.removesuffix("#crate"),
+        target_id=crate_id,
+        basis=basis,
+        control_files=tuple(sorted(set(control_files))),
+        configuration=configuration,
+        unresolved_reason=None,
+    )
+
+
+def _unresolved_rust(
+    reason: ImportUnresolvedReason,
+) -> rust.RustImportResolution:
+    return rust.RustImportResolution(
+        target_file=None,
+        target_crate=None,
+        target_id=None,
+        basis=None,
+        control_files=(),
+        configuration=None,
+        unresolved_reason=reason,
+    )
+
+
+def _merge_rust_resolutions(
+    resolutions: tuple[rust.RustImportResolution, ...],
+) -> rust.RustImportResolution:
+    unresolved = tuple(
+        item.unresolved_reason
+        for item in resolutions
+        if item.unresolved_reason is not None
+    )
+    if unresolved:
+        if len(unresolved) == len(resolutions) and len(set(unresolved)) == 1:
+            return _unresolved_rust(unresolved[0])
+        return _unresolved_rust("ambiguous")
+    endpoints = {
+        (item.target_file, item.target_crate, item.target_id)
+        for item in resolutions
+    }
+    if len(endpoints) != 1:
+        return _unresolved_rust("ambiguous")
+    first = resolutions[0]
+    bases = tuple(item.basis for item in resolutions)
+    configurations = tuple(item.configuration for item in resolutions)
+    assert all(basis is not None for basis in bases)
+    assert all(configuration is not None for configuration in configurations)
+    basis_priority = {
+        "cargo_package_library": 0,
+        "cargo_path_dependency": 1,
+        "cargo_workspace_dependency": 2,
+        "rust_module_path": 3,
+        "rust_module_declaration": 4,
+    }
+    basis = min(bases, key=basis_priority.__getitem__)  # type: ignore[arg-type]
+    configuration = configurations[0]
+    assert configuration is not None
+    for candidate in configurations[1:]:
+        assert candidate is not None
+        configuration = widest_configuration(configuration, candidate)
+    return rust.RustImportResolution(
+        target_file=first.target_file,
+        target_crate=first.target_crate,
+        target_id=first.target_id,
+        basis=basis,
+        control_files=tuple(sorted({
+            control
+            for item in resolutions
+            for control in item.control_files
+        })),
+        configuration=configuration,
+        unresolved_reason=None,
     )
 
 

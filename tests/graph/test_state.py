@@ -21,7 +21,7 @@ from loci.graph.state import (
     GraphIndexState,
     LoadedGraphContribution,
 )
-from loci.parser.imports import RawImport
+from loci.parser.imports import RawImport, RustImportContext
 
 
 FIXTURES = Path(__file__).parents[1] / "fixtures" / "graph_profiles"
@@ -47,6 +47,7 @@ def _resolved_import() -> ImportRecord:
         source_id="src/example.py::__file__#file",
         target_file="src/package/target.py",
         target_package=None,
+        target_crate=None,
         target_kind="file",
         target_id="src/package/target.py::__file__#file",
         status="resolved",
@@ -71,12 +72,68 @@ def _resolved_go_import() -> ImportRecord:
         source_id="cmd/server/main.go::__file__#file",
         target_file=None,
         target_package="example.com/project/internal/store",
+        target_crate=None,
         target_kind="package",
         target_id=(
             "internal/store::example.com/project/internal/store#package"
         ),
         status="resolved",
         unresolved_reason=None,
+    )
+
+
+def _rust_raw_import() -> RawImport:
+    return RawImport(
+        source_file="src/lib.rs",
+        language="rust",
+        line=2,
+        text="use crate::api::Client;",
+        specifier="crate::api::Client",
+        imported_name="Client",
+        type_only=False,
+        is_reexport=False,
+        source_hash="f" * 64,
+        rust=RustImportContext(
+            kind="use",
+            lexical_module_path=(),
+            visibility="private",
+            module_level=True,
+            configuration="unconditional",
+        ),
+    )
+
+
+def _resolved_rust_file_import() -> ImportRecord:
+    return ImportRecord(
+        raw=_rust_raw_import(),
+        source_id="src/lib.rs::__file__#file",
+        target_file="src/api.rs",
+        target_package=None,
+        target_crate=None,
+        target_kind="file",
+        target_id="src/api.rs::__file__#file",
+        status="resolved",
+        unresolved_reason=None,
+        resolution_basis="rust_module_path",
+        resolution_control_files=("Cargo.toml",),
+        resolution_configuration="unconditional",
+    )
+
+
+def _resolved_rust_crate_import() -> ImportRecord:
+    return ImportRecord(
+        raw=_rust_raw_import(),
+        source_id="src/lib.rs::__file__#file",
+        target_file=None,
+        target_package=None,
+        target_crate="Cargo.toml::lib:demo",
+        target_kind="crate",
+        target_id="Cargo.toml::lib:demo#crate",
+        status="resolved",
+        unresolved_reason=None,
+        resolution_basis="cargo_path_dependency",
+        resolution_control_files=("Cargo.toml", "demo/Cargo.toml"),
+        resolution_configuration="declared_possible",
     )
 
 
@@ -164,28 +221,33 @@ def test_import_record_round_trip_is_exact_and_stable():
             "type_only": False,
             "is_reexport": False,
             "source_hash": "d" * 64,
+            "rust": None,
         },
         "source_id": "src/example.py::__file__#file",
         "target_file": "src/package/target.py",
         "target_package": None,
+        "target_crate": None,
         "target_kind": "file",
         "target_id": "src/package/target.py::__file__#file",
         "status": "resolved",
         "unresolved_reason": None,
         "resolution_basis": None,
         "resolution_control_files": [],
+        "resolution_configuration": None,
     }
     assert list(serialized) == [
         "raw",
         "source_id",
         "target_file",
         "target_package",
+        "target_crate",
         "target_kind",
         "target_id",
         "status",
         "unresolved_reason",
         "resolution_basis",
         "resolution_control_files",
+        "resolution_configuration",
     ]
     assert list(serialized["raw"]) == [
         "source_file",
@@ -197,7 +259,45 @@ def test_import_record_round_trip_is_exact_and_stable():
         "type_only",
         "is_reexport",
         "source_hash",
+        "rust",
     ]
+    assert ImportRecord.from_dict(serialized) == record
+
+
+def test_rust_import_record_round_trip_preserves_strict_context_and_provenance():
+    record = _resolved_rust_file_import()
+
+    serialized = record.to_dict()
+
+    assert serialized["raw"]["rust"] == {
+        "kind": "use",
+        "lexical_module_path": [],
+        "visibility": "private",
+        "module_level": True,
+        "configuration": "unconditional",
+        "path_override": None,
+        "lexical_module_visibilities": [],
+        "lexical_module_configurations": [],
+        "inline": False,
+    }
+    assert serialized["target_file"] == "src/api.rs"
+    assert serialized["target_crate"] is None
+    assert serialized["resolution_basis"] == "rust_module_path"
+    assert serialized["resolution_configuration"] == "unconditional"
+    assert ImportRecord.from_dict(serialized) == record
+
+
+def test_rust_crate_import_round_trip_preserves_crate_identity():
+    record = _resolved_rust_crate_import()
+
+    serialized = record.to_dict()
+
+    assert serialized["target_file"] is None
+    assert serialized["target_package"] is None
+    assert serialized["target_crate"] == "Cargo.toml::lib:demo"
+    assert serialized["target_kind"] == "crate"
+    assert serialized["target_id"] == "Cargo.toml::lib:demo#crate"
+    assert serialized["resolution_configuration"] == "declared_possible"
     assert ImportRecord.from_dict(serialized) == record
 
 
@@ -229,6 +329,7 @@ def test_javascript_import_record_round_trip_preserves_resolution_provenance():
         source_id="apps/web/src/page.ts::__file__#file",
         target_file="packages/core/src/format.ts",
         target_package=None,
+        target_crate=None,
         target_kind="file",
         target_id="packages/core/src/format.ts::__file__#file",
         status="resolved",
@@ -278,9 +379,11 @@ def test_import_record_rejects_invalid_resolution_provenance(
         "status",
         "source_id",
         "target_package",
+        "target_crate",
         "target_kind",
         "resolution_basis",
         "resolution_control_files",
+        "resolution_configuration",
     ],
 )
 def test_import_record_rejects_missing_fields(field: str):
@@ -303,6 +406,78 @@ def test_import_record_rejects_unknown_raw_fields():
 
     assert exc_info.value.code == "INVALID_GRAPH_SCHEMA"
     assert exc_info.value.details["unknown"] == ["unexpected"]
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "kind",
+        "lexical_module_path",
+        "visibility",
+        "module_level",
+        "configuration",
+        "path_override",
+        "lexical_module_visibilities",
+        "lexical_module_configurations",
+        "inline",
+    ],
+)
+def test_rust_import_context_rejects_missing_fields(field: str):
+    payload = _resolved_rust_file_import().to_dict()
+    del payload["raw"]["rust"][field]
+
+    with pytest.raises(GraphContractError) as exc_info:
+        ImportRecord.from_dict(payload)
+
+    assert exc_info.value.code == "INVALID_GRAPH_SCHEMA"
+    assert exc_info.value.details["missing"] == [field]
+
+
+def test_rust_import_context_rejects_unknown_fields():
+    payload = _resolved_rust_file_import().to_dict()
+    payload["raw"]["rust"]["guessed_scope"] = "crate"
+
+    with pytest.raises(GraphContractError) as exc_info:
+        ImportRecord.from_dict(payload)
+
+    assert exc_info.value.details["unknown"] == ["guessed_scope"]
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("lexical_module_path", ["outer", "bad::child"]),
+        ("lexical_module_path", ["outer", ".."]),
+        ("lexical_module_visibilities", ["pub"]),
+        ("lexical_module_configurations", ["conditional"]),
+        ("visibility", "pub(in /outside)"),
+        ("inline", True),
+        ("path_override", "custom.rs"),
+    ],
+)
+def test_rust_import_context_rejects_invalid_scope_shapes(
+    field: str,
+    value: object,
+):
+    payload = _resolved_rust_file_import().to_dict()
+    payload["raw"]["rust"][field] = value
+
+    with pytest.raises(GraphContractError):
+        ImportRecord.from_dict(payload)
+
+
+def test_raw_import_rejects_missing_or_cross_language_rust_context():
+    missing = _resolved_rust_file_import().to_dict()
+    missing["raw"]["rust"] = None
+    cross_language = _resolved_import().to_dict()
+    cross_language["raw"]["rust"] = _resolved_rust_file_import().to_dict()[
+        "raw"
+    ]["rust"]
+
+    with pytest.raises(GraphContractError, match="requires Rust context"):
+        ImportRecord.from_dict(missing)
+    with pytest.raises(GraphContractError, match="Only Rust imports"):
+        ImportRecord.from_dict(cross_language)
 
 
 @pytest.mark.parametrize(
@@ -355,6 +530,50 @@ def test_import_record_rejects_language_target_mismatches(record, message: str):
         ImportRecord.from_dict(payload)
 
 
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("target_crate", None, "requires a target crate and ID"),
+        ("target_file", "src/api.rs", "cannot have a file or package target"),
+        ("target_id", "other#crate", "target identity is inconsistent"),
+        ("resolution_basis", "workspace_exports", "Invalid Rust resolution basis"),
+        ("resolution_configuration", None, "requires resolution configuration"),
+        ("resolution_configuration", "conditional", "Invalid Rust resolution"),
+    ],
+)
+def test_rust_crate_import_rejects_invalid_target_and_provenance(
+    field: str,
+    value: object,
+    message: str,
+):
+    payload = _resolved_rust_crate_import().to_dict()
+    payload[field] = value
+
+    with pytest.raises(GraphContractError, match=message):
+        ImportRecord.from_dict(payload)
+
+
+def test_unresolved_rust_import_rejects_control_or_configuration_provenance():
+    payload = _resolved_rust_crate_import().to_dict()
+    payload.update({
+        "target_crate": None,
+        "target_kind": None,
+        "target_id": None,
+        "status": "unresolved",
+        "unresolved_reason": "external",
+        "resolution_basis": None,
+    })
+    controls = dict(payload)
+    configuration = dict(payload)
+    controls["resolution_configuration"] = None
+    configuration["resolution_control_files"] = []
+
+    with pytest.raises(GraphContractError, match="cannot have control files"):
+        ImportRecord.from_dict(controls)
+    with pytest.raises(GraphContractError, match="cannot have resolution configuration"):
+        ImportRecord.from_dict(configuration)
+
+
 def test_empty_graph_state_has_complete_envelope():
     state = GraphIndexState.empty()
 
@@ -368,6 +587,10 @@ def test_empty_graph_state_has_complete_envelope():
         "input_hashes": {},
         "diagnostics": [],
     }
+
+
+def test_graph_state_uses_schema_version_five():
+    assert GRAPH_STATE_SCHEMA_VERSION == 5
 
 
 def test_graph_state_rejects_schema_version_two_as_stale():
@@ -397,7 +620,20 @@ def test_graph_state_rejects_schema_version_three_as_stale():
     }
 
 
-def test_graph_state_schema_four_rejects_old_import_record_shape():
+def test_graph_state_rejects_schema_version_four_as_stale():
+    payload = _state().to_dict()
+    payload["schema_version"] = 4
+
+    with pytest.raises(GraphContractError) as exc_info:
+        GraphIndexState.from_dict(payload)
+
+    assert exc_info.value.details == {
+        "field": "schema_version",
+        "schema_version": 4,
+    }
+
+
+def test_graph_state_schema_five_rejects_old_import_record_shape():
     payload = _state().to_dict()
     del payload["imports"][0]["target_package"]
     del payload["imports"][0]["target_kind"]
