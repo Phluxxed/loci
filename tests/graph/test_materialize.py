@@ -23,6 +23,14 @@ from loci.graph.javascript_modules import (
     load_javascript_module_context,
 )
 from loci.graph.profiles import GraphProfile, LoadedGraphProfile
+from loci.graph.rust_crates import (
+    CargoContext,
+    CargoPackage,
+    RustDependency,
+    RustTarget,
+    build_rust_crate_index,
+    make_rust_crate_id,
+)
 from loci.graph.state import LoadedGraphContribution
 from loci.parser.imports import extract_imports
 from loci.parser.symbols import Symbol, make_file_symbol
@@ -672,6 +680,136 @@ def test_materialize_graph_threads_go_package_index_into_import_edges(
             ]
         },
         file_hashes={source_node.file_path: source_hash},
+        imports=state.imports,
+    )
+
+
+def test_materialize_graph_threads_rust_index_into_file_and_crate_edges(
+    tmp_path: Path,
+):
+    source = tmp_path / "app" / "src" / "lib.rs"
+    module = tmp_path / "app" / "src" / "api.rs"
+    dependency_root = tmp_path / "core" / "src" / "lib.rs"
+    source.parent.mkdir(parents=True)
+    dependency_root.parent.mkdir(parents=True)
+    source.write_text(
+        "mod api;\nuse crate::Thing;\nuse core_alias::Thing;\n",
+        encoding="utf-8",
+    )
+    module.write_text("pub struct Api;\n", encoding="utf-8")
+    dependency_root.write_text("pub struct Thing;\n", encoding="utf-8")
+    source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
+    module_hash = hashlib.sha256(module.read_bytes()).hexdigest()
+    dependency_hash = hashlib.sha256(dependency_root.read_bytes()).hexdigest()
+    file_nodes = {
+        "app/src/lib.rs": make_file_symbol(
+            "app/src/lib.rs",
+            language="rust",
+            content_hash=source_hash,
+        ),
+        "app/src/api.rs": make_file_symbol(
+            "app/src/api.rs",
+            language="rust",
+            content_hash=module_hash,
+        ),
+        "core/src/lib.rs": make_file_symbol(
+            "core/src/lib.rs",
+            language="rust",
+            content_hash=dependency_hash,
+        ),
+    }
+    raw_imports = extract_imports(
+        source,
+        source_file="app/src/lib.rs",
+        language="rust",
+        source_hash=source_hash,
+    )
+    dependency = RustDependency(
+        alias="core_alias",
+        package_name="core",
+        kind="normal",
+        path="core",
+        optional=False,
+        default_features=True,
+        features=(),
+        target_condition=None,
+        inherited=False,
+        source="app/Cargo.toml",
+    )
+    context = CargoContext(
+        packages=(
+            CargoPackage(
+                source="app/Cargo.toml",
+                root="app",
+                name="app",
+                workspace_source=None,
+                edition="2021",
+                features={},
+                dependencies=(dependency,),
+                targets=(RustTarget(
+                    "lib",
+                    "app",
+                    "app",
+                    "app/src/lib.rs",
+                    "2021",
+                    (),
+                ),),
+            ),
+            CargoPackage(
+                source="core/Cargo.toml",
+                root="core",
+                name="core",
+                workspace_source=None,
+                edition="2021",
+                features={},
+                dependencies=(),
+                targets=(RustTarget(
+                    "lib",
+                    "core",
+                    "core",
+                    "core/src/lib.rs",
+                    "2021",
+                    (),
+                ),),
+            ),
+        ),
+        workspaces=(),
+    )
+    crate_build = build_rust_crate_index(
+        context,
+        file_nodes=file_nodes,
+        observations=raw_imports,
+    )
+    assert crate_build.problems == ()
+    symbols = [*file_nodes.values(), *crate_build.index.crate_nodes]
+    file_hashes = {
+        "app/src/lib.rs": source_hash,
+        "app/src/api.rs": module_hash,
+        "core/src/lib.rs": dependency_hash,
+    }
+
+    state = materialize_graph(
+        tmp_path,
+        symbols,
+        file_hashes,
+        [],
+        [],
+        raw_imports=raw_imports,
+        rust_crates=crate_build.index,
+    )
+
+    app_crate_id = make_rust_crate_id("app/Cargo.toml", "lib", "app")
+    core_crate_id = make_rust_crate_id("core/Cargo.toml", "lib", "core")
+    assert len(state.imports) == 3
+    assert {edge.to_id for edge in state.edges} == {
+        file_nodes["app/src/api.rs"].id,
+        core_crate_id,
+    }
+    assert any(record.target_id == app_crate_id for record in state.imports)
+    validate_graph_edges(
+        list(state.edges),
+        indexed_nodes={symbol.id: symbol.to_dict() for symbol in symbols},
+        file_hashes=file_hashes,
         imports=state.imports,
     )
 

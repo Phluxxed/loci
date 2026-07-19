@@ -527,6 +527,160 @@ def test_materializes_one_go_package_edge_with_earliest_evidence():
     )]
 
 
+def test_materializes_rust_file_and_crate_edges_and_suppresses_own_crate_root():
+    dependency = RustDependency(
+        alias="core_alias",
+        package_name="core",
+        kind="normal",
+        path="core",
+        optional=False,
+        default_features=True,
+        features=(),
+        target_condition=None,
+        inherited=False,
+        source="app/Cargo.toml",
+    )
+    app = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+        dependencies=(dependency,),
+    )
+    core = _rust_package(
+        source="core/Cargo.toml",
+        root="core",
+        name="core",
+        root_file="core/src/lib.rs",
+    )
+    module = _rust_raw("api", kind="module")
+    own_crate = _rust_raw("crate::Thing")
+    dependency_crate = _rust_raw("core_alias::Thing")
+    file_nodes = _rust_file_nodes(
+        "app/src/lib.rs",
+        "app/src/api.rs",
+        "core/src/lib.rs",
+    )
+    index = _rust_index(
+        (app, core),
+        file_nodes=file_nodes,
+        observations=(module,),
+    )
+    records = resolve_imports(
+        [module, own_crate, dependency_crate],
+        file_nodes=file_nodes,
+        rust_crates=index,
+    )
+
+    edges = materialize_import_edges(
+        records,
+        file_nodes=file_nodes,
+        rust_crates=index,
+    )
+
+    assert {edge.to_id for edge in edges} == {
+        file_nodes["app/src/api.rs"].id,
+        make_rust_crate_id("core/Cargo.toml", "lib", "core"),
+    }
+    assert all(edge.from_id == file_nodes["app/src/lib.rs"].id for edge in edges)
+    assert all(edge.type == "imports" for edge in edges)
+    assert any(
+        record.target_id == make_rust_crate_id("app/Cargo.toml", "lib", "app")
+        for record in records
+    )
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [("edition", "2027"), ("package_root", "other")],
+)
+def test_rust_crate_edge_rejects_invalid_crate_metadata(
+    field: str,
+    value: str,
+):
+    dependency = RustDependency(
+        alias="core_alias",
+        package_name="core",
+        kind="normal",
+        path="core",
+        optional=False,
+        default_features=True,
+        features=(),
+        target_condition=None,
+        inherited=False,
+        source="app/Cargo.toml",
+    )
+    app = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+        dependencies=(dependency,),
+    )
+    core = _rust_package(
+        source="core/Cargo.toml",
+        root="core",
+        name="core",
+        root_file="core/src/lib.rs",
+    )
+    raw = _rust_raw("core_alias::Thing")
+    file_nodes = _rust_file_nodes("app/src/lib.rs", "core/src/lib.rs")
+    index = _rust_index((app, core), file_nodes=file_nodes)
+    record = resolve_import(raw, file_nodes=file_nodes, rust_crates=index)
+    target = next(node for node in index.crate_nodes if node.id == record.target_id)
+    target.metadata["loci"][field] = value
+
+    with pytest.raises(GraphContractError) as exc_info:
+        materialize_import_edges(
+            [record],
+            file_nodes=file_nodes,
+            rust_crates=index,
+        )
+
+    assert exc_info.value.code == "INVALID_GRAPH_SCHEMA"
+    assert exc_info.value.details["field"] == "target_id"
+
+
+def test_materializes_same_package_library_edge_from_binary_root():
+    package = CargoPackage(
+        source="Cargo.toml",
+        root=".",
+        name="app",
+        workspace_source=None,
+        edition="2021",
+        features={},
+        dependencies=(),
+        targets=(
+            RustTarget("lib", "app", "app", "src/lib.rs", "2021", ()),
+            RustTarget("bin", "app", "app", "src/main.rs", "2021", ()),
+        ),
+    )
+    raw = _rust_raw("app::Thing", source_file="src/main.rs")
+    file_nodes = _rust_file_nodes("src/lib.rs", "src/main.rs")
+    index = _rust_index((package,), file_nodes=file_nodes)
+    record = resolve_import(raw, file_nodes=file_nodes, rust_crates=index)
+
+    edges = materialize_import_edges(
+        [record],
+        file_nodes=file_nodes,
+        rust_crates=index,
+    )
+
+    assert edges == [GraphEdge(
+        from_id=file_nodes["src/main.rs"].id,
+        to_id=make_rust_crate_id("Cargo.toml", "lib", "app"),
+        type="imports",
+        directed=True,
+        namespace="loci",
+        resolution="import-resolved",
+        evidence=GraphEvidence(
+            file="src/main.rs",
+            line=3,
+            content_hash=SOURCE_HASH,
+        ),
+    )]
+
+
 def test_go_package_edge_rejects_invalid_package_metadata():
     file_nodes = _go_file_nodes(
         ("cmd/server/main.go", "main"),
