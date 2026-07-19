@@ -39,6 +39,7 @@ from .javascript_modules import (
     resolve_javascript_import,
 )
 from .rust_crates import (
+    RustCrate,
     RustCrateIndex,
     RustResolutionBasis,
     RustResolutionConfiguration,
@@ -570,6 +571,7 @@ def materialize_import_edges(
     *,
     file_nodes: Mapping[str, Symbol],
     go_packages: GoPackageIndex | None = None,
+    rust_crates: RustCrateIndex | None = None,
 ) -> list[GraphEdge]:
     """Build one deterministic evidence-backed edge per resolved dependency."""
     edges: dict[tuple[str, str, str, str], GraphEdge] = {}
@@ -577,6 +579,10 @@ def materialize_import_edges(
     package_nodes = {
         node.id: node
         for node in (go_packages.package_nodes if go_packages is not None else ())
+    }
+    crate_nodes = {
+        node.id: node
+        for node in (rust_crates.crate_nodes if rust_crates is not None else ())
     }
 
     for record in records:
@@ -626,6 +632,40 @@ def materialize_import_edges(
                     target_id=record.target_id,
                 )
             _validate_go_package_target(target, record.target_package)
+        elif record.target_kind == "crate":
+            if record.raw.type_only:
+                raise _error(
+                    "Rust crate imports cannot be type-only",
+                    field="target_id",
+                    target_id=record.target_id,
+                )
+            if record.target_crate is None:
+                raise _error("Resolved crate import requires a target crate")
+            target = crate_nodes.get(record.target_id)
+            crate = (
+                rust_crates.crates_by_id.get(record.target_id)
+                if rust_crates is not None
+                else None
+            )
+            if target is None or crate is None:
+                raise _error(
+                    "Import record target is not present in the Rust crate index",
+                    field="target_id",
+                    target_id=record.target_id,
+                )
+            root = _require_file_node(
+                file_nodes,
+                crate.target.root_file,
+                field="target_file",
+            )
+            _validate_rust_crate_target(
+                target,
+                crate,
+                target_crate=record.target_crate,
+                root=root,
+            )
+            if record.raw.source_file == crate.target.root_file:
+                continue
         else:
             raise _error("Resolved import requires a supported target kind")
         if source.id == target.id:
@@ -921,6 +961,58 @@ def _validate_go_package_target(target: Symbol, import_path: str) -> None:
     ):
         raise _error(
             "Go package index target is invalid",
+            field="target_id",
+            target_id=target.id,
+        )
+
+
+def _validate_rust_crate_target(
+    target: Symbol,
+    crate: RustCrate,
+    *,
+    target_crate: str,
+    root: Symbol,
+) -> None:
+    loci = target.metadata.get("loci")
+    package_root = loci.get("package_root") if isinstance(loci, Mapping) else None
+    expected_package_root = PurePosixPath(crate.manifest).parent.as_posix()
+    valid_package_root = (
+        isinstance(package_root, str)
+        and bool(package_root)
+        and package_root == expected_package_root
+        and "\\" not in package_root
+        and not PurePosixPath(package_root).is_absolute()
+        and ".." not in PurePosixPath(package_root).parts
+        and PurePosixPath(package_root).as_posix() == package_root
+    )
+    if (
+        target.kind != "crate"
+        or target.language != "rust"
+        or target.id != crate.id
+        or target.id != f"{target_crate}#crate"
+        or target.name != crate.target.crate_name
+        or target.qualified_name != target_crate
+        or target.file_path != crate.target.root_file
+        or target.byte_offset != 0
+        or target.byte_length != 0
+        or target.signature != target_crate
+        or target.content_hash != root.content_hash
+        or target.line != 1
+        or target.end_line != 1
+        or not isinstance(loci, Mapping)
+        or loci.get("rust_crate_node") is not True
+        or loci.get("manifest") != crate.manifest
+        or loci.get("package_name") != crate.package_name
+        or not valid_package_root
+        or loci.get("target_kind") != crate.target.kind
+        or loci.get("target_name") != crate.target.target_name
+        or loci.get("crate_name") != crate.target.crate_name
+        or loci.get("crate_root") != crate.target.root_file
+        or loci.get("edition") != crate.target.edition
+        or loci.get("required_features") != list(crate.target.required_features)
+    ):
+        raise _error(
+            "Rust import target must be the matching indexed crate node",
             field="target_id",
             target_id=target.id,
         )

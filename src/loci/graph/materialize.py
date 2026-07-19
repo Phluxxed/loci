@@ -34,6 +34,7 @@ from loci.graph.profiles import (
     read_contained_file,
     validate_contained_file,
 )
+from loci.graph.rust_crates import RustCrateIndex
 from loci.graph.state import (
     GraphDiagnostic,
     GraphIndexState,
@@ -218,6 +219,7 @@ def materialize_graph(
     raw_imports: Sequence[RawImport] = (),
     go_packages: GoPackageIndex | None = None,
     javascript_modules: JavaScriptResolutionIndex | None = None,
+    rust_crates: RustCrateIndex | None = None,
     input_hashes: Mapping[str, str] | None = None,
     diagnostics: Sequence[GraphDiagnostic] = (),
 ) -> GraphIndexState:
@@ -241,6 +243,7 @@ def materialize_graph(
             file_nodes=file_nodes,
             go_packages=go_packages,
             javascript_modules=javascript_modules,
+            rust_crates=rust_crates,
         ),
         key=lambda record: (
             record.raw.source_file,
@@ -249,6 +252,7 @@ def materialize_graph(
             record.raw.imported_name or "",
             record.target_file or "",
             record.target_package or "",
+            record.target_crate or "",
         ),
     ))
     active_edges = list(extract_markdown_contains_edges(symbols))
@@ -256,6 +260,7 @@ def materialize_graph(
         import_records,
         file_nodes=file_nodes,
         go_packages=go_packages,
+        rust_crates=rust_crates,
     ))
     overlay_values: dict[tuple[str, str], dict[str, JSONValue]] = {}
     overlay_kinds: dict[tuple[str, str], str] = {}

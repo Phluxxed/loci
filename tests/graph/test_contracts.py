@@ -12,7 +12,7 @@ from loci.graph.contracts import (
     validate_graph_edges,
 )
 from loci.graph.imports import ImportRecord
-from loci.parser.imports import RawImport
+from loci.parser.imports import RawImport, RustImportContext
 
 
 PARENT_ID = "guide.md::Guide#section"
@@ -24,6 +24,11 @@ SOURCE_HASH = "c" * 64
 GO_SOURCE_ID = "cmd/server/main.go::__file__#file"
 GO_TARGET_ID = "internal/store::example.com/project/internal/store#package"
 GO_IMPORT_PATH = "example.com/project/internal/store"
+RUST_SOURCE_ID = "app/src/main.rs::__file__#file"
+RUST_ROOT_ID = "core/src/lib.rs::__file__#file"
+RUST_TARGET_CRATE = "core/Cargo.toml::lib:core"
+RUST_TARGET_ID = f"{RUST_TARGET_CRATE}#crate"
+RUST_TARGET_HASH = "d" * 64
 
 
 def _edge(**overrides) -> GraphEdge:
@@ -219,6 +224,122 @@ def _go_import_nodes(**target_overrides) -> dict[str, dict]:
     }
 
 
+def _rust_import_edge(**overrides) -> GraphEdge:
+    values = {
+        "from_id": RUST_SOURCE_ID,
+        "to_id": RUST_TARGET_ID,
+        "type": "imports",
+        "directed": True,
+        "namespace": "loci",
+        "resolution": "import-resolved",
+        "evidence": GraphEvidence(
+            file="app/src/main.rs",
+            line=4,
+            content_hash=SOURCE_HASH,
+        ),
+    }
+    values.update(overrides)
+    return GraphEdge(**values)
+
+
+def _rust_import_record(**overrides) -> ImportRecord:
+    values = {
+        "raw": RawImport(
+            source_file="app/src/main.rs",
+            language="rust",
+            line=4,
+            text="use core::Thing;",
+            specifier="core::Thing",
+            imported_name="Thing",
+            type_only=False,
+            is_reexport=False,
+            source_hash=SOURCE_HASH,
+            rust=RustImportContext(
+                kind="use",
+                lexical_module_path=(),
+                visibility="private",
+                module_level=True,
+                configuration="unconditional",
+            ),
+        ),
+        "source_id": RUST_SOURCE_ID,
+        "target_file": None,
+        "target_package": None,
+        "target_crate": RUST_TARGET_CRATE,
+        "target_kind": "crate",
+        "target_id": RUST_TARGET_ID,
+        "status": "resolved",
+        "unresolved_reason": None,
+        "resolution_basis": "cargo_path_dependency",
+        "resolution_control_files": ("app/Cargo.toml", "core/Cargo.toml"),
+        "resolution_configuration": "unconditional",
+    }
+    values.update(overrides)
+    return ImportRecord(**values)
+
+
+def _rust_import_nodes(
+    *,
+    target_overrides: dict | None = None,
+    metadata_overrides: dict | None = None,
+) -> dict[str, dict]:
+    target = {
+        "id": RUST_TARGET_ID,
+        "name": "core",
+        "qualified_name": RUST_TARGET_CRATE,
+        "kind": "crate",
+        "language": "rust",
+        "file_path": "core/src/lib.rs",
+        "byte_offset": 0,
+        "byte_length": 0,
+        "signature": RUST_TARGET_CRATE,
+        "line": 1,
+        "end_line": 1,
+        "content_hash": RUST_TARGET_HASH,
+        "metadata": {
+            "loci": {
+                "rust_crate_node": True,
+                "manifest": "core/Cargo.toml",
+                "package_name": "core-kit",
+                "package_root": "core",
+                "target_kind": "lib",
+                "target_name": "core-kit",
+                "crate_name": "core",
+                "crate_root": "core/src/lib.rs",
+                "edition": "2021",
+                "required_features": [],
+            }
+        },
+    }
+    target.update(target_overrides or {})
+    target["metadata"]["loci"].update(metadata_overrides or {})
+    return {
+        RUST_SOURCE_ID: {
+            "id": RUST_SOURCE_ID,
+            "name": "main.rs",
+            "qualified_name": "main.rs",
+            "kind": "file",
+            "language": "rust",
+            "file_path": "app/src/main.rs",
+            "line": 1,
+            "content_hash": SOURCE_HASH,
+            "metadata": {},
+        },
+        RUST_ROOT_ID: {
+            "id": RUST_ROOT_ID,
+            "name": "lib.rs",
+            "qualified_name": "lib.rs",
+            "kind": "file",
+            "language": "rust",
+            "file_path": "core/src/lib.rs",
+            "line": 1,
+            "content_hash": RUST_TARGET_HASH,
+            "metadata": {},
+        },
+        RUST_TARGET_ID: target,
+    }
+
+
 def test_graph_contract_round_trip_is_stable():
     contribution = GraphContribution(
         schema_version=GRAPH_SCHEMA_VERSION,
@@ -394,6 +515,201 @@ def test_import_edge_accepts_go_package_target():
         file_hashes={"cmd/server/main.go": SOURCE_HASH},
         imports=[_go_import_record()],
     )
+
+
+def test_import_edge_accepts_rust_crate_target():
+    validate_graph_edges(
+        [_rust_import_edge()],
+        indexed_nodes=_rust_import_nodes(),
+        file_hashes={
+            "app/src/main.rs": SOURCE_HASH,
+            "core/src/lib.rs": RUST_TARGET_HASH,
+        },
+        imports=[_rust_import_record()],
+    )
+
+
+@pytest.mark.parametrize(
+    ("target_overrides", "metadata_overrides"),
+    [
+        ({"kind": "file"}, {}),
+        ({"language": "go"}, {}),
+        ({"name": "wrong"}, {}),
+        ({"qualified_name": "core/Cargo.toml::lib:wrong"}, {}),
+        ({"file_path": "core/src/other.rs"}, {}),
+        ({"byte_offset": 1}, {}),
+        ({"byte_length": 1}, {}),
+        ({"signature": "wrong"}, {}),
+        ({"line": 2}, {}),
+        ({"end_line": 2}, {}),
+        ({"content_hash": "e" * 64}, {}),
+        ({}, {"rust_crate_node": False}),
+        ({}, {"manifest": "/core/Cargo.toml"}),
+        ({}, {"package_name": ""}),
+        ({}, {"package_root": "/core"}),
+        ({}, {"package_root": "other"}),
+        ({}, {"target_kind": "proc-macro"}),
+        ({}, {"target_name": ""}),
+        ({}, {"crate_name": "core-kit"}),
+        ({}, {"crate_root": "core/src/other.rs"}),
+        ({}, {"edition": "2027"}),
+        ({}, {"required_features": ["b", "a"]}),
+        ({}, {"required_features": ["feature", "feature"]}),
+        ({}, {"required_features": [1]}),
+    ],
+)
+def test_import_edge_rejects_invalid_rust_crate_target(
+    target_overrides: dict,
+    metadata_overrides: dict,
+):
+    with pytest.raises(GraphContractError) as exc_info:
+        validate_graph_edges(
+            [_rust_import_edge()],
+            indexed_nodes=_rust_import_nodes(
+                target_overrides=target_overrides,
+                metadata_overrides=metadata_overrides,
+            ),
+            file_hashes={
+                "app/src/main.rs": SOURCE_HASH,
+                "core/src/lib.rs": RUST_TARGET_HASH,
+            },
+            imports=[_rust_import_record()],
+        )
+
+    assert exc_info.value.code == "INVALID_GRAPH_EDGE"
+    assert exc_info.value.details["field"] == "target"
+
+
+def test_import_edge_rejects_rust_crate_target_without_indexed_root_file():
+    nodes = _rust_import_nodes()
+    nodes.pop(RUST_ROOT_ID)
+
+    with pytest.raises(GraphContractError) as exc_info:
+        validate_graph_edges(
+            [_rust_import_edge()],
+            indexed_nodes=nodes,
+            file_hashes={
+                "app/src/main.rs": SOURCE_HASH,
+                "core/src/lib.rs": RUST_TARGET_HASH,
+            },
+            imports=[_rust_import_record()],
+        )
+
+    assert exc_info.value.code == "INVALID_GRAPH_EDGE"
+    assert exc_info.value.details["field"] == "target"
+
+
+@pytest.mark.parametrize(
+    ("edge", "record", "field"),
+    [
+        (
+            _rust_import_edge(evidence=GraphEvidence(
+                file="app/src/main.rs",
+                line=5,
+                content_hash=SOURCE_HASH,
+            )),
+            _rust_import_record(),
+            "line",
+        ),
+        (
+            _rust_import_edge(evidence=GraphEvidence(
+                file="app/src/main.rs",
+                line=4,
+                content_hash="e" * 64,
+            )),
+            _rust_import_record(),
+            "content_hash",
+        ),
+        (
+            _rust_import_edge(),
+            _rust_import_record(
+                target_crate="other/Cargo.toml::lib:other",
+                target_id="other/Cargo.toml::lib:other#crate",
+            ),
+            "import_record",
+        ),
+    ],
+)
+def test_rust_crate_import_edge_rejects_mismatched_provenance(
+    edge: GraphEdge,
+    record: ImportRecord,
+    field: str,
+):
+    with pytest.raises(GraphContractError) as exc_info:
+        validate_graph_edges(
+            [edge],
+            indexed_nodes=_rust_import_nodes(),
+            file_hashes={
+                "app/src/main.rs": SOURCE_HASH,
+                "core/src/lib.rs": RUST_TARGET_HASH,
+            },
+            imports=[record],
+        )
+
+    assert exc_info.value.details["field"] == field
+
+
+def test_rust_crate_import_edge_rejects_type_only_edge():
+    with pytest.raises(GraphContractError) as exc_info:
+        validate_graph_edges(
+            [_rust_import_edge(type="imports_type")],
+            indexed_nodes=_rust_import_nodes(),
+            file_hashes={
+                "app/src/main.rs": SOURCE_HASH,
+                "core/src/lib.rs": RUST_TARGET_HASH,
+            },
+            imports=[_rust_import_record()],
+        )
+
+    assert exc_info.value.code == "INVALID_GRAPH_EDGE"
+    assert exc_info.value.details["field"] == "type"
+
+
+def test_rust_crate_import_edge_rejects_own_root_file_self_edge():
+    own_source_id = "core/src/lib.rs::__file__#file"
+    nodes = _rust_import_nodes()
+    nodes.pop(RUST_SOURCE_ID)
+    raw = RawImport(
+        source_file="core/src/lib.rs",
+        language="rust",
+        line=4,
+        text="use crate::Thing;",
+        specifier="crate::Thing",
+        imported_name="Thing",
+        type_only=False,
+        is_reexport=False,
+        source_hash=RUST_TARGET_HASH,
+        rust=RustImportContext(
+            kind="use",
+            lexical_module_path=(),
+            visibility="private",
+            module_level=True,
+            configuration="unconditional",
+        ),
+    )
+
+    with pytest.raises(GraphContractError) as exc_info:
+        validate_graph_edges(
+            [_rust_import_edge(
+                from_id=own_source_id,
+                evidence=GraphEvidence(
+                    file="core/src/lib.rs",
+                    line=4,
+                    content_hash=RUST_TARGET_HASH,
+                ),
+            )],
+            indexed_nodes=nodes,
+            file_hashes={"core/src/lib.rs": RUST_TARGET_HASH},
+            imports=[_rust_import_record(
+                raw=raw,
+                source_id=own_source_id,
+                resolution_basis="rust_module_path",
+                resolution_control_files=("core/Cargo.toml",),
+            )],
+        )
+
+    assert exc_info.value.code == "INVALID_GRAPH_EDGE"
+    assert exc_info.value.details["field"] == "endpoints"
 
 
 @pytest.mark.parametrize(

@@ -1224,6 +1224,11 @@ uv run pytest -q tests/graph/test_imports.py tests/graph/test_state.py
 
 ### Task 5 — Edge materialization and contracts
 
+**Implementation status:** complete on 2026-07-19; 171 focused tests and all
+798 repository tests passed, the lock and package build verified, Loci
+re-indexed healthy with 1,720 symbols, and the frozen-benchmark checksum
+remained unchanged. No judge was run.
+
 Files:
 
 - `src/loci/graph/materialize.py`
@@ -1235,6 +1240,23 @@ Files:
 Thread Rust context, materialize file/crate edges, validate crate endpoint
 metadata and record-backed evidence, and suppress self-edges while consuming
 the schema-5 record shape established by Task 4.
+
+`materialize_graph()` and `materialize_import_edges()` now accept the approved
+optional `RustCrateIndex`. Rust file targets continue through the generic file
+path; crate targets must be present in the supplied index and match its Cargo
+identity, root source, zero-width synthetic-node shape, metadata, and root
+content hash before an edge is emitted. Resolved observations remain persisted
+when the ordinary endpoint IDs match or when a crate-root file resolves to its
+own crate identity, but those two self-edge shapes are not materialized.
+Another target root in the same package may still depend on the library crate.
+
+The persisted-edge contract independently requires a current Rust crate node,
+runtime `imports` type, one matching resolved crate record, exact source line
+and hash evidence, normalized contained manifest/root paths, supported target
+kind and edition, and deterministic required-feature metadata. It rejects a
+crate-root-to-own-crate edge even if malformed graph state is supplied directly.
+Python, JavaScript/TypeScript, and Go retain their existing behavior. Cargo
+discovery and service wiring remain Task 6.
 
 Gate:
 

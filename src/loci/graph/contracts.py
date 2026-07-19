@@ -44,6 +44,10 @@ _GO_KEYWORDS = frozenset({
     "const", "fallthrough", "if", "range", "type", "continue", "for",
     "import", "return", "var",
 })
+_RUST_TARGET_KINDS = frozenset({
+    "lib", "bin", "example", "test", "bench", "build_script",
+})
+_RUST_EDITIONS = frozenset({"2015", "2018", "2021", "2024"})
 
 
 class GraphContractError(ValueError):
@@ -447,10 +451,13 @@ def _validate_import_edge(
                 "source_kind": cast(JSONValue, source.get("kind")),
             },
         )
-    if target.get("kind") == "package" and edge.type != "imports":
+    if target.get("kind") in {"package", "crate"} and edge.type != "imports":
+        target_description = (
+            "Go package" if target.get("kind") == "package" else "Rust crate"
+        )
         raise GraphContractError(
             "INVALID_GRAPH_EDGE",
-            "Go package imports cannot use the type-only edge type",
+            f"{target_description} imports cannot use the type-only edge type",
             {"edge_index": edge_index, "field": "type"},
         )
 
@@ -525,6 +532,36 @@ def _validate_import_edge(
             package_path=next(iter(package_paths)),
             edge_index=edge_index,
         )
+    elif target_kinds == {"crate"}:
+        crate_names = {
+            record.target_crate
+            for record in candidates
+            if (
+                record.target_file is None
+                and record.target_package is None
+                and record.target_crate is not None
+            )
+        }
+        if len(crate_names) != 1:
+            raise GraphContractError(
+                "GRAPH_EVIDENCE_INVALID",
+                "Import edge has inconsistent crate target records",
+                {"edge_index": edge_index, "field": "import_record"},
+            )
+        crate_qualified_name = next(iter(crate_names))
+        crate_root = _validate_rust_crate_endpoint(
+            target,
+            crate_qualified_name=crate_qualified_name,
+            edge_index=edge_index,
+            indexed_nodes=indexed_nodes,
+            file_hashes=file_hashes,
+        )
+        if source_file == crate_root:
+            raise GraphContractError(
+                "INVALID_GRAPH_EDGE",
+                "Rust crate-root files cannot import their own crate endpoint",
+                {"edge_index": edge_index, "field": "endpoints"},
+            )
     else:
         raise GraphContractError(
             "GRAPH_EVIDENCE_INVALID",
@@ -591,6 +628,120 @@ def _validate_go_package_endpoint(
                 "target_id": cast(JSONValue, target.get("id")),
             },
         )
+
+
+def _validate_rust_crate_endpoint(
+    target: Mapping[str, Any],
+    *,
+    crate_qualified_name: str,
+    edge_index: int,
+    indexed_nodes: Mapping[str, Mapping[str, Any]],
+    file_hashes: Mapping[str, str] | None,
+) -> str:
+    metadata = target.get("metadata")
+    loci = metadata.get("loci") if isinstance(metadata, Mapping) else None
+    manifest = loci.get("manifest") if isinstance(loci, Mapping) else None
+    package_name = loci.get("package_name") if isinstance(loci, Mapping) else None
+    package_root = loci.get("package_root") if isinstance(loci, Mapping) else None
+    target_kind = loci.get("target_kind") if isinstance(loci, Mapping) else None
+    target_name = loci.get("target_name") if isinstance(loci, Mapping) else None
+    rust_crate_name = loci.get("crate_name") if isinstance(loci, Mapping) else None
+    crate_root = loci.get("crate_root") if isinstance(loci, Mapping) else None
+    edition = loci.get("edition") if isinstance(loci, Mapping) else None
+    required_features = (
+        loci.get("required_features") if isinstance(loci, Mapping) else None
+    )
+    expected_name = (
+        f"{manifest}::{target_kind}:{rust_crate_name}"
+        if (
+            isinstance(manifest, str)
+            and isinstance(target_kind, str)
+            and isinstance(rust_crate_name, str)
+        )
+        else None
+    )
+    expected_package_root = (
+        PurePosixPath(manifest).parent.as_posix()
+        if isinstance(manifest, str)
+        else None
+    )
+    current_root_hash = (
+        file_hashes.get(crate_root)
+        if file_hashes is not None and isinstance(crate_root, str)
+        else None
+    )
+    root = (
+        indexed_nodes.get(f"{crate_root}::__file__#file")
+        if isinstance(crate_root, str)
+        else None
+    )
+    valid_root = (
+        isinstance(root, Mapping)
+        and root.get("kind") == "file"
+        and root.get("language") == "rust"
+        and root.get("file_path") == crate_root
+        and root.get("content_hash") == current_root_hash
+    )
+    valid_features = (
+        isinstance(required_features, list)
+        and all(isinstance(item, str) and item for item in required_features)
+        and required_features == sorted(set(required_features))
+    )
+    if (
+        target.get("kind") != "crate"
+        or target.get("language") != "rust"
+        or target.get("id") != f"{crate_qualified_name}#crate"
+        or target.get("name") != rust_crate_name
+        or target.get("qualified_name") != crate_qualified_name
+        or target.get("qualified_name") != expected_name
+        or target.get("file_path") != crate_root
+        or target.get("byte_offset") != 0
+        or target.get("byte_length") != 0
+        or target.get("signature") != crate_qualified_name
+        or target.get("content_hash") != current_root_hash
+        or not valid_root
+        or target.get("line") != 1
+        or target.get("end_line") != 1
+        or not isinstance(loci, Mapping)
+        or loci.get("rust_crate_node") is not True
+        or not _valid_relative_path(manifest, allow_dot=False)
+        or PurePosixPath(manifest).name != "Cargo.toml"
+        or not isinstance(package_name, str)
+        or not package_name
+        or not _valid_relative_path(package_root, allow_dot=True)
+        or package_root != expected_package_root
+        or target_kind not in _RUST_TARGET_KINDS
+        or not isinstance(target_name, str)
+        or not target_name
+        or not isinstance(rust_crate_name, str)
+        or not rust_crate_name
+        or not _valid_relative_path(crate_root, allow_dot=False)
+        or edition not in _RUST_EDITIONS
+        or not valid_features
+    ):
+        raise GraphContractError(
+            "INVALID_GRAPH_EDGE",
+            "Rust import target must be the matching indexed crate node",
+            {
+                "edge_index": edge_index,
+                "field": "target",
+                "target_id": cast(JSONValue, target.get("id")),
+            },
+        )
+    assert isinstance(crate_root, str)
+    return crate_root
+
+
+def _valid_relative_path(value: Any, *, allow_dot: bool) -> bool:
+    if not isinstance(value, str) or not value or "\\" in value:
+        return False
+    path = PurePosixPath(value)
+    return (
+        not path.is_absolute()
+        and ".." not in path.parts
+        and path.as_posix() == value
+        and (allow_dot or value != ".")
+    )
 
 
 def _valid_go_identifier(value: str) -> bool:
