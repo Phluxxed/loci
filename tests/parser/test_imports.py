@@ -409,6 +409,19 @@ def test_extracts_rust_extern_crates_modules_and_lexical_scope(tmp_path: Path):
             ),
         ),
         (
+            "inline",
+            "inline",
+            False,
+            RustImportContext(
+                kind="module",
+                lexical_module_path=(),
+                visibility="pub(crate)",
+                module_level=True,
+                configuration="conditional",
+                inline=True,
+            ),
+        ),
+        (
             "external",
             "external",
             False,
@@ -463,6 +476,19 @@ def test_extracts_rust_extern_crates_modules_and_lexical_scope(tmp_path: Path):
                 visibility="private",
                 module_level=False,
                 configuration="unconditional",
+            ),
+        ),
+        (
+            "inline_without_dependencies",
+            "inline_without_dependencies",
+            False,
+            RustImportContext(
+                kind="module",
+                lexical_module_path=(),
+                visibility="private",
+                module_level=True,
+                configuration="unconditional",
+                inline=True,
             ),
         ),
     ]

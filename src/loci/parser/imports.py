@@ -36,6 +36,7 @@ class RustImportContext:
     path_override: str | None = None
     lexical_module_visibilities: tuple[str, ...] = ()
     lexical_module_configurations: tuple[RustConfiguration, ...] = ()
+    inline: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -320,13 +321,12 @@ def _extract_rust_extern_crate(
 
 
 def _extract_rust_module(node, source: bytes, common: dict) -> list[RawImport]:
-    if node.child_by_field_name("body") is not None:
-        return []
+    inline = node.child_by_field_name("body") is not None
     name = node.child_by_field_name("name")
     if name is None:
         raise ImportExtractionError("unsupported Rust module declaration")
     specifier = _node_text(name, source)
-    context = _rust_context(node, source, kind="module")
+    context = _rust_context(node, source, kind="module", inline=inline)
     return [
         RawImport(
             **common,
@@ -344,6 +344,7 @@ def _rust_context(
     source: bytes,
     *,
     kind: RustObservationKind,
+    inline: bool = False,
 ) -> RustImportContext:
     visibility, visibility_supported = _rust_visibility(node, source)
     configuration, path_override = _rust_attributes(node, source, kind=kind)
@@ -363,6 +364,7 @@ def _rust_context(
         path_override=path_override,
         lexical_module_visibilities=lexical_module_visibilities,
         lexical_module_configurations=lexical_module_configurations,
+        inline=inline,
     )
 
 
