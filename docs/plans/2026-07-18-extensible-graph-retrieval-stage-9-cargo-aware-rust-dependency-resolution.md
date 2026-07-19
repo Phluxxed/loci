@@ -1266,6 +1266,12 @@ uv run pytest -q tests/graph/test_materialize.py tests/graph/test_contracts.py t
 
 ### Task 6 — Service, freshness, diagnostics, and retrieval
 
+**Implementation status:** complete on 2026-07-19; 153 focused tests and all
+804 repository tests passed, the lock, compile, and package-build gates
+verified, Loci re-indexed healthy with 1,723 symbols and passed all 1,723
+integrity checks, and the frozen-benchmark checksum remained unchanged. No
+judge was run.
+
 Files:
 
 - `src/loci/service.py`
@@ -1277,6 +1283,28 @@ Extend the one-pass scan, load/build/hash the Cargo context, rebuild synthetic
 nodes, merge bounded diagnostics, add the crate count, expose validated crate
 attributes, and prove control/source add/change/delete plus full/incremental
 equality.
+
+The service now discovers `Cargo.toml` candidates in the existing single root
+scan, loads their bounded context, builds the Rust crate/module index from the
+current file nodes plus retained observations, adds current crate nodes, and
+threads the index through import resolution and edge materialization. Cargo
+input hashes participate in freshness, while incremental reuse excludes old
+`crate` nodes so every refresh reconstructs them from current manifests and
+source roots. Loader and builder problems join graph health as bounded warning
+diagnostics; invalid controls retain their stable sentinels and do not create
+refresh loops.
+
+`index_repo()` and graph health now report `graph_rust_crates_indexed`.
+`graph_imports()` retains its existing flat fields and adds the strict raw
+record, `target_crate`, and `resolution_configuration`. Traversal, paths, and
+question-shaped retrieval expose Cargo crate attributes only when the
+synthetic node's identity, paths, target shape, edition, features, and root
+metadata are internally valid. Service tests cover a same-package library
+binding, a contained path dependency, Cargo add/change/delete, Rust source
+add/change/delete, stable invalid-control health, one-pass discovery, and
+byte-identical full/incremental persistence. The existing storage version and
+crate-root verification tests required no production storage change in this
+task. Fresh-process MCP proof and public/agent documentation remain Task 7.
 
 Gate:
 

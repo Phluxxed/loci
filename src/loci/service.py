@@ -26,6 +26,11 @@ from loci.graph.javascript_modules import (
     build_javascript_resolution_index,
     load_javascript_module_context,
 )
+from loci.graph.rust_crates import (
+    RustCrateProblem,
+    build_rust_crate_index,
+    load_cargo_context,
+)
 from loci.graph.anchors import select_graph_anchors
 from loci.graph.materialize import load_graph_extensions, materialize_graph
 from loci.graph.profiles import required_frontmatter_fields
@@ -71,6 +76,7 @@ class RepositoryScan:
     indexable_files: tuple[tuple[Path, str, str], ...]
     go_control_candidates: tuple[Path, ...]
     javascript_control_candidates: tuple[Path, ...]
+    cargo_control_candidates: tuple[Path, ...]
 
 
 @dataclass
@@ -154,6 +160,10 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
         repo_path,
         repository_scan.javascript_control_candidates,
     )
+    cargo_load = load_cargo_context(
+        repo_path,
+        repository_scan.cargo_control_candidates,
+    )
     extension_load = load_graph_extensions(
         repo_path,
         previous_graph=previous_graph,
@@ -189,7 +199,7 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
                 for symbol in existing_symbols
                 if (
                     symbol["file_path"] == rel_path
-                    and symbol["kind"] != "package"
+                    and symbol["kind"] not in {"package", "crate"}
                 )
             ]
             all_symbols.extend(kept)
@@ -289,7 +299,13 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
         javascript_module_load.context,
         file_nodes=file_nodes,
     )
+    rust_crate_build = build_rust_crate_index(
+        cargo_load.context,
+        file_nodes=file_nodes,
+        observations=raw_imports,
+    )
     all_symbols.extend(go_package_build.index.package_nodes)
+    all_symbols.extend(rust_crate_build.index.crate_nodes)
     go_diagnostics = tuple(
         _go_problem_diagnostic(problem)
         for problem in (*go_module_load.problems, *go_package_build.problems)
@@ -301,10 +317,15 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
             *javascript_resolution_build.problems,
         )
     )
+    rust_diagnostics = tuple(
+        _rust_problem_diagnostic(problem)
+        for problem in (*cargo_load.problems, *rust_crate_build.problems)
+    )
     graph_input_hashes = {
         **extension_load.input_hashes,
         **go_module_load.input_hashes,
         **javascript_module_load.input_hashes,
+        **cargo_load.input_hashes,
     }
 
     graph_state = materialize_graph(
@@ -316,12 +337,14 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
         raw_imports=raw_imports,
         go_packages=go_package_build.index,
         javascript_modules=javascript_resolution_build.index,
+        rust_crates=rust_crate_build.index,
         input_hashes=graph_input_hashes,
         diagnostics=(
             *extension_load.diagnostics,
             *import_diagnostics,
             *go_diagnostics,
             *javascript_diagnostics,
+            *rust_diagnostics,
         ),
     )
     try:
@@ -346,6 +369,7 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
             symbol.kind == "file" for symbol in all_symbols
         ),
         "graph_go_packages_indexed": len(go_package_build.index.package_nodes),
+        "graph_rust_crates_indexed": len(rust_crate_build.index.crate_nodes),
         "graph_imports_indexed": len(graph_state.imports),
         "graph_imports_resolved": sum(
             record.status == "resolved" for record in graph_state.imports
@@ -907,6 +931,8 @@ def graph_imports(
         record.raw.specifier,
         record.raw.imported_name or "",
         record.target_file or "",
+        record.target_package or "",
+        record.target_crate or "",
     ))
     resolved_count = sum(record.status == "resolved" for record in records)
     unresolved_count = sum(record.status == "unresolved" for record in records)
@@ -919,11 +945,14 @@ def graph_imports(
     items = []
     for record in page:
         raw = record.raw
+        serialized = record.to_dict()
         items.append({
+            "raw": serialized["raw"],
             "source_file": raw.source_file,
             "source_id": record.source_id,
             "target_file": record.target_file,
             "target_package": record.target_package,
+            "target_crate": record.target_crate,
             "target_kind": record.target_kind,
             "target_id": record.target_id,
             "specifier": raw.specifier,
@@ -940,6 +969,7 @@ def graph_imports(
             "unresolved_reason": record.unresolved_reason,
             "resolution_basis": record.resolution_basis,
             "resolution_control_files": list(record.resolution_control_files),
+            "resolution_configuration": record.resolution_configuration,
         })
     next_offset = offset + len(page)
     if next_offset >= len(filtered):
@@ -1024,6 +1054,10 @@ def graph_health(
             ),
             "graph_go_packages_indexed": sum(
                 isinstance(symbol, dict) and symbol.get("kind") == "package"
+                for symbol in index.get("symbols", [])
+            ),
+            "graph_rust_crates_indexed": sum(
+                isinstance(symbol, dict) and symbol.get("kind") == "crate"
                 for symbol in index.get("symbols", [])
             ),
             "graph_imports_indexed": len(state.imports),
@@ -1147,6 +1181,10 @@ def _index_is_stale(repo_path: Path, store: IndexStore, index: dict[str, Any]) -
         **load_javascript_module_context(
             repo_path,
             repository_scan.javascript_control_candidates,
+        ).input_hashes,
+        **load_cargo_context(
+            repo_path,
+            repository_scan.cargo_control_candidates,
         ).input_hashes,
     }
     graph = index.get("graph")
@@ -1280,6 +1318,7 @@ def _scan_repository_files(
     files: list[tuple[Path, str, str]] = []
     go_controls: list[Path] = []
     javascript_controls: list[Path] = []
+    cargo_controls: list[Path] = []
     for candidate in sorted(repo_path.rglob("*")):
         if any(part in SKIP_DIRS for part in candidate.parts):
             continue
@@ -1295,6 +1334,8 @@ def _scan_repository_files(
             "jsconfig.json",
         }:
             javascript_controls.append(candidate)
+        if candidate.name == "Cargo.toml":
+            cargo_controls.append(candidate)
         if not candidate.is_file() or _should_skip_file(candidate):
             continue
         files.append((candidate, rel_path, store.hash_file(candidate)))
@@ -1302,6 +1343,7 @@ def _scan_repository_files(
         indexable_files=tuple(files),
         go_control_candidates=tuple(go_controls),
         javascript_control_candidates=tuple(javascript_controls),
+        cargo_control_candidates=tuple(cargo_controls),
     )
 
 
@@ -1318,6 +1360,16 @@ def _go_problem_diagnostic(problem: GoModuleProblem) -> GraphDiagnostic:
 def _javascript_problem_diagnostic(
     problem: JavaScriptModuleProblem,
 ) -> GraphDiagnostic:
+    return GraphDiagnostic(
+        severity="warning",
+        code=problem.code,
+        message=problem.message,
+        source=problem.source,
+        details=problem.details,
+    )
+
+
+def _rust_problem_diagnostic(problem: RustCrateProblem) -> GraphDiagnostic:
     return GraphDiagnostic(
         severity="warning",
         code=problem.code,
