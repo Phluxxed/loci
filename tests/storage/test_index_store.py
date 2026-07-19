@@ -516,6 +516,62 @@ def test_verify_index_uses_anchor_file_hash_for_go_package_nodes(
     }]
 
 
+def test_verify_index_uses_root_file_hash_for_rust_crate_nodes(
+    store: IndexStore,
+    tmp_path: Path,
+):
+    source_path = tmp_path / "repo"
+    source_file = source_path / "src" / "lib.rs"
+    source_file.parent.mkdir(parents=True)
+    source_file.write_text("pub fn run() {}\n", encoding="utf-8")
+    content_hash = store.hash_file(source_file)
+    crate_node = Symbol(
+        id="Cargo.toml::lib:demo#crate",
+        name="demo",
+        qualified_name="Cargo.toml::lib:demo",
+        kind="crate",
+        language="rust",
+        file_path="src/lib.rs",
+        byte_offset=0,
+        byte_length=0,
+        signature="Cargo.toml::lib:demo",
+        content_hash=content_hash,
+        metadata={
+            "loci": {
+                "rust_crate_node": True,
+                "manifest": "Cargo.toml",
+                "package_name": "demo-kit",
+                "package_root": ".",
+                "target_kind": "lib",
+                "target_name": "demo-kit",
+                "crate_name": "demo",
+                "crate_root": "src/lib.rs",
+                "edition": "2021",
+                "required_features": [],
+            }
+        },
+        line=1,
+        end_line=1,
+    )
+    store.write(
+        source_path,
+        [crate_node],
+        file_hashes={"src/lib.rs": content_hash},
+    )
+
+    assert store.verify_index(source_path)["failed"] == []
+
+    source_file.write_text("pub fn changed() {}\n", encoding="utf-8")
+
+    assert store.verify_index(source_path)["failed"] == [{
+        "id": "Cargo.toml::lib:demo#crate",
+        "name": "demo",
+        "kind": "crate",
+        "file": "src/lib.rs",
+        "issue": "content_drift",
+    }]
+
+
 def test_get_symbol_content_returns_source(store: IndexStore, tmp_path: Path):
     source_path = tmp_path / "repo"
     source_path.mkdir()

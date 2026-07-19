@@ -560,8 +560,8 @@ class IndexStore:
         Returns a dict with 'repo', 'checked', 'passed', 'failed'. Each failure
         has the symbol id, name, kind, file, and the issue description.
 
-        Ordinary symbols use a name-in-bytes check. File and validated Go
-        package nodes use their whole anchor-file hash instead.
+        Ordinary symbols use a name-in-bytes check. File nodes and validated
+        Go package/Rust crate nodes use their whole anchor-file hash instead.
         """
         index = self.load(repo_path)
         if index is None:
@@ -633,7 +633,11 @@ class IndexStore:
                 live_file = repo_path / file_path
                 if live_file.exists():
                     try:
-                        if kind == "file" or _is_go_package_node(sym):
+                        if (
+                            kind == "file"
+                            or _is_go_package_node(sym)
+                            or _is_rust_crate_node(sym)
+                        ):
                             live_raw = live_file.read_bytes()
                         else:
                             with open(live_file, "rb") as lf:
@@ -1312,6 +1316,7 @@ def _should_verify_name_in_bytes(sym: dict[str, Any]) -> bool:
     return (
         sym.get("kind") != "file"
         and not _is_go_package_node(sym)
+        and not _is_rust_crate_node(sym)
         and not _is_synthetic_markdown_name(sym)
     )
 
@@ -1340,6 +1345,46 @@ def _is_go_package_node(sym: dict[str, Any]) -> bool:
         and bool(package_name)
         and sym.get("qualified_name") == import_path
         and sym.get("name") == package_name
+    )
+
+
+def _is_rust_crate_node(sym: dict[str, Any]) -> bool:
+    if sym.get("kind") != "crate" or sym.get("language") != "rust":
+        return False
+    metadata = sym.get("metadata")
+    loci_metadata = metadata.get("loci") if isinstance(metadata, dict) else None
+    if not (
+        isinstance(loci_metadata, dict)
+        and loci_metadata.get("rust_crate_node") is True
+        and sym.get("byte_offset") == 0
+        and sym.get("byte_length") == 0
+    ):
+        return False
+    manifest = loci_metadata.get("manifest")
+    target_kind = loci_metadata.get("target_kind")
+    crate_name = loci_metadata.get("crate_name")
+    crate_root = loci_metadata.get("crate_root")
+    required_features = loci_metadata.get("required_features")
+    qualified_name = (
+        f"{manifest}::{target_kind}:{crate_name}"
+        if all(isinstance(value, str) and value for value in (
+            manifest,
+            target_kind,
+            crate_name,
+        ))
+        else None
+    )
+    return (
+        target_kind in {"lib", "bin", "example", "test", "bench", "build_script"}
+        and isinstance(crate_root, str)
+        and bool(crate_root)
+        and crate_root == sym.get("file_path")
+        and isinstance(required_features, list)
+        and all(isinstance(item, str) and item for item in required_features)
+        and required_features == sorted(set(required_features))
+        and sym.get("qualified_name") == qualified_name
+        and sym.get("id") == f"{qualified_name}#crate"
+        and sym.get("name") == crate_name
     )
 
 
