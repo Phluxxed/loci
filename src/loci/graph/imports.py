@@ -9,6 +9,16 @@ from typing import Any, Literal, Mapping, TypeAlias, cast
 from loci.parser.imports import ImportUnresolvedReason, RawImport
 from loci.parser.symbols import Symbol
 
+from ._rust_import_schema import (
+    rust_context_from_dict,
+    rust_context_to_dict,
+    validate_raw_rust_context,
+)
+from ._rust_resolution import (
+    RustImportResolverIndex,
+    build_rust_import_resolver_index,
+    resolve_rust_import as _resolve_rust_import,
+)
 from .contracts import (
     GraphContractError,
     GraphEdge,
@@ -28,12 +38,20 @@ from .javascript_modules import (
     build_javascript_resolution_index,
     resolve_javascript_import,
 )
+from .rust_crates import (
+    RustCrateIndex,
+    RustResolutionBasis,
+    RustResolutionConfiguration,
+)
 
 
 ImportStatus: TypeAlias = Literal["resolved", "unresolved"]
-ImportTargetKind: TypeAlias = Literal["file", "package"]
+ImportTargetKind: TypeAlias = Literal["file", "package", "crate"]
+ImportResolutionBasis: TypeAlias = (
+    JavaScriptResolutionBasis | RustResolutionBasis
+)
 _IMPORT_STATUSES = frozenset({"resolved", "unresolved"})
-_IMPORT_TARGET_KINDS = frozenset({"file", "package"})
+_IMPORT_TARGET_KINDS = frozenset({"file", "package", "crate"})
 _UNRESOLVED_REASONS = frozenset({
     "external",
     "not_indexed",
@@ -53,18 +71,21 @@ _RAW_IMPORT_FIELDS = {
     "type_only",
     "is_reexport",
     "source_hash",
+    "rust",
 }
 _IMPORT_RECORD_FIELDS = {
     "raw",
     "source_id",
     "target_file",
     "target_package",
+    "target_crate",
     "target_kind",
     "target_id",
     "status",
     "unresolved_reason",
     "resolution_basis",
     "resolution_control_files",
+    "resolution_configuration",
 }
 _SHA256_RE = re.compile(r"[0-9a-f]{64}")
 _JAVASCRIPT_LANGUAGES = frozenset({"javascript", "typescript"})
@@ -78,6 +99,17 @@ _JAVASCRIPT_RESOLUTION_BASES = frozenset({
     "workspace_exports",
     "workspace_legacy_entry",
 })
+_RUST_RESOLUTION_BASES = frozenset({
+    "rust_module_declaration",
+    "rust_module_path",
+    "cargo_path_dependency",
+    "cargo_workspace_dependency",
+    "cargo_package_library",
+})
+_RUST_RESOLUTION_CONFIGURATIONS = frozenset({
+    "unconditional",
+    "declared_possible",
+})
 
 
 @dataclass(frozen=True, slots=True)
@@ -86,12 +118,14 @@ class ImportRecord:
     source_id: str
     target_file: str | None
     target_package: str | None
+    target_crate: str | None
     target_kind: ImportTargetKind | None
     target_id: str | None
     status: ImportStatus
     unresolved_reason: ImportUnresolvedReason | None
-    resolution_basis: JavaScriptResolutionBasis | None = None
+    resolution_basis: ImportResolutionBasis | None = None
     resolution_control_files: tuple[str, ...] = ()
+    resolution_configuration: RustResolutionConfiguration | None = None
 
     def __post_init__(self) -> None:
         _validate_raw_import(self.raw)
@@ -100,6 +134,8 @@ class ImportRecord:
             _relative_path(self.target_file, "target_file")
         if self.target_package is not None:
             _nonempty_string(self.target_package, "target_package")
+        if self.target_crate is not None:
+            _nonempty_string(self.target_crate, "target_crate")
         if (
             self.target_kind is not None
             and (
@@ -123,22 +159,37 @@ class ImportRecord:
                 "Invalid import unresolved reason",
                 field="unresolved_reason",
             )
-        if self.resolution_basis is not None and (
-            not isinstance(self.resolution_basis, str)
-            or self.resolution_basis not in _JAVASCRIPT_RESOLUTION_BASES
-        ):
-            raise _error(
-                "Invalid JavaScript resolution basis",
-                field="resolution_basis",
-            )
+        if self.resolution_basis is not None:
+            if (
+                not isinstance(self.resolution_basis, str)
+                or self.resolution_basis
+                not in _JAVASCRIPT_RESOLUTION_BASES | _RUST_RESOLUTION_BASES
+            ):
+                raise _error(
+                    "Invalid import resolution basis",
+                    field="resolution_basis",
+                )
         _validate_resolution_controls(self.resolution_control_files)
         is_javascript = self.raw.language in _JAVASCRIPT_LANGUAGES
-        if not is_javascript and (
-            self.resolution_basis is not None or self.resolution_control_files
+        is_rust = self.raw.language == "rust"
+        if self.resolution_configuration is not None and (
+            not isinstance(self.resolution_configuration, str)
+            or self.resolution_configuration not in _RUST_RESOLUTION_CONFIGURATIONS
         ):
             raise _error(
-                "Only JavaScript imports may carry resolution provenance"
+                "Invalid Rust resolution configuration",
+                field="resolution_configuration",
             )
+        if is_javascript and self.resolution_basis in _RUST_RESOLUTION_BASES:
+            raise _error("Invalid JavaScript resolution basis")
+        if is_rust and self.resolution_basis in _JAVASCRIPT_RESOLUTION_BASES:
+            raise _error("Invalid Rust resolution basis")
+        if not (is_javascript or is_rust) and (
+            self.resolution_basis is not None or self.resolution_control_files
+        ):
+            raise _error("Only JavaScript and Rust imports may carry provenance")
+        if not is_rust and self.resolution_configuration is not None:
+            raise _error("Only Rust imports may carry resolution configuration")
         if self.status == "resolved":
             if self.target_kind is None:
                 raise _error("Resolved import requires a target kind")
@@ -147,27 +198,53 @@ class ImportRecord:
                     raise _error("Resolved file import requires a target file and ID")
                 if self.target_package is not None:
                     raise _error("Resolved file import cannot have a target package")
+                if self.target_crate is not None:
+                    raise _error("Resolved file import cannot have a target crate")
                 if self.raw.language == "go":
                     raise _error("Go imports must target packages")
-            else:
+            elif self.target_kind == "package":
                 if self.target_file is not None:
                     raise _error("Resolved package import cannot have a target file")
+                if self.target_crate is not None:
+                    raise _error("Resolved package import cannot have a target crate")
                 if self.target_package is None or self.target_id is None:
                     raise _error(
                         "Resolved package import requires a target package and ID"
                     )
                 if self.raw.language != "go":
                     raise _error("Only Go imports may target packages")
-            if self.raw.language == "rust":
-                raise _error("Rust imports cannot be resolved")
+            else:
+                if self.target_file is not None or self.target_package is not None:
+                    raise _error(
+                        "Resolved crate import cannot have a file or package target"
+                    )
+                if self.target_crate is None or self.target_id is None:
+                    raise _error(
+                        "Resolved crate import requires a target crate and ID"
+                    )
+                if not is_rust:
+                    raise _error("Only Rust imports may target crates")
+                if self.target_id != f"{self.target_crate}#crate":
+                    raise _error(
+                        "Resolved crate import target identity is inconsistent",
+                        field="target_id",
+                    )
             if self.unresolved_reason is not None:
                 raise _error("Resolved import cannot have an unresolved reason")
             if is_javascript and self.resolution_basis is None:
                 raise _error("Resolved JavaScript import requires a resolution basis")
+            if is_rust:
+                if self.resolution_basis is None:
+                    raise _error("Resolved Rust import requires a resolution basis")
+                if self.resolution_configuration is None:
+                    raise _error(
+                        "Resolved Rust import requires resolution configuration"
+                    )
         else:
             if any((
                 self.target_file is not None,
                 self.target_package is not None,
+                self.target_crate is not None,
                 self.target_kind is not None,
                 self.target_id is not None,
             )):
@@ -176,6 +253,12 @@ class ImportRecord:
                 raise _error("Unresolved import requires an unresolved reason")
             if self.resolution_basis is not None:
                 raise _error("Unresolved import cannot have a resolution basis")
+            if self.resolution_configuration is not None:
+                raise _error(
+                    "Unresolved import cannot have resolution configuration"
+                )
+            if is_rust and self.resolution_control_files:
+                raise _error("Unresolved Rust import cannot have control files")
 
     def to_dict(self) -> dict[str, JSONValue]:
         return {
@@ -183,12 +266,14 @@ class ImportRecord:
             "source_id": self.source_id,
             "target_file": self.target_file,
             "target_package": self.target_package,
+            "target_crate": self.target_crate,
             "target_kind": self.target_kind,
             "target_id": self.target_id,
             "status": self.status,
             "unresolved_reason": self.unresolved_reason,
             "resolution_basis": self.resolution_basis,
             "resolution_control_files": list(self.resolution_control_files),
+            "resolution_configuration": self.resolution_configuration,
         }
 
     @classmethod
@@ -201,6 +286,10 @@ class ImportRecord:
         target_package = _optional_nonempty_string(
             value["target_package"],
             "target_package",
+        )
+        target_crate = _optional_nonempty_string(
+            value["target_crate"],
+            "target_crate",
         )
         target_kind = value["target_kind"]
         if target_kind is not None and (
@@ -224,29 +313,44 @@ class ImportRecord:
         resolution_basis = value["resolution_basis"]
         if resolution_basis is not None and (
             not isinstance(resolution_basis, str)
-            or resolution_basis not in _JAVASCRIPT_RESOLUTION_BASES
+            or resolution_basis
+            not in _JAVASCRIPT_RESOLUTION_BASES | _RUST_RESOLUTION_BASES
         ):
             raise _error(
-                "Invalid JavaScript resolution basis",
+                "Invalid import resolution basis",
                 field="resolution_basis",
             )
         resolution_control_files = _resolution_controls(
             value["resolution_control_files"]
         )
+        resolution_configuration = value["resolution_configuration"]
+        if resolution_configuration is not None and (
+            not isinstance(resolution_configuration, str)
+            or resolution_configuration not in _RUST_RESOLUTION_CONFIGURATIONS
+        ):
+            raise _error(
+                "Invalid Rust resolution configuration",
+                field="resolution_configuration",
+            )
         return cls(
             raw=_raw_import_from_dict(raw_value),
             source_id=_nonempty_string(value["source_id"], "source_id"),
             target_file=target_file,
             target_package=target_package,
+            target_crate=target_crate,
             target_kind=cast(ImportTargetKind | None, target_kind),
             target_id=target_id,
             status=cast(ImportStatus, status),
             unresolved_reason=cast(ImportUnresolvedReason | None, unresolved_reason),
             resolution_basis=cast(
-                JavaScriptResolutionBasis | None,
+                ImportResolutionBasis | None,
                 resolution_basis,
             ),
             resolution_control_files=resolution_control_files,
+            resolution_configuration=cast(
+                RustResolutionConfiguration | None,
+                resolution_configuration,
+            ),
         )
 
 
@@ -267,8 +371,9 @@ def resolve_import(
     file_nodes: Mapping[str, Symbol],
     go_packages: GoPackageIndex | None = None,
     javascript_modules: JavaScriptResolutionIndex | None = None,
+    rust_crates: RustCrateIndex | None = None,
 ) -> ImportRecord:
-    """Resolve one raw import against deterministic indexed file/package targets."""
+    """Resolve one raw import against deterministic indexed graph targets."""
     if _is_inline_rust_module(raw):
         raise _error(
             "inline Rust module observations are metadata, not imports",
@@ -279,6 +384,7 @@ def resolve_import(
         file_nodes=file_nodes,
         go_packages=go_packages,
         javascript_modules=javascript_modules,
+        rust_crates=rust_crates,
     )[0]
 
 
@@ -288,6 +394,7 @@ def resolve_imports(
     file_nodes: Mapping[str, Symbol],
     go_packages: GoPackageIndex | None = None,
     javascript_modules: JavaScriptResolutionIndex | None = None,
+    rust_crates: RustCrateIndex | None = None,
 ) -> list[ImportRecord]:
     """Resolve a batch while deriving indexed language layouts only once."""
     indexed_python_files = _indexed_python_files(file_nodes)
@@ -301,6 +408,11 @@ def resolve_imports(
         if go_packages is not None
         else None
     )
+    rust_resolver = (
+        build_rust_import_resolver_index(rust_crates)
+        if rust_crates is not None
+        else None
+    )
     return [
         _resolve_import(
             raw,
@@ -309,6 +421,8 @@ def resolve_imports(
             python_package_roots=python_package_roots,
             javascript_modules=javascript_resolver,
             go_resolver=go_resolver,
+            rust_crates=rust_crates,
+            rust_resolver=rust_resolver,
         )
         for raw in raw_imports
         if not _is_inline_rust_module(raw)
@@ -332,6 +446,8 @@ def _resolve_import(
     python_package_roots: tuple[PurePosixPath, ...],
     javascript_modules: JavaScriptResolutionIndex,
     go_resolver: _GoResolverIndex | None,
+    rust_crates: RustCrateIndex | None,
+    rust_resolver: RustImportResolverIndex | None,
 ) -> ImportRecord:
     _validate_raw_import(raw)
     source = _require_file_node(file_nodes, raw.source_file, field="source_file")
@@ -361,6 +477,7 @@ def _resolve_import(
             source_id=source.id,
             target_file=resolution.target_file,
             target_package=None,
+            target_crate=None,
             target_kind="file",
             target_id=target.id,
             status="resolved",
@@ -382,10 +499,52 @@ def _resolve_import(
             source_id=source.id,
             target_file=None,
             target_package=target_package.qualified_name,
+            target_crate=None,
             target_kind="package",
             target_id=target_package.id,
             status="resolved",
             unresolved_reason=None,
+        )
+    elif raw.language == "rust":
+        if rust_crates is None:
+            return _unresolved(raw, source.id, "unsupported_language")
+        assert rust_resolver is not None
+        resolution = _resolve_rust_import(
+            raw,
+            index=rust_crates,
+            resolver_index=rust_resolver,
+        )
+        if resolution.unresolved_reason is not None:
+            return _unresolved(raw, source.id, resolution.unresolved_reason)
+        assert resolution.basis is not None
+        assert resolution.configuration is not None
+        if resolution.target_file is not None:
+            target = _require_file_node(
+                file_nodes,
+                resolution.target_file,
+                field="target_file",
+            )
+            if target.id != resolution.target_id:
+                raise _error(
+                    "Rust file resolution target ID does not match indexed file",
+                    field="target_id",
+                )
+            target_kind: ImportTargetKind = "file"
+        else:
+            target_kind = "crate"
+        return ImportRecord(
+            raw=raw,
+            source_id=source.id,
+            target_file=resolution.target_file,
+            target_package=None,
+            target_crate=resolution.target_crate,
+            target_kind=target_kind,
+            target_id=resolution.target_id,
+            status="resolved",
+            unresolved_reason=None,
+            resolution_basis=resolution.basis,
+            resolution_control_files=resolution.control_files,
+            resolution_configuration=resolution.configuration,
         )
     else:
         return _unresolved(raw, source.id, "unsupported_language")
@@ -398,6 +557,7 @@ def _resolve_import(
         source_id=source.id,
         target_file=target_file,
         target_package=None,
+        target_crate=None,
         target_kind="file",
         target_id=target.id,
         status="resolved",
@@ -860,6 +1020,7 @@ def _unresolved(
         source_id=source_id,
         target_file=None,
         target_package=None,
+        target_crate=None,
         target_kind=None,
         target_id=None,
         status="unresolved",
@@ -913,6 +1074,7 @@ def _require_file_node(
 
 
 def _raw_import_to_dict(raw: RawImport) -> dict[str, JSONValue]:
+    _validate_raw_import(raw)
     return {
         "source_file": raw.source_file,
         "language": raw.language,
@@ -923,6 +1085,7 @@ def _raw_import_to_dict(raw: RawImport) -> dict[str, JSONValue]:
         "type_only": raw.type_only,
         "is_reexport": raw.is_reexport,
         "source_hash": raw.source_hash,
+        "rust": rust_context_to_dict(raw.rust),
     }
 
 
@@ -946,6 +1109,7 @@ def _raw_import_from_dict(value: Mapping[str, Any]) -> RawImport:
         type_only=type_only,
         is_reexport=is_reexport,
         source_hash=_sha256(value["source_hash"], "source_hash"),
+        rust=rust_context_from_dict(value["rust"]),
     )
     _validate_raw_import(raw)
     return raw
@@ -965,6 +1129,7 @@ def _validate_raw_import(raw: RawImport) -> None:
     _boolean(raw.type_only, "type_only")
     _boolean(raw.is_reexport, "is_reexport")
     _sha256(raw.source_hash, "source_hash")
+    validate_raw_rust_context(raw)
 
 
 def _require_keys(value: Mapping[str, Any], expected: set[str], record: str) -> None:

@@ -199,6 +199,11 @@ def build_alias_routes(
                 rust.MAX_RUST_ALIAS_PASSES,
             )
 
+    for key in tuple(dependency_routes):
+        crate = crates[key[0]]
+        if crate.target.edition == "2015" and key not in extern_groups:
+            dependency_routes.pop(key)
+
     return dict(sorted(routes.items())), dict(sorted(dependency_routes.items()))
 
 
