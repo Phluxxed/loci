@@ -472,10 +472,25 @@ def test_graph_imports_returns_stable_sorted_bounded_records(
         "status": "all",
         "items": [
             {
+                "raw": {
+                    "source_file": "a.py",
+                    "language": "python",
+                    "line": 1,
+                    "text": "import local_target",
+                    "specifier": "local_target",
+                    "imported_name": None,
+                    "type_only": False,
+                    "is_reexport": False,
+                    "source_hash": hashlib.sha256(
+                        (repo / "a.py").read_bytes()
+                    ).hexdigest(),
+                    "rust": None,
+                },
                 "source_file": "a.py",
                 "source_id": "a.py::__file__#file",
                 "target_file": "local_target.py",
                 "target_package": None,
+                "target_crate": None,
                 "target_kind": "file",
                 "target_id": "local_target.py::__file__#file",
                 "specifier": "local_target",
@@ -490,12 +505,28 @@ def test_graph_imports_returns_stable_sorted_bounded_records(
                 "unresolved_reason": None,
                 "resolution_basis": None,
                 "resolution_control_files": [],
+                "resolution_configuration": None,
             },
             {
+                "raw": {
+                    "source_file": "a.py",
+                    "language": "python",
+                    "line": 2,
+                    "text": "import missing",
+                    "specifier": "missing",
+                    "imported_name": None,
+                    "type_only": False,
+                    "is_reexport": False,
+                    "source_hash": hashlib.sha256(
+                        (repo / "a.py").read_bytes()
+                    ).hexdigest(),
+                    "rust": None,
+                },
                 "source_file": "a.py",
                 "source_id": "a.py::__file__#file",
                 "target_file": None,
                 "target_package": None,
+                "target_crate": None,
                 "target_kind": None,
                 "target_id": None,
                 "specifier": "missing",
@@ -510,6 +541,7 @@ def test_graph_imports_returns_stable_sorted_bounded_records(
                 "unresolved_reason": "not_indexed",
                 "resolution_basis": None,
                 "resolution_control_files": [],
+                "resolution_configuration": None,
             },
         ],
         "counts": {
@@ -623,6 +655,7 @@ def test_graph_health_counts_imports_without_degrading_normal_unresolved_records
         "diagnostics": 0,
         "graph_file_nodes_indexed": 4,
         "graph_go_packages_indexed": 0,
+        "graph_rust_crates_indexed": 0,
         "graph_imports_indexed": 4,
         "graph_imports_resolved": 1,
         "graph_imports_unresolved": 3,
@@ -1220,6 +1253,10 @@ def test_service_uses_one_root_scan_for_source_and_language_controls(
     (repo / "pkg.go").write_text("package pkg\n", encoding="utf-8")
     (repo / "package.json").write_text('{"name":"repo"}', encoding="utf-8")
     (repo / "tsconfig.json").write_text("{}", encoding="utf-8")
+    _write_cargo_package(repo, package_name="repo")
+    rust_source = repo / "src" / "lib.rs"
+    rust_source.parent.mkdir()
+    rust_source.write_text("pub fn indexed() {}\n", encoding="utf-8")
     original_rglob = Path.rglob
     root_scans = 0
 
@@ -1384,6 +1421,330 @@ def test_service_javascript_full_and_incremental_graph_state_match(
 
     assert incremental["files_skipped"] == 2
     assert incremental_graph == full_graph
+
+
+def _write_rust_lib_and_bin_repo(repo: Path, *, package_name: str = "app") -> None:
+    _write_cargo_package(repo, package_name=package_name)
+    source = repo / "src"
+    source.mkdir(parents=True, exist_ok=True)
+    (source / "lib.rs").write_text("pub struct Thing;\n", encoding="utf-8")
+    (source / "main.rs").write_text(
+        "use app::Thing;\n\nfn main() {}\n",
+        encoding="utf-8",
+    )
+
+
+def _write_cargo_package(repo: Path, *, package_name: str) -> None:
+    (repo / "Cargo.toml").write_text(
+        (
+            "[package]\n"
+            f'name = "{package_name}"\n'
+            'version = "0.1.0"\n'
+            'edition = "2021"\n'
+        ),
+        encoding="utf-8",
+    )
+
+
+def test_service_indexes_rust_crates_imports_edges_and_retrieval(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _write_rust_lib_and_bin_repo(repo)
+
+    indexed = index_repo(repo, incremental=False)
+    loaded = IndexStore(base_dir=base).load(repo.resolve())
+    imports = graph_imports(repo)
+    health = graph_health(repo)
+
+    assert loaded is not None
+    crate_nodes = [
+        symbol for symbol in loaded["symbols"] if symbol["kind"] == "crate"
+    ]
+    assert [node["id"] for node in crate_nodes] == [
+        "Cargo.toml::bin:app#crate",
+        "Cargo.toml::lib:app#crate",
+    ]
+    assert indexed["graph_rust_crates_indexed"] == 2
+    assert indexed["graph_imports_resolved"] == 1
+    assert health["counts"]["graph_rust_crates_indexed"] == 2
+
+    item = imports["items"][0]
+    assert item["raw"]["rust"]["kind"] == "use"
+    assert item["target_file"] is None
+    assert item["target_package"] is None
+    assert item["target_crate"] == "Cargo.toml::lib:app"
+    assert item["target_kind"] == "crate"
+    assert item["target_id"] == "Cargo.toml::lib:app#crate"
+    assert item["resolution_basis"] == "cargo_package_library"
+    assert item["resolution_control_files"] == ["Cargo.toml"]
+    assert item["resolution_configuration"] == "unconditional"
+
+    source_id = "src/main.rs::__file__#file"
+    crate_id = "Cargo.toml::lib:app#crate"
+    traversal = graph_traverse_neighbors(
+        repo,
+        [source_id],
+        namespaces=["loci"],
+        edge_types=["imports"],
+        resolutions=["import-resolved"],
+    )
+    paths = graph_paths(
+        repo,
+        [source_id],
+        [crate_id],
+        namespaces=["loci"],
+        edge_types=["imports"],
+        resolutions=["import-resolved"],
+        max_hops=1,
+        max_nodes=2,
+        max_paths=1,
+    )
+    retrieved = graph_retrieve(
+        repo,
+        "How does the Rust binary import the app library crate?",
+        [source_id, crate_id],
+        namespaces=["loci"],
+        edge_types=["imports"],
+        resolutions=["import-resolved"],
+        max_hops=1,
+        max_nodes=2,
+        max_paths=1,
+    )
+
+    crate_ref = {
+        "id": crate_id,
+        "namespace": "loci",
+        "kind": "crate",
+        "attributes": {
+            "language": "rust",
+            "file": "src/lib.rs",
+            "line": 1,
+            "end_line": 1,
+            "manifest": "Cargo.toml",
+            "package_name": "app",
+            "package_root": ".",
+            "target_kind": "lib",
+            "target_name": "app",
+            "crate_name": "app",
+            "crate_root": "src/lib.rs",
+            "edition": "2021",
+            "required_features": [],
+        },
+    }
+    assert traversal["results"][0]["neighbors"][0]["node"] == crate_ref
+    assert paths["paths"][0]["nodes"][1] == crate_ref
+    assert retrieved["paths"][0]["nodes"][1] == crate_ref
+
+    malformed = json.loads(json.dumps(crate_nodes[-1]))
+    malformed["metadata"]["loci"]["package_root"] = "wrong"
+    malformed_ref = service_module._graph_node_ref(malformed)
+    assert malformed_ref["attributes"] == {
+        "language": "rust",
+        "file": "src/lib.rs",
+        "line": 1,
+        "end_line": 1,
+    }
+
+
+def test_service_resolves_contained_cargo_path_dependency(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    app = repo / "app"
+    core = repo / "core"
+    (app / "src").mkdir(parents=True)
+    (core / "src").mkdir(parents=True)
+    (app / "Cargo.toml").write_text(
+        (
+            '[package]\nname = "app"\nversion = "0.1.0"\nedition = "2021"\n'
+            "[dependencies]\n"
+            'core_alias = { package = "core", path = "../core" }\n'
+        ),
+        encoding="utf-8",
+    )
+    (core / "Cargo.toml").write_text(
+        '[package]\nname = "core"\nversion = "0.1.0"\nedition = "2021"\n',
+        encoding="utf-8",
+    )
+    (app / "src" / "lib.rs").write_text(
+        "use core_alias::Thing;\n",
+        encoding="utf-8",
+    )
+    (core / "src" / "lib.rs").write_text(
+        "pub struct Thing;\n",
+        encoding="utf-8",
+    )
+
+    indexed = index_repo(repo, incremental=False)
+    item = graph_imports(repo)["items"][0]
+
+    assert indexed["graph_rust_crates_indexed"] == 2
+    assert indexed["graph_imports_resolved"] == 1
+    assert item["target_id"] == "core/Cargo.toml::lib:core#crate"
+    assert item["resolution_basis"] == "cargo_path_dependency"
+    assert item["resolution_control_files"] == [
+        "app/Cargo.toml",
+        "core/Cargo.toml",
+    ]
+    assert item["resolution_configuration"] == "unconditional"
+
+
+def test_service_invalid_cargo_control_is_stable_and_keeps_navigation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    source = repo / "src" / "lib.rs"
+    source.parent.mkdir(parents=True)
+    (repo / "Cargo.toml").write_text(
+        '[package]\nname = "first"\nname = "second"\n',
+        encoding="utf-8",
+    )
+    source.write_text("pub fn navigate() {}\n", encoding="utf-8")
+
+    indexed = index_repo(repo, incremental=False)
+    freshness = ensure_fresh_index(repo)
+    results = search_symbols(repo, "navigate")
+
+    assert indexed["graph_status"] == "degraded"
+    assert indexed["graph_rust_crates_indexed"] == 0
+    assert indexed["graph_diagnostics"] == [{
+        "severity": "warning",
+        "code": "GRAPH_CARGO_MANIFEST_INVALID",
+        "message": "Cargo manifest is invalid",
+        "source": "Cargo.toml",
+        "details": {"reason": "invalid_toml"},
+    }]
+    assert freshness == {"repo": str(repo.resolve()), "refreshed": False}
+    assert [item["name"] for item in results] == ["navigate"]
+
+
+def test_service_cargo_control_add_change_delete_drives_freshness(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    source = repo / "src"
+    source.mkdir(parents=True)
+    (source / "lib.rs").write_text("pub struct Thing;\n", encoding="utf-8")
+    (source / "main.rs").write_text(
+        "use app::Thing;\n\nfn main() {}\n",
+        encoding="utf-8",
+    )
+
+    initial = index_repo(repo, incremental=False)
+    _write_cargo_package(repo, package_name="app")
+    added = ensure_fresh_index(repo)
+    added_import = graph_imports(repo)["items"][0]
+    _write_cargo_package(repo, package_name="renamed")
+    changed = ensure_fresh_index(repo)
+    changed_import = graph_imports(repo)["items"][0]
+    (repo / "Cargo.toml").unlink()
+    deleted = ensure_fresh_index(repo)
+
+    assert initial["graph_rust_crates_indexed"] == 0
+    assert initial["graph_imports_unresolved"] == 1
+    assert added["refreshed"] is True
+    assert added["index"]["files_skipped"] == 2
+    assert added["index"]["graph_rust_crates_indexed"] == 2
+    assert added_import["target_id"] == "Cargo.toml::lib:app#crate"
+    assert changed["refreshed"] is True
+    assert changed["index"]["files_skipped"] == 2
+    assert changed["index"]["graph_rust_crates_indexed"] == 2
+    assert changed_import["status"] == "unresolved"
+    assert changed_import["unresolved_reason"] == "external"
+    assert deleted["refreshed"] is True
+    assert deleted["index"]["files_skipped"] == 2
+    assert deleted["index"]["graph_rust_crates_indexed"] == 0
+    assert ensure_fresh_index(repo) == {
+        "repo": str(repo.resolve()),
+        "refreshed": False,
+    }
+
+
+def test_service_rust_source_add_change_delete_reresolves_retained_imports(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    source = repo / "src"
+    source.mkdir(parents=True)
+    _write_cargo_package(repo, package_name="app")
+    (source / "lib.rs").write_text(
+        "pub mod api;\npub use crate::api::Thing;\n",
+        encoding="utf-8",
+    )
+
+    initial = index_repo(repo, incremental=False)
+    target = source / "api.rs"
+    target.write_text("pub struct Thing;\n", encoding="utf-8")
+    added = ensure_fresh_index(repo)
+    added_imports = graph_imports(repo)
+    target.write_text("pub struct Thing;\npub struct Changed;\n", encoding="utf-8")
+    changed = ensure_fresh_index(repo)
+    changed_symbols = search_symbols(repo, "Changed")
+    target.unlink()
+    deleted = ensure_fresh_index(repo)
+    deleted_imports = graph_imports(repo)
+
+    assert initial["graph_imports_resolved"] == 1
+    assert initial["graph_imports_unresolved"] == 1
+    assert added["refreshed"] is True
+    assert added["index"]["files_skipped"] == 1
+    assert added["index"]["graph_imports_resolved"] == 2
+    assert {item["target_file"] for item in added_imports["items"]} == {
+        "src/api.rs"
+    }
+    assert changed["refreshed"] is True
+    assert changed["index"]["files_skipped"] == 1
+    assert [item["name"] for item in changed_symbols] == ["Changed"]
+    assert deleted["refreshed"] is True
+    assert deleted["index"]["files_skipped"] == 1
+    assert deleted["index"]["graph_imports_resolved"] == 1
+    assert deleted["index"]["graph_imports_unresolved"] == 1
+    deleted_by_specifier = {
+        item["specifier"]: item for item in deleted_imports["items"]
+    }
+    assert deleted_by_specifier["api"]["unresolved_reason"] == "not_indexed"
+    assert deleted_by_specifier["crate::api::Thing"]["target_id"] == (
+        "Cargo.toml::lib:app#crate"
+    )
+
+
+def test_service_rust_full_and_incremental_serialized_indexes_match(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _write_rust_lib_and_bin_repo(repo)
+    store = IndexStore(base_dir=base)
+
+    index_repo(repo, incremental=False)
+    full = store.load(repo.resolve())
+    incremental_result = index_repo(repo, incremental=True)
+    incremental = store.load(repo.resolve())
+
+    assert full is not None
+    assert incremental is not None
+    assert incremental_result["files_skipped"] == 2
+    assert full == incremental
+    assert sum(
+        symbol["kind"] == "crate" for symbol in incremental["symbols"]
+    ) == 2
 
 
 def test_service_import_state_survives_fresh_process_read(
@@ -1710,6 +2071,7 @@ def test_service_materializes_profile_without_leaking_declared_neighbors(
             "diagnostics": 0,
             "graph_file_nodes_indexed": 0,
             "graph_go_packages_indexed": 0,
+            "graph_rust_crates_indexed": 0,
             "graph_imports_indexed": 0,
             "graph_imports_resolved": 0,
             "graph_imports_unresolved": 0,

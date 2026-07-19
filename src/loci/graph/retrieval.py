@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from math import ceil
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Sequence
 
 from .anchors import GraphAnchorSelection, select_graph_anchors
@@ -1020,6 +1020,7 @@ def _graph_node_ref(symbol: dict[str, Any]) -> dict[str, Any]:
         "end_line": symbol.get("end_line", 0),
     }
     _add_go_package_node_attributes(attributes, symbol)
+    _add_rust_crate_node_attributes(attributes, symbol)
     return GraphNodeRef(
         id=symbol["id"],
         namespace="loci",
@@ -1053,6 +1054,99 @@ def _add_go_package_node_attributes(
     ):
         return
     attributes.update(values)
+
+
+def _add_rust_crate_node_attributes(
+    attributes: dict[str, Any],
+    symbol: dict[str, Any],
+) -> None:
+    metadata = symbol.get("metadata")
+    loci_metadata = metadata.get("loci") if isinstance(metadata, dict) else None
+    if not (
+        symbol.get("kind") == "crate"
+        and symbol.get("language") == "rust"
+        and isinstance(loci_metadata, dict)
+        and loci_metadata.get("rust_crate_node") is True
+    ):
+        return
+    values = {
+        key: loci_metadata.get(key)
+        for key in (
+            "manifest",
+            "package_name",
+            "package_root",
+            "target_kind",
+            "target_name",
+            "crate_name",
+            "crate_root",
+            "edition",
+            "required_features",
+        )
+    }
+    string_fields = (
+        "manifest",
+        "package_name",
+        "package_root",
+        "target_kind",
+        "target_name",
+        "crate_name",
+        "crate_root",
+        "edition",
+    )
+    if not all(
+        isinstance(values[field], str) and values[field]
+        for field in string_fields
+    ):
+        return
+    manifest = values["manifest"]
+    package_root = values["package_root"]
+    target_kind = values["target_kind"]
+    crate_name = values["crate_name"]
+    crate_root = values["crate_root"]
+    required_features = values["required_features"]
+    assert isinstance(manifest, str)
+    assert isinstance(package_root, str)
+    assert isinstance(target_kind, str)
+    assert isinstance(crate_name, str)
+    assert isinstance(crate_root, str)
+    qualified_name = f"{manifest}::{target_kind}:{crate_name}"
+    if (
+        not _valid_retrieval_path(manifest, allow_dot=False)
+        or PurePosixPath(manifest).name != "Cargo.toml"
+        or not _valid_retrieval_path(package_root, allow_dot=True)
+        or package_root != PurePosixPath(manifest).parent.as_posix()
+        or target_kind
+        not in {"lib", "bin", "example", "test", "bench", "build_script"}
+        or not _valid_retrieval_path(crate_root, allow_dot=False)
+        or values["edition"] not in {"2015", "2018", "2021", "2024"}
+        or not isinstance(required_features, list)
+        or not all(isinstance(item, str) and item for item in required_features)
+        or required_features != sorted(set(required_features))
+        or symbol.get("id") != f"{qualified_name}#crate"
+        or symbol.get("name") != crate_name
+        or symbol.get("qualified_name") != qualified_name
+        or symbol.get("file_path") != crate_root
+        or symbol.get("byte_offset") != 0
+        or symbol.get("byte_length") != 0
+        or symbol.get("signature") != qualified_name
+        or not isinstance(symbol.get("content_hash"), str)
+        or not symbol["content_hash"]
+        or symbol.get("line") != 1
+        or symbol.get("end_line") != 1
+    ):
+        return
+    attributes.update(values)
+
+
+def _valid_retrieval_path(value: str, *, allow_dot: bool) -> bool:
+    path = PurePosixPath(value)
+    return (
+        not path.is_absolute()
+        and "\\" not in value
+        and ".." not in path.parts
+        and path.as_posix() == value
+        and (allow_dot or value != ".")
+    )
 
 
 def _invalid(message: str, **details: object) -> GraphContractError:
