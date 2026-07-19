@@ -1,6 +1,6 @@
 # Plan: Extensible Graph Retrieval Stage 9 — Cargo-aware Rust Dependency Resolution
 
-- **Status:** owner-approved; implementation in progress (Tasks 1–2 complete)
+- **Status:** owner-approved; implementation in progress (Tasks 1–3 complete)
 - **Date:** 2026-07-18
 - **Repository:** `/Users/brummerv/loci`
 - **Governing design:** `docs/design/2026-07-13-extensible-graph-retrieval-design.md`
@@ -1120,11 +1120,22 @@ uv run pytest -q tests/parser/test_imports.py tests/storage/test_index_store.py
 
 ### Task 3 — Cargo targets, crate nodes, and module ownership
 
+**Implementation status:** complete on 2026-07-19; the 171-test affected
+surface and all 707 repository tests passed, the lock and package build
+verified, and the frozen-benchmark checksum remained unchanged. No judge was
+run.
+
 Files:
 
 - `src/loci/graph/rust_crates.py`
 - new `src/loci/graph/_rust_resolution.py`
+- new `src/loci/graph/_rust_aliases.py`
+- new `src/loci/graph/_rust_semantics.py`
 - `tests/graph/test_rust_crates.py`
+- `src/loci/parser/imports.py`
+- `tests/parser/test_imports.py`
+- `src/loci/graph/imports.py`
+- `tests/graph/test_imports.py`
 - `src/loci/storage/index_store.py`
 - `tests/storage/test_index_store.py`
 
@@ -1133,11 +1144,23 @@ overrides, multi-crate ownership, dependency bindings, alias fixed point,
 visibility, and configuration convergence. Add whole-root verification for
 validated crate nodes.
 
+The implementation also closes one Task 2/Task 3 boundary hole: inline module
+observations now retain their visibility and configuration ancestry, including
+empty inline modules, so the crate builder can model them without rereading
+source. Extractor version 9 forces old indexes to rebuild. Inline module
+observations are explicitly excluded from generic import records because they
+describe ownership metadata rather than a dependency; external `mod foo;`
+observations remain available for Task 4 resolution.
+
 Gate:
 
 ~~~sh
 uv run pytest -q tests/graph/test_rust_crates.py tests/storage/test_index_store.py
 ~~~
+
+**Next implementation boundary:** Task 4 adds schema-5 import records and pure
+Rust path resolution. Task 3 deliberately does not materialize Rust import
+edges.
 
 ### Task 4 — Import record and pure Rust resolution
 
