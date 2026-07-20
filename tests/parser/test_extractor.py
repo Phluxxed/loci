@@ -86,6 +86,57 @@ def test_parse_python_method_qualified_name(sample_py: Path):
     assert multiply.qualified_name == "Calculator.multiply"
 
 
+@pytest.mark.parametrize(
+    ("filename", "source", "expected_qualified_name"),
+    [
+        (
+            "nested.py",
+            "def outer():\n    def inner():\n        pass\n    inner()\n",
+            "outer.inner",
+        ),
+        (
+            "nested.js",
+            "function outer() { function inner() {} inner(); }\n",
+            "outer.inner",
+        ),
+        (
+            "nested.ts",
+            "function outer(): void { function inner(): void {} inner(); }\n",
+            "outer.inner",
+        ),
+        (
+            "nested.rs",
+            "fn outer() { fn inner() {} inner(); }\n",
+            "outer.inner",
+        ),
+        (
+            "nested_method.py",
+            (
+                "class Runner:\n"
+                "    def run(self):\n"
+                "        def inner():\n"
+                "            pass\n"
+                "        inner()\n"
+            ),
+            "Runner.run.inner",
+        ),
+    ],
+)
+def test_parse_file_indexes_named_nested_functions_as_functions(
+    tmp_path: Path,
+    filename: str,
+    source: str,
+    expected_qualified_name: str,
+):
+    path = tmp_path / filename
+    path.write_text(source, encoding="utf-8")
+
+    nested = next(symbol for symbol in parse_file(path) if symbol.name == "inner")
+
+    assert nested.kind == "function"
+    assert nested.qualified_name == expected_qualified_name
+
+
 def test_parse_python_docstring_extracted(sample_py: Path):
     symbols = parse_file(sample_py)
     add_sym = next(s for s in symbols if s.name == "add")
