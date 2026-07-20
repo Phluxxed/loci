@@ -13,6 +13,7 @@ from loci.service import (
     graph_imports,
     graph_neighbors,
     graph_paths,
+    graph_references,
     graph_retrieve,
     graph_traverse_neighbors,
     get_cached_file,
@@ -208,6 +209,26 @@ def create_server() -> FastMCP:
         """Inspect bounded resolved and unresolved built-in import records."""
         return _handle_loci_error(
             lambda: graph_imports(
+                repo,
+                file=file,
+                status=status,
+                offset=offset,
+                limit=limit,
+                ensure_fresh=True,
+            )
+        )
+
+    @mcp.tool()
+    def loci_graph_references(
+        repo: str,
+        file: str | None = None,
+        status: str = "all",
+        offset: int = 0,
+        limit: int = 100,
+    ) -> CallToolResult:
+        """Inspect bounded resolved and unresolved imported-symbol references."""
+        return _handle_loci_error(
+            lambda: graph_references(
                 repo,
                 file=file,
                 status=status,
