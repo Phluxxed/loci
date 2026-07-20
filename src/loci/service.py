@@ -47,9 +47,9 @@ from loci.parser.imports import (
     ImportExtractionError,
     RawImport,
     extract_import_batch,
-    extract_imports,
 )
 from loci.parser.languages import EXTENSION_MAP, MARKDOWN_SUFFIXES
+from loci.parser.reference_models import RawLocalExport, RawSymbolReference
 from loci.parser.symbols import Symbol, make_file_symbol
 from loci.storage.index_store import IndexStore, index_versions_current
 from loci.storage.store_resolver import StoreResolution, resolve_store_base_dir
@@ -141,18 +141,27 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
     existing_hashes: dict[str, str] = existing.get("file_hashes", {}) if existing else {}
     existing_symbols: list[dict[str, Any]] = existing.get("symbols", []) if existing else []
     previous_imports: dict[str, list[RawImport]] = defaultdict(list)
-    previous_import_diagnostics: dict[str, list[GraphDiagnostic]] = defaultdict(list)
+    previous_exports: dict[str, list[RawLocalExport]] = defaultdict(list)
+    previous_symbol_references: dict[str, list[RawSymbolReference]] = defaultdict(list)
+    previous_extraction_diagnostics: dict[str, list[GraphDiagnostic]] = defaultdict(list)
     if previous_graph is not None:
         for record in previous_graph.imports:
             previous_imports[record.raw.source_file].append(record.raw)
         for observation in previous_graph.rust_module_observations:
             previous_imports[observation.source_file].append(observation)
+        for export in previous_graph.exports:
+            previous_exports[export.source_file].append(export)
+        for record in previous_graph.symbol_references:
+            previous_symbol_references[record.raw.source_file].append(record.raw)
         for diagnostic in previous_graph.diagnostics:
             if (
-                diagnostic.code == "GRAPH_IMPORT_EXTRACTION_FAILED"
+                diagnostic.code in {
+                    "GRAPH_IMPORT_EXTRACTION_FAILED",
+                    "GRAPH_REFERENCE_EXTRACTION_FAILED",
+                }
                 and diagnostic.source is not None
             ):
-                previous_import_diagnostics[diagnostic.source].append(diagnostic)
+                previous_extraction_diagnostics[diagnostic.source].append(diagnostic)
     repository_scan = _scan_repository_files(repo_path, store)
     go_module_load = load_go_module_context(
         repo_path,
@@ -182,7 +191,9 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
     language_counts: dict[str, int] = defaultdict(int)
     zero_symbol_warnings: list[dict[str, Any]] = []
     raw_imports: list[RawImport] = []
-    import_diagnostics: list[GraphDiagnostic] = []
+    raw_exports: list[RawLocalExport] = []
+    raw_symbol_references: list[RawSymbolReference] = []
+    extraction_diagnostics: list[GraphDiagnostic] = []
 
     for src_file, rel_path, file_hash in repository_scan.indexable_files:
         new_file_hashes[rel_path] = file_hash
@@ -206,8 +217,12 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
             ]
             all_symbols.extend(kept)
             raw_imports.extend(previous_imports.get(rel_path, ()))
-            import_diagnostics.extend(
-                previous_import_diagnostics.get(rel_path, ())
+            raw_exports.extend(previous_exports.get(rel_path, ()))
+            raw_symbol_references.extend(
+                previous_symbol_references.get(rel_path, ())
+            )
+            extraction_diagnostics.extend(
+                previous_extraction_diagnostics.get(rel_path, ())
             )
             files_skipped += 1
             lang = EXTENSION_MAP.get(src_file.suffix, "unknown")
@@ -258,34 +273,24 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
                 content_hash=file_hash,
             )
             try:
-                if lang == "go":
-                    batch = extract_import_batch(
-                        src_file,
-                        source_file=rel_path,
-                        language=lang,
-                        source_hash=file_hash,
-                    )
-                    raw_imports.extend(batch.imports)
-                    if batch.go_package is not None:
-                        file_node.metadata["loci"]["go_package"] = {
-                            "name": batch.go_package.name,
-                            "line": batch.go_package.line,
-                        }
-                else:
-                    raw_imports.extend(extract_imports(
-                        src_file,
-                        source_file=rel_path,
-                        language=lang,
-                        source_hash=file_hash,
-                    ))
+                batch = extract_import_batch(
+                    src_file,
+                    source_file=rel_path,
+                    language=lang,
+                    source_hash=file_hash,
+                )
+                raw_imports.extend(batch.imports)
+                raw_exports.extend(batch.exports)
+                raw_symbol_references.extend(batch.references)
+                if batch.go_package is not None:
+                    file_node.metadata["loci"]["go_package"] = {
+                        "name": batch.go_package.name,
+                        "line": batch.go_package.line,
+                    }
             except ImportExtractionError as exc:
-                import_diagnostics.append(GraphDiagnostic(
-                    severity="warning",
-                    code="GRAPH_IMPORT_EXTRACTION_FAILED",
-                    message="Import observations could not be extracted",
-                    source=rel_path,
-                    details={"reason": str(exc)},
-                ))
+                extraction_diagnostics.append(
+                    _extraction_diagnostic(rel_path, exc)
+                )
             all_symbols.append(file_node)
 
     file_nodes = {
@@ -337,13 +342,15 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
         extension_load.profiles,
         extension_load.contributions,
         raw_imports=raw_imports,
+        raw_exports=raw_exports,
+        raw_symbol_references=raw_symbol_references,
         go_packages=go_package_build.index,
         javascript_modules=javascript_resolution_build.index,
         rust_crates=rust_crate_build.index,
         input_hashes=graph_input_hashes,
         diagnostics=(
             *extension_load.diagnostics,
-            *import_diagnostics,
+            *extraction_diagnostics,
             *go_diagnostics,
             *javascript_diagnostics,
             *rust_diagnostics,
@@ -378,6 +385,13 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
         ),
         "graph_imports_unresolved": sum(
             record.status == "unresolved" for record in graph_state.imports
+        ),
+        "graph_symbol_references_indexed": len(graph_state.symbol_references),
+        "graph_symbol_references_resolved": sum(
+            record.status == "resolved" for record in graph_state.symbol_references
+        ),
+        "graph_symbol_references_unresolved": sum(
+            record.status == "unresolved" for record in graph_state.symbol_references
         ),
         "graph_status": _graph_status(graph_state),
         "graph_diagnostics": [
@@ -1069,6 +1083,13 @@ def graph_health(
             "graph_imports_unresolved": sum(
                 record.status == "unresolved" for record in state.imports
             ),
+            "graph_symbol_references_indexed": len(state.symbol_references),
+            "graph_symbol_references_resolved": sum(
+                record.status == "resolved" for record in state.symbol_references
+            ),
+            "graph_symbol_references_unresolved": sum(
+                record.status == "unresolved" for record in state.symbol_references
+            ),
         },
         "diagnostics": diagnostic_values,
     }
@@ -1378,6 +1399,31 @@ def _rust_problem_diagnostic(problem: RustCrateProblem) -> GraphDiagnostic:
         message=problem.message,
         source=problem.source,
         details=problem.details,
+    )
+
+
+def _extraction_diagnostic(
+    source: str,
+    error: ImportExtractionError,
+) -> GraphDiagnostic:
+    reference_failed = (
+        isinstance(error.__cause__, ValueError)
+        and " reference extraction failed: " in str(error)
+    )
+    return GraphDiagnostic(
+        severity="warning",
+        code=(
+            "GRAPH_REFERENCE_EXTRACTION_FAILED"
+            if reference_failed
+            else "GRAPH_IMPORT_EXTRACTION_FAILED"
+        ),
+        message=(
+            "Reference observations could not be extracted"
+            if reference_failed
+            else "Import observations could not be extracted"
+        ),
+        source=source,
+        details={"reason": str(error)},
     )
 
 

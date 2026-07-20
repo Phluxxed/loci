@@ -659,6 +659,9 @@ def test_graph_health_counts_imports_without_degrading_normal_unresolved_records
         "graph_imports_indexed": 4,
         "graph_imports_resolved": 1,
         "graph_imports_unresolved": 3,
+        "graph_symbol_references_indexed": 0,
+        "graph_symbol_references_resolved": 0,
+        "graph_symbol_references_unresolved": 0,
     }
     assert health["diagnostics"] == []
     assert {
@@ -1781,7 +1784,7 @@ def test_service_inline_rust_modules_survive_incremental_without_reparse(
     def fail_if_reparsed(*args, **kwargs):
         raise AssertionError("unchanged Rust source was reparsed")
 
-    monkeypatch.setattr(service_module, "extract_imports", fail_if_reparsed)
+    monkeypatch.setattr(service_module, "extract_import_batch", fail_if_reparsed)
     incremental_result = index_repo(repo, incremental=True)
     incremental = store.load(repo.resolve())
     incremental_imports = graph_imports(repo)["items"]
@@ -2044,13 +2047,14 @@ def test_service_retains_import_extraction_warning_for_unchanged_source(
     def fail_extraction(*args, **kwargs):
         nonlocal extraction_calls
         extraction_calls += 1
-        raise ImportExtractionError("broken import parse")
+        raise ImportExtractionError("broken import parse") from ValueError(
+            "tree-sitter rejected the source"
+        )
 
     monkeypatch.setattr(
         service_module,
-        "extract_imports",
+        "extract_import_batch",
         fail_extraction,
-        raising=False,
     )
 
     initial = index_repo(repo, incremental=False)
@@ -2147,6 +2151,9 @@ def test_service_materializes_profile_without_leaking_declared_neighbors(
             "graph_imports_indexed": 0,
             "graph_imports_resolved": 0,
             "graph_imports_unresolved": 0,
+            "graph_symbol_references_indexed": 0,
+            "graph_symbol_references_resolved": 0,
+            "graph_symbol_references_unresolved": 0,
         },
         "diagnostics": [],
     }

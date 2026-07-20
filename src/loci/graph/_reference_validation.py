@@ -265,6 +265,22 @@ def _build_validation_index(
                 [],
             ).append(node_id)
 
+    python_reexport_evidence: set[tuple[str, str, int, str, str]] = set()
+    for export in exports:
+        if not isinstance(export, RawLocalExport):
+            raise _error("Reference validation export is not a RawLocalExport")
+        if (
+            export.language == "python"
+            and export.local_name is not None
+            and export.definition_start_byte is None
+        ):
+            python_reexport_evidence.add((
+                export.source_file,
+                export.source_hash,
+                export.line,
+                export.text,
+                export.local_name,
+            ))
     imports_by_binding: dict[
         tuple[str, ImportBinding],
         list[ImportRecord],
@@ -291,11 +307,27 @@ def _build_validation_index(
                 record.raw.source_hash,
                 record.target_id,
             ))
+            if record.raw.language == "python" and any(
+                (
+                    record.raw.source_file,
+                    record.raw.source_hash,
+                    binding.import_line,
+                    binding.import_text,
+                    binding.local_name,
+                )
+                in python_reexport_evidence
+                for binding in record.raw.bindings
+            ):
+                import_support.add((
+                    True,
+                    record.raw.source_file,
+                    record.raw.line,
+                    record.raw.source_hash,
+                    record.target_id,
+                ))
 
     export_support: set[tuple[str, int, str, str]] = set()
     for export in exports:
-        if not isinstance(export, RawLocalExport):
-            raise _error("Reference validation export is not a RawLocalExport")
         if file_hashes.get(export.source_file) != export.source_hash:
             raise _error(
                 "Reference export source evidence is stale",
@@ -425,7 +457,10 @@ def _validate_import(
             "Reference import target does not match its import record",
             field="import_target_id",
         )
-    if record.import_unresolved_reason != matched.unresolved_reason:
+    if (
+        record.unresolved_reason == "import_unresolved"
+        and record.import_unresolved_reason != matched.unresolved_reason
+    ):
         raise _record_error(
             record_index,
             "Reference import outcome does not match its import record",
