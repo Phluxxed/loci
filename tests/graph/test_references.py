@@ -162,8 +162,10 @@ def test_resolves_javascript_named_namespace_default_and_type_only_bindings(
             "src/wrong.ts": "export class Thing {}\n",
             "src/use.ts": (
                 'import Factory, {Thing as Alias, type Shape} from "./model.js";\n'
+                'import type {Shape as StatementShape} from "./model.js";\n'
                 'import * as model from "./model.js";\n'
-                "function run(value: Shape) { Alias; model.Thing; Factory; }\n"
+                "function run(value: Shape, other: StatementShape) { "
+                "Alias; model.Thing; Factory; }\n"
             ),
         },
     )
@@ -172,11 +174,13 @@ def test_resolves_javascript_named_namespace_default_and_type_only_bindings(
 
     assert [record.raw.text for record in selected] == [
         "Shape",
+        "StatementShape",
         "Alias",
         "model.Thing",
         "Factory",
     ]
     assert [record.target_id for record in selected] == [
+        "src/model.ts::Shape#interface",
         "src/model.ts::Shape#interface",
         "src/model.ts::Thing#class",
         "src/model.ts::Thing#class",
@@ -185,10 +189,12 @@ def test_resolves_javascript_named_namespace_default_and_type_only_bindings(
     assert [record.resolution_basis for record in selected] == [
         "direct_binding",
         "direct_binding",
+        "direct_binding",
         "qualified_member",
         "direct_binding",
     ]
     assert [record.binding.type_only for record in selected if record.binding] == [
+        True,
         True,
         False,
         False,
@@ -203,13 +209,19 @@ def test_resolves_javascript_local_export_alias_and_named_reexport(
     records, _, _ = _resolve_javascript_tree(
         tmp_path,
         {
-            "src/model.ts": "export class Thing {}\n",
+            "src/model.ts": (
+                "export class Thing {}\n"
+                "export default function Factory() {}\n"
+            ),
             "src/local.ts": "class Local {}\nexport {Local as Renamed};\n",
-            "src/named.ts": 'export {Thing as PublicThing} from "./model.js";\n',
+            "src/named.ts": (
+                'export {Thing as PublicThing, default as PublicFactory} '
+                'from "./model.js";\n'
+            ),
             "src/use.ts": (
                 'import {Renamed} from "./local.js";\n'
-                'import {PublicThing} from "./named.js";\n'
-                "function run() { Renamed; PublicThing; }\n"
+                'import {PublicThing, PublicFactory} from "./named.js";\n'
+                "function run() { Renamed; PublicThing; PublicFactory; }\n"
             ),
         },
     )
@@ -219,13 +231,16 @@ def test_resolves_javascript_local_export_alias_and_named_reexport(
     assert [record.target_id for record in selected] == [
         "src/local.ts::Local#class",
         "src/model.ts::Thing#class",
+        "src/model.ts::Factory#function",
     ]
     assert [record.resolution_basis for record in selected] == [
         "direct_binding",
         "reexport_chain",
+        "reexport_chain",
     ]
     assert [[support.kind for support in record.support] for record in selected] == [
         ["import_binding", "local_export", "definition"],
+        ["import_binding", "reexport", "definition"],
         ["import_binding", "reexport", "definition"],
     ]
 
@@ -436,6 +451,73 @@ def test_javascript_reexport_pass_limit_fails_closed(
 
     assert record.target_id is None
     assert record.unresolved_reason == "ambiguous_target"
+
+
+def test_javascript_external_and_unsupported_config_failures_retain_provenance(
+    tmp_path: Path,
+):
+    external_records, _, _ = _resolve_javascript_tree(
+        tmp_path / "external",
+        {
+            "src/use.ts": (
+                'import {External} from "react";\n'
+                "function run() { External; }\n"
+            ),
+        },
+    )
+    configured_records, _, _ = _resolve_javascript_tree(
+        tmp_path / "configured",
+        {
+            "src/model.ts": "export class Thing {}\n",
+            "src/use.ts": (
+                'import {Thing} from "./model.js";\n'
+                "function run() { Thing; }\n"
+            ),
+        },
+        controls={
+            "tsconfig.json": (
+                '{"compilerOptions":{"plugins":[{"name":"custom-loader"}]}}'
+            ),
+        },
+    )
+
+    external = external_records[0]
+    configured = configured_records[0]
+    assert (
+        external.unresolved_reason,
+        external.import_unresolved_reason,
+        external.resolution_control_files,
+    ) == ("import_unresolved", "external", ())
+    assert (
+        configured.unresolved_reason,
+        configured.import_unresolved_reason,
+        configured.resolution_control_files,
+    ) == ("import_unresolved", "unsupported_configuration", ("tsconfig.json",))
+
+
+def test_reference_index_rejects_stale_javascript_export_evidence(tmp_path: Path):
+    _, symbols, batches = _resolve_javascript_tree(
+        tmp_path,
+        {
+            "src/model.ts": "export class Thing {}\n",
+            "src/use.ts": (
+                'import {Thing} from "./model.js";\n'
+                "function run() { Thing; }\n"
+            ),
+        },
+    )
+    file_nodes = {
+        symbol.file_path: symbol for symbol in symbols if symbol.kind == "file"
+    }
+    imports = resolve_imports(
+        [raw for batch in batches for raw in batch.imports],
+        file_nodes=file_nodes,
+    )
+    exports = [export for batch in batches for export in batch.exports]
+    stale = replace(exports[0], source_hash="f" * 64)
+
+    with pytest.raises(GraphContractError, match="stale"):
+        build_reference_resolver_index(symbols, imports, [stale, *exports[1:]])
 
 
 def test_resolves_python_direct_alias_and_qualified_members_inside_exact_endpoint(
