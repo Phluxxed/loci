@@ -74,6 +74,7 @@ def _raw(
         type_only=False,
         is_reexport=False,
         source_hash=SOURCE_HASH,
+        bindings=(),
     )
 
 
@@ -106,6 +107,7 @@ def _javascript_raw(
         type_only=type_only,
         is_reexport=is_reexport,
         source_hash=SOURCE_HASH,
+        bindings=(),
     )
 
 
@@ -140,6 +142,7 @@ def _go_raw(
         type_only=False,
         is_reexport=False,
         source_hash=SOURCE_HASH,
+        bindings=(),
     )
 
 
@@ -164,6 +167,7 @@ def _rust_module_raw(*, inline: bool) -> RawImport:
         type_only=False,
         is_reexport=False,
         source_hash=SOURCE_HASH,
+        bindings=(),
         rust=RustImportContext(
             kind="module",
             lexical_module_path=(),
@@ -198,6 +202,7 @@ def _rust_raw(
         type_only=False,
         is_reexport=is_reexport,
         source_hash=SOURCE_HASH,
+        bindings=(),
         rust=RustImportContext(
             kind=kind,  # type: ignore[arg-type]
             lexical_module_path=lexical_module_path,

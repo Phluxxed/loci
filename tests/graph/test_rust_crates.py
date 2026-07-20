@@ -70,6 +70,7 @@ def _rust_observation(
         type_only=False,
         is_reexport=is_reexport,
         source_hash="0" * 64,
+        bindings=(),
         rust=RustImportContext(
             kind=kind,  # type: ignore[arg-type]
             lexical_module_path=lexical_module_path,

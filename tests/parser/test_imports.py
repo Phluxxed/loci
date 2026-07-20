@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -13,6 +14,10 @@ from loci.parser.imports import (
     RustImportContext,
     extract_import_batch,
     extract_imports,
+)
+from loci.parser.reference_models import (
+    MAX_IMPORT_BINDINGS_PER_DECLARATION,
+    ImportBinding,
 )
 
 
@@ -67,63 +72,295 @@ def test_extracts_each_python_import_target_with_exact_evidence(tmp_path: Path):
         ),
     )
 
-    assert imports == [
-        RawImport(
-            source_file="src/consumer.py",
-            language="python",
-            line=1,
-            text="import alpha, beta as local_beta",
-            specifier="alpha",
-            imported_name=None,
-            type_only=False,
-            is_reexport=False,
-            source_hash=SOURCE_HASH,
+    assert [
+        (
+            item.source_file,
+            item.language,
+            item.line,
+            item.text,
+            item.specifier,
+            item.imported_name,
+            item.type_only,
+            item.is_reexport,
+            item.source_hash,
+        )
+        for item in imports
+    ] == [
+        (
+            "src/consumer.py",
+            "python",
+            1,
+            "import alpha, beta as local_beta",
+            "alpha",
+            None,
+            False,
+            False,
+            SOURCE_HASH,
         ),
-        RawImport(
-            source_file="src/consumer.py",
-            language="python",
-            line=1,
-            text="import alpha, beta as local_beta",
-            specifier="beta",
-            imported_name=None,
-            type_only=False,
-            is_reexport=False,
-            source_hash=SOURCE_HASH,
+        (
+            "src/consumer.py",
+            "python",
+            1,
+            "import alpha, beta as local_beta",
+            "beta",
+            None,
+            False,
+            False,
+            SOURCE_HASH,
         ),
-        RawImport(
-            source_file="src/consumer.py",
-            language="python",
-            line=2,
-            text="from ..pkg import One, Two as LocalTwo",
-            specifier="..pkg",
-            imported_name="One",
-            type_only=False,
-            is_reexport=False,
-            source_hash=SOURCE_HASH,
+        (
+            "src/consumer.py",
+            "python",
+            2,
+            "from ..pkg import One, Two as LocalTwo",
+            "..pkg",
+            "One",
+            False,
+            False,
+            SOURCE_HASH,
         ),
-        RawImport(
-            source_file="src/consumer.py",
-            language="python",
-            line=2,
-            text="from ..pkg import One, Two as LocalTwo",
-            specifier="..pkg",
-            imported_name="Two",
-            type_only=False,
-            is_reexport=False,
-            source_hash=SOURCE_HASH,
+        (
+            "src/consumer.py",
+            "python",
+            2,
+            "from ..pkg import One, Two as LocalTwo",
+            "..pkg",
+            "Two",
+            False,
+            False,
+            SOURCE_HASH,
         ),
-        RawImport(
-            source_file="src/consumer.py",
-            language="python",
-            line=3,
-            text="from . import *",
-            specifier=".",
-            imported_name=None,
-            type_only=False,
-            is_reexport=False,
-            source_hash=SOURCE_HASH,
+        (
+            "src/consumer.py",
+            "python",
+            3,
+            "from . import *",
+            ".",
+            None,
+            False,
+            False,
+            SOURCE_HASH,
         ),
     ]
+
+
+def test_extracts_python_import_bindings_with_aliases_and_glob(tmp_path: Path):
+    source = (
+        "import alpha.deep, beta as local_beta\n"
+        "from .pkg import One, Two as LocalTwo\n"
+        "from .pkg import *\n"
+    )
+    imports = _extract(
+        tmp_path,
+        name="bindings.py",
+        language="python",
+        source=source,
+    )
+
+    assert [
+        tuple(
+            (
+                binding.local_name,
+                binding.imported_name,
+                binding.exported_name,
+                binding.kind,
+                binding.type_only,
+            )
+            for binding in item.bindings
+        )
+        for item in imports
+    ] == [
+        (("alpha", None, None, "module", False),),
+        (("local_beta", None, None, "module", False),),
+        (("One", "One", None, "symbol", False),),
+        (("LocalTwo", "Two", None, "symbol", False),),
+        ((None, None, None, "glob", False),),
+    ]
+    assert all(
+        binding.import_line == item.line
+        and binding.import_text == item.text
+        and binding.import_specifier == item.specifier
+        and binding.module_level is True
+        and binding.declaration_start_byte >= 0
+        and binding.scope_start_byte == 0
+        and binding.scope_end_byte == len(source.encode("utf-8"))
+        for item in imports
+        for binding in item.bindings
+    )
+
+
+def test_extracts_javascript_binding_kinds_aliases_and_type_only_state(
+    tmp_path: Path,
+):
+    imports = _extract(
+        tmp_path,
+        name="bindings.ts",
+        language="typescript",
+        source=(
+            'import Default, {type Shape as LocalShape, run} from "./mod";\n'
+            'import * as ns from "./ns";\n'
+            'import type TypeDefault from "./type-default";\n'
+            'import type * as typeNs from "./type-ns";\n'
+            'import "./side";\n'
+            'export type {Shape as PublicShape} from "./types";\n'
+            'export {type TypeOnly, run as execute} from "./mixed";\n'
+            'export * as publicNs from "./namespace";\n'
+            'export * from "./all";\n'
+        ),
+    )
+
+    assert [
+        tuple(
+            (
+                binding.local_name,
+                binding.imported_name,
+                binding.exported_name,
+                binding.kind,
+                binding.type_only,
+            )
+            for binding in item.bindings
+        )
+        for item in imports
+    ] == [
+        (
+            ("Default", "default", None, "symbol", False),
+            ("LocalShape", "Shape", None, "symbol", True),
+            ("run", "run", None, "symbol", False),
+        ),
+        (("ns", None, None, "namespace", False),),
+        (("TypeDefault", "default", None, "symbol", True),),
+        (("typeNs", None, None, "namespace", True),),
+        ((None, None, None, "side_effect", False),),
+        ((None, "Shape", "PublicShape", "symbol", True),),
+        (
+            (None, "TypeOnly", "TypeOnly", "symbol", True),
+            (None, "run", "execute", "symbol", False),
+        ),
+        ((None, None, "publicNs", "namespace", False),),
+        ((None, None, None, "glob", False),),
+    ]
+
+
+def test_extracts_go_explicit_deferred_blank_and_dot_bindings(tmp_path: Path):
+    imports = _extract(
+        tmp_path,
+        name="bindings.go",
+        language="go",
+        source=(
+            "package sample\n"
+            'import "example.com/default"\n'
+            'import alias "example.com/explicit"\n'
+            'import _ "example.com/side"\n'
+            'import . "example.com/dot"\n'
+        ),
+    )
+
+    assert [
+        tuple((binding.local_name, binding.kind) for binding in item.bindings)
+        for item in imports
+    ] == [
+        ((None, "namespace"),),
+        (("alias", "namespace"),),
+        ((None, "blank"),),
+        ((None, "glob"),),
+    ]
+
+
+def test_extracts_rust_named_module_glob_blank_and_reexport_bindings(
+    tmp_path: Path,
+):
+    imports = _extract(
+        tmp_path,
+        name="bindings.rs",
+        language="rust",
+        source=(
+            "pub use crate::{Thing as Alias, module::self, glob::*};\n"
+            "use crate::Trait as _;\n"
+            "extern crate actual as local;\n"
+            "mod child;\n"
+        ),
+    )
+
+    assert [
+        tuple(
+            (
+                binding.local_name,
+                binding.imported_name,
+                binding.exported_name,
+                binding.kind,
+            )
+            for binding in item.bindings
+        )
+        for item in imports
+    ] == [
+        (("Alias", "Thing", "Alias", "symbol"),),
+        (("module", "module", "module", "module"),),
+        ((None, None, None, "glob"),),
+        ((None, "Trait", None, "blank"),),
+        (("local", None, None, "module"),),
+        (("child", "child", None, "module"),),
+    ]
+
+
+def test_import_binding_contract_is_frozen_in_parser_tests():
+    binding = ImportBinding(
+        local_name="Thing",
+        imported_name="Thing",
+        exported_name=None,
+        kind="symbol",
+        type_only=False,
+        module_level=True,
+        declaration_start_byte=0,
+        scope_start_byte=0,
+        scope_end_byte=24,
+        import_line=1,
+        import_text="from model import Thing",
+        import_specifier="model",
+    )
+
+    assert ImportBinding.from_dict(binding.to_dict()) == binding
+
+
+@pytest.mark.parametrize(
+    ("name", "language", "source", "specifier"),
+    [
+        (
+            "nested.py",
+            "python",
+            "def run():\n    from model import Thing\n    return Thing\n",
+            "model",
+        ),
+        (
+            "nested.rs",
+            "rust",
+            "fn run() {\n    use crate::model::Thing;\n    let _ = Thing;\n}\n",
+            "crate::model::Thing",
+        ),
+    ],
+)
+def test_nested_import_bindings_record_lexical_scope(
+    tmp_path: Path,
+    name: str,
+    language: str,
+    source: str,
+    specifier: str,
+):
+    raw = next(
+        item
+        for item in _extract(
+            tmp_path,
+            name=name,
+            language=language,
+            source=source,
+        )
+        if item.specifier == specifier
+    )
+    binding = raw.bindings[0]
+
+    assert binding.module_level is False
+    assert binding.scope_start_byte <= binding.declaration_start_byte
+    assert binding.scope_end_byte > binding.declaration_start_byte
+    assert binding.scope_end_byte <= len(source.encode("utf-8"))
 
 
 def test_classifies_typescript_type_imports_and_reexports(tmp_path: Path):
@@ -266,7 +503,12 @@ def test_go_batch_returns_no_declaration_for_comment_only_source(tmp_path: Path)
         source="// no package declaration\n",
     )
 
-    assert batch == ImportExtractionBatch(imports=(), go_package=None)
+    assert batch == ImportExtractionBatch(
+        imports=(),
+        go_package=None,
+        exports=(),
+        references=(),
+    )
 
 
 def test_expands_rust_use_trees_into_strict_dependency_observations(tmp_path: Path):
@@ -581,6 +823,71 @@ def test_rejects_rust_use_leaf_explosion_at_the_declaration_bound(tmp_path: Path
             name="too_many.rs",
             language="rust",
             source=f"use crate::{{{over_limit}}};\n",
+        )
+
+
+@pytest.mark.parametrize(
+    ("name", "language", "source"),
+    [
+        (
+            "too_many.py",
+            "python",
+            "import "
+            + ", ".join(
+                f"item_{index}"
+                for index in range(MAX_IMPORT_BINDINGS_PER_DECLARATION + 1)
+            )
+            + "\n",
+        ),
+        (
+            "too_many.ts",
+            "typescript",
+            "import {"
+            + ", ".join(
+                f"item_{index}"
+                for index in range(MAX_IMPORT_BINDINGS_PER_DECLARATION + 1)
+            )
+            + '} from "./module";\n',
+        ),
+    ],
+)
+def test_rejects_import_binding_explosion_before_returning_observations(
+    tmp_path: Path,
+    name: str,
+    language: str,
+    source: str,
+):
+    with pytest.raises(ImportExtractionError, match="exceeds binding limit"):
+        _extract(
+            tmp_path,
+            name=name,
+            language=language,
+            source=source,
+        )
+
+
+def test_raw_import_requires_bounded_matching_binding_locators(tmp_path: Path):
+    raw = _extract(
+        tmp_path,
+        name="consumer.py",
+        language="python",
+        source="from model import Thing\n",
+    )[0]
+    binding = raw.bindings[0]
+
+    with pytest.raises(ValueError, match="immutable tuple"):
+        replace(raw, bindings=[binding])
+
+    with pytest.raises(ValueError, match="locator"):
+        replace(
+            raw,
+            bindings=(replace(binding, import_specifier="other"),),
+        )
+
+    with pytest.raises(ValueError, match="per-declaration limit"):
+        replace(
+            raw,
+            bindings=(binding,) * (MAX_IMPORT_BINDINGS_PER_DECLARATION + 1),
         )
 
 

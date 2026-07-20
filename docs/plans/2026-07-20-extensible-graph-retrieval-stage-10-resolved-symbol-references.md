@@ -1177,6 +1177,7 @@ Full and incremental rules:
 ### New production files
 
 - `src/loci/parser/reference_models.py`
+- `src/loci/parser/_javascript_bindings.py`
 - `src/loci/parser/references.py`
 - `src/loci/graph/references.py`
 - `src/loci/graph/_python_references.py`
@@ -1233,9 +1234,17 @@ could repair it.
 
 ### Task 1 — Freeze binding/reference/export parser models
 
+**Implementation status:** complete on 2026-07-20. The focused parser gate
+passes 75 tests and the full repository suite passes 859 tests. JavaScript and
+TypeScript binding extraction lives in the private
+`src/loci/parser/_javascript_bindings.py` helper so the existing multi-language
+import parser remains below the 1,000-line review signal. Final Stage 10 owner
+acceptance remains pending.
+
 **Files:**
 
 - `src/loci/parser/reference_models.py` (new)
+- `src/loci/parser/_javascript_bindings.py` (new)
 - `src/loci/parser/imports.py`
 - `tests/parser/test_imports.py`
 - `tests/parser/test_references.py` (new)

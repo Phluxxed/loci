@@ -418,6 +418,7 @@ def _raw(
         type_only=type_only,
         is_reexport=False,
         source_hash="a" * 64,
+        bindings=(),
     )
 
 

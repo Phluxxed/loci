@@ -133,6 +133,7 @@ def _import_graph(
         type_only=False,
         is_reexport=False,
         source_hash=source_hash,
+        bindings=(),
     )
     record = ImportRecord(
         raw=raw,
