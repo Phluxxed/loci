@@ -4,7 +4,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal, TypeAlias, cast
 
+from loci.parser._binding_context import collect_syntax_context
 from loci.parser._javascript_bindings import extract_javascript_import_bindings
+from loci.parser.call_models import MAX_CALL_SITES_PER_FILE, RawCallSite
+from loci.parser.calls import extract_call_sites
 from loci.parser.languages import get_language_spec
 from loci.parser.reference_models import (
     MAX_IMPORT_BINDINGS_PER_DECLARATION,
@@ -90,6 +93,15 @@ class ImportExtractionBatch:
     go_package: GoPackageDeclaration | None
     exports: tuple[RawLocalExport, ...]
     references: tuple[RawSymbolReference, ...]
+    calls: tuple[RawCallSite, ...]
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.calls, tuple) or any(
+            not isinstance(call, RawCallSite) for call in self.calls
+        ):
+            raise ValueError("calls must be an immutable tuple of raw call sites")
+        if len(self.calls) > MAX_CALL_SITES_PER_FILE:
+            raise ValueError("calls exceeds the per-file limit")
 
 
 class ImportExtractionError(RuntimeError):
@@ -172,6 +184,7 @@ def extract_import_batch(
             f"{source_file} has multiple Go package declarations"
         )
     try:
+        context = collect_syntax_context(tree.root_node, source, language)
         reference_batch = extract_reference_batch(
             tree.root_node,
             source,
@@ -179,16 +192,31 @@ def extract_import_batch(
             language=language,
             source_hash=source_hash,
             imports=imports,
+            context=context,
         )
     except ValueError as exc:
         raise ImportExtractionError(
             f"{source_file} reference extraction failed: {exc}"
+        ) from exc
+    try:
+        calls = extract_call_sites(
+            tree.root_node,
+            source,
+            source_file=source_file,
+            language=language,
+            source_hash=source_hash,
+            context=context,
+        )
+    except ValueError as exc:
+        raise ImportExtractionError(
+            f"{source_file} call extraction failed: {exc}"
         ) from exc
     return ImportExtractionBatch(
         imports=tuple(imports),
         go_package=go_packages[0] if go_packages else None,
         exports=reference_batch.exports,
         references=reference_batch.references,
+        calls=calls,
     )
 
 

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Literal, TypeAlias
 
 from loci.parser._reference_exports import (
     _RUST_ITEM_TYPES,
@@ -25,20 +26,97 @@ _JAVASCRIPT_FUNCTION_NODES = {
     "method_definition",
 }
 
+CallableKind: TypeAlias = Literal["function", "method"]
+ExecutableOwnerKind: TypeAlias = Literal["file", "callable", "unindexed"]
+_CALLABLE_KINDS = {"function", "method"}
+_EXECUTABLE_OWNER_KINDS = {"file", "callable", "unindexed"}
+
 
 @dataclass(frozen=True, slots=True)
 class LexicalBinding:
     name: str
+    kind: str
     scope_start_byte: int
     scope_end_byte: int
     scope_type: str
     declaration_start_byte: int
+    declaration_end_byte: int
     active_start_byte: int
+    callable_kind: CallableKind | None
+
+
+@dataclass(frozen=True, slots=True)
+class ExecutableOwner:
+    kind: ExecutableOwnerKind
+    definition_start_byte: int | None
+    definition_end_byte: int | None
+    body_start_byte: int | None
+    body_end_byte: int | None
+
+    def __post_init__(self) -> None:
+        if self.kind not in _EXECUTABLE_OWNER_KINDS:
+            raise ValueError("kind must be a supported executable owner kind")
+        ranges = (
+            self.definition_start_byte,
+            self.definition_end_byte,
+            self.body_start_byte,
+            self.body_end_byte,
+        )
+        if self.kind == "file":
+            if any(value is not None for value in ranges):
+                raise ValueError("file owners cannot carry definition or body ranges")
+            return
+        if any(type(value) is not int or value < 0 for value in ranges):
+            raise ValueError("callable and unindexed owners require non-negative ranges")
+        definition_start = self.definition_start_byte
+        definition_end = self.definition_end_byte
+        body_start = self.body_start_byte
+        body_end = self.body_end_byte
+        assert definition_start is not None
+        assert definition_end is not None
+        assert body_start is not None
+        assert body_end is not None
+        if not (
+            definition_start < definition_end
+            and body_start < body_end
+            and definition_start <= body_start
+            and body_end <= definition_end
+        ):
+            raise ValueError("owner definition and body ranges must be ordered and nested")
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "kind": self.kind,
+            "definition_start_byte": self.definition_start_byte,
+            "definition_end_byte": self.definition_end_byte,
+            "body_start_byte": self.body_start_byte,
+            "body_end_byte": self.body_end_byte,
+        }
+
+    @classmethod
+    def from_dict(cls, value: Mapping[str, Any]) -> ExecutableOwner:
+        expected = {
+            "kind",
+            "definition_start_byte",
+            "definition_end_byte",
+            "body_start_byte",
+            "body_end_byte",
+        }
+        if not isinstance(value, Mapping) or set(value) != expected:
+            raise ValueError("executable owner fields are missing or unknown")
+        return cls(
+            kind=value["kind"],
+            definition_start_byte=value["definition_start_byte"],
+            definition_end_byte=value["definition_end_byte"],
+            body_start_byte=value["body_start_byte"],
+            body_end_byte=value["body_end_byte"],
+        )
 
 
 @dataclass(frozen=True, slots=True)
 class SyntaxContext:
     local_bindings: tuple[LexicalBinding, ...]
+    executable_owners: tuple[ExecutableOwner, ...]
     excluded_subtrees: frozenset[tuple[int, int, str]]
     unsupported_import_starts: frozenset[int]
 
@@ -46,6 +124,7 @@ class SyntaxContext:
 @dataclass(slots=True)
 class _SyntaxContextBuilder:
     local_bindings: list[LexicalBinding]
+    executable_owners: list[ExecutableOwner]
     excluded_subtrees: set[tuple[int, int, str]]
     unsupported_import_starts: set[int]
 
@@ -59,9 +138,11 @@ def collect_syntax_context(
         raise ValueError(f"unsupported syntax context language: {language}")
     context = _SyntaxContextBuilder(
         local_bindings=[],
+        executable_owners=[],
         excluded_subtrees=set(),
         unsupported_import_starts=set(),
     )
+    _collect_executable_owners(root, language, context)
     if language == "python":
         _collect_python_context(root, source, context)
     elif language in {"javascript", "typescript"}:
@@ -72,8 +153,38 @@ def collect_syntax_context(
         _collect_rust_context(root, source, context)
     return SyntaxContext(
         local_bindings=tuple(context.local_bindings),
+        executable_owners=tuple(context.executable_owners),
         excluded_subtrees=frozenset(context.excluded_subtrees),
         unsupported_import_starts=frozenset(context.unsupported_import_starts),
+    )
+
+
+def nearest_executable_owner(
+    context: SyntaxContext,
+    node: Any,
+) -> ExecutableOwner:
+    containing = [
+        owner
+        for owner in context.executable_owners
+        if owner.body_start_byte is not None
+        and owner.body_end_byte is not None
+        and owner.body_start_byte <= node.start_byte
+        and node.end_byte <= owner.body_end_byte
+    ]
+    if not containing:
+        return ExecutableOwner(
+            kind="file",
+            definition_start_byte=None,
+            definition_end_byte=None,
+            body_start_byte=None,
+            body_end_byte=None,
+        )
+    return min(
+        containing,
+        key=lambda owner: (
+            owner.body_end_byte - owner.body_start_byte,
+            -owner.body_start_byte,
+        ),
     )
 
 
@@ -112,6 +223,56 @@ def _scope_node(node: Any, node_types: set[str]) -> Any:
     return _nearest_ancestor(node, node_types) or _root_node(node)
 
 
+def _collect_executable_owners(
+    root: Any,
+    language: str,
+    context: _SyntaxContextBuilder,
+) -> None:
+    callable_types = {
+        "python": {"function_definition"},
+        "javascript": {"function_declaration", "method_definition"},
+        "typescript": {"function_declaration", "method_definition"},
+        "go": {"function_declaration", "method_declaration"},
+        "rust": {"function_item"},
+    }[language]
+    unindexed_types = {
+        "python": {"lambda"},
+        "javascript": {
+            "arrow_function",
+            "function_expression",
+            "generator_function",
+            "generator_function_declaration",
+        },
+        "typescript": {
+            "arrow_function",
+            "function_expression",
+            "generator_function",
+            "generator_function_declaration",
+        },
+        "go": {"func_literal"},
+        "rust": {"closure_expression"},
+    }[language]
+    for node in _walk_nodes(root):
+        if node.type not in callable_types | unindexed_types:
+            continue
+        body = node.child_by_field_name("body")
+        if body is None or body.start_byte >= body.end_byte:
+            continue
+        definition_start = node.start_byte
+        definition_end = node.end_byte
+        if language == "python":
+            definition_start, definition_end = _python_definition_range(node)
+        context.executable_owners.append(
+            ExecutableOwner(
+                kind="callable" if node.type in callable_types else "unindexed",
+                definition_start_byte=definition_start,
+                definition_end_byte=definition_end,
+                body_start_byte=body.start_byte,
+                body_end_byte=body.end_byte,
+            )
+        )
+
+
 def _add_local_binding(
     context: _SyntaxContextBuilder,
     *,
@@ -121,6 +282,9 @@ def _add_local_binding(
     declaration_start_byte: int,
     active_start_byte: int,
     scope_type: str | None = None,
+    kind: str = "value",
+    declaration_end_byte: int | None = None,
+    callable_kind: CallableKind | None = None,
 ) -> None:
     name = _node_text(name_node, source)
     if not name or name == "_":
@@ -128,11 +292,18 @@ def _add_local_binding(
     context.local_bindings.append(
         LexicalBinding(
             name=name,
+            kind=kind,
             scope_start_byte=scope.start_byte,
             scope_end_byte=scope.end_byte,
             scope_type=scope_type or scope.type,
             declaration_start_byte=declaration_start_byte,
+            declaration_end_byte=(
+                declaration_end_byte
+                if declaration_end_byte is not None
+                else declaration_start_byte
+            ),
             active_start_byte=active_start_byte,
+            callable_kind=callable_kind,
         )
     )
 
@@ -148,6 +319,24 @@ def _identifier_nodes(node: Any | None) -> list[Any]:
     for child in node.named_children:
         identifiers.extend(_identifier_nodes(child))
     return identifiers
+
+
+def _python_callable_kind(node: Any) -> CallableKind:
+    current = node.parent
+    while current is not None:
+        if current.type in {"function_definition", "lambda"}:
+            return "function"
+        if current.type == "class_definition":
+            return "method"
+        current = current.parent
+    return "function"
+
+
+def _python_definition_range(node: Any) -> tuple[int, int]:
+    parent = node.parent
+    if parent is not None and parent.type == "decorated_definition":
+        return parent.start_byte, node.end_byte
+    return node.start_byte, node.end_byte
 
 
 def _collect_python_context(
@@ -166,13 +355,22 @@ def _collect_python_context(
             _exclude(context, name)
             if name is not None:
                 scope = python_scope(node)
+                definition_start, definition_end = _python_definition_range(node)
+                callable_kind = (
+                    _python_callable_kind(node)
+                    if node.type == "function_definition"
+                    else None
+                )
                 _add_local_binding(
                     context,
                     name_node=name,
                     source=source,
                     scope=scope,
-                    declaration_start_byte=node.start_byte,
+                    declaration_start_byte=definition_start,
                     active_start_byte=node.end_byte,
+                    kind="callable" if callable_kind is not None else "value",
+                    declaration_end_byte=definition_end,
+                    callable_kind=callable_kind,
                 )
             parameters = node.child_by_field_name("parameters")
             if parameters is not None:
@@ -189,14 +387,18 @@ def _collect_python_context(
             if node.type == "function_definition" and name is not None:
                 body = node.child_by_field_name("body")
                 if body is not None:
+                    definition_start, definition_end = _python_definition_range(node)
                     _add_local_binding(
                         context,
                         name_node=name,
                         source=source,
                         scope=body,
-                        declaration_start_byte=node.start_byte,
+                        declaration_start_byte=definition_start,
                         active_start_byte=body.start_byte,
                         scope_type="definition_body",
+                        kind="callable",
+                        declaration_end_byte=definition_end,
+                        callable_kind=_python_callable_kind(node),
                     )
             continue
         if node.type == "lambda":
@@ -379,6 +581,12 @@ def _collect_javascript_context(
             _exclude(context, name)
             if name is not None:
                 scope = _javascript_lexical_scope(node)
+                callable_kind = (
+                    "function"
+                    if node.type
+                    in {"function_declaration", "generator_function_declaration"}
+                    else None
+                )
                 _add_local_binding(
                     context,
                     name_node=name,
@@ -386,12 +594,20 @@ def _collect_javascript_context(
                     scope=scope,
                     declaration_start_byte=node.start_byte,
                     active_start_byte=scope.start_byte,
+                    kind="callable" if callable_kind is not None else "value",
+                    declaration_end_byte=node.end_byte,
+                    callable_kind=callable_kind,
                 )
         if node.type in _JAVASCRIPT_FUNCTION_NODES:
             parameters = node.child_by_field_name("parameters")
             if parameters is not None:
                 for parameter in parameters.named_children:
-                    pattern = parameter.child_by_field_name("pattern") or parameter
+                    pattern = (
+                        parameter.child_by_field_name("pattern")
+                        or parameter.child_by_field_name("left")
+                        or parameter.child_by_field_name("name")
+                        or parameter
+                    )
                     _exclude(context, pattern)
                     for identifier in _identifier_nodes(pattern):
                         _add_local_binding(
@@ -459,7 +675,24 @@ def _collect_go_context(
             "type_spec",
             "const_spec",
         }:
-            _exclude(context, node.child_by_field_name("name"))
+            name = node.child_by_field_name("name")
+            _exclude(context, name)
+            if name is not None and node.type != "method_declaration":
+                scope = _scope_node(node, {"block", "source_file"})
+                callable_kind = (
+                    "function" if node.type == "function_declaration" else None
+                )
+                _add_local_binding(
+                    context,
+                    name_node=name,
+                    source=source,
+                    scope=scope,
+                    declaration_start_byte=node.start_byte,
+                    active_start_byte=scope.start_byte,
+                    kind="callable" if callable_kind is not None else "value",
+                    declaration_end_byte=node.end_byte,
+                    callable_kind=callable_kind,
+                )
         if node.type in function_types:
             body = node.child_by_field_name("body")
             if body is None:
@@ -521,6 +754,17 @@ def _rust_scope(node: Any) -> Any:
     return _scope_node(node, {"block", "declaration_list", "source_file"})
 
 
+def _rust_callable_kind(node: Any) -> CallableKind:
+    current = node.parent
+    while current is not None:
+        if current.type in {"impl_item", "trait_item"}:
+            return "method"
+        if current.type in {"function_item", "block", "source_file", "mod_item"}:
+            break
+        current = current.parent
+    return "function"
+
+
 def _collect_rust_context(
     root: Any,
     source: bytes,
@@ -549,6 +793,9 @@ def _collect_rust_context(
             _exclude(context, name)
             if name is not None:
                 scope = _rust_scope(node)
+                callable_kind = (
+                    _rust_callable_kind(node) if node.type == "function_item" else None
+                )
                 _add_local_binding(
                     context,
                     name_node=name,
@@ -556,6 +803,9 @@ def _collect_rust_context(
                     scope=scope,
                     declaration_start_byte=node.start_byte,
                     active_start_byte=scope.start_byte,
+                    kind="callable" if callable_kind is not None else "value",
+                    declaration_end_byte=node.end_byte,
+                    callable_kind=callable_kind,
                 )
             parameters = node.child_by_field_name("parameters")
             body = node.child_by_field_name("body")
