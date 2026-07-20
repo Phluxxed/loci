@@ -1,6 +1,6 @@
 # Plan: Extensible Graph Retrieval Stage 9 — Cargo-aware Rust Dependency Resolution
 
-- **Status:** owner-approved; implementation in progress (Tasks 1–3 complete)
+- **Status:** implementation and final evidence complete; explicit owner acceptance pending
 - **Date:** 2026-07-18
 - **Repository:** `/Users/brummerv/loci`
 - **Governing design:** `docs/design/2026-07-13-extensible-graph-retrieval-design.md`
@@ -892,8 +892,8 @@ Validation invariants:
 - unresolved Rust records have no control files, while JavaScript/TypeScript
   retain the accepted Stage 8 behavior of listing controls that explain a
   failed resolution; and
-- Python/Go record bytes and behavior remain unchanged except for strict new
-  null fields required by graph-state schema 5.
+- Python/Go record bytes and behavior remain unchanged except for strict null
+  fields introduced by graph-state schema 5 and retained by schema 6.
 
 ### Materialization and service APIs
 
@@ -1363,6 +1363,18 @@ uv run pytest -q tests/test_mcp_server.py
 
 ### Task 8 — Final verification and owner review packet
 
+**Implementation status:** evidence complete on 2026-07-20; explicit owner
+acceptance pending. The first disposable-repository run exposed that unchanged
+incremental indexing discarded inline Rust module ownership metadata and could
+retarget an exact file import to its crate node. Graph-state schema 6 now
+persists only those hidden structural observations, a no-reparse regression
+proves their reuse, and the corrected production MCP matrix produces
+byte-identical full/incremental indexes across all three fixtures. All 808
+tests, build, compile, lock, diff, frozen-checksum, fresh-process, execution
+guard, compatibility, and security gates pass. The final packet is
+`docs/reviews/2026-07-18-extensible-graph-retrieval-stage-9-final-review.md`.
+Stage 9 remains unaccepted until the owner approves that packet.
+
 Files:
 
 - new `docs/reviews/2026-07-18-extensible-graph-retrieval-stage-9-final-review.md`
@@ -1462,7 +1474,7 @@ Prove:
 
 Prove:
 
-1. schema 5 and extractor 9 force a full rebuild;
+1. graph-state schema 6 and extractor 9 force a full rebuild;
 2. Rust contexts, target shape, basis, controls, and configuration round-trip
    strictly through a fresh process;
 3. resolved module declarations/imports emit one directed file/crate edge with
@@ -1565,7 +1577,7 @@ cross-language regression blocks acceptance.
 ## Rollback
 
 Before final acceptance, rollback is the ordered revert of Stage 9 commits.
-Because graph-state 5 and extractor 9 force rebuilds, reverting returns Loci to
+Because graph-state 6 and extractor 9 force rebuilds, reverting returns Loci to
 the accepted Stage 8 behavior: Rust observations may still be extracted by the
 old parser but remain `unresolved/unsupported_language`, and no crate nodes or
 Rust edges survive a fresh index.
