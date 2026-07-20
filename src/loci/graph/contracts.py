@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, Any, Literal, Mapping, TypeAlias, cast
 
 if TYPE_CHECKING:
     from .imports import ImportRecord
+    from .references import SymbolReferenceRecord
 
 
 JSONValue: TypeAlias = (
@@ -321,7 +322,13 @@ def validate_graph_edges(
     indexed_nodes: Mapping[str, Mapping[str, Any]],
     file_hashes: Mapping[str, str] | None = None,
     imports: Sequence[ImportRecord] = (),
+    symbol_references: Sequence[SymbolReferenceRecord] = (),
 ) -> None:
+    reference_index = {}
+    if symbol_references:
+        from ._reference_validation import index_reference_edge_records
+
+        reference_index = index_reference_edge_records(symbol_references)
     for edge_index, edge in enumerate(edges):
         _validate_evidence(edge.evidence, edge_index=edge_index)
         if edge.from_id == edge.to_id:
@@ -348,6 +355,17 @@ def validate_graph_edges(
                 file_hashes=file_hashes,
                 imports=imports,
             )
+        elif edge_kind in {
+            ("loci", "references"),
+            ("loci", "references_type"),
+        }:
+            _validate_reference_edge(
+                edge,
+                edge_index=edge_index,
+                indexed_nodes=indexed_nodes,
+                file_hashes=file_hashes,
+                reference_index=reference_index,
+            )
         else:
             raise GraphContractError(
                 "GRAPH_EDGE_TYPE_UNSUPPORTED",
@@ -358,6 +376,28 @@ def validate_graph_edges(
                     "type": edge.type,
                 },
             )
+
+
+def _validate_reference_edge(
+    edge: GraphEdge,
+    *,
+    edge_index: int,
+    indexed_nodes: Mapping[str, Mapping[str, Any]],
+    file_hashes: Mapping[str, str] | None,
+    reference_index: Mapping[
+        tuple[str, str, bool, str, int, str],
+        Sequence[SymbolReferenceRecord],
+    ],
+) -> None:
+    from ._reference_validation import validate_reference_edge
+
+    validate_reference_edge(
+        edge,
+        edge_index=edge_index,
+        indexed_nodes=indexed_nodes,
+        file_hashes=file_hashes,
+        reference_index=reference_index,
+    )
 
 
 def _validate_contains_edge(

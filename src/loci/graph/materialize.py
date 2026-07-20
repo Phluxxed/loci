@@ -16,6 +16,7 @@ from loci.graph.contracts import (
     GraphEvidence,
     GraphNodeRef,
     JSONValue,
+    validate_graph_edges,
 )
 from loci.graph.imports import (
     _is_inline_rust_module,
@@ -35,6 +36,12 @@ from loci.graph.profiles import (
     read_contained_file,
     validate_contained_file,
 )
+from loci.graph.references import (
+    build_reference_resolver_index,
+    materialize_reference_edges,
+    resolve_symbol_references,
+    validate_symbol_reference_records,
+)
 from loci.graph.rust_crates import RustCrateIndex
 from loci.graph.state import (
     GraphDiagnostic,
@@ -42,6 +49,7 @@ from loci.graph.state import (
     LoadedGraphContribution,
 )
 from loci.parser.imports import RawImport
+from loci.parser.reference_models import RawLocalExport, RawSymbolReference
 from loci.parser.symbols import Symbol
 
 
@@ -218,6 +226,8 @@ def materialize_graph(
     contributions: Sequence[LoadedGraphContribution],
     *,
     raw_imports: Sequence[RawImport] = (),
+    raw_exports: Sequence[RawLocalExport] = (),
+    raw_symbol_references: Sequence[RawSymbolReference] = (),
     go_packages: GoPackageIndex | None = None,
     javascript_modules: JavaScriptResolutionIndex | None = None,
     rust_crates: RustCrateIndex | None = None,
@@ -269,6 +279,36 @@ def materialize_graph(
             observation.text,
         ),
     ))
+    reference_edges: list[GraphEdge] = []
+    if raw_exports or raw_symbol_references:
+        reference_index = build_reference_resolver_index(
+            symbols,
+            import_records,
+            raw_exports,
+            go_packages=go_packages,
+            rust_crates=rust_crates,
+        )
+        reference_records = tuple(resolve_symbol_references(
+            raw_symbol_references,
+            imports=import_records,
+            index=reference_index,
+        ))
+        serialized_nodes = {symbol.id: symbol.to_dict() for symbol in symbols}
+        validate_symbol_reference_records(
+            reference_records,
+            imports=import_records,
+            exports=raw_exports,
+            indexed_nodes=serialized_nodes,
+            file_hashes=file_hashes,
+        )
+        reference_edges = materialize_reference_edges(reference_records)
+        validate_graph_edges(
+            reference_edges,
+            indexed_nodes=serialized_nodes,
+            file_hashes=file_hashes,
+            imports=import_records,
+            symbol_references=reference_records,
+        )
     active_edges = list(extract_markdown_contains_edges(symbols))
     active_edges.extend(materialize_import_edges(
         import_records,
@@ -276,6 +316,7 @@ def materialize_graph(
         go_packages=go_packages,
         rust_crates=rust_crates,
     ))
+    active_edges.extend(reference_edges)
     overlay_values: dict[tuple[str, str], dict[str, JSONValue]] = {}
     overlay_kinds: dict[tuple[str, str], str] = {}
     materialization_diagnostics = list(diagnostics)
