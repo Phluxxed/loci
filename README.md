@@ -162,7 +162,7 @@ MCP read tools refresh stale indexes before returning cached data. `loci_index`
 still performs explicit indexing, while `loci_outline`, `loci_search`,
 `loci_get`, `loci_file`, `loci_grep`, `loci_graph_anchors`,
 `loci_graph_neighbors`, `loci_graph_traverse_neighbors`, `loci_graph_paths`,
-`loci_graph_retrieve`, `loci_graph_imports`, and
+`loci_graph_retrieve`, `loci_graph_imports`, `loci_graph_references`, and
 `loci_graph_health` first check indexed source, profile, and contribution hashes
 against the current repository and run a locked incremental refresh if needed.
 Freshness also includes Go module/workspace controls, JavaScript/TypeScript
@@ -182,6 +182,7 @@ project/package/workspace controls, and Cargo manifests.
 | `loci_graph_paths` | Find bounded, evidence-backed paths between exact endpoint IDs |
 | `loci_graph_retrieve` | Rank question-shaped paths and expose rejected semantic or hub shortcuts |
 | `loci_graph_imports` | Inspect bounded resolved and unresolved built-in import records |
+| `loci_graph_references` | Inspect bounded resolved and unresolved imported-symbol references |
 | `loci_graph_health` | Report loaded graph profiles, active record counts, and diagnostics |
 | `loci_verify` | Verify index integrity and content drift |
 | `loci_list` | List indexed repos |
@@ -404,7 +405,10 @@ tests, examples, or repository binaries, and never uses the network, Cargo
 home, target directory, ambient workspace, environment/toolchain state, or
 lockfiles. It does not choose features, target triples, profiles, or `cfg`
 truth; expand macros or generated modules; infer undeclared source files;
-resolve terminal Rust items; or create cross-file call edges. Unsupported,
+or create cross-file call edges. A Rust import edge alone never resolves a
+terminal item; the separate resolved-symbol reference layer can do so only for
+the bounded, visibility-checked, configuration-convergent subset documented
+below. Unsupported,
 missing, external, inaccessible, and ambiguous routes remain inspectable
 records rather than guessed edges.
 
@@ -415,10 +419,77 @@ become edges, and do not degrade graph health when they are normal resolution
 outcomes. `loci_graph_health` reports
 `graph_file_nodes_indexed`, `graph_go_packages_indexed`,
 `graph_rust_crates_indexed`, `graph_imports_indexed`,
-`graph_imports_resolved`, and `graph_imports_unresolved`; invalid controls,
-extraction failures, or persistence failures still appear as diagnostics.
+`graph_imports_resolved`, `graph_imports_unresolved`,
+`graph_symbol_references_indexed`, `graph_symbol_references_resolved`, and
+`graph_symbol_references_unresolved`; invalid controls, extraction failures, or
+persistence failures still appear as diagnostics.
 Loci never falls back to a repository-wide name guess. There is no import CLI
 command or separate top-level import store.
+
+### Built-in resolved symbol references
+
+Loci can refine a proven file, package, or crate import into a directed
+symbol-level relationship when the source syntax establishes one definite
+local binding and the imported endpoint exposes one exact accessible indexed
+symbol. Runtime references use `type="references"`; explicitly type-only
+TypeScript references use `type="references_type"`. Both use
+`namespace="loci"`, `resolution="import-resolved"`, and retain the exact source
+line and content hash as evidence.
+
+The source endpoint is the unique smallest indexed function, method, or class
+that contains the reference. Module-level code uses the source file node. The
+target is always the exact indexed definition reached through the matched
+import and supported export surface. A same-named symbol elsewhere in the
+repository is never a candidate.
+
+Inspect stored outcomes through the MCP-only diagnostic read:
+
+```text
+loci_graph_references(
+  repo="/path/to/repo",
+  file="src/consumer.py",
+  status="all",       # all | resolved | unresolved
+  offset=0,
+  limit=100,          # 1..500
+)
+```
+
+The response reports the raw reference, selected import binding, source and
+import endpoints, exact target when resolved, support records, resolution
+basis and controls, and explicit reference/import failure reasons. `file`
+filters before counts; `status` filters the returned items after total,
+resolved, and unresolved counts are calculated; `offset` and `limit` paginate
+the stable source-position order. Current reads do not rewrite a current
+index.
+
+Use the generic graph tools to navigate trusted reference edges. Outgoing
+traversal answers “which imported symbols does this function name?”; incoming
+traversal answers “which indexed symbols name this definition?” without
+reversing the stored edge:
+
+```text
+loci_graph_traverse_neighbors(
+  repo="/path/to/repo",
+  seed_ids=["src/consumer.py::build#function"],
+  namespaces=["loci"],
+  edge_types=["references", "references_type"],
+  resolutions=["import-resolved"],
+  direction="outgoing",
+)
+```
+
+`loci_graph_paths` accepts the same filters and hydrates the cached reference
+line. `loci_get` then retrieves the exact target source. Compatibility
+`loci_graph_neighbors` remains contains-only and never widens to references.
+
+This is reference resolution, not a call graph. Loci does not claim that the
+source invokes the target, choose runtime overloads or trait implementations,
+expand macros/generated code, interpret dynamic imports or computed member
+access, or compensate for unresolved, shadowed, ambiguous, inaccessible,
+external, unsupported, or configuration-divergent evidence. Those cases stay
+inspectable unresolved records and create no trusted edge. There is no
+reference CLI command, model call, runtime/toolchain execution, repository-code
+execution, package-manager access, or network access in this path.
 
 ## Analytics
 

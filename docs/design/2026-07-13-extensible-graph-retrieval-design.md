@@ -407,10 +407,11 @@ the strict raw observation, `target_crate`, Cargo/Rust resolution provenance,
 and `resolution_configuration`; graph health adds
 `graph_rust_crates_indexed`.
 
-Stages 1-9 are implemented, reviewed, and accepted. The next graph roadmap
-stage is resolved symbol references that follow definite imports.
+Stages 1-9 are implemented, reviewed, and accepted. Stage 10 resolved symbol
+references are implemented and have passed the production review matrix; the
+final owner acceptance gate remains open.
 
-### Stage 10: Resolved symbol references (approved)
+### Stage 10: Resolved symbol references (implemented, awaiting owner acceptance)
 
 The detailed Stage 10 plan was approved by the owner on 2026-07-20 for bounded,
 task-by-task production implementation:
@@ -428,6 +429,40 @@ edges.
 Cross-file calls, heuristic candidates, and graph orientation remain later
 roadmap stages. Stage 10 does not authorize executing repository code,
 compilers, runtimes, package managers, or network operations.
+
+The implementation now extracts strict import bindings, local export surfaces,
+lexically owned symbol uses, and conservative shadowing evidence across the
+supported Python, JavaScript/TypeScript, Go, and Rust subsets. Language-specific
+resolvers can select a target only inside the exact endpoint and export surface
+proven by the matched resolved import. Strict reference records are validated
+against current source hashes, imports, symbols, visibility, and support before
+they can materialize a directed `loci:references|references_type` edge with
+`resolution="import-resolved"`.
+
+Reference records live inside private graph-state schema 7; the outer index
+schema remains 5, public graph envelopes remain schema 1, and extractor version
+10 forces stale indexes through the existing complete rebuild path. Incremental
+indexing reuses unchanged observations but re-resolves them when a source,
+target, re-export, module/workspace/package control, or Cargo control changes.
+
+The additive `loci_graph_references(repo, file, status, offset, limit)` MCP read
+exposes bounded resolved and unresolved records. Existing generic traversal and
+path tools consume the standard edges in either direction, while
+`loci_graph_neighbors` remains contains-only. There is no reference CLI,
+parallel traversal engine, new dependency, model call, runtime/toolchain
+execution, repository-code execution, or network access.
+
+The final evidence packet is
+`docs/reviews/2026-07-20-extensible-graph-retrieval-stage-10-final-review.md`.
+It records the complete 1,013-test repository gate, frozen benchmark checksum,
+package build, live Loci dogfood, and installed-wrapper disposable MCP fixtures
+for all four language families plus cross-language decoys. Only Vik's explicit
+acceptance can change this stage from implemented-and-reviewed to accepted.
+
+After that acceptance, the next roadmap boundary is Stage 11 cross-file calls,
+limited to sites where both a Stage 10 reference and call-site syntax prove one
+definite callee. Heuristic candidates and architecture analysis remain later,
+separately reviewed stages.
 
 ## Technical Fit
 
