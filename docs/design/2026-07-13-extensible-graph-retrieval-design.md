@@ -1,6 +1,6 @@
 # loci: Extensible Graph Retrieval Layer — Design
 
-**Status:** Stages 1-9 implemented, reviewed, and accepted
+**Status:** Stages 1-9 implemented, reviewed, and accepted; Stage 10 approved for implementation
 
 **Date:** 2026-07-13
 
@@ -410,6 +410,25 @@ and `resolution_configuration`; graph health adds
 Stages 1-9 are implemented, reviewed, and accepted. The next graph roadmap
 stage is resolved symbol references that follow definite imports.
 
+### Stage 10: Resolved symbol references (approved)
+
+The detailed Stage 10 plan was approved by the owner on 2026-07-20 for bounded,
+task-by-task production implementation:
+`docs/plans/2026-07-20-extensible-graph-retrieval-stage-10-resolved-symbol-references.md`.
+
+The approved boundary adds symbol-level `references` and `references_type`
+edges only where a static local binding follows an already definite import to
+one exact accessible indexed symbol. It includes conservative shadowing checks
+and bounded definite re-export chains across the supported Python,
+JavaScript/TypeScript, Go, and Rust subsets. Unresolved imports, shadowed or
+ambiguous bindings, inaccessible or unindexed targets, dynamic syntax, and
+configuration-divergent Rust targets remain inspectable without becoming
+edges.
+
+Cross-file calls, heuristic candidates, and graph orientation remain later
+roadmap stages. Stage 10 does not authorize executing repository code,
+compilers, runtimes, package managers, or network operations.
+
 ## Technical Fit
 
 ### Stack
@@ -543,5 +562,5 @@ The staged implementation and its approved plans resolved the design questions:
 4. Stage 6 followed the reviewed Stage 5 llm-wiki integration and reused the
    same graph contracts rather than creating an import-specific subsystem.
 
-Future resolved-reference or call work is a new proposal, not an unanswered
-part of this design.
+Stage 10 resolved-reference work follows its separately approved plan. Future
+call work remains a new proposal, not an unanswered part of this design.
