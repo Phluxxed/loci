@@ -196,6 +196,39 @@ def test_resolves_javascript_named_namespace_default_and_type_only_bindings(
     assert {record.status for record in selected} == {"resolved"}
 
 
+def test_resolves_javascript_local_export_alias_and_named_reexport(
+    tmp_path: Path,
+):
+    records, _, _ = _resolve_javascript_tree(
+        tmp_path,
+        {
+            "src/model.ts": "export class Thing {}\n",
+            "src/local.ts": "class Local {}\nexport {Local as Renamed};\n",
+            "src/named.ts": 'export {Thing as PublicThing} from "./model.js";\n',
+            "src/use.ts": (
+                'import {Renamed} from "./local.js";\n'
+                'import {PublicThing} from "./named.js";\n'
+                "function run() { Renamed; PublicThing; }\n"
+            ),
+        },
+    )
+
+    selected = [record for record in records if record.raw.source_file == "src/use.ts"]
+
+    assert [record.target_id for record in selected] == [
+        "src/local.ts::Local#class",
+        "src/model.ts::Thing#class",
+    ]
+    assert [record.resolution_basis for record in selected] == [
+        "direct_binding",
+        "reexport_chain",
+    ]
+    assert [[support.kind for support in record.support] for record in selected] == [
+        ["import_binding", "local_export", "definition"],
+        ["import_binding", "reexport", "definition"],
+    ]
+
+
 def test_resolves_python_direct_alias_and_qualified_members_inside_exact_endpoint(
     tmp_path: Path,
 ):
