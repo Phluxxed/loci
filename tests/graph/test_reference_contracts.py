@@ -202,6 +202,28 @@ def test_reference_record_accepts_explicit_ambiguous_source_outcome():
     assert record.unresolved_reason == "ambiguous_source"
 
 
+def test_unresolved_reference_may_omit_binding_when_no_candidate_is_selected():
+    first = _binding()
+    second = replace(
+        first,
+        imported_name="OtherThing",
+        import_text="from .other import OtherThing as Alias",
+        import_specifier=".other",
+    )
+    raw = _raw_reference(
+        candidate_bindings=(first, second),
+        binding_state="unsupported",
+    )
+
+    record = _unresolved_record(
+        raw=raw,
+        binding=None,
+        unresolved_reason="unsupported_reference",
+    )
+
+    assert record.binding is None
+
+
 def test_reference_record_enforces_support_bound_atomically():
     with pytest.raises(GraphContractError, match="support"):
         _resolved_record(
