@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from ._go_references import GoReferenceIndex
     from ._javascript_references import JavaScriptReferenceIndex
     from ._python_references import PythonReferenceIndex
+    from ._rust_references import RustReferenceIndex
 
 
 MAX_REFERENCE_REEXPORT_PASSES = 128
@@ -411,6 +412,7 @@ class ReferenceResolverIndex:
     _python: PythonReferenceIndex
     _javascript: JavaScriptReferenceIndex
     _go: GoReferenceIndex
+    _rust: RustReferenceIndex
 
 
 @dataclass(frozen=True, slots=True)
@@ -473,7 +475,6 @@ def build_reference_resolver_index(
     rust_crates: RustCrateIndex | None = None,
 ) -> ReferenceResolverIndex:
     """Build bounded immutable reference lookups without repository I/O."""
-    del rust_crates  # Reserved by the frozen four-language API.
     symbols_by_id: dict[str, Symbol] = {}
     file_nodes: dict[str, Symbol] = {}
     source_symbols: dict[str, list[Symbol]] = {}
@@ -565,6 +566,15 @@ def build_reference_resolver_index(
         file_nodes=file_nodes,
         go_packages=go_packages,
     )
+    from ._rust_references import build_rust_reference_index
+
+    rust_index = build_rust_reference_index(
+        tuple(symbols_by_id.values()),
+        tuple(exports),
+        frozen_imports,
+        file_nodes=file_nodes,
+        rust_crates=rust_crates,
+    )
     return ReferenceResolverIndex(
         _symbols_by_id=MappingProxyType(symbols_by_id),
         _file_nodes=MappingProxyType(file_nodes),
@@ -574,6 +584,7 @@ def build_reference_resolver_index(
         _python=python_index,
         _javascript=javascript_index,
         _go=go_index,
+        _rust=rust_index,
     )
 
 
@@ -646,7 +657,7 @@ def _resolve_symbol_reference(
             import_record=import_record,
             reason="ambiguous_source",
         )
-    if raw.language not in {"python", "javascript", "typescript", "go"}:
+    if raw.language not in {"python", "javascript", "typescript", "go", "rust"}:
         return _unresolved_record(
             raw,
             binding=binding,
@@ -655,6 +666,7 @@ def _resolve_symbol_reference(
             reason="unsupported_reference",
         )
 
+    resolution_configuration: RustResolutionConfiguration | None = None
     if raw.language == "python":
         from ._python_references import resolve_python_reference
 
@@ -673,7 +685,7 @@ def _resolve_symbol_reference(
             import_record=import_record,
             index=index._javascript,
         )
-    else:
+    elif raw.language == "go":
         from ._go_references import resolve_go_reference
 
         outcome = resolve_go_reference(
@@ -682,6 +694,17 @@ def _resolve_symbol_reference(
             import_record=import_record,
             index=index._go,
         )
+    else:
+        from ._rust_references import resolve_rust_reference
+
+        rust_outcome = resolve_rust_reference(
+            raw,
+            binding=binding,
+            import_record=import_record,
+            index=index._rust,
+        )
+        outcome = rust_outcome
+        resolution_configuration = rust_outcome.resolution_configuration
     import_support = _import_binding_support(raw, import_record)
     if outcome.target is None:
         return _unresolved_record(
@@ -709,7 +732,7 @@ def _resolve_symbol_reference(
         resolution_basis=outcome.basis,
         support=(import_support, *outcome.support),
         resolution_control_files=outcome.resolution_control_files,
-        resolution_configuration=None,
+        resolution_configuration=resolution_configuration,
     )
 
 

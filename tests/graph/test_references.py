@@ -8,6 +8,7 @@ import pytest
 
 from loci.graph import _javascript_references
 from loci.graph import _python_references
+from loci.graph import _rust_references
 from loci.graph.contracts import GraphContractError
 from loci.graph.go_modules import (
     GoModule,
@@ -25,6 +26,14 @@ from loci.graph.javascript_modules import (
 from loci.graph.references import (
     build_reference_resolver_index,
     resolve_symbol_references,
+)
+from loci.graph.rust_crates import (
+    CargoContext,
+    CargoPackage,
+    CargoWorkspace,
+    RustDependency,
+    RustTarget,
+    build_rust_crate_index,
 )
 from loci.parser.extractor import parse_file
 from loci.parser.imports import ImportExtractionBatch, extract_import_batch
@@ -223,6 +232,616 @@ def _resolve_go_tree(
         symbols,
         batches,
     )
+
+
+def _rust_package(
+    *,
+    source: str,
+    root: str,
+    name: str,
+    root_file: str,
+    dependencies: tuple[RustDependency, ...] = (),
+) -> CargoPackage:
+    return CargoPackage(
+        source=source,
+        root=root,
+        name=name,
+        workspace_source=None,
+        edition="2021",
+        features={},
+        dependencies=dependencies,
+        targets=(
+            RustTarget(
+                "lib",
+                name,
+                name.replace("-", "_"),
+                root_file,
+                "2021",
+                (),
+            ),
+        ),
+    )
+
+
+def _resolve_rust_tree(
+    tmp_path: Path,
+    files: dict[str, str],
+    *,
+    packages: tuple[CargoPackage, ...],
+    workspaces: tuple[CargoWorkspace, ...] = (),
+) -> tuple[list, list[Symbol], list[ImportExtractionBatch]]:
+    symbols: list[Symbol] = []
+    batches: list[ImportExtractionBatch] = []
+    file_nodes: dict[str, Symbol] = {}
+    for relative_path, source in files.items():
+        path = tmp_path / relative_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(source, encoding="utf-8")
+        source_hash = hashlib.sha256(source.encode()).hexdigest()
+        file_node = make_file_symbol(
+            relative_path,
+            language="rust",
+            content_hash=source_hash,
+        )
+        file_nodes[relative_path] = file_node
+        symbols.append(file_node)
+        symbols.extend(
+            replace(
+                symbol,
+                id=make_symbol_id(relative_path, symbol.qualified_name, symbol.kind),
+                file_path=relative_path,
+            )
+            for symbol in parse_file(path)
+        )
+        batches.append(
+            extract_import_batch(
+                path,
+                source_file=relative_path,
+                language="rust",
+                source_hash=source_hash,
+            )
+        )
+
+    rust_build = build_rust_crate_index(
+        CargoContext(packages=packages, workspaces=workspaces),
+        file_nodes=file_nodes,
+        observations=tuple(
+            raw for batch in batches for raw in batch.imports
+        ),
+    )
+    assert rust_build.problems == ()
+    symbols.extend(rust_build.index.crate_nodes)
+    imports = resolve_imports(
+        [raw for batch in batches for raw in batch.imports],
+        file_nodes=file_nodes,
+        rust_crates=rust_build.index,
+    )
+    exports = [export for batch in batches for export in batch.exports]
+    observations = [reference for batch in batches for reference in batch.references]
+    index = build_reference_resolver_index(
+        symbols,
+        imports,
+        exports,
+        rust_crates=rust_build.index,
+    )
+    return (
+        resolve_symbol_references(observations, imports=imports, index=index),
+        symbols,
+        batches,
+    )
+
+
+def test_resolves_rust_named_alias_and_module_qualified_items_with_provenance(
+    tmp_path: Path,
+):
+    dependency = RustDependency(
+        alias="core_alias",
+        package_name="core",
+        kind="normal",
+        path="core",
+        optional=True,
+        default_features=True,
+        features=(),
+        target_condition=None,
+        inherited=False,
+        source="app/Cargo.toml",
+    )
+    app = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+        dependencies=(dependency,),
+    )
+    core = _rust_package(
+        source="core/Cargo.toml",
+        root="core",
+        name="core",
+        root_file="core/src/lib.rs",
+    )
+    records, _, _ = _resolve_rust_tree(
+        tmp_path,
+        {
+            "app/src/lib.rs": """
+mod local;
+use crate::local::inside;
+use core_alias::api::run as execute;
+use core_alias::api;
+
+pub fn call() {
+    inside();
+    execute();
+    let _: api::Thing;
+}
+""".lstrip(),
+            "app/src/local.rs": "pub(crate) fn inside() {}\n",
+            "core/src/lib.rs": "pub mod api;\n",
+            "core/src/api.rs": """
+pub fn run() {}
+pub struct Thing;
+""".lstrip(),
+            "unrelated/api.rs": "pub fn run() {}\npub struct Thing;\n",
+        },
+        packages=(app, core),
+    )
+
+    by_path = {record.raw.path: record for record in records}
+    assert by_path[("inside",)].status == "resolved", (
+        by_path[("inside",)].unresolved_reason,
+        by_path[("inside",)].import_unresolved_reason,
+    )
+    assert by_path[("inside",)].target_file == "app/src/local.rs"
+    assert by_path[("execute",)].status == "resolved", (
+        by_path[("execute",)].unresolved_reason,
+        by_path[("execute",)].import_unresolved_reason,
+    )
+    assert by_path[("execute",)].target_file == "core/src/api.rs"
+    assert by_path[("execute",)].resolution_configuration == "declared_possible"
+    assert by_path[("execute",)].resolution_control_files == (
+        "app/Cargo.toml",
+        "core/Cargo.toml",
+    )
+    assert by_path[("api", "Thing")].status == "resolved"
+    assert by_path[("api", "Thing")].target_kind == "struct"
+
+
+def test_resolves_rust_2015_extern_crate_to_same_package_library(tmp_path: Path):
+    package = CargoPackage(
+        source="Cargo.toml",
+        root=".",
+        name="demo",
+        workspace_source=None,
+        edition="2015",
+        features={},
+        dependencies=(),
+        targets=(
+            RustTarget("lib", "demo", "demo", "src/lib.rs", "2015", ()),
+            RustTarget("bin", "runner", "runner", "src/main.rs", "2015", ()),
+        ),
+    )
+    records, _, _ = _resolve_rust_tree(
+        tmp_path,
+        {
+            "src/lib.rs": "pub struct Thing;\n",
+            "src/main.rs": """
+extern crate demo as library;
+fn main() { let _: library::Thing; }
+""".lstrip(),
+        },
+        packages=(package,),
+    )
+
+    assert len(records) == 1
+    assert records[0].status == "resolved"
+    assert records[0].target_file == "src/lib.rs"
+    assert records[0].target_kind == "struct"
+    assert records[0].resolution_basis == "qualified_member"
+    assert records[0].resolution_control_files == ("Cargo.toml",)
+
+
+def test_resolves_rust_inherited_workspace_dependency_item(tmp_path: Path):
+    dependency = RustDependency(
+        alias="core_alias",
+        package_name="core",
+        kind="normal",
+        path="crates/core",
+        optional=False,
+        default_features=True,
+        features=(),
+        target_condition=None,
+        inherited=True,
+        source="Cargo.toml",
+    )
+    app = CargoPackage(
+        source="crates/app/Cargo.toml",
+        root="crates/app",
+        name="app",
+        workspace_source="Cargo.toml",
+        edition="2021",
+        features={},
+        dependencies=(dependency,),
+        targets=(RustTarget(
+            "lib",
+            "app",
+            "app",
+            "crates/app/src/lib.rs",
+            "2021",
+            (),
+        ),),
+    )
+    core = CargoPackage(
+        source="crates/core/Cargo.toml",
+        root="crates/core",
+        name="core",
+        workspace_source="Cargo.toml",
+        edition="2021",
+        features={},
+        dependencies=(),
+        targets=(RustTarget(
+            "lib",
+            "core",
+            "core",
+            "crates/core/src/lib.rs",
+            "2021",
+            (),
+        ),),
+    )
+    workspace = CargoWorkspace(
+        source="Cargo.toml",
+        root=".",
+        member_sources=("crates/app/Cargo.toml", "crates/core/Cargo.toml"),
+    )
+    records, _, _ = _resolve_rust_tree(
+        tmp_path,
+        {
+            "crates/app/src/lib.rs": (
+                "use core_alias::Thing;\npub fn call() { let _: Thing; }\n"
+            ),
+            "crates/core/src/lib.rs": "pub struct Thing;\n",
+        },
+        packages=(app, core),
+        workspaces=(workspace,),
+    )
+
+    assert len(records) == 1
+    assert records[0].status == "resolved"
+    assert records[0].target_file == "crates/core/src/lib.rs"
+    assert records[0].resolution_control_files == (
+        "Cargo.toml",
+        "crates/app/Cargo.toml",
+        "crates/core/Cargo.toml",
+    )
+
+
+def test_resolves_rust_named_public_reexport_but_not_private_canonical_route(
+    tmp_path: Path,
+):
+    dependency = RustDependency(
+        alias="core_alias",
+        package_name="core",
+        kind="normal",
+        path="core",
+        optional=False,
+        default_features=True,
+        features=(),
+        target_condition=None,
+        inherited=False,
+        source="app/Cargo.toml",
+    )
+    app = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+        dependencies=(dependency,),
+    )
+    core = _rust_package(
+        source="core/Cargo.toml",
+        root="core",
+        name="core",
+        root_file="core/src/lib.rs",
+    )
+    records, _, _ = _resolve_rust_tree(
+        tmp_path,
+        {
+            "app/src/lib.rs": """
+use core_alias::exposed;
+use core_alias::hidden::run as forbidden;
+
+pub fn call() {
+    exposed();
+    forbidden();
+}
+""".lstrip(),
+            "core/src/lib.rs": """
+mod hidden;
+mod facade;
+pub use facade::exposed;
+""".lstrip(),
+            "core/src/hidden.rs": "pub fn run() {}\n",
+            "core/src/facade.rs": "pub use crate::hidden::run as exposed;\n",
+        },
+        packages=(app, core),
+    )
+
+    by_path = {record.raw.path: record for record in records}
+    assert by_path[("exposed",)].status == "resolved"
+    assert by_path[("exposed",)].target_file == "core/src/hidden.rs"
+    assert by_path[("exposed",)].resolution_basis == "reexport_chain"
+    assert [support.kind for support in by_path[("exposed",)].support] == [
+        "import_binding",
+        "reexport",
+        "reexport",
+        "definition",
+    ]
+    assert by_path[("forbidden",)].status == "unresolved"
+    assert by_path[("forbidden",)].import_unresolved_reason == "inaccessible"
+
+
+def test_rust_reexport_pass_limit_fails_closed(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setattr(_rust_references, "MAX_REFERENCE_REEXPORT_PASSES", 1)
+    package = _rust_package(
+        source="Cargo.toml",
+        root=".",
+        name="demo",
+        root_file="src/lib.rs",
+    )
+    records, _, _ = _resolve_rust_tree(
+        tmp_path,
+        {
+            "src/lib.rs": """
+mod hidden;
+mod facade;
+mod consumer;
+pub use facade::exposed;
+""".lstrip(),
+            "src/hidden.rs": "pub fn run() {}\n",
+            "src/facade.rs": "pub use crate::hidden::run as exposed;\n",
+            "src/consumer.rs": (
+                "use crate::exposed;\npub fn call() { exposed(); }\n"
+            ),
+        },
+        packages=(package,),
+    )
+
+    assert len(records) == 1
+    assert records[0].status == "unresolved"
+    assert records[0].unresolved_reason == "ambiguous_target"
+
+
+def test_enforces_rust_terminal_item_visibility_scopes(tmp_path: Path):
+    dependency = RustDependency(
+        alias="core_alias",
+        package_name="core",
+        kind="normal",
+        path="core",
+        optional=False,
+        default_features=True,
+        features=(),
+        target_condition=None,
+        inherited=False,
+        source="app/Cargo.toml",
+    )
+    app = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+        dependencies=(dependency,),
+    )
+    core = _rust_package(
+        source="core/Cargo.toml",
+        root="core",
+        name="core",
+        root_file="core/src/lib.rs",
+    )
+    records, _, _ = _resolve_rust_tree(
+        tmp_path,
+        {
+            "app/src/lib.rs": """
+use core_alias::crate_only as crate_bad;
+use core_alias::public as public_external;
+
+pub fn call() {
+    crate_bad();
+    public_external();
+}
+""".lstrip(),
+            "core/src/lib.rs": """
+pub mod outer;
+pub(crate) fn crate_only() {}
+pub fn public() {}
+fn private() {}
+
+use crate::crate_only as crate_ok;
+use crate::private as private_ok;
+use crate::outer::child::parent_visible as parent_bad;
+use crate::outer::child::outer_visible as outer_bad;
+pub fn root_call() { crate_ok(); private_ok(); parent_bad(); outer_bad(); }
+""".lstrip(),
+            "core/src/outer.rs": """
+pub mod child;
+use self::child::parent_visible as parent_ok;
+use self::child::outer_visible as outer_ok;
+use self::child::self_only as self_bad;
+use self::child::private_child as private_bad;
+pub fn outer_call() { parent_ok(); outer_ok(); self_bad(); private_bad(); }
+""".lstrip(),
+            "core/src/outer/child.rs": """
+pub(super) fn parent_visible() {}
+pub(self) fn self_only() {}
+pub(in crate::outer) fn outer_visible() {}
+fn private_child() {}
+
+use self::self_only as self_ok;
+use self::private_child as private_ok;
+pub fn child_call() { self_ok(); private_ok(); }
+""".lstrip(),
+        },
+        packages=(app, core),
+    )
+
+    by_path = {record.raw.path: record for record in records}
+    for path in (
+        ("public_external",),
+        ("crate_ok",),
+        ("private_ok",),
+        ("parent_ok",),
+        ("outer_ok",),
+        ("self_ok",),
+    ):
+        assert by_path[path].status == "resolved", (path, by_path[path])
+    assert by_path[("crate_bad",)].unresolved_reason == "target_inaccessible"
+    assert by_path[("parent_bad",)].unresolved_reason == "target_inaccessible"
+    assert by_path[("outer_bad",)].unresolved_reason == "target_inaccessible"
+    assert by_path[("self_bad",)].unresolved_reason == "target_inaccessible"
+    assert by_path[("private_bad",)].unresolved_reason == "target_inaccessible"
+
+
+def test_rust_declared_configuration_converges_and_divergence_fails_closed(
+    tmp_path: Path,
+):
+    dependency = RustDependency(
+        alias="core_alias",
+        package_name="core",
+        kind="normal",
+        path="core",
+        optional=False,
+        default_features=True,
+        features=(),
+        target_condition=None,
+        inherited=False,
+        source="app/Cargo.toml",
+    )
+    app = _rust_package(
+        source="app/Cargo.toml",
+        root="app",
+        name="app",
+        root_file="app/src/lib.rs",
+        dependencies=(dependency,),
+    )
+    core = _rust_package(
+        source="core/Cargo.toml",
+        root="core",
+        name="core",
+        root_file="core/src/lib.rs",
+    )
+    records, _, _ = _resolve_rust_tree(
+        tmp_path,
+        {
+            "app/src/lib.rs": """
+use core_alias::convergent;
+use core_alias::divergent;
+pub fn call() { convergent(); divergent(); }
+""".lstrip(),
+            "core/src/lib.rs": """
+mod a;
+mod b;
+#[cfg(feature = "one")]
+pub use a::value as convergent;
+#[cfg(feature = "two")]
+pub use a::value as convergent;
+#[cfg(feature = "one")]
+pub use a::value as divergent;
+#[cfg(feature = "two")]
+pub use b::value as divergent;
+""".lstrip(),
+            "core/src/a.rs": "pub fn value() {}\n",
+            "core/src/b.rs": "pub fn value() {}\n",
+        },
+        packages=(app, core),
+    )
+
+    by_path = {record.raw.path: record for record in records}
+    assert by_path[("convergent",)].status == "resolved"
+    assert by_path[("convergent",)].resolution_configuration == "declared_possible"
+    assert by_path[("divergent",)].status == "unresolved"
+    assert by_path[("divergent",)].unresolved_reason == "configuration_divergent"
+
+
+def test_rust_unsupported_namespaces_macros_and_associated_items_fail_closed(
+    tmp_path: Path,
+):
+    package = _rust_package(
+        source="Cargo.toml",
+        root=".",
+        name="demo",
+        root_file="src/lib.rs",
+    )
+    records, _, batches = _resolve_rust_tree(
+        tmp_path,
+        {
+            "src/lib.rs": """
+pub mod model;
+use crate::model::Thing;
+use crate::model::Shared;
+use crate::model::Generated;
+use crate::model::*;
+pub fn call() { Thing::method(); Shared; Generated!(); Anything; }
+""".lstrip(),
+            "src/model.rs": """
+pub struct Thing;
+impl Thing { pub fn method() {} }
+pub trait Shared {}
+pub const Shared: usize = 1;
+""".lstrip(),
+        },
+        packages=(package,),
+    )
+
+    by_path = {record.raw.path: record for record in records}
+    assert by_path[("Thing", "method")].status == "resolved"
+    assert by_path[("Thing", "method")].target_kind == "struct"
+    assert by_path[("Shared",)].unresolved_reason == "ambiguous_target"
+    assert by_path[("Generated",)].unresolved_reason == "unsupported_reference"
+    assert all(
+        reference.path != ("Anything",)
+        for batch in batches
+        for reference in batch.references
+    )
+
+
+def test_rust_reference_index_rejects_inconsistent_item_metadata(tmp_path: Path):
+    source = "pub fn visible() {}\n"
+    path = tmp_path / "lib.rs"
+    path.write_text(source, encoding="utf-8")
+    source_hash = hashlib.sha256(source.encode()).hexdigest()
+    file_node = make_file_symbol(
+        "lib.rs",
+        language="rust",
+        content_hash=source_hash,
+    )
+    symbol = replace(
+        parse_file(path)[0],
+        id=make_symbol_id("lib.rs", "visible", "function"),
+        file_path="lib.rs",
+        metadata={
+            "loci": {
+                "rust_item": {
+                    "lexical_module_path": [],
+                    "visibility": "pub",
+                    "visibility_scope": [],
+                    "configuration": "unconditional",
+                }
+            }
+        },
+    )
+    batch = extract_import_batch(
+        path,
+        source_file="lib.rs",
+        language="rust",
+        source_hash=source_hash,
+    )
+
+    with pytest.raises(GraphContractError, match="scope is inconsistent"):
+        build_reference_resolver_index(
+            [file_node, symbol],
+            [],
+            batch.exports,
+        )
 
 
 def test_resolves_go_declared_package_name_and_explicit_alias(tmp_path: Path):

@@ -495,7 +495,10 @@ def _rust_visibility_scope(
     if visibility in {"private", "pub(self)"}:
         return True, lexical_path
     if visibility == "pub(super)":
-        return (True, lexical_path[:-1]) if lexical_path else (False, None)
+        # At the root of an externally declared module file the parser cannot
+        # see the owning module path.  Keep the relative empty scope; the Rust
+        # crate index normalizes it against the proven module route later.
+        return True, lexical_path[:-1]
     if not visibility.startswith("pub(in ") or not visibility.endswith(")"):
         return False, None
     raw_scope = visibility[len("pub(in "):-1]
@@ -511,13 +514,17 @@ def _rust_visibility_scope(
         offset = 0
         while offset < len(parts) and parts[offset] == "super":
             if not scope_parts:
-                return False, None
+                # As above, an external module's missing prefix is supplied by
+                # the crate/module index rather than guessed from its filename.
+                return True, ()
             scope_parts.pop()
             offset += 1
         scope = (*scope_parts, *parts[offset:])
     else:
         return False, None
-    return (True, scope) if lexical_path[:len(scope)] == scope else (False, None)
+    if lexical_path:
+        return (True, scope) if lexical_path[:len(scope)] == scope else (False, None)
+    return True, scope
 
 
 def _rust_cfg_dependent(node, source: bytes) -> bool:
