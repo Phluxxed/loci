@@ -1,6 +1,6 @@
 # Plan: Extensible Graph Retrieval Stage 10 — Resolved Symbol References
 
-**Status:** approved for implementation
+**Status:** implemented and reviewed; awaiting explicit owner acceptance
 **Date:** 2026-07-20
 **Governing design:** `docs/design/2026-07-13-extensible-graph-retrieval-design.md`
 **Accepted predecessor:** Stage 9, commit `11f21f8`
@@ -1847,6 +1847,15 @@ freshness, and storage boundaries.
 
 ### Task 11 — Document and run the production acceptance gate
 
+**Implementation status:** complete on 2026-07-20 through reviewed
+implementation head `366ca00`. The focused and complete repository matrices,
+build/integrity checks, frozen benchmark, live Loci dogfood, and five installed
+`loci-mcp` disposable-repository fixtures passed. The review found and fixed one
+Stage-10-introduced JavaScript binding type-boundary defect, while two initial
+harness-only assertion/guard defects were corrected without changing product
+behavior. The final review packet is ready for publication; Vik's explicit
+owner acceptance remains the only open Stage 10 gate.
+
 **Files:**
 
 - `README.md`
@@ -2089,57 +2098,57 @@ contains evidence for every item below.
 
 ### Contract and scope
 
-- [ ] Every resolved edge follows one exact resolved import binding.
-- [ ] Target search never leaves the imported endpoint/export surface.
-- [ ] Shadowed, ambiguous, inaccessible, external, unsupported, and divergent
+- [x] Every resolved edge follows one exact resolved import binding.
+- [x] Target search never leaves the imported endpoint/export surface.
+- [x] Shadowed, ambiguous, inaccessible, external, unsupported, and divergent
       cases create no edge.
-- [ ] No call, heuristic, or architecture-analysis scope entered Stage 10.
-- [ ] No runtime/toolchain/repository-code/network execution was added.
+- [x] No call, heuristic, or architecture-analysis scope entered Stage 10.
+- [x] No runtime/toolchain/repository-code/network execution was added.
 
 ### APIs and compatibility
 
-- [ ] `references` and `references_type` are reserved, directed,
+- [x] `references` and `references_type` are reserved, directed,
       `import-resolved`, and evidence-backed.
-- [ ] `loci_graph_references` matches the frozen input/output/error/pagination
+- [x] `loci_graph_references` matches the frozen input/output/error/pagination
       contract.
-- [ ] Generic traversal exposes reference edges only under its existing filters.
-- [ ] `loci_graph_neighbors` remains contains-only.
-- [ ] Public graph schema remains 1; outer index schema remains 5.
-- [ ] Private graph schema is 7; extractor version is 10; stale indexes rebuild.
-- [ ] No CLI command or dependency was added.
+- [x] Generic traversal exposes reference edges only under its existing filters.
+- [x] `loci_graph_neighbors` remains contains-only.
+- [x] Public graph schema remains 1; outer index schema remains 5.
+- [x] Private graph schema is 7; extractor version is 10; stale indexes rebuild.
+- [x] No CLI command or dependency was added.
 
 ### Language evidence
 
-- [ ] Python direct/module/re-export/shadow cases pass.
-- [ ] JS/TS named/namespace/type/default/barrel/conflict cases pass.
-- [ ] Go package/alias/export/shadow/ambiguity cases pass.
-- [ ] Rust crate/module/re-export/visibility/configuration cases pass.
-- [ ] Official source URLs and the installed grammar version are recorded.
+- [x] Python direct/module/re-export/shadow cases pass.
+- [x] JS/TS named/namespace/type/default/barrel/conflict cases pass.
+- [x] Go package/alias/export/shadow/ambiguity cases pass.
+- [x] Rust crate/module/re-export/visibility/configuration cases pass.
+- [x] Official source URLs and the installed grammar version are recorded.
 
 ### Persistence and operation
 
-- [ ] Full and no-op incremental serialized hashes match for all acceptance
+- [x] Full and no-op incremental serialized hashes match for all acceptance
       fixtures.
-- [ ] No-op incremental runs do not reparse unchanged files.
-- [ ] Add/change/delete and control-change freshness cases pass.
-- [ ] Fresh-process reads preserve index hash and mtime.
-- [ ] Execution/network traps remain untriggered.
-- [ ] `loci_verify` passes for every disposable fixture.
+- [x] No-op incremental runs do not reparse unchanged files.
+- [x] Add/change/delete and control-change freshness cases pass.
+- [x] Fresh-process reads preserve index hash and mtime.
+- [x] Execution/network traps remain untriggered.
+- [x] `loci_verify` passes for every disposable fixture.
 
 ### Repository verification
 
-- [ ] All focused matrices pass.
-- [ ] Complete `tests/` suite passes with exact count recorded.
-- [ ] `uv lock --check` passes.
-- [ ] `compileall` passes.
-- [ ] `uv build` produces sdist and wheel.
-- [ ] `git diff --check` is clean.
-- [ ] Frozen benchmark checksum is unchanged and benchmark tests pass.
-- [ ] Final worktree contains only intended Stage 10 changes.
+- [x] All focused matrices pass.
+- [x] Complete `tests/` suite passes with exact count recorded.
+- [x] `uv lock --check` passes.
+- [x] `compileall` passes.
+- [x] `uv build` produces sdist and wheel.
+- [x] `git diff --check` is clean.
+- [x] Frozen benchmark checksum is unchanged and benchmark tests pass.
+- [x] Final worktree contains only intended Stage 10 changes.
 
 ### Owner gate
 
-- [ ] `docs/reviews/2026-07-20-extensible-graph-retrieval-stage-10-final-review.md`
+- [x] `docs/reviews/2026-07-20-extensible-graph-retrieval-stage-10-final-review.md`
       contains exact commands, hashes, counts, fixture outcomes, unresolved
       limits, and commit IDs.
 - [ ] Vik explicitly accepts the final evidence.

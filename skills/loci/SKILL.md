@@ -21,11 +21,11 @@ loci_analyze(repo) when diagnostics are needed
 MCP read tools (`loci_outline`, `loci_search`, `loci_get`, `loci_file`,
 `loci_grep`, `loci_graph_anchors`, `loci_graph_neighbors`,
 `loci_graph_traverse_neighbors`, `loci_graph_paths`, `loci_graph_retrieve`,
-`loci_graph_imports`, and `loci_graph_health`) refresh stale indexes before
-returning cached data. Freshness includes repository-local graph profiles,
-contributions, built-in import records, Go module/workspace controls, and
-JavaScript/TypeScript package, workspace, and project controls, plus Cargo
-manifests.
+`loci_graph_imports`, `loci_graph_references`, and `loci_graph_health`) refresh
+stale indexes before returning cached data. Freshness includes repository-local
+graph profiles, contributions, built-in import records, Go module/workspace
+controls, and JavaScript/TypeScript package, workspace, and project controls,
+plus Cargo manifests.
 `loci_index` is still required for a repo that has never been indexed, and
 remains useful for explicit rebuilds or after large changes.
 
@@ -88,6 +88,7 @@ If loci is unavailable, fails, or the task is a standalone doc/config check wher
 | `loci_graph_paths` | Finding bounded evidence-backed paths between exact endpoint IDs |
 | `loci_graph_retrieve` | Retrieving and ranking question-shaped paths with inspected rejections |
 | `loci_graph_imports` | Inspecting bounded resolved and unresolved built-in import records |
+| `loci_graph_references` | Inspecting bounded resolved and unresolved imported-symbol references |
 | `loci_graph_health` | Inspecting loaded graph profiles, active counts, and degraded diagnostics |
 | `loci_verify` | Checking index integrity and content drift |
 | `loci_list` | Listing indexed repos |
@@ -109,8 +110,9 @@ If loci is unavailable, fails, or the task is a standalone doc/config check wher
 | `loci list` | Listing indexed repos |
 | `loci invalidate <path>` | Clearing stale cache |
 
-There is no CLI import command. Use `loci_graph_imports` through MCP for import
-diagnostics and the generic graph MCP tools for dependency traversal.
+There is no CLI import or reference command. Use `loci_graph_imports` and
+`loci_graph_references` through MCP for diagnostics and the generic graph MCP
+tools for dependency and symbol-reference traversal.
 
 ## Output Schemas
 
@@ -148,13 +150,22 @@ traversal or answerability claims:
 `loci_graph_health` returns persisted extension status and diagnostics:
 
 ```json
-{"schema_version":1,"repo":"...","status":"healthy|degraded","profiles":[],"counts":{"profiles":0,"node_overlays":0,"edges":0,"contributions":0,"diagnostics":0,"graph_file_nodes_indexed":0,"graph_go_packages_indexed":0,"graph_rust_crates_indexed":0,"graph_imports_indexed":0,"graph_imports_resolved":0,"graph_imports_unresolved":0},"diagnostics":[]}
+{"schema_version":1,"repo":"...","status":"healthy|degraded","profiles":[],"counts":{"profiles":0,"node_overlays":0,"edges":0,"contributions":0,"diagnostics":0,"graph_file_nodes_indexed":0,"graph_go_packages_indexed":0,"graph_rust_crates_indexed":0,"graph_imports_indexed":0,"graph_imports_resolved":0,"graph_imports_unresolved":0,"graph_symbol_references_indexed":0,"graph_symbol_references_resolved":0,"graph_symbol_references_unresolved":0},"diagnostics":[]}
 ```
 
 `loci_graph_imports` returns a bounded diagnostic page:
 
 ```json
 {"schema_version":1,"repo":"...","file":null,"status":"all","items":[{"raw":{"source_file":"src/a.py","language":"python","line":1,"text":"import b","specifier":"b","imported_name":null,"type_only":false,"is_reexport":false,"source_hash":"...","rust":null},"source_file":"src/a.py","source_id":"src/a.py::__file__#file","target_file":"src/b.py","target_package":null,"target_crate":null,"target_kind":"file","target_id":"src/b.py::__file__#file","specifier":"b","imported_name":null,"language":"python","line":1,"text":"import b","type_only":false,"is_reexport":false,"status":"resolved","resolution":"import-resolved","unresolved_reason":null,"resolution_basis":null,"resolution_control_files":[],"resolution_configuration":null}],"counts":{"total":1,"resolved":1,"unresolved":0,"returned":1},"pagination":{"offset":0,"limit":100,"next_offset":null}}
+```
+
+`loci_graph_references` returns the same bounded query envelope for imported
+symbol uses. Each item retains the raw syntax, selected import binding, source
+owner, import endpoints, exact target when resolved, support records, control
+provenance, and explicit failure reasons:
+
+```json
+{"schema_version":1,"repo":"...","file":null,"status":"all","items":[{"raw":{"source_file":"src/use.py","language":"python","line":4,"column":11,"start_byte":61,"end_byte":66,"text":"Thing","path":["Thing"],"candidate_bindings":[{"local_name":"Thing","imported_name":"Thing","exported_name":null,"kind":"symbol","type_only":false,"module_level":true,"declaration_start_byte":0,"scope_start_byte":0,"scope_end_byte":80,"import_line":1,"import_text":"from model import Thing","import_specifier":"model"}],"binding_state":"definite","source_hash":"..."},"binding":{"local_name":"Thing","imported_name":"Thing","exported_name":null,"kind":"symbol","type_only":false,"module_level":true,"declaration_start_byte":0,"scope_start_byte":0,"scope_end_byte":80,"import_line":1,"import_text":"from model import Thing","import_specifier":"model"},"source_file":"src/use.py","source_id":"src/use.py::build#function","source_kind":"function","import_source_id":"src/use.py::__file__#file","import_target_id":"src/model.py::__file__#file","target_file":"src/model.py","target_id":"src/model.py::Thing#class","target_kind":"class","status":"resolved","resolution":"import-resolved","unresolved_reason":null,"import_unresolved_reason":null,"resolution_basis":"direct_binding","support":[{"kind":"import_binding","file":"src/use.py","line":1,"content_hash":"...","endpoint_id":"src/model.py::__file__#file"},{"kind":"definition","file":"src/model.py","line":1,"content_hash":"...","endpoint_id":"src/model.py::Thing#class"}],"resolution_control_files":[],"resolution_configuration":null}],"counts":{"total":1,"resolved":1,"unresolved":0,"returned":1},"pagination":{"offset":0,"limit":100,"next_offset":null}}
 ```
 
 `loci_graph_paths` returns `support_kind: "edge_sequence"`, ordered nodes,
@@ -273,9 +284,11 @@ are labeled `"unconditional"`. Divergent alternatives stay ambiguous.
 Loci never runs Cargo/rustc/repository code, uses the network or ambient
 toolchain state, reads lockfiles or Cargo caches, chooses an active feature,
 target, profile, or cfg set, expands macros/generated modules, infers
-undeclared files, resolves terminal Rust items, or creates call edges. Treat a
-Rust edge as “this declared source can depend on this contained endpoint,” not
-“the current default Cargo build activates this edge.”
+undeclared files, or creates call edges. A Rust import edge alone means “this
+declared source can depend on this contained endpoint,” not “the current
+default Cargo build activates this edge.” The separate resolved-symbol
+reference layer can reach a terminal Rust item only for the bounded,
+visibility-checked, configuration-convergent subset described below.
 
 Unresolved, ambiguous, external, inaccessible, unsupported-configuration, and
 unsupported-language observations remain bounded records with an explicit
@@ -284,6 +297,64 @@ outcomes do not degrade graph health. Invalid controls do degrade health.
 Inspect aggregate file-node, Go-package, Rust-crate, and import counts with
 `loci_graph_health`. Loci does not guess targets by bare name, maintain a
 separate top-level import store, or expose an import CLI command.
+
+## Resolved Symbol References
+
+Use `loci_graph_references` when the question concerns a particular imported
+class, function, type, constant, interface, struct, or other supported indexed
+definition rather than only the imported file/package/crate:
+
+```text
+loci_graph_references(
+  repo="/path/to/repo",
+  file="src/use.py",
+  status="all",
+  offset=0,
+  limit=100,
+)
+```
+
+`file` is a normalized repository-relative path. `status` is `all`,
+`resolved`, or `unresolved`; `offset` is non-negative; and `limit` is 1..500.
+The file filter applies before counts, the status filter before pagination,
+and the stable order is source file/line/column/byte followed by binding and
+target identity. Current reads preserve a current index's serialized hash and
+mtime.
+
+Resolved records materialize directed `namespace="loci"`,
+`resolution="import-resolved"` edges. Runtime references use
+`type="references"`; explicitly type-only TypeScript bindings use
+`type="references_type"`. The source is the unique smallest indexed owner of
+the use, or the source file node for module-level code. The target is one exact
+indexed symbol reached only through the matched definite import and its
+supported export surface.
+
+Traverse references through the generic tools:
+
+```text
+loci_graph_traverse_neighbors(
+  repo="/path/to/repo",
+  seed_ids=["src/use.py::build#function"],
+  namespaces=["loci"],
+  edge_types=["references", "references_type"],
+  resolutions=["import-resolved"],
+  direction="outgoing",
+)
+```
+
+Use incoming direction for “who names this definition?”, `loci_graph_paths`
+for exact source evidence, and `loci_get` for the final target. Do not use
+`loci_graph_neighbors`; it intentionally remains contains-only.
+
+The supported static subset covers definite Python imports and explicit
+re-exports; JavaScript/TypeScript default, named, namespace, type-only, and
+bounded barrel exports; qualified exported Go package identifiers; and bounded
+Rust crate/module imports, aliases, named re-exports, visibility, and
+configuration-convergent items. Shadowing and ambiguous ownership fail closed.
+Dynamic/computed syntax, globs that do not prove one target, inaccessible or
+external items, divergent configurations, generated/macro output, overload or
+trait dispatch, and calls remain unresolved or outside scope. Never substitute
+a repository-wide same-name search for a missing target.
 
 ## Selection Rules
 
@@ -297,6 +368,11 @@ separate top-level import store, or expose an import CLI command.
   type, resolution, and direction explicitly when the domain is known.
 - Need import observations or unresolved reasons: `loci_graph_imports`; filter
   by normalized repository-relative `file` and `status` when useful.
+- Need imported-symbol observations or reference failure reasons:
+  `loci_graph_references`; use its bounded file/status/page filters.
+- Need symbol-reference traversal: use `loci_graph_traverse_neighbors` or
+  `loci_graph_paths` with `references`/`references_type` and
+  `import-resolved`, in the required direction.
 - Need code dependencies: start from exact file-node IDs and use
   `loci_graph_traverse_neighbors` or `loci_graph_paths`, never
   `loci_graph_neighbors`.
