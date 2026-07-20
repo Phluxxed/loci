@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any, cast
 
 import pytest
 
@@ -16,12 +17,18 @@ from loci.graph.contracts import (
 )
 from loci.graph.imports import ImportRecord
 from loci.graph.profiles import GraphProfile, LoadedGraphProfile
+from loci.graph.references import ReferenceSupport, SymbolReferenceRecord
 from loci.graph.state import (
     GraphDiagnostic,
     GraphIndexState,
     LoadedGraphContribution,
 )
 from loci.parser.imports import RawImport, RustImportContext
+from loci.parser.reference_models import (
+    ImportBinding,
+    RawLocalExport,
+    RawSymbolReference,
+)
 
 
 FIXTURES = Path(__file__).parents[1] / "fixtures" / "graph_profiles"
@@ -163,6 +170,88 @@ def _resolved_rust_crate_import() -> ImportRecord:
     )
 
 
+def _reference_binding() -> ImportBinding:
+    return ImportBinding(
+        local_name="Target",
+        imported_name="Target",
+        exported_name=None,
+        kind="symbol",
+        type_only=False,
+        module_level=True,
+        declaration_start_byte=0,
+        scope_start_byte=0,
+        scope_end_byte=200,
+        import_line=3,
+        import_text="from package import Target",
+        import_specifier="package",
+    )
+
+
+def _local_export() -> RawLocalExport:
+    return RawLocalExport(
+        source_file="src/package/target.py",
+        language="python",
+        line=2,
+        text="class Target:",
+        local_name="Target",
+        exported_name="Target",
+        type_only=False,
+        definition_start_byte=10,
+        definition_end_byte=40,
+        source_hash="e" * 64,
+    )
+
+
+def _symbol_reference() -> SymbolReferenceRecord:
+    binding = _reference_binding()
+    raw = RawSymbolReference(
+        source_file="src/example.py",
+        language="python",
+        line=5,
+        column=12,
+        start_byte=80,
+        end_byte=86,
+        text="Target",
+        path=("Target",),
+        candidate_bindings=(binding,),
+        binding_state="definite",
+        source_hash="d" * 64,
+    )
+    return SymbolReferenceRecord(
+        raw=raw,
+        binding=binding,
+        source_id="src/example.py::run#function",
+        source_kind="function",
+        import_source_id="src/example.py::__file__#file",
+        import_target_id="src/package/target.py::__file__#file",
+        target_file="src/package/target.py",
+        target_id="src/package/target.py::Target#class",
+        target_kind="class",
+        status="resolved",
+        unresolved_reason=None,
+        import_unresolved_reason=None,
+        resolution_basis="direct_binding",
+        support=(
+            ReferenceSupport(
+                kind="import_binding",
+                file="src/example.py",
+                line=3,
+                content_hash="d" * 64,
+                endpoint_id="src/package/target.py::__file__#file",
+            ),
+            ReferenceSupport(
+                kind="definition",
+                file="src/package/target.py",
+                line=2,
+                content_hash="e" * 64,
+                endpoint_id="src/package/target.py::Target#class",
+            ),
+        ),
+        resolution_control_files=(),
+        resolution_configuration=None,
+    )
+
+
 def _state() -> GraphIndexState:
     profile = GraphProfile.from_dict(
         json.loads((FIXTURES / "generic.json").read_text())
@@ -203,6 +292,8 @@ def _state() -> GraphIndexState:
         edges=(edge,),
         imports=(_resolved_import(),),
         rust_module_observations=(_inline_rust_module_observation(),),
+        exports=(_local_export(),),
+        symbol_references=(_symbol_reference(),),
         contributions=(LoadedGraphContribution(
             source=".loci/graph/contributions/example.json",
             content_hash="c" * 64,
@@ -230,6 +321,10 @@ def test_graph_state_round_trip_is_stable():
 
     assert restored == state
     assert list(serialized["input_hashes"]) == sorted(serialized["input_hashes"])
+    assert json.dumps(
+        restored.to_dict(),
+        separators=(",", ":"),
+    ) == json.dumps(serialized, separators=(",", ":"))
 
 
 def test_import_record_round_trip_is_exact_and_stable():
@@ -436,6 +531,17 @@ def test_import_record_rejects_unknown_raw_fields():
     assert exc_info.value.details["unknown"] == ["unexpected"]
 
 
+def test_graph_state_rejects_missing_raw_import_bindings():
+    payload = cast(dict[str, Any], _state().to_dict())
+    del payload["imports"][0]["raw"]["bindings"]
+
+    with pytest.raises(GraphContractError) as exc_info:
+        GraphIndexState.from_dict(payload)
+
+    assert exc_info.value.code == "INVALID_GRAPH_SCHEMA"
+    assert exc_info.value.details["missing"] == ["bindings"]
+
+
 @pytest.mark.parametrize(
     "field",
     [
@@ -612,14 +718,16 @@ def test_empty_graph_state_has_complete_envelope():
         "edges": [],
         "imports": [],
         "rust_module_observations": [],
+        "exports": [],
+        "symbol_references": [],
         "contributions": [],
         "input_hashes": {},
         "diagnostics": [],
     }
 
 
-def test_graph_state_uses_schema_version_six():
-    assert GRAPH_STATE_SCHEMA_VERSION == 6
+def test_graph_state_uses_schema_version_seven():
+    assert GRAPH_STATE_SCHEMA_VERSION == 7
 
 
 def test_graph_state_rejects_schema_version_two_as_stale():
@@ -673,6 +781,64 @@ def test_graph_state_rejects_schema_version_five_as_stale():
         "field": "schema_version",
         "schema_version": 5,
     }
+
+
+def test_graph_state_rejects_schema_version_six_as_stale():
+    payload = _state().to_dict()
+    payload["schema_version"] = 6
+
+    with pytest.raises(GraphContractError) as exc_info:
+        GraphIndexState.from_dict(payload)
+
+    assert exc_info.value.details == {
+        "field": "schema_version",
+        "schema_version": 6,
+    }
+
+
+@pytest.mark.parametrize("field", ["exports", "symbol_references"])
+def test_graph_state_rejects_missing_reference_envelope_fields(field: str):
+    payload = _state().to_dict()
+    del payload[field]
+
+    with pytest.raises(GraphContractError) as exc_info:
+        GraphIndexState.from_dict(payload)
+
+    assert exc_info.value.code == "INVALID_GRAPH_SCHEMA"
+    assert exc_info.value.details["missing"] == [field]
+
+
+def test_graph_state_rejects_unknown_reference_envelope_field():
+    payload = _state().to_dict()
+    payload["reference_guesses"] = []
+
+    with pytest.raises(GraphContractError) as exc_info:
+        GraphIndexState.from_dict(payload)
+
+    assert exc_info.value.code == "INVALID_GRAPH_SCHEMA"
+    assert exc_info.value.details["unknown"] == ["reference_guesses"]
+
+
+def test_graph_state_rejects_malformed_local_export():
+    payload = cast(dict[str, Any], _state().to_dict())
+    payload["exports"][0]["source_file"] = "../target.py"
+
+    with pytest.raises(GraphContractError) as exc_info:
+        GraphIndexState.from_dict(payload)
+
+    assert exc_info.value.code == "INVALID_GRAPH_SCHEMA"
+    assert exc_info.value.details["field"] == "exports"
+
+
+def test_graph_state_rejects_malformed_symbol_reference():
+    payload = cast(dict[str, Any], _state().to_dict())
+    payload["symbol_references"][0]["raw"]["source_hash"] = "stale"
+
+    with pytest.raises(GraphContractError) as exc_info:
+        GraphIndexState.from_dict(payload)
+
+    assert exc_info.value.code == "INVALID_GRAPH_SCHEMA"
+    assert exc_info.value.details["field"] == "symbol_references"
 
 
 def test_graph_state_rejects_non_inline_rust_module_observation():

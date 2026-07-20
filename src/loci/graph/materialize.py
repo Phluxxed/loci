@@ -37,6 +37,7 @@ from loci.graph.profiles import (
     validate_contained_file,
 )
 from loci.graph.references import (
+    SymbolReferenceRecord,
     build_reference_resolver_index,
     materialize_reference_edges,
     resolve_symbol_references,
@@ -280,6 +281,7 @@ def materialize_graph(
         ),
     ))
     reference_edges: list[GraphEdge] = []
+    reference_records: tuple[SymbolReferenceRecord, ...] = ()
     if raw_exports or raw_symbol_references:
         reference_index = build_reference_resolver_index(
             symbols,
@@ -726,6 +728,8 @@ def materialize_graph(
         edges=edges,
         imports=import_records,
         rust_module_observations=rust_module_observations,
+        exports=tuple(raw_exports),
+        symbol_references=reference_records,
         contributions=active_contributions,
         input_hashes=dict(sorted(resolved_input_hashes.items())),
         diagnostics=sorted_diagnostics,

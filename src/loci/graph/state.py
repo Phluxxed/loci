@@ -7,6 +7,7 @@ from pathlib import PurePosixPath
 from typing import Any, Literal, Mapping, Sequence, cast
 
 from loci.parser.imports import RawImport
+from loci.parser.reference_models import RawLocalExport
 
 from .contracts import (
     GRAPH_STATE_SCHEMA_VERSION,
@@ -18,11 +19,14 @@ from .contracts import (
 )
 from .imports import (
     ImportRecord,
+    _import_record_from_state_dict,
+    _import_record_to_state_dict,
     _is_inline_rust_module,
-    _raw_import_from_dict,
-    _raw_import_to_dict,
+    _raw_import_from_state_dict,
+    _raw_import_to_state_dict,
 )
 from .profiles import LoadedGraphProfile
+from .references import SymbolReferenceRecord
 
 
 GraphDiagnosticSeverity = Literal["info", "warning", "error"]
@@ -122,6 +126,8 @@ class GraphIndexState:
     edges: tuple[GraphEdge, ...]
     imports: tuple[ImportRecord, ...]
     rust_module_observations: tuple[RawImport, ...]
+    exports: tuple[RawLocalExport, ...]
+    symbol_references: tuple[SymbolReferenceRecord, ...]
     contributions: tuple[LoadedGraphContribution, ...]
     input_hashes: dict[str, str]
     diagnostics: tuple[GraphDiagnostic, ...]
@@ -132,10 +138,20 @@ class GraphIndexState:
             "profiles": [profile.to_dict() for profile in self.profiles],
             "nodes": [node.to_dict() for node in self.nodes],
             "edges": [edge.to_dict() for edge in self.edges],
-            "imports": [record.to_dict() for record in self.imports],
+            "imports": [
+                _import_record_to_state_dict(record)
+                for record in self.imports
+            ],
             "rust_module_observations": [
-                _raw_import_to_dict(observation)
+                _raw_import_to_state_dict(observation)
                 for observation in self.rust_module_observations
+            ],
+            "exports": [
+                cast(dict[str, JSONValue], export.to_dict())
+                for export in self.exports
+            ],
+            "symbol_references": [
+                record.to_dict() for record in self.symbol_references
             ],
             "contributions": [
                 contribution.to_dict() for contribution in self.contributions
@@ -157,6 +173,8 @@ class GraphIndexState:
             edges=tuple(edges),
             imports=(),
             rust_module_observations=(),
+            exports=(),
+            symbol_references=(),
             contributions=(),
             input_hashes={},
             diagnostics=(),
@@ -182,6 +200,8 @@ class GraphIndexState:
                 "edges",
                 "imports",
                 "rust_module_observations",
+                "exports",
+                "symbol_references",
                 "contributions",
                 "input_hashes",
                 "diagnostics",
@@ -201,7 +221,7 @@ class GraphIndexState:
             for item in _list(value["edges"], "edges")
         )
         imports = tuple(
-            ImportRecord.from_dict(_mapping(item, "import record"))
+            _import_record_from_state_dict(_mapping(item, "import record"))
             for item in _list(value["imports"], "imports")
         )
         rust_module_observations = tuple(
@@ -210,6 +230,14 @@ class GraphIndexState:
                 value["rust_module_observations"],
                 "rust_module_observations",
             )
+        )
+        exports = tuple(
+            _local_export_from_dict(item)
+            for item in _list(value["exports"], "exports")
+        )
+        symbol_references = tuple(
+            _symbol_reference_from_dict(item)
+            for item in _list(value["symbol_references"], "symbol_references")
         )
         contributions = tuple(
             LoadedGraphContribution.from_dict(
@@ -242,6 +270,8 @@ class GraphIndexState:
             edges=edges,
             imports=imports,
             rust_module_observations=rust_module_observations,
+            exports=exports,
+            symbol_references=symbol_references,
             contributions=contributions,
             input_hashes=dict(sorted(input_hashes.items())),
             diagnostics=diagnostics,
@@ -249,7 +279,7 @@ class GraphIndexState:
 
 
 def _rust_module_observation_from_dict(value: Any) -> RawImport:
-    observation = _raw_import_from_dict(
+    observation = _raw_import_from_state_dict(
         _mapping(value, "Rust module observation")
     )
     if not _is_inline_rust_module(observation):
@@ -258,6 +288,29 @@ def _rust_module_observation_from_dict(value: Any) -> RawImport:
             field="rust_module_observations",
         )
     return observation
+
+
+def _local_export_from_dict(value: Any) -> RawLocalExport:
+    try:
+        return RawLocalExport.from_dict(_mapping(value, "local export"))
+    except GraphContractError:
+        raise
+    except (KeyError, TypeError, ValueError) as exc:
+        raise _error("Invalid graph local export", field="exports") from exc
+
+
+def _symbol_reference_from_dict(value: Any) -> SymbolReferenceRecord:
+    try:
+        return SymbolReferenceRecord.from_dict(
+            _mapping(value, "symbol reference record")
+        )
+    except GraphContractError:
+        raise
+    except (KeyError, TypeError, ValueError) as exc:
+        raise _error(
+            "Invalid graph symbol reference",
+            field="symbol_references",
+        ) from exc
 
 
 def _require_keys(value: Mapping[str, Any], expected: set[str], record: str) -> None:

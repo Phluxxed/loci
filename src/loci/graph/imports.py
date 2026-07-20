@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import re
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import PurePosixPath
 from typing import Any, Literal, Mapping, TypeAlias, cast
 
 from loci.parser.imports import ImportUnresolvedReason, RawImport
+from loci.parser.reference_models import ImportBinding
 from loci.parser.symbols import Symbol
 
 from ._rust_import_schema import (
@@ -74,6 +75,7 @@ _RAW_IMPORT_FIELDS = {
     "source_hash",
     "rust",
 }
+_STATE_RAW_IMPORT_FIELDS = _RAW_IMPORT_FIELDS | {"bindings"}
 _IMPORT_RECORD_FIELDS = {
     "raw",
     "source_id",
@@ -1206,6 +1208,62 @@ def _raw_import_from_dict(value: Mapping[str, Any]) -> RawImport:
     )
     _validate_raw_import(raw)
     return raw
+
+
+def _import_record_to_state_dict(record: ImportRecord) -> dict[str, JSONValue]:
+    payload = record.to_dict()
+    payload["raw"] = _raw_import_to_state_dict(record.raw)
+    return payload
+
+
+def _import_record_from_state_dict(value: Mapping[str, Any]) -> ImportRecord:
+    _require_keys(value, _IMPORT_RECORD_FIELDS, "import record")
+    raw_value = value["raw"]
+    if not isinstance(raw_value, Mapping):
+        raise _error("Import raw observation must be an object", field="raw")
+    raw = _raw_import_from_state_dict(raw_value)
+    public_value = dict(value)
+    public_value["raw"] = {
+        field: raw_value[field]
+        for field in _RAW_IMPORT_FIELDS
+    }
+    return replace(ImportRecord.from_dict(public_value), raw=raw)
+
+
+def _raw_import_to_state_dict(raw: RawImport) -> dict[str, JSONValue]:
+    payload = _raw_import_to_dict(raw)
+    rust = payload.pop("rust")
+    payload["bindings"] = [
+        cast(dict[str, JSONValue], binding.to_dict())
+        for binding in raw.bindings
+    ]
+    payload["rust"] = rust
+    return payload
+
+
+def _raw_import_from_state_dict(value: Mapping[str, Any]) -> RawImport:
+    _require_keys(value, _STATE_RAW_IMPORT_FIELDS, "raw import")
+    bindings_value = value["bindings"]
+    if not isinstance(bindings_value, list):
+        raise _error("Import bindings must be a list", field="bindings")
+    try:
+        bindings: list[ImportBinding] = []
+        for binding in bindings_value:
+            if not isinstance(binding, Mapping):
+                raise ValueError("bindings contains a non-object item")
+            bindings.append(ImportBinding.from_dict(binding))
+        public_value = {
+            field: value[field]
+            for field in _RAW_IMPORT_FIELDS
+        }
+        return replace(
+            _raw_import_from_dict(public_value),
+            bindings=tuple(bindings),
+        )
+    except GraphContractError:
+        raise
+    except (KeyError, TypeError, ValueError) as exc:
+        raise _error("Invalid import bindings", field="bindings") from exc
 
 
 def _validate_raw_import(raw: RawImport) -> None:
