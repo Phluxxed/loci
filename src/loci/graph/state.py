@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from pathlib import PurePosixPath
 from typing import Any, Literal, Mapping, Sequence, cast
 
+from loci.parser.imports import RawImport
+
 from .contracts import (
     GRAPH_STATE_SCHEMA_VERSION,
     GraphContractError,
@@ -14,7 +16,12 @@ from .contracts import (
     GraphNodeRef,
     JSONValue,
 )
-from .imports import ImportRecord
+from .imports import (
+    ImportRecord,
+    _is_inline_rust_module,
+    _raw_import_from_dict,
+    _raw_import_to_dict,
+)
 from .profiles import LoadedGraphProfile
 
 
@@ -114,6 +121,7 @@ class GraphIndexState:
     nodes: tuple[GraphNodeRef, ...]
     edges: tuple[GraphEdge, ...]
     imports: tuple[ImportRecord, ...]
+    rust_module_observations: tuple[RawImport, ...]
     contributions: tuple[LoadedGraphContribution, ...]
     input_hashes: dict[str, str]
     diagnostics: tuple[GraphDiagnostic, ...]
@@ -125,6 +133,10 @@ class GraphIndexState:
             "nodes": [node.to_dict() for node in self.nodes],
             "edges": [edge.to_dict() for edge in self.edges],
             "imports": [record.to_dict() for record in self.imports],
+            "rust_module_observations": [
+                _raw_import_to_dict(observation)
+                for observation in self.rust_module_observations
+            ],
             "contributions": [
                 contribution.to_dict() for contribution in self.contributions
             ],
@@ -144,6 +156,7 @@ class GraphIndexState:
             nodes=(),
             edges=tuple(edges),
             imports=(),
+            rust_module_observations=(),
             contributions=(),
             input_hashes={},
             diagnostics=(),
@@ -168,6 +181,7 @@ class GraphIndexState:
                 "nodes",
                 "edges",
                 "imports",
+                "rust_module_observations",
                 "contributions",
                 "input_hashes",
                 "diagnostics",
@@ -189,6 +203,13 @@ class GraphIndexState:
         imports = tuple(
             ImportRecord.from_dict(_mapping(item, "import record"))
             for item in _list(value["imports"], "imports")
+        )
+        rust_module_observations = tuple(
+            _rust_module_observation_from_dict(item)
+            for item in _list(
+                value["rust_module_observations"],
+                "rust_module_observations",
+            )
         )
         contributions = tuple(
             LoadedGraphContribution.from_dict(
@@ -220,10 +241,23 @@ class GraphIndexState:
             nodes=nodes,
             edges=edges,
             imports=imports,
+            rust_module_observations=rust_module_observations,
             contributions=contributions,
             input_hashes=dict(sorted(input_hashes.items())),
             diagnostics=diagnostics,
         )
+
+
+def _rust_module_observation_from_dict(value: Any) -> RawImport:
+    observation = _raw_import_from_dict(
+        _mapping(value, "Rust module observation")
+    )
+    if not _is_inline_rust_module(observation):
+        raise _error(
+            "Graph Rust module observation must describe an inline module",
+            field="rust_module_observations",
+        )
+    return observation
 
 
 def _require_keys(value: Mapping[str, Any], expected: set[str], record: str) -> None:

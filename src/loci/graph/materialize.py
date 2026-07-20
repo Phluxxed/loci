@@ -18,6 +18,7 @@ from loci.graph.contracts import (
     JSONValue,
 )
 from loci.graph.imports import (
+    _is_inline_rust_module,
     materialize_import_edges,
     resolve_imports,
 )
@@ -253,6 +254,19 @@ def materialize_graph(
             record.target_file or "",
             record.target_package or "",
             record.target_crate or "",
+        ),
+    ))
+    rust_module_observations = tuple(sorted(
+        (
+            observation
+            for observation in raw_imports
+            if _is_inline_rust_module(observation)
+        ),
+        key=lambda observation: (
+            observation.source_file,
+            observation.line,
+            observation.specifier,
+            observation.text,
         ),
     ))
     active_edges = list(extract_markdown_contains_edges(symbols))
@@ -670,6 +684,7 @@ def materialize_graph(
         nodes=nodes,
         edges=edges,
         imports=import_records,
+        rust_module_observations=rust_module_observations,
         contributions=active_contributions,
         input_hashes=dict(sorted(resolved_input_hashes.items())),
         diagnostics=sorted_diagnostics,

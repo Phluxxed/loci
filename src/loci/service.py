@@ -145,6 +145,8 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
     if previous_graph is not None:
         for record in previous_graph.imports:
             previous_imports[record.raw.source_file].append(record.raw)
+        for observation in previous_graph.rust_module_observations:
+            previous_imports[observation.source_file].append(observation)
         for diagnostic in previous_graph.diagnostics:
             if (
                 diagnostic.code == "GRAPH_IMPORT_EXTRACTION_FAILED"
