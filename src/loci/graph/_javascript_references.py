@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import Mapping, Sequence, TypeAlias, cast
+from typing import Hashable, Mapping, Sequence, TypeAlias, TypeVar, cast
 
 from loci.parser.imports import ImportUnresolvedReason
 from loci.parser.reference_models import (
@@ -26,6 +26,7 @@ from .references import (
 
 
 _ExportKey: TypeAlias = tuple[str, str]
+_Node = TypeVar("_Node", bound=Hashable)
 _JAVASCRIPT_LANGUAGES = frozenset({"javascript", "typescript"})
 _LOCAL_EXPORT_RE = re.compile(r"^\s*export\s+(?:type\s+)?\{")
 
@@ -347,11 +348,11 @@ def build_javascript_reference_index(
     graph: dict[_ExportKey, set[_ExportKey]] = {}
     for rule in rules:
         graph.setdefault(rule.source, set()).add(rule.target)
-    cyclic_keys = _cycle_reachable_keys(graph)
+    cyclic_keys = _cycle_reachable_nodes(graph)
     star_graph: dict[str, set[str]] = {}
     for rule in star_rules:
         star_graph.setdefault(rule.source_file, set()).add(rule.target_file)
-    cyclic_files = _cycle_reachable_files(star_graph)
+    cyclic_files = _cycle_reachable_nodes(star_graph)
     return JavaScriptReferenceIndex(
         surfaces=MappingProxyType({
             key: tuple(value.values()) for key, value in surfaces.items()
@@ -503,22 +504,22 @@ def _star_rule_key(rule: _JavaScriptStarRule) -> tuple[object, ...]:
     )
 
 
-def _cycle_reachable_keys(
-    graph: Mapping[_ExportKey, set[_ExportKey]],
-) -> set[_ExportKey]:
+def _cycle_reachable_nodes(
+    graph: Mapping[_Node, set[_Node]],
+) -> set[_Node]:
     nodes = set(graph)
     nodes.update(target for targets in graph.values() for target in targets)
-    reverse: dict[_ExportKey, set[_ExportKey]] = {}
+    reverse: dict[_Node, set[_Node]] = {}
     for source, targets in graph.items():
         for target in targets:
             reverse.setdefault(target, set()).add(source)
 
-    visited: set[_ExportKey] = set()
-    finish_order: list[_ExportKey] = []
-    for root in sorted(nodes):
+    visited: set[_Node] = set()
+    finish_order: list[_Node] = []
+    for root in sorted(nodes, key=repr):
         if root in visited:
             continue
-        stack: list[tuple[_ExportKey, bool]] = [(root, False)]
+        stack: list[tuple[_Node, bool]] = [(root, False)]
         while stack:
             node, expanded = stack.pop()
             if expanded:
@@ -530,75 +531,16 @@ def _cycle_reachable_keys(
             stack.append((node, True))
             stack.extend(
                 (target, False)
-                for target in reversed(sorted(graph.get(node, ())))
+                for target in reversed(sorted(graph.get(node, ()), key=repr))
                 if target not in visited
             )
 
-    assigned: set[_ExportKey] = set()
-    cycle_members: set[_ExportKey] = set()
+    assigned: set[_Node] = set()
+    cycle_members: set[_Node] = set()
     for root in reversed(finish_order):
         if root in assigned:
             continue
-        component: set[_ExportKey] = set()
-        component_stack = [root]
-        while component_stack:
-            node = component_stack.pop()
-            if node in assigned:
-                continue
-            assigned.add(node)
-            component.add(node)
-            component_stack.extend(
-                source for source in reverse.get(node, ()) if source not in assigned
-            )
-        if len(component) > 1 or any(node in graph.get(node, ()) for node in component):
-            cycle_members.update(component)
-
-    reachable = set(cycle_members)
-    frontier = list(cycle_members)
-    while frontier:
-        target = frontier.pop()
-        for source in reverse.get(target, ()):
-            if source not in reachable:
-                reachable.add(source)
-                frontier.append(source)
-    return reachable
-
-
-def _cycle_reachable_files(graph: Mapping[str, set[str]]) -> set[str]:
-    nodes = set(graph)
-    nodes.update(target for targets in graph.values() for target in targets)
-    reverse: dict[str, set[str]] = {}
-    for source, targets in graph.items():
-        for target in targets:
-            reverse.setdefault(target, set()).add(source)
-
-    visited: set[str] = set()
-    finish_order: list[str] = []
-    for root in sorted(nodes):
-        if root in visited:
-            continue
-        stack: list[tuple[str, bool]] = [(root, False)]
-        while stack:
-            node, expanded = stack.pop()
-            if expanded:
-                finish_order.append(node)
-                continue
-            if node in visited:
-                continue
-            visited.add(node)
-            stack.append((node, True))
-            stack.extend(
-                (target, False)
-                for target in reversed(sorted(graph.get(node, ())))
-                if target not in visited
-            )
-
-    assigned: set[str] = set()
-    cycle_members: set[str] = set()
-    for root in reversed(finish_order):
-        if root in assigned:
-            continue
-        component: set[str] = set()
+        component: set[_Node] = set()
         component_stack = [root]
         while component_stack:
             node = component_stack.pop()
