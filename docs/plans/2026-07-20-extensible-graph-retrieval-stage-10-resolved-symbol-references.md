@@ -1269,9 +1269,21 @@ call signatures remain; malformed fields fail closed.
 
 ### Task 2 — Extract lexical references and local exports in one parse
 
+**Implementation status:** complete on 2026-07-20. The focused parser gate
+passes 97 tests and the full repository suite passes 881 tests. `uv build`
+produces both distribution artifacts, the frozen traversal benchmark passes
+all 7 tests, and its fixture remains byte-identical at SHA-256
+`c52def1bdf592ad735149d199910f74183598eccd9ccf8064335fa0cd0e84e27`.
+The private `_reference_exports.py` and `_reference_paths.py` helpers keep the
+four-language lexical orchestrator below the 1,000-line review signal without
+adding another parse or public API. Final Stage 10 owner acceptance remains
+pending.
+
 **Files:**
 
 - `src/loci/parser/references.py` (new)
+- `src/loci/parser/_reference_exports.py` (new private helper)
+- `src/loci/parser/_reference_paths.py` (new private helper)
 - `src/loci/parser/imports.py`
 - `tests/parser/test_references.py`
 - `tests/parser/test_imports.py`
@@ -1296,11 +1308,11 @@ dependency parse; dynamic/unsupported syntax never becomes definite.
 
 ### Checkpoint A — Parser contract review
 
-- [ ] Installed tree-sitter 0.13.0 node shapes are covered.
-- [ ] No third parse was added.
-- [ ] Every supported alias/type-only/module-level form has a test.
-- [ ] Shadowing and resource-limit fixtures fail closed.
-- [ ] Existing import extraction tests remain green.
+- [x] Installed tree-sitter 0.13.0 node shapes are covered.
+- [x] No third parse was added.
+- [x] Every supported alias/type-only/module-level form has a test.
+- [x] Shadowing and resource-limit fixtures fail closed.
+- [x] Existing import extraction tests remain green.
 
 ### Task 3 — Add source ownership, records, and Python resolution
 
