@@ -165,6 +165,8 @@ still performs explicit indexing, while `loci_outline`, `loci_search`,
 `loci_graph_retrieve`, `loci_graph_imports`, and
 `loci_graph_health` first check indexed source, profile, and contribution hashes
 against the current repository and run a locked incremental refresh if needed.
+Freshness also includes Go module/workspace controls, JavaScript/TypeScript
+project/package/workspace controls, and Cargo manifests.
 
 | Tool | Purpose |
 |---|---|
@@ -294,9 +296,23 @@ effective import path, for example
 anchored to a deterministic indexed non-test Go file for outline and retrieval,
 but has a zero-width span and exposes validated `directory`, `import_path`, and
 `package_name` attributes. An import record distinguishes this package target
-with `target_kind="package"`, `target_package`, and `target_file=null`.
+with `target_kind="package"`, `target_package`, and null file/crate fields.
 Resolved Python and JavaScript/TypeScript records instead use
-`target_kind="file"`, `target_file`, and `target_package=null`.
+`target_kind="file"`, `target_file`, and null package/crate fields.
+
+Resolved Rust observations target either the exact external module file or a
+stable zero-width `kind="crate"` node for one Cargo target. A crate-node ID is
+`<manifest>::<target-kind>:<crate-name>#crate`, for example
+`core/Cargo.toml::lib:core#crate`. Crate endpoints expose validated manifest,
+package root/name, target kind/name, crate name/root, edition, and required
+features. Import records distinguish crate targets with
+`target_kind="crate"`, `target_crate`, and null file/package target fields.
+Their strict `raw.rust` context preserves the observation kind, lexical module
+ancestry, visibility, scope, configuration, and literal path override needed
+to reproduce resolution after an incremental restart. Its exact fields are
+`kind`, `lexical_module_path`, `lexical_module_visibilities`,
+`lexical_module_configurations`, `visibility`, `module_level`, `configuration`,
+`path_override`, and `inline`.
 
 JavaScript/TypeScript resolution is static, deterministic, and contained in
 the indexed repository. Loci understands relative imports, bounded
@@ -362,19 +378,47 @@ never guesses by package name.
 Loci deliberately does not download modules, inspect Go caches or environment
 workspace settings, implement minimal version selection, follow remote
 replacements, model vendoring, or evaluate build, platform, architecture, or
-cgo constraints. Those cases remain explicit unresolved observations. Rust
-imports remain extract-and-report only and do not produce trusted edges.
+cgo constraints. Those cases remain explicit unresolved observations.
+
+Rust resolution is Cargo-aware, deterministic, and repository-contained. Loci
+loads bounded regular, non-symlink `Cargo.toml` files and supports standalone
+packages, root or virtual workspaces, contained members, inherited workspace
+dependencies, and contained path dependencies. It constructs library, binary,
+example, test, benchmark, and build-script crate targets; expands Rust `use`
+trees; records `extern crate`; builds the explicit inline/external module tree;
+applies edition-aware `crate`/`self`/`super`/extern paths, definite module
+aliases/re-exports, dependency-kind availability, and known module visibility.
+It never resolves by repository-wide filename, package-name, or crate-name
+similarity.
+
+Rust edges describe declared-possible static dependencies, not one active
+Cargo build. `resolution_configuration="unconditional"` means no supported
+configuration gate was observed; `"declared_possible"` means the one proven
+endpoint depends on a declared `cfg`, optional or target-specific dependency,
+or required feature. Divergent conditional endpoints remain
+`unresolved/ambiguous`. Registry/git dependencies and standard-library crates
+remain external even if a same-named local package exists.
+
+Loci never runs Cargo, rustc, rustdoc, build scripts, macros, generators,
+tests, examples, or repository binaries, and never uses the network, Cargo
+home, target directory, ambient workspace, environment/toolchain state, or
+lockfiles. It does not choose features, target triples, profiles, or `cfg`
+truth; expand macros or generated modules; infer undeclared source files;
+resolve terminal Rust items; or create cross-file call edges. Unsupported,
+missing, external, inaccessible, and ambiguous routes remain inspectable
+records rather than guessed edges.
 
 Unresolved, ambiguous, external, inaccessible, unsupported-configuration, and
 unsupported-language observations remain bounded records with an explicit
 `unresolved_reason`. They are visible through `loci_graph_imports`, do not
 become edges, and do not degrade graph health when they are normal resolution
 outcomes. `loci_graph_health` reports
-`graph_file_nodes_indexed`, `graph_go_packages_indexed`, `graph_imports_indexed`,
-`graph_imports_resolved`, and `graph_imports_unresolved`; extraction or
-persistence failures still appear as diagnostics. Loci never falls back to a
-repository-wide name guess. There is no import CLI command or separate
-top-level import store.
+`graph_file_nodes_indexed`, `graph_go_packages_indexed`,
+`graph_rust_crates_indexed`, `graph_imports_indexed`,
+`graph_imports_resolved`, and `graph_imports_unresolved`; invalid controls,
+extraction failures, or persistence failures still appear as diagnostics.
+Loci never falls back to a repository-wide name guess. There is no import CLI
+command or separate top-level import store.
 
 ## Analytics
 

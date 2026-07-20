@@ -323,9 +323,9 @@ unsupported cases remain inspectable records without trusted edges.
 At Stage 7 acceptance, Rust import resolution remained deferred because no
 current Rust consumer had been identified. That rationale was superseded on
 2026-07-18: Anvil now has an explicit near-term Rust requirement, so Cargo-aware
-Rust resolution is a committed dependency-layer stage. Until that stage lands,
-Rust observations continue to be extracted and reported as unresolved and must
-not produce trusted edges.
+Rust resolution became a committed dependency-layer stage. Stage 9 now
+implements that bounded contract; Stage 7 remains the historical record of the
+earlier deferral.
 
 The accepted plan freezes exact module-resolution rules, package-node semantics,
 APIs, files, fixtures, compatibility checks, rollback behavior, and the final
@@ -361,31 +361,29 @@ inspectable unresolved observation and never becomes an edge.
 
 The owner corrected the post-Stage-7 roadmap on 2026-07-18. Dependency
 resolution must be trustworthy across the language portfolio before higher
-semantic layers depend on it. With Stage 8 accepted, the remaining approved
-order is:
+semantic layers depend on it. Stage 9 implements the first item in the
+corrected order; after its final acceptance gate, the remaining order is:
 
-1. implement deterministic Cargo-aware Rust dependency resolution, with crate,
-   package, workspace, module, feature, and visibility boundaries scoped by a
-   separate design and review gate;
-2. add resolved symbol references that follow definite imports;
-3. add cross-file calls only where binding and import resolution are definite;
-4. expose heuristic candidates as opt-in diagnostics, never trusted defaults;
+1. add resolved symbol references that follow definite imports;
+2. add cross-file calls only where binding and import resolution are definite;
+3. expose heuristic candidates as opt-in diagnostics, never trusted defaults;
    and
-5. add graph orientation or architecture analysis after the underlying edges
+4. add graph orientation or architecture analysis after the underlying edges
    have enough real-repository evidence.
 
 "Complete" here means complete for an explicitly documented, bounded static
 resolution contract. It does not authorize executing repository tools or code,
 using the network, or silently approximating every runtime loader behavior.
 
-### Stage 9: Cargo-aware Rust dependency resolution (proposed)
+### Stage 9: Cargo-aware Rust dependency resolution (implemented; review pending)
 
 The owner selected Cargo-aware Rust resolution as the next dependency-layer
-stage on 2026-07-18. The detailed proposal is ready for review but is not yet
-approved for implementation:
+stage on 2026-07-18 and approved its separate implementation boundary. The
+implementation is complete as of 2026-07-20; final evidence review and owner
+acceptance remain intentionally separate:
 `docs/plans/2026-07-18-extensible-graph-retrieval-stage-9-cargo-aware-rust-dependency-resolution.md`.
 
-The proposal adds bounded Cargo package/workspace/target loading, stable Rust
+The implementation adds bounded Cargo package/workspace/target loading, stable Rust
 crate nodes, contained path and inherited workspace dependencies, explicit
 module-tree construction, edition-aware paths, definite module aliases and
 re-exports, and module visibility enforcement. It keeps registry/git
@@ -393,15 +391,23 @@ dependencies external and never runs Cargo, rustc, build scripts, macros,
 repository code, or the network.
 
 Because feature, target, and `cfg` activation depend on an absent build
-invocation, the proposed graph is explicitly a declared-possible static
+invocation, the implemented graph is explicitly a declared-possible static
 dependency graph. Rust import records distinguish unconditional relationships
 from configuration-dependent relationships; divergent conditional endpoints
 remain unresolved. Terminal item/symbol resolution and calls stay in later
 stages.
 
-The governing status remains “Stages 1-8 implemented, reviewed, and accepted”
-until the Stage 9 implementation passes its separate final evidence packet and
-owner gate.
+Cargo controls participate in freshness, invalid controls degrade health
+without creating refresh loops, and stable crate endpoints expose only
+validated manifest/package/target/root/edition/feature attributes. The public
+MCP tool set and `loci_graph_imports` input schema are unchanged. Its items add
+the strict raw observation, `target_crate`, Cargo/Rust resolution provenance,
+and `resolution_configuration`; graph health adds
+`graph_rust_crates_indexed`.
+
+The governing acceptance status remains “Stages 1-8 implemented, reviewed,
+and accepted; Stage 9 implemented with final review pending” until Task 8's
+evidence packet passes and the owner explicitly approves it.
 
 ## Technical Fit
 
