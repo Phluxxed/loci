@@ -1,6 +1,6 @@
 # loci: Extensible Graph Retrieval Layer — Design
 
-**Status:** Stages 1-8 accepted; Stage 9 implemented with final owner acceptance pending
+**Status:** Stages 1-9 implemented, reviewed, and accepted
 
 **Date:** 2026-07-13
 
@@ -362,7 +362,7 @@ inspectable unresolved observation and never becomes an edge.
 The owner corrected the post-Stage-7 roadmap on 2026-07-18. Dependency
 resolution must be trustworthy across the language portfolio before higher
 semantic layers depend on it. Stage 9 implements the first item in the
-corrected order; after its final acceptance gate, the remaining order is:
+corrected order. With Stage 9 accepted, the remaining order is:
 
 1. add resolved symbol references that follow definite imports;
 2. add cross-file calls only where binding and import resolution are definite;
@@ -375,12 +375,12 @@ corrected order; after its final acceptance gate, the remaining order is:
 resolution contract. It does not authorize executing repository tools or code,
 using the network, or silently approximating every runtime loader behavior.
 
-### Stage 9: Cargo-aware Rust dependency resolution (implemented; owner acceptance pending)
+### Stage 9: Cargo-aware Rust dependency resolution (implemented and accepted)
 
 The owner selected Cargo-aware Rust resolution as the next dependency-layer
 stage on 2026-07-18 and approved its separate implementation boundary. The
-implementation is complete as of 2026-07-20; final evidence review and owner
-acceptance remain intentionally separate:
+implementation and final evidence packet were explicitly accepted by the owner
+on 2026-07-20:
 `docs/plans/2026-07-18-extensible-graph-retrieval-stage-9-cargo-aware-rust-dependency-resolution.md`.
 The completed final evidence packet is
 `docs/reviews/2026-07-18-extensible-graph-retrieval-stage-9-final-review.md`.
@@ -407,9 +407,8 @@ the strict raw observation, `target_crate`, Cargo/Rust resolution provenance,
 and `resolution_configuration`; graph health adds
 `graph_rust_crates_indexed`.
 
-The governing acceptance status remains “Stages 1-8 implemented, reviewed,
-and accepted; Stage 9 implemented with final evidence complete and owner
-acceptance pending” until the owner explicitly approves the Task 8 packet.
+Stages 1-9 are implemented, reviewed, and accepted. The next graph roadmap
+stage is resolved symbol references that follow definite imports.
 
 ## Technical Fit
 

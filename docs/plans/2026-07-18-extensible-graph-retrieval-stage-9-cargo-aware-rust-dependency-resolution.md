@@ -1,6 +1,6 @@
 # Plan: Extensible Graph Retrieval Stage 9 — Cargo-aware Rust Dependency Resolution
 
-- **Status:** implementation and final evidence complete; explicit owner acceptance pending
+- **Status:** implemented, reviewed, and accepted by owner on 2026-07-20
 - **Date:** 2026-07-18
 - **Repository:** `/Users/brummerv/loci`
 - **Governing design:** `docs/design/2026-07-13-extensible-graph-retrieval-design.md`
@@ -1363,8 +1363,8 @@ uv run pytest -q tests/test_mcp_server.py
 
 ### Task 8 — Final verification and owner review packet
 
-**Implementation status:** evidence complete on 2026-07-20; explicit owner
-acceptance pending. The first disposable-repository run exposed that unchanged
+**Implementation status:** accepted by the owner on 2026-07-20. The first
+disposable-repository run exposed that unchanged
 incremental indexing discarded inline Rust module ownership metadata and could
 retarget an exact file import to its crate node. Graph-state schema 6 now
 persists only those hidden structural observations, a no-reparse regression
@@ -1373,7 +1373,7 @@ byte-identical full/incremental indexes across all three fixtures. All 808
 tests, build, compile, lock, diff, frozen-checksum, fresh-process, execution
 guard, compatibility, and security gates pass. The final packet is
 `docs/reviews/2026-07-18-extensible-graph-retrieval-stage-9-final-review.md`.
-Stage 9 remains unaccepted until the owner approves that packet.
+The owner explicitly approved that packet after reviewing the final handoff.
 
 Files:
 
@@ -1597,7 +1597,6 @@ The owner approved this implementation boundary before Task 1 began, including:
 - exact additive APIs and version bumps; and
 - the separate final acceptance gate.
 
-Tasks 1-7 may implement and document the approved boundary. Task 8 remains the
-separate final evidence packet and explicit owner acceptance gate; until that
-gate passes, Stage 8 is the latest accepted stage even though Stage 9 is
-implemented.
+Tasks 1-7 implemented and documented the approved boundary. Task 8 remained a
+separate evidence and owner-acceptance gate. The owner explicitly accepted its
+final packet on 2026-07-20, so Stage 9 is now the latest accepted stage.

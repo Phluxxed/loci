@@ -1,6 +1,6 @@
 # Final Review: Extensible Graph Retrieval Stage 9 — Cargo-aware Rust Dependency Resolution
 
-- **Status:** implementation and final evidence complete; explicit owner acceptance pending
+- **Status:** accepted by owner on 2026-07-20
 - **Date:** 2026-07-20
 - **Repository:** `/Users/brummerv/loci`
 - **Governing plan:** `docs/plans/2026-07-18-extensible-graph-retrieval-stage-9-cargo-aware-rust-dependency-resolution.md`
@@ -360,7 +360,8 @@ analysis entered this implementation.
 - [x] Python, JavaScript/TypeScript, Go, Markdown, and generic graph behavior pass
 - [x] residual limitations and the next-stage boundary are explicit
 - [x] implementation and review packet are committed and pushed directly to `master`
-- [ ] owner explicitly accepts this final review packet
+- [x] owner explicitly accepts this final review packet
 
-Stage 9 is implemented and ready for acceptance, but it is not marked accepted
-until the owner explicitly approves this packet.
+The owner explicitly accepted this packet on 2026-07-20. The governing design
+now records Stages 1-9 as implemented, reviewed, and accepted. The next roadmap
+stage is resolved symbol references that follow definite imports.
