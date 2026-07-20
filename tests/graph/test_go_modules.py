@@ -526,6 +526,23 @@ def test_builder_creates_stable_same_module_root_and_subpackage_nodes():
     assert moved.content_hash == "2" * 64
 
 
+def test_builder_preserves_declared_package_name_when_import_basename_differs():
+    module = _module()
+    storage = _go_file("internal/storage/store.go", "store")
+
+    built = build_go_package_index(
+        GoModuleContext(modules=(module,), workspaces=()),
+        file_nodes={storage.file_path: storage},
+    )
+
+    package = built.index.packages_by_binding[
+        (".", "example.com/project/internal/storage")
+    ]
+    assert package.name == "store"
+    assert package.qualified_name == "example.com/project/internal/storage"
+    assert package.metadata["loci"]["package_name"] == "store"
+
+
 def test_builder_uses_nearest_workspace_and_keeps_nested_module_ownership():
     app = _module(root="work/app", module_path="example.com/app")
     lib = _module(root="work/lib", module_path="example.com/lib")
