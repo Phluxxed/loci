@@ -4,12 +4,16 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from tree_sitter import Parser
+from tree_sitter_language_pack import get_language
 
+from loci.parser._binding_context import collect_syntax_context
 from loci.parser.imports import (
     ImportExtractionBatch,
     ImportExtractionError,
     extract_import_batch,
 )
+from loci.parser.references import extract_reference_batch
 from loci.parser.reference_models import (
     MAX_LOCAL_EXPORTS_PER_FILE,
     MAX_REFERENCE_PATH_SEGMENTS,
@@ -39,6 +43,76 @@ def _extract_batch(
         language=language,
         source_hash=SOURCE_HASH,
     )
+
+
+@pytest.mark.parametrize(
+    ("name", "source", "language", "tree_sitter_language"),
+    [
+        (
+            "consumer.py",
+            "from model import Thing\ndef run():\n    Thing()\n",
+            "python",
+            "python",
+        ),
+        (
+            "consumer.js",
+            'import {Thing} from "./model.js";\nfunction run() { Thing(); }\n',
+            "javascript",
+            "javascript",
+        ),
+        (
+            "consumer.ts",
+            'import {Thing} from "./model";\nfunction run(): void { Thing(); }\n',
+            "typescript",
+            "typescript",
+        ),
+        (
+            "consumer.go",
+            'package consumer\nimport model "example/model"\nfunc run() { model.Thing() }\n',
+            "go",
+            "go",
+        ),
+        (
+            "consumer.rs",
+            "use crate::model::Thing;\nfn run() { Thing(); }\n",
+            "rust",
+            "rust",
+        ),
+    ],
+)
+def test_explicit_shared_syntax_context_preserves_reference_extraction(
+    tmp_path: Path,
+    name: str,
+    source: str,
+    language: str,
+    tree_sitter_language: str,
+):
+    batch = _extract_batch(
+        tmp_path,
+        name=name,
+        source=source,
+        language=language,
+    )
+    encoded = source.encode()
+    root = Parser(get_language(tree_sitter_language)).parse(encoded).root_node
+    context = collect_syntax_context(root, encoded, language)
+
+    explicit = extract_reference_batch(
+        root,
+        encoded,
+        source_file=f"src/{name}",
+        language=language,
+        source_hash=SOURCE_HASH,
+        imports=batch.imports,
+        context=context,
+    )
+
+    assert isinstance(context.local_bindings, tuple)
+    assert isinstance(context.excluded_subtrees, frozenset)
+    assert isinstance(context.unsupported_import_starts, frozenset)
+    assert explicit.exports == batch.exports
+    assert explicit.references == batch.references
+    assert explicit.references
 
 
 def _binding(**overrides) -> ImportBinding:
