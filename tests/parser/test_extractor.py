@@ -307,6 +307,50 @@ def test_rust_fixture_derive_decorator():
     assert "derive" in counter.decorators
 
 
+def test_rust_items_record_lexical_visibility_scope_and_configuration(
+    tmp_path: Path,
+):
+    path = tmp_path / "items.rs"
+    path.write_text(
+        """
+#[cfg(feature = "outer")]
+mod outer {
+    pub mod inner {
+        pub fn public_item() {}
+        pub(crate) fn crate_item() {}
+        pub(super) fn parent_item() {}
+        pub(self) fn self_item() {}
+        pub(in crate::outer) fn restricted_item() {}
+        fn private_item() {}
+    }
+}
+""".lstrip(),
+        encoding="utf-8",
+    )
+
+    items = {symbol.name: symbol for symbol in parse_file(path)}
+
+    expected = {
+        "public_item": ("pub", None),
+        "crate_item": ("pub(crate)", []),
+        "parent_item": ("pub(super)", ["outer"]),
+        "self_item": ("pub(self)", ["outer", "inner"]),
+        "restricted_item": ("pub(in crate::outer)", ["outer"]),
+        "private_item": ("private", ["outer", "inner"]),
+    }
+    for name, (visibility, scope) in expected.items():
+        assert items[name].metadata == {
+            "loci": {
+                "rust_item": {
+                    "lexical_module_path": ["outer", "inner"],
+                    "visibility": visibility,
+                    "visibility_scope": scope,
+                    "configuration": "declared_possible",
+                }
+            }
+        }
+
+
 def test_rust_fixture_no_spurious_symbols():
     extracted = _extracted("sample.rs")
     kinds = {kind for _, kind in extracted}

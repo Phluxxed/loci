@@ -416,6 +416,123 @@ def _rust_decorators_before(source: bytes, start: int) -> list[str]:
     return list(reversed(decorators))
 
 
+def _rust_item_metadata(node, source: bytes) -> dict[str, Any]:
+    lexical_modules = []
+    ancestor = node.parent
+    while ancestor is not None:
+        if ancestor.type == "mod_item" and ancestor.child_by_field_name("body") is not None:
+            name = ancestor.child_by_field_name("name")
+            if name is None:
+                return {}
+            lexical_modules.append(
+                source[name.start_byte:name.end_byte].decode(errors="replace")
+            )
+        ancestor = ancestor.parent
+    lexical_path = tuple(reversed(lexical_modules))
+
+    visibility = _rust_item_visibility(node, source)
+    valid_visibility, visibility_scope = _rust_visibility_scope(
+        visibility,
+        lexical_path,
+    )
+    if not valid_visibility:
+        return {}
+    configuration = "declared_possible" if any(
+        _rust_cfg_dependent(item, source)
+        for item in (node, *_rust_inline_module_ancestors(node))
+    ) else "unconditional"
+    return {
+        "loci": {
+            "rust_item": {
+                "lexical_module_path": list(lexical_path),
+                "visibility": visibility,
+                "visibility_scope": (
+                    None if visibility_scope is None else list(visibility_scope)
+                ),
+                "configuration": configuration,
+            }
+        }
+    }
+
+
+def _rust_inline_module_ancestors(node) -> list[Any]:
+    modules = []
+    ancestor = node.parent
+    while ancestor is not None:
+        if ancestor.type == "mod_item" and ancestor.child_by_field_name("body") is not None:
+            modules.append(ancestor)
+        ancestor = ancestor.parent
+    return modules
+
+
+def _rust_item_visibility(node, source: bytes) -> str:
+    modifier = next(
+        (child for child in node.named_children if child.type == "visibility_modifier"),
+        None,
+    )
+    if modifier is None:
+        return "private"
+    compact = "".join(
+        source[modifier.start_byte:modifier.end_byte].decode(errors="replace").split()
+    )
+    if compact in {"pub", "pub(crate)", "pub(self)", "pub(super)"}:
+        return compact
+    if compact.startswith("pub(in") and compact.endswith(")"):
+        path = compact[len("pub(in"):-1]
+        if path:
+            return f"pub(in {path})"
+    return "unsupported"
+
+
+def _rust_visibility_scope(
+    visibility: str,
+    lexical_path: tuple[str, ...],
+) -> tuple[bool, tuple[str, ...] | None]:
+    if visibility == "pub":
+        return True, None
+    if visibility == "pub(crate)":
+        return True, ()
+    if visibility in {"private", "pub(self)"}:
+        return True, lexical_path
+    if visibility == "pub(super)":
+        return (True, lexical_path[:-1]) if lexical_path else (False, None)
+    if not visibility.startswith("pub(in ") or not visibility.endswith(")"):
+        return False, None
+    raw_scope = visibility[len("pub(in "):-1]
+    parts = tuple(part for part in raw_scope.split("::") if part)
+    if not parts:
+        return False, None
+    if parts[0] == "crate":
+        scope = parts[1:]
+    elif parts[0] == "self":
+        scope = (*lexical_path, *parts[1:])
+    elif parts[0] == "super":
+        scope_parts = list(lexical_path)
+        offset = 0
+        while offset < len(parts) and parts[offset] == "super":
+            if not scope_parts:
+                return False, None
+            scope_parts.pop()
+            offset += 1
+        scope = (*scope_parts, *parts[offset:])
+    else:
+        return False, None
+    return (True, scope) if lexical_path[:len(scope)] == scope else (False, None)
+
+
+def _rust_cfg_dependent(node, source: bytes) -> bool:
+    sibling = node.prev_named_sibling
+    while sibling is not None:
+        if sibling.type == "attribute_item":
+            text = source[sibling.start_byte:sibling.end_byte].decode(errors="replace")
+            if re.match(r"#\s*!?\[\s*cfg(?:_attr)?\b", text):
+                return True
+        elif sibling.type not in {"block_comment", "line_comment"}:
+            break
+        sibling = sibling.prev_named_sibling
+    return False
+
+
 def _walk(
     node,
     source: bytes,
@@ -540,6 +657,7 @@ def _extract_symbol(
         content_hash=content_hash,
         decorators=decorators,
         keywords=sorted(keywords),
+        metadata=_rust_item_metadata(node, source) if language == "rust" else {},
         line=line,
         end_line=end_line,
     ))
