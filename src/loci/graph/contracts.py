@@ -30,7 +30,7 @@ ResolutionTier: TypeAlias = Literal[
 ]
 
 GRAPH_SCHEMA_VERSION = 1  # Public contribution and retrieval envelopes.
-GRAPH_STATE_SCHEMA_VERSION = 6  # Persisted index.json.graph envelope only.
+GRAPH_STATE_SCHEMA_VERSION = 7  # Persisted index.json.graph envelope only.
 MAX_GRAPH_CONTRIBUTION_RECORDS = 10_000
 RESOLUTION_TIERS = frozenset({
     "exact",

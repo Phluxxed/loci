@@ -1574,13 +1574,24 @@ record and every support record validates against current indexed evidence.
 
 ### Task 8 — Persist schema 7 and prove storage integrity
 
+**Implementation status:** completed and verified on 2026-07-20. Private graph
+state now preserves exact import-binding snapshots, raw local exports, resolved
+and unresolved symbol-reference records, and their validated graph edges across
+save/reload boundaries. The binding serializer is deliberately private to
+schema 7, so the existing public `graph_imports()` response remains unchanged.
+
 **Files:**
 
 - `src/loci/graph/state.py`
 - `src/loci/graph/contracts.py`
+- `src/loci/graph/imports.py`
+- `src/loci/graph/materialize.py`
 - `src/loci/storage/index_store.py`
 - `tests/graph/test_state.py`
+- `tests/graph/test_materialize.py`
 - `tests/storage/test_reference_index_store.py` (new)
+- `tests/storage/test_index_store.py`
+- `tests/test_service.py`
 
 **Work:**
 
@@ -1593,6 +1604,45 @@ record and every support record validates against current indexed evidence.
 **Acceptance:** state round trips byte-stably; corrupt/missing/unknown fields and
 unbacked edges fail; ordinary repositories still persist an empty complete
 reference envelope.
+
+**Implementation evidence:**
+
+- `GRAPH_STATE_SCHEMA_VERSION` is `7`, `EXTRACTOR_VERSION` is `10`, and the
+  outer/public schema versions remain unchanged.
+- `GraphIndexState` strictly serializes and restores `exports` and
+  `symbol_references`; private import-state serialization also retains every
+  validated `ImportBinding` needed to recheck a record after restart.
+- `materialize_graph()` returns the raw export evidence and complete resolved
+  or unresolved reference records that produced its reference edges.
+- `IndexStore.write()` parses the complete state envelope, validates current
+  export/reference evidence, and validates all built-in or reserved import and
+  reference edges before creating the repository cache directory, source
+  mirror, temporary index, or final index file.
+- Schema 6 cannot load as schema 7, extractor 9 is stale under the existing
+  freshness check, and there is no partial in-place migration.
+- The exact Task 8 gate passes `140` tests; the affected graph/storage/service
+  gate passes `341` tests; the full repository suite passes `985` tests.
+- The frozen anchor/traversal gate passes `26` tests and the frozen fixture
+  remains SHA-256
+  `c52def1bdf592ad735149d199910f74183598eccd9ccf8064335fa0cd0e84e27`.
+- Lock verification, compilation, wheel/sdist builds, targeted Pyright, and
+  `git diff --check` pass. No model, judge, compiler, runtime,
+  repository-code, or network execution was added.
+
+**Review gate:** passed across correctness, readability, architecture,
+security, and performance. The required public/private serializer separation
+was verified by the unchanged `graph_imports()` contract. Persistence
+validation uses bounded pre-indexed evidence and linear record/edge passes; it
+does not rescan the repository or introduce an executable trust boundary.
+
+- [x] Private schema 7 round trips byte-stably with exact binding, export, and
+      reference evidence.
+- [x] Missing, unknown, malformed, stale, and unbacked state fails closed
+      before an index write.
+- [x] `references` and `references_type` remain reserved to the `loci`
+      namespace at the storage boundary.
+- [x] Empty-reference repositories persist the complete schema-7 envelope.
+- [x] Schema 6/extractor 9 state rebuilds instead of partially loading.
 
 **Verify:**
 

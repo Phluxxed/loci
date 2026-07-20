@@ -618,6 +618,16 @@ def test_materialize_graph_threads_resolved_symbol_references_after_imports(
     reference_edges = [
         edge for edge in state.edges if edge.type.startswith("references")
     ]
+    expected_exports = tuple(
+        raw for batch in batches for raw in batch.exports
+    )
+    assert state.exports == expected_exports
+    assert len(state.symbol_references) == 1
+    assert state.symbol_references[0].status == "resolved"
+    assert state.symbol_references[0].raw in {
+        raw for batch in batches for raw in batch.references
+    }
+    assert state.imports[0].raw.bindings
     assert reference_edges == [GraphEdge(
         from_id="use.py::run#function",
         to_id="pkg/model.py::Thing#class",
