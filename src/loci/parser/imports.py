@@ -2,16 +2,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal, TypeAlias
+from typing import Any, Literal, TypeAlias, cast
 
 from loci.parser._javascript_bindings import extract_javascript_import_bindings
 from loci.parser.languages import get_language_spec
 from loci.parser.reference_models import (
     MAX_IMPORT_BINDINGS_PER_DECLARATION,
     ImportBinding,
+    ImportBindingKind,
     RawLocalExport,
     RawSymbolReference,
 )
+from loci.parser.references import extract_reference_batch
 
 
 ImportUnresolvedReason: TypeAlias = Literal[
@@ -133,7 +135,12 @@ def extract_import_batch(
         from tree_sitter import Parser
         from tree_sitter_language_pack import get_language
 
-        tree = Parser(get_language(spec.ts_language)).parse(source)
+        tree_sitter_language = (
+            "tsx"
+            if language == "typescript" and path.suffix.lower() == ".tsx"
+            else spec.ts_language
+        )
+        tree = Parser(get_language(cast(Any, tree_sitter_language))).parse(source)
     except Exception as exc:
         raise ImportExtractionError(
             f"could not parse {source_file} for {language} imports"
@@ -164,11 +171,24 @@ def extract_import_batch(
         raise ImportExtractionError(
             f"{source_file} has multiple Go package declarations"
         )
+    try:
+        reference_batch = extract_reference_batch(
+            tree.root_node,
+            source,
+            source_file=source_file,
+            language=language,
+            source_hash=source_hash,
+            imports=imports,
+        )
+    except ValueError as exc:
+        raise ImportExtractionError(
+            f"{source_file} reference extraction failed: {exc}"
+        ) from exc
     return ImportExtractionBatch(
         imports=tuple(imports),
         go_package=go_packages[0] if go_packages else None,
-        exports=(),
-        references=(),
+        exports=reference_batch.exports,
+        references=reference_batch.references,
     )
 
 
@@ -396,7 +416,7 @@ def _extract_rust_import(node, source: bytes, common: dict) -> list[RawImport]:
     argument = node.child_by_field_name("argument")
     if argument is None:
         raise ImportExtractionError("unsupported Rust use declaration")
-    leaves: list[tuple[str, str | None, str]] = []
+    leaves: list[tuple[str, str | None, ImportBindingKind]] = []
     _expand_rust_use_tree(argument, source, prefix="", leaves=leaves)
     context = _rust_context(node, source, kind="use")
     return [
@@ -676,7 +696,7 @@ def _expand_rust_use_tree(
     source: bytes,
     *,
     prefix: str,
-    leaves: list[tuple[str, str | None, str]],
+    leaves: list[tuple[str, str | None, ImportBindingKind]],
 ) -> None:
     if node.type == "use_list":
         for child in node.named_children:
@@ -744,10 +764,10 @@ def _expand_rust_use_tree(
 
 
 def _append_rust_use_leaf(
-    leaves: list[tuple[str, str | None, str]],
+    leaves: list[tuple[str, str | None, ImportBindingKind]],
     specifier: str,
     imported_name: str | None,
-    binding_kind: str,
+    binding_kind: ImportBindingKind,
 ) -> None:
     if len(leaves) >= MAX_RUST_USE_LEAVES_PER_DECLARATION:
         raise ImportExtractionError("Rust use declaration exceeds leaf limit")
@@ -812,7 +832,7 @@ def _import_binding(
     local_name: str | None,
     imported_name: str | None,
     exported_name: str | None,
-    kind: str,
+    kind: ImportBindingKind,
     type_only: bool,
     module_level: bool | None = None,
 ) -> ImportBinding:
