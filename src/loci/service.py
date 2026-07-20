@@ -880,15 +880,12 @@ def graph_retrieve(
         raise LociError(exc.code, exc.message, exc.details) from exc
 
 
-def graph_imports(
-    repo: str | Path,
-    *,
-    file: str | None = None,
-    status: Literal["all", "resolved", "unresolved"] = "all",
-    offset: int = 0,
-    limit: int = 100,
-    ensure_fresh: bool = False,
-) -> dict[str, Any]:
+def _validate_graph_record_query(
+    file: str | None,
+    status: str,
+    offset: int,
+    limit: int,
+) -> None:
     if file is not None:
         valid_file = isinstance(file, str) and bool(file) and "\\" not in file
         if valid_file:
@@ -934,6 +931,17 @@ def graph_imports(
             {"field": "limit", "value": limit, "minimum": 1, "maximum": 500},
         )
 
+
+def graph_imports(
+    repo: str | Path,
+    *,
+    file: str | None = None,
+    status: Literal["all", "resolved", "unresolved"] = "all",
+    offset: int = 0,
+    limit: int = 100,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    _validate_graph_record_query(file, status, offset, limit)
     repo_path = Path(repo).resolve()
     _, _, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
     records = [
@@ -984,6 +992,91 @@ def graph_imports(
             ),
             "unresolved_reason": record.unresolved_reason,
             "resolution_basis": record.resolution_basis,
+            "resolution_control_files": list(record.resolution_control_files),
+            "resolution_configuration": record.resolution_configuration,
+        })
+    next_offset = offset + len(page)
+    if next_offset >= len(filtered):
+        next_offset = None
+
+    return {
+        "schema_version": GRAPH_SCHEMA_VERSION,
+        "repo": str(repo_path),
+        "file": file,
+        "status": status,
+        "items": items,
+        "counts": {
+            "total": len(records),
+            "resolved": resolved_count,
+            "unresolved": unresolved_count,
+            "returned": len(items),
+        },
+        "pagination": {
+            "offset": offset,
+            "limit": limit,
+            "next_offset": next_offset,
+        },
+    }
+
+
+def graph_references(
+    repo: str | Path,
+    *,
+    file: str | None = None,
+    status: Literal["all", "resolved", "unresolved"] = "all",
+    offset: int = 0,
+    limit: int = 100,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    _validate_graph_record_query(file, status, offset, limit)
+    repo_path = Path(repo).resolve()
+    _, _, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
+    records = [
+        record
+        for record in state.symbol_references
+        if file is None or record.raw.source_file == file
+    ]
+    records.sort(key=lambda record: (
+        record.raw.source_file,
+        record.raw.line,
+        record.raw.column,
+        record.raw.start_byte,
+        record.binding.import_line if record.binding is not None else 0,
+        record.binding.import_specifier if record.binding is not None else "",
+        record.binding.local_name if record.binding is not None else "",
+        record.target_file or "",
+        record.target_id or "",
+    ))
+    resolved_count = sum(record.status == "resolved" for record in records)
+    unresolved_count = sum(record.status == "unresolved" for record in records)
+    filtered = (
+        records
+        if status == "all"
+        else [record for record in records if record.status == status]
+    )
+    page = filtered[offset:offset + limit]
+    items = []
+    for record in page:
+        serialized = record.to_dict()
+        items.append({
+            "raw": serialized["raw"],
+            "binding": serialized["binding"],
+            "source_file": record.raw.source_file,
+            "source_id": record.source_id,
+            "source_kind": record.source_kind,
+            "import_source_id": record.import_source_id,
+            "import_target_id": record.import_target_id,
+            "target_file": record.target_file,
+            "target_id": record.target_id,
+            "target_kind": record.target_kind,
+            "status": record.status,
+            "resolution": (
+                "import-resolved" if record.status == "resolved" else None
+            ),
+            "unresolved_reason": record.unresolved_reason,
+            "import_unresolved_reason": record.import_unresolved_reason,
+            "resolution_basis": record.resolution_basis,
+            "support": serialized["support"],
             "resolution_control_files": list(record.resolution_control_files),
             "resolution_configuration": record.resolution_configuration,
         })
