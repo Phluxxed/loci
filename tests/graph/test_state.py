@@ -103,6 +103,28 @@ def _rust_raw_import() -> RawImport:
     )
 
 
+def _inline_rust_module_observation() -> RawImport:
+    return RawImport(
+        source_file="src/lib.rs",
+        language="rust",
+        line=1,
+        text="pub mod inline { pub struct Thing; }",
+        specifier="inline",
+        imported_name=None,
+        type_only=False,
+        is_reexport=True,
+        source_hash="f" * 64,
+        rust=RustImportContext(
+            kind="module",
+            lexical_module_path=(),
+            visibility="pub",
+            module_level=True,
+            configuration="unconditional",
+            inline=True,
+        ),
+    )
+
+
 def _resolved_rust_file_import() -> ImportRecord:
     return ImportRecord(
         raw=_rust_raw_import(),
@@ -176,6 +198,7 @@ def _state() -> GraphIndexState:
         nodes=(node,),
         edges=(edge,),
         imports=(_resolved_import(),),
+        rust_module_observations=(_inline_rust_module_observation(),),
         contributions=(LoadedGraphContribution(
             source=".loci/graph/contributions/example.json",
             content_hash="c" * 64,
@@ -583,14 +606,15 @@ def test_empty_graph_state_has_complete_envelope():
         "nodes": [],
         "edges": [],
         "imports": [],
+        "rust_module_observations": [],
         "contributions": [],
         "input_hashes": {},
         "diagnostics": [],
     }
 
 
-def test_graph_state_uses_schema_version_five():
-    assert GRAPH_STATE_SCHEMA_VERSION == 5
+def test_graph_state_uses_schema_version_six():
+    assert GRAPH_STATE_SCHEMA_VERSION == 6
 
 
 def test_graph_state_rejects_schema_version_two_as_stale():
@@ -633,7 +657,32 @@ def test_graph_state_rejects_schema_version_four_as_stale():
     }
 
 
-def test_graph_state_schema_five_rejects_old_import_record_shape():
+def test_graph_state_rejects_schema_version_five_as_stale():
+    payload = _state().to_dict()
+    payload["schema_version"] = 5
+
+    with pytest.raises(GraphContractError) as exc_info:
+        GraphIndexState.from_dict(payload)
+
+    assert exc_info.value.details == {
+        "field": "schema_version",
+        "schema_version": 5,
+    }
+
+
+def test_graph_state_rejects_non_inline_rust_module_observation():
+    payload = _state().to_dict()
+    observation = payload["rust_module_observations"][0]
+    observation["rust"]["inline"] = False
+
+    with pytest.raises(GraphContractError) as exc_info:
+        GraphIndexState.from_dict(payload)
+
+    assert exc_info.value.code == "INVALID_GRAPH_SCHEMA"
+    assert exc_info.value.details == {"field": "rust_module_observations"}
+
+
+def test_graph_state_rejects_old_import_record_shape():
     payload = _state().to_dict()
     del payload["imports"][0]["target_package"]
     del payload["imports"][0]["target_kind"]

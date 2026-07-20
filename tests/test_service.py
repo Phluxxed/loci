@@ -1747,6 +1747,64 @@ def test_service_rust_full_and_incremental_serialized_indexes_match(
     ) == 2
 
 
+def test_service_inline_rust_modules_survive_incremental_without_reparse(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _write_cargo_package(repo, package_name="app")
+    source = repo / "src"
+    source.mkdir()
+    (source / "lib.rs").write_text(
+        (
+            "pub mod inline {\n"
+            "    pub mod nested {\n"
+            "        pub struct InlineThing;\n"
+            "    }\n"
+            "}\n"
+        ),
+        encoding="utf-8",
+    )
+    (source / "main.rs").write_text(
+        "use app::inline::nested::InlineThing;\n\nfn main() {}\n",
+        encoding="utf-8",
+    )
+    store = IndexStore(base_dir=base)
+
+    index_repo(repo, incremental=False)
+    full = store.load(repo.resolve())
+    full_imports = graph_imports(repo)["items"]
+
+    def fail_if_reparsed(*args, **kwargs):
+        raise AssertionError("unchanged Rust source was reparsed")
+
+    monkeypatch.setattr(service_module, "extract_imports", fail_if_reparsed)
+    incremental_result = index_repo(repo, incremental=True)
+    incremental = store.load(repo.resolve())
+    incremental_imports = graph_imports(repo)["items"]
+
+    assert full is not None
+    assert incremental is not None
+    assert incremental_result["files_skipped"] == 2
+    assert incremental == full
+    assert incremental_imports == full_imports
+    resolved = next(
+        item
+        for item in incremental_imports
+        if item["specifier"] == "app::inline::nested::InlineThing"
+    )
+    assert resolved["target_kind"] == "file"
+    assert resolved["target_file"] == "src/lib.rs"
+    assert resolved["target_id"] == "src/lib.rs::__file__#file"
+    assert all(
+        item["specifier"] not in {"inline", "nested"}
+        for item in full_imports
+    )
+
+
 def test_service_import_state_survives_fresh_process_read(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
