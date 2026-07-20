@@ -1,15 +1,23 @@
 from __future__ import annotations
 
 import re
+from bisect import bisect_right
 from dataclasses import dataclass
 from pathlib import PurePosixPath
-from typing import Any, Literal, Mapping, Sequence, TypeAlias, cast
+from types import MappingProxyType
+from typing import TYPE_CHECKING, Any, Literal, Mapping, Sequence, TypeAlias, cast
 
 from loci.parser.imports import ImportUnresolvedReason
-from loci.parser.reference_models import ImportBinding, RawSymbolReference
+from loci.parser.reference_models import ImportBinding, RawLocalExport, RawSymbolReference
+from loci.parser.symbols import Symbol
 
 from .contracts import GraphContractError, JSONValue
-from .rust_crates import RustResolutionConfiguration
+from .go_modules import GoPackageIndex
+from .imports import ImportRecord
+from .rust_crates import RustCrateIndex, RustResolutionConfiguration
+
+if TYPE_CHECKING:
+    from ._python_references import PythonReferenceIndex
 
 
 MAX_REFERENCE_REEXPORT_PASSES = 128
@@ -267,8 +275,6 @@ class SymbolReferenceRecord:
             raise _error("Unresolved reference cannot have a final target or basis")
         if self.unresolved_reason is None:
             raise _error("Unresolved reference requires an unresolved reason")
-        if self.binding is None and self.unresolved_reason != "ambiguous_binding":
-            raise _error("Unresolved reference requires its selected binding")
         if (
             self.import_unresolved_reason is not None
             and self.unresolved_reason != "import_unresolved"
@@ -386,6 +392,403 @@ class SymbolReferenceRecord:
                 ),
             ),
         )
+
+
+@dataclass(frozen=True, slots=True)
+class ReferenceResolverIndex:
+    """Frozen exact-endpoint lookups shared by language reference resolvers."""
+
+    _symbols_by_id: Mapping[str, Symbol]
+    _file_nodes: Mapping[str, Symbol]
+    _source_spans: Mapping[str, _SourceSpanIndex]
+    _imports: tuple[ImportRecord, ...]
+    _imports_by_binding: Mapping[
+        tuple[str, ImportBinding],
+        tuple[ImportRecord, ...],
+    ]
+    _python: PythonReferenceIndex
+
+
+@dataclass(frozen=True, slots=True)
+class _SourceOwner:
+    symbol: Symbol
+    ambiguous: bool
+
+
+@dataclass(frozen=True, slots=True)
+class _SourceSpanIndex:
+    symbols: tuple[Symbol, ...]
+    starts: tuple[int, ...]
+    tree_size: int
+    max_ends: tuple[int, ...]
+
+    @classmethod
+    def build(cls, symbols: Sequence[Symbol]) -> _SourceSpanIndex:
+        ordered = tuple(sorted(symbols, key=lambda item: (item.byte_offset, item.id)))
+        tree_size = 1
+        while tree_size < len(ordered):
+            tree_size *= 2
+        max_ends = [-1] * (tree_size * 2)
+        for index, symbol in enumerate(ordered):
+            max_ends[tree_size + index] = symbol.byte_offset + symbol.byte_length
+        for index in range(tree_size - 1, 0, -1):
+            max_ends[index] = max(max_ends[index * 2], max_ends[index * 2 + 1])
+        return cls(
+            symbols=ordered,
+            starts=tuple(symbol.byte_offset for symbol in ordered),
+            tree_size=tree_size,
+            max_ends=tuple(max_ends),
+        )
+
+    def containing(self, start_byte: int, end_byte: int) -> list[Symbol]:
+        upper = bisect_right(self.starts, start_byte)
+        if upper == 0:
+            return []
+        matches: list[Symbol] = []
+        pending = [(1, 0, self.tree_size)]
+        while pending:
+            node, left, right = pending.pop()
+            if left >= upper or self.max_ends[node] < end_byte:
+                continue
+            if right - left == 1:
+                if left < len(self.symbols):
+                    matches.append(self.symbols[left])
+                continue
+            middle = (left + right) // 2
+            pending.append((node * 2 + 1, middle, right))
+            pending.append((node * 2, left, middle))
+        return matches
+
+
+def build_reference_resolver_index(
+    symbols: Sequence[Symbol],
+    imports: Sequence[ImportRecord],
+    exports: Sequence[RawLocalExport],
+    *,
+    go_packages: GoPackageIndex | None = None,
+    rust_crates: RustCrateIndex | None = None,
+) -> ReferenceResolverIndex:
+    """Build bounded immutable reference lookups without repository I/O."""
+    del go_packages, rust_crates  # Reserved by the frozen four-language API.
+    symbols_by_id: dict[str, Symbol] = {}
+    file_nodes: dict[str, Symbol] = {}
+    source_symbols: dict[str, list[Symbol]] = {}
+    for symbol in symbols:
+        _validate_symbol(symbol)
+        if symbol.id in symbols_by_id:
+            raise _error(
+                "Reference index contains duplicate symbol IDs",
+                symbol_id=symbol.id,
+            )
+        symbols_by_id[symbol.id] = symbol
+        if _is_file_node(symbol):
+            if symbol.file_path in file_nodes:
+                raise _error(
+                    "Reference index contains duplicate file nodes",
+                    file=symbol.file_path,
+                )
+            file_nodes[symbol.file_path] = symbol
+        elif not _is_synthetic_symbol(symbol):
+            source_symbols.setdefault(symbol.file_path, []).append(symbol)
+
+    frozen_imports = tuple(imports)
+    imports_by_binding: dict[
+        tuple[str, ImportBinding],
+        list[ImportRecord],
+    ] = {}
+    for record in frozen_imports:
+        if not isinstance(record, ImportRecord):
+            raise _error("Reference index import is not an ImportRecord")
+        source = file_nodes.get(record.raw.source_file)
+        if source is None or source.id != record.source_id:
+            raise _error(
+                "Reference import source does not match an indexed file node",
+                file=record.raw.source_file,
+            )
+        if source.content_hash != record.raw.source_hash:
+            raise _error(
+                "Reference import source hash is stale",
+                file=record.raw.source_file,
+            )
+        for binding in record.raw.bindings:
+            imports_by_binding.setdefault(
+                (record.raw.source_file, binding),
+                [],
+            ).append(record)
+
+    for file, values in source_symbols.items():
+        file_node = file_nodes.get(file)
+        if file_node is None:
+            raise _error(
+                "Reference symbol has no indexed file node",
+                file=file,
+            )
+        for symbol in values:
+            if symbol.language != file_node.language:
+                raise _error(
+                    "Reference symbol language does not match its file node",
+                    symbol_id=symbol.id,
+                )
+
+    frozen_spans = {
+        file: _SourceSpanIndex.build(values)
+        for file, values in source_symbols.items()
+    }
+    frozen_import_map = {
+        key: tuple(value) for key, value in imports_by_binding.items()
+    }
+    from ._python_references import build_python_reference_index
+
+    python_index = build_python_reference_index(
+        tuple(symbols_by_id.values()),
+        frozen_imports,
+        tuple(exports),
+        file_nodes=file_nodes,
+    )
+    return ReferenceResolverIndex(
+        _symbols_by_id=MappingProxyType(symbols_by_id),
+        _file_nodes=MappingProxyType(file_nodes),
+        _source_spans=MappingProxyType(frozen_spans),
+        _imports=frozen_imports,
+        _imports_by_binding=MappingProxyType(frozen_import_map),
+        _python=python_index,
+    )
+
+
+def resolve_symbol_references(
+    observations: Sequence[RawSymbolReference],
+    *,
+    imports: Sequence[ImportRecord],
+    index: ReferenceResolverIndex,
+) -> list[SymbolReferenceRecord]:
+    """Resolve raw observations against only their proven import endpoints."""
+    if not isinstance(index, ReferenceResolverIndex):
+        raise _error("Reference resolver index has an invalid type")
+    if tuple(imports) != index._imports:
+        raise _error("Reference resolver imports do not match its frozen index")
+    return [_resolve_symbol_reference(raw, index) for raw in observations]
+
+
+def _resolve_symbol_reference(
+    raw: RawSymbolReference,
+    index: ReferenceResolverIndex,
+) -> SymbolReferenceRecord:
+    if not isinstance(raw, RawSymbolReference):
+        raise _error("Reference observation must be a RawSymbolReference")
+    owner = _source_owner(raw, index)
+    binding = raw.candidate_bindings[0] if len(raw.candidate_bindings) == 1 else None
+    matched_imports = (
+        index._imports_by_binding.get((raw.source_file, binding), ())
+        if binding is not None
+        else ()
+    )
+    import_record = matched_imports[0] if len(matched_imports) == 1 else None
+
+    binding_reason = {
+        "shadowed": "binding_shadowed",
+        "ambiguous": "ambiguous_binding",
+        "unsupported": "unsupported_reference",
+    }.get(raw.binding_state)
+    if binding_reason is not None:
+        return _unresolved_record(
+            raw,
+            binding=binding,
+            owner=owner,
+            import_record=import_record,
+            reason=cast(ReferenceUnresolvedReason, binding_reason),
+        )
+    if binding is None or len(matched_imports) > 1:
+        return _unresolved_record(
+            raw,
+            binding=None,
+            owner=owner,
+            import_record=None,
+            reason="ambiguous_binding",
+        )
+    if import_record is None:
+        return _unresolved_record(
+            raw,
+            binding=binding,
+            owner=owner,
+            import_record=None,
+            reason="import_unresolved",
+        )
+    if import_record.status == "unresolved":
+        return _unresolved_record(
+            raw,
+            binding=binding,
+            owner=owner,
+            import_record=import_record,
+            reason="import_unresolved",
+            import_reason=import_record.unresolved_reason,
+        )
+    if owner.ambiguous:
+        return _unresolved_record(
+            raw,
+            binding=binding,
+            owner=owner,
+            import_record=import_record,
+            reason="ambiguous_source",
+        )
+    if raw.language != "python":
+        return _unresolved_record(
+            raw,
+            binding=binding,
+            owner=owner,
+            import_record=import_record,
+            reason="unsupported_reference",
+        )
+
+    from ._python_references import resolve_python_reference
+
+    outcome = resolve_python_reference(
+        raw,
+        binding=binding,
+        import_record=import_record,
+        index=index._python,
+    )
+    import_support = _import_binding_support(raw, import_record)
+    if outcome.target is None:
+        return _unresolved_record(
+            raw,
+            binding=binding,
+            owner=owner,
+            import_record=import_record,
+            reason=outcome.reason or "target_not_indexed",
+            import_reason=outcome.import_unresolved_reason,
+            support=(import_support, *outcome.support),
+        )
+    return SymbolReferenceRecord(
+        raw=raw,
+        binding=binding,
+        source_id=owner.symbol.id,
+        source_kind=owner.symbol.kind,
+        import_source_id=import_record.source_id,
+        import_target_id=import_record.target_id,
+        target_file=outcome.target.file_path,
+        target_id=outcome.target.id,
+        target_kind=outcome.target.kind,
+        status="resolved",
+        unresolved_reason=None,
+        import_unresolved_reason=None,
+        resolution_basis=outcome.basis,
+        support=(import_support, *outcome.support),
+        resolution_control_files=outcome.resolution_control_files,
+        resolution_configuration=None,
+    )
+
+
+def _source_owner(
+    raw: RawSymbolReference,
+    index: ReferenceResolverIndex,
+) -> _SourceOwner:
+    file_node = index._file_nodes.get(raw.source_file)
+    if file_node is None:
+        raise _error("Reference source file node is not indexed", file=raw.source_file)
+    if file_node.language != raw.language or file_node.content_hash != raw.source_hash:
+        raise _error("Reference source evidence is stale", file=raw.source_file)
+    spans = index._source_spans.get(raw.source_file)
+    candidates = (
+        spans.containing(raw.start_byte, raw.end_byte)
+        if spans is not None
+        else []
+    )
+    if not candidates:
+        return _SourceOwner(file_node, False)
+    smallest_length = min(symbol.byte_length for symbol in candidates)
+    smallest = [
+        symbol for symbol in candidates if symbol.byte_length == smallest_length
+    ]
+    if len(smallest) != 1:
+        return _SourceOwner(file_node, True)
+    return _SourceOwner(smallest[0], False)
+
+
+def _unresolved_record(
+    raw: RawSymbolReference,
+    *,
+    binding: ImportBinding | None,
+    owner: _SourceOwner,
+    import_record: ImportRecord | None,
+    reason: ReferenceUnresolvedReason,
+    import_reason: ImportUnresolvedReason | None = None,
+    support: tuple[ReferenceSupport, ...] = (),
+) -> SymbolReferenceRecord:
+    file_node_id = f"{raw.source_file}::__file__#file"
+    return SymbolReferenceRecord(
+        raw=raw,
+        binding=binding,
+        source_id=owner.symbol.id,
+        source_kind=owner.symbol.kind,
+        import_source_id=(
+            import_record.source_id if import_record is not None else file_node_id
+        ),
+        import_target_id=(
+            import_record.target_id if import_record is not None else None
+        ),
+        target_file=None,
+        target_id=None,
+        target_kind=None,
+        status="unresolved",
+        unresolved_reason=reason,
+        import_unresolved_reason=import_reason,
+        resolution_basis=None,
+        support=support,
+        resolution_control_files=(),
+        resolution_configuration=None,
+    )
+
+
+def _import_binding_support(
+    raw: RawSymbolReference,
+    import_record: ImportRecord,
+) -> ReferenceSupport:
+    if import_record.target_id is None:
+        raise _error("Resolved reference import has no target endpoint")
+    return ReferenceSupport(
+        kind="import_binding",
+        file=raw.source_file,
+        line=import_record.raw.line,
+        content_hash=raw.source_hash,
+        endpoint_id=import_record.target_id,
+    )
+
+
+def _validate_symbol(symbol: Any) -> None:
+    if not isinstance(symbol, Symbol):
+        raise _error("Reference index symbol is not a Symbol")
+    _nonempty_string(symbol.id, "symbol.id")
+    _relative_path(symbol.file_path, "symbol.file_path")
+    _nonempty_string(symbol.kind, "symbol.kind")
+    _nonempty_string(symbol.language, "symbol.language")
+    if (
+        isinstance(symbol.byte_offset, bool)
+        or not isinstance(symbol.byte_offset, int)
+        or symbol.byte_offset < 0
+        or isinstance(symbol.byte_length, bool)
+        or not isinstance(symbol.byte_length, int)
+        or symbol.byte_length < 0
+    ):
+        raise _error("Reference symbol has an invalid byte range", symbol_id=symbol.id)
+
+
+def _is_file_node(symbol: Symbol) -> bool:
+    loci = symbol.metadata.get("loci")
+    return (
+        symbol.kind == "file"
+        and isinstance(loci, Mapping)
+        and loci.get("file_node") is True
+    )
+
+
+def _is_synthetic_symbol(symbol: Symbol) -> bool:
+    if symbol.kind in {"file", "package", "crate"} or symbol.language == "markdown":
+        return True
+    loci = symbol.metadata.get("loci")
+    return isinstance(loci, Mapping) and any(
+        loci.get(key) is True
+        for key in ("file_node", "go_package", "rust_crate")
+    )
 
 
 def _support_tuple(value: Any) -> None:
