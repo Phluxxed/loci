@@ -508,6 +508,7 @@ def test_go_batch_returns_no_declaration_for_comment_only_source(tmp_path: Path)
         go_package=None,
         exports=(),
         references=(),
+        calls=(),
     )
 
 
