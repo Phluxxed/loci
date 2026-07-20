@@ -253,6 +253,30 @@ def _validate_records(*records: SymbolReferenceRecord) -> None:
     )
 
 
+def test_unsupported_reference_does_not_claim_unresolved_import_outcome():
+    raw = _raw_reference(binding_state="unsupported", text="Alias[str]")
+    record = _unresolved_record(
+        raw=raw,
+        import_target_id=None,
+        unresolved_reason="unsupported_reference",
+    )
+    unresolved_import = _import_record(
+        target_file=None,
+        target_kind=None,
+        target_id=None,
+        status="unresolved",
+        unresolved_reason="not_indexed",
+    )
+
+    validate_symbol_reference_records(
+        [record],
+        imports=[unresolved_import],
+        exports=[_definition_export()],
+        indexed_nodes=_indexed_nodes(),
+        file_hashes={"src/use.py": SOURCE_HASH, "src/model.py": TARGET_HASH},
+    )
+
+
 @pytest.mark.parametrize("record", [_support(), _resolved_record(), _unresolved_record()])
 def test_reference_graph_records_round_trip_strictly(record):
     serialized = record.to_dict()

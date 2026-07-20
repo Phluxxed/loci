@@ -1622,7 +1622,7 @@ reference envelope.
   freshness check, and there is no partial in-place migration.
 - The exact Task 8 gate passes `140` tests; the affected graph/storage/service
   gate passes `341` tests; the full repository suite passes `985` tests.
-- The frozen anchor/traversal gate passes `26` tests and the frozen fixture
+- The frozen anchor/traversal gate passes `15` tests and the frozen fixture
   remains SHA-256
   `c52def1bdf592ad735149d199910f74183598eccd9ccf8064335fa0cd0e84e27`.
 - Lock verification, compilation, wheel/sdist builds, targeted Pyright, and
@@ -1652,12 +1652,20 @@ does not rescan the repository or introduce an executable trust boundary.
 
 ### Task 9 — Integrate incremental service behavior and health
 
+**Implementation status:** complete on 2026-07-20. Incremental indexing now
+retains unchanged raw export/reference evidence, replaces or drops evidence by
+current source-file identity, and re-resolves every retained reference against
+the current source, export, import, and language-control indexes. The accepted
+`materialize_graph()` inputs from Tasks 7–8 required no further Task 9 edit.
+Final Stage 10 owner acceptance remains pending.
+
 **Files:**
 
 - `src/loci/service.py`
-- `src/loci/graph/materialize.py`
+- `src/loci/graph/_reference_validation.py`
 - `tests/test_symbol_reference_service.py` (new)
 - `tests/test_service.py`
+- `tests/graph/test_reference_contracts.py`
 
 **Work:**
 
@@ -1670,6 +1678,74 @@ does not rescan the repository or introduce an executable trust boundary.
 **Acceptance:** add/change/delete scenarios for source, target, re-export, and
 language controls produce current exact records; fresh full and incremental
 indexes serialize identically.
+
+**Implementation evidence:**
+
+- Every changed supported code file now uses the existing one-pass
+  `extract_import_batch()` result atomically for imports, Go package metadata,
+  local exports, and symbol references. A failed dependency/reference batch
+  retains ordinary navigation symbols but none of that file's partial graph
+  evidence.
+- Every unchanged file restores imports, inline Rust module observations,
+  exports, raw references, and extraction diagnostics from strict schema-7
+  state without running symbol or dependency parsing.
+- Changed files replace their prior observations, deleted files contribute no
+  observations, and `materialize_graph()` rebuilds all import/export/reference
+  resolver indexes from the current combined evidence on every write.
+- Python module-level named re-exports now pass persistence validation only
+  when the resolver's support record matches both one current resolved import
+  and its exact current `RawLocalExport` evidence. This closes the integration
+  mismatch found by the Task 9 re-export test without weakening fail-closed
+  support validation.
+- Unsupported or shadowed references may retain an exact selected binding
+  without falsely claiming an underlying external/unresolved import outcome;
+  `import_unresolved_reason` equality is required when and only when the
+  reference outcome is `import_unresolved`.
+- Index output and `graph_health()` add the exact record counts
+  `graph_symbol_references_indexed`, `graph_symbol_references_resolved`, and
+  `graph_symbol_references_unresolved`; ordinary unresolved records do not
+  degrade health.
+- Import/tree-parser failures retain `GRAPH_IMPORT_EXTRACTION_FAILED` while
+  the parser's explicit bounded reference-extraction wrapper emits
+  `GRAPH_REFERENCE_EXTRACTION_FAILED`. Both diagnostics survive no-op
+  incremental indexing byte-stably.
+- Source replacement/deletion, target addition/deletion, Python re-export
+  change/restoration, JavaScript workspace-control change/restoration, no-op
+  no-reparse behavior, and fresh-full/incremental serialized equality are
+  covered by service-level tests.
+- A fresh-process full index of Loci itself is healthy with `3,114` reference
+  records (`1,122` resolved and `1,992` deliberately unresolved) and `1,915`
+  graph edges. Its no-op incremental run skips all `84` indexed files without
+  either parser running and reproduces the exact serialized index.
+- The exact Task 9 gate passes `102` tests; the affected
+  reference/materialization/storage/service gate passes `217` tests; the full
+  repository suite passes `993` tests.
+- The frozen anchor/traversal gate passes `15` tests and the frozen fixture
+  remains SHA-256
+  `c52def1bdf592ad735149d199910f74183598eccd9ccf8064335fa0cd0e84e27`.
+- Lock verification, compilation, wheel/sdist builds, targeted Pyright, and
+  `git diff --check` pass. No dependency, model, judge, compiler, runtime,
+  repository-code, or network execution was added.
+
+**Review gate:** passed across correctness, readability, architecture,
+security, and performance. The implementation extends the existing per-file
+retention maps and single-parse batch instead of adding a second cache or parse
+path. Re-resolution is deterministic and linear over bounded persisted
+observations; no-op runs prove that unchanged files are not reparsed. Strict
+state loading, current hash checks, exact import/export support matching, and
+atomic `IndexStore.write()` remain the storage trust boundary.
+
+- [x] Unchanged raw exports/references and their extraction diagnostics survive
+      no-op incremental indexing without either parser running.
+- [x] Changed sources replace and deleted sources drop their complete current
+      dependency/reference batch.
+- [x] Target, re-export, and language-control changes re-resolve references
+      whose source files were unchanged.
+- [x] Index and health counts describe records rather than deduplicated edges.
+- [x] Fresh full and incremental indexes serialize identically for the same
+      repository state.
+- [x] Ordinary unresolved outcomes remain healthy; bounded extraction failures
+      degrade health with stable diagnostics and no partial evidence.
 
 **Verify:**
 
