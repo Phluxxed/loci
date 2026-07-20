@@ -47,11 +47,20 @@ class _JavaScriptReexportRule:
 
 
 @dataclass(frozen=True, slots=True)
+class _JavaScriptStarRule:
+    source_file: str
+    target_file: str
+    support: ReferenceSupport
+    control_files: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class JavaScriptReferenceIndex:
     surfaces: Mapping[_ExportKey, tuple[_JavaScriptExportTarget, ...]]
     ambiguous: frozenset[_ExportKey]
     cyclic_keys: frozenset[_ExportKey]
     cyclic_files: frozenset[str]
+    ambiguous_files: frozenset[str]
     import_failures: Mapping[_ExportKey, frozenset[ImportUnresolvedReason]]
     star_import_failures: Mapping[str, frozenset[ImportUnresolvedReason]]
 
@@ -138,11 +147,39 @@ def build_javascript_reference_index(
         )
 
     rules: list[_JavaScriptReexportRule] = []
+    star_rules: list[_JavaScriptStarRule] = []
     failures: dict[_ExportKey, set[ImportUnresolvedReason]] = {}
+    star_failures: dict[str, set[ImportUnresolvedReason]] = {}
     for record in imports:
         if record.raw.language not in _JAVASCRIPT_LANGUAGES or not record.raw.is_reexport:
             continue
         for binding in record.raw.bindings:
+            if binding.kind == "glob":
+                if record.status == "unresolved":
+                    if record.unresolved_reason is not None:
+                        star_failures.setdefault(record.raw.source_file, set()).add(
+                            record.unresolved_reason
+                        )
+                elif record.target_file is None or record.target_id is None:
+                    star_failures.setdefault(record.raw.source_file, set()).add(
+                        "ambiguous"
+                    )
+                else:
+                    star_rules.append(
+                        _JavaScriptStarRule(
+                            source_file=record.raw.source_file,
+                            target_file=record.target_file,
+                            support=ReferenceSupport(
+                                kind="reexport",
+                                file=record.raw.source_file,
+                                line=record.raw.line,
+                                content_hash=record.raw.source_hash,
+                                endpoint_id=record.target_id,
+                            ),
+                            control_files=record.resolution_control_files,
+                        )
+                    )
+                continue
             if binding.kind != "symbol" or binding.exported_name is None:
                 if binding.exported_name is not None:
                     key = (record.raw.source_file, binding.exported_name)
@@ -191,13 +228,46 @@ def build_javascript_reference_index(
         for source in sorted(rules_by_source)
         for rule in rules_by_source[source]
     ]
+    ambiguous_files: set[str] = set()
+    star_rules = sorted(set(star_rules), key=_star_rule_key)
+    star_rules_by_source: dict[str, list[_JavaScriptStarRule]] = {}
+    for rule in star_rules:
+        source_rules = star_rules_by_source.setdefault(rule.source_file, [])
+        if len(source_rules) >= MAX_REFERENCE_RESOLUTION_CANDIDATES:
+            ambiguous_files.add(rule.source_file)
+            continue
+        source_rules.append(rule)
+    star_rules = [
+        rule
+        for source in sorted(star_rules_by_source)
+        for rule in star_rules_by_source[source]
+    ]
+    explicit_keys = frozenset(explicit_counts)
     for _ in range(MAX_REFERENCE_REEXPORT_PASSES):
         snapshot = {key: dict(value) for key, value in surfaces.items()}
+        snapshot_ambiguous = frozenset(ambiguous)
+        snapshot_failures = {
+            key: frozenset(value) for key, value in failures.items()
+        }
+        snapshot_star_failures = {
+            file: frozenset(value) for file, value in star_failures.items()
+        }
+        names_by_file: dict[str, set[str]] = {}
+        for file, name in set(snapshot) | set(snapshot_ambiguous) | set(snapshot_failures):
+            names_by_file.setdefault(file, set()).add(name)
         changed = False
         for rule in rules:
-            if rule.target in ambiguous:
-                ambiguous.add(rule.source)
+            if rule.target in snapshot_ambiguous:
+                if rule.source not in ambiguous:
+                    ambiguous.add(rule.source)
+                    changed = True
                 continue
+            target_failures = snapshot_failures.get(rule.target, frozenset())
+            if target_failures:
+                source_failures = failures.setdefault(rule.source, set())
+                previous_count = len(source_failures)
+                source_failures.update(target_failures)
+                changed |= len(source_failures) != previous_count
             for target in snapshot.get(rule.target, {}).values():
                 support = (rule.support, *target.support)
                 if len(support) >= MAX_REFERENCE_SUPPORT_RECORDS:
@@ -216,10 +286,60 @@ def build_javascript_reference_index(
                     ),
                     ambiguous=ambiguous,
                 )
+        for rule in star_rules:
+            source_star_failures = star_failures.setdefault(rule.source_file, set())
+            previous_count = len(source_star_failures)
+            source_star_failures.update(
+                snapshot_star_failures.get(rule.target_file, frozenset())
+            )
+            changed |= len(source_star_failures) != previous_count
+            for exported_name in sorted(names_by_file.get(rule.target_file, ())):
+                if exported_name == "default":
+                    continue
+                source_key = (rule.source_file, exported_name)
+                target_key = (rule.target_file, exported_name)
+                if source_key in explicit_keys:
+                    continue
+                if target_key in snapshot_ambiguous:
+                    if source_key not in ambiguous:
+                        ambiguous.add(source_key)
+                        changed = True
+                    continue
+                target_failures = snapshot_failures.get(target_key, frozenset())
+                if target_failures:
+                    source_failures = failures.setdefault(source_key, set())
+                    failure_count = len(source_failures)
+                    source_failures.update(target_failures)
+                    changed |= len(source_failures) != failure_count
+                for target in snapshot.get(target_key, {}).values():
+                    support = (rule.support, *target.support)
+                    if len(support) >= MAX_REFERENCE_SUPPORT_RECORDS:
+                        if source_key not in ambiguous:
+                            ambiguous.add(source_key)
+                            changed = True
+                        continue
+                    changed |= _add_export_target(
+                        surfaces,
+                        source_key,
+                        _JavaScriptExportTarget(
+                            symbol=target.symbol,
+                            support=support,
+                            control_files=tuple(sorted(set(
+                                (*rule.control_files, *target.control_files)
+                            ))),
+                            via_reexport=True,
+                        ),
+                        ambiguous=ambiguous,
+                    )
+        for key, targets in surfaces.items():
+            if len(targets) > 1 and key not in ambiguous:
+                ambiguous.add(key)
+                changed = True
         if not changed:
             break
     else:
         ambiguous.update(rule.source for rule in rules)
+        ambiguous_files.update(rule.source_file for rule in star_rules)
 
     for key, targets in surfaces.items():
         if len(targets) > 1:
@@ -228,17 +348,24 @@ def build_javascript_reference_index(
     for rule in rules:
         graph.setdefault(rule.source, set()).add(rule.target)
     cyclic_keys = _cycle_reachable_keys(graph)
+    star_graph: dict[str, set[str]] = {}
+    for rule in star_rules:
+        star_graph.setdefault(rule.source_file, set()).add(rule.target_file)
+    cyclic_files = _cycle_reachable_files(star_graph)
     return JavaScriptReferenceIndex(
         surfaces=MappingProxyType({
             key: tuple(value.values()) for key, value in surfaces.items()
         }),
         ambiguous=frozenset(ambiguous),
         cyclic_keys=frozenset(cyclic_keys),
-        cyclic_files=frozenset(),
+        cyclic_files=frozenset(cyclic_files),
+        ambiguous_files=frozenset(ambiguous_files),
         import_failures=MappingProxyType({
             key: frozenset(value) for key, value in failures.items()
         }),
-        star_import_failures=MappingProxyType({}),
+        star_import_failures=MappingProxyType({
+            file: frozenset(value) for file, value in star_failures.items()
+        }),
     )
 
 
@@ -254,19 +381,28 @@ def resolve_javascript_reference(
     if target_name is None or basis is None or import_record.target_file is None:
         return _unresolved("unsupported_reference")
     key = (import_record.target_file, target_name)
-    if key in index.ambiguous:
+    if key in index.ambiguous or import_record.target_file in index.ambiguous_files:
         return _unresolved("ambiguous_target")
     targets = index.surfaces.get(key, ())
     if len(targets) > 1:
         return _unresolved("ambiguous_target")
     if not targets:
         failures = index.import_failures.get(key, frozenset())
-        if len(failures) == 1:
+        star_failures = index.star_import_failures.get(
+            import_record.target_file,
+            frozenset(),
+        )
+        combined_failures = failures | star_failures
+        if len(combined_failures) == 1:
             return _unresolved(
                 "import_unresolved",
-                import_reason=next(iter(failures)),
+                import_reason=next(iter(combined_failures)),
             )
-        if len(failures) > 1 or key in index.cyclic_keys:
+        if (
+            len(combined_failures) > 1
+            or key in index.cyclic_keys
+            or import_record.target_file in index.cyclic_files
+        ):
             return _unresolved("ambiguous_target")
         return _unresolved("target_not_indexed")
     target = targets[0]
@@ -357,6 +493,16 @@ def _reexport_rule_key(rule: _JavaScriptReexportRule) -> tuple[object, ...]:
     )
 
 
+def _star_rule_key(rule: _JavaScriptStarRule) -> tuple[object, ...]:
+    return (
+        rule.source_file,
+        rule.target_file,
+        rule.support.line,
+        rule.support.endpoint_id,
+        rule.control_files,
+    )
+
+
 def _cycle_reachable_keys(
     graph: Mapping[_ExportKey, set[_ExportKey]],
 ) -> set[_ExportKey]:
@@ -394,6 +540,65 @@ def _cycle_reachable_keys(
         if root in assigned:
             continue
         component: set[_ExportKey] = set()
+        component_stack = [root]
+        while component_stack:
+            node = component_stack.pop()
+            if node in assigned:
+                continue
+            assigned.add(node)
+            component.add(node)
+            component_stack.extend(
+                source for source in reverse.get(node, ()) if source not in assigned
+            )
+        if len(component) > 1 or any(node in graph.get(node, ()) for node in component):
+            cycle_members.update(component)
+
+    reachable = set(cycle_members)
+    frontier = list(cycle_members)
+    while frontier:
+        target = frontier.pop()
+        for source in reverse.get(target, ()):
+            if source not in reachable:
+                reachable.add(source)
+                frontier.append(source)
+    return reachable
+
+
+def _cycle_reachable_files(graph: Mapping[str, set[str]]) -> set[str]:
+    nodes = set(graph)
+    nodes.update(target for targets in graph.values() for target in targets)
+    reverse: dict[str, set[str]] = {}
+    for source, targets in graph.items():
+        for target in targets:
+            reverse.setdefault(target, set()).add(source)
+
+    visited: set[str] = set()
+    finish_order: list[str] = []
+    for root in sorted(nodes):
+        if root in visited:
+            continue
+        stack: list[tuple[str, bool]] = [(root, False)]
+        while stack:
+            node, expanded = stack.pop()
+            if expanded:
+                finish_order.append(node)
+                continue
+            if node in visited:
+                continue
+            visited.add(node)
+            stack.append((node, True))
+            stack.extend(
+                (target, False)
+                for target in reversed(sorted(graph.get(node, ())))
+                if target not in visited
+            )
+
+    assigned: set[str] = set()
+    cycle_members: set[str] = set()
+    for root in reversed(finish_order):
+        if root in assigned:
+            continue
+        component: set[str] = set()
         component_stack = [root]
         while component_stack:
             node = component_stack.pop()

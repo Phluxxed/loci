@@ -368,6 +368,48 @@ def test_extracts_typescript_exports_type_references_and_unsupported_computed_me
     ]
 
 
+def test_extracts_javascript_named_default_and_reexport_surface_evidence(
+    tmp_path: Path,
+):
+    batch = _extract_batch(
+        tmp_path,
+        name="surface.ts",
+        source=(
+            "export default function Factory() {}\n"
+            'export {default as Named, type Shape as PublicShape} from "./model.js";\n'
+            'export * from "./star.js";\n'
+            'export * as model from "./model.js";\n'
+        ),
+        language="typescript",
+    )
+    anonymous = _extract_batch(
+        tmp_path,
+        name="anonymous.js",
+        source="export default function () {}\n",
+        language="javascript",
+    )
+
+    assert [
+        (item.local_name, item.exported_name, item.type_only)
+        for item in batch.exports
+    ] == [("Factory", "default", False)]
+    assert [
+        [
+            (binding.kind, binding.imported_name, binding.exported_name, binding.type_only)
+            for binding in raw.bindings
+        ]
+        for raw in batch.imports
+    ] == [
+        [
+            ("symbol", "default", "Named", False),
+            ("symbol", "Shape", "PublicShape", True),
+        ],
+        [("glob", None, None, False)],
+        [("namespace", None, "model", False)],
+    ]
+    assert anonymous.exports == ()
+
+
 def test_extracts_imported_component_references_from_tsx(tmp_path: Path):
     batch = _extract_batch(
         tmp_path,
