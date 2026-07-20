@@ -355,6 +355,93 @@ def test_mcp_go_package_target_survives_fresh_process(tmp_path: Path):
     assert result["compatibility"]["results"][0]["neighbors"] == []
 
 
+def test_mcp_rust_crate_target_survives_fresh_process(tmp_path: Path):
+    result = asyncio.run(
+        _rust_crate_target_after_restart(
+            tmp_path / "repo",
+            tmp_path / ".codeindex",
+        )
+    )
+
+    source_id = "src/main.rs::__file__#file"
+    crate_id = "Cargo.toml::lib:app#crate"
+    assert result["tool_names"].count("loci_graph_imports") == 1
+    assert set(result["imports_schema"]["properties"]) == {
+        "repo",
+        "file",
+        "status",
+        "offset",
+        "limit",
+    }
+    assert result["indexed"]["graph_rust_crates_indexed"] == 2
+    assert result["health"]["counts"]["graph_rust_crates_indexed"] == 2
+    assert result["initial_imports"] == result["imports"]
+    assert result["initial_outgoing"] == result["outgoing"]
+
+    item = result["imports"]["items"][0]
+    assert item["raw"]["rust"] == {
+        "kind": "use",
+        "lexical_module_path": [],
+        "lexical_module_visibilities": [],
+        "lexical_module_configurations": [],
+        "visibility": "private",
+        "module_level": True,
+        "configuration": "unconditional",
+        "path_override": None,
+        "inline": False,
+    }
+    assert item["target_file"] is None
+    assert item["target_package"] is None
+    assert item["target_crate"] == "Cargo.toml::lib:app"
+    assert item["target_kind"] == "crate"
+    assert item["target_id"] == crate_id
+    assert item["resolution_basis"] == "cargo_package_library"
+    assert item["resolution_control_files"] == ["Cargo.toml"]
+    assert item["resolution_configuration"] == "unconditional"
+
+    crate_ref = {
+        "id": crate_id,
+        "namespace": "loci",
+        "kind": "crate",
+        "attributes": {
+            "language": "rust",
+            "file": "src/lib.rs",
+            "line": 1,
+            "end_line": 1,
+            "manifest": "Cargo.toml",
+            "package_name": "app",
+            "package_root": ".",
+            "target_kind": "lib",
+            "target_name": "app",
+            "crate_name": "app",
+            "crate_root": "src/lib.rs",
+            "edition": "2021",
+            "required_features": [],
+        },
+    }
+    outgoing = result["outgoing"]["results"][0]["neighbors"][0]
+    assert outgoing["node"] == crate_ref
+    assert outgoing["traversed"] == "forward"
+    assert outgoing["edge"]["from"] == source_id
+    assert outgoing["edge"]["to"] == crate_id
+    assert result["paths"]["paths"][0]["nodes"] == [
+        {
+            "id": source_id,
+            "namespace": "loci",
+            "kind": "file",
+            "attributes": {
+                "language": "rust",
+                "file": "src/main.rs",
+                "line": 1,
+                "end_line": 1,
+            },
+        },
+        crate_ref,
+    ]
+    assert result["retrieved"]["paths"][0]["nodes"][1] == crate_ref
+    assert result["compatibility"]["results"][0]["neighbors"] == []
+
+
 async def _round_trip(
     repo: Path,
     cache_dir: Path,
@@ -969,6 +1056,130 @@ async def _go_package_target_after_restart(
                 "outgoing": outgoing.structuredContent,
                 "incoming": incoming.structuredContent,
                 "paths": paths.structuredContent,
+                "compatibility": compatibility.structuredContent,
+            }
+
+
+async def _rust_crate_target_after_restart(
+    repo: Path,
+    cache_dir: Path,
+) -> dict[str, Any]:
+    source = repo / "src" / "main.rs"
+    target = repo / "src" / "lib.rs"
+    source.parent.mkdir(parents=True)
+    (repo / "Cargo.toml").write_text(
+        (
+            "[package]\n"
+            'name = "app"\n'
+            'version = "0.1.0"\n'
+            'edition = "2021"\n'
+        ),
+        encoding="utf-8",
+    )
+    source.write_text("use app::Thing;\n\nfn main() {}\n", encoding="utf-8")
+    target.write_text("pub struct Thing;\n", encoding="utf-8")
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["PYTHONPATH"] = str(Path.cwd() / "src")
+    server_params = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "loci.mcp_server"],
+        env=env,
+        cwd=Path.cwd(),
+    )
+    source_id = "src/main.rs::__file__#file"
+    crate_id = "Cargo.toml::lib:app#crate"
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            indexed = await session.call_tool(
+                "loci_index",
+                arguments={"path": str(repo), "incremental": False},
+            )
+            initial_imports = await session.call_tool(
+                "loci_graph_imports",
+                arguments={"repo": str(repo)},
+            )
+            initial_outgoing = await session.call_tool(
+                "loci_graph_traverse_neighbors",
+                arguments={
+                    "repo": str(repo),
+                    "seed_ids": [source_id],
+                    "namespaces": ["loci"],
+                    "edge_types": ["imports"],
+                    "resolutions": ["import-resolved"],
+                },
+            )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            tools = await session.list_tools()
+            imports_tool = next(
+                tool for tool in tools.tools if tool.name == "loci_graph_imports"
+            )
+            imports = await session.call_tool(
+                "loci_graph_imports",
+                arguments={"repo": str(repo)},
+            )
+            health = await session.call_tool(
+                "loci_graph_health",
+                arguments={"repo": str(repo)},
+            )
+            outgoing = await session.call_tool(
+                "loci_graph_traverse_neighbors",
+                arguments={
+                    "repo": str(repo),
+                    "seed_ids": [source_id],
+                    "namespaces": ["loci"],
+                    "edge_types": ["imports"],
+                    "resolutions": ["import-resolved"],
+                },
+            )
+            paths = await session.call_tool(
+                "loci_graph_paths",
+                arguments={
+                    "repo": str(repo),
+                    "source_ids": [source_id],
+                    "target_ids": [crate_id],
+                    "namespaces": ["loci"],
+                    "edge_types": ["imports"],
+                    "resolutions": ["import-resolved"],
+                    "max_hops": 1,
+                    "max_nodes": 2,
+                    "max_paths": 1,
+                },
+            )
+            retrieved = await session.call_tool(
+                "loci_graph_retrieve",
+                arguments={
+                    "repo": str(repo),
+                    "question": "How does the Rust binary import its library crate?",
+                    "seed_ids": [source_id, crate_id],
+                    "namespaces": ["loci"],
+                    "edge_types": ["imports"],
+                    "resolutions": ["import-resolved"],
+                    "max_hops": 1,
+                    "max_nodes": 2,
+                    "max_paths": 1,
+                },
+            )
+            compatibility = await session.call_tool(
+                "loci_graph_neighbors",
+                arguments={"repo": str(repo), "seed_ids": [source_id]},
+            )
+            return {
+                "indexed": indexed.structuredContent,
+                "initial_imports": initial_imports.structuredContent,
+                "initial_outgoing": initial_outgoing.structuredContent,
+                "tool_names": [tool.name for tool in tools.tools],
+                "imports_schema": imports_tool.inputSchema,
+                "imports": imports.structuredContent,
+                "health": health.structuredContent,
+                "outgoing": outgoing.structuredContent,
+                "paths": paths.structuredContent,
+                "retrieved": retrieved.structuredContent,
                 "compatibility": compatibility.structuredContent,
             }
 

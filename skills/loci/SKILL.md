@@ -24,7 +24,8 @@ MCP read tools (`loci_outline`, `loci_search`, `loci_get`, `loci_file`,
 `loci_graph_imports`, and `loci_graph_health`) refresh stale indexes before
 returning cached data. Freshness includes repository-local graph profiles,
 contributions, built-in import records, Go module/workspace controls, and
-JavaScript/TypeScript package, workspace, and project controls.
+JavaScript/TypeScript package, workspace, and project controls, plus Cargo
+manifests.
 `loci_index` is still required for a repo that has never been indexed, and
 remains useful for explicit rebuilds or after large changes.
 
@@ -147,13 +148,13 @@ traversal or answerability claims:
 `loci_graph_health` returns persisted extension status and diagnostics:
 
 ```json
-{"schema_version":1,"repo":"...","status":"healthy|degraded","profiles":[],"counts":{"profiles":0,"node_overlays":0,"edges":0,"contributions":0,"diagnostics":0,"graph_file_nodes_indexed":0,"graph_go_packages_indexed":0,"graph_imports_indexed":0,"graph_imports_resolved":0,"graph_imports_unresolved":0},"diagnostics":[]}
+{"schema_version":1,"repo":"...","status":"healthy|degraded","profiles":[],"counts":{"profiles":0,"node_overlays":0,"edges":0,"contributions":0,"diagnostics":0,"graph_file_nodes_indexed":0,"graph_go_packages_indexed":0,"graph_rust_crates_indexed":0,"graph_imports_indexed":0,"graph_imports_resolved":0,"graph_imports_unresolved":0},"diagnostics":[]}
 ```
 
 `loci_graph_imports` returns a bounded diagnostic page:
 
 ```json
-{"schema_version":1,"repo":"...","file":null,"status":"all","items":[{"source_file":"src/a.py","source_id":"src/a.py::__file__#file","target_file":"src/b.py","target_package":null,"target_kind":"file","target_id":"src/b.py::__file__#file","specifier":"b","imported_name":null,"language":"python","line":1,"text":"import b","type_only":false,"is_reexport":false,"status":"resolved","resolution":"import-resolved","unresolved_reason":null,"resolution_basis":null,"resolution_control_files":[]}],"counts":{"total":1,"resolved":1,"unresolved":0,"returned":1},"pagination":{"offset":0,"limit":100,"next_offset":null}}
+{"schema_version":1,"repo":"...","file":null,"status":"all","items":[{"raw":{"source_file":"src/a.py","language":"python","line":1,"text":"import b","specifier":"b","imported_name":null,"type_only":false,"is_reexport":false,"source_hash":"...","rust":null},"source_file":"src/a.py","source_id":"src/a.py::__file__#file","target_file":"src/b.py","target_package":null,"target_crate":null,"target_kind":"file","target_id":"src/b.py::__file__#file","specifier":"b","imported_name":null,"language":"python","line":1,"text":"import b","type_only":false,"is_reexport":false,"status":"resolved","resolution":"import-resolved","unresolved_reason":null,"resolution_basis":null,"resolution_control_files":[],"resolution_configuration":null}],"counts":{"total":1,"resolved":1,"unresolved":0,"returned":1},"pagination":{"offset":0,"limit":100,"next_offset":null}}
 ```
 
 `loci_graph_paths` returns `support_kind: "edge_sequence"`, ordered nodes,
@@ -174,13 +175,25 @@ ID as `<normalized-repository-relative-path>::__file__#file`, for example
 section nodes and does not receive a duplicate file node.
 
 Resolved Python and JavaScript/TypeScript imports target file nodes and report
-`target_kind="file"`, `target_file`, and `target_package=null`. Resolved Go
+`target_kind="file"`, `target_file`, and null package/crate fields. Resolved Go
 imports target one stable zero-width `kind="package"` node and report
-`target_kind="package"`, `target_package`, and `target_file=null`. Go package
+`target_kind="package"`, `target_package`, and null file/crate fields. Go package
 IDs have the form `<directory>::<effective-import-path>#package`; node refs
 expose validated `directory`, `import_path`, and `package_name` attributes.
 Treat the node as the imported package even though a deterministic non-test Go
 file anchors it for outline and retrieval.
+
+Resolved Rust observations target an exact external module file or one stable
+zero-width `kind="crate"` Cargo target. Crate IDs use
+`<manifest>::<target-kind>:<crate-name>#crate`; records use
+`target_kind="crate"`, `target_crate`, and null file/package fields for crate
+targets. Node refs expose validated `manifest`, `package_name`, `package_root`,
+`target_kind`, `target_name`, `crate_name`, `crate_root`, `edition`, and
+`required_features`. Inspect `raw.rust`, `resolution_basis`,
+`resolution_control_files`, and `resolution_configuration` before explaining a
+Rust edge. The strict Rust context fields are `kind`, `lexical_module_path`,
+`lexical_module_visibilities`, `lexical_module_configurations`, `visibility`,
+`module_level`, `configuration`, `path_override`, and `inline`.
 
 For JavaScript/TypeScript, inspect `resolution_basis` and
 `resolution_control_files` before explaining why a file target was selected.
@@ -244,14 +257,33 @@ conflicting package directories. It never runs Go or repository code, reads an
 ambient workspace, downloads modules, implements minimal version selection,
 follows remote replacements, models vendoring, or evaluates build/platform/cgo
 constraints. Unsupported cases remain inspectable unresolved records rather
-than guessed edges. Rust remains extract-and-report only.
+than guessed edges.
 
-Unresolved, ambiguous, external, and unsupported-language observations remain
-bounded records with an explicit `unresolved_reason`. They never become graph
-edges and normal unresolved outcomes do not degrade graph health. Inspect
-aggregate file-node and import counts with `loci_graph_health`. Loci does not
-guess targets by bare name, maintain a separate top-level import store, or
-expose an import CLI command.
+Rust resolution is intentionally bounded and repository-contained. It supports
+strict Cargo packages/workspaces/targets, inherited or direct contained path
+dependencies, same-package libraries, explicit inline/external module trees,
+edition-aware paths, definite module aliases/re-exports, dependency-kind rules,
+and known module visibility. It never binds by repository-wide filename,
+package-name, or crate-name similarity. Registry/git/standard-library crates
+remain external. Configuration-dependent relationships resolve only when all
+supported alternatives converge, and are labeled
+`resolution_configuration="declared_possible"`; unconditional relationships
+are labeled `"unconditional"`. Divergent alternatives stay ambiguous.
+
+Loci never runs Cargo/rustc/repository code, uses the network or ambient
+toolchain state, reads lockfiles or Cargo caches, chooses an active feature,
+target, profile, or cfg set, expands macros/generated modules, infers
+undeclared files, resolves terminal Rust items, or creates call edges. Treat a
+Rust edge as “this declared source can depend on this contained endpoint,” not
+“the current default Cargo build activates this edge.”
+
+Unresolved, ambiguous, external, inaccessible, unsupported-configuration, and
+unsupported-language observations remain bounded records with an explicit
+`unresolved_reason`. They never become graph edges and normal unresolved
+outcomes do not degrade graph health. Invalid controls do degrade health.
+Inspect aggregate file-node, Go-package, Rust-crate, and import counts with
+`loci_graph_health`. Loci does not guess targets by bare name, maintain a
+separate top-level import store, or expose an import CLI command.
 
 ## Selection Rules
 

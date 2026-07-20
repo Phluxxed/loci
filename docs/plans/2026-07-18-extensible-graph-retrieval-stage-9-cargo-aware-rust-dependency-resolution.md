@@ -371,6 +371,9 @@ class RustImportContext:
     module_level: bool
     configuration: RustConfiguration
     path_override: str | None = None
+    lexical_module_visibilities: tuple[str, ...] = ()
+    lexical_module_configurations: tuple[RustConfiguration, ...] = ()
+    inline: bool = False
 
 @dataclass(frozen=True, slots=True)
 class RawImport:
@@ -1314,6 +1317,13 @@ uv run pytest -q tests/test_service.py tests/storage/test_index_store.py
 
 ### Task 7 — MCP and user/agent documentation
 
+**Implementation status:** complete on 2026-07-20; the live restarted MCP
+reported the additive Rust crate count and import fields, all 15 fresh-process
+MCP tests passed, all 805 repository tests passed, and the lock, compile,
+package-build, diff, and frozen-benchmark checksum gates passed. Loci re-indexed
+healthy with 1,723 symbols and passed all 1,723 integrity checks. No judge was
+run.
+
 Files:
 
 - `tests/test_mcp_server.py`
@@ -1325,6 +1335,25 @@ Prove fresh-process MCP output and document the exact supported/unsupported and
 declared-possible semantics. Mark Stage 9 implemented in the governing design
 only when all implementation gates pass. The MCP server should need no code
 change; if its input or tool set must change, stop for owner review.
+
+The MCP server, tool list, and `loci_graph_imports` input schema required no
+change. A new regression indexes a Cargo package with library and binary crates
+through one stdio process, then starts a second process and proves byte-equal
+persisted imports/traversal plus the strict Rust context, crate target shape,
+Cargo resolution basis/controls, unconditional configuration class, validated
+crate endpoint attributes, graph path/retrieval, Rust crate health count, and
+containment-only compatibility operation. Its first run exposed that the
+frozen `RustImportContext` example omitted the implemented inline-module
+visibility/configuration ancestry fields; the example and exact regression
+were corrected together without a production-code change.
+
+`README.md` and the portable Loci skill now describe the supported Cargo target,
+workspace/path-dependency, Rust module/path/visibility, and declared-possible
+semantics as well as the boundaries that forbid toolchain execution, network
+access, active-build claims, and terminal-item resolution. The governing design
+now records Stage 9 as
+implemented with final review pending. Task 8 still owns the disposable-fixture
+evidence matrix and explicit owner acceptance gate.
 
 Gate:
 
@@ -1547,7 +1576,7 @@ and rerun the Stage 8 compatibility suite.
 
 ## Owner Review Decision
 
-Implementation begins only after the owner approves this boundary, including:
+The owner approved this implementation boundary before Task 1 began, including:
 
 - stable Cargo target/crate nodes;
 - declared-possible configuration semantics;
@@ -1556,5 +1585,7 @@ Implementation begins only after the owner approves this boundary, including:
 - exact additive APIs and version bumps; and
 - the separate final acceptance gate.
 
-Until then, the accepted Stage 8 implementation remains authoritative and Rust
-imports remain unsupported in the trusted graph.
+Tasks 1-7 may implement and document the approved boundary. Task 8 remains the
+separate final evidence packet and explicit owner acceptance gate; until that
+gate passes, Stage 8 is the latest accepted stage even though Stage 9 is
+implemented.
