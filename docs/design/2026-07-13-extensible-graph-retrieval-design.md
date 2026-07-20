@@ -1,6 +1,6 @@
 # loci: Extensible Graph Retrieval Layer — Design
 
-**Status:** Stages 1-8 implemented, reviewed, and accepted
+**Status:** Stages 1-8 accepted; Stage 9 implemented with final owner acceptance pending
 
 **Date:** 2026-07-13
 
@@ -375,13 +375,15 @@ corrected order; after its final acceptance gate, the remaining order is:
 resolution contract. It does not authorize executing repository tools or code,
 using the network, or silently approximating every runtime loader behavior.
 
-### Stage 9: Cargo-aware Rust dependency resolution (implemented; review pending)
+### Stage 9: Cargo-aware Rust dependency resolution (implemented; owner acceptance pending)
 
 The owner selected Cargo-aware Rust resolution as the next dependency-layer
 stage on 2026-07-18 and approved its separate implementation boundary. The
 implementation is complete as of 2026-07-20; final evidence review and owner
 acceptance remain intentionally separate:
 `docs/plans/2026-07-18-extensible-graph-retrieval-stage-9-cargo-aware-rust-dependency-resolution.md`.
+The completed final evidence packet is
+`docs/reviews/2026-07-18-extensible-graph-retrieval-stage-9-final-review.md`.
 
 The implementation adds bounded Cargo package/workspace/target loading, stable Rust
 crate nodes, contained path and inherited workspace dependencies, explicit
@@ -406,8 +408,8 @@ and `resolution_configuration`; graph health adds
 `graph_rust_crates_indexed`.
 
 The governing acceptance status remains “Stages 1-8 implemented, reviewed,
-and accepted; Stage 9 implemented with final review pending” until Task 8's
-evidence packet passes and the owner explicitly approves it.
+and accepted; Stage 9 implemented with final evidence complete and owner
+acceptance pending” until the owner explicitly approves the Task 8 packet.
 
 ## Technical Fit
 
