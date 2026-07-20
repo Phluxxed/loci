@@ -598,25 +598,7 @@ def _resolve_symbol_reference(
     if not isinstance(raw, RawSymbolReference):
         raise _error("Reference observation must be a RawSymbolReference")
     owner = _source_owner(raw, index)
-    if raw.language == "go" and raw.binding_state == "deferred":
-        from ._go_references import select_go_reference_binding
-
-        binding, import_record = select_go_reference_binding(
-            raw,
-            imports_by_binding=index._imports_by_binding,
-            index=index._go,
-        )
-        matched_imports = (import_record,) if import_record is not None else ()
-    else:
-        binding = (
-            raw.candidate_bindings[0] if len(raw.candidate_bindings) == 1 else None
-        )
-        matched_imports = (
-            index._imports_by_binding.get((raw.source_file, binding), ())
-            if binding is not None
-            else ()
-        )
-        import_record = matched_imports[0] if len(matched_imports) == 1 else None
+    binding, import_record, import_is_ambiguous = _select_reference_import(raw, index)
 
     binding_reason = {
         "shadowed": "binding_shadowed",
@@ -631,7 +613,7 @@ def _resolve_symbol_reference(
             import_record=import_record,
             reason=cast(ReferenceUnresolvedReason, binding_reason),
         )
-    if binding is None or len(matched_imports) > 1:
+    if binding is None or import_is_ambiguous:
         return _unresolved_record(
             raw,
             binding=None,
@@ -728,6 +710,33 @@ def _resolve_symbol_reference(
         support=(import_support, *outcome.support),
         resolution_control_files=outcome.resolution_control_files,
         resolution_configuration=None,
+    )
+
+
+def _select_reference_import(
+    raw: RawSymbolReference,
+    index: ReferenceResolverIndex,
+) -> tuple[ImportBinding | None, ImportRecord | None, bool]:
+    if raw.language == "go" and raw.binding_state == "deferred":
+        from ._go_references import select_go_reference_binding
+
+        binding, record = select_go_reference_binding(
+            raw,
+            imports_by_binding=index._imports_by_binding,
+            index=index._go,
+        )
+        return binding, record, False
+
+    binding = raw.candidate_bindings[0] if len(raw.candidate_bindings) == 1 else None
+    matched = (
+        index._imports_by_binding.get((raw.source_file, binding), ())
+        if binding is not None
+        else ()
+    )
+    return (
+        binding,
+        matched[0] if len(matched) == 1 else None,
+        len(matched) > 1,
     )
 
 
