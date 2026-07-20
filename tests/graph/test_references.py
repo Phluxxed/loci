@@ -12,6 +12,8 @@ from loci.graph.contracts import GraphContractError
 from loci.graph.go_modules import (
     GoModule,
     GoModuleContext,
+    GoReplacement,
+    GoRequirement,
     GoWorkspace,
     build_go_package_index,
 )
@@ -277,6 +279,233 @@ def test_resolves_go_declared_package_name_and_explicit_alias(tmp_path: Path):
     assert {
         tuple(support.kind for support in record.support) for record in selected
     } == {("import_binding", "definition")}
+
+
+def test_resolves_go_workspace_package_only_through_active_stage_7_endpoint(
+    tmp_path: Path,
+):
+    app = GoModule(
+        source="app/go.mod",
+        root="app",
+        module_path="example.com/app",
+        requirements=(),
+        exclusions=(),
+        replacements=(),
+    )
+    library = GoModule(
+        source="lib/go.mod",
+        root="lib",
+        module_path="example.com/lib",
+        requirements=(),
+        exclusions=(),
+        replacements=(),
+    )
+    workspace = GoWorkspace(
+        source="go.work",
+        root=".",
+        go_version="1.26",
+        use_roots=("app", "lib"),
+        replacements=(),
+    )
+    records, _, _ = _resolve_go_tree(
+        tmp_path,
+        {
+            "app/main.go": (
+                "package main\n"
+                'import "example.com/lib/logging"\n'
+                "func run() { logging.Write() }\n"
+            ),
+            "lib/logging/logging.go": "package logging\nfunc Write() {}\n",
+            "unrelated/logging.go": "package logging\nfunc Write() {}\n",
+        },
+        modules=(app, library),
+        workspaces=(workspace,),
+    )
+
+    record = next(
+        item for item in records if item.raw.source_file == "app/main.go"
+    )
+    assert record.status == "resolved"
+    assert record.import_target_id == "lib/logging::example.com/lib/logging#package"
+    assert record.target_id == "lib/logging/logging.go::Write#function"
+
+
+def test_resolves_go_contained_replacement_under_required_import_identity(
+    tmp_path: Path,
+):
+    application = GoModule(
+        source="app/go.mod",
+        root="app",
+        module_path="example.com/app",
+        requirements=(GoRequirement("example.com/dep", "v1.2.0"),),
+        exclusions=(),
+        replacements=(
+            GoReplacement(
+                module_path="example.com/dep",
+                version=None,
+                local_root="third_party/dep",
+                remote_path=None,
+                remote_version=None,
+            ),
+        ),
+    )
+    dependency = GoModule(
+        source="third_party/dep/go.mod",
+        root="third_party/dep",
+        module_path="local.invalid/dep",
+        requirements=(),
+        exclusions=(),
+        replacements=(),
+    )
+    records, _, _ = _resolve_go_tree(
+        tmp_path,
+        {
+            "app/main.go": (
+                "package main\n"
+                'import "example.com/dep/client"\n'
+                "func run() { client.New() }\n"
+            ),
+            "third_party/dep/client/client.go": "package client\nfunc New() {}\n",
+        },
+        modules=(application, dependency),
+    )
+
+    record = next(
+        item for item in records if item.raw.source_file == "app/main.go"
+    )
+    assert record.status == "resolved"
+    assert record.import_target_id == (
+        "third_party/dep/client::example.com/dep/client#package"
+    )
+    assert record.target_id == "third_party/dep/client/client.go::New#function"
+
+
+def test_go_unexported_method_duplicate_missing_and_external_cases_fail_closed(
+    tmp_path: Path,
+):
+    module = GoModule(
+        source="go.mod",
+        root=".",
+        module_path="example.com/project",
+        requirements=(),
+        exclusions=(),
+        replacements=(),
+    )
+    records, _, _ = _resolve_go_tree(
+        tmp_path,
+        {
+            "store/first.go": (
+                "package store\n"
+                "const hidden = 1\n"
+                "type Record struct{}\n"
+                "func Open() {}\n"
+                "func Duplicate() {}\n"
+                "func (Record) Method() {}\n"
+            ),
+            "store/second.go": "package store\nfunc Duplicate() {}\n",
+            "audit/log.go": "package audit\nfunc Log() {}\n",
+            "wrong/wrong.go": "package wrong\nfunc Missing() {}\n",
+            "cmd/use/main.go": (
+                "package main\n"
+                "import (\n"
+                '    "example.com/project/audit"\n'
+                '    "example.com/project/store"\n'
+                ")\n"
+                "func run() { store.hidden; store.Record.Method; "
+                "store.Missing(); store.Duplicate() }\n"
+            ),
+            "cmd/shadow/main.go": (
+                "package main\n"
+                'import depot "example.com/project/store"\n'
+                "func run(depot int) { depot.Open() }\n"
+            ),
+            "cmd/external/main.go": (
+                "package main\n"
+                'import "external.invalid/pkg"\n'
+                "func run() { pkg.Open() }\n"
+            ),
+            "one/pkg.go": "package shared\nfunc Open() {}\n",
+            "two/pkg.go": "package shared\nfunc Open() {}\n",
+            "cmd/ambiguous/main.go": (
+                "package main\n"
+                "import (\n"
+                '    "example.com/project/one"\n'
+                '    "example.com/project/two"\n'
+                ")\n"
+                "func run() { shared.Open() }\n"
+            ),
+        },
+        modules=(module,),
+    )
+
+    outcomes = {
+        record.raw.text: (
+            record.status,
+            record.unresolved_reason,
+            record.import_unresolved_reason,
+            record.target_id,
+        )
+        for record in records
+        if record.raw.source_file.startswith("cmd/")
+    }
+    assert outcomes == {
+        "store.hidden": ("unresolved", "target_inaccessible", None, None),
+        "store.Record.Method": (
+            "unresolved",
+            "unsupported_reference",
+            None,
+            None,
+        ),
+        "store.Missing": ("unresolved", "target_not_indexed", None, None),
+        "store.Duplicate": ("unresolved", "ambiguous_target", None, None),
+        "depot.Open": ("unresolved", "binding_shadowed", None, None),
+        "pkg.Open": ("unresolved", "import_unresolved", "external", None),
+        "shared.Open": ("unresolved", "ambiguous_binding", None, None),
+    }
+    store_reference = next(
+        record.raw for record in records if record.raw.text == "store.Missing"
+    )
+    assert len(store_reference.candidate_bindings) == 2
+
+
+def test_go_dot_and_blank_imports_never_create_symbol_reference_candidates(
+    tmp_path: Path,
+):
+    module = GoModule(
+        source="go.mod",
+        root=".",
+        module_path="example.com/project",
+        requirements=(),
+        exclusions=(),
+        replacements=(),
+    )
+    records, _, batches = _resolve_go_tree(
+        tmp_path,
+        {
+            "store/store.go": "package store\nfunc Open() {}\n",
+            "cmd/dot/main.go": (
+                "package main\n"
+                'import . "example.com/project/store"\n'
+                "func run() { Open() }\n"
+            ),
+            "cmd/blank/main.go": (
+                "package main\n"
+                'import _ "example.com/project/store"\n'
+                "func run() {}\n"
+            ),
+        },
+        modules=(module,),
+    )
+
+    assert not [
+        record for record in records if record.raw.source_file.startswith("cmd/")
+    ]
+    assert not [
+        reference
+        for batch in batches
+        if batch.go_package is not None and batch.go_package.name == "main"
+        for reference in batch.references
+    ]
 
 
 def test_resolves_javascript_named_namespace_default_and_type_only_bindings(
