@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from loci.graph import _javascript_references
 from loci.graph import _python_references
 from loci.graph.contracts import GraphContractError
 from loci.graph.imports import resolve_imports
@@ -227,6 +228,214 @@ def test_resolves_javascript_local_export_alias_and_named_reexport(
         ["import_binding", "local_export", "definition"],
         ["import_binding", "reexport", "definition"],
     ]
+
+
+def test_resolves_javascript_star_barrels_but_never_forwards_default(
+    tmp_path: Path,
+):
+    records, _, _ = _resolve_javascript_tree(
+        tmp_path,
+        {
+            "src/model.ts": (
+                "export class Thing {}\n"
+                "export default function Factory() {}\n"
+            ),
+            "src/first.ts": 'export * from "./model.js";\n',
+            "src/second.ts": 'export * from "./first.js";\n',
+            "src/use.ts": (
+                'import Factory, {Thing} from "./second.js";\n'
+                "function run() { Thing; Factory; }\n"
+            ),
+        },
+    )
+
+    selected = [record for record in records if record.raw.source_file == "src/use.ts"]
+
+    assert [(record.raw.text, record.target_id) for record in selected] == [
+        ("Thing", "src/model.ts::Thing#class"),
+        ("Factory", None),
+    ]
+    assert selected[0].resolution_basis == "reexport_chain"
+    assert [support.kind for support in selected[0].support] == [
+        "import_binding",
+        "reexport",
+        "reexport",
+        "definition",
+    ]
+    assert selected[1].unresolved_reason == "target_not_indexed"
+
+
+def test_javascript_star_conflicts_and_wrong_file_names_never_select_a_target(
+    tmp_path: Path,
+):
+    records, _, _ = _resolve_javascript_tree(
+        tmp_path,
+        {
+            "src/left.ts": "export class Thing {}\n",
+            "src/right.ts": "export class Thing {}\n",
+            "src/wrong.ts": "export class Missing {}\n",
+            "src/barrel.ts": (
+                'export * from "./left.js";\n'
+                'export * from "./right.js";\n'
+            ),
+            "src/use.ts": (
+                'import {Thing, Missing} from "./barrel.js";\n'
+                "function run() { Thing; Missing; }\n"
+            ),
+        },
+    )
+
+    selected = [record for record in records if record.raw.source_file == "src/use.ts"]
+
+    assert [(record.raw.text, record.unresolved_reason) for record in selected] == [
+        ("Thing", "ambiguous_target"),
+        ("Missing", "target_not_indexed"),
+    ]
+    assert all(record.target_id is None for record in selected)
+
+
+def test_javascript_explicit_reexport_overrides_same_name_star_candidate(
+    tmp_path: Path,
+):
+    records, _, _ = _resolve_javascript_tree(
+        tmp_path,
+        {
+            "src/selected.ts": "export class Thing {}\n",
+            "src/ignored.ts": "export class Thing {}\n",
+            "src/barrel.ts": (
+                'export {Thing} from "./selected.js";\n'
+                'export * from "./ignored.js";\n'
+            ),
+            "src/use.ts": (
+                'import {Thing} from "./barrel.js";\n'
+                "function run() { Thing; }\n"
+            ),
+        },
+    )
+
+    record = next(record for record in records if record.raw.source_file == "src/use.ts")
+
+    assert record.target_id == "src/selected.ts::Thing#class"
+    assert record.resolution_basis == "reexport_chain"
+
+
+def test_javascript_star_cycles_resolve_only_a_single_convergent_target(
+    tmp_path: Path,
+):
+    records, _, _ = _resolve_javascript_tree(
+        tmp_path,
+        {
+            "src/a.ts": 'export * from "./b.js";\n',
+            "src/b.ts": (
+                'export * from "./a.js";\n'
+                "export class Seed {}\n"
+            ),
+            "src/use.ts": (
+                'import {Seed, Missing} from "./a.js";\n'
+                "function run() { Seed; Missing; }\n"
+            ),
+        },
+    )
+
+    selected = [record for record in records if record.raw.source_file == "src/use.ts"]
+
+    assert selected[0].target_id == "src/b.ts::Seed#class"
+    assert selected[0].resolution_basis == "reexport_chain"
+    assert selected[1].target_id is None
+    assert selected[1].unresolved_reason == "ambiguous_target"
+
+
+def test_javascript_workspace_barrel_preserves_stage_8_control_provenance(
+    tmp_path: Path,
+):
+    records, _, _ = _resolve_javascript_tree(
+        tmp_path,
+        {
+            "apps/web/src/use.ts": (
+                'import {Thing} from "@repo/core";\n'
+                "export function run() { return Thing; }\n"
+            ),
+            "packages/core/src/index.ts": 'export * from "./model.js";\n',
+            "packages/core/src/model.ts": "export class Thing {}\n",
+        },
+        controls={
+            "package.json": '{"name":"root","workspaces":["apps/*","packages/*"]}',
+            "apps/web/package.json": (
+                '{"name":"@repo/web","dependencies":{"@repo/core":"workspace:*"}}'
+            ),
+            "packages/core/package.json": (
+                '{"name":"@repo/core","exports":"./src/index.ts"}'
+            ),
+        },
+    )
+
+    record = next(
+        record for record in records if record.raw.source_file == "apps/web/src/use.ts"
+    )
+
+    assert record.target_id == "packages/core/src/model.ts::Thing#class"
+    assert record.resolution_basis == "reexport_chain"
+    assert record.resolution_control_files == (
+        "apps/web/package.json",
+        "package.json",
+        "packages/core/package.json",
+    )
+
+
+def test_javascript_anonymous_default_computed_and_commonjs_cases_fail_closed(
+    tmp_path: Path,
+):
+    records, _, batches = _resolve_javascript_tree(
+        tmp_path,
+        {
+            "src/model.ts": "export default function () {}\nexport class Thing {}\n",
+            "src/use.ts": (
+                'import Factory from "./model.js";\n'
+                'import * as model from "./model.js";\n'
+                "Factory; model[name];\n"
+                'const legacy = require("./model.js"); legacy.Thing;\n'
+            ),
+        },
+    )
+
+    selected = [record for record in records if record.raw.source_file == "src/use.ts"]
+
+    assert [(record.raw.text, record.unresolved_reason) for record in selected] == [
+        ("Factory", "target_not_indexed"),
+        ("model[name]", "unsupported_reference"),
+    ]
+    use_batch = next(
+        batch
+        for batch in batches
+        if any(raw.source_file == "src/use.ts" for raw in batch.imports)
+    )
+    assert len(use_batch.imports) == 2
+    assert all(reference.path[0] != "legacy" for reference in use_batch.references)
+
+
+def test_javascript_reexport_pass_limit_fails_closed(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setattr(_javascript_references, "MAX_REFERENCE_REEXPORT_PASSES", 1)
+
+    records, _, _ = _resolve_javascript_tree(
+        tmp_path,
+        {
+            "src/model.ts": "export class Thing {}\n",
+            "src/first.ts": 'export * from "./model.js";\n',
+            "src/second.ts": 'export * from "./first.js";\n',
+            "src/use.ts": (
+                'import {Thing} from "./second.js";\n'
+                "function run() { Thing; }\n"
+            ),
+        },
+    )
+
+    record = next(record for record in records if record.raw.source_file == "src/use.ts")
+
+    assert record.target_id is None
+    assert record.unresolved_reason == "ambiguous_target"
 
 
 def test_resolves_python_direct_alias_and_qualified_members_inside_exact_endpoint(
