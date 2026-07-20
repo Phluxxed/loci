@@ -421,6 +421,8 @@ indexed symbol contains it, the stable file node is the source endpoint.
 
 Equal-span ambiguity is unresolved rather than broken by list order. Markdown,
 Go package, and Rust crate synthetic nodes are never selected as source owners.
+The explicit record outcome is `ambiguous_source`; it is distinct from
+`ambiguous_target` because no target was selected or evaluated.
 
 ### 6. Target lookup never leaves the imported endpoint
 
@@ -744,6 +746,7 @@ ReferenceUnresolvedReason = Literal[
     "import_unresolved",
     "binding_shadowed",
     "ambiguous_binding",
+    "ambiguous_source",
     "target_not_indexed",
     "target_inaccessible",
     "ambiguous_target",
@@ -1140,6 +1143,7 @@ matched import binding plus any underlying `import_unresolved_reason`.
 | Import unresolved for any Stage 6–9 reason | `unresolved/import_unresolved` plus import reason | No |
 | Local name may be shadowed | `unresolved/binding_shadowed` | No |
 | Multiple visible import bindings own the root | `unresolved/ambiguous_binding` | No |
+| Equal smallest source spans prevent unique ownership | `unresolved/ambiguous_source` | No |
 | Endpoint has no indexed target symbol | `unresolved/target_not_indexed` | No |
 | Target exists but language visibility/export rules reject it | `unresolved/target_inaccessible` | No |
 | Export/re-export routes reach multiple symbols | `unresolved/ambiguous_target` | No |
@@ -1315,6 +1319,20 @@ dependency parse; dynamic/unsupported syntax never becomes definite.
 - [x] Existing import extraction tests remain green.
 
 ### Task 3 — Add source ownership, records, and Python resolution
+
+> **TL;DR:** Complete: Loci can now prove exact Python symbol references through
+> resolved imports and bounded named re-exports, while every shadowed,
+> ambiguous, stale, unsupported, or off-endpoint case remains unresolved.
+
+**Implementation status:** complete on 2026-07-20. The focused Task 3 gate
+passes 40 tests, the affected parser/import/reference regression slice passes
+219 tests, and the full repository suite passes 921 tests. Targeted Pyright
+reports zero errors, `uv lock --check`, `compileall`, and `uv build` pass, and
+the 15 frozen anchor/traversal tests pass with the external fixture unchanged
+at SHA-256
+`c52def1bdf592ad735149d199910f74183598eccd9ccf8064335fa0cd0e84e27`.
+Fresh Loci self-index verification passes all 1,988 symbols with healthy graph
+state. Final Stage 10 owner acceptance remains pending.
 
 **Files:**
 
