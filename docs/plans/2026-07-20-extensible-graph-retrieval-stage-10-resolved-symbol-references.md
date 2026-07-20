@@ -1514,9 +1514,28 @@ Cargo/rustc/code execution occurs.
 
 ### Task 7 — Materialize and validate reserved reference edges
 
+> **TL;DR:** Resolved symbol-reference records can now become deterministic,
+> traversable `loci:references` or `loci:references_type` edges only after their
+> current source owner, import binding, target identity, hashes, export evidence,
+> and complete support set validate. Unresolved, stale, synthetic-target, and
+> namespace-spoofed records fail closed.
+
+**Implementation status:** complete on 2026-07-20. The exact Task 7 gate passes
+139 tests and the complete repository suite passes 972 tests. The broader
+reference/import/materialization matrix passes 258 tests. Targeted Pyright
+reports zero errors for the new validation module, reference API, and
+materializer; the six existing findings in `contracts.py` remain outside the
+Task 7 diff. `uv lock --check`, `compileall`, `uv build`, and
+`git diff --check` pass. The 26 frozen anchor/traversal tests pass with the
+external fixture unchanged at SHA-256
+`c52def1bdf592ad735149d199910f74183598eccd9ccf8064335fa0cd0e84e27`.
+No model, judge, compiler, runtime, repository-code, or network execution was
+added. Persistence of the validated records themselves remains Task 8.
+
 **Files:**
 
 - `src/loci/graph/contracts.py`
+- `src/loci/graph/_reference_validation.py` (new internal policy/index)
 - `src/loci/graph/references.py`
 - `src/loci/graph/materialize.py`
 - `tests/graph/test_reference_contracts.py`
@@ -1538,6 +1557,20 @@ record and every support record validates against current indexed evidence.
 ```bash
 .venv/bin/python -m pytest tests/graph/test_reference_contracts.py tests/graph/test_materialize.py tests/graph/test_contracts.py -q
 ```
+
+**Task 7 review gate:**
+
+- [x] Only resolved records materialize; unresolved records remain record-only.
+- [x] Repeated uses retain independent records while edges deduplicate by the
+      earliest deterministic reference evidence.
+- [x] Explicit type-only bindings alone produce `references_type`.
+- [x] Current source ownership, import binding, endpoint identity, source hash,
+      export definition, and every support record validate before edge creation.
+- [x] Reference edge validation uses pre-indexed evidence rather than repeated
+      repository-wide scans.
+- [x] Both reference edge names are accepted only in the `loci` namespace.
+- [x] Stale, incomplete, unbacked, synthetic-target, and unresolved evidence
+      cannot create a trusted edge.
 
 ### Task 8 — Persist schema 7 and prove storage integrity
 

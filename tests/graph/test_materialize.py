@@ -2,9 +2,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import replace
 from pathlib import Path
 
+import pytest
+
 from loci.graph.contracts import (
+    GraphContractError,
     GraphContribution,
     GraphEdge,
     GraphEvidence,
@@ -32,8 +36,9 @@ from loci.graph.rust_crates import (
     make_rust_crate_id,
 )
 from loci.graph.state import LoadedGraphContribution
-from loci.parser.imports import extract_imports
-from loci.parser.symbols import Symbol, make_file_symbol
+from loci.parser.extractor import parse_file
+from loci.parser.imports import extract_import_batch, extract_imports
+from loci.parser.symbols import Symbol, make_file_symbol, make_symbol_id
 
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
@@ -553,6 +558,117 @@ def test_materialization_retains_duplicate_import_records_and_one_edge(tmp_path:
     assert len(state.imports) == 2
     assert len(state.edges) == 1
     assert state.edges[0].evidence.line == 1
+
+
+def test_materialize_graph_threads_resolved_symbol_references_after_imports(
+    tmp_path: Path,
+):
+    files = {
+        "pkg/__init__.py": "",
+        "pkg/model.py": "class Thing:\n    pass\n",
+        "use.py": (
+            "from pkg.model import Thing as Alias\n"
+            "\n"
+            "def run():\n"
+            "    return Alias()\n"
+        ),
+    }
+    symbols: list[Symbol] = []
+    batches = []
+    file_hashes = {}
+    for relative_path, source in files.items():
+        path = tmp_path / relative_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(source, encoding="utf-8")
+        source_hash = hashlib.sha256(source.encode()).hexdigest()
+        file_hashes[relative_path] = source_hash
+        symbols.append(make_file_symbol(
+            relative_path,
+            language="python",
+            content_hash=source_hash,
+        ))
+        symbols.extend(
+            replace(
+                symbol,
+                id=make_symbol_id(relative_path, symbol.qualified_name, symbol.kind),
+                file_path=relative_path,
+            )
+            for symbol in parse_file(path)
+        )
+        batches.append(extract_import_batch(
+            path,
+            source_file=relative_path,
+            language="python",
+            source_hash=source_hash,
+        ))
+
+    state = materialize_graph(
+        tmp_path,
+        symbols,
+        file_hashes,
+        [],
+        [],
+        raw_imports=[raw for batch in batches for raw in batch.imports],
+        raw_exports=[raw for batch in batches for raw in batch.exports],
+        raw_symbol_references=[
+            raw for batch in batches for raw in batch.references
+        ],
+    )
+
+    reference_edges = [
+        edge for edge in state.edges if edge.type.startswith("references")
+    ]
+    assert reference_edges == [GraphEdge(
+        from_id="use.py::run#function",
+        to_id="pkg/model.py::Thing#class",
+        type="references",
+        directed=True,
+        namespace="loci",
+        resolution="import-resolved",
+        evidence=GraphEvidence(
+            file="use.py",
+            line=4,
+            content_hash=file_hashes["use.py"],
+        ),
+    )]
+
+
+def test_materialize_graph_rejects_stale_reference_export_evidence(tmp_path: Path):
+    source = tmp_path / "model.py"
+    source.write_text("class Thing:\n    pass\n", encoding="utf-8")
+    source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
+    file_node = make_file_symbol(
+        "model.py",
+        language="python",
+        content_hash=source_hash,
+    )
+    symbols = [
+        file_node,
+        *(
+            replace(
+                symbol,
+                id=make_symbol_id("model.py", symbol.qualified_name, symbol.kind),
+                file_path="model.py",
+            )
+            for symbol in parse_file(source)
+        ),
+    ]
+    batch = extract_import_batch(
+        source,
+        source_file="model.py",
+        language="python",
+        source_hash=source_hash,
+    )
+
+    with pytest.raises(GraphContractError, match="stale"):
+        materialize_graph(
+            tmp_path,
+            symbols,
+            {"model.py": source_hash},
+            [],
+            [],
+            raw_exports=[replace(batch.exports[0], source_hash="c" * 64)],
+        )
 
 
 def test_missing_python_import_is_retained_without_an_edge(tmp_path: Path):

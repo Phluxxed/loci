@@ -11,7 +11,7 @@ from loci.parser.imports import ImportUnresolvedReason
 from loci.parser.reference_models import ImportBinding, RawLocalExport, RawSymbolReference
 from loci.parser.symbols import Symbol
 
-from .contracts import GraphContractError, JSONValue
+from .contracts import GraphContractError, GraphEdge, JSONValue
 from .go_modules import GoPackageIndex
 from .imports import ImportRecord
 from .rust_crates import RustCrateIndex, RustResolutionConfiguration
@@ -600,6 +600,37 @@ def resolve_symbol_references(
     if tuple(imports) != index._imports:
         raise _error("Reference resolver imports do not match its frozen index")
     return [_resolve_symbol_reference(raw, index) for raw in observations]
+
+
+def materialize_reference_edges(
+    records: Sequence[SymbolReferenceRecord],
+) -> list[GraphEdge]:
+    """Build one deterministic edge per resolved source/target relationship."""
+    from ._reference_validation import materialize_reference_edges as materialize
+
+    return materialize(records)
+
+
+def validate_symbol_reference_records(
+    records: Sequence[SymbolReferenceRecord],
+    *,
+    imports: Sequence[ImportRecord],
+    exports: Sequence[RawLocalExport],
+    indexed_nodes: Mapping[str, Mapping[str, Any]],
+    file_hashes: Mapping[str, str],
+) -> None:
+    """Cross-check reference records against current indexed evidence."""
+    from ._reference_validation import (
+        validate_symbol_reference_records as validate_records,
+    )
+
+    validate_records(
+        records,
+        imports=imports,
+        exports=exports,
+        indexed_nodes=indexed_nodes,
+        file_hashes=file_hashes,
+    )
 
 
 def _resolve_symbol_reference(
