@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from loci.parser.reference_models import ImportBinding
+from loci.parser.reference_models import ImportBinding, ImportBindingKind
 
 
 def extract_javascript_import_bindings(
@@ -22,7 +22,7 @@ def extract_javascript_import_bindings(
         local_name: str | None,
         imported_name: str | None,
         exported_name: str | None,
-        kind: str,
+        kind: ImportBindingKind,
         type_only: bool,
     ) -> None:
         bindings.append(
