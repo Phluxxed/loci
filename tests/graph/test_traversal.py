@@ -61,6 +61,56 @@ def test_filter_defaults_include_trusted_tiers_and_exclude_heuristic_edges():
     ]
 
 
+def test_reference_edges_use_generic_filters_directions_and_paths():
+    runtime = _edge(
+        "caller",
+        "Thing",
+        namespace="loci",
+        edge_type="references",
+        resolution="import-resolved",
+    )
+    type_only = _edge(
+        "annotation",
+        "ThingType",
+        namespace="loci",
+        edge_type="references_type",
+        resolution="import-resolved",
+    )
+    unrelated = _edge(
+        "consumer",
+        "module",
+        namespace="loci",
+        edge_type="imports",
+        resolution="import-resolved",
+    )
+
+    filtered = filter_graph_edges(
+        [unrelated, type_only, runtime],
+        namespaces=["loci"],
+        edge_types=["references", "references_type"],
+        resolutions=["import-resolved"],
+    )
+    outgoing = graph_adjacency(filtered, direction="outgoing")
+    incoming = graph_adjacency(filtered, direction="incoming")
+    paths = find_graph_paths(
+        filtered,
+        ["caller"],
+        ["Thing"],
+        direction="outgoing",
+        max_hops=1,
+        max_nodes=4,
+        max_paths=2,
+    )
+
+    assert [edge.type for edge in filtered] == ["references", "references_type"]
+    assert outgoing["caller"][0].to_id == "Thing"
+    assert outgoing["caller"][0].traversed == "forward"
+    assert incoming["Thing"][0].to_id == "caller"
+    assert incoming["Thing"][0].traversed == "reverse"
+    assert paths.paths[0].node_ids == ("caller", "Thing")
+    assert paths.paths[0].steps[0].edge == runtime
+
+
 def test_filter_applies_all_allow_lists_and_deduplicates_values():
     keep = _edge("a", "b", namespace="wiki", edge_type="supports")
     edges = [
