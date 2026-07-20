@@ -125,6 +125,12 @@ def build_go_reference_index(
         target = candidates[0]
         for key in keys:
             targets = surfaces.setdefault(key, {})
+            if (
+                target.id not in targets
+                and len(targets) >= MAX_REFERENCE_RESOLUTION_CANDIDATES
+            ):
+                ambiguous.add(key)
+                continue
             targets[target.id] = _GoExportTarget(
                 symbol=target,
                 support=(
@@ -244,6 +250,8 @@ def _parent_directory(file: str) -> str:
 
 
 def _exported_name(name: str) -> bool:
+    # Go uses Unicode category Lu, not an ASCII-only uppercase check.
+    # Source: https://go.dev/ref/spec#Exported_identifiers
     return bool(name) and unicodedata.category(name[0]) == "Lu"
 
 
