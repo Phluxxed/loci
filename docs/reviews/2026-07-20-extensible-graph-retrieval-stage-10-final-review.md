@@ -1,6 +1,6 @@
 # Final Review: Extensible Graph Retrieval Stage 10 — Resolved Symbol References
 
-- **Status:** implementation accepted by engineering review; awaiting explicit owner acceptance
+- **Status:** accepted by engineering review and owner
 - **Date:** 2026-07-20
 - **Repository:** `/Users/brummerv/loci`
 - **Governing plan:** `docs/plans/2026-07-20-extensible-graph-retrieval-stage-10-resolved-symbol-references.md`
@@ -491,8 +491,8 @@ Existing contains/import traversal remains the accepted fallback.
 - [x] every disposable repository passes `loci_verify`
 - [x] residual limits, rollback, and the Stage 11 boundary are explicit
 - [x] review packet and operator/agent documentation are ready for publication
-- [ ] Vik explicitly accepts this final review packet
-- [ ] governing design marks Stage 10 implemented, reviewed, and accepted
+- [x] Vik explicitly accepts this final review packet
+- [x] governing design marks Stage 10 implemented, reviewed, and accepted
 
-Stage 10 is implemented and engineering-reviewed. It must remain
-`awaiting owner acceptance` until Vik explicitly approves this packet.
+Vik explicitly accepted this packet on 2026-07-20. Stage 10 is implemented,
+engineering-reviewed, owner-accepted, and closed.
