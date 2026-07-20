@@ -38,6 +38,7 @@ def _raw_import() -> RawImport:
         type_only=False,
         is_reexport=False,
         source_hash="d" * 64,
+        bindings=(),
     )
 
 
@@ -66,6 +67,7 @@ def _resolved_go_import() -> ImportRecord:
         type_only=False,
         is_reexport=False,
         source_hash="e" * 64,
+        bindings=(),
     )
     return ImportRecord(
         raw=raw,
@@ -93,6 +95,7 @@ def _rust_raw_import() -> RawImport:
         type_only=False,
         is_reexport=False,
         source_hash="f" * 64,
+        bindings=(),
         rust=RustImportContext(
             kind="use",
             lexical_module_path=(),
@@ -114,6 +117,7 @@ def _inline_rust_module_observation() -> RawImport:
         type_only=False,
         is_reexport=True,
         source_hash="f" * 64,
+        bindings=(),
         rust=RustImportContext(
             kind="module",
             lexical_module_path=(),
@@ -346,6 +350,7 @@ def test_javascript_import_record_round_trip_preserves_resolution_provenance():
         type_only=False,
         is_reexport=False,
         source_hash="f" * 64,
+        bindings=(),
     )
     record = ImportRecord(
         raw=raw,

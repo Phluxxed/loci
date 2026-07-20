@@ -4,7 +4,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, TypeAlias
 
+from loci.parser._javascript_bindings import extract_javascript_import_bindings
 from loci.parser.languages import get_language_spec
+from loci.parser.reference_models import (
+    MAX_IMPORT_BINDINGS_PER_DECLARATION,
+    ImportBinding,
+    RawLocalExport,
+    RawSymbolReference,
+)
 
 
 ImportUnresolvedReason: TypeAlias = Literal[
@@ -23,7 +30,7 @@ RustConfiguration: TypeAlias = Literal[
     "unsupported",
 ]
 
-MAX_RUST_USE_LEAVES_PER_DECLARATION = 1_024
+MAX_RUST_USE_LEAVES_PER_DECLARATION = MAX_IMPORT_BINDINGS_PER_DECLARATION
 
 
 @dataclass(frozen=True, slots=True)
@@ -50,7 +57,23 @@ class RawImport:
     type_only: bool
     is_reexport: bool
     source_hash: str
+    bindings: tuple[ImportBinding, ...]
     rust: RustImportContext | None = None
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.bindings, tuple):
+            raise ValueError("bindings must be an immutable tuple")
+        if len(self.bindings) > MAX_IMPORT_BINDINGS_PER_DECLARATION:
+            raise ValueError("bindings exceeds the per-declaration limit")
+        for binding in self.bindings:
+            if not isinstance(binding, ImportBinding):
+                raise ValueError("bindings contains an invalid item")
+            if (
+                binding.import_line != self.line
+                or binding.import_text != self.text
+                or binding.import_specifier != self.specifier
+            ):
+                raise ValueError("binding locator does not match its raw import")
 
 
 @dataclass(frozen=True, slots=True)
@@ -63,6 +86,8 @@ class GoPackageDeclaration:
 class ImportExtractionBatch:
     imports: tuple[RawImport, ...]
     go_package: GoPackageDeclaration | None
+    exports: tuple[RawLocalExport, ...]
+    references: tuple[RawSymbolReference, ...]
 
 
 class ImportExtractionError(RuntimeError):
@@ -142,6 +167,8 @@ def extract_import_batch(
     return ImportExtractionBatch(
         imports=tuple(imports),
         go_package=go_packages[0] if go_packages else None,
+        exports=(),
+        references=(),
     )
 
 
@@ -180,49 +207,113 @@ def _extract_node_imports(
 
 def _extract_python_imports(node, source: bytes, common: dict) -> list[RawImport]:
     if node.type == "import_statement":
-        return [
-            RawImport(
-                **common,
-                specifier=_python_import_name(child, source),
-                imported_name=None,
-                type_only=False,
-                is_reexport=False,
+        import_names = _children_by_field_name(node, "name")
+        _enforce_import_binding_limit(len(import_names))
+        imports: list[RawImport] = []
+        for child in import_names:
+            specifier, alias = _python_import_parts(child, source)
+            local_name = alias or specifier.split(".", 1)[0]
+            imports.append(
+                RawImport(
+                    **common,
+                    specifier=specifier,
+                    imported_name=None,
+                    type_only=False,
+                    is_reexport=False,
+                    bindings=(
+                        _import_binding(
+                            node,
+                            common,
+                            specifier=specifier,
+                            local_name=local_name,
+                            imported_name=None,
+                            exported_name=None,
+                            kind="module",
+                            type_only=False,
+                        ),
+                    ),
+                )
             )
-            for child in _children_by_field_name(node, "name")
-        ]
+        return imports
 
     module = node.child_by_field_name("module_name")
     specifier = _node_text(module, source) if module is not None else ""
-    imported_names = [
-        _python_import_name(child, source)
-        for child in _children_by_field_name(node, "name")
-    ]
-    if any(child.type == "wildcard_import" for child in node.named_children):
-        imported_names.append(None)
-
-    return [
-        RawImport(
-            **common,
-            specifier=specifier,
-            imported_name=imported_name,
-            type_only=False,
-            is_reexport=False,
+    import_names = _children_by_field_name(node, "name")
+    has_wildcard = any(
+        child.type == "wildcard_import" for child in node.named_children
+    )
+    _enforce_import_binding_limit(len(import_names) + int(has_wildcard))
+    imports = []
+    for child in import_names:
+        imported_name, alias = _python_import_parts(child, source)
+        local_name = alias or imported_name
+        imports.append(
+            RawImport(
+                **common,
+                specifier=specifier,
+                imported_name=imported_name,
+                type_only=False,
+                is_reexport=False,
+                bindings=(
+                    _import_binding(
+                        node,
+                        common,
+                        specifier=specifier,
+                        local_name=local_name,
+                        imported_name=imported_name,
+                        exported_name=None,
+                        kind="symbol",
+                        type_only=False,
+                    ),
+                ),
+            )
         )
-        for imported_name in imported_names
-    ]
+    if has_wildcard:
+        imports.append(
+            RawImport(
+                **common,
+                specifier=specifier,
+                imported_name=None,
+                type_only=False,
+                is_reexport=False,
+                bindings=(
+                    _import_binding(
+                        node,
+                        common,
+                        specifier=specifier,
+                        local_name=None,
+                        imported_name=None,
+                        exported_name=None,
+                        kind="glob",
+                        type_only=False,
+                    ),
+                ),
+            )
+        )
+    return imports
 
 
 def _extract_javascript_import(node, source: bytes, common: dict) -> list[RawImport]:
     source_node = node.child_by_field_name("source")
     if source_node is None:
         return []
+    specifier = _unquote(_node_text(source_node, source))
+    bindings = extract_javascript_import_bindings(
+        node,
+        source,
+        specifier=specifier,
+        import_line=common["line"],
+        import_text=common["text"],
+    )
+    _enforce_import_binding_limit(len(bindings))
     return [
         RawImport(
             **common,
-            specifier=_unquote(_node_text(source_node, source)),
+            specifier=specifier,
             imported_name=None,
             type_only=_javascript_dependency_is_type_only(node),
             is_reexport=node.type == "export_statement",
+            bindings=bindings,
         )
     ]
 
@@ -246,13 +337,38 @@ def _extract_go_import(node, source: bytes, common: dict) -> list[RawImport]:
     path = node.child_by_field_name("path")
     if path is None:
         return []
+    specifier = _unquote(_node_text(path, source))
+    name_node = node.child_by_field_name("name")
+    explicit_name = _node_text(name_node, source) if name_node is not None else None
+    if explicit_name == "_":
+        local_name = None
+        kind = "blank"
+    elif explicit_name == ".":
+        local_name = None
+        kind = "glob"
+    else:
+        local_name = explicit_name
+        kind = "namespace"
     return [
         RawImport(
             **common,
-            specifier=_unquote(_node_text(path, source)),
+            specifier=specifier,
             imported_name=None,
             type_only=False,
             is_reexport=False,
+            bindings=(
+                _import_binding(
+                    node,
+                    common,
+                    specifier=specifier,
+                    local_name=local_name,
+                    imported_name=None,
+                    exported_name=None,
+                    kind=kind,
+                    type_only=False,
+                    module_level=True,
+                ),
+            ),
         )
     ]
 
@@ -280,7 +396,7 @@ def _extract_rust_import(node, source: bytes, common: dict) -> list[RawImport]:
     argument = node.child_by_field_name("argument")
     if argument is None:
         raise ImportExtractionError("unsupported Rust use declaration")
-    leaves: list[tuple[str, str | None]] = []
+    leaves: list[tuple[str, str | None, str]] = []
     _expand_rust_use_tree(argument, source, prefix="", leaves=leaves)
     context = _rust_context(node, source, kind="use")
     return [
@@ -291,8 +407,32 @@ def _extract_rust_import(node, source: bytes, common: dict) -> list[RawImport]:
             type_only=False,
             is_reexport=context.visibility != "private",
             rust=context,
+            bindings=(
+                _import_binding(
+                    node,
+                    common,
+                    specifier=specifier,
+                    local_name=(
+                        None if binding_kind in {"glob", "blank"} else imported_name
+                    ),
+                    imported_name=(
+                        _rust_imported_name(specifier)
+                        if binding_kind != "glob"
+                        else None
+                    ),
+                    exported_name=(
+                        imported_name
+                        if context.visibility != "private"
+                        and binding_kind not in {"glob", "blank"}
+                        else None
+                    ),
+                    kind=binding_kind,
+                    type_only=False,
+                    module_level=context.module_level,
+                ),
+            ),
         )
-        for specifier, imported_name in leaves
+        for specifier, imported_name, binding_kind in leaves
     ]
 
 
@@ -316,6 +456,21 @@ def _extract_rust_extern_crate(
             type_only=False,
             is_reexport=context.visibility != "private",
             rust=context,
+            bindings=(
+                _import_binding(
+                    node,
+                    common,
+                    specifier=specifier,
+                    local_name=imported_name,
+                    imported_name=None,
+                    exported_name=(
+                        imported_name if context.visibility != "private" else None
+                    ),
+                    kind="module",
+                    type_only=False,
+                    module_level=context.module_level,
+                ),
+            ),
         )
     ]
 
@@ -335,6 +490,19 @@ def _extract_rust_module(node, source: bytes, common: dict) -> list[RawImport]:
             type_only=False,
             is_reexport=False,
             rust=context,
+            bindings=(
+                _import_binding(
+                    node,
+                    common,
+                    specifier=specifier,
+                    local_name=specifier,
+                    imported_name=specifier,
+                    exported_name=None,
+                    kind="module",
+                    type_only=False,
+                    module_level=context.module_level,
+                ),
+            ),
         )
     ]
 
@@ -508,7 +676,7 @@ def _expand_rust_use_tree(
     source: bytes,
     *,
     prefix: str,
-    leaves: list[tuple[str, str | None]],
+    leaves: list[tuple[str, str | None, str]],
 ) -> None:
     if node.type == "use_list":
         for child in node.named_children:
@@ -540,31 +708,50 @@ def _expand_rust_use_tree(
             leaves,
             _collapse_trailing_rust_self(specifier),
             _node_text(alias, source),
+            (
+                "blank"
+                if _node_text(alias, source) == "_"
+                else "module"
+                if _rust_path_is_definitely_module(specifier)
+                else "symbol"
+            ),
         )
         return
 
     if node.type == "use_wildcard":
         wildcard = _normalized_rust_path(node, source)
-        _append_rust_use_leaf(leaves, _join_rust_path(prefix, wildcard), None)
+        _append_rust_use_leaf(
+            leaves,
+            _join_rust_path(prefix, wildcard),
+            None,
+            "glob",
+        )
         return
 
     if node.type in {"identifier", "scoped_identifier", "crate", "self", "super"}:
-        path = _join_rust_path(prefix, _normalized_rust_path(node, source))
+        original_path = _join_rust_path(prefix, _normalized_rust_path(node, source))
+        path = original_path
         path = _collapse_trailing_rust_self(path)
-        _append_rust_use_leaf(leaves, path, _rust_imported_name(path))
+        _append_rust_use_leaf(
+            leaves,
+            path,
+            _rust_imported_name(path),
+            "module" if _rust_path_is_definitely_module(original_path) else "symbol",
+        )
         return
 
     raise ImportExtractionError("unsupported Rust use declaration")
 
 
 def _append_rust_use_leaf(
-    leaves: list[tuple[str, str | None]],
+    leaves: list[tuple[str, str | None, str]],
     specifier: str,
     imported_name: str | None,
+    binding_kind: str,
 ) -> None:
     if len(leaves) >= MAX_RUST_USE_LEAVES_PER_DECLARATION:
         raise ImportExtractionError("Rust use declaration exceeds leaf limit")
-    leaves.append((specifier, imported_name))
+    leaves.append((specifier, imported_name, binding_kind))
 
 
 def _join_rust_path(prefix: str, suffix: str) -> str:
@@ -591,6 +778,10 @@ def _rust_imported_name(path: str) -> str | None:
     return path.rsplit("::", 1)[-1]
 
 
+def _rust_path_is_definitely_module(path: str) -> bool:
+    return path.rsplit("::", 1)[-1] in {"crate", "self", "super"}
+
+
 def _children_by_field_name(node, field_name: str) -> list:
     return [
         child
@@ -599,9 +790,91 @@ def _children_by_field_name(node, field_name: str) -> list:
     ]
 
 
-def _python_import_name(node, source: bytes) -> str:
+def _enforce_import_binding_limit(count: int) -> None:
+    if count > MAX_IMPORT_BINDINGS_PER_DECLARATION:
+        raise ImportExtractionError("import declaration exceeds binding limit")
+
+
+def _python_import_parts(node, source: bytes) -> tuple[str, str | None]:
     name = node.child_by_field_name("name")
-    return _node_text(name or node, source)
+    alias = node.child_by_field_name("alias")
+    return (
+        _node_text(name or node, source),
+        _node_text(alias, source) if alias is not None else None,
+    )
+
+
+def _import_binding(
+    node,
+    common: dict,
+    *,
+    specifier: str,
+    local_name: str | None,
+    imported_name: str | None,
+    exported_name: str | None,
+    kind: str,
+    type_only: bool,
+    module_level: bool | None = None,
+) -> ImportBinding:
+    effective_module_level = (
+        _import_is_module_level(node, common["language"])
+        if module_level is None
+        else module_level
+    )
+    scope = _import_scope_node(
+        node,
+        common["language"],
+        module_level=effective_module_level,
+    )
+    return ImportBinding(
+        local_name=local_name,
+        imported_name=imported_name,
+        exported_name=exported_name,
+        kind=kind,
+        type_only=type_only,
+        module_level=effective_module_level,
+        declaration_start_byte=node.start_byte,
+        scope_start_byte=scope.start_byte,
+        scope_end_byte=scope.end_byte,
+        import_line=common["line"],
+        import_text=common["text"],
+        import_specifier=specifier,
+    )
+
+
+def _import_is_module_level(node, language: str) -> bool:
+    if language in {"javascript", "typescript", "go"}:
+        return True
+    ancestor = node.parent
+    if language == "python":
+        while ancestor is not None:
+            if ancestor.type in {"class_definition", "function_definition", "lambda"}:
+                return False
+            ancestor = ancestor.parent
+        return True
+    if language == "rust":
+        return _rust_is_module_level(node)
+    return False
+
+
+def _import_scope_node(node, language: str, *, module_level: bool):
+    root = node
+    while root.parent is not None:
+        root = root.parent
+
+    ancestor = node.parent
+    if language == "python" and not module_level:
+        while ancestor is not None:
+            if ancestor.type in {"class_definition", "function_definition", "lambda"}:
+                return ancestor
+            ancestor = ancestor.parent
+    elif language == "rust":
+        target_type = "declaration_list" if module_level else "block"
+        while ancestor is not None:
+            if ancestor.type == target_type:
+                return ancestor
+            ancestor = ancestor.parent
+    return root
 
 
 def _node_text(node, source: bytes) -> str:

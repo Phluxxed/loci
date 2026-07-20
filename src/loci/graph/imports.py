@@ -1201,6 +1201,7 @@ def _raw_import_from_dict(value: Mapping[str, Any]) -> RawImport:
         type_only=type_only,
         is_reexport=is_reexport,
         source_hash=_sha256(value["source_hash"], "source_hash"),
+        bindings=(),
         rust=rust_context_from_dict(value["rust"]),
     )
     _validate_raw_import(raw)

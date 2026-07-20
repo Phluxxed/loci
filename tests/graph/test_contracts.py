@@ -99,6 +99,7 @@ def _raw_import(**overrides) -> RawImport:
         "type_only": False,
         "is_reexport": False,
         "source_hash": SOURCE_HASH,
+        "bindings": (),
     }
     values.update(overrides)
     return RawImport(**values)
@@ -172,6 +173,7 @@ def _go_import_record(**overrides) -> ImportRecord:
         "type_only": False,
         "is_reexport": False,
         "source_hash": SOURCE_HASH,
+        "bindings": (),
     }
     values = {
         "raw": RawImport(**raw_values),
@@ -254,6 +256,7 @@ def _rust_import_record(**overrides) -> ImportRecord:
             type_only=False,
             is_reexport=False,
             source_hash=SOURCE_HASH,
+            bindings=(),
             rust=RustImportContext(
                 kind="use",
                 lexical_module_path=(),
@@ -679,6 +682,7 @@ def test_rust_crate_import_edge_rejects_own_root_file_self_edge():
         type_only=False,
         is_reexport=False,
         source_hash=RUST_TARGET_HASH,
+        bindings=(),
         rust=RustImportContext(
             kind="use",
             lexical_module_path=(),
