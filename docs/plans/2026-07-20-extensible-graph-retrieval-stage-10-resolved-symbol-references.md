@@ -1755,6 +1755,12 @@ atomic `IndexStore.write()` remain the storage trust boundary.
 
 ### Task 10 — Expose fresh-process MCP diagnostics and traversal
 
+**Implementation status:** complete on 2026-07-20. The bounded reference
+diagnostic service and MCP tool are implemented through the existing graph
+state loader, freshness check, and structured error adapter. Generic traversal
+required no new production path. Task 11 production acceptance and the final
+owner review remain.
+
 **Files:**
 
 - `src/loci/service.py`
@@ -1774,6 +1780,64 @@ atomic `IndexStore.write()` remain the storage trust boundary.
 **Acceptance:** a newly launched real stdio client can inspect resolved and
 unresolved records, traverse exact reference edges, hydrate evidence, and
 retrieve the final target through `loci_get`.
+
+**Implementation evidence:**
+
+- `graph_references()` implements the frozen additive service signature and
+  exact stable record order. It filters by normalized source file before
+  counts, filters by status before pagination, returns at most `500` records,
+  and derives `resolution="import-resolved"` only for resolved records.
+- `graph_imports()` and `graph_references()` share one boundary validator for
+  file, status, offset, and limit. The existing import diagnostic contract
+  remains unchanged and its service regressions pass.
+- `loci_graph_references` is advertised exactly once with only `repo`, `file`,
+  `status`, `offset`, and `limit`; it delegates with `ensure_fresh=True`
+  through the existing structured `LociError` adapter.
+- The MCP adapter keeps its public string schemas while explicitly narrowing
+  them only for typed service calls. Runtime validation remains in the service
+  boundary, including structured errors for invalid file, status, offset, and
+  limit values.
+- A real stdio process indexes a disposable Python repository with one
+  resolved and one unresolved imported-symbol reference. A newly launched
+  second process reads both pages, applies file/status filters, receives exact
+  structured errors, traverses the resolved edge outgoing and incoming,
+  hydrates its cached source evidence through `loci_graph_paths`, and retrieves
+  the final class through `loci_get`.
+- The same fresh-process test records the persisted `index.json` SHA-256 and
+  nanosecond mtime before the second process and proves both are identical
+  afterward. Current diagnostic reads therefore do not rewrite a current
+  index.
+- `loci_graph_neighbors` remains contains-only and returns no reference
+  neighbor for the code-symbol seed. Reference-only filters work through the
+  existing generic adjacency and path implementation for both `references`
+  and `references_type`; no reference-specific traversal code was added.
+- The exact Task 10 gate passes `64` tests; the affected
+  service/MCP/traversal gate passes `159` tests; and the full repository suite
+  passes `1,013` tests.
+- The frozen anchor/traversal gate passes `15` tests and the fixture remains
+  SHA-256
+  `c52def1bdf592ad735149d199910f74183598eccd9ccf8064335fa0cd0e84e27`.
+- Lock verification, compilation, wheel/sdist builds, targeted Pyright, and
+  `git diff --check` pass. No dependency, model, judge, subprocess, network,
+  compiler/runtime, package-manager, or repository-code execution was added.
+
+**Review gate:** passed across correctness, readability, architecture,
+security, and performance. The reader is additive and lives beside
+`graph_imports()` because the public contracts deliberately match; extracting
+one diagnostic into a new module would add indirection without shrinking the
+service boundary. Query work is one bounded state scan, one deterministic
+sort, and serialization of the requested page only. Repository paths and
+persisted state continue through existing validation, hash, containment,
+freshness, and storage boundaries.
+
+- [x] Exact service and MCP input/output/error/pagination contracts pass.
+- [x] Resolved and unresolved records survive a fresh stdio process.
+- [x] Current fresh-process reads preserve index SHA-256 and mtime.
+- [x] Outgoing/incoming reference traversal and evidence-backed paths pass.
+- [x] The final target is retrievable through `loci_get`.
+- [x] Compatibility neighbors remain contains-only.
+- [x] No parallel traversal path, CLI command, dependency, or executable trust
+      boundary was added.
 
 **Verify:**
 
