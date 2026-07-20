@@ -351,6 +351,42 @@ mod outer {
         }
 
 
+def test_rust_external_module_items_keep_resolvable_relative_visibility(
+    tmp_path: Path,
+):
+    path = tmp_path / "child.rs"
+    path.write_text(
+        """
+pub(super) fn parent_item() {}
+pub(in crate::outer) fn restricted_item() {}
+pub(self) fn self_item() {}
+fn private_item() {}
+""".lstrip(),
+        encoding="utf-8",
+    )
+
+    items = {symbol.name: symbol for symbol in parse_file(path)}
+
+    assert items["parent_item"].metadata["loci"]["rust_item"] == {
+        "lexical_module_path": [],
+        "visibility": "pub(super)",
+        "visibility_scope": [],
+        "configuration": "unconditional",
+    }
+    assert items["restricted_item"].metadata["loci"]["rust_item"] == {
+        "lexical_module_path": [],
+        "visibility": "pub(in crate::outer)",
+        "visibility_scope": ["outer"],
+        "configuration": "unconditional",
+    }
+    assert items["self_item"].metadata["loci"]["rust_item"][
+        "visibility_scope"
+    ] == []
+    assert items["private_item"].metadata["loci"]["rust_item"][
+        "visibility_scope"
+    ] == []
+
+
 def test_rust_fixture_no_spurious_symbols():
     extracted = _extracted("sample.rs")
     kinds = {kind for _, kind in extracted}

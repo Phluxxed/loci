@@ -141,6 +141,10 @@ against the actual tree-sitter grammars installed by Loci.
   <https://doc.rust-lang.org/stable/reference/paths.html>
 - Rust visibility and privacy:
   <https://doc.rust-lang.org/stable/reference/visibility-and-privacy.html>
+- Rust conditional compilation:
+  <https://doc.rust-lang.org/stable/reference/conditional-compilation.html>
+- Rust namespaces and name resolution:
+  <https://doc.rust-lang.org/stable/reference/names/namespaces.html>
 
 Live dependency evidence on 2026-07-20:
 
@@ -1450,6 +1454,26 @@ references resolve only through the already accepted Go import records.
 
 ### Task 6 — Add Rust terminal-item metadata and resolution
 
+> **TL;DR:** Complete: Loci can now follow a definite Rust `use`, alias,
+> module-qualified path, 2015 `extern crate`, same-package library route, or
+> named `pub use` chain to the exact indexed item. It applies both module and
+> item privacy, retains Cargo/configuration evidence, and refuses glob,
+> macro, namespace-conflicted, inaccessible, wrong-crate, over-limit, and
+> configuration-divergent guesses. `Type::method` may identify the imported
+> type only; it never claims the associated method or a call.
+
+**Implementation status:** complete on 2026-07-20. The focused Task 6 gate
+passes 194 tests and the full repository suite passes 950 tests. Targeted
+Pyright reports zero errors for the new Rust resolver and shared resolver;
+the six existing extractor findings remain unchanged. `uv lock --check`,
+`compileall`, `uv build`, and `git diff --check` pass. The 26 frozen
+anchor/traversal tests pass with the external fixture unchanged at SHA-256
+`c52def1bdf592ad735149d199910f74183598eccd9ccf8064335fa0cd0e84e27`.
+A fresh Loci self-index is healthy with 2,058 symbols, 1,041 graph edges, 47
+file nodes, and 680 imports (364 resolved and 316 unresolved); integrity
+verification passes all 2,058 symbols. No Cargo, rustc, repository code, or
+network execution was added. Final Stage 10 owner acceptance remains pending.
+
 **Files:**
 
 - `src/loci/parser/extractor.py`
@@ -1481,12 +1505,12 @@ Cargo/rustc/code execution occurs.
 
 ### Checkpoint B — Four-language resolver review
 
-- [ ] Every target search is endpoint-scoped.
-- [ ] Every re-export loop is bounded and deterministic.
-- [ ] Language visibility/export rules have positive and negative tests.
-- [ ] Same-name adversarial fixtures cannot fabricate a target.
-- [ ] Rust declared-possible status is preserved, not silently upgraded.
-- [ ] No resolver performs I/O after its frozen index is built.
+- [x] Every target search is endpoint-scoped.
+- [x] Every re-export loop is bounded and deterministic.
+- [x] Language visibility/export rules have positive and negative tests.
+- [x] Same-name adversarial fixtures cannot fabricate a target.
+- [x] Rust declared-possible status is preserved, not silently upgraded.
+- [x] No resolver performs I/O after its frozen index is built.
 
 ### Task 7 — Materialize and validate reserved reference edges
 
