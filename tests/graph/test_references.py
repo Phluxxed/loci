@@ -9,6 +9,10 @@ import pytest
 from loci.graph import _python_references
 from loci.graph.contracts import GraphContractError
 from loci.graph.imports import resolve_imports
+from loci.graph.javascript_modules import (
+    build_javascript_resolution_index,
+    load_javascript_module_context,
+)
 from loci.graph.references import (
     build_reference_resolver_index,
     resolve_symbol_references,
@@ -66,6 +70,130 @@ def _resolve_python_tree(
         symbols,
         batches,
     )
+
+
+def _javascript_language(relative_path: str) -> str:
+    return (
+        "typescript"
+        if Path(relative_path).suffix in {".ts", ".tsx", ".mts", ".cts"}
+        else "javascript"
+    )
+
+
+def _resolve_javascript_tree(
+    tmp_path: Path,
+    files: dict[str, str],
+    *,
+    controls: dict[str, str] | None = None,
+) -> tuple[list, list[Symbol], list[ImportExtractionBatch]]:
+    symbols: list[Symbol] = []
+    batches: list[ImportExtractionBatch] = []
+    file_nodes: dict[str, Symbol] = {}
+    for relative_path, source in files.items():
+        path = tmp_path / relative_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(source, encoding="utf-8")
+        source_hash = hashlib.sha256(source.encode()).hexdigest()
+        language = _javascript_language(relative_path)
+        file_node = make_file_symbol(
+            relative_path,
+            language=language,
+            content_hash=source_hash,
+        )
+        file_nodes[relative_path] = file_node
+        symbols.append(file_node)
+        symbols.extend(
+            replace(
+                symbol,
+                id=make_symbol_id(relative_path, symbol.qualified_name, symbol.kind),
+                file_path=relative_path,
+            )
+            for symbol in parse_file(path)
+        )
+        batches.append(
+            extract_import_batch(
+                path,
+                source_file=relative_path,
+                language=language,
+                source_hash=source_hash,
+            )
+        )
+
+    control_paths: list[Path] = []
+    for relative_path, source in (controls or {}).items():
+        path = tmp_path / relative_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(source, encoding="utf-8")
+        control_paths.append(path)
+    loaded = load_javascript_module_context(tmp_path, control_paths)
+    assert loaded.problems == ()
+    javascript_index = build_javascript_resolution_index(
+        loaded.context,
+        file_nodes=file_nodes,
+    )
+    assert javascript_index.problems == ()
+    imports = resolve_imports(
+        [raw for batch in batches for raw in batch.imports],
+        file_nodes=file_nodes,
+        javascript_modules=javascript_index.index,
+    )
+    exports = [export for batch in batches for export in batch.exports]
+    observations = [reference for batch in batches for reference in batch.references]
+    index = build_reference_resolver_index(symbols, imports, exports)
+    return (
+        resolve_symbol_references(observations, imports=imports, index=index),
+        symbols,
+        batches,
+    )
+
+
+def test_resolves_javascript_named_namespace_default_and_type_only_bindings(
+    tmp_path: Path,
+):
+    records, _, _ = _resolve_javascript_tree(
+        tmp_path,
+        {
+            "src/model.ts": (
+                "export class Thing {}\n"
+                "export interface Shape {}\n"
+                "export default function Factory() {}\n"
+            ),
+            "src/wrong.ts": "export class Thing {}\n",
+            "src/use.ts": (
+                'import Factory, {Thing as Alias, type Shape} from "./model.js";\n'
+                'import * as model from "./model.js";\n'
+                "function run(value: Shape) { Alias; model.Thing; Factory; }\n"
+            ),
+        },
+    )
+
+    selected = [record for record in records if record.raw.source_file == "src/use.ts"]
+
+    assert [record.raw.text for record in selected] == [
+        "Shape",
+        "Alias",
+        "model.Thing",
+        "Factory",
+    ]
+    assert [record.target_id for record in selected] == [
+        "src/model.ts::Shape#interface",
+        "src/model.ts::Thing#class",
+        "src/model.ts::Thing#class",
+        "src/model.ts::Factory#function",
+    ]
+    assert [record.resolution_basis for record in selected] == [
+        "direct_binding",
+        "direct_binding",
+        "qualified_member",
+        "direct_binding",
+    ]
+    assert [record.binding.type_only for record in selected if record.binding] == [
+        True,
+        False,
+        False,
+        False,
+    ]
+    assert {record.status for record in selected} == {"resolved"}
 
 
 def test_resolves_python_direct_alias_and_qualified_members_inside_exact_endpoint(

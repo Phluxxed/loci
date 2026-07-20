@@ -17,6 +17,7 @@ from .imports import ImportRecord
 from .rust_crates import RustCrateIndex, RustResolutionConfiguration
 
 if TYPE_CHECKING:
+    from ._javascript_references import JavaScriptReferenceIndex
     from ._python_references import PythonReferenceIndex
 
 
@@ -407,6 +408,7 @@ class ReferenceResolverIndex:
         tuple[ImportRecord, ...],
     ]
     _python: PythonReferenceIndex
+    _javascript: JavaScriptReferenceIndex
 
 
 @dataclass(frozen=True, slots=True)
@@ -545,6 +547,14 @@ def build_reference_resolver_index(
         tuple(exports),
         file_nodes=file_nodes,
     )
+    from ._javascript_references import build_javascript_reference_index
+
+    javascript_index = build_javascript_reference_index(
+        tuple(symbols_by_id.values()),
+        frozen_imports,
+        tuple(exports),
+        file_nodes=file_nodes,
+    )
     return ReferenceResolverIndex(
         _symbols_by_id=MappingProxyType(symbols_by_id),
         _file_nodes=MappingProxyType(file_nodes),
@@ -552,6 +562,7 @@ def build_reference_resolver_index(
         _imports=frozen_imports,
         _imports_by_binding=MappingProxyType(frozen_import_map),
         _python=python_index,
+        _javascript=javascript_index,
     )
 
 
@@ -630,7 +641,7 @@ def _resolve_symbol_reference(
             import_record=import_record,
             reason="ambiguous_source",
         )
-    if raw.language != "python":
+    if raw.language not in {"python", "javascript", "typescript"}:
         return _unresolved_record(
             raw,
             binding=binding,
@@ -639,14 +650,24 @@ def _resolve_symbol_reference(
             reason="unsupported_reference",
         )
 
-    from ._python_references import resolve_python_reference
+    if raw.language == "python":
+        from ._python_references import resolve_python_reference
 
-    outcome = resolve_python_reference(
-        raw,
-        binding=binding,
-        import_record=import_record,
-        index=index._python,
-    )
+        outcome = resolve_python_reference(
+            raw,
+            binding=binding,
+            import_record=import_record,
+            index=index._python,
+        )
+    else:
+        from ._javascript_references import resolve_javascript_reference
+
+        outcome = resolve_javascript_reference(
+            raw,
+            binding=binding,
+            import_record=import_record,
+            index=index._javascript,
+        )
     import_support = _import_binding_support(raw, import_record)
     if outcome.target is None:
         return _unresolved_record(
