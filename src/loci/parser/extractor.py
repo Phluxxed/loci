@@ -144,11 +144,18 @@ def _parse_file_with_process(source: bytes, spec: LanguageSpec, language: str, f
             end_line=end_line,
         ))
 
-    def walk_structure(items, parent_name: Optional[str] = None) -> None:
+    def walk_structure(
+        items,
+        parent_name: Optional[str] = None,
+        parent_is_container: bool = False,
+    ) -> None:
         for item in items:
             name = getattr(item, "name", None)
             span = getattr(item, "span", None)
-            kind = _process_structure_kind(getattr(item, "kind", None), parent_name)
+            kind = _process_structure_kind(
+                getattr(item, "kind", None),
+                parent_is_container,
+            )
             if name and span is not None and kind:
                 start, end = _span_bounds(span)
                 add_symbol(
@@ -161,8 +168,15 @@ def _parse_file_with_process(source: bytes, spec: LanguageSpec, language: str, f
                     docstring=getattr(item, "doc_comment", None),
                 )
 
-            child_parent = name if kind in {"class", "struct", "impl", "trait", "interface"} else parent_name
-            walk_structure(getattr(item, "children", None) or [], child_parent)
+            qualified_name = (
+                f"{parent_name}.{name}" if parent_name and name else name or parent_name
+            )
+            child_parent = qualified_name if name and kind else parent_name
+            walk_structure(
+                getattr(item, "children", None) or [],
+                child_parent,
+                kind in {"class", "struct", "impl", "trait", "interface"},
+            )
 
     walk_structure(getattr(result, "structure", None) or [])
 
@@ -185,7 +199,7 @@ def _span_bounds(span) -> tuple[int, int]:
     return int(getattr(span, "start_byte", 0) or 0), int(getattr(span, "end_byte", 0) or 0)
 
 
-def _process_structure_kind(kind, parent_name: Optional[str]) -> str:
+def _process_structure_kind(kind, parent_is_container: bool) -> str:
     value = str(kind).lower()
     mapping = {
         "function": "function",
@@ -198,7 +212,7 @@ def _process_structure_kind(kind, parent_name: Optional[str]) -> str:
         "impl": "impl",
     }
     result = mapping.get(value, "")
-    if parent_name and result == "function":
+    if parent_is_container and result == "function":
         return "method"
     return result
 
@@ -548,6 +562,7 @@ def _walk(
     file_path: str,
     out: list[Symbol],
     parent_name: Optional[str],
+    parent_is_container: bool = False,
 ) -> None:
     node_type = node.type
 
@@ -555,17 +570,62 @@ def _walk(
     if node_type == "decorated_definition":
         for child in node.children:
             if child.type in spec.symbol_node_types and child.type != "decorated_definition":
-                _extract_symbol(child, source, spec, language, file_path, out, parent_name, node)
-                _recurse_body(child, source, spec, language, file_path, out)
+                _extract_symbol(
+                    child,
+                    source,
+                    spec,
+                    language,
+                    file_path,
+                    out,
+                    parent_name,
+                    node,
+                    parent_is_container,
+                )
+                _recurse_body(
+                    child,
+                    source,
+                    spec,
+                    language,
+                    file_path,
+                    out,
+                    parent_name,
+                )
         return
 
     if node_type in spec.symbol_node_types:
-        _extract_symbol(node, source, spec, language, file_path, out, parent_name, None)
-        _recurse_body(node, source, spec, language, file_path, out)
+        _extract_symbol(
+            node,
+            source,
+            spec,
+            language,
+            file_path,
+            out,
+            parent_name,
+            None,
+            parent_is_container,
+        )
+        _recurse_body(
+            node,
+            source,
+            spec,
+            language,
+            file_path,
+            out,
+            parent_name,
+        )
         return
 
     for child in node.children:
-        _walk(child, source, spec, language, file_path, out, parent_name)
+        _walk(
+            child,
+            source,
+            spec,
+            language,
+            file_path,
+            out,
+            parent_name,
+            parent_is_container,
+        )
 
 
 def _recurse_body(
@@ -575,26 +635,45 @@ def _recurse_body(
     language: str,
     file_path: str,
     out: list[Symbol],
+    parent_name: Optional[str],
 ) -> None:
-    """Recurse into a container node (class body) to find methods."""
+    """Find named declarations nested inside a type or callable body."""
     node_type = node.type
-    if node_type not in spec.container_node_types:
+    symbol_kind = spec.symbol_node_types.get(node_type)
+    is_container = node_type in spec.container_node_types
+    if not is_container and symbol_kind not in {"function", "method"}:
         return
 
     name = _extract_name(node, spec, source)
     if not name:
         return
+    qualified_name = f"{parent_name}.{name}" if parent_name else name
 
-    # For TypeScript, the body is in the "body" field (class_body node);
-    # we need to walk the body's children with this class as parent.
     body = node.child_by_field_name("body")
     if body is not None:
         for child in body.children:
-            _walk(child, source, spec, language, file_path, out, parent_name=name)
+            _walk(
+                child,
+                source,
+                spec,
+                language,
+                file_path,
+                out,
+                parent_name=qualified_name,
+                parent_is_container=is_container,
+            )
     else:
-        # Python class_definition: body is directly the block child
         for child in node.children:
-            _walk(child, source, spec, language, file_path, out, parent_name=name)
+            _walk(
+                child,
+                source,
+                spec,
+                language,
+                file_path,
+                out,
+                parent_name=qualified_name,
+                parent_is_container=is_container,
+            )
 
 
 def _extract_symbol(
@@ -606,6 +685,7 @@ def _extract_symbol(
     out: list[Symbol],
     parent_name: Optional[str],
     decorator_node,
+    parent_is_container: bool,
 ) -> None:
     name = _extract_name(node, spec, source)
     if not name:
@@ -613,7 +693,7 @@ def _extract_symbol(
 
     kind = spec.symbol_node_types.get(node.type, "function")
     # Functions inside a class container become methods
-    if parent_name and kind == "function":
+    if parent_is_container and kind == "function":
         kind = "method"
 
     # For constants, apply the name pattern filter if the spec defines one
