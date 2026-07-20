@@ -1406,6 +1406,24 @@ same-name candidates never create edges; type-only bindings are preserved.
 
 ### Task 5 — Add Go package-symbol resolution
 
+> **TL;DR:** Complete: Loci can now follow a proven Go import into its exact
+> Stage 7 package, use either the package's real declared name or an explicit
+> alias, and resolve exported package-level functions, types, and constants.
+> Uncertain package names, shadowing, dot/blank imports, unexported names,
+> methods/fields, duplicate targets, external packages, and off-endpoint
+> same-name symbols remain unresolved without guessed relationships.
+
+**Implementation status:** complete on 2026-07-20. The focused Task 5 gate
+passes 152 tests and the full repository suite passes 939 tests. Targeted
+Pyright reports zero errors, `uv lock --check`, `compileall`, and `uv build`
+pass, and the 26 frozen anchor/traversal tests pass with the external fixture
+unchanged at SHA-256
+`c52def1bdf592ad735149d199910f74183598eccd9ccf8064335fa0cd0e84e27`.
+A fresh Loci self-index is healthy with 2,018 symbols, 1,030 graph edges, 46
+file nodes, and 653 imports (343 resolved and 310 unresolved); integrity
+verification passes all 2,018 symbols. Final Stage 10 owner acceptance remains
+pending.
+
 **Files:**
 
 - `src/loci/graph/_go_references.py` (new)
