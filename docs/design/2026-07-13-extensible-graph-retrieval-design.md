@@ -1,6 +1,6 @@
 # loci: Extensible Graph Retrieval Layer — Design
 
-**Status:** Stages 1-9 implemented, reviewed, and accepted; Stage 10 approved for implementation
+**Status:** Stages 1-10 implemented, reviewed, and accepted
 
 **Date:** 2026-07-13
 
@@ -407,11 +407,10 @@ the strict raw observation, `target_crate`, Cargo/Rust resolution provenance,
 and `resolution_configuration`; graph health adds
 `graph_rust_crates_indexed`.
 
-Stages 1-9 are implemented, reviewed, and accepted. Stage 10 resolved symbol
-references are implemented and have passed the production review matrix; the
-final owner acceptance gate remains open.
+Stages 1-10 are implemented, reviewed, and accepted. Vik explicitly accepted
+the Stage 10 resolved-symbol-reference production evidence on 2026-07-20.
 
-### Stage 10: Resolved symbol references (implemented, awaiting owner acceptance)
+### Stage 10: Resolved symbol references (implemented and accepted)
 
 The detailed Stage 10 plan was approved by the owner on 2026-07-20 for bounded,
 task-by-task production implementation:
@@ -456,10 +455,10 @@ The final evidence packet is
 `docs/reviews/2026-07-20-extensible-graph-retrieval-stage-10-final-review.md`.
 It records the complete 1,013-test repository gate, frozen benchmark checksum,
 package build, live Loci dogfood, and installed-wrapper disposable MCP fixtures
-for all four language families plus cross-language decoys. Only Vik's explicit
-acceptance can change this stage from implemented-and-reviewed to accepted.
+for all four language families plus cross-language decoys. Vik explicitly
+accepted that evidence on 2026-07-20.
 
-After that acceptance, the next roadmap boundary is Stage 11 cross-file calls,
+The next roadmap boundary is Stage 11 cross-file calls,
 limited to sites where both a Stage 10 reference and call-site syntax prove one
 definite callee. Heuristic candidates and architecture analysis remain later,
 separately reviewed stages.

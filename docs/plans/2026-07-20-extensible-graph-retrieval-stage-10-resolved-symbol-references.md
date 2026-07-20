@@ -1,6 +1,6 @@
 # Plan: Extensible Graph Retrieval Stage 10 — Resolved Symbol References
 
-**Status:** implemented and reviewed; awaiting explicit owner acceptance
+**Status:** implemented, reviewed, and accepted
 **Date:** 2026-07-20
 **Governing design:** `docs/design/2026-07-13-extensible-graph-retrieval-design.md`
 **Accepted predecessor:** Stage 9, commit `11f21f8`
@@ -68,8 +68,8 @@ standing repository workflow:
 5. commit and push the verified save point directly to GitHub; and
 6. continue without a pull request.
 
-No judge runs or delegated subagents are part of this plan. A final owner review
-gate remains mandatory before Stage 10 is marked accepted.
+No judge runs or delegated subagents are part of this plan. Vik satisfied the
+mandatory final owner review gate on 2026-07-20.
 
 ## Reconciliation with Governing Documents
 
@@ -1847,14 +1847,14 @@ freshness, and storage boundaries.
 
 ### Task 11 — Document and run the production acceptance gate
 
-**Implementation status:** complete on 2026-07-20 through reviewed
+**Implementation status:** accepted on 2026-07-20 through reviewed
 implementation head `366ca00`. The focused and complete repository matrices,
 build/integrity checks, frozen benchmark, live Loci dogfood, and five installed
 `loci-mcp` disposable-repository fixtures passed. The review found and fixed one
 Stage-10-introduced JavaScript binding type-boundary defect, while two initial
 harness-only assertion/guard defects were corrected without changing product
-behavior. The final review packet is ready for publication; Vik's explicit
-owner acceptance remains the only open Stage 10 gate.
+behavior. Vik explicitly accepted the published final review packet on
+2026-07-20, closing the final Stage 10 gate.
 
 **Files:**
 
@@ -1874,8 +1874,9 @@ owner acceptance remains the only open Stage 10 gate.
   final review packet; and
 - stop for Vik's explicit acceptance.
 
-**Acceptance:** every final gate item has reproducible evidence; design status
-remains implemented-awaiting-acceptance until Vik approves.
+**Acceptance:** every final gate item has reproducible evidence, Vik explicitly
+approved the evidence on 2026-07-20, and the governing design marks Stage 10
+implemented, reviewed, and accepted.
 
 ## Required Test Matrix
 
@@ -2151,8 +2152,8 @@ contains evidence for every item below.
 - [x] `docs/reviews/2026-07-20-extensible-graph-retrieval-stage-10-final-review.md`
       contains exact commands, hashes, counts, fixture outcomes, unresolved
       limits, and commit IDs.
-- [ ] Vik explicitly accepts the final evidence.
-- [ ] Only after that acceptance is Stage 10 marked implemented, reviewed, and
+- [x] Vik explicitly accepts the final evidence.
+- [x] Only after that acceptance is Stage 10 marked implemented, reviewed, and
       accepted in the governing design.
 
 ## Rollback
