@@ -755,7 +755,11 @@ def _unresolved_record(
         import_unresolved_reason=import_reason,
         resolution_basis=None,
         support=support,
-        resolution_control_files=(),
+        resolution_control_files=(
+            import_record.resolution_control_files
+            if import_record is not None
+            else ()
+        ),
         resolution_configuration=None,
     )
 
