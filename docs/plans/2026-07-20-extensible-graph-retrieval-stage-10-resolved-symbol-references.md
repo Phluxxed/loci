@@ -1361,6 +1361,23 @@ cases produce the frozen outcomes.
 
 ### Task 4 — Add JavaScript/TypeScript export-surface resolution
 
+> **TL;DR:** Complete: Loci can now prove exact JavaScript and TypeScript
+> symbol references through direct ESM imports, aliases, namespace members,
+> named defaults, local export clauses, named re-exports, and safe star barrels.
+> Conflicts, unsupported syntax/configuration, anonymous defaults, and
+> non-convergent routes remain explicit unresolved records.
+
+**Implementation status:** complete on 2026-07-20. The focused Task 4 gate
+passes 132 tests and the full repository suite passes 933 tests. Targeted
+Pyright reports zero errors, `uv lock --check`, `compileall`, and `uv build`
+pass, and the 26 frozen anchor/traversal tests pass with the external fixture
+unchanged at SHA-256
+`c52def1bdf592ad735149d199910f74183598eccd9ccf8064335fa0cd0e84e27`.
+A fresh Loci self-index is healthy with 2,005 symbols, 1,022 graph edges, 45
+file nodes, and 629 imports (326 resolved and 303 unresolved); integrity
+verification passes all 2,005 symbols. Final Stage 10 owner acceptance remains
+pending.
+
 **Files:**
 
 - `src/loci/graph/_javascript_references.py` (new)
