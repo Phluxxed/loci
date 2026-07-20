@@ -9,6 +9,12 @@ import pytest
 from loci.graph import _javascript_references
 from loci.graph import _python_references
 from loci.graph.contracts import GraphContractError
+from loci.graph.go_modules import (
+    GoModule,
+    GoModuleContext,
+    GoWorkspace,
+    build_go_package_index,
+)
 from loci.graph.imports import resolve_imports
 from loci.graph.javascript_modules import (
     build_javascript_resolution_index,
@@ -146,6 +152,131 @@ def _resolve_javascript_tree(
         symbols,
         batches,
     )
+
+
+def _resolve_go_tree(
+    tmp_path: Path,
+    files: dict[str, str],
+    *,
+    modules: tuple[GoModule, ...],
+    workspaces: tuple[GoWorkspace, ...] = (),
+) -> tuple[list, list[Symbol], list[ImportExtractionBatch]]:
+    symbols: list[Symbol] = []
+    batches: list[ImportExtractionBatch] = []
+    file_nodes: dict[str, Symbol] = {}
+    for relative_path, source in files.items():
+        path = tmp_path / relative_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(source, encoding="utf-8")
+        source_hash = hashlib.sha256(source.encode()).hexdigest()
+        file_node = make_file_symbol(
+            relative_path,
+            language="go",
+            content_hash=source_hash,
+        )
+        batch = extract_import_batch(
+            path,
+            source_file=relative_path,
+            language="go",
+            source_hash=source_hash,
+        )
+        if batch.go_package is not None:
+            file_node.metadata["loci"]["go_package"] = {
+                "name": batch.go_package.name,
+                "line": batch.go_package.line,
+            }
+        file_nodes[relative_path] = file_node
+        symbols.append(file_node)
+        symbols.extend(
+            replace(
+                symbol,
+                id=make_symbol_id(relative_path, symbol.qualified_name, symbol.kind),
+                file_path=relative_path,
+            )
+            for symbol in parse_file(path)
+        )
+        batches.append(batch)
+
+    package_build = build_go_package_index(
+        GoModuleContext(modules=modules, workspaces=workspaces),
+        file_nodes=file_nodes,
+    )
+    assert package_build.problems == ()
+    symbols.extend(package_build.index.package_nodes)
+    imports = resolve_imports(
+        [raw for batch in batches for raw in batch.imports],
+        file_nodes=file_nodes,
+        go_packages=package_build.index,
+    )
+    exports = [export for batch in batches for export in batch.exports]
+    observations = [reference for batch in batches for reference in batch.references]
+    index = build_reference_resolver_index(
+        symbols,
+        imports,
+        exports,
+        go_packages=package_build.index,
+    )
+    return (
+        resolve_symbol_references(observations, imports=imports, index=index),
+        symbols,
+        batches,
+    )
+
+
+def test_resolves_go_declared_package_name_and_explicit_alias(tmp_path: Path):
+    module = GoModule(
+        source="go.mod",
+        root=".",
+        module_path="example.com/project",
+        requirements=(),
+        exclusions=(),
+        replacements=(),
+    )
+    records, _, _ = _resolve_go_tree(
+        tmp_path,
+        {
+            "internal/storage/store.go": (
+                "package store\n"
+                "const Limit = 10\n"
+                "type Record struct{}\n"
+                "func Open() {}\n"
+            ),
+            "cmd/default/main.go": (
+                "package main\n"
+                'import "example.com/project/internal/storage"\n'
+                "func run() { store.Open(); store.Record{}; _ = store.Limit }\n"
+            ),
+            "cmd/alias/main.go": (
+                "package main\n"
+                'import depot "example.com/project/internal/storage"\n'
+                "func run() { depot.Open() }\n"
+            ),
+        },
+        modules=(module,),
+    )
+
+    selected = [
+        record
+        for record in records
+        if record.raw.source_file in {"cmd/default/main.go", "cmd/alias/main.go"}
+    ]
+    assert [(record.raw.text, record.target_id) for record in selected] == [
+        ("store.Open", "internal/storage/store.go::Open#function"),
+        ("store.Record", "internal/storage/store.go::Record#type"),
+        ("store.Limit", "internal/storage/store.go::Limit#constant"),
+        ("depot.Open", "internal/storage/store.go::Open#function"),
+    ]
+    assert {record.status for record in selected} == {"resolved"}
+    assert {record.resolution_basis for record in selected} == {"qualified_member"}
+    assert [record.binding.local_name for record in selected if record.binding] == [
+        None,
+        None,
+        None,
+        "depot",
+    ]
+    assert {
+        tuple(support.kind for support in record.support) for record in selected
+    } == {("import_binding", "definition")}
 
 
 def test_resolves_javascript_named_namespace_default_and_type_only_bindings(

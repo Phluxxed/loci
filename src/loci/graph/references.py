@@ -17,6 +17,7 @@ from .imports import ImportRecord
 from .rust_crates import RustCrateIndex, RustResolutionConfiguration
 
 if TYPE_CHECKING:
+    from ._go_references import GoReferenceIndex
     from ._javascript_references import JavaScriptReferenceIndex
     from ._python_references import PythonReferenceIndex
 
@@ -409,6 +410,7 @@ class ReferenceResolverIndex:
     ]
     _python: PythonReferenceIndex
     _javascript: JavaScriptReferenceIndex
+    _go: GoReferenceIndex
 
 
 @dataclass(frozen=True, slots=True)
@@ -471,7 +473,7 @@ def build_reference_resolver_index(
     rust_crates: RustCrateIndex | None = None,
 ) -> ReferenceResolverIndex:
     """Build bounded immutable reference lookups without repository I/O."""
-    del go_packages, rust_crates  # Reserved by the frozen four-language API.
+    del rust_crates  # Reserved by the frozen four-language API.
     symbols_by_id: dict[str, Symbol] = {}
     file_nodes: dict[str, Symbol] = {}
     source_symbols: dict[str, list[Symbol]] = {}
@@ -555,6 +557,14 @@ def build_reference_resolver_index(
         tuple(exports),
         file_nodes=file_nodes,
     )
+    from ._go_references import build_go_reference_index
+
+    go_index = build_go_reference_index(
+        tuple(symbols_by_id.values()),
+        tuple(exports),
+        file_nodes=file_nodes,
+        go_packages=go_packages,
+    )
     return ReferenceResolverIndex(
         _symbols_by_id=MappingProxyType(symbols_by_id),
         _file_nodes=MappingProxyType(file_nodes),
@@ -563,6 +573,7 @@ def build_reference_resolver_index(
         _imports_by_binding=MappingProxyType(frozen_import_map),
         _python=python_index,
         _javascript=javascript_index,
+        _go=go_index,
     )
 
 
@@ -587,13 +598,25 @@ def _resolve_symbol_reference(
     if not isinstance(raw, RawSymbolReference):
         raise _error("Reference observation must be a RawSymbolReference")
     owner = _source_owner(raw, index)
-    binding = raw.candidate_bindings[0] if len(raw.candidate_bindings) == 1 else None
-    matched_imports = (
-        index._imports_by_binding.get((raw.source_file, binding), ())
-        if binding is not None
-        else ()
-    )
-    import_record = matched_imports[0] if len(matched_imports) == 1 else None
+    if raw.language == "go" and raw.binding_state == "deferred":
+        from ._go_references import select_go_reference_binding
+
+        binding, import_record = select_go_reference_binding(
+            raw,
+            imports_by_binding=index._imports_by_binding,
+            index=index._go,
+        )
+        matched_imports = (import_record,) if import_record is not None else ()
+    else:
+        binding = (
+            raw.candidate_bindings[0] if len(raw.candidate_bindings) == 1 else None
+        )
+        matched_imports = (
+            index._imports_by_binding.get((raw.source_file, binding), ())
+            if binding is not None
+            else ()
+        )
+        import_record = matched_imports[0] if len(matched_imports) == 1 else None
 
     binding_reason = {
         "shadowed": "binding_shadowed",
@@ -641,7 +664,7 @@ def _resolve_symbol_reference(
             import_record=import_record,
             reason="ambiguous_source",
         )
-    if raw.language not in {"python", "javascript", "typescript"}:
+    if raw.language not in {"python", "javascript", "typescript", "go"}:
         return _unresolved_record(
             raw,
             binding=binding,
@@ -659,7 +682,7 @@ def _resolve_symbol_reference(
             import_record=import_record,
             index=index._python,
         )
-    else:
+    elif raw.language in {"javascript", "typescript"}:
         from ._javascript_references import resolve_javascript_reference
 
         outcome = resolve_javascript_reference(
@@ -667,6 +690,15 @@ def _resolve_symbol_reference(
             binding=binding,
             import_record=import_record,
             index=index._javascript,
+        )
+    else:
+        from ._go_references import resolve_go_reference
+
+        outcome = resolve_go_reference(
+            raw,
+            binding=binding,
+            import_record=import_record,
+            index=index._go,
         )
     import_support = _import_binding_support(raw, import_record)
     if outcome.target is None:
