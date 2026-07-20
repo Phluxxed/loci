@@ -165,7 +165,7 @@ def test_graph_references_filters_before_counts_status_and_pagination(
 def test_graph_references_rejects_invalid_filters_and_pagination(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
-    kwargs: dict[str, object],
+    kwargs: dict[str, Any],
     field: str,
 ):
     repo = _reference_repo(tmp_path, monkeypatch)
@@ -279,8 +279,10 @@ async def _reference_mcp_after_restart(
                 "loci_index",
                 arguments={"path": str(repo), "incremental": False},
             )
-            assert indexed.structuredContent["graph_symbol_references_resolved"] == 1
-            assert indexed.structuredContent["graph_symbol_references_unresolved"] == 1
+            indexed_content = indexed.structuredContent
+            assert indexed_content is not None
+            assert indexed_content["graph_symbol_references_resolved"] == 1
+            assert indexed_content["graph_symbol_references_unresolved"] == 1
 
     index_path = IndexStore(base_dir=cache_dir)._index_path(repo.resolve())
     index_before = (

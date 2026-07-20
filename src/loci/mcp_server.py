@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal, cast
 
 from mcp.server.fastmcp import FastMCP
 from mcp.types import CallToolResult, TextContent
 
+from loci.graph.traversal import GraphDirection
 from loci.service import (
     LociError,
     analyze_usage,
@@ -111,7 +112,7 @@ def create_server() -> FastMCP:
                 namespaces=namespaces,
                 edge_types=edge_types,
                 resolutions=resolutions,
-                direction=direction,
+                direction=cast(GraphDirection, direction),
                 max_neighbors=max_neighbors,
                 ensure_fresh=True,
             )
@@ -142,7 +143,7 @@ def create_server() -> FastMCP:
                 namespaces=namespaces,
                 edge_types=edge_types,
                 resolutions=resolutions,
-                direction=direction,
+                direction=cast(GraphDirection, direction),
                 max_hops=max_hops,
                 max_nodes=max_nodes,
                 max_paths=max_paths,
@@ -179,7 +180,7 @@ def create_server() -> FastMCP:
                 namespaces=namespaces,
                 edge_types=edge_types,
                 resolutions=resolutions,
-                direction=direction,
+                direction=cast(GraphDirection, direction),
                 max_anchors=max_anchors,
                 max_hops=max_hops,
                 max_nodes=max_nodes,
@@ -211,7 +212,7 @@ def create_server() -> FastMCP:
             lambda: graph_imports(
                 repo,
                 file=file,
-                status=status,
+                status=cast(Literal["all", "resolved", "unresolved"], status),
                 offset=offset,
                 limit=limit,
                 ensure_fresh=True,
@@ -231,7 +232,7 @@ def create_server() -> FastMCP:
             lambda: graph_references(
                 repo,
                 file=file,
-                status=status,
+                status=cast(Literal["all", "resolved", "unresolved"], status),
                 offset=offset,
                 limit=limit,
                 ensure_fresh=True,
