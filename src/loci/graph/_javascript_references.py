@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Mapping, Sequence, TypeAlias, cast
@@ -16,6 +17,8 @@ from loci.parser.symbols import Symbol
 from .contracts import GraphContractError, JSONValue
 from .imports import ImportRecord
 from .references import (
+    MAX_REFERENCE_REEXPORT_PASSES,
+    MAX_REFERENCE_SUPPORT_RECORDS,
     ReferenceResolutionBasis,
     ReferenceSupport,
     ReferenceUnresolvedReason,
@@ -24,6 +27,7 @@ from .references import (
 
 _ExportKey: TypeAlias = tuple[str, str]
 _JAVASCRIPT_LANGUAGES = frozenset({"javascript", "typescript"})
+_LOCAL_EXPORT_RE = re.compile(r"^\s*export\s+(?:type\s+)?\{")
 
 
 @dataclass(frozen=True, slots=True)
@@ -35,9 +39,18 @@ class _JavaScriptExportTarget:
 
 
 @dataclass(frozen=True, slots=True)
+class _JavaScriptReexportRule:
+    source: _ExportKey
+    target: _ExportKey
+    support: ReferenceSupport
+    control_files: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class JavaScriptReferenceIndex:
     surfaces: Mapping[_ExportKey, tuple[_JavaScriptExportTarget, ...]]
     ambiguous: frozenset[_ExportKey]
+    cyclic_keys: frozenset[_ExportKey]
     cyclic_files: frozenset[str]
     import_failures: Mapping[_ExportKey, frozenset[ImportUnresolvedReason]]
     star_import_failures: Mapping[str, frozenset[ImportUnresolvedReason]]
@@ -61,7 +74,6 @@ def build_javascript_reference_index(
     file_nodes: Mapping[str, Symbol],
 ) -> JavaScriptReferenceIndex:
     """Compile exact JavaScript and TypeScript export surfaces without I/O."""
-    del imports  # Re-export routes are added in the next incremental slice.
     definitions: dict[tuple[str, int, int], list[Symbol]] = {}
     for symbol in symbols:
         if (
@@ -80,6 +92,7 @@ def build_javascript_reference_index(
 
     surfaces: dict[_ExportKey, dict[str, _JavaScriptExportTarget]] = {}
     ambiguous: set[_ExportKey] = set()
+    explicit_counts: dict[_ExportKey, int] = {}
     for export in exports:
         if not isinstance(export, RawLocalExport):
             raise _error("JavaScript reference export is not a RawLocalExport")
@@ -96,6 +109,7 @@ def build_javascript_reference_index(
                 file=export.source_file,
             )
         key = (export.source_file, export.exported_name)
+        explicit_counts[key] = explicit_counts.get(key, 0) + 1
         if export.definition_start_byte is None:
             ambiguous.add(key)
             continue
@@ -111,32 +125,119 @@ def build_javascript_reference_index(
             ambiguous.add(key)
             continue
         target = candidates[0]
-        targets = surfaces.setdefault(key, {})
-        if target.id in targets or targets:
-            ambiguous.add(key)
-            continue
-        targets[target.id] = _JavaScriptExportTarget(
-            symbol=target,
-            support=(
-                ReferenceSupport(
-                    kind="definition",
-                    file=export.source_file,
-                    line=export.line,
-                    content_hash=export.source_hash,
-                    endpoint_id=target.id,
-                ),
+        _add_export_target(
+            surfaces,
+            key,
+            _JavaScriptExportTarget(
+                symbol=target,
+                support=_definition_support(export, target),
+                control_files=(),
+                via_reexport=False,
             ),
-            control_files=(),
-            via_reexport=False,
+            ambiguous=ambiguous,
         )
 
+    rules: list[_JavaScriptReexportRule] = []
+    failures: dict[_ExportKey, set[ImportUnresolvedReason]] = {}
+    for record in imports:
+        if record.raw.language not in _JAVASCRIPT_LANGUAGES or not record.raw.is_reexport:
+            continue
+        for binding in record.raw.bindings:
+            if binding.kind != "symbol" or binding.exported_name is None:
+                if binding.exported_name is not None:
+                    key = (record.raw.source_file, binding.exported_name)
+                    explicit_counts[key] = explicit_counts.get(key, 0) + 1
+                    ambiguous.add(key)
+                continue
+            key = (record.raw.source_file, binding.exported_name)
+            explicit_counts[key] = explicit_counts.get(key, 0) + 1
+            if record.status == "unresolved":
+                if record.unresolved_reason is not None:
+                    failures.setdefault(key, set()).add(record.unresolved_reason)
+                continue
+            if (
+                binding.imported_name is None
+                or record.target_file is None
+                or record.target_id is None
+            ):
+                ambiguous.add(key)
+                continue
+            rules.append(
+                _JavaScriptReexportRule(
+                    source=key,
+                    target=(record.target_file, binding.imported_name),
+                    support=ReferenceSupport(
+                        kind="reexport",
+                        file=record.raw.source_file,
+                        line=record.raw.line,
+                        content_hash=record.raw.source_hash,
+                        endpoint_id=record.target_id,
+                    ),
+                    control_files=record.resolution_control_files,
+                )
+            )
+
+    ambiguous.update(key for key, count in explicit_counts.items() if count > 1)
+    rules = sorted(set(rules), key=_reexport_rule_key)
+    rules_by_source: dict[_ExportKey, list[_JavaScriptReexportRule]] = {}
+    for rule in rules:
+        source_rules = rules_by_source.setdefault(rule.source, [])
+        if len(source_rules) >= MAX_REFERENCE_RESOLUTION_CANDIDATES:
+            ambiguous.add(rule.source)
+            continue
+        source_rules.append(rule)
+    rules = [
+        rule
+        for source in sorted(rules_by_source)
+        for rule in rules_by_source[source]
+    ]
+    for _ in range(MAX_REFERENCE_REEXPORT_PASSES):
+        snapshot = {key: dict(value) for key, value in surfaces.items()}
+        changed = False
+        for rule in rules:
+            if rule.target in ambiguous:
+                ambiguous.add(rule.source)
+                continue
+            for target in snapshot.get(rule.target, {}).values():
+                support = (rule.support, *target.support)
+                if len(support) >= MAX_REFERENCE_SUPPORT_RECORDS:
+                    ambiguous.add(rule.source)
+                    continue
+                changed |= _add_export_target(
+                    surfaces,
+                    rule.source,
+                    _JavaScriptExportTarget(
+                        symbol=target.symbol,
+                        support=support,
+                        control_files=tuple(sorted(set(
+                            (*rule.control_files, *target.control_files)
+                        ))),
+                        via_reexport=True,
+                    ),
+                    ambiguous=ambiguous,
+                )
+        if not changed:
+            break
+    else:
+        ambiguous.update(rule.source for rule in rules)
+
+    for key, targets in surfaces.items():
+        if len(targets) > 1:
+            ambiguous.add(key)
+    graph: dict[_ExportKey, set[_ExportKey]] = {}
+    for rule in rules:
+        graph.setdefault(rule.source, set()).add(rule.target)
+    cyclic_keys = _cycle_reachable_keys(graph)
     return JavaScriptReferenceIndex(
         surfaces=MappingProxyType({
             key: tuple(value.values()) for key, value in surfaces.items()
         }),
         ambiguous=frozenset(ambiguous),
+        cyclic_keys=frozenset(cyclic_keys),
         cyclic_files=frozenset(),
-        import_failures=MappingProxyType({}),
+        import_failures=MappingProxyType({
+            key: frozenset(value) for key, value in failures.items()
+        }),
         star_import_failures=MappingProxyType({}),
     )
 
@@ -159,6 +260,14 @@ def resolve_javascript_reference(
     if len(targets) > 1:
         return _unresolved("ambiguous_target")
     if not targets:
+        failures = index.import_failures.get(key, frozenset())
+        if len(failures) == 1:
+            return _unresolved(
+                "import_unresolved",
+                import_reason=next(iter(failures)),
+            )
+        if len(failures) > 1 or key in index.cyclic_keys:
+            return _unresolved("ambiguous_target")
         return _unresolved("target_not_indexed")
     target = targets[0]
     return JavaScriptReferenceOutcome(
@@ -182,6 +291,131 @@ def _javascript_target_name(
     if binding.kind == "namespace" and len(raw.path) >= 2:
         return raw.path[1], "qualified_member"
     return None, None
+
+
+def _definition_support(
+    export: RawLocalExport,
+    target: Symbol,
+) -> tuple[ReferenceSupport, ...]:
+    definition = ReferenceSupport(
+        kind="definition",
+        file=export.source_file,
+        line=target.line,
+        content_hash=export.source_hash,
+        endpoint_id=target.id,
+    )
+    if not _LOCAL_EXPORT_RE.match(export.text):
+        return (definition,)
+    return (
+        ReferenceSupport(
+            kind="local_export",
+            file=export.source_file,
+            line=export.line,
+            content_hash=export.source_hash,
+            endpoint_id=target.id,
+        ),
+        definition,
+    )
+
+
+def _add_export_target(
+    surfaces: dict[_ExportKey, dict[str, _JavaScriptExportTarget]],
+    key: _ExportKey,
+    target: _JavaScriptExportTarget,
+    *,
+    ambiguous: set[_ExportKey],
+) -> bool:
+    targets = surfaces.setdefault(key, {})
+    current = targets.get(target.symbol.id)
+    if current is None and len(targets) >= MAX_REFERENCE_RESOLUTION_CANDIDATES:
+        ambiguous.add(key)
+        return False
+    if current is None or _target_route_key(target) < _target_route_key(current):
+        targets[target.symbol.id] = target
+        return True
+    return False
+
+
+def _target_route_key(target: _JavaScriptExportTarget) -> tuple[object, ...]:
+    return (
+        len(target.support),
+        tuple(
+            (support.kind, support.file, support.line, support.endpoint_id)
+            for support in target.support
+        ),
+        target.control_files,
+    )
+
+
+def _reexport_rule_key(rule: _JavaScriptReexportRule) -> tuple[object, ...]:
+    return (
+        rule.source,
+        rule.target,
+        rule.support.line,
+        rule.support.endpoint_id,
+        rule.control_files,
+    )
+
+
+def _cycle_reachable_keys(
+    graph: Mapping[_ExportKey, set[_ExportKey]],
+) -> set[_ExportKey]:
+    nodes = set(graph)
+    nodes.update(target for targets in graph.values() for target in targets)
+    reverse: dict[_ExportKey, set[_ExportKey]] = {}
+    for source, targets in graph.items():
+        for target in targets:
+            reverse.setdefault(target, set()).add(source)
+
+    visited: set[_ExportKey] = set()
+    finish_order: list[_ExportKey] = []
+    for root in sorted(nodes):
+        if root in visited:
+            continue
+        stack: list[tuple[_ExportKey, bool]] = [(root, False)]
+        while stack:
+            node, expanded = stack.pop()
+            if expanded:
+                finish_order.append(node)
+                continue
+            if node in visited:
+                continue
+            visited.add(node)
+            stack.append((node, True))
+            stack.extend(
+                (target, False)
+                for target in reversed(sorted(graph.get(node, ())))
+                if target not in visited
+            )
+
+    assigned: set[_ExportKey] = set()
+    cycle_members: set[_ExportKey] = set()
+    for root in reversed(finish_order):
+        if root in assigned:
+            continue
+        component: set[_ExportKey] = set()
+        component_stack = [root]
+        while component_stack:
+            node = component_stack.pop()
+            if node in assigned:
+                continue
+            assigned.add(node)
+            component.add(node)
+            component_stack.extend(
+                source for source in reverse.get(node, ()) if source not in assigned
+            )
+        if len(component) > 1 or any(node in graph.get(node, ()) for node in component):
+            cycle_members.update(component)
+
+    reachable = set(cycle_members)
+    frontier = list(cycle_members)
+    while frontier:
+        target = frontier.pop()
+        for source in reverse.get(target, ()):
+            if source not in reachable:
+                reachable.add(source)
+                frontier.append(source)
+    return reachable
 
 
 def _unresolved(
