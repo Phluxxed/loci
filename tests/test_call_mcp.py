@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import os
-import shutil
 from pathlib import Path
 from typing import Any
 
@@ -79,11 +78,19 @@ def _write_fixture(repo: Path, language: str) -> dict[str, Any]:
 
 
 def _server(cache_dir: Path) -> StdioServerParameters:
-    command = shutil.which("loci-mcp")
-    assert command is not None, "installed loci-mcp wrapper is required"
+    command = Path.home() / ".local/bin/loci-mcp"
+    repo_root = Path(__file__).resolve().parents[1]
+    expected = repo_root / ".shared/loci-mcp-wrapper.sh"
+    assert command.is_file(), "installed loci-mcp wrapper is required"
+    assert command.resolve() == expected.resolve()
     env = os.environ.copy()
     env["LOCI_BASE_DIR"] = str(cache_dir)
-    return StdioServerParameters(command=command, args=[], env=env, cwd=Path.cwd())
+    return StdioServerParameters(
+        command=str(command),
+        args=[],
+        env=env,
+        cwd=repo_root,
+    )
 
 
 @pytest.mark.parametrize("language", tuple(CALL_FIXTURES))
