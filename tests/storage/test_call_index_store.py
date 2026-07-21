@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
+import sys
 from dataclasses import replace
 from pathlib import Path
 
@@ -168,6 +170,42 @@ def test_fresh_store_rejects_model_valid_but_stale_call_record(tmp_path: Path):
     fresh_store = IndexStore(base_dir=store.base_dir)
     with pytest.raises(GraphContractError, match="stale"):
         fresh_store.get_graph_state(repo)
+
+
+def test_fresh_process_rejects_model_valid_but_stale_call_record(tmp_path: Path):
+    store = IndexStore(base_dir=tmp_path / ".codeindex")
+    repo, symbols, file_hashes, state = _call_fixture(store, tmp_path)
+    store.write(repo, symbols, file_hashes, graph_state=state)
+    index_path = store._index_path(repo)
+    payload = json.loads(index_path.read_text())
+    record = payload["graph"]["calls"][0]
+    record["raw"]["source_hash"] = "0" * 64
+    for support in record["support"]:
+        if support["kind"] in {"call_site", "symbol_reference"}:
+            support["content_hash"] = "0" * 64
+    index_path.write_text(json.dumps(payload))
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            (
+                "import sys; from pathlib import Path; "
+                "from loci.storage.index_store import IndexStore; "
+                "IndexStore(base_dir=Path(sys.argv[2])).get_graph_state("
+                "Path(sys.argv[1]))"
+            ),
+            str(repo),
+            str(store.base_dir),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+
+    assert completed.returncode != 0
+    assert "stale" in completed.stderr
 
 
 def test_fresh_store_rejects_call_edge_without_current_record(tmp_path: Path):
