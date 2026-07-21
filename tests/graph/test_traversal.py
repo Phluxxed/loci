@@ -111,6 +111,53 @@ def test_reference_edges_use_generic_filters_directions_and_paths():
     assert paths.paths[0].steps[0].edge == runtime
 
 
+def test_call_edges_use_generic_filters_directions_paths_and_bounded_cycles():
+    direct = _edge(
+        "caller",
+        "target",
+        namespace="loci",
+        edge_type="calls",
+        resolution="exact",
+    )
+    imported = _edge(
+        "target",
+        "imported",
+        namespace="loci",
+        edge_type="calls",
+        resolution="import-resolved",
+    )
+    recursive = _edge(
+        "target",
+        "target",
+        namespace="loci",
+        edge_type="calls",
+        resolution="exact",
+    )
+
+    filtered = filter_graph_edges(
+        [imported, recursive, direct],
+        namespaces=["loci"],
+        edge_types=["calls"],
+        resolutions=["exact", "import-resolved"],
+    )
+    outgoing = graph_adjacency(filtered, direction="outgoing")
+    incoming = graph_adjacency(filtered, direction="incoming")
+    paths = find_graph_paths(
+        filtered,
+        ["caller"],
+        ["imported"],
+        direction="outgoing",
+        max_hops=3,
+        max_nodes=3,
+        max_paths=2,
+    )
+
+    assert [step.to_id for step in outgoing["caller"]] == ["target"]
+    assert [step.to_id for step in incoming["imported"]] == ["target"]
+    assert paths.paths[0].node_ids == ("caller", "target", "imported")
+    assert all(len(path.node_ids) == len(set(path.node_ids)) for path in paths.paths)
+
+
 def test_filter_applies_all_allow_lists_and_deduplicates_values():
     keep = _edge("a", "b", namespace="wiki", edge_type="supports")
     edges = [

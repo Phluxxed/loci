@@ -643,6 +643,133 @@ def test_materialize_graph_threads_resolved_symbol_references_after_imports(
     )]
 
 
+def test_materialize_graph_resolves_calls_after_their_reference_evidence(
+    tmp_path: Path,
+):
+    files = {
+        "target.py": "def target():\n    return 1\n",
+        "use.py": (
+            "from target import target\n"
+            "\n"
+            "def caller():\n"
+            "    return target()\n"
+        ),
+    }
+    symbols: list[Symbol] = []
+    batches = []
+    file_hashes = {}
+    for relative_path, source in files.items():
+        path = tmp_path / relative_path
+        path.write_text(source, encoding="utf-8")
+        source_hash = hashlib.sha256(source.encode()).hexdigest()
+        file_hashes[relative_path] = source_hash
+        symbols.append(make_file_symbol(
+            relative_path,
+            language="python",
+            content_hash=source_hash,
+        ))
+        symbols.extend(
+            replace(
+                symbol,
+                id=make_symbol_id(relative_path, symbol.qualified_name, symbol.kind),
+                file_path=relative_path,
+            )
+            for symbol in parse_file(path)
+        )
+        batches.append(extract_import_batch(
+            path,
+            source_file=relative_path,
+            language="python",
+            source_hash=source_hash,
+        ))
+
+    state = materialize_graph(
+        tmp_path,
+        symbols,
+        file_hashes,
+        [],
+        [],
+        raw_imports=[raw for batch in batches for raw in batch.imports],
+        raw_exports=[raw for batch in batches for raw in batch.exports],
+        raw_symbol_references=[
+            raw for batch in batches for raw in batch.references
+        ],
+        raw_calls=[raw for batch in batches for raw in batch.calls],
+    )
+
+    call_edges = [edge for edge in state.edges if edge.type == "calls"]
+    assert call_edges == [GraphEdge(
+        from_id="use.py::caller#function",
+        to_id="target.py::target#function",
+        type="calls",
+        directed=True,
+        namespace="loci",
+        resolution="import-resolved",
+        evidence=GraphEvidence(
+            file="use.py",
+            line=4,
+            content_hash=file_hashes["use.py"],
+        ),
+    )]
+
+
+def test_materialize_graph_preserves_a_proven_recursive_call_self_edge(
+    tmp_path: Path,
+):
+    source = "def recurse(value):\n    return recurse(value - 1) if value else 0\n"
+    path = tmp_path / "recursive.py"
+    path.write_text(source, encoding="utf-8")
+    source_hash = hashlib.sha256(source.encode()).hexdigest()
+    symbols = [
+        make_file_symbol(
+            "recursive.py",
+            language="python",
+            content_hash=source_hash,
+        ),
+        *(
+            replace(
+                symbol,
+                id=make_symbol_id(
+                    "recursive.py", symbol.qualified_name, symbol.kind
+                ),
+                file_path="recursive.py",
+            )
+            for symbol in parse_file(path)
+        ),
+    ]
+    batch = extract_import_batch(
+        path,
+        source_file="recursive.py",
+        language="python",
+        source_hash=source_hash,
+    )
+
+    state = materialize_graph(
+        tmp_path,
+        symbols,
+        {"recursive.py": source_hash},
+        [],
+        [],
+        raw_exports=batch.exports,
+        raw_calls=batch.calls,
+    )
+
+    recursive_id = "recursive.py::recurse#function"
+    assert [edge for edge in state.edges if edge.type == "calls"] == [GraphEdge(
+        from_id=recursive_id,
+        to_id=recursive_id,
+        type="calls",
+        directed=True,
+        namespace="loci",
+        resolution="exact",
+        evidence=GraphEvidence(
+            file="recursive.py",
+            line=2,
+            content_hash=source_hash,
+        ),
+    )]
+
+
 def test_materialize_graph_rejects_stale_reference_export_evidence(tmp_path: Path):
     source = tmp_path / "model.py"
     source.write_text("class Thing:\n    pass\n", encoding="utf-8")

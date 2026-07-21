@@ -8,6 +8,12 @@ from pathlib import Path, PurePosixPath
 from typing import Any, cast
 
 from loci.graph.builtins import extract_markdown_contains_edges
+from loci.graph.calls import (
+    CallRecord,
+    materialize_call_edges,
+    resolve_calls,
+    validate_call_records,
+)
 from loci.graph.contracts import (
     GRAPH_STATE_SCHEMA_VERSION,
     GraphContractError,
@@ -49,6 +55,7 @@ from loci.graph.state import (
     GraphIndexState,
     LoadedGraphContribution,
 )
+from loci.parser.call_models import RawCallSite
 from loci.parser.imports import RawImport
 from loci.parser.reference_models import RawLocalExport, RawSymbolReference
 from loci.parser.symbols import Symbol
@@ -229,6 +236,7 @@ def materialize_graph(
     raw_imports: Sequence[RawImport] = (),
     raw_exports: Sequence[RawLocalExport] = (),
     raw_symbol_references: Sequence[RawSymbolReference] = (),
+    raw_calls: Sequence[RawCallSite] = (),
     go_packages: GoPackageIndex | None = None,
     javascript_modules: JavaScriptResolutionIndex | None = None,
     rust_crates: RustCrateIndex | None = None,
@@ -282,6 +290,11 @@ def materialize_graph(
     ))
     reference_edges: list[GraphEdge] = []
     reference_records: tuple[SymbolReferenceRecord, ...] = ()
+    serialized_nodes = (
+        {symbol.id: symbol.to_dict() for symbol in symbols}
+        if raw_exports or raw_symbol_references or raw_calls
+        else {}
+    )
     if raw_exports or raw_symbol_references:
         reference_index = build_reference_resolver_index(
             symbols,
@@ -295,7 +308,6 @@ def materialize_graph(
             imports=import_records,
             index=reference_index,
         ))
-        serialized_nodes = {symbol.id: symbol.to_dict() for symbol in symbols}
         validate_symbol_reference_records(
             reference_records,
             imports=import_records,
@@ -311,6 +323,30 @@ def materialize_graph(
             imports=import_records,
             symbol_references=reference_records,
         )
+    call_edges: list[GraphEdge] = []
+    call_records: tuple[CallRecord, ...] = ()
+    if raw_calls:
+        call_records = tuple(resolve_calls(
+            raw_calls,
+            symbols=symbols,
+            symbol_references=reference_records,
+            file_hashes=file_hashes,
+        ))
+        validate_call_records(
+            call_records,
+            symbol_references=reference_records,
+            indexed_nodes=serialized_nodes,
+            file_hashes=file_hashes,
+        )
+        call_edges = materialize_call_edges(call_records)
+        validate_graph_edges(
+            call_edges,
+            indexed_nodes=serialized_nodes,
+            file_hashes=file_hashes,
+            imports=import_records,
+            symbol_references=reference_records,
+            calls=call_records,
+        )
     active_edges = list(extract_markdown_contains_edges(symbols))
     active_edges.extend(materialize_import_edges(
         import_records,
@@ -319,6 +355,7 @@ def materialize_graph(
         rust_crates=rust_crates,
     ))
     active_edges.extend(reference_edges)
+    active_edges.extend(call_edges)
     overlay_values: dict[tuple[str, str], dict[str, JSONValue]] = {}
     overlay_kinds: dict[tuple[str, str], str] = {}
     materialization_diagnostics = list(diagnostics)
