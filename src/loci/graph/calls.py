@@ -237,6 +237,8 @@ class CallRecord:
                 raise _error("Unresolved call cannot have a final target or basis")
             if self.unresolved_reason is None:
                 raise _error("Unresolved call requires an unresolved reason")
+            if self.resolution_control_files:
+                raise _error("Unresolved call cannot carry resolution controls")
             if (
                 self.reference_unresolved_reason is None
             ) != (self.unresolved_reason != "reference_unresolved"):
@@ -308,8 +310,32 @@ class CallRecord:
             return
         if self.resolution_basis != "imported_reference":
             raise _error("Import-resolved call requires imported_reference basis")
-        if not any(item.kind == "symbol_reference" for item in self.support):
-            raise _error("Import-resolved call requires symbol reference support")
+        if any(item.kind == "local_definition" for item in self.support):
+            raise _error("Import-resolved call cannot carry local definition support")
+        references = [
+            item for item in self.support if item.kind == "symbol_reference"
+        ]
+        if len(references) != 1:
+            raise _error(
+                "Import-resolved call requires exactly one symbol reference support"
+            )
+        reference = references[0]
+        if (
+            reference.file != self.raw.source_file
+            or reference.line != self.raw.line
+            or reference.content_hash != self.raw.source_hash
+            or reference.endpoint_id != self.target_id
+        ):
+            raise _error("Symbol reference support does not match the call target")
+        if self.raw.language not in {"javascript", "typescript", "rust"} and (
+            self.resolution_control_files
+            or self.resolution_configuration is not None
+        ):
+            raise _error("Call language cannot carry import resolution provenance")
+        if self.raw.language != "rust" and self.resolution_configuration is not None:
+            raise _error("Only Rust calls may carry resolution configuration")
+        if self.raw.language == "rust" and self.resolution_configuration is None:
+            raise _error("Import-resolved Rust call requires configuration")
 
     def _validate_unresolved_reason(self) -> None:
         expected_state = {
@@ -465,16 +491,17 @@ def resolve_calls(
     symbol_references: Sequence[SymbolReferenceRecord],
     file_hashes: Mapping[str, str],
 ) -> list[CallRecord]:
-    """Resolve only exact same-file callable bindings in this stage."""
+    """Resolve exact local calls and exact joins to accepted Stage 10 references."""
     _validate_observations(observations)
     _validate_file_hashes(file_hashes)
-    _ = symbol_references  # Imported call resolution is deliberately Task 4.
 
     file_nodes: dict[str, list[Symbol]] = defaultdict(list)
     callables: dict[tuple[str, int, int, str], list[Symbol]] = defaultdict(list)
+    symbols_by_id: dict[str, list[Symbol]] = defaultdict(list)
     for symbol in symbols:
         if not isinstance(symbol, Symbol):
             raise _error("Call resolver symbol is not a Symbol")
+        symbols_by_id[symbol.id].append(symbol)
         if symbol.kind == "file":
             _validate_indexed_symbol(symbol)
             file_nodes[symbol.file_path].append(symbol)
@@ -489,22 +516,50 @@ def resolve_calls(
                 )
             ].append(symbol)
 
+    references: dict[
+        tuple[str, str, int, int],
+        list[SymbolReferenceRecord],
+    ] = defaultdict(list)
+    for reference in symbol_references:
+        if not isinstance(reference, SymbolReferenceRecord):
+            raise _error("Call resolver reference is not a SymbolReferenceRecord")
+        if file_hashes.get(reference.raw.source_file) != reference.raw.source_hash:
+            raise _error(
+                "Call reference evidence is missing or stale",
+                file=reference.raw.source_file,
+            )
+        references[
+            (
+                reference.raw.source_file,
+                reference.raw.source_hash,
+                reference.raw.start_byte,
+                reference.raw.end_byte,
+            )
+        ].append(reference)
+
     return [
-        _resolve_local_call(
+        _resolve_call(
             raw,
             file_nodes=file_nodes,
             callables=callables,
+            symbols_by_id=symbols_by_id,
+            references=references,
             file_hashes=file_hashes,
         )
         for raw in observations
     ]
 
 
-def _resolve_local_call(
+def _resolve_call(
     raw: RawCallSite,
     *,
     file_nodes: Mapping[str, list[Symbol]],
     callables: Mapping[tuple[str, int, int, str], list[Symbol]],
+    symbols_by_id: Mapping[str, list[Symbol]],
+    references: Mapping[
+        tuple[str, str, int, int],
+        list[SymbolReferenceRecord],
+    ],
     file_hashes: Mapping[str, str],
 ) -> CallRecord:
     current_hash = file_hashes.get(raw.source_file)
@@ -542,9 +597,68 @@ def _resolve_local_call(
             caller=caller,
             reason=cast(CallUnresolvedReason, binding_reason),
         )
-    if raw.local_binding_state != "definite":
-        return _unresolved(raw, caller=caller, reason="callee_not_proven")
 
+    exact_references = references.get(
+        (
+            raw.source_file,
+            raw.source_hash,
+            raw.callee_start_byte,
+            raw.callee_end_byte,
+        ),
+        [],
+    )
+    reference = exact_references[0] if len(exact_references) == 1 else None
+    local_target, local_reason = _local_target(raw, callables=callables)
+    imported_reference = (
+        reference
+        if reference is not None
+        and reference.status == "resolved"
+        and reference.binding is not None
+        and not reference.binding.type_only
+        and reference.target_kind in _CALLABLE_KINDS
+        else None
+    )
+
+    if local_target is not None and imported_reference is not None:
+        return _unresolved(raw, caller=caller, reason="conflicting_resolution")
+    if local_target is not None:
+        return _resolved_local(raw, caller=caller, target=local_target)
+    if imported_reference is not None:
+        return _resolved_import(
+            raw,
+            caller=caller,
+            reference=imported_reference,
+            symbols_by_id=symbols_by_id,
+            file_hashes=file_hashes,
+        )
+    if reference is not None and reference.status == "unresolved":
+        assert reference.unresolved_reason is not None
+        return _unresolved(
+            raw,
+            caller=caller,
+            reason="reference_unresolved",
+            reference_reason=reference.unresolved_reason,
+        )
+    if (
+        reference is not None
+        and reference.status == "resolved"
+        and reference.binding is not None
+        and not reference.binding.type_only
+        and reference.target_kind not in _CALLABLE_KINDS
+    ):
+        return _unresolved(raw, caller=caller, reason="target_not_callable")
+    if local_reason is not None:
+        return _unresolved(raw, caller=caller, reason=local_reason)
+    return _unresolved(raw, caller=caller, reason="callee_not_proven")
+
+
+def _local_target(
+    raw: RawCallSite,
+    *,
+    callables: Mapping[tuple[str, int, int, str], list[Symbol]],
+) -> tuple[Symbol | None, CallUnresolvedReason | None]:
+    if raw.local_binding_state != "definite":
+        return None, None
     binding = raw.local_candidates[0]
     candidates = [
         symbol
@@ -560,10 +674,18 @@ def _resolve_local_call(
         if symbol.name == binding.name and symbol.language == raw.language
     ]
     if not candidates:
-        return _unresolved(raw, caller=caller, reason="local_target_not_indexed")
+        return None, "local_target_not_indexed"
     if len(candidates) != 1:
-        return _unresolved(raw, caller=caller, reason="local_binding_ambiguous")
-    target = candidates[0]
+        return None, "local_binding_ambiguous"
+    return candidates[0], None
+
+
+def _resolved_local(
+    raw: RawCallSite,
+    *,
+    caller: Symbol,
+    target: Symbol,
+) -> CallRecord:
     support = _resolved_support(raw, caller=caller, target=target)
     return CallRecord(
         raw=raw,
@@ -581,6 +703,74 @@ def _resolve_local_call(
         resolution_control_files=(),
         resolution_configuration=None,
     )
+
+
+def _resolved_import(
+    raw: RawCallSite,
+    *,
+    caller: Symbol,
+    reference: SymbolReferenceRecord,
+    symbols_by_id: Mapping[str, list[Symbol]],
+    file_hashes: Mapping[str, str],
+) -> CallRecord:
+    assert reference.target_file is not None
+    assert reference.target_id is not None
+    assert reference.target_kind in _CALLABLE_KINDS
+    targets = symbols_by_id.get(reference.target_id, [])
+    if len(targets) != 1:
+        raise _error(
+            "Call reference target endpoint is missing or ambiguous",
+            endpoint_id=reference.target_id,
+        )
+    target = targets[0]
+    if (
+        target.file_path != reference.target_file
+        or target.kind != reference.target_kind
+        or not _same_language_family(target.language, raw.language)
+    ):
+        raise _error(
+            "Call reference target evidence is missing or stale",
+            endpoint_id=reference.target_id,
+        )
+    current_target_hash = file_hashes.get(target.file_path)
+    target_support = [
+        item
+        for item in reference.support
+        if item.kind == "definition" and item.endpoint_id == target.id
+    ]
+    if (
+        current_target_hash is None
+        or len(target_support) != 1
+        or target_support[0].file != target.file_path
+        or target_support[0].content_hash != current_target_hash
+    ):
+        raise _error(
+            "Call reference target support is missing or stale",
+            endpoint_id=reference.target_id,
+        )
+    support = _resolved_support(raw, caller=caller, reference=reference)
+    return CallRecord(
+        raw=raw,
+        caller_id=caller.id,
+        caller_kind=caller.kind,
+        target_file=reference.target_file,
+        target_id=reference.target_id,
+        target_kind=reference.target_kind,
+        status="resolved",
+        resolution="import-resolved",
+        unresolved_reason=None,
+        reference_unresolved_reason=None,
+        resolution_basis="imported_reference",
+        support=support,
+        resolution_control_files=reference.resolution_control_files,
+        resolution_configuration=reference.resolution_configuration,
+    )
+
+
+def _same_language_family(left: str, right: str) -> bool:
+    if left == right:
+        return True
+    return {left, right} == {"javascript", "typescript"}
 
 
 def _resolve_caller(
@@ -620,8 +810,11 @@ def _resolved_support(
     raw: RawCallSite,
     *,
     caller: Symbol,
-    target: Symbol,
+    target: Symbol | None = None,
+    reference: SymbolReferenceRecord | None = None,
 ) -> tuple[CallSupport, ...]:
+    if (target is None) == (reference is None):
+        raise _error("Call support requires exactly one target proof")
     support = [
         CallSupport(
             kind="call_site",
@@ -641,15 +834,28 @@ def _resolved_support(
                 endpoint_id=caller.id,
             )
         )
-    support.append(
-        CallSupport(
-            kind="local_definition",
-            file=target.file_path,
-            line=target.line,
-            content_hash=target.content_hash,
-            endpoint_id=target.id,
+    if target is not None:
+        support.append(
+            CallSupport(
+                kind="local_definition",
+                file=target.file_path,
+                line=target.line,
+                content_hash=target.content_hash,
+                endpoint_id=target.id,
+            )
         )
-    )
+    else:
+        assert reference is not None
+        assert reference.target_id is not None
+        support.append(
+            CallSupport(
+                kind="symbol_reference",
+                file=reference.raw.source_file,
+                line=reference.raw.line,
+                content_hash=reference.raw.source_hash,
+                endpoint_id=reference.target_id,
+            )
+        )
     return tuple(support)
 
 
@@ -658,6 +864,7 @@ def _unresolved(
     *,
     reason: CallUnresolvedReason,
     caller: Symbol | None = None,
+    reference_reason: ReferenceUnresolvedReason | None = None,
 ) -> CallRecord:
     return CallRecord(
         raw=raw,
@@ -669,7 +876,7 @@ def _unresolved(
         status="unresolved",
         resolution=None,
         unresolved_reason=reason,
-        reference_unresolved_reason=None,
+        reference_unresolved_reason=reference_reason,
         resolution_basis=None,
         support=(),
         resolution_control_files=(),
