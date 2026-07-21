@@ -662,6 +662,9 @@ def test_graph_health_counts_imports_without_degrading_normal_unresolved_records
         "graph_symbol_references_indexed": 0,
         "graph_symbol_references_resolved": 0,
         "graph_symbol_references_unresolved": 0,
+        "graph_calls_indexed": 0,
+        "graph_calls_resolved": 0,
+        "graph_calls_unresolved": 0,
     }
     assert health["diagnostics"] == []
     assert {
@@ -2154,6 +2157,9 @@ def test_service_materializes_profile_without_leaking_declared_neighbors(
             "graph_symbol_references_indexed": 0,
             "graph_symbol_references_resolved": 0,
             "graph_symbol_references_unresolved": 0,
+            "graph_calls_indexed": 0,
+            "graph_calls_resolved": 0,
+            "graph_calls_unresolved": 0,
         },
         "diagnostics": [],
     }

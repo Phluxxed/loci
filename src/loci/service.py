@@ -401,6 +401,13 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
         "graph_symbol_references_unresolved": sum(
             record.status == "unresolved" for record in graph_state.symbol_references
         ),
+        "graph_calls_indexed": len(graph_state.calls),
+        "graph_calls_resolved": sum(
+            record.status == "resolved" for record in graph_state.calls
+        ),
+        "graph_calls_unresolved": sum(
+            record.status == "unresolved" for record in graph_state.calls
+        ),
         "graph_status": _graph_status(graph_state),
         "graph_diagnostics": [
             diagnostic.to_dict() for diagnostic in graph_state.diagnostics
@@ -1112,6 +1119,67 @@ def graph_references(
     }
 
 
+def graph_calls(
+    repo: str | Path,
+    *,
+    file: str | None = None,
+    status: Literal["all", "resolved", "unresolved"] = "all",
+    offset: int = 0,
+    limit: int = 100,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    _validate_graph_record_query(file, status, offset, limit)
+    repo_path = Path(repo).resolve()
+    _, _, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
+    records = [
+        record
+        for record in state.calls
+        if file is None or record.raw.source_file == file
+    ]
+    records.sort(key=lambda record: (
+        record.raw.source_file,
+        record.raw.line,
+        record.raw.column,
+        record.raw.start_byte,
+        record.raw.callee_start_byte,
+        record.caller_id or "",
+        record.target_file or "",
+        record.target_id or "",
+        record.resolution or "",
+    ))
+    resolved_count = sum(record.status == "resolved" for record in records)
+    unresolved_count = sum(record.status == "unresolved" for record in records)
+    filtered = (
+        records
+        if status == "all"
+        else [record for record in records if record.status == status]
+    )
+    page = filtered[offset:offset + limit]
+    items = [record.to_dict() for record in page]
+    next_offset = offset + len(page)
+    if next_offset >= len(filtered):
+        next_offset = None
+
+    return {
+        "schema_version": GRAPH_SCHEMA_VERSION,
+        "repo": str(repo_path),
+        "file": file,
+        "status": status,
+        "items": items,
+        "counts": {
+            "total": len(records),
+            "resolved": resolved_count,
+            "unresolved": unresolved_count,
+            "returned": len(items),
+        },
+        "pagination": {
+            "offset": offset,
+            "limit": limit,
+            "next_offset": next_offset,
+        },
+    }
+
+
 def graph_health(
     repo: str | Path,
     *,
@@ -1190,6 +1258,13 @@ def graph_health(
             ),
             "graph_symbol_references_unresolved": sum(
                 record.status == "unresolved" for record in state.symbol_references
+            ),
+            "graph_calls_indexed": len(state.calls),
+            "graph_calls_resolved": sum(
+                record.status == "resolved" for record in state.calls
+            ),
+            "graph_calls_unresolved": sum(
+                record.status == "unresolved" for record in state.calls
             ),
         },
         "diagnostics": diagnostic_values,
