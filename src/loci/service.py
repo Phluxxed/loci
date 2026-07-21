@@ -42,6 +42,7 @@ from loci.graph.retrieval import (
     retrieve_graph_question,
 )
 from loci.graph.traversal import GraphDirection
+from loci.parser.call_models import RawCallSite
 from loci.parser.extractor import parse_file
 from loci.parser.imports import (
     ImportExtractionError,
@@ -143,6 +144,7 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
     previous_imports: dict[str, list[RawImport]] = defaultdict(list)
     previous_exports: dict[str, list[RawLocalExport]] = defaultdict(list)
     previous_symbol_references: dict[str, list[RawSymbolReference]] = defaultdict(list)
+    previous_calls: dict[str, list[RawCallSite]] = defaultdict(list)
     previous_extraction_diagnostics: dict[str, list[GraphDiagnostic]] = defaultdict(list)
     if previous_graph is not None:
         for record in previous_graph.imports:
@@ -153,6 +155,8 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
             previous_exports[export.source_file].append(export)
         for record in previous_graph.symbol_references:
             previous_symbol_references[record.raw.source_file].append(record.raw)
+        for record in previous_graph.calls:
+            previous_calls[record.raw.source_file].append(record.raw)
         for diagnostic in previous_graph.diagnostics:
             if (
                 diagnostic.code in {
@@ -193,6 +197,7 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
     raw_imports: list[RawImport] = []
     raw_exports: list[RawLocalExport] = []
     raw_symbol_references: list[RawSymbolReference] = []
+    raw_calls: list[RawCallSite] = []
     extraction_diagnostics: list[GraphDiagnostic] = []
 
     for src_file, rel_path, file_hash in repository_scan.indexable_files:
@@ -221,6 +226,7 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
             raw_symbol_references.extend(
                 previous_symbol_references.get(rel_path, ())
             )
+            raw_calls.extend(previous_calls.get(rel_path, ()))
             extraction_diagnostics.extend(
                 previous_extraction_diagnostics.get(rel_path, ())
             )
@@ -282,6 +288,7 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
                 raw_imports.extend(batch.imports)
                 raw_exports.extend(batch.exports)
                 raw_symbol_references.extend(batch.references)
+                raw_calls.extend(batch.calls)
                 if batch.go_package is not None:
                     file_node.metadata["loci"]["go_package"] = {
                         "name": batch.go_package.name,
@@ -344,6 +351,7 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
         raw_imports=raw_imports,
         raw_exports=raw_exports,
         raw_symbol_references=raw_symbol_references,
+        raw_calls=raw_calls,
         go_packages=go_package_build.index,
         javascript_modules=javascript_resolution_build.index,
         rust_crates=rust_crate_build.index,
