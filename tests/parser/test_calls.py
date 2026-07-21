@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from dataclasses import replace
 from pathlib import Path
+from typing import cast
 
 import pytest
 from tree_sitter import Parser
-from tree_sitter_language_pack import get_language
+from tree_sitter_language_pack import SupportedLanguage, get_language
 
 from loci.parser._binding_context import (
     ExecutableOwner,
@@ -217,7 +218,8 @@ def _extract_calls(
     tree_sitter_language: str | None = None,
 ) -> tuple[RawCallSite, ...]:
     encoded = source.encode()
-    root = Parser(get_language(tree_sitter_language or language)).parse(encoded).root_node
+    parser_language = cast(SupportedLanguage, tree_sitter_language or language)
+    root = Parser(get_language(parser_language)).parse(encoded).root_node
     context = collect_syntax_context(root, encoded, language)
     return extract_call_sites(
         root,

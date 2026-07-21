@@ -179,12 +179,17 @@ def nearest_executable_owner(
             body_start_byte=None,
             body_end_byte=None,
         )
+
+    def owner_span_key(owner: ExecutableOwner) -> tuple[int, int]:
+        body_start = owner.body_start_byte
+        body_end = owner.body_end_byte
+        assert body_start is not None
+        assert body_end is not None
+        return (body_end - body_start, -body_start)
+
     return min(
         containing,
-        key=lambda owner: (
-            owner.body_end_byte - owner.body_start_byte,
-            -owner.body_start_byte,
-        ),
+        key=owner_span_key,
     )
 
 

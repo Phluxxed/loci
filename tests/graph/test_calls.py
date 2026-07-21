@@ -14,6 +14,7 @@ from loci.graph.calls import (
 )
 from loci.graph.contracts import GraphContractError
 from loci.graph.references import ReferenceSupport, SymbolReferenceRecord
+from loci.graph.rust_crates import RustResolutionConfiguration
 from loci.parser._binding_context import ExecutableOwner
 from loci.parser.call_models import LocalCallableBinding, RawCallSite
 from loci.parser.extractor import parse_file
@@ -234,7 +235,7 @@ def _imported_call_fixture(
     target_name: str,
     target_language: str | None = None,
     controls: tuple[str, ...] = (),
-    configuration: str | None = None,
+    configuration: RustResolutionConfiguration | None = None,
 ) -> tuple[RawCallSite, list[Symbol], SymbolReferenceRecord, dict[str, str]]:
     files = {
         source_file: (language, source),
@@ -794,7 +795,7 @@ def test_resolves_imported_calls_only_through_exact_stage_10_reference(
     target_source: str,
     target_name: str,
     controls: tuple[str, ...],
-    configuration: str | None,
+    configuration: RustResolutionConfiguration | None,
 ):
     call, symbols, reference, hashes = _imported_call_fixture(
         tmp_path,
@@ -825,6 +826,7 @@ def test_resolves_imported_calls_only_through_exact_stage_10_reference(
     assert record.target_kind == "function"
     assert record.resolution_control_files == reference.resolution_control_files
     assert record.resolution_configuration == reference.resolution_configuration
+    assert reference.target_id is not None
     assert [item.kind for item in record.support] == [
         "call_site",
         "caller_definition",
