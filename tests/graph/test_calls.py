@@ -13,6 +13,7 @@ from loci.graph.calls import (
     resolve_calls,
 )
 from loci.graph.contracts import GraphContractError
+from loci.graph.references import ReferenceSupport, SymbolReferenceRecord
 from loci.parser._binding_context import ExecutableOwner
 from loci.parser.call_models import LocalCallableBinding, RawCallSite
 from loci.parser.extractor import parse_file
@@ -220,6 +221,125 @@ def _resolve_source(
         ),
         symbols,
     )
+
+
+def _imported_call_fixture(
+    tmp_path: Path,
+    *,
+    source_file: str,
+    language: str,
+    source: str,
+    target_file: str,
+    target_source: str,
+    target_name: str,
+    target_language: str | None = None,
+    controls: tuple[str, ...] = (),
+    configuration: str | None = None,
+) -> tuple[RawCallSite, list[Symbol], SymbolReferenceRecord, dict[str, str]]:
+    files = {
+        source_file: (language, source),
+        target_file: (target_language or language, target_source),
+        f"decoy/{Path(target_file).name}": (
+            target_language or language,
+            target_source,
+        ),
+    }
+    symbols: list[Symbol] = []
+    hashes: dict[str, str] = {}
+    source_batch = None
+    for relative_path, (file_language, text) in files.items():
+        path = tmp_path / relative_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+        source_hash = hashlib.sha256(text.encode()).hexdigest()
+        hashes[relative_path] = source_hash
+        symbols.append(
+            make_file_symbol(
+                relative_path,
+                language=file_language,
+                content_hash=source_hash,
+            )
+        )
+        symbols.extend(
+            replace(
+                symbol,
+                id=make_symbol_id(
+                    relative_path,
+                    symbol.qualified_name,
+                    symbol.kind,
+                ),
+                file_path=relative_path,
+            )
+            for symbol in parse_file(path)
+        )
+        if relative_path == source_file:
+            source_batch = extract_import_batch(
+                path,
+                source_file=relative_path,
+                language=file_language,
+                source_hash=source_hash,
+            )
+
+    assert source_batch is not None
+    assert len(source_batch.calls) == 1
+    call = source_batch.calls[0]
+    reference = next(
+        item
+        for item in source_batch.references
+        if (item.start_byte, item.end_byte)
+        == (call.callee_start_byte, call.callee_end_byte)
+    )
+    target = next(
+        symbol
+        for symbol in symbols
+        if symbol.file_path == target_file
+        and symbol.name == target_name
+        and symbol.kind == "function"
+    )
+    caller = next(
+        symbol
+        for symbol in symbols
+        if symbol.file_path == source_file
+        and symbol.kind == "function"
+        and symbol.byte_offset == call.owner.definition_start_byte
+    )
+    binding = reference.candidate_bindings[0]
+    record = SymbolReferenceRecord(
+        raw=reference,
+        binding=binding,
+        source_id=caller.id,
+        source_kind=caller.kind,
+        import_source_id=f"{source_file}::__file__#file",
+        import_target_id=f"{target_file}::__file__#file",
+        target_file=target_file,
+        target_id=target.id,
+        target_kind=target.kind,
+        status="resolved",
+        unresolved_reason=None,
+        import_unresolved_reason=None,
+        resolution_basis=(
+            "qualified_member" if len(reference.path) > 1 else "direct_binding"
+        ),
+        support=(
+            ReferenceSupport(
+                kind="import_binding",
+                file=source_file,
+                line=binding.import_line,
+                content_hash=hashes[source_file],
+                endpoint_id=f"{target_file}::__file__#file",
+            ),
+            ReferenceSupport(
+                kind="definition",
+                file=target_file,
+                line=target.line,
+                content_hash=hashes[target_file],
+                endpoint_id=target.id,
+            ),
+        ),
+        resolution_control_files=controls,
+        resolution_configuration=configuration,
+    )
+    return call, symbols, record, hashes
 
 
 def test_call_record_round_trips_exact_fields():
@@ -602,3 +722,344 @@ def test_missing_or_stale_file_hash_is_a_contract_error():
             symbol_references=(),
             file_hashes={SOURCE_FILE: "c" * 64},
         )
+
+
+@pytest.mark.parametrize(
+    (
+        "source_file",
+        "language",
+        "source",
+        "target_file",
+        "target_source",
+        "target_name",
+        "controls",
+        "configuration",
+    ),
+    [
+        (
+            "app.py",
+            "python",
+            "from lib import target as alias\n\ndef caller():\n    return alias()\n",
+            "lib.py",
+            "def target():\n    return 1\n",
+            "target",
+            (),
+            None,
+        ),
+        (
+            "src/app.ts",
+            "typescript",
+            (
+                'import * as lib from "./lib.js";\n'
+                "export function caller(): number { return lib.target(); }\n"
+            ),
+            "src/lib.ts",
+            "export function target(): number { return 1; }\n",
+            "target",
+            ("tsconfig.json",),
+            None,
+        ),
+        (
+            "cmd/app/main.go",
+            "go",
+            (
+                "package main\n"
+                'import api "example.com/project/api"\n'
+                "func caller() { api.Target() }\n"
+            ),
+            "api/api.go",
+            "package api\nfunc Target() {}\n",
+            "Target",
+            (),
+            None,
+        ),
+        (
+            "src/lib.rs",
+            "rust",
+            "use crate::api;\npub fn caller() { api::target(); }\n",
+            "src/api.rs",
+            "pub fn target() {}\n",
+            "target",
+            ("Cargo.toml",),
+            "declared_possible",
+        ),
+    ],
+)
+def test_resolves_imported_calls_only_through_exact_stage_10_reference(
+    tmp_path: Path,
+    source_file: str,
+    language: str,
+    source: str,
+    target_file: str,
+    target_source: str,
+    target_name: str,
+    controls: tuple[str, ...],
+    configuration: str | None,
+):
+    call, symbols, reference, hashes = _imported_call_fixture(
+        tmp_path,
+        source_file=source_file,
+        language=language,
+        source=source,
+        target_file=target_file,
+        target_source=target_source,
+        target_name=target_name,
+        controls=controls,
+        configuration=configuration,
+    )
+
+    records = resolve_calls(
+        (call,),
+        symbols=symbols,
+        symbol_references=(reference,),
+        file_hashes=hashes,
+    )
+
+    assert len(records) == 1
+    record = records[0]
+    assert record.status == "resolved"
+    assert record.resolution == "import-resolved"
+    assert record.resolution_basis == "imported_reference"
+    assert record.target_file == reference.target_file
+    assert record.target_id == reference.target_id
+    assert record.target_kind == "function"
+    assert record.resolution_control_files == reference.resolution_control_files
+    assert record.resolution_configuration == reference.resolution_configuration
+    assert [item.kind for item in record.support] == [
+        "call_site",
+        "caller_definition",
+        "symbol_reference",
+    ]
+    assert record.support[-1] == CallSupport(
+        kind="symbol_reference",
+        file=reference.raw.source_file,
+        line=reference.raw.line,
+        content_hash=reference.raw.source_hash,
+        endpoint_id=reference.target_id,
+    )
+    assert CallRecord.from_dict(record.to_dict()) == record
+
+
+@pytest.mark.parametrize(
+    "reference_reason",
+    [
+        "import_unresolved",
+        "binding_shadowed",
+        "ambiguous_binding",
+        "ambiguous_source",
+        "target_not_indexed",
+        "target_inaccessible",
+        "ambiguous_target",
+        "unsupported_reference",
+        "configuration_divergent",
+    ],
+)
+def test_unresolved_stage_10_reason_is_preserved_separately(
+    tmp_path: Path,
+    reference_reason: str,
+):
+    call, symbols, reference, hashes = _imported_call_fixture(
+        tmp_path,
+        source_file="app.py",
+        language="python",
+        source="from lib import target\n\ndef caller():\n    target()\n",
+        target_file="lib.py",
+        target_source="def target():\n    pass\n",
+        target_name="target",
+    )
+    unresolved_reference = replace(
+        reference,
+        target_file=None,
+        target_id=None,
+        target_kind=None,
+        status="unresolved",
+        unresolved_reason=reference_reason,
+        resolution_basis=None,
+        resolution_control_files=(),
+        resolution_configuration=None,
+    )
+
+    record = resolve_calls(
+        (call,),
+        symbols=symbols,
+        symbol_references=(unresolved_reference,),
+        file_hashes=hashes,
+    )[0]
+
+    assert record.status == "unresolved"
+    assert record.unresolved_reason == "reference_unresolved"
+    assert record.reference_unresolved_reason == reference_reason
+
+
+def test_typescript_call_accepts_stage_10_javascript_target(tmp_path: Path):
+    call, symbols, reference, hashes = _imported_call_fixture(
+        tmp_path,
+        source_file="src/app.ts",
+        language="typescript",
+        source=(
+            'import {target} from "./lib.js";\n'
+            "export function caller(): number { return target(); }\n"
+        ),
+        target_file="src/lib.js",
+        target_language="javascript",
+        target_source="export function target() { return 1; }\n",
+        target_name="target",
+    )
+
+    record = resolve_calls(
+        (call,),
+        symbols=symbols,
+        symbol_references=(reference,),
+        file_hashes=hashes,
+    )[0]
+
+    assert record.status == "resolved"
+    assert record.target_file == "src/lib.js"
+
+
+def test_non_callable_and_type_only_stage_10_targets_do_not_resolve(
+    tmp_path: Path,
+):
+    call, symbols, reference, hashes = _imported_call_fixture(
+        tmp_path,
+        source_file="src/app.ts",
+        language="typescript",
+        source=(
+            'import {target} from "./lib.js";\n'
+            "export function caller(): void { target(); }\n"
+        ),
+        target_file="src/lib.ts",
+        target_source=(
+            "export class Builder {}\n"
+            "export function target(): void {}\n"
+        ),
+        target_name="target",
+    )
+    assert reference.binding is not None
+    type_binding = replace(reference.binding, type_only=True)
+    type_raw = replace(reference.raw, candidate_bindings=(type_binding,))
+    type_reference = replace(reference, raw=type_raw, binding=type_binding)
+    non_callable_target = next(
+        symbol
+        for symbol in symbols
+        if symbol.file_path == "src/lib.ts" and symbol.name == "Builder"
+    )
+    non_callable_reference = replace(
+        reference,
+        target_id=non_callable_target.id,
+        target_kind=non_callable_target.kind,
+        support=tuple(
+            replace(item, endpoint_id=non_callable_target.id)
+            if item.kind == "definition"
+            else item
+            for item in reference.support
+        ),
+    )
+
+    type_only = resolve_calls(
+        (call,),
+        symbols=symbols,
+        symbol_references=(type_reference,),
+        file_hashes=hashes,
+    )[0]
+    non_callable = resolve_calls(
+        (call,),
+        symbols=symbols,
+        symbol_references=(non_callable_reference,),
+        file_hashes=hashes,
+    )[0]
+
+    assert type_only.unresolved_reason == "callee_not_proven"
+    assert non_callable.unresolved_reason == "target_not_callable"
+
+
+def test_reference_join_rejects_span_mismatch_and_multiple_exact_records(
+    tmp_path: Path,
+):
+    call, symbols, reference, hashes = _imported_call_fixture(
+        tmp_path,
+        source_file="app.py",
+        language="python",
+        source="from lib import target\n\ndef caller():\n    target()\n",
+        target_file="lib.py",
+        target_source="def target():\n    pass\n",
+        target_name="target",
+    )
+    mismatched = replace(
+        reference,
+        raw=replace(
+            reference.raw,
+            start_byte=reference.raw.start_byte + 1,
+        ),
+    )
+
+    no_match = resolve_calls(
+        (call,),
+        symbols=symbols,
+        symbol_references=(mismatched,),
+        file_hashes=hashes,
+    )[0]
+    conflicting = resolve_calls(
+        (call,),
+        symbols=symbols,
+        symbol_references=(reference, reference),
+        file_hashes=hashes,
+    )[0]
+
+    assert no_match.unresolved_reason == "callee_not_proven"
+    assert conflicting.unresolved_reason == "callee_not_proven"
+
+    stale = replace(
+        reference,
+        raw=replace(reference.raw, source_hash="c" * 64),
+    )
+    with pytest.raises(GraphContractError, match="reference evidence"):
+        resolve_calls(
+            (call,),
+            symbols=symbols,
+            symbol_references=(stale,),
+            file_hashes=hashes,
+        )
+
+
+def test_local_and_imported_proof_conflict_fails_closed(tmp_path: Path):
+    call, symbols, reference, hashes = _imported_call_fixture(
+        tmp_path,
+        source_file="app.py",
+        language="python",
+        source="from lib import target\n\ndef caller():\n    target()\n",
+        target_file="lib.py",
+        target_source="def target():\n    pass\n",
+        target_name="target",
+    )
+    local = _symbol(
+        symbol_id="app.py::target#function",
+        name="target",
+        kind="function",
+        file_path="app.py",
+        start=0,
+        end=20,
+        line=1,
+        content_hash=hashes["app.py"],
+    )
+    local_binding = _binding(
+        name="target",
+        definition_start_byte=local.byte_offset,
+        definition_end_byte=local.byte_offset + local.byte_length,
+        definition_line=local.line,
+    )
+    conflicting_call = replace(
+        call,
+        local_candidates=(local_binding,),
+        local_binding_state="definite",
+    )
+
+    record = resolve_calls(
+        (conflicting_call,),
+        symbols=(*symbols, local),
+        symbol_references=(reference,),
+        file_hashes=hashes,
+    )[0]
+
+    assert record.status == "unresolved"
+    assert record.unresolved_reason == "conflicting_resolution"
