@@ -150,3 +150,38 @@ def test_fresh_store_rejects_schema_seven_call_state(tmp_path: Path):
     fresh_store = IndexStore(base_dir=store.base_dir)
     with pytest.raises(GraphContractError, match="Unsupported graph state"):
         fresh_store.get_graph_state(repo)
+
+
+def test_fresh_store_rejects_model_valid_but_stale_call_record(tmp_path: Path):
+    store = IndexStore(base_dir=tmp_path / ".codeindex")
+    repo, symbols, file_hashes, state = _call_fixture(store, tmp_path)
+    store.write(repo, symbols, file_hashes, graph_state=state)
+    index_path = store._index_path(repo)
+    payload = json.loads(index_path.read_text())
+    record = payload["graph"]["calls"][0]
+    record["raw"]["source_hash"] = "0" * 64
+    for support in record["support"]:
+        if support["kind"] in {"call_site", "symbol_reference"}:
+            support["content_hash"] = "0" * 64
+    index_path.write_text(json.dumps(payload))
+
+    fresh_store = IndexStore(base_dir=store.base_dir)
+    with pytest.raises(GraphContractError, match="stale"):
+        fresh_store.get_graph_state(repo)
+
+
+def test_fresh_store_rejects_call_edge_without_current_record(tmp_path: Path):
+    store = IndexStore(base_dir=tmp_path / ".codeindex")
+    repo, symbols, file_hashes, state = _call_fixture(store, tmp_path)
+    store.write(repo, symbols, file_hashes, graph_state=state)
+    index_path = store._index_path(repo)
+    payload = json.loads(index_path.read_text())
+    payload["graph"]["calls"] = []
+    index_path.write_text(json.dumps(payload))
+
+    fresh_store = IndexStore(base_dir=store.base_dir)
+    with pytest.raises(GraphContractError) as exc_info:
+        fresh_store.get_graph_state(repo)
+
+    assert exc_info.value.code == "GRAPH_EVIDENCE_INVALID"
+    assert exc_info.value.details["field"] == "call_record"
