@@ -24,6 +24,7 @@ def test_mcp_index_outline_get_round_trip(tmp_path: Path, fixtures_dir: Path):
         "loci_file",
         "loci_get",
         "loci_graph_anchors",
+        "loci_graph_calls",
         "loci_graph_health",
         "loci_graph_imports",
         "loci_graph_neighbors",

@@ -10,6 +10,7 @@ from loci.service import (
     LociError,
     analyze_usage,
     graph_anchors,
+    graph_calls,
     graph_health,
     graph_imports,
     graph_neighbors,
@@ -230,6 +231,26 @@ def create_server() -> FastMCP:
         """Inspect bounded resolved and unresolved imported-symbol references."""
         return _handle_loci_error(
             lambda: graph_references(
+                repo,
+                file=file,
+                status=cast(Literal["all", "resolved", "unresolved"], status),
+                offset=offset,
+                limit=limit,
+                ensure_fresh=True,
+            )
+        )
+
+    @mcp.tool()
+    def loci_graph_calls(
+        repo: str,
+        file: str | None = None,
+        status: str = "all",
+        offset: int = 0,
+        limit: int = 100,
+    ) -> CallToolResult:
+        """Inspect bounded resolved and unresolved definite-call records."""
+        return _handle_loci_error(
+            lambda: graph_calls(
                 repo,
                 file=file,
                 status=cast(Literal["all", "resolved", "unresolved"], status),
