@@ -66,6 +66,78 @@ def test_service_indexes_resolved_symbol_references_and_health_counts(
     )]
 
 
+@pytest.mark.parametrize(
+    ("reexport", "consumer_import"),
+    [
+        (
+            'export { default } from "elkjs/lib/elk.bundled.js";\n',
+            'import ELK from "./elk-runtime.js";\n',
+        ),
+        (
+            'export { ELK } from "elkjs";\n',
+            'import { ELK } from "./elk-runtime.js";\n',
+        ),
+    ],
+    ids=("default", "named"),
+)
+def test_service_preserves_external_reexport_failure_behind_resolved_local_import(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    reexport: str,
+    consumer_import: str,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    source = repo / "src"
+    source.mkdir(parents=True)
+    (source / "elk-runtime.js").write_text(reexport, encoding="utf-8")
+    (source / "layout.ts").write_text(
+        consumer_import + "export function layout() { return ELK; }\n",
+        encoding="utf-8",
+    )
+    store = IndexStore(base_dir=base)
+
+    indexed = index_repo(repo, incremental=False)
+    full = store.load(repo.resolve())
+    incremental_result = index_repo(repo, incremental=True)
+    incremental = store.load(repo.resolve())
+
+    assert full is not None
+    graph = full["graph"]
+    record = next(
+        item
+        for item in graph["symbol_references"]
+        if item["raw"]["source_file"] == "src/layout.ts"
+    )
+    assert indexed["graph_symbol_references_unresolved"] == 1
+    assert record["import_target_id"] == "src/elk-runtime.js::__file__#file"
+    assert record["unresolved_reason"] == "import_unresolved"
+    assert record["import_unresolved_reason"] == "external"
+    assert [
+        (support["kind"], support["file"], support["endpoint_id"])
+        for support in record["support"]
+    ] == [
+        (
+            "import_binding",
+            "src/layout.ts",
+            "src/elk-runtime.js::__file__#file",
+        ),
+        (
+            "reexport",
+            "src/elk-runtime.js",
+            "src/elk-runtime.js::__file__#file",
+        ),
+    ]
+    assert not [
+        edge
+        for edge in graph["edges"]
+        if edge["type"] in {"references", "references_type"}
+    ]
+    assert incremental_result["files_skipped"] == 2
+    assert incremental == full
+
+
 def test_service_noop_incremental_reuses_reference_evidence_without_reparse(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
