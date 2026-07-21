@@ -9,7 +9,7 @@ from typing import Any, Literal, Mapping, Sequence, TypeAlias, cast
 from loci.parser.call_models import MAX_CALL_SITES_PER_FILE, RawCallSite
 from loci.parser.symbols import Symbol
 
-from .contracts import GraphContractError, JSONValue
+from .contracts import GraphContractError, GraphEdge, JSONValue
 from .references import ReferenceUnresolvedReason, SymbolReferenceRecord
 from .rust_crates import RustResolutionConfiguration
 
@@ -338,11 +338,15 @@ class CallRecord:
             raise _error("Import-resolved Rust call requires configuration")
 
     def _validate_unresolved_reason(self) -> None:
-        expected_state = {
-            "unsupported_callee": "unsupported",
-            "local_binding_shadowed": "shadowed",
-            "local_target_not_indexed": "definite",
-        }.get(self.unresolved_reason)
+        expected_state = (
+            {
+                "unsupported_callee": "unsupported",
+                "local_binding_shadowed": "shadowed",
+                "local_target_not_indexed": "definite",
+            }.get(self.unresolved_reason)
+            if self.unresolved_reason is not None
+            else None
+        )
         if expected_state is not None and self.raw.local_binding_state != expected_state:
             raise _error("Call failure does not match its local binding state")
         if (
@@ -548,6 +552,31 @@ def resolve_calls(
         )
         for raw in observations
     ]
+
+
+def materialize_call_edges(records: Sequence[CallRecord]) -> list[GraphEdge]:
+    """Build one deterministic edge per resolved caller/target relationship."""
+    from ._call_validation import materialize_call_edges as materialize
+
+    return materialize(records)
+
+
+def validate_call_records(
+    records: Sequence[CallRecord],
+    *,
+    symbol_references: Sequence[SymbolReferenceRecord],
+    indexed_nodes: Mapping[str, Mapping[str, Any]],
+    file_hashes: Mapping[str, str],
+) -> None:
+    """Cross-check call records against current indexed evidence."""
+    from ._call_validation import validate_call_records as validate_records
+
+    validate_records(
+        records,
+        symbol_references=symbol_references,
+        indexed_nodes=indexed_nodes,
+        file_hashes=file_hashes,
+    )
 
 
 def _resolve_call(

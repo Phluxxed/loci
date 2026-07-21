@@ -9,6 +9,7 @@ from pathlib import PurePosixPath
 from typing import TYPE_CHECKING, Any, Literal, Mapping, TypeAlias, cast
 
 if TYPE_CHECKING:
+    from .calls import CallRecord
     from .imports import ImportRecord
     from .references import SymbolReferenceRecord
 
@@ -226,7 +227,7 @@ class GraphEdge:
             resolution=cast(ResolutionTier, resolution),
             evidence=GraphEvidence.from_dict(evidence_value),
         )
-        if edge.from_id == edge.to_id:
+        if edge.from_id == edge.to_id and not _valid_call_self_edge_shape(edge):
             raise GraphContractError(
                 "INVALID_GRAPH_EDGE",
                 "Graph edge endpoints must be different",
@@ -323,21 +324,27 @@ def validate_graph_edges(
     file_hashes: Mapping[str, str] | None = None,
     imports: Sequence[ImportRecord] = (),
     symbol_references: Sequence[SymbolReferenceRecord] = (),
+    calls: Sequence[CallRecord] = (),
 ) -> None:
     reference_index = {}
     if symbol_references:
         from ._reference_validation import index_reference_edge_records
 
         reference_index = index_reference_edge_records(symbol_references)
+    call_index = {}
+    if calls:
+        from ._call_validation import index_call_edge_records
+
+        call_index = index_call_edge_records(calls)
     for edge_index, edge in enumerate(edges):
         _validate_evidence(edge.evidence, edge_index=edge_index)
-        if edge.from_id == edge.to_id:
+        edge_kind = (edge.namespace, edge.type)
+        if edge.from_id == edge.to_id and edge_kind != ("loci", "calls"):
             raise GraphContractError(
                 "INVALID_GRAPH_EDGE",
                 "Graph edge endpoints must be different",
                 {"edge_index": edge_index},
             )
-        edge_kind = (edge.namespace, edge.type)
         if edge_kind == ("loci", "contains"):
             _validate_contains_edge(
                 edge,
@@ -366,6 +373,14 @@ def validate_graph_edges(
                 file_hashes=file_hashes,
                 reference_index=reference_index,
             )
+        elif edge_kind == ("loci", "calls"):
+            _validate_call_edge(
+                edge,
+                edge_index=edge_index,
+                indexed_nodes=indexed_nodes,
+                file_hashes=file_hashes,
+                call_index=call_index,
+            )
         else:
             raise GraphContractError(
                 "GRAPH_EDGE_TYPE_UNSUPPORTED",
@@ -376,6 +391,34 @@ def validate_graph_edges(
                     "type": edge.type,
                 },
             )
+
+
+def _validate_call_edge(
+    edge: GraphEdge,
+    *,
+    edge_index: int,
+    indexed_nodes: Mapping[str, Mapping[str, Any]],
+    file_hashes: Mapping[str, str] | None,
+    call_index: Mapping[tuple[str, str, str], Sequence[CallRecord]],
+) -> None:
+    from ._call_validation import validate_call_edge
+
+    validate_call_edge(
+        edge,
+        edge_index=edge_index,
+        indexed_nodes=indexed_nodes,
+        file_hashes=file_hashes,
+        call_index=call_index,
+    )
+
+
+def _valid_call_self_edge_shape(edge: GraphEdge) -> bool:
+    return (
+        edge.namespace == "loci"
+        and edge.type == "calls"
+        and edge.directed is True
+        and edge.resolution in {"exact", "import-resolved"}
+    )
 
 
 def _validate_reference_edge(

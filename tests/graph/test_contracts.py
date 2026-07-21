@@ -424,12 +424,12 @@ def test_graph_edge_rejects_unknown_resolution():
 def test_graph_edge_rejects_unknown_type():
     with pytest.raises(GraphContractError) as exc_info:
         validate_graph_edges(
-            [_edge(type="calls")],
+            [_edge(type="unknown")],
             indexed_nodes=_indexed_nodes(),
         )
 
     assert exc_info.value.code == "GRAPH_EDGE_TYPE_UNSUPPORTED"
-    assert exc_info.value.details["type"] == "calls"
+    assert exc_info.value.details["type"] == "unknown"
 
 
 def test_graph_edge_rejects_missing_endpoint():
