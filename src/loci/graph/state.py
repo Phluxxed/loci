@@ -17,6 +17,7 @@ from .contracts import (
     GraphNodeRef,
     JSONValue,
 )
+from .calls import CallRecord
 from .imports import (
     ImportRecord,
     _import_record_from_state_dict,
@@ -128,6 +129,7 @@ class GraphIndexState:
     rust_module_observations: tuple[RawImport, ...]
     exports: tuple[RawLocalExport, ...]
     symbol_references: tuple[SymbolReferenceRecord, ...]
+    calls: tuple[CallRecord, ...]
     contributions: tuple[LoadedGraphContribution, ...]
     input_hashes: dict[str, str]
     diagnostics: tuple[GraphDiagnostic, ...]
@@ -153,6 +155,7 @@ class GraphIndexState:
             "symbol_references": [
                 record.to_dict() for record in self.symbol_references
             ],
+            "calls": [record.to_dict() for record in self.calls],
             "contributions": [
                 contribution.to_dict() for contribution in self.contributions
             ],
@@ -175,6 +178,7 @@ class GraphIndexState:
             rust_module_observations=(),
             exports=(),
             symbol_references=(),
+            calls=(),
             contributions=(),
             input_hashes={},
             diagnostics=(),
@@ -202,6 +206,7 @@ class GraphIndexState:
                 "rust_module_observations",
                 "exports",
                 "symbol_references",
+                "calls",
                 "contributions",
                 "input_hashes",
                 "diagnostics",
@@ -239,6 +244,10 @@ class GraphIndexState:
             _symbol_reference_from_dict(item)
             for item in _list(value["symbol_references"], "symbol_references")
         )
+        calls = tuple(
+            _call_record_from_dict(item)
+            for item in _list(value["calls"], "calls")
+        )
         contributions = tuple(
             LoadedGraphContribution.from_dict(
                 _mapping(item, "loaded contribution")
@@ -272,6 +281,7 @@ class GraphIndexState:
             rust_module_observations=rust_module_observations,
             exports=exports,
             symbol_references=symbol_references,
+            calls=calls,
             contributions=contributions,
             input_hashes=dict(sorted(input_hashes.items())),
             diagnostics=diagnostics,
@@ -311,6 +321,15 @@ def _symbol_reference_from_dict(value: Any) -> SymbolReferenceRecord:
             "Invalid graph symbol reference",
             field="symbol_references",
         ) from exc
+
+
+def _call_record_from_dict(value: Any) -> CallRecord:
+    try:
+        return CallRecord.from_dict(_mapping(value, "call record"))
+    except GraphContractError:
+        raise
+    except (KeyError, TypeError, ValueError) as exc:
+        raise _error("Invalid graph call record", field="calls") from exc
 
 
 def _require_keys(value: Mapping[str, Any], expected: set[str], record: str) -> None:

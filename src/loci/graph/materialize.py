@@ -767,6 +767,7 @@ def materialize_graph(
         rust_module_observations=rust_module_observations,
         exports=tuple(raw_exports),
         symbol_references=reference_records,
+        calls=call_records,
         contributions=active_contributions,
         input_hashes=dict(sorted(resolved_input_hashes.items())),
         diagnostics=sorted_diagnostics,

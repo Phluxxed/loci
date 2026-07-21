@@ -12,13 +12,14 @@ from loci.graph.contracts import (
     GraphEdge,
     validate_graph_edges,
 )
+from loci.graph.calls import validate_call_records
 from loci.graph.references import validate_symbol_reference_records
 from loci.graph.state import GraphIndexState
 from loci.parser.symbols import Symbol
 
 LAST_SEARCH_TTL = 300  # 5 minutes
 INDEX_SCHEMA_VERSION = 5
-EXTRACTOR_VERSION = 10
+EXTRACTOR_VERSION = 11
 
 
 def _resolve_worktree_root(path: str) -> str:
@@ -100,6 +101,13 @@ class IndexStore:
                 indexed_nodes=indexed_nodes,
                 file_hashes=file_hashes,
             )
+        if persisted_graph.calls:
+            validate_call_records(
+                persisted_graph.calls,
+                symbol_references=persisted_graph.symbol_references,
+                indexed_nodes=indexed_nodes,
+                file_hashes=file_hashes,
+            )
         built_in_edge_candidates = [
             edge
             for edge in persisted_graph.edges
@@ -119,6 +127,7 @@ class IndexStore:
             file_hashes=file_hashes,
             imports=persisted_graph.imports,
             symbol_references=persisted_graph.symbol_references,
+            calls=persisted_graph.calls,
         )
 
         repo_dir = self._repo_dir(repo_path)
