@@ -1,7 +1,8 @@
 # loci: Extensible Graph Retrieval Layer — Design
 
-**Status:** Stages 1-10 implemented, reviewed, and accepted; Stage 11 proposed
-for owner review
+**Status:** Stages 1-10 implemented, reviewed, and accepted; Stage 11
+implemented and engineering-reviewed, with final owner evidence acceptance
+pending
 
 **Date:** 2026-07-13
 
@@ -459,9 +460,9 @@ package build, live Loci dogfood, and installed-wrapper disposable MCP fixtures
 for all four language families plus cross-language decoys. Vik explicitly
 accepted that evidence on 2026-07-20.
 
-### Stage 11: Trustworthy call relationships (proposed)
+### Stage 11: Trustworthy call relationships (implemented; owner acceptance pending)
 
-The detailed Stage 11 implementation proposal is
+The detailed Stage 11 implementation is governed by
 `docs/plans/2026-07-20-extensible-graph-retrieval-stage-11-trustworthy-calls.md`.
 It reconciles two previously separated boundaries:
 
@@ -470,14 +471,14 @@ It reconciles two previously separated boundaries:
 - the current roadmap's cross-file calls, which Stage 10 deliberately deferred
   until an exact imported-symbol reference existed.
 
-The proposed stage therefore adds one complete trustworthy call layer rather
+The implemented stage adds one complete trustworthy call layer rather
 than shipping cross-file calls while leaving the simpler local gap behind.
 A directed `loci:calls` edge is permitted only when static call syntax proves
 the call site and either a unique visible same-file callable binding proves the
 callee with `resolution="exact"`, or one resolved Stage 10 symbol-reference
 record proves it with `resolution="import-resolved"`.
 
-The proposal remains deliberately narrower than full language call semantics.
+The implementation remains deliberately narrower than full language call semantics.
 It includes direct calls to indexed functions and methods only when binding and
 caller ownership are exact. It excludes constructors, computed or dynamic
 callees, receiver/trait/interface dispatch, callable values, macros, reflection,
@@ -490,12 +491,18 @@ Stage 11 does not add general same-file `references` edges. Local binding proof
 is used only to establish a definite call. A broader local-reference feature
 remains deferred until it has a separate retrieval use case and review.
 
-Approval of this design proposal does not authorize implementation. Vik must
-approve the exact Stage 11 plan before product code changes begin. After an
-accepted Stage 11, architecture/orientation analysis becomes the next planned
-graph capability. Heuristic candidate diagnostics remain deferred until live
-dogfood shows that the trusted graph's unresolved cases justify their cost and
-noise.
+The final engineering evidence packet is
+`docs/reviews/2026-07-20-extensible-graph-retrieval-stage-11-final-review.md`.
+It records the complete 1,185-test repository gate, unchanged frozen benchmark,
+package build, exact installed-wrapper fixtures for all four language families,
+execution/network/toolchain/package-manager/judge tripwires, and fresh-process
+live dogfood over Loci's own repository. Stage 11 is not marked accepted until
+Vik explicitly approves that packet.
+
+After an accepted Stage 11, architecture/orientation analysis becomes the next
+planned graph capability. Heuristic candidate diagnostics remain deferred
+until live dogfood shows that the trusted graph's unresolved cases justify
+their cost and noise.
 
 ## Technical Fit
 

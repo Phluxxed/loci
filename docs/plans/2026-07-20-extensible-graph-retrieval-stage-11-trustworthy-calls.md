@@ -1,6 +1,7 @@
 # Plan: Extensible Graph Retrieval Stage 11 — Trustworthy Calls
 
-**Status:** proposed; awaiting Vik's implementation approval
+**Status:** implemented and engineering-reviewed; final owner evidence
+acceptance pending
 
 **Date:** 2026-07-20
 
@@ -941,6 +942,11 @@ edges after restart.
 
 ### Task 8 — Documentation and production acceptance
 
+**Implementation status:** complete through reviewed implementation head
+`2ba9f6c`. The final evidence packet is
+`docs/reviews/2026-07-20-extensible-graph-retrieval-stage-11-final-review.md`;
+Stage 11 remains unaccepted until Vik explicitly approves it.
+
 1. Update README and the Loci skill with trusted-call semantics, examples,
    filters, and explicit exclusions.
 2. Run all focused suites, complete suite, package/build/integrity checks, live
@@ -1064,59 +1070,59 @@ A checksum mismatch stops the final gate and requires owner review.
 ## Final Review Gate
 
 Implementation is ready for Vik only when a final review packet proves every
-unchecked item below.
+implementation item below.
 
 ### Contract and scope
 
-- [ ] Same-file calls require one exact lexical callable binding.
-- [ ] Cross-file calls require one exact resolved Stage 10 reference.
-- [ ] Caller ownership follows executable bodies, not broad symbol spans.
-- [ ] Dynamic/constructor/dispatch/type-only/non-callable cases create no edge.
-- [ ] No general local references, heuristics, architecture analysis, execution,
+- [x] Same-file calls require one exact lexical callable binding.
+- [x] Cross-file calls require one exact resolved Stage 10 reference.
+- [x] Caller ownership follows executable bodies, not broad symbol spans.
+- [x] Dynamic/constructor/dispatch/type-only/non-callable cases create no edge.
+- [x] No general local references, heuristics, architecture analysis, execution,
       network, dependency, model call, CLI, or judge entered Stage 11.
 
 ### APIs and compatibility
 
-- [ ] `calls` is reserved, directed, evidence-backed, and limited to
+- [x] `calls` is reserved, directed, evidence-backed, and limited to
       `exact|import-resolved`.
-- [ ] `graph_calls()` and `loci_graph_calls` match the frozen query/response/
+- [x] `graph_calls()` and `loci_graph_calls` match the frozen query/response/
       error/pagination contract.
-- [ ] Generic traversal consumes calls; `loci_graph_neighbors` remains
+- [x] Generic traversal consumes calls; `loci_graph_neighbors` remains
       contains-only.
-- [ ] Public graph schema is 1; outer index schema is 5; private graph schema is
+- [x] Public graph schema is 1; outer index schema is 5; private graph schema is
       8; extractor version is 11.
-- [ ] Existing Stage 10 record and MCP schemas are unchanged.
+- [x] Existing Stage 10 record and MCP schemas are unchanged.
 
 ### Language and trust evidence
 
-- [ ] Positive and negative Python call matrix passes.
-- [ ] Positive and negative JavaScript/TypeScript call matrix passes.
-- [ ] Positive and negative Go call matrix passes.
-- [ ] Positive and negative Rust call matrix passes.
-- [ ] Recursive self-calls work and all other self-edges remain rejected.
-- [ ] Official sources and installed parser versions are recorded.
+- [x] Positive and negative Python call matrix passes.
+- [x] Positive and negative JavaScript/TypeScript call matrix passes.
+- [x] Positive and negative Go call matrix passes.
+- [x] Positive and negative Rust call matrix passes.
+- [x] Recursive self-calls work and all other self-edges remain rejected.
+- [x] Official sources and installed parser versions are recorded.
 
 ### Persistence and operation
 
-- [ ] Full/no-op incremental serialized hashes match all acceptance fixtures.
-- [ ] No-op incremental runs do not reparse unchanged files.
-- [ ] Add/change/delete and all relevant control-change cases pass.
-- [ ] Fresh-process reads preserve index hash and mtime when already fresh.
-- [ ] Execution/network/toolchain/package-manager/judge traps remain untriggered.
-- [ ] `loci_verify` passes every disposable fixture and live Loci dogfood.
+- [x] Full/no-op incremental serialized hashes match all acceptance fixtures.
+- [x] No-op incremental runs do not reparse unchanged files.
+- [x] Add/change/delete and all relevant control-change cases pass.
+- [x] Fresh-process reads preserve index hash and mtime when already fresh.
+- [x] Execution/network/toolchain/package-manager/judge traps remain untriggered.
+- [x] `loci_verify` passes every disposable fixture and live Loci dogfood.
 
 ### Repository verification
 
-- [ ] Every focused matrix passes with counts recorded.
-- [ ] Complete `tests/` suite passes with exact count recorded.
-- [ ] `uv lock --check`, `compileall`, package build, and `git diff --check` pass.
-- [ ] Frozen benchmark hash remains
+- [x] Every focused matrix passes with counts recorded.
+- [x] Complete `tests/` suite passes with exact count recorded.
+- [x] `uv lock --check`, `compileall`, package build, and `git diff --check` pass.
+- [x] Frozen benchmark hash remains
       `c52def1bdf592ad735149d199910f74183598eccd9ccf8064335fa0cd0e84e27`.
-- [ ] Final worktree contains only intended Stage 11 changes.
+- [x] Final worktree contains only intended Stage 11 changes.
 
 ### Owner gate
 
-- [ ] `docs/reviews/2026-07-20-extensible-graph-retrieval-stage-11-final-review.md`
+- [x] `docs/reviews/2026-07-20-extensible-graph-retrieval-stage-11-final-review.md`
       contains exact commands, hashes, counts, versions, fixture outcomes,
       unresolved limits, and commit IDs.
 - [ ] Vik explicitly accepts the final evidence.
@@ -1137,7 +1143,8 @@ full rebuild.
 
 ## Owner Review Decision
 
-Pending. Approval authorizes only the eight bounded implementation tasks and
-their verification gates above. It does not authorize heuristic candidates,
-general local references, constructors, dynamic dispatch, architecture
-analysis, visualization, new dependencies, or any adjacent roadmap stage.
+Vik approved the bounded implementation plan on 2026-07-20. Engineering review
+and production acceptance are complete; final evidence acceptance is pending.
+That pending decision does not authorize heuristic candidates, general local
+references, constructors, dynamic dispatch, architecture analysis,
+visualization, new dependencies, or any adjacent roadmap stage.
