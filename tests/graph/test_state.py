@@ -15,6 +15,7 @@ from loci.graph.contracts import (
     GraphEvidence,
     GraphNodeRef,
 )
+from loci.graph.calls import CallRecord
 from loci.graph.imports import ImportRecord
 from loci.graph.profiles import GraphProfile, LoadedGraphProfile
 from loci.graph.references import ReferenceSupport, SymbolReferenceRecord
@@ -24,6 +25,8 @@ from loci.graph.state import (
     LoadedGraphContribution,
 )
 from loci.parser.imports import RawImport, RustImportContext
+from loci.parser._binding_context import ExecutableOwner
+from loci.parser.call_models import RawCallSite
 from loci.parser.reference_models import (
     ImportBinding,
     RawLocalExport,
@@ -252,6 +255,47 @@ def _symbol_reference() -> SymbolReferenceRecord:
     )
 
 
+def _call_record() -> CallRecord:
+    return CallRecord(
+        raw=RawCallSite(
+            source_file="src/example.py",
+            language="python",
+            line=5,
+            column=12,
+            start_byte=80,
+            end_byte=88,
+            callee_start_byte=80,
+            callee_end_byte=86,
+            callee_text="Target",
+            callee_path=("Target",),
+            callee_form="identifier",
+            local_candidates=(),
+            local_binding_state="absent",
+            owner=ExecutableOwner(
+                kind="callable",
+                definition_start_byte=50,
+                definition_end_byte=120,
+                body_start_byte=70,
+                body_end_byte=120,
+            ),
+            source_hash="d" * 64,
+        ),
+        caller_id="src/example.py::run#function",
+        caller_kind="function",
+        target_file=None,
+        target_id=None,
+        target_kind=None,
+        status="unresolved",
+        resolution=None,
+        unresolved_reason="callee_not_proven",
+        reference_unresolved_reason=None,
+        resolution_basis=None,
+        support=(),
+        resolution_control_files=(),
+        resolution_configuration=None,
+    )
+
+
 def _state() -> GraphIndexState:
     profile = GraphProfile.from_dict(
         json.loads((FIXTURES / "generic.json").read_text())
@@ -294,6 +338,7 @@ def _state() -> GraphIndexState:
         rust_module_observations=(_inline_rust_module_observation(),),
         exports=(_local_export(),),
         symbol_references=(_symbol_reference(),),
+        calls=(_call_record(),),
         contributions=(LoadedGraphContribution(
             source=".loci/graph/contributions/example.json",
             content_hash="c" * 64,
@@ -720,14 +765,15 @@ def test_empty_graph_state_has_complete_envelope():
         "rust_module_observations": [],
         "exports": [],
         "symbol_references": [],
+        "calls": [],
         "contributions": [],
         "input_hashes": {},
         "diagnostics": [],
     }
 
 
-def test_graph_state_uses_schema_version_seven():
-    assert GRAPH_STATE_SCHEMA_VERSION == 7
+def test_graph_state_uses_schema_version_eight():
+    assert GRAPH_STATE_SCHEMA_VERSION == 8
 
 
 def test_graph_state_rejects_schema_version_two_as_stale():
@@ -796,7 +842,20 @@ def test_graph_state_rejects_schema_version_six_as_stale():
     }
 
 
-@pytest.mark.parametrize("field", ["exports", "symbol_references"])
+def test_graph_state_rejects_schema_version_seven_as_stale():
+    payload = _state().to_dict()
+    payload["schema_version"] = 7
+
+    with pytest.raises(GraphContractError) as exc_info:
+        GraphIndexState.from_dict(payload)
+
+    assert exc_info.value.details == {
+        "field": "schema_version",
+        "schema_version": 7,
+    }
+
+
+@pytest.mark.parametrize("field", ["exports", "symbol_references", "calls"])
 def test_graph_state_rejects_missing_reference_envelope_fields(field: str):
     payload = _state().to_dict()
     del payload[field]
@@ -839,6 +898,17 @@ def test_graph_state_rejects_malformed_symbol_reference():
 
     assert exc_info.value.code == "INVALID_GRAPH_SCHEMA"
     assert exc_info.value.details["field"] == "symbol_references"
+
+
+def test_graph_state_rejects_malformed_call_record():
+    payload = cast(dict[str, Any], _state().to_dict())
+    payload["calls"][0]["raw"]["source_hash"] = "stale"
+
+    with pytest.raises(GraphContractError) as exc_info:
+        GraphIndexState.from_dict(payload)
+
+    assert exc_info.value.code == "INVALID_GRAPH_SCHEMA"
+    assert exc_info.value.details["field"] == "calls"
 
 
 def test_graph_state_rejects_non_inline_rust_module_observation():
