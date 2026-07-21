@@ -163,8 +163,9 @@ still performs explicit indexing, while `loci_outline`, `loci_search`,
 `loci_get`, `loci_file`, `loci_grep`, `loci_graph_anchors`,
 `loci_graph_neighbors`, `loci_graph_traverse_neighbors`, `loci_graph_paths`,
 `loci_graph_retrieve`, `loci_graph_imports`, `loci_graph_references`, and
-`loci_graph_health` first check indexed source, profile, and contribution hashes
-against the current repository and run a locked incremental refresh if needed.
+`loci_graph_calls`, and `loci_graph_health` first check indexed source, profile,
+and contribution hashes against the current repository and run a locked
+incremental refresh if needed.
 Freshness also includes Go module/workspace controls, JavaScript/TypeScript
 project/package/workspace controls, and Cargo manifests.
 
@@ -183,6 +184,7 @@ project/package/workspace controls, and Cargo manifests.
 | `loci_graph_retrieve` | Rank question-shaped paths and expose rejected semantic or hub shortcuts |
 | `loci_graph_imports` | Inspect bounded resolved and unresolved built-in import records |
 | `loci_graph_references` | Inspect bounded resolved and unresolved imported-symbol references |
+| `loci_graph_calls` | Inspect bounded resolved and unresolved definite-call records |
 | `loci_graph_health` | Report loaded graph profiles, active record counts, and diagnostics |
 | `loci_verify` | Verify index integrity and content drift |
 | `loci_list` | List indexed repos |
@@ -405,10 +407,10 @@ tests, examples, or repository binaries, and never uses the network, Cargo
 home, target directory, ambient workspace, environment/toolchain state, or
 lockfiles. It does not choose features, target triples, profiles, or `cfg`
 truth; expand macros or generated modules; infer undeclared source files;
-or create cross-file call edges. A Rust import edge alone never resolves a
-terminal item; the separate resolved-symbol reference layer can do so only for
-the bounded, visibility-checked, configuration-convergent subset documented
-below. Unsupported,
+or create call edges from an import alone. A Rust import edge alone never
+resolves a terminal item; the separate resolved-symbol reference layer can do
+so only for the bounded, visibility-checked, configuration-convergent subset
+documented below. Unsupported,
 missing, external, inaccessible, and ambiguous routes remain inspectable
 records rather than guessed edges.
 
@@ -421,8 +423,9 @@ outcomes. `loci_graph_health` reports
 `graph_rust_crates_indexed`, `graph_imports_indexed`,
 `graph_imports_resolved`, `graph_imports_unresolved`,
 `graph_symbol_references_indexed`, `graph_symbol_references_resolved`, and
-`graph_symbol_references_unresolved`; invalid controls, extraction failures, or
-persistence failures still appear as diagnostics.
+`graph_symbol_references_unresolved`, plus `graph_calls_indexed`,
+`graph_calls_resolved`, and `graph_calls_unresolved`; invalid controls,
+extraction failures, or persistence failures still appear as diagnostics.
 Loci never falls back to a repository-wide name guess. There is no import CLI
 command or separate top-level import store.
 
@@ -482,14 +485,80 @@ loci_graph_traverse_neighbors(
 line. `loci_get` then retrieves the exact target source. Compatibility
 `loci_graph_neighbors` remains contains-only and never widens to references.
 
-This is reference resolution, not a call graph. Loci does not claim that the
-source invokes the target, choose runtime overloads or trait implementations,
-expand macros/generated code, interpret dynamic imports or computed member
-access, or compensate for unresolved, shadowed, ambiguous, inaccessible,
-external, unsupported, or configuration-divergent evidence. Those cases stay
-inspectable unresolved records and create no trusted edge. There is no
-reference CLI command, model call, runtime/toolchain execution, repository-code
-execution, package-manager access, or network access in this path.
+Reference resolution alone does not claim invocation. A call edge requires the
+separate static call-site and caller-ownership proof below. References still do
+not choose runtime overloads or trait implementations, expand macros/generated
+code, interpret dynamic imports or computed member access, or compensate for
+unresolved, shadowed, ambiguous, inaccessible, external, unsupported, or
+configuration-divergent evidence. Those cases stay inspectable unresolved
+records and create no trusted reference edge. There is no reference CLI
+command, model call, runtime/toolchain execution, repository-code execution,
+package-manager access, or network access in this path.
+
+### Built-in trustworthy call relationships
+
+Loci records a directed `namespace="loci"`, `type="calls"` edge only when a
+static call expression has one definite caller and one definite indexed
+function or method target. A same-file call uses `resolution="exact"` after
+lexical scope, visibility, shadowing, and declaration ownership prove one
+callable. A cross-file call uses `resolution="import-resolved"` only when the
+callee span exactly matches one already-resolved symbol-reference record.
+
+Caller ownership follows executable bodies. Calls in decorators, annotations,
+default arguments, class/module initialization, nested named functions, and
+anonymous functions are not silently assigned to a broader enclosing symbol.
+Module-level calls use the source file node; named nested functions keep their
+own indexed identity. A proven recursive call may be a trusted self-edge, while
+every other graph self-edge remains invalid.
+
+Inspect every stored outcome through the MCP-only diagnostic read:
+
+```text
+loci_graph_calls(
+  repo="/path/to/repo",
+  file="src/consumer.py",
+  status="all",       # all | resolved | unresolved
+  offset=0,
+  limit=100,          # 1..500
+)
+```
+
+Each item retains the exact raw call/callee bytes, line, column, text, path,
+caller ownership, source hash, local binding candidates or symbol-reference
+support, target when resolved, support records, inherited control/configuration
+provenance, and an explicit unresolved reason. `file` filters before counts;
+`status` filters before pagination; stable ordering starts with source
+file/line/column/call byte/callee byte. Current reads preserve a current
+index's serialized hash and mtime.
+
+Use the generic graph tools for call navigation. Outgoing traversal answers
+“what does this function definitely call?”; incoming traversal answers “what
+definitely calls this function?” without reversing stored edge direction:
+
+```text
+loci_graph_traverse_neighbors(
+  repo="/path/to/repo",
+  seed_ids=["src/consumer.py::build#function"],
+  namespaces=["loci"],
+  edge_types=["calls"],
+  resolutions=["exact", "import-resolved"],
+  direction="outgoing",
+)
+```
+
+`loci_graph_paths` accepts the same filters and hydrates the exact call line;
+`loci_get` retrieves the final target. Compatibility
+`loci_graph_neighbors` remains contains-only.
+
+This is deliberately not whole-program call analysis. Constructors, computed
+or dynamic callees, optional JavaScript calls, callable variables/fields,
+receiver/interface/trait/virtual dispatch, overload selection, macros,
+reflection, generated code, external targets, type-only bindings, non-callable
+targets, ambiguous or shadowed bindings, and divergent configurations create
+no trusted call edge. Loci never falls back to a repository-wide same-name
+search. There is no call CLI, model or judge call, runtime/toolchain execution,
+repository-code execution, package-manager access, or network access in this
+path.
 
 ## Analytics
 
