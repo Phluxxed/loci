@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 from tree_sitter import Parser
-from tree_sitter_language_pack import get_language
+from tree_sitter_language_pack import SupportedLanguage, get_language
 
 from loci.parser._binding_context import collect_syntax_context
 from loci.parser.imports import (
@@ -85,7 +85,7 @@ def test_explicit_shared_syntax_context_preserves_reference_extraction(
     name: str,
     source: str,
     language: str,
-    tree_sitter_language: str,
+    tree_sitter_language: SupportedLanguage,
 ):
     batch = _extract_batch(
         tmp_path,
