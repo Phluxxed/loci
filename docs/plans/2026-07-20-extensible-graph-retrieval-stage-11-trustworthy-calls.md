@@ -1,7 +1,6 @@
 # Plan: Extensible Graph Retrieval Stage 11 — Trustworthy Calls
 
-**Status:** implemented and engineering-reviewed; final owner evidence
-acceptance pending
+**Status:** implemented, reviewed, and accepted
 
 **Date:** 2026-07-20
 
@@ -945,7 +944,7 @@ edges after restart.
 **Implementation status:** complete through reviewed implementation head
 `2ba9f6c`. The final evidence packet is
 `docs/reviews/2026-07-20-extensible-graph-retrieval-stage-11-final-review.md`;
-Stage 11 remains unaccepted until Vik explicitly approves it.
+Vik explicitly accepted it on 2026-07-21.
 
 1. Update README and the Loci skill with trusted-call semantics, examples,
    filters, and explicit exclusions.
@@ -1125,8 +1124,8 @@ implementation item below.
 - [x] `docs/reviews/2026-07-20-extensible-graph-retrieval-stage-11-final-review.md`
       contains exact commands, hashes, counts, versions, fixture outcomes,
       unresolved limits, and commit IDs.
-- [ ] Vik explicitly accepts the final evidence.
-- [ ] Only after that acceptance is Stage 11 marked implemented, reviewed, and
+- [x] Vik explicitly accepts the final evidence.
+- [x] Only after that acceptance is Stage 11 marked implemented, reviewed, and
       accepted in the governing design.
 
 ## Rollback
@@ -1143,8 +1142,9 @@ full rebuild.
 
 ## Owner Review Decision
 
-Vik approved the bounded implementation plan on 2026-07-20. Engineering review
-and production acceptance are complete; final evidence acceptance is pending.
-That pending decision does not authorize heuristic candidates, general local
-references, constructors, dynamic dispatch, architecture analysis,
-visualization, new dependencies, or any adjacent roadmap stage.
+Vik approved the bounded implementation plan on 2026-07-20 and explicitly
+accepted the final engineering and production evidence on 2026-07-21. Stage 11
+is implemented, reviewed, accepted, and closed. That acceptance does not widen
+the delivered scope to heuristic candidates, general local references,
+constructors, dynamic dispatch, architecture analysis, visualization, new
+dependencies, or any adjacent roadmap stage.

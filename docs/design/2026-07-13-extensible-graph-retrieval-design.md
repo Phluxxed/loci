@@ -1,8 +1,6 @@
 # loci: Extensible Graph Retrieval Layer — Design
 
-**Status:** Stages 1-10 implemented, reviewed, and accepted; Stage 11
-implemented and engineering-reviewed, with final owner evidence acceptance
-pending
+**Status:** Stages 1-11 implemented, reviewed, and accepted
 
 **Date:** 2026-07-13
 
@@ -460,7 +458,7 @@ package build, live Loci dogfood, and installed-wrapper disposable MCP fixtures
 for all four language families plus cross-language decoys. Vik explicitly
 accepted that evidence on 2026-07-20.
 
-### Stage 11: Trustworthy call relationships (implemented; owner acceptance pending)
+### Stage 11: Trustworthy call relationships (implemented, reviewed, and accepted)
 
 The detailed Stage 11 implementation is governed by
 `docs/plans/2026-07-20-extensible-graph-retrieval-stage-11-trustworthy-calls.md`.
@@ -496,10 +494,11 @@ The final engineering evidence packet is
 It records the complete 1,185-test repository gate, unchanged frozen benchmark,
 package build, exact installed-wrapper fixtures for all four language families,
 execution/network/toolchain/package-manager/judge tripwires, and fresh-process
-live dogfood over Loci's own repository. Stage 11 is not marked accepted until
-Vik explicitly approves that packet.
+live dogfood over Loci's own repository. Acceptance remained gated on Vik's
+explicit approval of that packet. Vik accepted the final evidence on 2026-07-21,
+so Stage 11 is implemented, reviewed, and accepted.
 
-After an accepted Stage 11, architecture/orientation analysis becomes the next
+With Stage 11 accepted, architecture/orientation analysis becomes the next
 planned graph capability. Heuristic candidate diagnostics remain deferred
 until live dogfood shows that the trusted graph's unresolved cases justify
 their cost and noise.

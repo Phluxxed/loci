@@ -1,6 +1,6 @@
 # Final Review: Extensible Graph Retrieval Stage 11 — Trustworthy Calls
 
-- **Status:** engineering review complete; explicit owner acceptance pending
+- **Status:** accepted by engineering review and owner
 - **Date:** 2026-07-21
 - **Repository:** `/Users/brummerv/loci`
 - **Governing plan:** `docs/plans/2026-07-20-extensible-graph-retrieval-stage-11-trustworthy-calls.md`
@@ -453,8 +453,8 @@ accepted fallback.
 - [x] every disposable repository and the live index pass `loci_verify`
 - [x] residual limits and rollback are explicit
 - [x] review packet and operator/agent documentation are ready for publication
-- [ ] Vik explicitly accepts this final review packet
-- [ ] governing design marks Stage 11 implemented, reviewed, and accepted
+- [x] Vik explicitly accepts this final review packet
+- [x] governing design marks Stage 11 implemented, reviewed, and accepted
 
-Stage 11 is implemented and engineering-reviewed. It remains deliberately open
-until Vik reviews this evidence and explicitly accepts it.
+Vik explicitly accepted this packet on 2026-07-21. Stage 11 is implemented,
+engineering-reviewed, owner-accepted, and closed.
