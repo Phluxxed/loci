@@ -578,6 +578,82 @@ def test_reference_record_accepts_current_named_reexport_support_chain():
     )
 
 
+def test_reference_record_requires_exact_downstream_reexport_failure_support():
+    barrel_hash = "d" * 64
+    barrel_id = "src/barrel.py::__file__#file"
+    nodes = _indexed_nodes()
+    nodes[barrel_id] = {
+        "id": barrel_id,
+        "kind": "file",
+        "language": "python",
+        "file_path": "src/barrel.py",
+        "byte_offset": 0,
+        "byte_length": 0,
+        "content_hash": barrel_hash,
+        "line": 1,
+        "metadata": {"loci": {"file_node": True}},
+    }
+    direct_import = _import_record(
+        target_file="src/barrel.py",
+        target_id=barrel_id,
+    )
+    reexport_binding = _binding(
+        local_name="Thing",
+        exported_name="Thing",
+        import_line=1,
+        import_text="from external import Thing",
+        import_specifier="external",
+    )
+    failed_reexport = _import_record(
+        raw=_raw_import(
+            source_file="src/barrel.py",
+            line=1,
+            text="from external import Thing",
+            specifier="external",
+            is_reexport=True,
+            source_hash=barrel_hash,
+            bindings=(reexport_binding,),
+        ),
+        source_id=barrel_id,
+        target_file=None,
+        target_kind=None,
+        target_id=None,
+        status="unresolved",
+        unresolved_reason="external",
+    )
+    import_support = _import_support(endpoint_id=barrel_id)
+    failure_support = ReferenceSupport(
+        kind="reexport",
+        file="src/barrel.py",
+        line=1,
+        content_hash=barrel_hash,
+        endpoint_id=barrel_id,
+    )
+    record = _unresolved_record(
+        import_target_id=barrel_id,
+        unresolved_reason="import_unresolved",
+        import_unresolved_reason="external",
+        support=(import_support, failure_support),
+    )
+    evidence = {
+        "imports": [direct_import, failed_reexport],
+        "exports": [],
+        "indexed_nodes": nodes,
+        "file_hashes": {
+            "src/use.py": SOURCE_HASH,
+            "src/barrel.py": barrel_hash,
+            "src/model.py": TARGET_HASH,
+        },
+    }
+
+    validate_symbol_reference_records([record], **evidence)
+    with pytest.raises(GraphContractError, match="direct or downstream failure"):
+        validate_symbol_reference_records(
+            [replace(record, support=(import_support,))],
+            **evidence,
+        )
+
+
 def test_unresolved_reference_record_cannot_back_a_reference_edge():
     record = _unresolved_record()
     edge = GraphEdge(

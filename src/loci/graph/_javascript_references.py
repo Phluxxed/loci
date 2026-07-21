@@ -27,6 +27,7 @@ from .references import (
 
 _ExportKey: TypeAlias = tuple[str, str]
 _Node = TypeVar("_Node", bound=Hashable)
+_FailureKey = TypeVar("_FailureKey", bound=Hashable)
 _JAVASCRIPT_LANGUAGES = frozenset({"javascript", "typescript"})
 _LOCAL_EXPORT_RE = re.compile(r"^\s*export\s+(?:type\s+)?\{")
 
@@ -56,14 +57,21 @@ class _JavaScriptStarRule:
 
 
 @dataclass(frozen=True, slots=True)
+class _JavaScriptImportFailure:
+    reason: ImportUnresolvedReason
+    support: tuple[ReferenceSupport, ...]
+    control_files: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class JavaScriptReferenceIndex:
     surfaces: Mapping[_ExportKey, tuple[_JavaScriptExportTarget, ...]]
     ambiguous: frozenset[_ExportKey]
     cyclic_keys: frozenset[_ExportKey]
     cyclic_files: frozenset[str]
     ambiguous_files: frozenset[str]
-    import_failures: Mapping[_ExportKey, frozenset[ImportUnresolvedReason]]
-    star_import_failures: Mapping[str, frozenset[ImportUnresolvedReason]]
+    import_failures: Mapping[_ExportKey, frozenset[_JavaScriptImportFailure]]
+    star_import_failures: Mapping[str, frozenset[_JavaScriptImportFailure]]
 
 
 @dataclass(frozen=True, slots=True)
@@ -149,8 +157,9 @@ def build_javascript_reference_index(
 
     rules: list[_JavaScriptReexportRule] = []
     star_rules: list[_JavaScriptStarRule] = []
-    failures: dict[_ExportKey, set[ImportUnresolvedReason]] = {}
-    star_failures: dict[str, set[ImportUnresolvedReason]] = {}
+    failures: dict[_ExportKey, set[_JavaScriptImportFailure]] = {}
+    star_failures: dict[str, set[_JavaScriptImportFailure]] = {}
+    ambiguous_files: set[str] = set()
     for record in imports:
         if record.raw.language not in _JAVASCRIPT_LANGUAGES or not record.raw.is_reexport:
             continue
@@ -158,13 +167,14 @@ def build_javascript_reference_index(
             if binding.kind == "glob":
                 if record.status == "unresolved":
                     if record.unresolved_reason is not None:
-                        star_failures.setdefault(record.raw.source_file, set()).add(
-                            record.unresolved_reason
+                        _add_import_failure(
+                            star_failures,
+                            record.raw.source_file,
+                            _import_failure(record),
+                            ambiguous=ambiguous_files,
                         )
                 elif record.target_file is None or record.target_id is None:
-                    star_failures.setdefault(record.raw.source_file, set()).add(
-                        "ambiguous"
-                    )
+                    ambiguous_files.add(record.raw.source_file)
                 else:
                     star_rules.append(
                         _JavaScriptStarRule(
@@ -191,7 +201,12 @@ def build_javascript_reference_index(
             explicit_counts[key] = explicit_counts.get(key, 0) + 1
             if record.status == "unresolved":
                 if record.unresolved_reason is not None:
-                    failures.setdefault(key, set()).add(record.unresolved_reason)
+                    _add_import_failure(
+                        failures,
+                        key,
+                        _import_failure(record),
+                        ambiguous=ambiguous,
+                    )
                 continue
             if (
                 binding.imported_name is None
@@ -229,7 +244,6 @@ def build_javascript_reference_index(
         for source in sorted(rules_by_source)
         for rule in rules_by_source[source]
     ]
-    ambiguous_files: set[str] = set()
     star_rules = sorted(set(star_rules), key=_star_rule_key)
     star_rules_by_source: dict[str, list[_JavaScriptStarRule]] = {}
     for rule in star_rules:
@@ -263,12 +277,24 @@ def build_javascript_reference_index(
                     ambiguous.add(rule.source)
                     changed = True
                 continue
-            target_failures = snapshot_failures.get(rule.target, frozenset())
-            if target_failures:
-                source_failures = failures.setdefault(rule.source, set())
-                previous_count = len(source_failures)
-                source_failures.update(target_failures)
-                changed |= len(source_failures) != previous_count
+            for target_failure in snapshot_failures.get(rule.target, frozenset()):
+                support = (rule.support, *target_failure.support)
+                if len(support) >= MAX_REFERENCE_SUPPORT_RECORDS:
+                    ambiguous.add(rule.source)
+                    continue
+                changed |= _add_import_failure(
+                    failures,
+                    rule.source,
+                    _JavaScriptImportFailure(
+                        reason=target_failure.reason,
+                        support=support,
+                        control_files=tuple(sorted(set((
+                            *rule.control_files,
+                            *target_failure.control_files,
+                        )))),
+                    ),
+                    ambiguous=ambiguous,
+                )
             for target in snapshot.get(rule.target, {}).values():
                 support = (rule.support, *target.support)
                 if len(support) >= MAX_REFERENCE_SUPPORT_RECORDS:
@@ -290,9 +316,27 @@ def build_javascript_reference_index(
         for rule in star_rules:
             source_star_failures = star_failures.setdefault(rule.source_file, set())
             previous_count = len(source_star_failures)
-            source_star_failures.update(
-                snapshot_star_failures.get(rule.target_file, frozenset())
-            )
+            for target_failure in snapshot_star_failures.get(
+                rule.target_file,
+                frozenset(),
+            ):
+                support = (rule.support, *target_failure.support)
+                if len(support) >= MAX_REFERENCE_SUPPORT_RECORDS:
+                    ambiguous_files.add(rule.source_file)
+                    continue
+                _add_import_failure(
+                    star_failures,
+                    rule.source_file,
+                    _JavaScriptImportFailure(
+                        reason=target_failure.reason,
+                        support=support,
+                        control_files=tuple(sorted(set((
+                            *rule.control_files,
+                            *target_failure.control_files,
+                        )))),
+                    ),
+                    ambiguous=ambiguous_files,
+                )
             changed |= len(source_star_failures) != previous_count
             for exported_name in sorted(names_by_file.get(rule.target_file, ())):
                 if exported_name == "default":
@@ -306,12 +350,27 @@ def build_javascript_reference_index(
                         ambiguous.add(source_key)
                         changed = True
                     continue
-                target_failures = snapshot_failures.get(target_key, frozenset())
-                if target_failures:
-                    source_failures = failures.setdefault(source_key, set())
-                    failure_count = len(source_failures)
-                    source_failures.update(target_failures)
-                    changed |= len(source_failures) != failure_count
+                for target_failure in snapshot_failures.get(
+                    target_key,
+                    frozenset(),
+                ):
+                    support = (rule.support, *target_failure.support)
+                    if len(support) >= MAX_REFERENCE_SUPPORT_RECORDS:
+                        ambiguous.add(source_key)
+                        continue
+                    changed |= _add_import_failure(
+                        failures,
+                        source_key,
+                        _JavaScriptImportFailure(
+                            reason=target_failure.reason,
+                            support=support,
+                            control_files=tuple(sorted(set((
+                                *rule.control_files,
+                                *target_failure.control_files,
+                            )))),
+                        ),
+                        ambiguous=ambiguous,
+                    )
                 for target in snapshot.get(target_key, {}).values():
                     support = (rule.support, *target.support)
                     if len(support) >= MAX_REFERENCE_SUPPORT_RECORDS:
@@ -395,9 +454,12 @@ def resolve_javascript_reference(
         )
         combined_failures = failures | star_failures
         if len(combined_failures) == 1:
+            failure = next(iter(combined_failures))
             return _unresolved(
                 "import_unresolved",
-                import_reason=next(iter(combined_failures)),
+                import_reason=failure.reason,
+                support=failure.support,
+                control_files=failure.control_files,
             )
         if (
             len(combined_failures) > 1
@@ -453,6 +515,39 @@ def _definition_support(
         ),
         definition,
     )
+
+
+def _import_failure(record: ImportRecord) -> _JavaScriptImportFailure:
+    if record.unresolved_reason is None:
+        raise _error("JavaScript re-export failure has no unresolved reason")
+    return _JavaScriptImportFailure(
+        reason=record.unresolved_reason,
+        support=(ReferenceSupport(
+            kind="reexport",
+            file=record.raw.source_file,
+            line=record.raw.line,
+            content_hash=record.raw.source_hash,
+            endpoint_id=record.source_id,
+        ),),
+        control_files=record.resolution_control_files,
+    )
+
+
+def _add_import_failure(
+    failures: dict[_FailureKey, set[_JavaScriptImportFailure]],
+    key: _FailureKey,
+    failure: _JavaScriptImportFailure,
+    *,
+    ambiguous: set[_FailureKey],
+) -> bool:
+    values = failures.setdefault(key, set())
+    if failure in values:
+        return False
+    if len(values) >= MAX_REFERENCE_RESOLUTION_CANDIDATES:
+        ambiguous.add(key)
+        return False
+    values.add(failure)
+    return True
 
 
 def _add_export_target(
@@ -569,14 +664,16 @@ def _unresolved(
     reason: ReferenceUnresolvedReason,
     *,
     import_reason: ImportUnresolvedReason | None = None,
+    support: tuple[ReferenceSupport, ...] = (),
+    control_files: tuple[str, ...] = (),
 ) -> JavaScriptReferenceOutcome:
     return JavaScriptReferenceOutcome(
         target=None,
         reason=reason,
         import_unresolved_reason=import_reason,
         basis=None,
-        support=(),
-        resolution_control_files=(),
+        support=support,
+        resolution_control_files=control_files,
     )
 
 

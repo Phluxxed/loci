@@ -26,6 +26,7 @@ class _ValidationIndex:
         tuple[ImportRecord, ...],
     ]
     import_support: frozenset[tuple[bool, str, int, str, str]]
+    failed_reexport_support: frozenset[tuple[str, int, str, str, str]]
     export_support: frozenset[tuple[str, int, str, str]]
 
 
@@ -286,6 +287,7 @@ def _build_validation_index(
         list[ImportRecord],
     ] = {}
     import_support: set[tuple[bool, str, int, str, str]] = set()
+    failed_reexport_support: set[tuple[str, int, str, str, str]] = set()
     for record in imports:
         if not isinstance(record, ImportRecord):
             raise _error("Reference validation import is not an ImportRecord")
@@ -325,6 +327,18 @@ def _build_validation_index(
                     record.raw.source_hash,
                     record.target_id,
                 ))
+        elif (
+            record.status == "unresolved"
+            and record.raw.is_reexport
+            and record.unresolved_reason is not None
+        ):
+            failed_reexport_support.add((
+                record.raw.source_file,
+                record.raw.line,
+                record.raw.source_hash,
+                record.source_id,
+                record.unresolved_reason,
+            ))
 
     export_support: set[tuple[str, int, str, str]] = set()
     for export in exports:
@@ -357,6 +371,7 @@ def _build_validation_index(
             key: tuple(records) for key, records in imports_by_binding.items()
         }),
         import_support=frozenset(import_support),
+        failed_reexport_support=frozenset(failed_reexport_support),
         export_support=frozenset(export_support),
     )
 
@@ -457,28 +472,61 @@ def _validate_import(
             "Reference import target does not match its import record",
             field="import_target_id",
         )
-    if (
-        record.unresolved_reason == "import_unresolved"
-        and record.import_unresolved_reason != matched.unresolved_reason
-    ):
-        raise _record_error(
-            record_index,
-            "Reference import outcome does not match its import record",
-            field="import_unresolved_reason",
+    if record.unresolved_reason == "import_unresolved":
+        direct_failure = (
+            matched.status == "unresolved"
+            and record.import_unresolved_reason == matched.unresolved_reason
         )
+        downstream_failure = (
+            matched.status == "resolved"
+            and _has_valid_downstream_reexport_failure(
+                record,
+                matched_import=matched,
+                validation_index=validation_index,
+            )
+        )
+        if not direct_failure and not downstream_failure:
+            raise _record_error(
+                record_index,
+                "Reference import outcome has no matching direct or downstream failure",
+                field="import_unresolved_reason",
+            )
     if record.status == "resolved" and matched.status != "resolved":
         raise _record_error(
             record_index,
             "Resolved reference requires a resolved import record",
             field="import_record",
         )
-    if record.unresolved_reason == "import_unresolved" and matched.status != "unresolved":
-        raise _record_error(
-            record_index,
-            "Import-unresolved reference requires an unresolved import record",
-            field="import_record",
-        )
     return matched
+
+
+def _has_valid_downstream_reexport_failure(
+    record: SymbolReferenceRecord,
+    *,
+    matched_import: ImportRecord,
+    validation_index: _ValidationIndex,
+) -> bool:
+    reexports = tuple(
+        support for support in record.support if support.kind == "reexport"
+    )
+    if not reexports or reexports[0].file != matched_import.target_file:
+        return False
+    for index, support in enumerate(reexports):
+        failure_key = _failed_reexport_support_key(
+            support,
+            record.import_unresolved_reason,
+        )
+        if failure_key in validation_index.failed_reexport_support:
+            return index == len(reexports) - 1
+        if (
+            _import_support_key(support, reexport=True)
+            not in validation_index.import_support
+            or index == len(reexports) - 1
+            or support.endpoint_id
+            != f"{reexports[index + 1].file}::__file__#file"
+        ):
+            return False
+    return False
 
 
 def _validate_target(
@@ -539,10 +587,19 @@ def _validate_support(
                 )
             continue
         if support.kind == "reexport":
-            if (
+            resolved_reexport = (
                 _import_support_key(support, reexport=True)
-                not in validation_index.import_support
-            ):
+                in validation_index.import_support
+            )
+            failed_reexport = (
+                record.unresolved_reason == "import_unresolved"
+                and _failed_reexport_support_key(
+                    support,
+                    record.import_unresolved_reason,
+                )
+                in validation_index.failed_reexport_support
+            )
+            if not resolved_reexport and not failed_reexport:
                 raise _record_error(
                     record_index,
                     "Reference re-export support does not match a current import",
@@ -580,6 +637,21 @@ def _import_support_key(
         support.line,
         support.content_hash,
         support.endpoint_id,
+    )
+
+
+def _failed_reexport_support_key(
+    support: ReferenceSupport,
+    reason: str | None,
+) -> tuple[str, int, str, str, str] | None:
+    if reason is None:
+        return None
+    return (
+        support.file,
+        support.line,
+        support.content_hash,
+        support.endpoint_id,
+        reason,
     )
 
 

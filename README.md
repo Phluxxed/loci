@@ -465,6 +465,11 @@ resolved, and unresolved counts are calculated; `offset` and `limit` paginate
 the stable source-position order. Current reads do not rewrite a current
 index.
 
+When a local import resolves but its bounded re-export chain ends at an
+external or otherwise unresolved import, the reference remains unresolved and
+retains support for both the direct import and the exact failing re-export. No
+trusted reference edge is created.
+
 Use the generic graph tools to navigate trusted reference edges. Outgoing
 traversal answers “which imported symbols does this function name?”; incoming
 traversal answers “which indexed symbols name this definition?” without
