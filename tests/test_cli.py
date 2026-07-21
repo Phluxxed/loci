@@ -349,6 +349,8 @@ def test_cli_help_excludes_removed_agent_maintenance_commands():
     assert result.returncode == 0, result.stderr
     assert "summarize" not in result.stdout
     assert "analyze" not in result.stdout
+    assert "graph-calls" not in result.stdout
+    assert "calls" not in result.stdout
 
 
 def test_stats_without_env_prefers_codex_mcp_store(tmp_path):
