@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from loci import service as service_module
-from loci.service import LociError, graph_health, index_repo
+from loci.service import LociError, graph_calls, graph_health, index_repo
 from loci.storage.index_store import IndexStore
 
 
@@ -39,9 +39,16 @@ def test_service_persists_resolved_calls_and_edges(
     repo = tmp_path / "repo"
     _write_python_call_repo(repo)
 
-    index_repo(repo, incremental=False)
+    indexed = index_repo(repo, incremental=False)
     graph = _load_graph(base, repo)
+    health = graph_health(repo)
 
+    assert indexed["graph_calls_indexed"] == 1
+    assert indexed["graph_calls_resolved"] == 1
+    assert indexed["graph_calls_unresolved"] == 0
+    assert health["counts"]["graph_calls_indexed"] == 1
+    assert health["counts"]["graph_calls_resolved"] == 1
+    assert health["counts"]["graph_calls_unresolved"] == 0
     assert len(graph["calls"]) == 1
     assert graph["calls"][0]["status"] == "resolved"
     assert graph["calls"][0]["caller_id"] == "use.py::caller#function"
@@ -418,3 +425,164 @@ def test_service_fresh_process_rejects_then_repairs_stale_call_state(
 
     assert health["status"] == "healthy"
     assert repaired["calls"][0]["status"] == "resolved"
+
+
+def _write_call_diagnostics_repo(repo: Path) -> None:
+    repo.mkdir()
+    (repo / "target.py").write_text(
+        "def target():\n    return 1\n",
+        encoding="utf-8",
+    )
+    (repo / "use.py").write_text(
+        (
+            "from target import target\n"
+            "from missing import lost\n\n"
+            "def first():\n"
+            "    return target()\n\n"
+            "def second():\n"
+            "    return lost()\n"
+        ),
+        encoding="utf-8",
+    )
+
+
+def test_graph_calls_returns_stable_bounded_record_page(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    _write_call_diagnostics_repo(repo)
+    index_repo(repo, incremental=False)
+
+    result = graph_calls(repo, limit=1)
+
+    assert result["schema_version"] == 1
+    assert result["repo"] == str(repo.resolve())
+    assert result["file"] is None
+    assert result["status"] == "all"
+    assert result["counts"] == {
+        "total": 2,
+        "resolved": 1,
+        "unresolved": 1,
+        "returned": 1,
+    }
+    assert result["pagination"] == {
+        "offset": 0,
+        "limit": 1,
+        "next_offset": 1,
+    }
+    item = result["items"][0]
+    assert set(item) == {
+        "raw",
+        "caller_id",
+        "caller_kind",
+        "target_file",
+        "target_id",
+        "target_kind",
+        "status",
+        "resolution",
+        "unresolved_reason",
+        "reference_unresolved_reason",
+        "resolution_basis",
+        "support",
+        "resolution_control_files",
+        "resolution_configuration",
+    }
+    assert item["raw"]["callee_path"] == ["target"]
+    assert item["caller_id"] == "use.py::first#function"
+    assert item["target_id"] == "target.py::target#function"
+    assert item["status"] == "resolved"
+    assert item["resolution"] == "import-resolved"
+
+
+def test_graph_calls_filters_before_status_and_pagination(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    _write_call_diagnostics_repo(repo)
+    index_repo(repo, incremental=False)
+
+    unresolved = graph_calls(repo, file="use.py", status="unresolved", limit=1)
+    second = graph_calls(repo, offset=1, limit=1)
+    empty = graph_calls(repo, file="not-indexed.py", status="resolved")
+
+    assert unresolved["counts"] == {
+        "total": 2,
+        "resolved": 1,
+        "unresolved": 1,
+        "returned": 1,
+    }
+    assert unresolved["items"][0]["raw"]["callee_path"] == ["lost"]
+    assert unresolved["items"][0]["status"] == "unresolved"
+    assert unresolved["items"][0]["resolution"] is None
+    assert unresolved["pagination"]["next_offset"] is None
+    assert second["items"][0]["raw"]["callee_path"] == ["lost"]
+    assert second["pagination"]["next_offset"] is None
+    assert empty["counts"] == {
+        "total": 0,
+        "resolved": 0,
+        "unresolved": 0,
+        "returned": 0,
+    }
+    assert empty["items"] == []
+    assert empty["pagination"]["next_offset"] is None
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "field"),
+    [
+        ({"file": ""}, "file"),
+        ({"file": "../use.py"}, "file"),
+        ({"file": "./use.py"}, "file"),
+        ({"file": "/use.py"}, "file"),
+        ({"file": "use\\file.py"}, "file"),
+        ({"file": 1}, "file"),
+        ({"status": "RESOLVED"}, "status"),
+        ({"status": None}, "status"),
+        ({"status": []}, "status"),
+        ({"offset": -1}, "offset"),
+        ({"offset": True}, "offset"),
+        ({"offset": "0"}, "offset"),
+        ({"limit": 0}, "limit"),
+        ({"limit": 501}, "limit"),
+        ({"limit": True}, "limit"),
+        ({"limit": "1"}, "limit"),
+    ],
+)
+def test_graph_calls_rejects_invalid_filters_and_pagination(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    kwargs: dict,
+    field: str,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    _write_call_diagnostics_repo(repo)
+    index_repo(repo, incremental=False)
+
+    with pytest.raises(LociError) as exc_info:
+        graph_calls(repo, **kwargs)
+
+    assert exc_info.value.code == "INVALID_INPUT"
+    assert exc_info.value.details["field"] == field
+
+
+def test_graph_calls_refreshes_only_when_requested(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    _write_python_call_repo(repo)
+    index_repo(repo, incremental=False)
+    target = repo / "target.py"
+    target.write_text("def other():\n    return 2\n", encoding="utf-8")
+
+    stale = graph_calls(repo)
+    refreshed = graph_calls(repo, ensure_fresh=True)
+
+    assert stale["items"][0]["status"] == "resolved"
+    assert refreshed["items"][0]["status"] == "unresolved"
