@@ -47,6 +47,50 @@ def index_versions_current(index: dict[str, Any]) -> bool:
     )
 
 
+def _validate_graph_state(
+    graph_state: GraphIndexState,
+    *,
+    indexed_nodes: Mapping[str, Mapping[str, Any]],
+    file_hashes: Mapping[str, str],
+) -> None:
+    if graph_state.exports or graph_state.symbol_references:
+        validate_symbol_reference_records(
+            graph_state.symbol_references,
+            imports=graph_state.imports,
+            exports=graph_state.exports,
+            indexed_nodes=indexed_nodes,
+            file_hashes=file_hashes,
+        )
+    if graph_state.calls:
+        validate_call_records(
+            graph_state.calls,
+            symbol_references=graph_state.symbol_references,
+            indexed_nodes=indexed_nodes,
+            file_hashes=file_hashes,
+        )
+    built_in_edges = [
+        edge
+        for edge in graph_state.edges
+        if (
+            edge.namespace == "loci"
+            or edge.type in {
+                "imports",
+                "imports_type",
+                "references",
+                "references_type",
+            }
+        )
+    ]
+    validate_graph_edges(
+        built_in_edges,
+        indexed_nodes=indexed_nodes,
+        file_hashes=file_hashes,
+        imports=graph_state.imports,
+        symbol_references=graph_state.symbol_references,
+        calls=graph_state.calls,
+    )
+
+
 class IndexStore:
     def __init__(self, base_dir: Optional[Path] = None) -> None:
         self.base_dir = base_dir or Path.home() / ".codeindex"
@@ -93,41 +137,10 @@ class IndexStore:
         persisted_graph = graph_state or GraphIndexState.empty()
         persisted_graph = GraphIndexState.from_dict(persisted_graph.to_dict())
         indexed_nodes = {symbol.id: symbol.to_dict() for symbol in symbols}
-        if persisted_graph.exports or persisted_graph.symbol_references:
-            validate_symbol_reference_records(
-                persisted_graph.symbol_references,
-                imports=persisted_graph.imports,
-                exports=persisted_graph.exports,
-                indexed_nodes=indexed_nodes,
-                file_hashes=file_hashes,
-            )
-        if persisted_graph.calls:
-            validate_call_records(
-                persisted_graph.calls,
-                symbol_references=persisted_graph.symbol_references,
-                indexed_nodes=indexed_nodes,
-                file_hashes=file_hashes,
-            )
-        built_in_edge_candidates = [
-            edge
-            for edge in persisted_graph.edges
-            if (
-                edge.namespace == "loci"
-                or edge.type in {
-                    "imports",
-                    "imports_type",
-                    "references",
-                    "references_type",
-                }
-            )
-        ]
-        validate_graph_edges(
-            built_in_edge_candidates,
+        _validate_graph_state(
+            persisted_graph,
             indexed_nodes=indexed_nodes,
             file_hashes=file_hashes,
-            imports=persisted_graph.imports,
-            symbol_references=persisted_graph.symbol_references,
-            calls=persisted_graph.calls,
         )
 
         repo_dir = self._repo_dir(repo_path)
@@ -172,10 +185,10 @@ class IndexStore:
     def get_graph_edges(self, repo_path: Path) -> list[GraphEdge]:
         return list(self.get_graph_state(repo_path).edges)
 
-    def get_graph_state(self, repo_path: Path) -> GraphIndexState:
-        index = self.load(repo_path)
-        if index is None:
-            return GraphIndexState.empty()
+    def validate_graph_state(
+        self,
+        index: Mapping[str, Any],
+    ) -> GraphIndexState:
         graph = index.get("graph")
         if not isinstance(graph, Mapping):
             raise GraphContractError(
@@ -183,7 +196,52 @@ class IndexStore:
                 "Index does not contain a graph envelope",
                 {},
             )
-        return GraphIndexState.from_dict(graph)
+        symbols = index.get("symbols")
+        file_hashes = index.get("file_hashes")
+        if not isinstance(symbols, list) or not isinstance(file_hashes, Mapping):
+            raise GraphContractError(
+                "INVALID_GRAPH_SCHEMA",
+                "Index cannot validate its graph envelope",
+                {},
+            )
+        indexed_nodes: dict[str, Mapping[str, Any]] = {}
+        for symbol in symbols:
+            if not isinstance(symbol, Mapping) or not isinstance(symbol.get("id"), str):
+                raise GraphContractError(
+                    "INVALID_GRAPH_SCHEMA",
+                    "Index contains an invalid graph endpoint",
+                    {},
+                )
+            symbol_id = symbol["id"]
+            if symbol_id in indexed_nodes:
+                raise GraphContractError(
+                    "INVALID_GRAPH_SCHEMA",
+                    "Index contains duplicate graph endpoints",
+                    {"id": symbol_id},
+                )
+            indexed_nodes[symbol_id] = symbol
+        current_hashes: dict[str, str] = {}
+        for path, content_hash in file_hashes.items():
+            if not isinstance(path, str) or not isinstance(content_hash, str):
+                raise GraphContractError(
+                    "INVALID_GRAPH_SCHEMA",
+                    "Index contains invalid graph file hashes",
+                    {},
+                )
+            current_hashes[path] = content_hash
+        state = GraphIndexState.from_dict(graph)
+        _validate_graph_state(
+            state,
+            indexed_nodes=indexed_nodes,
+            file_hashes=current_hashes,
+        )
+        return state
+
+    def get_graph_state(self, repo_path: Path) -> GraphIndexState:
+        index = self.load(repo_path)
+        if index is None:
+            return GraphIndexState.empty()
+        return self.validate_graph_state(index)
 
     def get_symbol_content(self, repo_path: Path, symbol_id: str) -> Optional[str]:
         index = self.load(repo_path)

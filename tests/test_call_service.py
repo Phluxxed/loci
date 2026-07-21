@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from loci import service as service_module
-from loci.service import index_repo
+from loci.service import LociError, graph_health, index_repo
 from loci.storage.index_store import IndexStore
 
 
@@ -389,3 +389,32 @@ def test_service_schema_seven_call_cache_forces_full_rebuild(
     assert rebuilt["files_skipped"] == 0
     assert graph["schema_version"] == 8
     assert graph["calls"][0]["status"] == "resolved"
+
+
+def test_service_fresh_process_rejects_then_repairs_stale_call_state(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    _write_python_call_repo(repo)
+    index_repo(repo, incremental=False)
+    store = IndexStore(base_dir=base)
+    index_path = store._index_path(repo.resolve())
+    payload = json.loads(index_path.read_text())
+    record = payload["graph"]["calls"][0]
+    record["raw"]["source_hash"] = "0" * 64
+    for support in record["support"]:
+        if support["kind"] in {"call_site", "symbol_reference"}:
+            support["content_hash"] = "0" * 64
+    index_path.write_text(json.dumps(payload))
+
+    with pytest.raises(LociError, match="stale"):
+        graph_health(repo)
+
+    health = graph_health(repo, ensure_fresh=True)
+    repaired = _load_graph(base, repo)
+
+    assert health["status"] == "healthy"
+    assert repaired["calls"][0]["status"] == "resolved"

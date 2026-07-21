@@ -136,7 +136,7 @@ def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
             existing = None
         else:
             try:
-                previous_graph = GraphIndexState.from_dict(graph_value)
+                previous_graph = store.validate_graph_state(existing)
             except GraphContractError:
                 existing = None
     existing_hashes: dict[str, str] = existing.get("file_hashes", {}) if existing else {}
@@ -631,7 +631,7 @@ def graph_anchors(
             {"repo": str(repo_path)},
         )
     try:
-        graph_state = GraphIndexState.from_dict(graph_value)
+        graph_state = store.validate_graph_state(index)
         selection = select_graph_anchors(
             tuple(indexed_nodes.values()),
             question,
@@ -1130,7 +1130,7 @@ def graph_health(
             {"repo": str(repo_path)},
         )
     try:
-        state = GraphIndexState.from_dict(graph_value)
+        state = store.validate_graph_state(index)
     except GraphContractError as exc:
         raise LociError(exc.code, exc.message, exc.details) from exc
 
@@ -1315,7 +1315,7 @@ def _index_is_stale(repo_path: Path, store: IndexStore, index: dict[str, Any]) -
     if not isinstance(graph, dict):
         return True
     try:
-        persisted_graph = GraphIndexState.from_dict(graph)
+        persisted_graph = store.validate_graph_state(index)
     except GraphContractError:
         return True
     indexed_graph_hashes = persisted_graph.input_hashes
@@ -1399,7 +1399,7 @@ def _load_graph_context(
             {"repo": str(repo_path)},
         )
     try:
-        state = GraphIndexState.from_dict(graph_value)
+        state = store.validate_graph_state(index)
     except GraphContractError as exc:
         raise LociError(exc.code, exc.message, exc.details) from exc
     return store, indexed_nodes, state
