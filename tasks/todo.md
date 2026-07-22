@@ -15,7 +15,17 @@
   - Verify: `.venv/bin/python -m pytest -q tests/test_service.py`
   - Files: `src/loci/service.py`, `tests/test_service.py`.
 
-- [ ] Task 4: Production qualification and review
+- [x] Task 4: Production qualification and review
   - Acceptance: all spec success criteria and Definition of Done gates pass.
   - Verify: full pytest, pyright, compileall, lockfile check, package build, and MCP smoke tests.
   - Files: verification evidence only unless review finds a required correction.
+
+## Qualification
+
+- Full suite: `1216 passed in 54.77s`.
+- Changed source: pyright `0 errors`; repo-wide unconfigured diagnostic retains
+  263 unrelated existing findings.
+- Compile, lockfile, package build, wrapper syntax, installed MCP smoke, Loci
+  index verification, and graph health passed.
+- Manifest task `work_df7cca19-c64c-441a-9790-b5c79d50dd17` completed with
+  commit, test, design, and live-registration evidence.
