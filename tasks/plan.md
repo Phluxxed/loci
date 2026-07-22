@@ -38,10 +38,10 @@ preserve CLI convenience behavior, and qualify safe same-harness concurrency.
 
 ### Checkpoint: Complete
 
-- [ ] Full tests, type checks, compile, lockfile, package build, and runtime MCP
+- [x] Full tests, changed-source type checks, compile, lockfile, package build, and runtime MCP
   smoke checks pass.
-- [ ] Five-axis code review finds no unresolved required issues.
-- [ ] Manifest evidence is attached and the task is completed.
+- [x] Five-axis code review finds no unresolved required issues.
+- [x] Manifest evidence is attached and the task is completed.
 
 ## Risks and Mitigations
 
