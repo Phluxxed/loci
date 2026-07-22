@@ -1,10 +1,8 @@
-"""Per-host base-dir routing in .shared/loci wrapper scripts.
+"""Per-host base-dir routing in the tracked loci wrappers.
 
-The CLI and MCP wrappers pick LOCI_BASE_DIR only for host-specific routing.
-Claude Code gets ~/.claude/loci-index. A bare terminal leaves LOCI_BASE_DIR
-unset so the Python resolver can prefer configured MCP stores and fall back
-safely. These tests pin the wrapper behavior down so shell defaults do not
-override the service resolver.
+The CLI wrapper retains host-specific convenience routing. The MCP wrapper is
+different: its client registration must supply an explicit base directory and
+namespace, so the wrapper must not infer either value from ambient host state.
 
 The real wrappers resolve their repo root from their own location and exec
 `<repo>/.venv/bin/loci*`. We reproduce that layout under tmp_path with fake
@@ -62,11 +60,10 @@ def _run_wrapper(wrapper: Path, home: Path, extra_env: dict) -> str:
     return result.stdout
 
 
-@pytest.mark.parametrize(("wrapper_name", "entrypoint_name"), WRAPPERS)
 def test_claude_code_routes_to_claude_store(
-    tmp_path: Path, wrapper_name: str, entrypoint_name: str
+    tmp_path: Path,
 ):
-    wrapper = _build_fake_repo(tmp_path, wrapper_name, entrypoint_name)
+    wrapper = _build_fake_repo(tmp_path, "loci-wrapper.sh", "loci")
     home = tmp_path / "home"
     home.mkdir()
 
@@ -75,16 +72,27 @@ def test_claude_code_routes_to_claude_store(
     assert out == str(home / ".claude" / "loci-index")
 
 
-@pytest.mark.parametrize(("wrapper_name", "entrypoint_name"), WRAPPERS)
 def test_non_claude_leaves_store_resolution_to_python(
-    tmp_path: Path, wrapper_name: str, entrypoint_name: str
+    tmp_path: Path,
 ):
-    wrapper = _build_fake_repo(tmp_path, wrapper_name, entrypoint_name)
+    wrapper = _build_fake_repo(tmp_path, "loci-wrapper.sh", "loci")
     home = tmp_path / "home"
     home.mkdir()
 
     # CLAUDECODE unset and no explicit store -> Python resolver decides.
     out = _run_wrapper(wrapper, home, {})
+
+    assert out == ""
+
+
+def test_mcp_wrapper_does_not_guess_store_from_claude_ambient_state(
+    tmp_path: Path,
+):
+    wrapper = _build_fake_repo(tmp_path, "loci-mcp-wrapper.sh", "loci-mcp")
+    home = tmp_path / "home"
+    home.mkdir()
+
+    out = _run_wrapper(wrapper, home, {"CLAUDECODE": "1"})
 
     assert out == ""
 

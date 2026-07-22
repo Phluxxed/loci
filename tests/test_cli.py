@@ -73,6 +73,44 @@ def test_index_exits_zero(sample_repo: Path, tmp_path: Path):
     assert result.returncode == 0, result.stderr
 
 
+def test_concurrent_index_processes_share_store_safely(
+    sample_repo: Path,
+    tmp_path: Path,
+):
+    import os
+
+    base = tmp_path / ".codeindex"
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(base)
+    command = [sys.executable, "-m", "loci.cli", "index", str(sample_repo)]
+
+    first = subprocess.Popen(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        env=env,
+    )
+    second = subprocess.Popen(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        env=env,
+    )
+    first_out, first_err = first.communicate(timeout=30)
+    second_out, second_err = second.communicate(timeout=30)
+
+    assert first.returncode == 0, first_err
+    assert second.returncode == 0, second_err
+    assert json.loads(first_out)["symbols_indexed"] > 0
+    assert json.loads(second_out)["symbols_indexed"] > 0
+    verify = run_loci("verify", str(sample_repo), env_extra={"LOCI_BASE_DIR": str(base)})
+    assert verify.returncode == 0, verify.stderr
+    assert not list(base.rglob("*.tmp"))
+    assert not list(base.rglob("refresh.lock"))
+
+
 def test_index_outputs_json(sample_repo: Path, tmp_path: Path):
     result = run_loci("index", str(sample_repo), env_extra={"LOCI_BASE_DIR": str(tmp_path / ".codeindex")})
     data = json.loads(result.stdout)
@@ -351,6 +389,41 @@ def test_cli_help_excludes_removed_agent_maintenance_commands():
     assert "analyze" not in result.stdout
     assert "graph-calls" not in result.stdout
     assert "calls" not in result.stdout
+
+
+def test_store_init_requires_explicit_adoption_for_nonempty_root(tmp_path: Path):
+    root = tmp_path / "legacy-index"
+    root.mkdir()
+    (root / "existing.json").write_text("preserve me")
+
+    result = run_loci("store", "init", "--base-dir", str(root), "--namespace", "codex")
+
+    assert result.returncode == 1
+    error = json.loads(result.stderr)
+    assert error["code"] == "STORE_IDENTITY_REQUIRED"
+    assert (root / "existing.json").read_text() == "preserve me"
+
+
+def test_store_init_adopts_existing_root_with_explicit_flag(tmp_path: Path):
+    root = tmp_path / "legacy-index"
+    root.mkdir()
+    (root / "existing.json").write_text("preserve me")
+
+    result = run_loci(
+        "store",
+        "init",
+        "--base-dir",
+        str(root),
+        "--namespace",
+        "codex",
+        "--adopt-existing",
+    )
+
+    assert result.returncode == 0
+    output = json.loads(result.stdout)
+    assert output["namespace"] == "codex"
+    assert output["adopted_existing"] is True
+    assert (root / "existing.json").read_text() == "preserve me"
 
 
 def test_stats_without_env_prefers_codex_mcp_store(tmp_path):

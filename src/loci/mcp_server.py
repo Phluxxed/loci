@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import sys
 from typing import Any, Literal, cast
 
 from mcp.server.fastmcp import FastMCP
@@ -28,6 +30,8 @@ from loci.service import (
     session_stats,
     verify_repo,
 )
+from loci.storage.store_identity import StoreIdentityError, bind_mcp_store
+from loci.storage.store_resolver import activate_mcp_store
 
 
 def create_server() -> FastMCP:
@@ -369,6 +373,11 @@ mcp = create_server()
 
 
 def main() -> None:
+    try:
+        activate_mcp_store(bind_mcp_store())
+    except StoreIdentityError as exc:
+        print(json.dumps({"error": exc.to_dict()}), file=sys.stderr)
+        raise SystemExit(78) from exc
     mcp.run(transport="stdio")
 
 

@@ -85,6 +85,7 @@ def _server(cache_dir: Path) -> StdioServerParameters:
     assert command.resolve() == expected.resolve()
     env = os.environ.copy()
     env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["LOCI_STORE_NAMESPACE"] = "test"
     return StdioServerParameters(
         command=str(command),
         args=[],

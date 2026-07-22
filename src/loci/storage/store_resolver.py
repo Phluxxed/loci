@@ -5,12 +5,16 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from loci.storage.store_identity import StoreBinding, StoreIdentityError
+
 
 @dataclass(frozen=True)
 class StoreResolution:
     base_dir: Path
     source: str
     config_path: Path | None = None
+    namespace: str | None = None
+    store_id: str | None = None
 
     def to_dict(self) -> dict[str, str]:
         data = {
@@ -19,10 +23,19 @@ class StoreResolution:
         }
         if self.config_path is not None:
             data["config_path"] = str(self.config_path)
+        if self.namespace is not None:
+            data["namespace"] = self.namespace
+        if self.store_id is not None:
+            data["store_id"] = self.store_id
         return data
 
 
+_active_mcp_store: StoreResolution | None = None
+
+
 def resolve_store_base_dir() -> StoreResolution:
+    if _active_mcp_store is not None:
+        return _active_mcp_store
     env_base = os.environ.get("LOCI_BASE_DIR")
     if env_base:
         return StoreResolution(Path(env_base).expanduser(), "env")
@@ -42,6 +55,29 @@ def resolve_store_base_dir() -> StoreResolution:
         return StoreResolution(codex_default, "codex_default")
 
     return StoreResolution(Path.home() / ".codeindex", "legacy_default")
+
+
+def activate_mcp_store(binding: StoreBinding) -> StoreResolution:
+    global _active_mcp_store
+    candidate = StoreResolution(
+        base_dir=binding.base_dir,
+        source="mcp_environment",
+        namespace=binding.namespace,
+        store_id=binding.store_id,
+    )
+    if _active_mcp_store is not None:
+        if _active_mcp_store == candidate:
+            return _active_mcp_store
+        raise StoreIdentityError(
+            "MCP_STORE_ALREADY_BOUND",
+            "The Loci MCP process is already bound to another store",
+            {
+                "active": _active_mcp_store.to_dict(),
+                "requested": candidate.to_dict(),
+            },
+        )
+    _active_mcp_store = candidate
+    return _active_mcp_store
 
 
 def _read_codex_mcp_loci_base_dir(config_path: Path) -> str | None:

@@ -264,6 +264,7 @@ async def _reference_mcp_after_restart(
     )
     env = os.environ.copy()
     env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["LOCI_STORE_NAMESPACE"] = "test"
     env["PYTHONPATH"] = str(Path.cwd() / "src")
     server_params = StdioServerParameters(
         command=sys.executable,
