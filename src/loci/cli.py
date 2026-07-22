@@ -20,9 +20,21 @@ from loci.service import (
     session_stats,
     verify_repo,
 )
+from loci.storage.store_identity import StoreIdentityError, initialize_store
 
 
 def _print_loci_error(exc: LociError) -> None:
+    print(
+        json.dumps({
+            "error": exc.message,
+            "code": exc.code,
+            "details": exc.details,
+        }),
+        file=sys.stderr,
+    )
+
+
+def _print_store_identity_error(exc: StoreIdentityError) -> None:
     print(
         json.dumps({
             "error": exc.message,
@@ -413,6 +425,20 @@ def cmd_outline(args: argparse.Namespace) -> int:
         return 1
 
 
+def cmd_store_init(args: argparse.Namespace) -> int:
+    try:
+        binding = initialize_store(
+            args.base_dir,
+            args.namespace,
+            adopt_existing=args.adopt_existing,
+        )
+        print(json.dumps(binding.to_dict()))
+        return 0
+    except StoreIdentityError as exc:
+        _print_store_identity_error(exc)
+        return 1
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="loci", description="Code symbol indexer")
     sub = parser.add_subparsers(dest="command")
@@ -465,6 +491,17 @@ def main() -> None:
     p_verify = sub.add_parser("verify", help="Verify byte offsets for all indexed symbols")
     p_verify.add_argument("path", help="Path to repo")
 
+    p_store = sub.add_parser("store", help="Initialize a harness-owned store")
+    store_sub = p_store.add_subparsers(dest="store_command")
+    p_store_init = store_sub.add_parser("init", help="Create or adopt a store identity")
+    p_store_init.add_argument("--base-dir", required=True, help="Absolute store root")
+    p_store_init.add_argument("--namespace", required=True, help="Store namespace")
+    p_store_init.add_argument(
+        "--adopt-existing",
+        action="store_true",
+        help="Adopt a verified non-empty unmarked store without moving its contents",
+    )
+
     args = parser.parse_args()
 
     if args.command == "index":
@@ -487,6 +524,8 @@ def main() -> None:
         sys.exit(cmd_stats(args))
     elif args.command == "verify":
         sys.exit(cmd_verify(args))
+    elif args.command == "store" and args.store_command == "init":
+        sys.exit(cmd_store_init(args))
     else:
         parser.print_help()
         sys.exit(1)

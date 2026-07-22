@@ -4,7 +4,26 @@ from pathlib import Path
 
 import pytest
 
-from loci.storage.store_resolver import resolve_store_base_dir
+import loci.storage.store_resolver as resolver_module
+from loci.storage.store_identity import StoreBinding, StoreIdentityError
+from loci.storage.store_resolver import activate_mcp_store, resolve_store_base_dir
+
+
+def test_activate_mcp_store_is_process_immutable(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(resolver_module, "_active_mcp_store", None)
+    first = StoreBinding(tmp_path / "codex", "codex", "first")
+    second = StoreBinding(tmp_path / "claude", "claude", "second")
+
+    active = activate_mcp_store(first)
+
+    assert activate_mcp_store(first) is active
+    with pytest.raises(StoreIdentityError) as exc_info:
+        activate_mcp_store(second)
+    assert exc_info.value.code == "MCP_STORE_ALREADY_BOUND"
+    assert resolve_store_base_dir() is active
 
 
 def test_resolve_store_base_dir_env_wins(

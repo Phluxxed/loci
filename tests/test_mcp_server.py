@@ -2,6 +2,7 @@ import asyncio
 import json
 import os
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -9,6 +10,69 @@ from typing import Any
 import pytest
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+
+from loci.storage.store_identity import initialize_store
+
+
+@pytest.fixture(autouse=True)
+def _explicit_test_store_namespace(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("LOCI_STORE_NAMESPACE", "test")
+
+
+def test_mcp_process_requires_explicit_store_configuration(tmp_path: Path):
+    env = os.environ.copy()
+    env.pop("LOCI_BASE_DIR", None)
+    env.pop("LOCI_STORE_NAMESPACE", None)
+
+    result = subprocess.run(
+        [sys.executable, "-m", "loci.mcp_server"],
+        capture_output=True,
+        text=True,
+        env=env,
+        timeout=5,
+    )
+
+    assert result.returncode == 78
+    error = json.loads(result.stderr)["error"]
+    assert error["code"] == "MCP_STORE_CONFIG_MISSING"
+    assert error["details"]["missing"] == [
+        "LOCI_BASE_DIR",
+        "LOCI_STORE_NAMESPACE",
+    ]
+
+
+def test_mcp_process_refuses_store_from_another_namespace(tmp_path: Path):
+    root = tmp_path / "index"
+    initialize_store(root, "codex")
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(root)
+    env["LOCI_STORE_NAMESPACE"] = "claude"
+
+    result = subprocess.run(
+        [sys.executable, "-m", "loci.mcp_server"],
+        capture_output=True,
+        text=True,
+        env=env,
+        timeout=5,
+    )
+
+    assert result.returncode == 78
+    error = json.loads(result.stderr)["error"]
+    assert error["code"] == "STORE_NAMESPACE_MISMATCH"
+
+
+def test_mcp_processes_bind_distinct_harness_stores(tmp_path: Path):
+    codex_root = tmp_path / "codex-index"
+    claude_root = tmp_path / "claude-index"
+
+    codex = asyncio.run(_store_stats(codex_root, "codex"))
+    claude = asyncio.run(_store_stats(claude_root, "claude"))
+
+    assert codex["base_dir"] == str(codex_root.resolve())
+    assert codex["namespace"] == "codex"
+    assert claude["base_dir"] == str(claude_root.resolve())
+    assert claude["namespace"] == "claude"
+    assert codex["store_id"] != claude["store_id"]
 
 
 def test_mcp_index_outline_get_round_trip(tmp_path: Path, fixtures_dir: Path):
@@ -56,6 +120,8 @@ def test_mcp_index_outline_get_round_trip(tmp_path: Path, fixtures_dir: Path):
     assert any(entry["path"] == str(repo.resolve()) for entry in result["list"]["repos"])
     assert result["stats"]["total_gets"] >= 1
     assert result["stats"]["store"]["base_dir"] == str((tmp_path / ".codeindex").resolve())
+    assert result["stats"]["store"]["namespace"] == "test"
+    assert result["stats"]["store"]["store_id"]
     assert "summary" in result["analyze"]
     assert result["analyze"]["store"]["base_dir"] == str((tmp_path / ".codeindex").resolve())
     assert result["invalid_grep"]["error"]["code"] == "INVALID_REGEX"
@@ -553,6 +619,25 @@ async def _round_trip(
         "analyze": analyze.structuredContent,
         "invalid_grep": invalid_grep.structuredContent,
     }
+
+
+async def _store_stats(cache_dir: Path, namespace: str) -> dict[str, Any]:
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["LOCI_STORE_NAMESPACE"] = namespace
+    env["PYTHONPATH"] = str(Path.cwd() / "src")
+    server_params = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "loci.mcp_server"],
+        env=env,
+        cwd=Path.cwd(),
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            stats = await session.call_tool("loci_stats", arguments={})
+            return stats.structuredContent["store"]
 
 
 async def _graph_neighbors_after_restart(repo: Path, cache_dir: Path) -> dict[str, Any]:

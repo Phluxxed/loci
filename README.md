@@ -35,10 +35,9 @@ pip install -e .
 ```
 
 For repo-local dogfooding, install the tracked wrappers so both commands are
-globally resolvable. The wrappers honor an explicit `LOCI_BASE_DIR`; otherwise
-Claude Code uses `~/.claude/loci-index` via `CLAUDECODE=1`, and bare terminal
-calls fall through to the Python store resolver. Codex and Claude MCP configs
-should pass their agent-specific stores explicitly:
+globally resolvable. The CLI wrapper retains convenience routing for legacy
+hooks and human diagnostics. The MCP wrapper performs no host guessing: every
+MCP registration must supply an explicit store root and namespace.
 
 ```bash
 mkdir -p ~/.local/bin
@@ -60,7 +59,8 @@ This installs both command entrypoints:
 Codex has a built-in MCP server manager. After installing loci, register the local stdio server:
 
 ```bash
-codex mcp add --env LOCI_BASE_DIR="$HOME/.codex/loci-index" loci -- loci-mcp
+loci store init --base-dir "$HOME/.codex/loci-index" --namespace codex
+codex mcp add --env LOCI_BASE_DIR="$HOME/.codex/loci-index" --env LOCI_STORE_NAMESPACE=codex loci -- loci-mcp
 codex mcp get --json loci
 ```
 
@@ -75,7 +75,8 @@ wrapper.
 Custom cache location:
 
 ```bash
-codex mcp add --env LOCI_BASE_DIR=/absolute/path/to/.codeindex loci -- loci-mcp
+loci store init --base-dir /absolute/path/to/.codeindex --namespace my-codex
+codex mcp add --env LOCI_BASE_DIR=/absolute/path/to/.codeindex --env LOCI_STORE_NAMESPACE=my-codex loci -- loci-mcp
 ```
 
 ### Claude Code
@@ -83,7 +84,8 @@ codex mcp add --env LOCI_BASE_DIR=/absolute/path/to/.codeindex loci -- loci-mcp
 Claude Code has a built-in MCP server manager. After installing loci, register the local stdio server:
 
 ```bash
-claude mcp add loci -s local -e LOCI_BASE_DIR="$HOME/.claude/loci-index" -- loci-mcp
+loci store init --base-dir "$HOME/.claude/loci-index" --namespace claude
+claude mcp add loci -s local -e LOCI_BASE_DIR="$HOME/.claude/loci-index" LOCI_STORE_NAMESPACE=claude -- loci-mcp
 claude mcp get loci
 ```
 
@@ -98,7 +100,7 @@ wrapper.
 Claude can also load MCP servers from config JSON. For a one-off launch:
 
 ```bash
-claude --mcp-config '{"mcpServers":{"loci":{"command":"loci-mcp","args":[],"env":{"LOCI_BASE_DIR":"/absolute/path/to/.claude/loci-index"}}}}'
+claude --mcp-config '{"mcpServers":{"loci":{"command":"loci-mcp","args":[],"env":{"LOCI_BASE_DIR":"/absolute/path/to/.claude/loci-index","LOCI_STORE_NAMESPACE":"claude"}}}}'
 ```
 
 Or put the same config in a JSON file and pass the file path:
@@ -110,7 +112,8 @@ Or put the same config in a JSON file and pass the file path:
       "command": "loci-mcp",
       "args": [],
       "env": {
-        "LOCI_BASE_DIR": "/absolute/path/to/.claude/loci-index"
+        "LOCI_BASE_DIR": "/absolute/path/to/.claude/loci-index",
+        "LOCI_STORE_NAMESPACE": "claude"
       }
     }
   }
@@ -128,7 +131,11 @@ The diagnostic JSON form for the Python module is:
   "mcpServers": {
     "loci": {
       "command": "/absolute/path/to/python",
-      "args": ["-m", "loci.mcp_server"]
+      "args": ["-m", "loci.mcp_server"],
+      "env": {
+        "LOCI_BASE_DIR": "/absolute/path/to/.claude/loci-index",
+        "LOCI_STORE_NAMESPACE": "claude"
+      }
     }
   }
 }
@@ -145,16 +152,20 @@ For clients that use `mcpServers` JSON, configure the server as a local stdio pr
       "command": "loci-mcp",
       "args": [],
       "env": {
-        "LOCI_BASE_DIR": "/absolute/path/to/.codeindex"
+        "LOCI_BASE_DIR": "/absolute/path/to/.codeindex",
+        "LOCI_STORE_NAMESPACE": "my-client"
       }
     }
   }
 }
 ```
 
-`LOCI_BASE_DIR` is optional. If omitted, loci first looks for a configured
-Codex MCP `LOCI_BASE_DIR`, then an existing `~/.codex/loci-index`, then falls
-back to `~/.codeindex`.
+Both values are required in MCP mode. `LOCI_BASE_DIR` must be absolute and
+`LOCI_STORE_NAMESPACE` must identify the owning harness or an intentionally
+shared namespace. Empty roots gain a versioned identity marker automatically.
+For a verified non-empty legacy root, run `loci store init` again with
+`--adopt-existing`; MCP never adopts it silently. Human CLI commands retain the
+legacy Codex-aware fallback when they run outside MCP mode.
 
 ### MCP Tools
 
@@ -602,7 +613,7 @@ For Claude specifically, add this to your `CLAUDE.md`:
 ```
 **MANDATORY**: Use the `loci` skill at the start of any non-trivial codebase task.
 Prefer the local `loci` MCP server. If MCP tools are not visible, configure
-loci first with `claude mcp add loci -s local -e LOCI_BASE_DIR="$HOME/.claude/loci-index" -- loci-mcp` and `claude mcp get loci`.
+loci first with `loci store init --base-dir "$HOME/.claude/loci-index" --namespace claude`, then `claude mcp add loci -s local -e LOCI_BASE_DIR="$HOME/.claude/loci-index" LOCI_STORE_NAMESPACE=claude -- loci-mcp` and `claude mcp get loci`.
 Tell the user a fresh Claude session may be required before the new `loci_*`
 tools are visible. Use `loci` CLI fallback only as a temporary bridge.
 ```
@@ -634,7 +645,8 @@ This symlinks the hooks and skill files into `~/.claude/` and patches `~/.claude
 loci can run as a local MCP server inside Codex. This is the preferred Codex integration.
 
 ```bash
-codex mcp add --env LOCI_BASE_DIR="$HOME/.codex/loci-index" loci -- loci-mcp
+loci store init --base-dir "$HOME/.codex/loci-index" --namespace codex
+codex mcp add --env LOCI_BASE_DIR="$HOME/.codex/loci-index" --env LOCI_STORE_NAMESPACE=codex loci -- loci-mcp
 codex mcp get --json loci
 ```
 

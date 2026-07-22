@@ -70,6 +70,7 @@ SKIP_EXTENSIONS = {
     ".bin", ".pem", ".key", ".p12",
 }
 REFRESH_LOCK_POLL_SECONDS = 0.05
+REFRESH_LOCK_RECLAIM_GRACE_SECONDS = 1.0
 
 
 @dataclass(frozen=True, slots=True)
@@ -111,6 +112,22 @@ def _get_store_with_resolution() -> tuple[IndexStore, StoreResolution]:
 
 
 def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
+    repo_path = Path(path).resolve()
+    _validate_repo_path(repo_path)
+    store = get_store()
+    lock_path = store.refresh_lock_path(repo_path)
+    timeout = float(os.environ.get("LOCI_REFRESH_LOCK_TIMEOUT", "10"))
+    _acquire_refresh_lock(lock_path, timeout=timeout)
+    try:
+        return _index_repo_unlocked(repo_path, incremental)
+    finally:
+        lock_path.unlink(missing_ok=True)
+
+
+def _index_repo_unlocked(
+    path: str | Path,
+    incremental: bool = True,
+) -> dict[str, Any]:
     repo_path = Path(path).resolve()
     if not repo_path.exists():
         raise LociError(
@@ -435,7 +452,7 @@ def ensure_fresh_index(repo: str | Path) -> dict[str, Any]:
         index = _load_required_index(store, repo_path)
         if not _index_is_stale(repo_path, store, index):
             return {"repo": str(repo_path), "refreshed": False}
-        result = index_repo(repo_path, incremental=True)
+        result = _index_repo_unlocked(repo_path, incremental=True)
         return {"repo": str(repo_path), "refreshed": True, "index": result}
     except LociError:
         raise
@@ -1496,6 +1513,8 @@ def _acquire_refresh_lock(lock_path: Path, timeout: float) -> None:
         try:
             fd = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
         except FileExistsError:
+            if _reclaim_abandoned_refresh_lock(lock_path):
+                continue
             if time.monotonic() >= deadline:
                 raise LociError(
                     "STALE_INDEX_REFRESH_FAILED",
@@ -1507,6 +1526,36 @@ def _acquire_refresh_lock(lock_path: Path, timeout: float) -> None:
         with os.fdopen(fd, "w") as f:
             f.write(str(os.getpid()))
         return
+
+
+def _reclaim_abandoned_refresh_lock(lock_path: Path) -> bool:
+    try:
+        initial = lock_path.stat()
+    except FileNotFoundError:
+        return True
+    if time.time() - initial.st_mtime < REFRESH_LOCK_RECLAIM_GRACE_SECONDS:
+        return False
+    try:
+        owner = int(lock_path.read_text().strip())
+    except (OSError, ValueError):
+        owner = -1
+    if owner > 0:
+        try:
+            os.kill(owner, 0)
+        except ProcessLookupError:
+            pass
+        except PermissionError:
+            return False
+        else:
+            return False
+    try:
+        current = lock_path.stat()
+        if (current.st_dev, current.st_ino) != (initial.st_dev, initial.st_ino):
+            return False
+        lock_path.unlink()
+    except FileNotFoundError:
+        pass
+    return True
 
 
 def _scan_repository_files(

@@ -1,8 +1,10 @@
 from pathlib import Path
 import hashlib
 import json
+import os
 import subprocess
 import sys
+import time
 
 import pytest
 
@@ -31,6 +33,59 @@ from loci.service import (
     verify_repo,
 )
 from loci.storage.index_store import EXTRACTOR_VERSION, IndexStore
+
+
+def test_direct_index_uses_repository_refresh_lock(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "sample.py").write_text("def sample():\n    return 1\n")
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    events: list[tuple[str, Path]] = []
+
+    def acquire(lock_path: Path, timeout: float) -> None:
+        events.append(("acquire", lock_path))
+        lock_path.write_text("test")
+
+    def index_without_lock(path: str | Path, incremental: bool) -> dict:
+        events.append(("index", Path(path)))
+        return {"path": str(Path(path).resolve()), "symbols_indexed": 0}
+
+    monkeypatch.setattr(service_module, "_acquire_refresh_lock", acquire)
+    monkeypatch.setattr(service_module, "_index_repo_unlocked", index_without_lock)
+
+    result = index_repo(repo, incremental=False)
+
+    lock_path = IndexStore(base).refresh_lock_path(repo.resolve())
+    assert events == [("acquire", lock_path), ("index", repo.resolve())]
+    assert result["path"] == str(repo.resolve())
+    assert not lock_path.exists()
+
+
+def test_refresh_lock_reclaims_abandoned_owner(tmp_path: Path):
+    lock_path = tmp_path / "refresh.lock"
+    lock_path.write_text("99999999")
+    old = time.time() - 60
+    os.utime(lock_path, (old, old))
+
+    service_module._acquire_refresh_lock(lock_path, timeout=0.2)
+
+    assert lock_path.read_text() == str(os.getpid())
+
+
+def test_refresh_lock_does_not_steal_live_owner(tmp_path: Path):
+    lock_path = tmp_path / "refresh.lock"
+    lock_path.write_text(str(os.getpid()))
+    old = time.time() - 60
+    os.utime(lock_path, (old, old))
+
+    with pytest.raises(LociError) as exc_info:
+        service_module._acquire_refresh_lock(lock_path, timeout=0.05)
+
+    assert exc_info.value.code == "STALE_INDEX_REFRESH_FAILED"
 
 
 def _run_python_json(source: str, *args: Path) -> dict:

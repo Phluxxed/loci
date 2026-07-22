@@ -35,16 +35,25 @@ If MCP tools are not configured in the current agent runtime, configure MCP firs
 For Claude Code, run:
 
 ```bash
-claude mcp add loci -s local -e LOCI_BASE_DIR="$HOME/.claude/loci-index" -- loci-mcp
+loci store init --base-dir "$HOME/.claude/loci-index" --namespace claude
+claude mcp add loci -s local -e LOCI_BASE_DIR="$HOME/.claude/loci-index" LOCI_STORE_NAMESPACE=claude -- loci-mcp
 claude mcp get loci
 ```
 
 For Codex, run:
 
 ```bash
-codex mcp add --env LOCI_BASE_DIR="$HOME/.codex/loci-index" loci -- loci-mcp
+loci store init --base-dir "$HOME/.codex/loci-index" --namespace codex
+codex mcp add --env LOCI_BASE_DIR="$HOME/.codex/loci-index" --env LOCI_STORE_NAMESPACE=codex loci -- loci-mcp
 codex mcp get --json loci
 ```
+
+MCP storage is process-bound. Both `LOCI_BASE_DIR` and
+`LOCI_STORE_NAMESPACE` are required, and the namespace must match the store's
+versioned identity marker. The server refuses missing configuration,
+cross-namespace reuse, and silent adoption of a populated legacy store. After
+verifying ownership of an existing unmarked store, initialize it once with
+`loci store init --base-dir <absolute-path> --namespace <name> --adopt-existing`.
 
 If `loci-mcp` is not on `PATH`, fix the install or wrapper symlink first. For this repo-local install, `~/.local/bin/loci-mcp` should resolve to `.shared/loci-mcp-wrapper.sh`. Use `/absolute/path/to/python -m loci.mcp_server` only as a diagnostic fallback, not as the permanent MCP client config.
 
