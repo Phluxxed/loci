@@ -1,31 +1,50 @@
-# Loci MCP Harness Store Isolation
+# Trustworthy Loci Coverage and Store Lifecycle
 
-- [x] Task 1: Store identity foundation
-  - Acceptance: explicit namespace marker; mismatch refusal; explicit legacy adoption.
-  - Verify: `.venv/bin/python -m pytest -q tests/storage/test_store_identity.py tests/storage/test_store_resolver.py`
-  - Files: `src/loci/storage/store_identity.py`, `src/loci/storage/store_resolver.py`, storage tests.
+- [ ] Task 1.1: Centralize indexability and restore maintained test coverage.
+  - Acceptance: maintained tests and fixtures are indexed; only generated,
+    cache, vendor, build, temporary, ignored, or explicitly throwaway material
+    is excluded.
+  - Verify: focused service, CLI, and scan-policy tests.
 
-- [x] Task 2: MCP and registration boundary
-  - Acceptance: startup fails without explicit root/namespace; wrapper does not guess; host docs configure distinct stores.
-  - Verify: `.venv/bin/python -m pytest -q tests/test_wrapper_routing.py tests/test_mcp_server.py`
-  - Files: `src/loci/mcp_server.py`, `.shared/loci-mcp-wrapper.sh`, MCP/wrapper tests, README and skill.
+- [ ] Task 1.2: Expose query coverage and honest empty-result semantics.
+  - Acceptance: empty and non-empty search/grep outcomes carry typed coverage.
+  - Verify: focused service and MCP contract tests.
 
-- [x] Task 3: Same-harness write serialization
-  - Acceptance: explicit indexing and freshness refresh use the same repository lock without deadlock.
-  - Verify: `.venv/bin/python -m pytest -q tests/test_service.py`
-  - Files: `src/loci/service.py`, `tests/test_service.py`.
+- [ ] Task 1.3: Make Claude enforcement coverage-equivalent.
+  - Acceptance: redirects are answer-equivalent, schema-correct, and independent
+    of aggregate index bytes.
+  - Verify: focused hook tests for tests/, root grep, nested roots, and fallback.
 
-- [x] Task 4: Production qualification and review
-  - Acceptance: all spec success criteria and Definition of Done gates pass.
-  - Verify: full pytest, pyright, compileall, lockfile check, package build, and MCP smoke tests.
-  - Files: verification evidence only unless review finds a required correction.
+- [ ] Task 2.1: Build an atomic repository catalog and fast inventory.
+  - Acceptance: list cost scales with catalog entries and legacy repair is
+    deterministic.
+  - Verify: focused atomicity, recovery, compatibility, and performance tests.
 
-## Qualification
+- [ ] Task 2.2: Diagnose freshness, dead roots, corruption, and overlaps.
+  - Acceptance: bounded typed health findings with no mutation during reads.
+  - Verify: focused mixed-store health fixtures.
 
-- Full suite: `1216 passed in 54.77s`.
-- Changed source: pyright `0 errors`; repo-wide unconfigured diagnostic retains
-  263 unrelated existing findings.
-- Compile, lockfile, package build, wrapper syntax, installed MCP smoke, Loci
-  index verification, and graph health passed.
-- Manifest task `work_df7cca19-c64c-441a-9790-b5c79d50dd17` completed with
-  commit, test, design, and live-registration evidence.
+- [ ] Task 2.3: Add explicit dead-root pruning.
+  - Acceptance: deterministic dry-run, exact reviewed apply, and post-prune
+    integrity proof.
+  - Verify: focused disposable-store prune tests.
+
+- [ ] Task 2.4: Prevent new overlapping repository roots.
+  - Acceptance: structured conflicts for ancestor/descendant roots; exact-root
+    reindex and sibling roots remain valid.
+  - Verify: focused path, symlink, and worktree overlap tests.
+
+- [ ] Task 3.1: Guarantee test-store isolation.
+  - Acceptance: in-process and subprocess tests cannot resolve operator stores.
+  - Verify: focused isolation sentinels and subprocess proofs.
+
+- [ ] Task 3.2: Normalize MCP repository-root parameters.
+  - Acceptance: one canonical root name, deliberate compatibility, and updated
+    first-party guidance.
+  - Verify: focused schema snapshots and installed stdio smoke.
+
+- [ ] Task 3.3: Qualify the complete trust contract.
+  - Acceptance: every Objective criterion has bounded evidence and no required
+    review finding remains.
+  - Verify: focused end-to-end coverage, store, hook, and MCP scenarios; wider
+    checks only with separate approval.
