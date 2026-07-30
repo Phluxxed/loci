@@ -1,6 +1,6 @@
 # Trustworthy Loci Coverage and Store Lifecycle
 
-- [ ] Task 1.1: Centralize indexability and restore maintained test coverage.
+- [x] Task 1.1: Centralize indexability and restore maintained test coverage.
   - Acceptance: maintained tests and fixtures are indexed; only generated,
     cache, vendor, build, temporary, ignored, or explicitly throwaway material
     is excluded.

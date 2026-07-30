@@ -68,6 +68,67 @@ def test_index_skips_uv_cache_directories(tmp_path: Path):
     assert "should_not_be_indexed" not in names
 
 
+def test_cli_queries_include_maintained_test_source(tmp_path: Path):
+    repo = tmp_path / "repo"
+    test_file = repo / "tests" / "test_cli_probe.py"
+    test_file.parent.mkdir(parents=True)
+    test_file.write_text(
+        "def cli_test_probe():\n    return 'indexed'\n",
+        encoding="utf-8",
+    )
+    base = str(tmp_path / ".codeindex")
+
+    indexed = run_loci(
+        "index",
+        str(repo),
+        env_extra={"LOCI_BASE_DIR": base},
+    )
+    outline = run_loci(
+        "outline",
+        str(repo),
+        "--file",
+        "tests/test_cli_probe.py",
+        env_extra={"LOCI_BASE_DIR": base},
+    )
+    search = run_loci(
+        "search",
+        "cli_test_probe",
+        "--repo",
+        str(repo),
+        env_extra={"LOCI_BASE_DIR": base},
+    )
+    search_results = json.loads(search.stdout)
+    symbol_id = next(result["id"] for result in search_results)
+    fetched = run_loci(
+        "get",
+        symbol_id,
+        "--repo",
+        str(repo),
+        env_extra={"LOCI_BASE_DIR": base},
+    )
+    cached_file = run_loci(
+        "file",
+        "tests/test_cli_probe.py",
+        "--repo",
+        str(repo),
+        env_extra={"LOCI_BASE_DIR": base},
+    )
+    grep = run_loci(
+        "grep",
+        "cli_test_probe",
+        "--repo",
+        str(repo),
+        env_extra={"LOCI_BASE_DIR": base},
+    )
+
+    assert indexed.returncode == 0, indexed.stderr
+    assert json.loads(outline.stdout)[0]["file"] == "tests/test_cli_probe.py"
+    assert json.loads(fetched.stdout)["id"].startswith("tests/test_cli_probe.py::")
+    assert "def cli_test_probe" in json.loads(fetched.stdout)["source"]
+    assert "cli_test_probe" in json.loads(cached_file.stdout)["content"]
+    assert json.loads(grep.stdout)[0]["file"] == "tests/test_cli_probe.py"
+
+
 def test_index_exits_zero(sample_repo: Path, tmp_path: Path):
     result = run_loci("index", str(sample_repo), env_extra={"LOCI_BASE_DIR": str(tmp_path / ".codeindex")})
     assert result.returncode == 0, result.stderr

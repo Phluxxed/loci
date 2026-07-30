@@ -213,6 +213,93 @@ def test_service_index_outline_get_round_trip(sample_repo: Path, tmp_path: Path,
     assert "context_after" in results[0]
 
 
+def test_service_indexes_maintained_tests_and_supported_fixtures(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    (repo / "tests" / "fixtures").mkdir(parents=True)
+    (repo / "__tests__").mkdir()
+    (repo / "src").mkdir()
+    (repo / "pkg").mkdir()
+    (repo / "tests" / "test_widget.py").write_text(
+        "def maintained_test_probe():\n    return 'indexed'\n",
+        encoding="utf-8",
+    )
+    (repo / "__tests__" / "widget.test.ts").write_text(
+        "export function typescriptTestProbe(): string { return 'indexed'; }\n",
+        encoding="utf-8",
+    )
+    (repo / "src" / "widget_test.py").write_text(
+        "def suffix_test_probe():\n    return 'indexed'\n",
+        encoding="utf-8",
+    )
+    (repo / "pkg" / "widget_test.go").write_text(
+        "package widget\nfunc GoTestProbe() string { return \"indexed\" }\n",
+        encoding="utf-8",
+    )
+    (repo / "tests" / "fixtures" / "sample.rs").write_text(
+        "pub fn fixture_probe() -> &'static str { \"indexed\" }\n",
+        encoding="utf-8",
+    )
+
+    index_repo(repo, incremental=False)
+
+    outline = outline_repo(repo)
+    outlined_files = {entry["file"] for entry in outline}
+    search_results = search_symbols(repo, "maintained_test_probe", limit=5)
+    symbol_id = next(
+        result["id"]
+        for result in search_results
+        if result["name"] == "maintained_test_probe"
+    )
+    cached_file = get_cached_file(repo, "tests/test_widget.py")
+    grep_results = grep_repo(repo, "maintained_test_probe")
+    symbols = get_symbols(repo, [symbol_id])
+
+    assert {
+        "tests/test_widget.py",
+        "__tests__/widget.test.ts",
+        "src/widget_test.py",
+        "pkg/widget_test.go",
+        "tests/fixtures/sample.rs",
+    } <= outlined_files
+    assert "maintained_test_probe" in cached_file["content"]
+    assert any(result["file"] == "tests/test_widget.py" for result in grep_results)
+    assert symbols[0]["id"].startswith("tests/test_widget.py::")
+    assert "def maintained_test_probe" in symbols[0]["source"]
+
+
+def test_service_excludes_disposable_and_ignored_source(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    source_files = {
+        "src/maintained.py": "def maintained_probe():\n    return True\n",
+        "src/ignored.py": "def ignored_probe():\n    return True\n",
+        "generated/client.py": "def generated_probe():\n    return True\n",
+        "vendor/dependency.py": "def vendor_probe():\n    return True\n",
+        "dist/bundle.js": "export function distProbe() { return true; }\n",
+        "target/debug.rs": "pub fn target_probe() -> bool { true }\n",
+        "tmp/scratch.py": "def temporary_probe():\n    return True\n",
+        "src/__pycache__/cached.py": "def cached_probe():\n    return True\n",
+    }
+    for relative_path, source in source_files.items():
+        path = repo / relative_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(source, encoding="utf-8")
+    (repo / ".gitignore").write_text("src/ignored.py\n", encoding="utf-8")
+
+    index_repo(repo, incremental=False)
+
+    outlined_files = {entry["file"] for entry in outline_repo(repo)}
+    assert outlined_files == {"src/maintained.py"}
+
+
 def test_service_index_warns_on_short_nonempty_markdown_with_zero_symbols(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
