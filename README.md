@@ -250,12 +250,21 @@ loci grep "TODO|FIXME" --repo /path/to/repo
 loci verify /path/to/repo          # check for content drift
 loci list                           # all indexed repos
 loci invalidate /path/to/repo      # clear stale cache
+loci store repair-catalog          # explicitly migrate/repair legacy inventory
 
 # Human token savings analytics
 loci stats
 loci stats --pretty
 loci stats --repo /path/to/repo
 ```
+
+`loci list` reads a small atomic repository catalog and never parses repository
+indexes. A legacy store without a catalog, a corrupt catalog, or an interrupted
+index/invalidate mutation returns `REPOSITORY_CATALOG_REPAIR_REQUIRED` instead
+of a possibly stale inventory. Run `loci store repair-catalog` explicitly to
+rebuild it. Repair is non-destructive and bounded by `--max-repositories` and
+`--max-total-index-bytes`; raise those limits deliberately when a known legacy
+store exceeds them.
 
 ## Symbol fields
 

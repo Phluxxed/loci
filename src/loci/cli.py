@@ -21,6 +21,11 @@ from loci.service import (
     verify_repo,
 )
 from loci.storage.store_identity import StoreIdentityError, initialize_store
+from loci.storage.repository_catalog import (
+    DEFAULT_MAX_REPOSITORIES,
+    DEFAULT_MAX_TOTAL_INDEX_BYTES,
+    RepositoryCatalogError,
+)
 
 
 def _print_loci_error(exc: LociError) -> None:
@@ -35,6 +40,17 @@ def _print_loci_error(exc: LociError) -> None:
 
 
 def _print_store_identity_error(exc: StoreIdentityError) -> None:
+    print(
+        json.dumps({
+            "error": exc.message,
+            "code": exc.code,
+            "details": exc.details,
+        }),
+        file=sys.stderr,
+    )
+
+
+def _print_repository_catalog_error(exc: RepositoryCatalogError) -> None:
     print(
         json.dumps({
             "error": exc.message,
@@ -138,16 +154,24 @@ def cmd_verify(args: argparse.Namespace) -> int:
 
 
 def cmd_list(_args: argparse.Namespace) -> int:
-    print(json.dumps(list_repos()))
-    return 0
+    try:
+        print(json.dumps(list_repos()))
+        return 0
+    except LociError as exc:
+        _print_loci_error(exc)
+        return 1
 
 
 def cmd_invalidate(args: argparse.Namespace) -> int:
     repo_path = Path(args.path).resolve()
     store = get_service_store()
-    store.invalidate(repo_path)
-    print(json.dumps({"invalidated": str(repo_path)}))
-    return 0
+    try:
+        store.invalidate(repo_path)
+        print(json.dumps({"invalidated": str(repo_path)}))
+        return 0
+    except RepositoryCatalogError as exc:
+        _print_repository_catalog_error(exc)
+        return 1
 
 
 def _fmt_bytes(n: int) -> str:
@@ -440,6 +464,20 @@ def cmd_store_init(args: argparse.Namespace) -> int:
         return 1
 
 
+def cmd_store_repair_catalog(args: argparse.Namespace) -> int:
+    store = get_service_store()
+    try:
+        result = store.repair_catalog(
+            max_repositories=args.max_repositories,
+            max_total_index_bytes=args.max_total_index_bytes,
+        )
+        print(json.dumps(result))
+        return 0
+    except RepositoryCatalogError as exc:
+        _print_repository_catalog_error(exc)
+        return 1
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="loci", description="Code symbol indexer")
     sub = parser.add_subparsers(dest="command")
@@ -497,7 +535,7 @@ def main() -> None:
     p_verify = sub.add_parser("verify", help="Verify byte offsets for all indexed symbols")
     p_verify.add_argument("path", help="Path to repo")
 
-    p_store = sub.add_parser("store", help="Initialize a harness-owned store")
+    p_store = sub.add_parser("store", help="Manage repository store metadata")
     store_sub = p_store.add_subparsers(dest="store_command")
     p_store_init = store_sub.add_parser("init", help="Create or adopt a store identity")
     p_store_init.add_argument("--base-dir", required=True, help="Absolute store root")
@@ -506,6 +544,22 @@ def main() -> None:
         "--adopt-existing",
         action="store_true",
         help="Adopt a verified non-empty unmarked store without moving its contents",
+    )
+    p_store_repair = store_sub.add_parser(
+        "repair-catalog",
+        help="Explicitly rebuild the repository catalog",
+    )
+    p_store_repair.add_argument(
+        "--max-repositories",
+        type=int,
+        default=DEFAULT_MAX_REPOSITORIES,
+        help="Maximum repository indexes to inspect",
+    )
+    p_store_repair.add_argument(
+        "--max-total-index-bytes",
+        type=int,
+        default=DEFAULT_MAX_TOTAL_INDEX_BYTES,
+        help="Maximum combined legacy index bytes to scan",
     )
 
     args = parser.parse_args()
@@ -532,6 +586,8 @@ def main() -> None:
         sys.exit(cmd_verify(args))
     elif args.command == "store" and args.store_command == "init":
         sys.exit(cmd_store_init(args))
+    elif args.command == "store" and args.store_command == "repair-catalog":
+        sys.exit(cmd_store_repair_catalog(args))
     else:
         parser.print_help()
         sys.exit(1)

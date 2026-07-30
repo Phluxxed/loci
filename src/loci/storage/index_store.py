@@ -16,6 +16,12 @@ from loci.graph.calls import validate_call_records
 from loci.graph.references import validate_symbol_reference_records
 from loci.graph.state import GraphIndexState
 from loci.parser.symbols import Symbol
+from loci.storage.repository_catalog import (
+    DEFAULT_MAX_REPOSITORIES,
+    DEFAULT_MAX_TOTAL_INDEX_BYTES,
+    RepositoryCatalog,
+    RepositoryCatalogEntry,
+)
 from loci.storage.store_layout import repository_cache_key
 
 LAST_SEARCH_TTL = 300  # 5 minutes
@@ -96,6 +102,7 @@ class IndexStore:
     def __init__(self, base_dir: Optional[Path] = None) -> None:
         self.base_dir = base_dir or Path.home() / ".codeindex"
         self.base_dir.mkdir(parents=True, exist_ok=True)
+        self._catalog = RepositoryCatalog(self.base_dir)
         self._worktree_cache: dict[str, str] = {}
 
     def _canonical_repo(self, repo_path: str) -> str:
@@ -143,6 +150,10 @@ class IndexStore:
             file_hashes=file_hashes,
         )
 
+        cache_key = self._cache_key(repo_path)
+        catalog_entries = self._catalog.entries_for_mutation()
+        self._catalog.begin_mutation("write", cache_key)
+
         repo_dir = self._repo_dir(repo_path)
         repo_dir.mkdir(parents=True, exist_ok=True)
 
@@ -177,6 +188,15 @@ class IndexStore:
         tmp_path = index_path.with_suffix(".tmp")
         tmp_path.write_text(json.dumps(index_data, indent=2))
         tmp_path.replace(index_path)
+        catalog_entry = RepositoryCatalogEntry(
+            cache_key=cache_key,
+            symbols=len(symbols),
+            path=str(repo_path.resolve()),
+        )
+        self._catalog.write_repository_metadata(catalog_entry)
+        catalog_entries[cache_key] = catalog_entry
+        self._catalog.commit(catalog_entries)
+        self._catalog.finish_mutation()
 
     def load(self, repo_path: Path) -> Optional[dict[str, Any]]:
         index_path = self._index_path(repo_path)
@@ -355,23 +375,18 @@ class IndexStore:
 
 
     def list_repos(self) -> list[dict[str, Any]]:
-        repos = []
-        for repo_dir in self.base_dir.iterdir():
-            if not repo_dir.is_dir():
-                continue
-            index_file = repo_dir / "index.json"
-            if not index_file.exists():
-                continue
-            try:
-                data = json.loads(index_file.read_text())
-                repos.append({
-                    "cache_key": repo_dir.name,
-                    "symbols": len(data.get("symbols", [])),
-                    "path": data.get("repo_path", repo_dir.name),
-                })
-            except Exception:
-                continue
-        return repos
+        return self._catalog.list_entries()
+
+    def repair_catalog(
+        self,
+        *,
+        max_repositories: int = DEFAULT_MAX_REPOSITORIES,
+        max_total_index_bytes: int = DEFAULT_MAX_TOTAL_INDEX_BYTES,
+    ) -> dict[str, Any]:
+        return self._catalog.repair(
+            max_repositories=max_repositories,
+            max_total_index_bytes=max_total_index_bytes,
+        )
 
     def _session_log_path(self) -> Path:
         return self.base_dir / "session.jsonl"
@@ -635,8 +650,16 @@ class IndexStore:
 
     def invalidate(self, repo_path: Path) -> None:
         repo_dir = self._repo_dir(repo_path)
+        cache_key = self._cache_key(repo_path)
+        catalog_entries = self._catalog.entries_for_mutation()
+        if not repo_dir.exists() and cache_key not in catalog_entries:
+            return
+        self._catalog.begin_mutation("invalidate", cache_key)
         if repo_dir.exists():
             shutil.rmtree(repo_dir)
+        catalog_entries.pop(cache_key, None)
+        self._catalog.commit(catalog_entries)
+        self._catalog.finish_mutation()
 
     def verify_index(self, repo_path: Path) -> dict[str, Any]:
         """Check indexed symbol spans and synthetic-node anchor hashes.
