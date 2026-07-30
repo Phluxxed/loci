@@ -127,6 +127,48 @@ def test_mcp_index_outline_get_round_trip(tmp_path: Path, fixtures_dir: Path):
     assert result["invalid_grep"]["error"]["code"] == "INVALID_REGEX"
 
 
+def test_mcp_repository_scoped_tools_use_one_root_parameter(tmp_path: Path) -> None:
+    result = asyncio.run(
+        _repository_parameter_round_trip(
+            tmp_path / "repo",
+            tmp_path / ".codeindex",
+        )
+    )
+
+    repository_tools = {
+        "loci_index",
+        "loci_outline",
+        "loci_get",
+        "loci_graph_anchors",
+        "loci_graph_neighbors",
+        "loci_graph_traverse_neighbors",
+        "loci_graph_paths",
+        "loci_graph_retrieve",
+        "loci_graph_health",
+        "loci_graph_imports",
+        "loci_graph_references",
+        "loci_graph_calls",
+        "loci_search",
+        "loci_file",
+        "loci_grep",
+        "loci_verify",
+    }
+    for tool_name, schema in result["schemas"].items():
+        assert "path" not in schema["properties"], tool_name
+        if tool_name in repository_tools:
+            assert "repo" in schema["properties"], tool_name
+            assert "repo" in schema["required"], tool_name
+
+    assert result["canonical"]["indexed"]["symbols_indexed"] > 0
+    assert result["canonical"]["outline"]["files"][0]["file"] == "sample.py"
+    assert result["canonical"]["verify"]["failed"] == []
+    assert result["legacy"]["indexed"]["symbols_indexed"] > 0
+    assert result["legacy"]["outline"]["files"][0]["file"] == "sample.py"
+    assert result["legacy"]["verify"]["failed"] == []
+    assert result["duplicate"]["is_error"] is True
+    assert "provide only 'repo'" in result["duplicate"]["message"]
+
+
 def test_mcp_search_and_grep_expose_honest_coverage(tmp_path: Path):
     result = asyncio.run(
         _query_coverage_round_trip(
@@ -583,11 +625,11 @@ async def _round_trip(
 
             indexed = await session.call_tool(
                 "loci_index",
-                arguments={"path": str(repo), "incremental": False},
+                arguments={"repo": str(repo), "incremental": False},
             )
             outline = await session.call_tool(
                 "loci_outline",
-                arguments={"path": str(repo)},
+                arguments={"repo": str(repo)},
             )
             symbol_id = next(
                 symbol["id"]
@@ -634,7 +676,7 @@ async def _round_trip(
             )
             verify = await session.call_tool(
                 "loci_verify",
-                arguments={"path": str(repo)},
+                arguments={"repo": str(repo)},
             )
             repos = await session.call_tool("loci_list", arguments={})
             stats = await session.call_tool(
@@ -667,6 +709,78 @@ async def _round_trip(
         "stats": stats.structuredContent,
         "analyze": analyze.structuredContent,
         "invalid_grep": invalid_grep.structuredContent,
+    }
+
+
+async def _repository_parameter_round_trip(
+    repo: Path,
+    cache_dir: Path,
+) -> dict[str, Any]:
+    repo.mkdir()
+    (repo / "sample.py").write_text("def sample():\n    return 1\n")
+
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["LOCI_STORE_NAMESPACE"] = "test"
+    env["PYTHONPATH"] = str(Path.cwd() / "src")
+    server_params = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "loci.mcp_server"],
+        env=env,
+        cwd=Path.cwd(),
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            tools = await session.list_tools()
+            schemas = {tool.name: tool.inputSchema for tool in tools.tools}
+
+            indexed = await session.call_tool(
+                "loci_index",
+                arguments={"repo": str(repo), "incremental": False},
+            )
+            outline = await session.call_tool(
+                "loci_outline",
+                arguments={"repo": str(repo)},
+            )
+            verify = await session.call_tool(
+                "loci_verify",
+                arguments={"repo": str(repo)},
+            )
+            legacy_indexed = await session.call_tool(
+                "loci_index",
+                arguments={"path": str(repo), "incremental": True},
+            )
+            legacy_outline = await session.call_tool(
+                "loci_outline",
+                arguments={"path": str(repo)},
+            )
+            legacy_verify = await session.call_tool(
+                "loci_verify",
+                arguments={"path": str(repo)},
+            )
+            duplicate = await session.call_tool(
+                "loci_outline",
+                arguments={"repo": str(repo), "path": str(repo)},
+            )
+
+    return {
+        "schemas": schemas,
+        "canonical": {
+            "indexed": indexed.structuredContent,
+            "outline": outline.structuredContent,
+            "verify": verify.structuredContent,
+        },
+        "legacy": {
+            "indexed": legacy_indexed.structuredContent,
+            "outline": legacy_outline.structuredContent,
+            "verify": legacy_verify.structuredContent,
+        },
+        "duplicate": {
+            "is_error": duplicate.isError,
+            "message": duplicate.content[0].text,
+        },
     }
 
 
@@ -719,7 +833,7 @@ async def _query_coverage_round_trip(
             await session.initialize()
             await session.call_tool(
                 "loci_index",
-                arguments={"path": str(repo), "incremental": False},
+                arguments={"repo": str(repo), "incremental": False},
             )
             calls = {
                 "search_present": (
@@ -767,7 +881,7 @@ async def _graph_neighbors_after_restart(repo: Path, cache_dir: Path) -> dict[st
             await session.initialize()
             indexed = await session.call_tool(
                 "loci_index",
-                arguments={"path": str(repo), "incremental": False},
+                arguments={"repo": str(repo), "incremental": False},
             )
             assert indexed.structuredContent["graph_edges_indexed"] == 1
 
@@ -824,7 +938,7 @@ async def _graph_health_after_restart(
             await session.initialize()
             await session.call_tool(
                 "loci_index",
-                arguments={"path": str(repo), "incremental": False},
+                arguments={"repo": str(repo), "incremental": False},
             )
 
     async with stdio_client(server_params) as (read, write):
@@ -862,7 +976,7 @@ async def _graph_anchors_after_restart(
             await session.initialize()
             await session.call_tool(
                 "loci_index",
-                arguments={"path": str(repo), "incremental": False},
+                arguments={"repo": str(repo), "incremental": False},
             )
 
     guide.write_text(
@@ -929,7 +1043,7 @@ async def _graph_paths_after_restart(
             await session.initialize()
             await session.call_tool(
                 "loci_index",
-                arguments={"path": str(repo), "incremental": False},
+                arguments={"repo": str(repo), "incremental": False},
             )
 
     async with stdio_client(server_params) as (read, write):
@@ -1004,7 +1118,7 @@ async def _graph_imports_after_restart(
             await session.initialize()
             indexed = await session.call_tool(
                 "loci_index",
-                arguments={"path": str(repo), "incremental": False},
+                arguments={"repo": str(repo), "incremental": False},
             )
             assert indexed.structuredContent["graph_imports_resolved"] == 1
             assert indexed.structuredContent["graph_imports_unresolved"] == 1
@@ -1101,7 +1215,7 @@ async def _javascript_workspace_import_after_restart(
             await session.initialize()
             indexed = await session.call_tool(
                 "loci_index",
-                arguments={"path": str(repo), "incremental": False},
+                arguments={"repo": str(repo), "incremental": False},
             )
             assert indexed.structuredContent["graph_imports_resolved"] == 1
 
@@ -1167,7 +1281,7 @@ async def _go_package_target_after_restart(
             await session.initialize()
             indexed = await session.call_tool(
                 "loci_index",
-                arguments={"path": str(repo), "incremental": False},
+                arguments={"repo": str(repo), "incremental": False},
             )
             initial_imports = await session.call_tool(
                 "loci_graph_imports",
@@ -1288,7 +1402,7 @@ async def _rust_crate_target_after_restart(
             await session.initialize()
             indexed = await session.call_tool(
                 "loci_index",
-                arguments={"path": str(repo), "incremental": False},
+                arguments={"repo": str(repo), "incremental": False},
             )
             initial_imports = await session.call_tool(
                 "loci_graph_imports",
@@ -1397,7 +1511,7 @@ async def _search_after_repo_change(repo: Path, cache_dir: Path) -> dict[str, An
             await session.initialize()
             await session.call_tool(
                 "loci_index",
-                arguments={"path": str(repo), "incremental": False},
+                arguments={"repo": str(repo), "incremental": False},
             )
             source.write_text("def fresh_symbol():\n    return 2\n")
             search = await session.call_tool(
@@ -1427,7 +1541,7 @@ async def _grep_after_indexed_file_deleted(repo: Path, cache_dir: Path) -> dict[
             await session.initialize()
             await session.call_tool(
                 "loci_index",
-                arguments={"path": str(repo), "incremental": False},
+                arguments={"repo": str(repo), "incremental": False},
             )
             source.unlink()
             grep = await session.call_tool(
@@ -1466,11 +1580,11 @@ async def _markdown_search_and_outline(repo: Path, cache_dir: Path) -> dict[str,
             await session.initialize()
             await session.call_tool(
                 "loci_index",
-                arguments={"path": str(repo), "incremental": False},
+                arguments={"repo": str(repo), "incremental": False},
             )
             outline = await session.call_tool(
                 "loci_outline",
-                arguments={"path": str(repo), "file": "README.md"},
+                arguments={"repo": str(repo), "file": "README.md"},
             )
             search = await session.call_tool(
                 "loci_search",
@@ -1501,7 +1615,7 @@ async def _outline_missing_repo(cache_dir: Path, repo: Path) -> dict[str, Any]:
     async with stdio_client(server_params) as (read, write):
         async with ClientSession(read, write) as session:
             await session.initialize()
-            result = await session.call_tool("loci_outline", arguments={"path": str(repo)})
+            result = await session.call_tool("loci_outline", arguments={"repo": str(repo)})
             assert result.isError is True
             return result.structuredContent["error"]
 

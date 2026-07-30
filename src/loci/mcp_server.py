@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import json
 import sys
+from collections.abc import Sequence
 from typing import Any, Literal, cast
 
 from mcp.server.fastmcp import FastMCP
-from mcp.types import CallToolResult, TextContent
+from mcp.server.fastmcp.exceptions import ToolError
+from mcp.types import CallToolResult, ContentBlock, TextContent
 
 from loci.graph.traversal import GraphDirection
 from loci.service import (
@@ -34,8 +36,42 @@ from loci.storage.store_identity import StoreIdentityError, bind_mcp_store
 from loci.storage.store_resolver import activate_mcp_store
 
 
+_LEGACY_PATH_PARAMETER_TOOLS = frozenset({
+    "loci_index",
+    "loci_outline",
+    "loci_verify",
+})
+
+
+class LociMCP(FastMCP):
+    async def call_tool(
+        self,
+        name: str,
+        arguments: dict[str, Any],
+    ) -> Sequence[ContentBlock] | dict[str, Any]:
+        return await super().call_tool(
+            name,
+            _normalize_repository_arguments(name, arguments),
+        )
+
+
+def _normalize_repository_arguments(
+    tool_name: str,
+    arguments: dict[str, Any],
+) -> dict[str, Any]:
+    if tool_name not in _LEGACY_PATH_PARAMETER_TOOLS or "path" not in arguments:
+        return arguments
+    if "repo" in arguments:
+        raise ToolError(
+            f"{tool_name} received both 'repo' and legacy 'path'; provide only 'repo'"
+        )
+    normalized = dict(arguments)
+    normalized["repo"] = normalized.pop("path")
+    return normalized
+
+
 def create_server() -> FastMCP:
-    mcp = FastMCP(
+    mcp = LociMCP(
         "loci",
         instructions=(
             "Local code navigation server. Index local repositories, inspect symbol "
@@ -46,15 +82,15 @@ def create_server() -> FastMCP:
     )
 
     @mcp.tool()
-    def loci_index(path: str, incremental: bool = True) -> CallToolResult:
+    def loci_index(repo: str, incremental: bool = True) -> CallToolResult:
         """Index a local repository path into the loci cache."""
-        return _handle_loci_error(lambda: index_repo(path, incremental=incremental))
+        return _handle_loci_error(lambda: index_repo(repo, incremental=incremental))
 
     @mcp.tool()
-    def loci_outline(path: str, file: str | None = None) -> CallToolResult:
+    def loci_outline(repo: str, file: str | None = None) -> CallToolResult:
         """Return indexed symbols grouped by file."""
         return _handle_loci_error(
-            lambda: {"files": outline_repo(path, file=file, ensure_fresh=True)}
+            lambda: {"files": outline_repo(repo, file=file, ensure_fresh=True)}
         )
 
     @mcp.tool()
@@ -310,9 +346,9 @@ def create_server() -> FastMCP:
         )
 
     @mcp.tool()
-    def loci_verify(path: str) -> CallToolResult:
+    def loci_verify(repo: str) -> CallToolResult:
         """Verify index integrity and content drift for an indexed repository."""
-        return _handle_loci_error(lambda: verify_repo(path))
+        return _handle_loci_error(lambda: verify_repo(repo))
 
     @mcp.tool()
     def loci_list() -> CallToolResult:
