@@ -7,7 +7,7 @@ import uuid
 from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
-from typing import Any, Literal
+from typing import Any, Literal, TypedDict
 
 import pathspec
 
@@ -43,8 +43,8 @@ from loci.graph.retrieval import (
 )
 from loci.graph.traversal import GraphDirection
 from loci.indexability import (
-    is_excluded_repository_path,
-    is_indexable_source_path,
+    repository_path_exclusion_root,
+    source_exclusion_reason,
 )
 from loci.parser.call_models import RawCallSite
 from loci.parser.extractor import parse_file
@@ -56,11 +56,28 @@ from loci.parser.imports import (
 from loci.parser.languages import EXTENSION_MAP, MARKDOWN_SUFFIXES
 from loci.parser.reference_models import RawLocalExport, RawSymbolReference
 from loci.parser.symbols import Symbol, make_file_symbol
+from loci.query_coverage import (
+    QueryCoverage,
+    QueryCoverageRecorder,
+    StoredQueryCoverage,
+    query_coverage_from_index,
+    stored_query_coverage,
+)
 from loci.storage.index_store import IndexStore, index_versions_current
 from loci.storage.store_resolver import StoreResolution, resolve_store_base_dir
 
 REFRESH_LOCK_POLL_SECONDS = 0.05
 REFRESH_LOCK_RECLAIM_GRACE_SECONDS = 1.0
+
+
+class SearchSymbolsResult(TypedDict):
+    symbols: list[dict[str, Any]]
+    coverage: QueryCoverage
+
+
+class GrepRepoResult(TypedDict):
+    matches: list[dict[str, Any]]
+    coverage: QueryCoverage
 
 
 @dataclass(frozen=True, slots=True)
@@ -69,6 +86,7 @@ class RepositoryScan:
     go_control_candidates: tuple[Path, ...]
     javascript_control_candidates: tuple[Path, ...]
     cargo_control_candidates: tuple[Path, ...]
+    coverage: StoredQueryCoverage
 
 
 @dataclass
@@ -376,6 +394,7 @@ def _index_repo_unlocked(
             repo_path,
             all_symbols,
             file_hashes=new_file_hashes,
+            coverage=repository_scan.coverage,
             graph_state=graph_state,
         )
     except GraphContractError as exc:
@@ -419,6 +438,7 @@ def _index_repo_unlocked(
         "graph_diagnostics": [
             diagnostic.to_dict() for diagnostic in graph_state.diagnostics
         ],
+        "coverage": repository_scan.coverage,
         "files_skipped": files_skipped,
         "languages": dict(language_counts),
     }
@@ -536,6 +556,24 @@ def search_symbols(
     limit: int = 20,
     ensure_fresh: bool = False,
 ) -> list[dict[str, Any]]:
+    return search_symbols_result(
+        repo,
+        query,
+        kind=kind,
+        lang=lang,
+        limit=limit,
+        ensure_fresh=ensure_fresh,
+    )["symbols"]
+
+
+def search_symbols_result(
+    repo: str | Path,
+    query: str,
+    kind: str | None = None,
+    lang: str | None = None,
+    limit: int = 20,
+    ensure_fresh: bool = False,
+) -> SearchSymbolsResult:
     repo_path = Path(repo).resolve()
     if limit < 1:
         raise LociError(
@@ -547,7 +585,7 @@ def search_symbols(
     store = get_store()
     if ensure_fresh:
         ensure_fresh_index(repo_path)
-    _load_required_index(store, repo_path)
+    index = _load_required_index(store, repo_path)
 
     results = store.search(repo_path, query, kind=kind, lang=lang, limit=limit)
     if results:
@@ -555,7 +593,10 @@ def search_symbols(
         store.log_search(search_id, query, str(repo_path), [result["id"] for result in results])
     else:
         store.log_miss("search_empty", repo_path=str(repo_path), query=query)
-    return results
+    return {
+        "symbols": results,
+        "coverage": query_coverage_from_index(index, "indexed_symbols"),
+    }
 
 
 def get_cached_file(
@@ -602,20 +643,36 @@ def grep_repo(
     pattern: str,
     ensure_fresh: bool = False,
 ) -> list[dict[str, Any]]:
+    return grep_repo_result(
+        repo,
+        pattern,
+        ensure_fresh=ensure_fresh,
+    )["matches"]
+
+
+def grep_repo_result(
+    repo: str | Path,
+    pattern: str,
+    ensure_fresh: bool = False,
+) -> GrepRepoResult:
     repo_path = Path(repo).resolve()
     store = get_store()
     if ensure_fresh:
         ensure_fresh_index(repo_path)
-    _load_required_index(store, repo_path)
+    index = _load_required_index(store, repo_path)
 
     try:
-        return store.grep_files(repo_path, pattern)
+        matches = store.grep_files(repo_path, pattern)
     except ValueError as exc:
         raise LociError(
             "INVALID_REGEX",
             str(exc),
             {"repo": str(repo_path), "pattern": pattern},
         ) from exc
+    return {
+        "matches": matches,
+        "coverage": query_coverage_from_index(index, "indexed_source_text"),
+    }
 
 
 def graph_anchors(
@@ -1370,7 +1427,12 @@ def _load_required_index(store: IndexStore, repo_path: Path) -> dict[str, Any]:
 def _index_is_stale(repo_path: Path, store: IndexStore, index: dict[str, Any]) -> bool:
     if not index_versions_current(index):
         return True
+    stored_coverage = stored_query_coverage(index)
+    if stored_coverage is None:
+        return True
     repository_scan = _scan_repository_files(repo_path, store)
+    if repository_scan.coverage != stored_coverage:
+        return True
     current_hashes = {
         rel_path: file_hash
         for _, rel_path, file_hash in repository_scan.indexable_files
@@ -1557,11 +1619,25 @@ def _scan_repository_files(
     go_controls: list[Path] = []
     javascript_controls: list[Path] = []
     cargo_controls: list[Path] = []
+    coverage = QueryCoverageRecorder()
+    ignored_roots: set[PurePosixPath] = set()
+
     for candidate in sorted(repo_path.rglob("*")):
-        rel_path = str(candidate.relative_to(repo_path))
-        if is_excluded_repository_path(PurePosixPath(rel_path)):
+        rel_path = candidate.relative_to(repo_path).as_posix()
+        repository_path = PurePosixPath(rel_path)
+        exclusion_root = repository_path_exclusion_root(repository_path)
+        if exclusion_root is not None:
+            coverage.record("policy_excluded", exclusion_root.as_posix())
             continue
-        if gitignore and gitignore.match_file(rel_path):
+        if any(parent in ignored_roots for parent in repository_path.parents):
+            continue
+        is_file = candidate.is_file()
+        is_directory = not is_file and candidate.is_dir()
+        ignore_path = f"{rel_path}/" if is_directory else rel_path
+        if gitignore and gitignore.match_file(ignore_path):
+            coverage.record("ignored", rel_path)
+            if is_directory:
+                ignored_roots.add(repository_path)
             continue
         if candidate.name in {"go.mod", "go.work"}:
             go_controls.append(candidate)
@@ -1574,10 +1650,11 @@ def _scan_repository_files(
             javascript_controls.append(candidate)
         if candidate.name == "Cargo.toml":
             cargo_controls.append(candidate)
-        if (
-            not candidate.is_file()
-            or not is_indexable_source_path(PurePosixPath(rel_path))
-        ):
+        if not is_file:
+            continue
+        exclusion_reason = source_exclusion_reason(repository_path)
+        if exclusion_reason is not None:
+            coverage.record(exclusion_reason, rel_path)
             continue
         files.append((candidate, rel_path, store.hash_file(candidate)))
     return RepositoryScan(
@@ -1585,6 +1662,7 @@ def _scan_repository_files(
         go_control_candidates=tuple(go_controls),
         javascript_control_candidates=tuple(javascript_controls),
         cargo_control_candidates=tuple(cargo_controls),
+        coverage=coverage.build(len(files)),
     )
 
 

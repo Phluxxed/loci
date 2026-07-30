@@ -132,6 +132,7 @@ class IndexStore:
         symbols: list[Symbol],
         file_hashes: dict[str, str],
         *,
+        coverage: Mapping[str, Any] | None = None,
         graph_state: GraphIndexState | None = None,
     ) -> None:
         persisted_graph = graph_state or GraphIndexState.empty()
@@ -171,6 +172,8 @@ class IndexStore:
             "repo_path": str(repo_path.resolve()),
             "graph": persisted_graph.to_dict(),
         }
+        if coverage is not None:
+            index_data["coverage"] = dict(coverage)
         index_path = self._index_path(repo_path)
         tmp_path = index_path.with_suffix(".tmp")
         tmp_path.write_text(json.dumps(index_data, indent=2))

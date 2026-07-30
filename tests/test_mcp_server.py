@@ -127,6 +127,55 @@ def test_mcp_index_outline_get_round_trip(tmp_path: Path, fixtures_dir: Path):
     assert result["invalid_grep"]["error"]["code"] == "INVALID_REGEX"
 
 
+def test_mcp_search_and_grep_expose_honest_coverage(tmp_path: Path):
+    result = asyncio.run(
+        _query_coverage_round_trip(
+            tmp_path / "repo",
+            tmp_path / ".codeindex",
+        )
+    )
+
+    assert result["search_present"]["symbols"]
+    assert result["search_absent"]["symbols"] == []
+    assert result["grep_present"]["matches"]
+    assert result["grep_absent"]["matches"] == []
+    search_coverage = result["search_present"]["coverage"]
+    grep_coverage = result["grep_present"]["coverage"]
+    assert result["search_absent"]["coverage"] == search_coverage
+    assert result["grep_absent"]["coverage"] == grep_coverage
+    common_coverage = {
+        "schema_version": 1,
+        "state": "partial",
+        "scope": "repository",
+        "source_scope": "indexed_supported_source",
+        "indexed_files": 1,
+        "excluded_paths": 2,
+        "exclusions": [
+            {
+                "reason": "ignored",
+                "paths": 1,
+                "samples": ["ignored.py"],
+                "omitted_samples": 0,
+            },
+            {
+                "reason": "unsupported_file_type",
+                "paths": 1,
+                "samples": [".gitignore"],
+                "omitted_samples": 0,
+            },
+        ],
+        "unknown_reason": None,
+    }
+    assert search_coverage == {
+        **common_coverage,
+        "query_scope": "indexed_symbols",
+    }
+    assert grep_coverage == {
+        **common_coverage,
+        "query_scope": "indexed_source_text",
+    }
+
+
 def test_mcp_loci_mcp_command_round_trip(tmp_path: Path, fixtures_dir: Path):
     if shutil.which("loci-mcp") is None:
         pytest.skip("loci-mcp is not installed on PATH")
@@ -638,6 +687,63 @@ async def _store_stats(cache_dir: Path, namespace: str) -> dict[str, Any]:
             await session.initialize()
             stats = await session.call_tool("loci_stats", arguments={})
             return stats.structuredContent["store"]
+
+
+async def _query_coverage_round_trip(
+    repo: Path,
+    cache_dir: Path,
+) -> dict[str, dict[str, Any]]:
+    repo.mkdir()
+    (repo / ".gitignore").write_text("ignored.py\n", encoding="utf-8")
+    (repo / "source.py").write_text(
+        "def present_symbol():\n    return True\n",
+        encoding="utf-8",
+    )
+    (repo / "ignored.py").write_text(
+        "def ignored_symbol():\n    return True\n",
+        encoding="utf-8",
+    )
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["LOCI_STORE_NAMESPACE"] = "test"
+    env["PYTHONPATH"] = str(Path.cwd() / "src")
+    server_params = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "loci.mcp_server"],
+        env=env,
+        cwd=Path.cwd(),
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            await session.call_tool(
+                "loci_index",
+                arguments={"path": str(repo), "incremental": False},
+            )
+            calls = {
+                "search_present": (
+                    "loci_search",
+                    {"repo": str(repo), "query": "present_symbol"},
+                ),
+                "search_absent": (
+                    "loci_search",
+                    {"repo": str(repo), "query": "xyzzy_no_match_ever_12345"},
+                ),
+                "grep_present": (
+                    "loci_grep",
+                    {"repo": str(repo), "pattern": "present_symbol"},
+                ),
+                "grep_absent": (
+                    "loci_grep",
+                    {"repo": str(repo), "pattern": "absent_symbol"},
+                ),
+            }
+            results: dict[str, dict[str, Any]] = {}
+            for name, (tool, arguments) in calls.items():
+                response = await session.call_tool(tool, arguments=arguments)
+                results[name] = response.structuredContent
+            return results
 
 
 async def _graph_neighbors_after_restart(repo: Path, cache_dir: Path) -> dict[str, Any]:

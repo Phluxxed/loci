@@ -25,10 +25,12 @@ from loci.service import (
     get_cached_file,
     get_symbols,
     grep_repo,
+    grep_repo_result,
     index_repo,
     list_repos,
     outline_repo,
     search_symbols,
+    search_symbols_result,
     session_stats,
     verify_repo,
 )
@@ -298,6 +300,203 @@ def test_service_excludes_disposable_and_ignored_source(
 
     outlined_files = {entry["file"] for entry in outline_repo(repo)}
     assert outlined_files == {"src/maintained.py"}
+
+
+def test_service_query_results_report_complete_coverage(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "source.py").write_text(
+        "def present_symbol():\n    return True\n",
+        encoding="utf-8",
+    )
+    index_repo(repo, incremental=False)
+
+    search_result = search_symbols_result(repo, "present_symbol")
+    grep_result = grep_repo_result(repo, "absent_symbol")
+
+    assert any(
+        symbol["name"] == "present_symbol"
+        for symbol in search_result["symbols"]
+    )
+    assert grep_result["matches"] == []
+    common_coverage = {
+        "schema_version": 1,
+        "state": "complete",
+        "scope": "repository",
+        "source_scope": "indexed_supported_source",
+        "indexed_files": 1,
+        "excluded_paths": 0,
+        "exclusions": [],
+        "unknown_reason": None,
+    }
+    assert search_result["coverage"] == {
+        **common_coverage,
+        "query_scope": "indexed_symbols",
+    }
+    assert grep_result["coverage"] == {
+        **common_coverage,
+        "query_scope": "indexed_source_text",
+    }
+
+
+def test_service_query_results_report_bounded_exclusions(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    (repo / "generated").mkdir(parents=True)
+    (repo / ".gitignore").write_text("ignored.py\n", encoding="utf-8")
+    (repo / "source.py").write_text(
+        "def present_symbol():\n    return True\n",
+        encoding="utf-8",
+    )
+    (repo / "ignored.py").write_text("IGNORED = True\n", encoding="utf-8")
+    (repo / "generated" / "client.py").write_text(
+        "GENERATED = True\n",
+        encoding="utf-8",
+    )
+    (repo / "certificate.pem").write_text("not-a-real-key\n", encoding="utf-8")
+    (repo / "notes.txt").write_text("unparsed notes\n", encoding="utf-8")
+    index_repo(repo, incremental=False)
+
+    result = search_symbols_result(repo, "xyzzy_no_match_ever_12345")
+
+    assert result["symbols"] == []
+    assert result["coverage"] == {
+        "schema_version": 1,
+        "state": "partial",
+        "scope": "repository",
+        "source_scope": "indexed_supported_source",
+        "query_scope": "indexed_symbols",
+        "indexed_files": 1,
+        "excluded_paths": 5,
+        "exclusions": [
+            {
+                "reason": "ignored",
+                "paths": 1,
+                "samples": ["ignored.py"],
+                "omitted_samples": 0,
+            },
+            {
+                "reason": "policy_excluded",
+                "paths": 1,
+                "samples": ["generated"],
+                "omitted_samples": 0,
+            },
+            {
+                "reason": "sensitive_or_binary",
+                "paths": 1,
+                "samples": ["certificate.pem"],
+                "omitted_samples": 0,
+            },
+            {
+                "reason": "unsupported_file_type",
+                "paths": 2,
+                "samples": [".gitignore", "notes.txt"],
+                "omitted_samples": 0,
+            },
+        ],
+        "unknown_reason": None,
+    }
+
+
+def test_service_query_coverage_bounds_exclusion_samples(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "source.py").write_text("VALUE = True\n", encoding="utf-8")
+    for index in range(25):
+        (repo / f"note-{index:02}.txt").write_text(
+            "unsupported\n",
+            encoding="utf-8",
+        )
+    index_repo(repo, incremental=False)
+
+    result = grep_repo_result(repo, "not present")
+
+    assert result["coverage"]["excluded_paths"] == 25
+    assert result["coverage"]["exclusions"] == [{
+        "reason": "unsupported_file_type",
+        "paths": 25,
+        "samples": [f"note-{index:02}.txt" for index in range(20)],
+        "omitted_samples": 5,
+    }]
+
+
+def test_service_query_coverage_collapses_ignored_directory_roots(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    (repo / "scratch").mkdir(parents=True)
+    (repo / ".gitignore").write_text("scratch/\n", encoding="utf-8")
+    (repo / "source.py").write_text("VALUE = True\n", encoding="utf-8")
+    for index in range(25):
+        (repo / "scratch" / f"ignored-{index:02}.py").write_text(
+            "IGNORED = True\n",
+            encoding="utf-8",
+        )
+    index_repo(repo, incremental=False)
+
+    result = grep_repo_result(repo, "not present")
+
+    assert result["coverage"]["excluded_paths"] == 2
+    assert result["coverage"]["exclusions"] == [
+        {
+            "reason": "ignored",
+            "paths": 1,
+            "samples": ["scratch"],
+            "omitted_samples": 0,
+        },
+        {
+            "reason": "unsupported_file_type",
+            "paths": 1,
+            "samples": [".gitignore"],
+            "omitted_samples": 0,
+        },
+    ]
+
+
+def test_service_query_coverage_marks_legacy_metadata_unknown(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "source.py").write_text("VALUE = True\n", encoding="utf-8")
+    index_repo(repo, incremental=False)
+    store = IndexStore(base_dir=base)
+    index_path = store._index_path(repo.resolve())
+    legacy_index = json.loads(index_path.read_text())
+    legacy_index.pop("coverage")
+    index_path.write_text(json.dumps(legacy_index), encoding="utf-8")
+
+    legacy_result = grep_repo_result(repo, "VALUE")
+    refreshed_result = grep_repo_result(repo, "VALUE", ensure_fresh=True)
+
+    assert legacy_result["coverage"] == {
+        "schema_version": 1,
+        "state": "unknown",
+        "scope": "repository",
+        "source_scope": "indexed_supported_source",
+        "query_scope": "indexed_source_text",
+        "indexed_files": 1,
+        "excluded_paths": None,
+        "exclusions": [],
+        "unknown_reason": "coverage_metadata_unavailable",
+    }
+    assert refreshed_result["coverage"]["state"] == "complete"
 
 
 def test_service_index_warns_on_short_nonempty_markdown_with_zero_symbols(
