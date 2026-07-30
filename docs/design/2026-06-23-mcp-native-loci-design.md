@@ -80,13 +80,19 @@ These may belong in MCP, but they are not part of the first production workflow.
 
 ## Tool contracts
 
+Repository-scoped tools expose `repo` as their one repository-root parameter.
+As advisory migration compatibility with no removal date, the server accepts
+legacy `path` calls for `loci_index`, `loci_outline`, and `loci_verify` before
+schema validation, while advertising only `repo` and rejecting calls that send
+both names.
+
 ### `loci_index`
 
 Input:
 
 ```json
 {
-  "path": "/absolute/or/relative/repo/path",
+  "repo": "/absolute/or/relative/repo/path",
   "incremental": true
 }
 ```
@@ -111,7 +117,7 @@ Input:
 
 ```json
 {
-  "path": "/absolute/or/relative/repo/path",
+  "repo": "/absolute/or/relative/repo/path",
   "file": "optional/relative/path.py"
 }
 ```
@@ -263,7 +269,7 @@ Input:
 
 ```json
 {
-  "path": "/absolute/or/relative/repo/path"
+  "repo": "/absolute/or/relative/repo/path"
 }
 ```
 

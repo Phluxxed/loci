@@ -202,7 +202,7 @@ async def _call_diagnostics_after_restart(
             await session.initialize()
             indexed = await session.call_tool(
                 "loci_index",
-                arguments={"path": str(repo), "incremental": False},
+                arguments={"repo": str(repo), "incremental": False},
             )
             assert indexed.structuredContent is not None
             assert indexed.structuredContent["graph_calls_resolved"] == 1
@@ -255,7 +255,7 @@ async def _call_diagnostics_after_restart(
             )
             verify = await session.call_tool(
                 "loci_verify",
-                arguments={"path": str(repo)},
+                arguments={"repo": str(repo)},
             )
 
     index_after = (
@@ -287,7 +287,7 @@ async def _call_errors(repo: Path, cache_dir: Path) -> dict[str, Any]:
             await session.initialize()
             await session.call_tool(
                 "loci_index",
-                arguments={"path": str(repo), "incremental": False},
+                arguments={"repo": str(repo), "incremental": False},
             )
             errors = {}
             for field, arguments in (
@@ -313,7 +313,7 @@ async def _call_refresh_after_change(repo: Path, cache_dir: Path) -> dict[str, A
             await session.initialize()
             await session.call_tool(
                 "loci_index",
-                arguments={"path": str(repo), "incremental": False},
+                arguments={"repo": str(repo), "incremental": False},
             )
 
     (repo / "main.py").write_text(

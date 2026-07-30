@@ -278,7 +278,7 @@ async def _reference_mcp_after_restart(
             await session.initialize()
             indexed = await session.call_tool(
                 "loci_index",
-                arguments={"path": str(repo), "incremental": False},
+                arguments={"repo": str(repo), "incremental": False},
             )
             indexed_content = indexed.structuredContent
             assert indexed_content is not None

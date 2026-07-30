@@ -12,11 +12,16 @@ loci is agent-owned codebase navigation infrastructure. The user is not expected
 Prefer the local MCP server when its tools are available:
 
 ```text
-loci_index(path, incremental=true)
-loci_outline(path) or loci_search(repo, query)
+loci_index(repo, incremental=true)
+loci_outline(repo) or loci_search(repo, query)
 loci_get(repo, symbol_ids)
 loci_analyze(repo) when diagnostics are needed
 ```
+
+Every repository-scoped MCP tool uses `repo` for the repository root. The
+server accepts legacy `path` calls for `loci_index`, `loci_outline`, and
+`loci_verify` as advisory compatibility with no removal date, but `path` is not
+part of their public schemas and must not appear in new guidance.
 
 MCP read tools (`loci_outline`, `loci_search`, `loci_get`, `loci_file`,
 `loci_grep`, `loci_graph_anchors`, `loci_graph_neighbors`,

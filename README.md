@@ -180,6 +180,12 @@ incremental refresh if needed.
 Freshness also includes Go module/workspace controls, JavaScript/TypeScript
 project/package/workspace controls, and Cargo manifests.
 
+The canonical repository-root parameter is `repo` on every repository-scoped
+MCP tool. Legacy `path` remains an advisory compatibility input for
+`loci_index`, `loci_outline`, and `loci_verify`; no removal date is set.
+`path` is no longer advertised in their schemas, and calls must not send both
+names.
+
 | Tool | Purpose |
 |---|---|
 | `loci_index` | Index a local repo path, optionally incrementally |
