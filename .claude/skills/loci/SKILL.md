@@ -143,14 +143,22 @@ traversal.
 `loci_search` returns ranked symbols:
 
 ```json
-{"symbols":[{"id":"...","name":"...","kind":"function","score":20.0,"signature":"...","summary":""}]}
+{"symbols":[{"id":"...","name":"...","kind":"function","score":20.0,"signature":"...","summary":""}],"coverage":{"schema_version":1,"state":"partial","scope":"repository","source_scope":"indexed_supported_source","query_scope":"indexed_symbols","indexed_files":12,"excluded_paths":3,"exclusions":[{"reason":"ignored","paths":1,"samples":["local.py"],"omitted_samples":0},{"reason":"policy_excluded","paths":2,"samples":[".git","build"],"omitted_samples":0}],"unknown_reason":null}}
 ```
 
 `loci_grep` returns matching lines with context:
 
 ```json
-{"matches":[{"file":"...","line":42,"match":"...","context_before":[],"context_after":[]}]}
+{"matches":[{"file":"...","line":42,"match":"...","context_before":[],"context_after":[]}],"coverage":{"schema_version":1,"state":"complete","scope":"repository","source_scope":"indexed_supported_source","query_scope":"indexed_source_text","indexed_files":12,"excluded_paths":0,"exclusions":[],"unknown_reason":null}}
 ```
+
+Coverage is identical for empty and non-empty outcomes. `complete` means the
+repository had no excluded paths; `partial` reports known ignored,
+policy-excluded, sensitive/binary, or unsupported paths; `unknown` means a
+legacy index has not yet recorded coverage. Samples are capped at 20 paths per
+reason and `omitted_samples` reports the remainder. Never interpret an empty
+result as absence outside its `query_scope`. The CLI deliberately preserves
+its existing bare-array output for compatibility.
 
 `loci_graph_anchors` returns inferred or explicit graph starts without
 traversal or answerability claims:

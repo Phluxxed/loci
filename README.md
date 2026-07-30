@@ -202,6 +202,16 @@ project/package/workspace controls, and Cargo manifests.
 | `loci_stats` | Return structured retrieval savings stats |
 | `loci_analyze` | Return structured search and extraction diagnostics |
 
+`loci_search` and `loci_grep` include a versioned `coverage` object alongside
+their existing `symbols` or `matches` arrays. It reports whether repository
+coverage is `complete`, `partial`, or `unknown`, identifies the
+`indexed_supported_source` source scope and the operation-specific
+`indexed_symbols` or `indexed_source_text` query scope, and gives bounded
+counts and samples for ignored, policy-excluded, sensitive/binary, and
+unsupported paths. Empty results therefore describe what was searched instead
+of implying repository-wide absence. The CLI keeps its existing bare-array
+output.
+
 ## CLI Usage
 
 The CLI is retained as legacy/debug tooling. New production agent workflows should use MCP.

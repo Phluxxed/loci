@@ -22,11 +22,11 @@ from loci.service import (
     graph_traverse_neighbors,
     get_cached_file,
     get_symbols,
-    grep_repo,
+    grep_repo_result,
     index_repo,
     list_repos,
     outline_repo,
-    search_symbols,
+    search_symbols_result,
     session_stats,
     verify_repo,
 )
@@ -272,18 +272,16 @@ def create_server() -> FastMCP:
         lang: str | None = None,
         limit: int = 20,
     ) -> CallToolResult:
-        """Search indexed symbols by query."""
+        """Search indexed symbols and report bounded repository coverage."""
         return _handle_loci_error(
-            lambda: {
-                "symbols": search_symbols(
-                    repo,
-                    query,
-                    kind=kind,
-                    lang=lang,
-                    limit=limit,
-                    ensure_fresh=True,
-                )
-            }
+            lambda: search_symbols_result(
+                repo,
+                query,
+                kind=kind,
+                lang=lang,
+                limit=limit,
+                ensure_fresh=True,
+            )
         )
 
     @mcp.tool()
@@ -306,9 +304,9 @@ def create_server() -> FastMCP:
 
     @mcp.tool()
     def loci_grep(repo: str, pattern: str) -> CallToolResult:
-        """Regex-search cached files."""
+        """Regex-search cached files and report bounded repository coverage."""
         return _handle_loci_error(
-            lambda: {"matches": grep_repo(repo, pattern, ensure_fresh=True)}
+            lambda: grep_repo_result(repo, pattern, ensure_fresh=True)
         )
 
     @mcp.tool()
