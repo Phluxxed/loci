@@ -42,6 +42,10 @@ from loci.graph.retrieval import (
     retrieve_graph_question,
 )
 from loci.graph.traversal import GraphDirection
+from loci.indexability import (
+    is_excluded_repository_path,
+    is_indexable_source_path,
+)
 from loci.parser.call_models import RawCallSite
 from loci.parser.extractor import parse_file
 from loci.parser.imports import (
@@ -55,20 +59,6 @@ from loci.parser.symbols import Symbol, make_file_symbol
 from loci.storage.index_store import IndexStore, index_versions_current
 from loci.storage.store_resolver import StoreResolution, resolve_store_base_dir
 
-SKIP_DIRS = {
-    ".git", "node_modules", "__pycache__", ".venv", "venv",
-    ".tox", "dist", "build", ".mypy_cache", ".pytest_cache",
-    ".ruff_cache", ".uv-cache", "uv-cache", "__tests__", "tests",
-}
-TEST_FILE_SUFFIXES = (
-    ".test.ts", ".test.tsx", ".test.js", ".test.jsx",
-    ".spec.ts", ".spec.tsx", ".spec.js", ".spec.jsx",
-)
-SKIP_FILES = {".env", ".env.local", "credentials.json", "secrets.json"}
-SKIP_EXTENSIONS = {
-    ".pyc", ".pyo", ".so", ".dylib", ".dll", ".exe",
-    ".bin", ".pem", ".key", ".p12",
-}
 REFRESH_LOCK_POLL_SECONDS = 0.05
 REFRESH_LOCK_RECLAIM_GRACE_SECONDS = 1.0
 
@@ -1568,9 +1558,9 @@ def _scan_repository_files(
     javascript_controls: list[Path] = []
     cargo_controls: list[Path] = []
     for candidate in sorted(repo_path.rglob("*")):
-        if any(part in SKIP_DIRS for part in candidate.parts):
-            continue
         rel_path = str(candidate.relative_to(repo_path))
+        if is_excluded_repository_path(PurePosixPath(rel_path)):
+            continue
         if gitignore and gitignore.match_file(rel_path):
             continue
         if candidate.name in {"go.mod", "go.work"}:
@@ -1584,7 +1574,10 @@ def _scan_repository_files(
             javascript_controls.append(candidate)
         if candidate.name == "Cargo.toml":
             cargo_controls.append(candidate)
-        if not candidate.is_file() or _should_skip_file(candidate):
+        if (
+            not candidate.is_file()
+            or not is_indexable_source_path(PurePosixPath(rel_path))
+        ):
             continue
         files.append((candidate, rel_path, store.hash_file(candidate)))
     return RepositoryScan(
@@ -1745,18 +1738,3 @@ def _load_gitignore(repo_path: Path) -> "pathspec.PathSpec | None":
         return None
     lines = gitignore.read_text(encoding="utf-8", errors="replace").splitlines()
     return pathspec.PathSpec.from_lines("gitwildmatch", lines)
-
-
-def _should_skip_file(path: Path) -> bool:
-    if path.name in SKIP_FILES:
-        return True
-    if path.suffix in SKIP_EXTENSIONS:
-        return True
-    if path.suffix not in EXTENSION_MAP:
-        return True
-    name = path.name
-    if name.startswith("test_") or name.endswith("_test.py") or name.endswith("_test.go"):
-        return True
-    if any(name.endswith(suffix) for suffix in TEST_FILE_SUFFIXES):
-        return True
-    return False

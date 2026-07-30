@@ -6,9 +6,10 @@
 Root cause: `.tsx` was mapped to the `typescript` tree-sitter parser, which can't parse JSX syntax.
 Fix: added a `tsx` language spec using `ts_language="tsx"` and updated `EXTENSION_MAP[".tsx"]` to use it.
 
-### ~~Test file constants inflating the index~~ ✓ FIXED
-Test files are now excluded entirely at index time.
-Skipped via `SKIP_DIRS` (`__tests__`, `tests`) and `_should_skip_file` patterns (`test_*.py`, `*_test.py`, `*_test.go`, `*.test.*`, `*.spec.*`).
+### ~~Maintained test files missing from the index~~ ✓ FIXED
+Maintained tests and supported fixtures are indexed like other source files.
+The shared repository-relative policy excludes only generated, cached,
+vendored, build, temporary, ignored, sensitive, or unsupported material.
 
 ## Search
 

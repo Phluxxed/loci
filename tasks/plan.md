@@ -22,7 +22,7 @@ recoverable lifecycle.
 
 ### Thread 1: Repository coverage
 
-- [ ] Task 1.1: Centralize indexability and restore maintained test coverage.
+- [x] Task 1.1: Centralize indexability and restore maintained test coverage.
 - [ ] Task 1.2: Expose query coverage and honest empty-result semantics.
 - [ ] Task 1.3: Make Claude enforcement coverage-equivalent.
 
