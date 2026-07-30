@@ -1,9 +1,12 @@
-import pytest
+import hashlib
 import json
 import time
 import time as time_module
 from dataclasses import replace
 from pathlib import Path
+
+import pytest
+
 from loci.graph.contracts import (
     GRAPH_STATE_SCHEMA_VERSION,
     GraphContractError,
@@ -20,11 +23,24 @@ from loci.storage.index_store import (
     IndexStore,
     index_versions_current,
 )
+from loci.storage.store_layout import repository_cache_key
 
 
 @pytest.fixture
 def store(tmp_path: Path) -> IndexStore:
     return IndexStore(base_dir=tmp_path / ".codeindex")
+
+
+def test_repository_cache_key_is_the_public_store_layout_contract(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "nested" / "repo"
+    repo.mkdir(parents=True)
+    store = IndexStore(base_dir=tmp_path / "store")
+    digest = hashlib.md5(str(repo.resolve()).encode()).hexdigest()[:12]
+
+    assert repository_cache_key(repo) == f"{digest}_repo"
+    assert store._cache_key(repo) == repository_cache_key(repo)
 
 
 @pytest.fixture

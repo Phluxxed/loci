@@ -1,6 +1,8 @@
+import json
 import os
 import stat
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -136,3 +138,55 @@ def test_claude_hook_indexes_repo_root_when_run_from_subdir(tmp_path: Path):
     # Index path in the message should be the repo root, not the subdir.
     assert f"loci: repo indexed at {repo} " in result.stdout
     assert str(subdir) not in result.stdout
+
+
+def test_installer_registers_answer_equivalent_enforcement_for_read_and_bash(
+    tmp_path: Path,
+) -> None:
+    home = tmp_path / "home"
+    claude_dir = home / ".claude"
+    claude_dir.mkdir(parents=True)
+    settings = claude_dir / "settings.json"
+    settings.write_text(
+        json.dumps(
+            {
+                "hooks": {
+                    "PreToolUse": [
+                        {
+                            "matcher": "Read",
+                            "hooks": [
+                                {
+                                    "type": "command",
+                                    "command": "/old/hooks/loci-enforce-read.py",
+                                    "timeout": 5,
+                                }
+                            ],
+                        }
+                    ]
+                }
+            }
+        )
+    )
+    env = os.environ.copy()
+    env["HOME"] = str(home)
+
+    result = subprocess.run(
+        [sys.executable, str(REPO_ROOT / ".claude" / "install-hooks.sh")],
+        capture_output=True,
+        text=True,
+        env=env,
+        timeout=10,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    pre_tool_use = json.loads(settings.read_text())["hooks"]["PreToolUse"]
+    by_matcher = {entry["matcher"]: entry["hooks"] for entry in pre_tool_use}
+    for matcher in ("Read", "Bash"):
+        enforce_hooks = [
+            hook
+            for hook in by_matcher[matcher]
+            if "loci-enforce-read.py" in hook["command"]
+        ]
+        assert enforce_hooks
+        assert enforce_hooks[0]["timeout"] >= 10

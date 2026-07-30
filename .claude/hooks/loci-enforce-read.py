@@ -1,37 +1,57 @@
 #!/usr/bin/env python3
-"""PreToolUse hook for Read: blocks whole-file reads of source files in
-loci-indexed repos.
+"""PreToolUse hook: redirect only answer-equivalent source reads to Loci.
 
-Forces compliance with the CLAUDE.md rule: use `loci_outline` then either
-`loci_get` (for understanding) or a targeted `Read offset=line limit=N`
-(for editing) instead of slurping a whole .py/.ts/.tsx/.js/.go/.rs file.
+The hook denies a whole-file Read, or a simple ``cat FILE``, only after the
+authoritative Loci policy, exact store layout, mirrored source, and fresh
+``loci file`` path all agree that Loci can answer for that same file. Native
+directory searches, pipelines, transformed reads, uncovered paths, and
+unreachable or stale Loci processes pass through.
 
-The targeted-read passthrough is what makes `Edit` work on indexed files —
-Edit demands a prior Read receipt on the path, and a Read with explicit
-offset+limit satisfies that without losing loci's token-efficiency win for
-exploration.
+That fail-open boundary is deliberate. A broader native operation must never
+be redirected to a repository-wide Loci call with a different content scope.
+The hook performs no aggregate store listing and never parses sibling
+``index.json`` files; lookup cost depends on target path depth and the one
+candidate repository.
 
 Store resolution mirrors the Claude session-start hook: LOCI_BASE_DIR if set,
-else ~/.claude/loci-index. That is Claude Code's own store; the hook never
-reads codex's store or the legacy ~/.codeindex. If LOCI_STORE_NAMESPACE is set
-and the store's identity marker names a different namespace, the hook fails
-open rather than enforce against a store that is not this harness's own —
-matching loci's MCP store-isolation contract.
+else ~/.claude/loci-index — Claude Code's own store, never codex's or the
+legacy ~/.codeindex. If LOCI_STORE_NAMESPACE is set and the store's identity
+marker names a different namespace, the hook fails open rather than enforce
+against a store that is not this harness's.
 
-Outputs JSON per Claude Code PreToolUse hook spec:
-  - permissionDecision "deny" with a reason that points the agent at loci
-  - otherwise exits silently (allow)
+Outputs JSON per the Claude Code PreToolUse hook spec: `deny` with a reason
+that names the exact loci call to make instead, else exits silently (allow).
+Any unexpected error fails open — a broken guardrail must not block all work.
 """
 from __future__ import annotations
 
 import json
 import os
+import shlex
+import shutil
+import subprocess
 import sys
+from dataclasses import dataclass
 from pathlib import Path
+from pathlib import PurePosixPath
 from typing import NoReturn
 
-LOCI_EXTS = {".py", ".ts", ".tsx", ".js", ".go", ".rs"}
 STORE_IDENTITY_FILE = ".loci-store.json"
+PROBE_TIMEOUT_S = 8.0
+SHELL_META = frozenset("|&;<>\n")
+
+try:
+    from loci.indexability import is_indexable_source_path
+    from loci.storage.store_layout import repository_cache_key
+except Exception:
+    is_indexable_source_path = None
+    repository_cache_key = None
+
+
+@dataclass(frozen=True)
+class IndexedSourceTarget:
+    repo: Path
+    relative_path: str
 
 
 def allow() -> NoReturn:
@@ -65,94 +85,191 @@ def store_namespace(base_dir: Path) -> str | None:
         return None
 
 
-def indexed_repos(base_dir: Path) -> list[str]:
-    repos = []
-    if not base_dir.is_dir():
-        return repos
-    for entry in base_dir.iterdir():
-        if not entry.is_dir():
+def indexed_source_target(
+    base_dir: Path,
+    path: str | Path,
+) -> IndexedSourceTarget | None:
+    """Resolve one exact file without enumerating or parsing the aggregate store."""
+    if is_indexable_source_path is None or repository_cache_key is None:
+        return None
+    source = Path(path).expanduser().resolve()
+    if not source.is_file():
+        return None
+    for repo in (source.parent, *source.parents[1:]):
+        repo_dir = base_dir / repository_cache_key(repo)
+        if not (repo_dir / "index.json").is_file():
             continue
-        index_file = entry / "index.json"
-        if not index_file.exists():
-            continue
-        try:
-            data = json.loads(index_file.read_text())
-            rp = data.get("repo_path", "")
-            if rp:
-                repos.append(os.path.realpath(rp))
-        except Exception:
-            continue
-    return repos
+        relative = source.relative_to(repo)
+        if not is_indexable_source_path(PurePosixPath(relative.as_posix())):
+            return None
+        if not (repo_dir / "sources" / relative).is_file():
+            return None
+        return IndexedSourceTarget(repo=repo, relative_path=relative.as_posix())
+    return None
 
 
-def main():
+def loci_can_answer(base_dir: Path, target: IndexedSourceTarget) -> bool:
+    """Probe the same fresh file service used by the MCP tool."""
+    binary = shutil.which("loci")
+    if binary is None:
+        return False
+    env = dict(os.environ)
+    env["LOCI_BASE_DIR"] = str(base_dir)
     try:
-        payload = json.load(sys.stdin)
-    except Exception:
-        allow()
+        proc = subprocess.run(
+            [
+                binary,
+                "file",
+                target.relative_path,
+                "--repo",
+                str(target.repo),
+                "--start",
+                "1",
+                "--end",
+                "1",
+                "--ensure-fresh",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=PROBE_TIMEOUT_S,
+            env=env,
+        )
+    except (subprocess.TimeoutExpired, OSError, ValueError):
+        return False
+    if proc.returncode != 0:
+        return False
+    try:
+        result = json.loads(proc.stdout)
+    except (json.JSONDecodeError, TypeError):
+        return False
+    return isinstance(result, dict) and isinstance(result.get("content"), str)
 
-    if payload.get("tool_name") != "Read":
-        allow()
 
+def loci_recipe(target: IndexedSourceTarget) -> str:
+    """Exact MCP calls whose required arguments match the live schemas."""
+    repo = json.dumps(str(target.repo))
+    relative = json.dumps(target.relative_path)
+    return (
+        f"  loci_file repo={repo} file_path={relative}\n"
+        "      → exact indexed content for this file\n"
+        f"  loci_outline repo={repo} file={relative}\n"
+        "      → symbol boundaries for targeted navigation\n"
+    )
+
+
+def handle_read(payload: dict, base_dir: Path) -> None:
     tool_input = payload.get("tool_input") or {}
     file_path = tool_input.get("file_path", "")
     if not file_path:
         allow()
 
-    ext = os.path.splitext(file_path)[1].lower()
-    if ext not in LOCI_EXTS:
+    # Targeted reads pass through — they are the sanctioned Edit path.
+    if tool_input.get("offset") is not None or tool_input.get("limit") is not None:
+        allow()
+
+    target = indexed_source_target(base_dir, file_path)
+    if target is None or not loci_can_answer(base_dir, target):
+        allow()
+
+    deny(
+        f"Read blocked: Loci just proved it can answer the same whole-file scope "
+        f"for '{target.relative_path}' in '{target.repo}'. Use:\n"
+        + loci_recipe(target)
+        + f"  Read {file_path} offset=<line> limit=<end_line - line + 1>\n"
+        f"      → targeted read; use this when you intend to Edit (it makes the "
+        f"receipt Edit needs)\n"
+        "Directory searches and transformed shell reads are not blocked because "
+        "the current MCP tools cannot preserve those native scopes exactly."
+    )
+
+
+def simple_cat_target(command: str, cwd: str) -> Path | None:
+    """Return the sole file from a plain ``cat FILE`` command."""
+    if any(operator in command for operator in SHELL_META):
+        return None
+    try:
+        tokens = shlex.split(command)
+    except ValueError:
+        return None
+    index = 0
+    while index < len(tokens) and "=" in tokens[index]:
+        name, _, _value = tokens[index].partition("=")
+        if not name.replace("_", "a").isalnum() or name[:1].isdigit():
+            break
+        index += 1
+    if index >= len(tokens) or os.path.basename(tokens[index]) != "cat":
+        return None
+    arguments = tokens[index + 1 :]
+    if len(arguments) == 2 and arguments[0] == "--":
+        arguments = arguments[1:]
+    if len(arguments) != 1 or arguments[0].startswith("-"):
+        return None
+    candidate = Path(arguments[0]).expanduser()
+    if not candidate.is_absolute():
+        candidate = Path(cwd) / candidate
+    return candidate.resolve() if candidate.is_file() else None
+
+
+def handle_bash(payload: dict, base_dir: Path) -> None:
+    tool_input = payload.get("tool_input") or {}
+    command = tool_input.get("command", "")
+    if not command:
+        allow()
+
+    cwd = payload.get("cwd") or os.getcwd()
+    source = simple_cat_target(command, cwd)
+    if source is None:
+        allow()
+
+    target = indexed_source_target(base_dir, source)
+    if target is None or not loci_can_answer(base_dir, target):
+        allow()
+
+    deny(
+        f"Bash read blocked: plain `cat` would read the same whole file Loci just "
+        f"proved it can answer for '{target.relative_path}' in '{target.repo}'. "
+        "Use:\n"
+        + loci_recipe(target)
+        + "Shell pipelines, range transforms, and directory searches pass through "
+        "because replacing them would change the operation's content scope."
+    )
+
+
+def main() -> None:
+    try:
+        payload = json.load(sys.stdin)
+    except Exception:
+        allow()
+
+    tool = payload.get("tool_name")
+    if tool not in ("Read", "Bash"):
         allow()
 
     base_dir = store_base_dir()
 
     # Store isolation: if this harness declares a namespace and the store's
     # identity marker names a different one, the store is not ours — fail open
-    # rather than enforce against another harness's index (and never fall back
-    # to a legacy store).
+    # rather than enforce against another harness's index.
     want_ns = os.environ.get("LOCI_STORE_NAMESPACE")
     if want_ns is not None:
         have_ns = store_namespace(base_dir)
         if have_ns is not None and have_ns != want_ns:
             allow()
 
-    abs_path = os.path.realpath(os.path.expanduser(file_path))
-    repos = indexed_repos(base_dir)
-
-    # Longest-prefix wins: a file under a nested indexed repo must be attributed
-    # to the nearest (most specific) repo root, not whichever repo happens to be
-    # listed first. First-match here is what misdirected reads to an ancestor
-    # repo indexed alongside its own subdirectories.
-    matched_repo = None
-    for repo in repos:
-        if abs_path == repo or abs_path.startswith(repo.rstrip("/") + "/"):
-            if matched_repo is None or len(repo) > len(matched_repo):
-                matched_repo = repo
-
-    if matched_repo is None:
-        allow()
-
-    # Targeted reads pass through. They generate the Read receipt that Edit
-    # needs without slurping the whole file, and the agent is expected to
-    # source the line range from `loci_outline` rather than guessing.
-    if tool_input.get("offset") is not None and tool_input.get("limit") is not None:
-        allow()
-
-    rel = os.path.relpath(abs_path, matched_repo)
-    deny(
-        f"Read blocked: '{file_path}' is a {ext} source file inside the "
-        f"loci-indexed repo '{matched_repo}' (file='{rel}'). Per CLAUDE.md, "
-        f"use loci instead of a whole-file Read:\n"
-        f"  1. loci_outline repo='{matched_repo}' file='{rel}' — list the symbols "
-        f"(each with line + end_line)\n"
-        f"  2. loci_get repo='{matched_repo}' "
-        f"symbol_ids='[\"<symbol_id>\"]' — fetch one symbol body, OR\n"
-        f"     Read {file_path} offset=<line> limit=<end_line - line + 1> — targeted "
-        f"read (use this form when you intend to Edit; it also makes the Read receipt Edit needs)\n"
-        f"Whole-file Reads on indexed source defeat loci's token savings. If you "
-        f"genuinely need the whole file (module-level code that is not a symbol), "
-        f"use Bash `cat` as an explicit override."
-    )
+    if tool == "Read":
+        handle_read(payload, base_dir)
+    else:
+        handle_bash(payload, base_dir)
+    allow()
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SystemExit:
+        raise
+    except Exception:
+        # A guardrail that crashes must not become a guardrail that blocks
+        # everything. Fail open, loudly enough to notice in hook debug output.
+        print("loci-enforce-read: internal error, allowing", file=sys.stderr)
+        sys.exit(0)

@@ -105,6 +105,7 @@ def cmd_file(args: argparse.Namespace) -> int:
             args.file_path,
             start_line=args.start,
             end_line=args.end,
+            ensure_fresh=args.ensure_fresh,
         )
         print(json.dumps(result))
         return 0
@@ -465,6 +466,11 @@ def main() -> None:
     p_file.add_argument("--repo", required=True, help="Path to indexed repo")
     p_file.add_argument("--start", type=int, default=None, help="Start line (1-indexed, inclusive)")
     p_file.add_argument("--end", type=int, default=None, help="End line (1-indexed, inclusive)")
+    p_file.add_argument(
+        "--ensure-fresh",
+        action="store_true",
+        help="Refresh a stale repository index before reading",
+    )
 
     p_grep = sub.add_parser("grep", help="Search text across cached files")
     p_grep.add_argument("pattern", help="Regex pattern to search for")

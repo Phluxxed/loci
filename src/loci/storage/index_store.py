@@ -16,6 +16,7 @@ from loci.graph.calls import validate_call_records
 from loci.graph.references import validate_symbol_reference_records
 from loci.graph.state import GraphIndexState
 from loci.parser.symbols import Symbol
+from loci.storage.store_layout import repository_cache_key
 
 LAST_SEARCH_TTL = 300  # 5 minutes
 INDEX_SCHEMA_VERSION = 5
@@ -103,9 +104,7 @@ class IndexStore:
         return self._worktree_cache[repo_path]
 
     def _cache_key(self, repo_path: Path) -> str:
-        abs_path = str(repo_path.resolve())
-        h = hashlib.md5(abs_path.encode()).hexdigest()[:12]
-        return f"{h}_{repo_path.name}"
+        return repository_cache_key(repo_path)
 
     def _repo_dir(self, repo_path: Path) -> Path:
         return self.base_dir / self._cache_key(repo_path)

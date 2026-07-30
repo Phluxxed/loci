@@ -159,6 +159,15 @@ def test_mcp_repository_scoped_tools_use_one_root_parameter(tmp_path: Path) -> N
             assert "repo" in schema["properties"], tool_name
             assert "repo" in schema["required"], tool_name
 
+    file_schema = result["schemas"]["loci_file"]
+    assert "file_path" in file_schema["properties"]
+    assert "file_path" in file_schema["required"]
+    assert "file" not in file_schema["properties"]
+
+    outline_schema = result["schemas"]["loci_outline"]
+    assert "file" in outline_schema["properties"]
+    assert "file_path" not in outline_schema["properties"]
+
     assert result["canonical"]["indexed"]["symbols_indexed"] > 0
     assert result["canonical"]["outline"]["files"][0]["file"] == "sample.py"
     assert result["canonical"]["verify"]["failed"] == []
