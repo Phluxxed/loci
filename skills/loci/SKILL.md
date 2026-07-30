@@ -125,6 +125,7 @@ If loci is unavailable, fails, or the task is a standalone doc/config check wher
 | `loci stats [--repo <path>] [--pretty]` | Checking token savings |
 | `loci list` | Listing indexed repos |
 | `loci invalidate <path>` | Clearing stale cache |
+| `loci store repair-catalog [--max-repositories N] [--max-total-index-bytes N]` | Explicitly repairing legacy, corrupt, or interrupted inventory |
 
 There is no CLI import, reference, or call command. Use `loci_graph_imports`,
 `loci_graph_references`, and `loci_graph_calls` through MCP for diagnostics and

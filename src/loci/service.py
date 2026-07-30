@@ -64,6 +64,7 @@ from loci.query_coverage import (
     stored_query_coverage,
 )
 from loci.storage.index_store import IndexStore, index_versions_current
+from loci.storage.repository_catalog import RepositoryCatalogError
 from loci.storage.store_resolver import StoreResolution, resolve_store_base_dir
 
 REFRESH_LOCK_POLL_SECONDS = 0.05
@@ -397,7 +398,7 @@ def _index_repo_unlocked(
             coverage=repository_scan.coverage,
             graph_state=graph_state,
         )
-    except GraphContractError as exc:
+    except (GraphContractError, RepositoryCatalogError) as exc:
         raise LociError(exc.code, exc.message, exc.details) from exc
 
     output: dict[str, Any] = {
@@ -1349,7 +1350,10 @@ def verify_repo(path: str | Path) -> dict[str, Any]:
 
 
 def list_repos() -> list[dict[str, Any]]:
-    return get_store().list_repos()
+    try:
+        return get_store().list_repos()
+    except RepositoryCatalogError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
 
 
 def session_stats(
@@ -1393,7 +1397,10 @@ def analyze_usage(
 
     store, resolution = _get_store_with_resolution()
     repo_filter = str(Path(repo).resolve()) if repo else None
-    result = store.analyze(since_days=since_days, repo_filter=repo_filter)
+    try:
+        result = store.analyze(since_days=since_days, repo_filter=repo_filter)
+    except RepositoryCatalogError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
     result["store"] = resolution.to_dict()
     return result
 

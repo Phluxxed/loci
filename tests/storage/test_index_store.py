@@ -1261,6 +1261,7 @@ def test_analyze_kind_dead_weight_finding(tmp_path):
     index_path.write_text(json.dumps({
         "repo_path": str(repo_path), "indexed_at": time.time(), "symbols": fake_symbols
     }))
+    store.repair_catalog()
     # Log only function fetches — no constants
     _write_log(tmp_path, [
         {"ts": time.time(), "event": "get", "symbol_id": "src/foo.py::bar",

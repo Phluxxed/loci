@@ -382,6 +382,42 @@ def test_invalidate_removes_cache(indexed_repo):
     assert store.load(repo) is None
 
 
+def test_store_repair_catalog_migrates_legacy_inventory(tmp_path: Path):
+    from loci.storage.store_layout import repository_cache_key
+
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    base = tmp_path / "legacy-store"
+    repo_dir = base / repository_cache_key(repo)
+    repo_dir.mkdir(parents=True)
+    (repo_dir / "index.json").write_text(json.dumps({
+        "symbols": [{"id": "sample.py::example#function"}],
+        "repo_path": str(repo.resolve()),
+    }, indent=2))
+
+    before = run_loci("list", env_extra={"LOCI_BASE_DIR": str(base)})
+    repaired = run_loci(
+        "store",
+        "repair-catalog",
+        "--max-repositories",
+        "1",
+        "--max-total-index-bytes",
+        "4096",
+        env_extra={"LOCI_BASE_DIR": str(base)},
+    )
+    after = run_loci("list", env_extra={"LOCI_BASE_DIR": str(base)})
+
+    assert before.returncode == 1
+    assert json.loads(before.stderr)["code"] == "REPOSITORY_CATALOG_REPAIR_REQUIRED"
+    assert repaired.returncode == 0, repaired.stderr
+    assert json.loads(repaired.stdout)["repositories"] == 1
+    assert json.loads(after.stdout) == [{
+        "cache_key": repository_cache_key(repo),
+        "symbols": 1,
+        "path": str(repo.resolve()),
+    }]
+
+
 def test_outline_returns_files_with_symbols(indexed_repo):
     repo, base = indexed_repo
     result = run_loci("outline", str(repo), env_extra={"LOCI_BASE_DIR": base})
