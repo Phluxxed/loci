@@ -18,11 +18,15 @@ def test_first_party_guidance_uses_canonical_repository_parameter() -> None:
 
     hook = (ROOT / ".claude" / "hooks" / "loci-enforce-read.py").read_text()
     assert "loci_outline repo=" in hook
-    assert "loci_get repo=" in hook
+    assert "loci_file repo=" in hook
     assert "repo='{repo}' path='{repo}'" not in hook
 
     readme = (ROOT / "README.md").read_text()
+    readme_words = " ".join(readme.split())
     assert "canonical repository-root parameter is `repo`" in readme
+    assert "`loci-enforce-read.py`" in readme
+    assert "answer-equivalent" in readme
+    assert "directory searches and shell pipelines fail open" in readme_words
 
     design = (
         ROOT / "docs" / "design" / "2026-06-23-mcp-native-loci-design.md"

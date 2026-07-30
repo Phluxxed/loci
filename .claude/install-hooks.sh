@@ -34,7 +34,7 @@ AGENT_INJECT_HOOK = {
 ENFORCE_READ_HOOK = {
     "type": "command",
     "command": f"{CLAUDE_HOOKS}/loci-enforce-read.py",
-    "timeout": 5,
+    "timeout": 12,
 }
 
 
@@ -107,18 +107,31 @@ def patch_settings() -> None:
         changed = True
         print("  added loci-agent-inject to PreToolUse[Agent]")
 
-    # PreToolUse — add to Read matcher (whole-file Read enforcement)
-    read_entry = next(
-        (e for e in cfg["hooks"]["PreToolUse"] if e.get("matcher") == "Read"),
-        None,
-    )
-    if read_entry is None:
-        read_entry = {"matcher": "Read", "hooks": []}
-        cfg["hooks"]["PreToolUse"].append(read_entry)
-    if not _hook_present(read_entry["hooks"], "loci-enforce-read"):
-        read_entry["hooks"].append(ENFORCE_READ_HOOK)
-        changed = True
-        print("  added loci-enforce-read to PreToolUse[Read]")
+    # PreToolUse — whole-file Read and answer-equivalent simple cat enforcement.
+    for matcher in ("Read", "Bash"):
+        enforce_entry = next(
+            (e for e in cfg["hooks"]["PreToolUse"] if e.get("matcher") == matcher),
+            None,
+        )
+        if enforce_entry is None:
+            enforce_entry = {"matcher": matcher, "hooks": []}
+            cfg["hooks"]["PreToolUse"].append(enforce_entry)
+        existing_index = next(
+            (
+                index
+                for index, hook in enumerate(enforce_entry["hooks"])
+                if "loci-enforce-read" in hook.get("command", "")
+            ),
+            None,
+        )
+        if existing_index is None:
+            enforce_entry["hooks"].append(ENFORCE_READ_HOOK)
+            changed = True
+            print(f"  added loci-enforce-read to PreToolUse[{matcher}]")
+        elif enforce_entry["hooks"][existing_index] != ENFORCE_READ_HOOK:
+            enforce_entry["hooks"][existing_index] = ENFORCE_READ_HOOK
+            changed = True
+            print(f"  updated loci-enforce-read in PreToolUse[{matcher}]")
 
     if changed:
         with open(SETTINGS, "w") as f:

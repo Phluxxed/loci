@@ -790,6 +790,26 @@ def test_file_with_line_range(indexed_repo):
     assert len(data["content"].splitlines()) == 3
 
 
+def test_file_ensure_fresh_refreshes_changed_source(indexed_repo):
+    repo, base = indexed_repo
+    (repo / "sample.py").write_text(
+        "def replacement():\n    return 'fresh'\n",
+        encoding="utf-8",
+    )
+
+    result = run_loci(
+        "file",
+        "sample.py",
+        "--repo",
+        str(repo),
+        "--ensure-fresh",
+        env_extra={"LOCI_BASE_DIR": base},
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert "def replacement" in json.loads(result.stdout)["content"]
+
+
 def test_file_unknown_file_returns_error(indexed_repo):
     repo, base = indexed_repo
     result = run_loci("file", "nonexistent.py", "--repo", str(repo), env_extra={"LOCI_BASE_DIR": base})

@@ -648,12 +648,20 @@ python3 .claude/install-hooks.sh
 
 This symlinks the hooks and skill files into `~/.claude/` and patches `~/.claude/settings.json` to register them. Restart Claude Code after running it.
 
+`loci-enforce-read.py` is registered for `Read` and `Bash`, but it denies only
+answer-equivalent operations: whole-file reads and a plain `cat FILE` after a
+fresh Loci file probe succeeds for that exact indexed path. Broader directory
+searches and shell pipelines fail open because the current MCP tools cannot
+preserve those native content scopes. Repository lookup is derived from the
+target path and never lists or parses sibling indexes.
+
 **What gets installed**
 
 | Component | Location | Effect |
 |---|---|---|
 | `loci-session-start.sh` | `~/.claude/hooks/` | Reports an existing index, or runs bounded initial `loci index --incremental` when no cache exists |
 | `loci-agent-inject.sh` | `~/.claude/hooks/` | Injects the skill into subagent prompts before `Agent` tool calls |
+| `loci-enforce-read.py` | `~/.claude/hooks/` | Redirects only exact whole-file reads that a fresh Loci file call can answer equivalently |
 | `SKILL.md` | `~/.claude/skills/loci/` | The agent workflow guide Claude loads via the `loci` skill |
 
 ## Codex integration
