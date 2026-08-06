@@ -11,9 +11,10 @@ temporary, ignored, or explicitly throwaway material, but it must never turn a
 coverage exclusion into a confident-looking repository-wide miss.
 
 The store must maintain a cheap, current inventory; detect missing repositories,
-stale or corrupt indexes, and overlapping roots; and offer a recoverable,
-explicit cleanup path. Detection and dry-run are safe defaults. Deletion is
-never automatic or implicit.
+stale or corrupt indexes, and overlapping roots; and automatically clean up
+only derived entries whose canonical repository roots no longer exist when the
+store opens for normal use. Cleanup is deterministic, recoverable, and never
+touches repository/source roots.
 
 ## Accepted Decisions
 
@@ -25,8 +26,10 @@ never automatic or implicit.
 - Treat missing repository roots, stale or corrupt indexes, and overlapping
   roots as first-class store health findings.
 - Keep normal inventory reads independent of full `index.json` parsing.
-- Make cleanup dry-run first and explicit to apply, with exact targets and
-  post-action verification.
+- Make normal store startup perform deterministic per-entry dead-root cleanup
+  under the existing catalog mutation protocol; record only bounded removal
+  count/byte diagnostics. No manual, dry-run, apply, age, size, stale, corrupt,
+  overlap, or indexability pruning is part of this contract.
 - Reject new overlapping roots in one store unless a later approved use case
   earns an explicit exception contract.
 - Guarantee test processes cannot write into an operator store by default.
@@ -93,7 +96,8 @@ free-form warning text when a typed result can state it directly.
   coverage boundary.
 - Use temporary, explicitly named stores for all tests and subprocesses.
 - Exercise catalog updates, interrupted writes, missing roots, corruption,
-  overlaps, dry-run cleanup, explicit cleanup, and post-cleanup integrity.
+  overlaps, automatic startup cleanup, pending-mutation recovery, and
+  post-cleanup integrity.
 - Contract-test MCP schemas and first-party guidance rather than checking only
   that a tool name appears in an error message.
 - Measure `loci list` against store size so its cost cannot regress to parsing
@@ -106,13 +110,14 @@ free-form warning text when a typed result can state it directly.
 - Treat current repository files and focused tests as authoritative evidence.
 - Keep store metadata writes atomic and recoverable.
 - Return machine-readable coverage and health state.
-- Preserve existing indexes until an explicit cleanup action names them.
+- Preserve healthy and source repositories; automatic cleanup may remove only a
+  derived index/cache directory and its catalog entry when the canonical root
+  is missing.
 - Update first-party hooks, docs, and skills with public MCP contract changes.
 
 ### Ask First
 
 - Add a new dependency.
-- Introduce automatic destructive pruning.
 - Permit overlapping roots in one store.
 - Change the store identity or namespace model.
 - Run repository-wide qualification.
@@ -138,8 +143,9 @@ free-form warning text when a typed result can state it directly.
 - Repository inventory does not parse every `index.json`.
 - Store health identifies missing roots, stale/corrupt entries, and overlaps
   with bounded evidence.
-- Cleanup offers deterministic dry-run output, explicit apply, and verified
-  post-cleanup health without touching healthy entries.
+- Normal store startup deterministically removes only entries whose canonical
+  roots are missing, leaves healthy entries and source repositories untouched,
+  and records bounded removed-count/removed-byte diagnostics.
 - New overlapping roots fail with a structured conflict naming the existing
   root and a safe operator action.
 - The full test harness is isolated from Codex, Claude, and legacy stores.
@@ -280,20 +286,29 @@ Verification:
 - Focused health fixtures for every state and mixed-store pagination/bounds.
 
 <a id="store-prune-task"></a>
-#### Task 2.3: Add explicit dead-root pruning
+#### Task 2.3: Automatically prune dead roots during normal store startup
 
-Provide deterministic dry-run and apply operations for entries whose canonical
-repository roots no longer exist.
+When the store opens for normal use, process catalog entries in deterministic
+order. For each entry, perform one canonical-root existence check; keep it when
+present, otherwise remove only its derived index/cache directory and catalog
+entry using the existing mutation/recovery protocol. Repositories and source
+roots are never touched, and no daemon or manual/dry-run/apply interface is
+introduced.
 
 Acceptance:
 
-- Dry-run is the default and names cache keys, roots, bytes, and reasons.
-- Apply requires exact reviewed targets and leaves healthy entries untouched.
-- Post-prune catalog and store integrity are verified.
+- Missing roots remove exactly one derived cache directory and catalog entry;
+  healthy roots remain unchanged.
+- Cleanup is deterministic, per-entry recoverable, and cannot collide with a
+  pending catalog write/invalidate mutation.
+- A bounded diagnostic summary records removed count and bytes; age, size,
+  stale, corrupt, overlap, and indexability policies remain out of scope.
+- Post-cleanup catalog and store integrity are verified.
 
 Verification:
 
-- Focused dry-run/apply/recovery tests using disposable stores.
+- Focused disposable-store startup, preservation, summary, and
+  pending-mutation recovery tests.
 
 <a id="store-overlap-task"></a>
 #### Task 2.4: Prevent new overlapping repository roots
@@ -401,7 +416,8 @@ Verification:
 ### Store checkpoint
 
 - Tasks 2.1 and 2.2 complete with catalog recovery and health fixtures.
-- Review exact prune targets and apply contract before implementing deletion.
+- Review startup cleanup and pending-mutation recovery evidence before final
+  qualification.
 
 ### Integration checkpoint
 

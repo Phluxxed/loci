@@ -1,4 +1,5 @@
 import json
+import shutil
 from pathlib import Path
 
 import pytest
@@ -240,3 +241,101 @@ def test_legacy_repair_refuses_to_cross_index_byte_budget(tmp_path: Path) -> Non
     assert exc_info.value.code == "REPOSITORY_CATALOG_REPAIR_LIMIT_EXCEEDED"
     assert not (base_dir / CATALOG_FILE_NAME).exists()
     assert not (base_dir / PENDING_MUTATION_FILE_NAME).exists()
+
+
+def test_store_open_automatically_removes_missing_root_cache_and_reports_summary(
+    tmp_path: Path,
+) -> None:
+    base_dir = tmp_path / "store"
+    dead_repo = _repo(tmp_path, "dead")
+    live_repo = _repo(tmp_path, "live")
+    store = IndexStore(base_dir=base_dir)
+    store.write(dead_repo, [_symbol("dead")], file_hashes={})
+    store.write(live_repo, [_symbol("live")], file_hashes={})
+
+    dead_cache_dir = base_dir / repository_cache_key(dead_repo)
+    dead_cache_bytes = sum(
+        path.stat().st_size
+        for path in dead_cache_dir.rglob("*")
+        if path.is_file()
+    )
+    dead_repo_source = dead_repo / "src" / "example.py"
+    live_repo_source = live_repo / "src" / "example.py"
+    dead_repo_source.unlink()
+    dead_repo_source.parent.rmdir()
+    dead_repo.rmdir()
+    original_live_source = live_repo_source.read_bytes()
+
+    reopened = IndexStore(base_dir=base_dir)
+
+    assert not dead_cache_dir.exists()
+    assert reopened.list_repos() == [{
+        "cache_key": repository_cache_key(live_repo),
+        "symbols": 1,
+        "path": str(live_repo.resolve()),
+    }]
+    assert live_repo_source.read_bytes() == original_live_source
+    cleanup_events = [
+        json.loads(line)
+        for line in (base_dir / "session.jsonl").read_text().splitlines()
+        if line.strip()
+    ]
+    assert cleanup_events[-1] == {
+        "event": "store_cleanup",
+        "removed_count": 1,
+        "removed_bytes": dead_cache_bytes,
+    }
+
+
+def test_store_open_does_not_cleanup_while_catalog_mutation_is_pending(
+    tmp_path: Path,
+) -> None:
+    base_dir = tmp_path / "store"
+    repo = _repo(tmp_path)
+    store = IndexStore(base_dir=base_dir)
+    store.write(repo, [_symbol("example")], file_hashes={})
+    repo_dir = base_dir / repository_cache_key(repo)
+    repo_source = repo / "src" / "example.py"
+    repo_source.unlink()
+    repo_source.parent.rmdir()
+    repo.rmdir()
+    (base_dir / PENDING_MUTATION_FILE_NAME).write_text(
+        json.dumps({
+            "schema_version": 1,
+            "operation": "write",
+            "cache_key": repository_cache_key(repo),
+        })
+    )
+
+    IndexStore(base_dir=base_dir)
+
+    assert repo_dir.exists()
+    assert (base_dir / PENDING_MUTATION_FILE_NAME).exists()
+
+
+def test_interrupted_startup_cleanup_recovers_through_catalog_repair(
+    tmp_path: Path,
+) -> None:
+    base_dir = tmp_path / "store"
+    repo = _repo(tmp_path)
+    store = IndexStore(base_dir=base_dir)
+    store.write(repo, [_symbol("example")], file_hashes={})
+    repo_dir = base_dir / repository_cache_key(repo)
+    repo_source = repo / "src" / "example.py"
+    repo_source.unlink()
+    repo_source.parent.rmdir()
+    repo.rmdir()
+    (base_dir / PENDING_MUTATION_FILE_NAME).write_text(
+        json.dumps({
+            "schema_version": 1,
+            "operation": "cleanup",
+            "cache_key": repository_cache_key(repo),
+        })
+    )
+    shutil.rmtree(repo_dir)
+
+    reopened = IndexStore(base_dir=base_dir)
+    repaired = reopened.repair_catalog()
+
+    assert repaired["repositories"] == 0
+    assert reopened.list_repos() == []

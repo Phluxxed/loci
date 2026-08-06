@@ -13,7 +13,8 @@ recoverable lifecycle.
   enforcement.
 - Search and grep state what they covered, including empty results.
 - A small atomic catalog serves inventory without parsing every index.
-- Health detection is read-only; cleanup is dry-run first and explicit to apply.
+- Health detection is read-only; normal store opens automatically remove only
+  entries whose canonical repository roots no longer exist.
 - New overlapping roots fail closed with a structured conflict.
 - The test harness always selects a temporary namespaced store.
 - MCP repository-root naming is normalized through a reviewed migration.
@@ -32,7 +33,7 @@ recoverable lifecycle.
 
 - [x] Task 2.1: Build an atomic repository catalog and fast inventory.
 - [x] Task 2.2: Diagnose freshness, dead roots, corruption, and overlaps.
-- [ ] Task 2.3: Add explicit dead-root pruning.
+- [x] Task 2.3: Automatically prune dead roots during normal store startup.
 - [ ] Task 2.4: Prevent new overlapping repository roots.
 
 ### Thread 3: Harness and public contracts
@@ -44,7 +45,8 @@ recoverable lifecycle.
 ## Checkpoints
 
 - [x] Coverage: maintained tests are discoverable and empty results are honest.
-- [ ] Store: catalog recovery and health diagnosis pass before prune apply work.
+- [x] Store: catalog recovery, health diagnosis, and startup dead-root cleanup
+  pass focused disposable-store proofs.
 - [ ] Integration: hook, cleanup, overlap, isolation, and MCP migration pass
   focused end-to-end proofs.
 

@@ -270,6 +270,15 @@ rebuild it. Repair is non-destructive and bounded by `--max-repositories` and
 `--max-total-index-bytes`; raise those limits deliberately when a known legacy
 store exceeds them.
 
+Normal store opens also perform bounded startup housekeeping: catalog entries are
+processed deterministically, and an entry is removed only when its canonical
+repository root no longer exists. Cleanup removes the derived cache directory
+and catalog entry, never the repository/source root, and records a compact
+removed-count/removed-byte diagnostic. Healthy entries are left untouched;
+there is no manual, dry-run, apply, age, size, stale, corrupt, overlap, or
+indexability pruning policy. `loci store health` and `loci_store_health` remain
+read-only diagnostics and do not run startup cleanup.
+
 `loci store health` and the `loci_store_health` MCP tool return the same
 versioned projection. Repository entries carry a `states` array so findings
 such as `stale` and `overlapping` remain visible together, plus structured

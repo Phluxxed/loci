@@ -21,6 +21,7 @@ from loci.storage.repository_catalog import (
     DEFAULT_MAX_TOTAL_INDEX_BYTES,
     RepositoryCatalog,
     RepositoryCatalogEntry,
+    RepositoryCatalogError,
 )
 from loci.storage.store_layout import repository_cache_key
 
@@ -110,6 +111,12 @@ class IndexStore:
             self.base_dir.mkdir(parents=True, exist_ok=True)
         self._catalog = RepositoryCatalog(self.base_dir)
         self._worktree_cache: dict[str, str] = {}
+        self._startup_cleanup_summary = {
+            "removed_count": 0,
+            "removed_bytes": 0,
+        }
+        if create_base_dir:
+            self._cleanup_missing_repositories()
 
     def _canonical_repo(self, repo_path: str) -> str:
         if repo_path not in self._worktree_cache:
@@ -137,6 +144,49 @@ class IndexStore:
         h = hashlib.sha256()
         h.update(path.read_bytes())
         return h.hexdigest()
+
+    def _cleanup_missing_repositories(self) -> None:
+        try:
+            catalog_entries = self._catalog.entries_for_mutation()
+        except RepositoryCatalogError:
+            # Existing catalog recovery remains the normal explicit repair path;
+            # startup cleanup must not race or mask an interrupted mutation.
+            return
+
+        removed_count = 0
+        removed_bytes = 0
+        for cache_key in sorted(catalog_entries):
+            entry = catalog_entries[cache_key]
+            if Path(entry.path).exists():
+                continue
+
+            try:
+                self._catalog.begin_mutation("cleanup", cache_key)
+            except RepositoryCatalogError:
+                # A concurrent writer owns the catalog mutation marker. Leave
+                # the remaining entries for the next normal store open.
+                break
+            repo_dir = self.base_dir / cache_key
+            cache_bytes = _directory_file_bytes(repo_dir)
+            if repo_dir.exists():
+                shutil.rmtree(repo_dir)
+            catalog_entries.pop(cache_key)
+            self._catalog.commit(catalog_entries)
+            self._catalog.finish_mutation()
+            removed_count += 1
+            removed_bytes += cache_bytes
+
+        self._startup_cleanup_summary = {
+            "removed_count": removed_count,
+            "removed_bytes": removed_bytes,
+        }
+        if removed_count:
+            with self._session_log_path().open("a", encoding="utf-8") as handle:
+                handle.write(json.dumps({
+                    "event": "store_cleanup",
+                    "removed_count": removed_count,
+                    "removed_bytes": removed_bytes,
+                }) + "\n")
 
     def write(
         self,
@@ -1066,6 +1116,19 @@ class IndexStore:
 def _ts_to_iso(ts: float) -> str:
     from datetime import datetime, timezone
     return datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _directory_file_bytes(path: Path) -> int:
+    if not path.is_dir():
+        return 0
+    total = 0
+    for child in path.rglob("*"):
+        if child.is_file():
+            try:
+                total += child.stat().st_size
+            except OSError:
+                continue
+    return total
 
 
 def _name_words(name: str) -> set[str]:
