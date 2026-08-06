@@ -15,6 +15,7 @@ from loci.graph.references import (
 )
 from loci.graph.state import GraphIndexState
 from loci.parser.imports import RawImport
+from loci.parser._binding_context import ExecutableOwner
 from loci.parser.reference_models import (
     ImportBinding,
     RawLocalExport,
@@ -122,6 +123,13 @@ def _reference_fixture(
         candidate_bindings=(binding,),
         binding_state="definite",
         source_hash=source_hash,
+        owner=ExecutableOwner(
+            kind="callable",
+            definition_start_byte=source_start,
+            definition_end_byte=len(SOURCE_TEXT.encode()),
+            body_start_byte=SOURCE_TEXT.index("return Alias"),
+            body_end_byte=len(SOURCE_TEXT.encode()),
+        ),
     )
     record = SymbolReferenceRecord(
         raw=raw_reference,

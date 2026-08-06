@@ -394,7 +394,7 @@ def test_service_schema_seven_call_cache_forces_full_rebuild(
     graph = _load_graph(base, repo)
 
     assert rebuilt["files_skipped"] == 0
-    assert graph["schema_version"] == 8
+    assert graph["schema_version"] == 9
     assert graph["calls"][0]["status"] == "resolved"
 
 

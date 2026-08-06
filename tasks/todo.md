@@ -15,7 +15,7 @@
     of aggregate index bytes.
   - Verify: focused hook tests for tests/, root grep, nested roots, and fallback.
 
-- [ ] Task 1.4: Align definition-time reference and call ownership and restore
+- [x] Task 1.4: Align definition-time reference and call ownership and restore
   stale-index refresh.
   - Acceptance: decorators, annotations, defaults, and other definition-time
     expressions use the enclosing executable/file owner consistently across

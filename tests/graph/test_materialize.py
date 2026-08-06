@@ -643,6 +643,75 @@ def test_materialize_graph_threads_resolved_symbol_references_after_imports(
     )]
 
 
+def test_materialize_graph_uses_file_owner_for_definition_time_references(
+    tmp_path: Path,
+):
+    files = {
+        "target.py": "class Imported:\n    pass\n",
+        "use.py": (
+            "from target import Imported\n"
+            "\n"
+            "@Imported\n"
+            "def decorated(value: Imported = Imported()):\n"
+            "    return Imported()\n"
+        ),
+    }
+    symbols: list[Symbol] = []
+    batches = []
+    file_hashes = {}
+    for relative_path, source in files.items():
+        path = tmp_path / relative_path
+        path.write_text(source, encoding="utf-8")
+        source_hash = hashlib.sha256(source.encode()).hexdigest()
+        file_hashes[relative_path] = source_hash
+        symbols.append(make_file_symbol(
+            relative_path,
+            language="python",
+            content_hash=source_hash,
+        ))
+        symbols.extend(
+            replace(
+                symbol,
+                id=make_symbol_id(relative_path, symbol.qualified_name, symbol.kind),
+                file_path=relative_path,
+            )
+            for symbol in parse_file(path)
+        )
+        batches.append(extract_import_batch(
+            path,
+            source_file=relative_path,
+            language="python",
+            source_hash=source_hash,
+        ))
+
+    state = materialize_graph(
+        tmp_path,
+        symbols,
+        file_hashes,
+        [],
+        [],
+        raw_imports=[raw for batch in batches for raw in batch.imports],
+        raw_exports=[raw for batch in batches for raw in batch.exports],
+        raw_symbol_references=[
+            raw for batch in batches for raw in batch.references
+        ],
+        raw_calls=[raw for batch in batches for raw in batch.calls],
+    )
+
+    assert {
+        record.source_id
+        for record in state.symbol_references
+        if record.raw.source_file == "use.py"
+        and record.raw.line in {3, 4}
+    } == {"use.py::__file__#file"}
+    assert {
+        record.source_id
+        for record in state.symbol_references
+        if record.raw.source_file == "use.py"
+        and record.raw.line == 5
+    } == {"use.py::decorated#function"}
+
+
 def test_materialize_graph_resolves_calls_after_their_reference_evidence(
     tmp_path: Path,
 ):

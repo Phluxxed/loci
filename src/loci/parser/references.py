@@ -4,9 +4,11 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, AbstractSet, Any, Sequence
 
 from loci.parser._binding_context import (
+    ExecutableOwner,
     LexicalBinding,
     SyntaxContext,
     collect_syntax_context,
+    nearest_executable_owner,
     node_key,
     python_scope,
 )
@@ -87,6 +89,7 @@ def extract_reference_batch(
         reference = _match_observation(
             observation,
             source,
+            owner=nearest_executable_owner(context, observation.node),
             source_file=source_file,
             language=language,
             source_hash=source_hash,
@@ -111,6 +114,7 @@ def _match_observation(
     observation: _PathObservation,
     source: bytes,
     *,
+    owner: ExecutableOwner,
     source_file: str,
     language: str,
     source_hash: str,
@@ -165,6 +169,7 @@ def _match_observation(
             source_file=source_file,
             language=language,
             source_hash=source_hash,
+            owner=owner,
             candidates=tuple(candidates),
             state=state,
         )
@@ -190,6 +195,7 @@ def _match_observation(
         source_file=source_file,
         language=language,
         source_hash=source_hash,
+        owner=owner,
         candidates=tuple(deferred),
         state="deferred",
     )
@@ -202,6 +208,7 @@ def _raw_reference(
     source_file: str,
     language: str,
     source_hash: str,
+    owner: ExecutableOwner,
     candidates: tuple[ImportBinding, ...],
     state: BindingState,
 ) -> RawSymbolReference:
@@ -218,6 +225,7 @@ def _raw_reference(
         candidate_bindings=candidates,
         binding_state=state,
         source_hash=source_hash,
+        owner=owner,
     )
 
 

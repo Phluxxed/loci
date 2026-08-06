@@ -178,6 +178,13 @@ def _reference(**overrides) -> SymbolReferenceRecord:
         candidate_bindings=(binding,),
         binding_state="definite",
         source_hash=SOURCE_HASH,
+        owner=ExecutableOwner(
+            kind="callable",
+            definition_start_byte=30,
+            definition_end_byte=100,
+            body_start_byte=40,
+            body_end_byte=100,
+        ),
     )
     values = {
         "raw": raw,

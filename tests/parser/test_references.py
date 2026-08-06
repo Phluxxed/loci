@@ -7,7 +7,7 @@ import pytest
 from tree_sitter import Parser
 from tree_sitter_language_pack import SupportedLanguage, get_language
 
-from loci.parser._binding_context import collect_syntax_context
+from loci.parser._binding_context import ExecutableOwner, collect_syntax_context
 from loci.parser.imports import (
     ImportExtractionBatch,
     ImportExtractionError,
@@ -164,6 +164,13 @@ def _reference(**overrides) -> RawSymbolReference:
         "candidate_bindings": (_binding(),),
         "binding_state": "definite",
         "source_hash": SOURCE_HASH,
+        "owner": ExecutableOwner(
+            kind="file",
+            definition_start_byte=None,
+            definition_end_byte=None,
+            body_start_byte=None,
+            body_end_byte=None,
+        ),
     }
     values.update(overrides)
     return RawSymbolReference(**values)
@@ -192,6 +199,23 @@ def test_reference_parser_models_round_trip_strictly(record):
     unknown["unknown"] = True
     with pytest.raises(ValueError, match="fields"):
         type(record).from_dict(unknown)
+
+
+def test_raw_reference_owner_is_persisted_as_a_strict_typed_field():
+    reference = _reference()
+    serialized = reference.to_dict()
+
+    assert serialized["owner"] == reference.owner.to_dict()
+
+    missing_owner = dict(serialized)
+    missing_owner.pop("owner")
+    with pytest.raises(ValueError, match="fields"):
+        RawSymbolReference.from_dict(missing_owner)
+
+    invalid_owner = dict(serialized)
+    invalid_owner["owner"] = {"kind": "file"}
+    with pytest.raises(ValueError):
+        RawSymbolReference.from_dict(invalid_owner)
 
 
 @pytest.mark.parametrize(
@@ -650,6 +674,30 @@ def test_python_parameter_annotations_remain_reference_sites(tmp_path: Path):
         ("Kind", "definite"),
         ("Kind", "definite"),
     ]
+
+
+def test_python_definition_time_references_use_file_owner(tmp_path: Path):
+    source = (
+        "from model import Kind\n"
+        "\n"
+        "@Kind\n"
+        "def build(value: Kind = Kind()):\n"
+        "    return Kind()\n"
+    )
+    batch = _extract_batch(
+        tmp_path,
+        name="definition_time.py",
+        source=source,
+        language="python",
+    )
+
+    assert [
+        (item.line, item.owner.kind)
+        for item in batch.references
+    ] == [(3, "file"), (4, "file"), (4, "file"), (5, "callable")]
+    body_owner = batch.references[-1].owner
+    assert body_owner.definition_start_byte == source.index("@Kind")
+    assert body_owner.body_start_byte == source.index("return Kind")
 
 
 def test_python_exports_preserve_source_order_and_import_evidence(tmp_path: Path):

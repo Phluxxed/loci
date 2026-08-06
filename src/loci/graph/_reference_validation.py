@@ -396,22 +396,28 @@ def _validate_source_owner(
             "Reference import source is not the current source file node",
             field="import_source_id",
         )
-    candidates = [
-        node
-        for node in validation_index.nodes_by_file.get(raw.source_file, ())
-        if not _is_synthetic_node(node) and _contains_reference(node, raw)
-    ]
     ambiguous = False
     expected = file_node
-    if candidates:
-        smallest_length = min(cast(int, node["byte_length"]) for node in candidates)
-        smallest = [
-            node for node in candidates if node.get("byte_length") == smallest_length
+    if raw.owner.kind == "callable":
+        assert raw.owner.definition_start_byte is not None
+        assert raw.owner.definition_end_byte is not None
+        candidates = [
+            node
+            for node in validation_index.nodes_by_file.get(raw.source_file, ())
+            if node.get("kind") in {"function", "method"}
+            and node.get("byte_offset") == raw.owner.definition_start_byte
+            and (
+                cast(int, node.get("byte_offset", 0))
+                + cast(int, node.get("byte_length", 0))
+                == raw.owner.definition_end_byte
+            )
         ]
-        if len(smallest) == 1:
-            expected = smallest[0]
+        if len(candidates) == 1:
+            expected = candidates[0]
         else:
             ambiguous = True
+    elif raw.owner.kind != "file":
+        ambiguous = True
     if (
         expected.get("id") != record.source_id
         or expected.get("kind") != record.source_kind

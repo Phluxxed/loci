@@ -19,6 +19,7 @@ from loci.graph.references import (
     validate_symbol_reference_records,
 )
 from loci.parser.imports import RawImport
+from loci.parser._binding_context import ExecutableOwner
 from loci.parser.reference_models import (
     ImportBinding,
     RawLocalExport,
@@ -66,6 +67,13 @@ def _raw_reference(**overrides) -> RawSymbolReference:
         "candidate_bindings": (_binding(),),
         "binding_state": "definite",
         "source_hash": SOURCE_HASH,
+        "owner": ExecutableOwner(
+            kind="callable",
+            definition_start_byte=50,
+            definition_end_byte=150,
+            body_start_byte=60,
+            body_end_byte=150,
+        ),
     }
     values.update(overrides)
     return RawSymbolReference(**values)

@@ -25,7 +25,7 @@ recoverable lifecycle.
 - [x] Task 1.1: Centralize indexability and restore maintained test coverage.
 - [x] Task 1.2: Expose query coverage and honest empty-result semantics.
 - [x] Task 1.3: Make Claude enforcement coverage-equivalent.
-- [ ] Task 1.4: Align definition-time reference and call ownership and restore
+- [x] Task 1.4: Align definition-time reference and call ownership and restore
   stale-index refresh.
 
 ### Thread 2: Store lifecycle
@@ -43,7 +43,7 @@ recoverable lifecycle.
 
 ## Checkpoints
 
-- [ ] Coverage: maintained tests are discoverable and empty results are honest.
+- [x] Coverage: maintained tests are discoverable and empty results are honest.
 - [ ] Store: catalog recovery and health diagnosis pass before prune apply work.
 - [ ] Integration: hook, cleanup, overlap, isolation, and MCP migration pass
   focused end-to-end proofs.

@@ -25,8 +25,8 @@ from loci.storage.repository_catalog import (
 from loci.storage.store_layout import repository_cache_key
 
 LAST_SEARCH_TTL = 300  # 5 minutes
-INDEX_SCHEMA_VERSION = 5
-EXTRACTOR_VERSION = 11
+INDEX_SCHEMA_VERSION = 6
+EXTRACTOR_VERSION = 12
 
 
 def _resolve_worktree_root(path: str) -> str:
