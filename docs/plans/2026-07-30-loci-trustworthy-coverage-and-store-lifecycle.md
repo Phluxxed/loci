@@ -32,6 +32,11 @@ never automatic or implicit.
 - Guarantee test processes cannot write into an operator store by default.
 - Normalize MCP repository-root parameter naming and update all first-party
   consumers through one reviewed migration.
+- Use the same nearest-named-executable-body ownership contract for Python
+  imported references and calls. Decorators, annotations, defaults, and other
+  definition-time expressions belong to their enclosing executable scope, or
+  the file node at repository top level; they never inherit the callable they
+  define.
 
 ## Commands
 
@@ -212,6 +217,29 @@ Verification:
 - Focused hook contract tests including `tests/`, repository-root grep, invalid
   guidance prevention, unreachable Loci, and nested repositories.
 
+<a id="definition-time-owner-task"></a>
+#### Task 1.4: Align definition-time reference and call ownership and restore refresh
+
+Correct the imported-reference owner projection so it uses the same
+nearest-named-executable-body contract already applied to call records. This
+is a blocking correction exposed when maintained decorated tests entered the
+index: current-source stale refresh otherwise creates call/reference records
+that cannot satisfy graph validation.
+
+Acceptance:
+
+- Decorator, annotation, default-argument, and other definition-time imported
+  references use their enclosing executable or file node, matching call
+  ownership.
+- Graph validation remains strict and accepts the resulting unique
+  call/reference evidence without dropping or weakening records.
+- A stale read can refresh a current Loci checkout in an isolated store.
+
+Verification:
+
+- Focused Python reference-owner and call-materialization regression tests.
+- One disposable-store stale-refresh proof using current source.
+
 <a id="store-thread"></a>
 ### Thread 2: Make store inventory and lifecycle healthy
 
@@ -344,6 +372,8 @@ Verification:
 
 - Task 1.1 blocks Tasks 1.2 and 1.3.
 - Task 1.2 blocks Task 1.3.
+- Task 1.4 blocks remaining delivery while current-source stale refresh cannot
+  satisfy the call/reference ownership invariant.
 - Task 2.1 blocks Tasks 2.2, 2.3, and 2.4.
 - Task 2.2 blocks Tasks 2.3 and 2.4.
 - Task 3.1 can proceed independently after the plan is accepted.

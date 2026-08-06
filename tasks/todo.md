@@ -6,21 +6,30 @@
     is excluded.
   - Verify: focused service, CLI, and scan-policy tests.
 
-- [ ] Task 1.2: Expose query coverage and honest empty-result semantics.
+- [x] Task 1.2: Expose query coverage and honest empty-result semantics.
   - Acceptance: empty and non-empty search/grep outcomes carry typed coverage.
   - Verify: focused service and MCP contract tests.
 
-- [ ] Task 1.3: Make Claude enforcement coverage-equivalent.
+- [x] Task 1.3: Make Claude enforcement coverage-equivalent.
   - Acceptance: redirects are answer-equivalent, schema-correct, and independent
     of aggregate index bytes.
   - Verify: focused hook tests for tests/, root grep, nested roots, and fallback.
 
-- [ ] Task 2.1: Build an atomic repository catalog and fast inventory.
+- [ ] Task 1.4: Align definition-time reference and call ownership and restore
+  stale-index refresh.
+  - Acceptance: decorators, annotations, defaults, and other definition-time
+    expressions use the enclosing executable/file owner consistently across
+    imported references and calls; current-source refresh satisfies graph
+    validation without weakening the invariant.
+  - Verify: focused reference-owner and call-materialization regressions plus
+    one disposable-store stale-refresh proof.
+
+- [x] Task 2.1: Build an atomic repository catalog and fast inventory.
   - Acceptance: list cost scales with catalog entries and legacy repair is
     deterministic.
   - Verify: focused atomicity, recovery, compatibility, and performance tests.
 
-- [ ] Task 2.2: Diagnose freshness, dead roots, corruption, and overlaps.
+- [x] Task 2.2: Diagnose freshness, dead roots, corruption, and overlaps.
   - Acceptance: bounded typed health findings with no mutation during reads.
   - Verify: focused mixed-store health fixtures.
 
@@ -38,7 +47,7 @@
   - Acceptance: in-process and subprocess tests cannot resolve operator stores.
   - Verify: focused isolation sentinels and subprocess proofs.
 
-- [ ] Task 3.2: Normalize MCP repository-root parameters.
+- [x] Task 3.2: Normalize MCP repository-root parameters.
   - Acceptance: one canonical root name, deliberate compatibility, and updated
     first-party guidance.
   - Verify: focused schema snapshots and installed stdio smoke.
