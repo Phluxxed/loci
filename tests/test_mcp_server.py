@@ -102,6 +102,7 @@ def test_mcp_index_outline_get_round_trip(tmp_path: Path, fixtures_dir: Path):
         "loci_outline",
         "loci_search",
         "loci_stats",
+        "loci_store_health",
         "loci_verify",
     ]
     assert result["outline"]["files"][0]["file"] == "sample.py"
@@ -116,6 +117,10 @@ def test_mcp_index_outline_get_round_trip(tmp_path: Path, fixtures_dir: Path):
     assert result["graph"]["results"][0]["neighbors"] == []
     assert result["health"]["status"] == "healthy"
     assert result["health"]["counts"]["profiles"] == 0
+    assert result["store_health"]["status"] == "healthy"
+    assert result["store_health"]["complete"] is True
+    assert result["store_health"]["items"][0]["states"] == ["healthy"]
+    assert result["invalid_store_health"]["error"]["code"] == "INVALID_INPUT"
     assert result["verify"]["failed"] == []
     assert any(entry["path"] == str(repo.resolve()) for entry in result["list"]["repos"])
     assert result["stats"]["total_gets"] >= 1
@@ -167,6 +172,17 @@ def test_mcp_repository_scoped_tools_use_one_root_parameter(tmp_path: Path) -> N
     outline_schema = result["schemas"]["loci_outline"]
     assert "file" in outline_schema["properties"]
     assert "file_path" not in outline_schema["properties"]
+
+    store_health_schema = result["schemas"]["loci_store_health"]
+    assert "repo" not in store_health_schema["properties"]
+    assert set(store_health_schema["properties"]) == {
+        "offset",
+        "limit",
+        "max_catalog_bytes",
+        "max_index_bytes",
+        "max_probe_paths",
+        "max_probe_bytes",
+    }
 
     assert result["canonical"]["indexed"]["symbols_indexed"] > 0
     assert result["canonical"]["outline"]["files"][0]["file"] == "sample.py"
@@ -683,6 +699,15 @@ async def _round_trip(
                 "loci_graph_health",
                 arguments={"repo": str(repo)},
             )
+            store_health = await session.call_tool(
+                "loci_store_health",
+                arguments={"offset": 0, "limit": 10},
+            )
+            invalid_store_health = await session.call_tool(
+                "loci_store_health",
+                arguments={"limit": 0},
+            )
+            assert invalid_store_health.isError is True
             verify = await session.call_tool(
                 "loci_verify",
                 arguments={"repo": str(repo)},
@@ -713,6 +738,8 @@ async def _round_trip(
         "anchors": anchors.structuredContent,
         "graph": graph.structuredContent,
         "health": health.structuredContent,
+        "store_health": store_health.structuredContent,
+        "invalid_store_health": invalid_store_health.structuredContent,
         "verify": verify.structuredContent,
         "list": repos.structuredContent,
         "stats": stats.structuredContent,

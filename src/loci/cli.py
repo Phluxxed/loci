@@ -18,6 +18,7 @@ from loci.service import (
     reset_session_stats,
     search_symbols,
     session_stats,
+    store_health,
     verify_repo,
 )
 from loci.storage.store_identity import StoreIdentityError, initialize_store
@@ -25,6 +26,13 @@ from loci.storage.repository_catalog import (
     DEFAULT_MAX_REPOSITORIES,
     DEFAULT_MAX_TOTAL_INDEX_BYTES,
     RepositoryCatalogError,
+)
+from loci.storage.store_health import (
+    DEFAULT_HEALTH_LIMIT,
+    DEFAULT_MAX_CATALOG_BYTES,
+    DEFAULT_MAX_INDEX_BYTES,
+    DEFAULT_MAX_PROBE_BYTES,
+    DEFAULT_MAX_PROBE_PATHS,
 )
 
 
@@ -478,6 +486,23 @@ def cmd_store_repair_catalog(args: argparse.Namespace) -> int:
         return 1
 
 
+def cmd_store_health(args: argparse.Namespace) -> int:
+    try:
+        result = store_health(
+            offset=args.offset,
+            limit=args.limit,
+            max_catalog_bytes=args.max_catalog_bytes,
+            max_index_bytes=args.max_index_bytes,
+            max_probe_paths=args.max_probe_paths,
+            max_probe_bytes=args.max_probe_bytes,
+        )
+        print(json.dumps(result))
+        return 0
+    except LociError as exc:
+        _print_loci_error(exc)
+        return 1
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="loci", description="Code symbol indexer")
     sub = parser.add_subparsers(dest="command")
@@ -561,6 +586,46 @@ def main() -> None:
         default=DEFAULT_MAX_TOTAL_INDEX_BYTES,
         help="Maximum combined legacy index bytes to scan",
     )
+    p_store_health = store_sub.add_parser(
+        "health",
+        help="Inspect bounded read-only repository store health",
+    )
+    p_store_health.add_argument(
+        "--offset",
+        type=int,
+        default=0,
+        help="Catalog entry offset (default: 0)",
+    )
+    p_store_health.add_argument(
+        "--limit",
+        type=int,
+        default=DEFAULT_HEALTH_LIMIT,
+        help="Repositories to diagnose, 1..500 (default: 100)",
+    )
+    p_store_health.add_argument(
+        "--max-catalog-bytes",
+        type=int,
+        default=DEFAULT_MAX_CATALOG_BYTES,
+        help="Maximum catalog bytes to read",
+    )
+    p_store_health.add_argument(
+        "--max-index-bytes",
+        type=int,
+        default=DEFAULT_MAX_INDEX_BYTES,
+        help="Maximum bytes to read from each repository index",
+    )
+    p_store_health.add_argument(
+        "--max-probe-paths",
+        type=int,
+        default=DEFAULT_MAX_PROBE_PATHS,
+        help="Maximum repository paths to inspect per freshness probe",
+    )
+    p_store_health.add_argument(
+        "--max-probe-bytes",
+        type=int,
+        default=DEFAULT_MAX_PROBE_BYTES,
+        help="Maximum repository bytes to read per freshness probe",
+    )
 
     args = parser.parse_args()
 
@@ -588,6 +653,8 @@ def main() -> None:
         sys.exit(cmd_store_init(args))
     elif args.command == "store" and args.store_command == "repair-catalog":
         sys.exit(cmd_store_repair_catalog(args))
+    elif args.command == "store" and args.store_command == "health":
+        sys.exit(cmd_store_health(args))
     else:
         parser.print_help()
         sys.exit(1)
