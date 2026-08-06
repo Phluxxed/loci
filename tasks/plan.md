@@ -30,7 +30,7 @@ recoverable lifecycle.
 - [x] Task 1.3: Make Claude enforcement coverage-equivalent.
 - [x] Task 1.4: Align definition-time reference and call ownership and restore
   stale-index refresh.
-- [ ] Task 1.5: Make ambiguous reference evidence non-fatal during stale
+- [x] Task 1.5: Make ambiguous reference evidence non-fatal during stale
   refresh.
 
 ### Thread 2: Store lifecycle
