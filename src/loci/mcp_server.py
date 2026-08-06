@@ -30,9 +30,17 @@ from loci.service import (
     outline_repo,
     search_symbols_result,
     session_stats,
+    store_health,
     verify_repo,
 )
 from loci.storage.store_identity import StoreIdentityError, bind_mcp_store
+from loci.storage.store_health import (
+    DEFAULT_HEALTH_LIMIT,
+    DEFAULT_MAX_CATALOG_BYTES,
+    DEFAULT_MAX_INDEX_BYTES,
+    DEFAULT_MAX_PROBE_BYTES,
+    DEFAULT_MAX_PROBE_PATHS,
+)
 from loci.storage.store_resolver import activate_mcp_store
 
 
@@ -77,7 +85,8 @@ def create_server() -> FastMCP:
             "Local code navigation server. Index local repositories, inspect symbol "
             "outlines, retrieve exact symbol source, select explained graph anchors, "
             "inspect exact or filtered graph neighbours, retrieve evidence-backed "
-            "paths, and report graph-extension health from the loci cache."
+            "paths, and report graph-extension or bounded repository-store health "
+            "from the loci cache."
         ),
     )
 
@@ -354,6 +363,27 @@ def create_server() -> FastMCP:
     def loci_list() -> CallToolResult:
         """List repositories present in the loci cache."""
         return _handle_loci_error(lambda: {"repos": list_repos()})
+
+    @mcp.tool()
+    def loci_store_health(
+        offset: int = 0,
+        limit: int = DEFAULT_HEALTH_LIMIT,
+        max_catalog_bytes: int = DEFAULT_MAX_CATALOG_BYTES,
+        max_index_bytes: int = DEFAULT_MAX_INDEX_BYTES,
+        max_probe_paths: int = DEFAULT_MAX_PROBE_PATHS,
+        max_probe_bytes: int = DEFAULT_MAX_PROBE_BYTES,
+    ) -> CallToolResult:
+        """Inspect bounded read-only freshness, liveness, integrity, and overlaps."""
+        return _handle_loci_error(
+            lambda: store_health(
+                offset=offset,
+                limit=limit,
+                max_catalog_bytes=max_catalog_bytes,
+                max_index_bytes=max_index_bytes,
+                max_probe_paths=max_probe_paths,
+                max_probe_bytes=max_probe_bytes,
+            )
+        )
 
     @mcp.tool()
     def loci_stats(

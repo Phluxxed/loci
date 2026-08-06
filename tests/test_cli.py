@@ -418,6 +418,29 @@ def test_store_repair_catalog_migrates_legacy_inventory(tmp_path: Path):
     }]
 
 
+def test_store_health_reports_typed_bounded_page(indexed_repo):
+    repo, base = indexed_repo
+
+    result = run_loci(
+        "store",
+        "health",
+        "--limit",
+        "10",
+        "--max-index-bytes",
+        str(8 * 1024 * 1024),
+        env_extra={"LOCI_BASE_DIR": base},
+    )
+
+    assert result.returncode == 0, result.stderr
+    health = json.loads(result.stdout)
+    assert health["status"] == "healthy"
+    assert health["complete"] is True
+    assert health["items"][0]["repo"] == str(repo.resolve())
+    assert health["items"][0]["states"] == ["healthy"]
+    assert health["pagination"]["next_offset"] is None
+    assert health["bounds"]["max_index_bytes"] == 8 * 1024 * 1024
+
+
 def test_outline_returns_files_with_symbols(indexed_repo):
     repo, base = indexed_repo
     result = run_loci("outline", str(repo), env_extra={"LOCI_BASE_DIR": base})
