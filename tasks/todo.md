@@ -33,10 +33,13 @@
   - Acceptance: bounded typed health findings with no mutation during reads.
   - Verify: focused mixed-store health fixtures.
 
-- [ ] Task 2.3: Add explicit dead-root pruning.
-  - Acceptance: deterministic dry-run, exact reviewed apply, and post-prune
-    integrity proof.
-  - Verify: focused disposable-store prune tests.
+- [x] Task 2.3: Automatically prune dead roots during normal store startup.
+  - Acceptance: deterministic per-entry cleanup removes only derived cache
+    directories and catalog entries whose canonical roots are missing; healthy
+    roots and source repositories remain untouched, with bounded removal
+    diagnostics and pending-mutation recovery.
+  - Verify: focused disposable-store startup, preservation, summary, and
+    pending-mutation tests.
 
 - [ ] Task 2.4: Prevent new overlapping repository roots.
   - Acceptance: structured conflicts for ancestor/descendant roots; exact-root
