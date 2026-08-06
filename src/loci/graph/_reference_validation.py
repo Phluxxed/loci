@@ -428,10 +428,7 @@ def _validate_source_owner(
             "Reference source owner does not match the current symbol index",
             field="source_id",
         )
-    if ambiguous and not (
-        record.status == "unresolved"
-        and record.unresolved_reason == "ambiguous_source"
-    ):
+    if ambiguous and record.status != "unresolved":
         raise _record_error(
             record_index,
             "Ambiguous reference source cannot be treated as resolved",

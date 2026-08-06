@@ -90,6 +90,35 @@ def test_refresh_lock_does_not_steal_live_owner(tmp_path: Path):
     assert exc_info.value.code == "STALE_INDEX_REFRESH_FAILED"
 
 
+def test_stale_refresh_keeps_unindexed_unresolved_reference_non_fatal(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    source = repo / "module.py"
+    source.write_text("VALUE = 1\n", encoding="utf-8")
+    index_repo(repo, incremental=False)
+
+    source.write_text(
+        "from missing import Thing\n"
+        "value = lambda: Thing()\n",
+        encoding="utf-8",
+    )
+
+    refreshed = ensure_fresh_index(repo)
+
+    assert refreshed["refreshed"] is True
+    assert refreshed["index"]["graph_symbol_references_unresolved"] == 1
+    loaded = IndexStore(base_dir=tmp_path / ".codeindex").load(repo.resolve())
+    assert loaded is not None
+    assert loaded["graph"]["symbol_references"][0]["status"] == "unresolved"
+    assert loaded["graph"]["symbol_references"][0]["unresolved_reason"] == (
+        "import_unresolved"
+    )
+
+
 def _run_python_json(source: str, *args: Path) -> dict:
     completed = subprocess.run(
         [sys.executable, "-c", source, *(str(arg) for arg in args)],

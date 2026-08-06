@@ -264,6 +264,13 @@ Acceptance:
   resolved relationships and strict graph validation remain unchanged.
 - A stale read refreshes the current Loci checkout in an isolated store.
 
+Status: Complete.
+
+Shipped behavior: unresolved references with ambiguous or unindexed source
+ownership retain an explicit unresolved reason and no guessed target; resolved
+ambiguous references remain rejected. The focused stale-refresh regression and
+existing equal-span ambiguity guard both pass.
+
 Verification:
 
 - A focused regression for the exact current-source ambiguous-reference shape.
