@@ -179,6 +179,8 @@ and contribution hashes against the current repository and run a locked
 incremental refresh if needed.
 Freshness also includes Go module/workspace controls, JavaScript/TypeScript
 project/package/workspace controls, and Cargo manifests.
+`loci_store_health` is deliberately different: it diagnoses the active store
+without repairing, refreshing, rewriting, pruning, or otherwise mutating it.
 
 The canonical repository-root parameter is `repo` on every repository-scoped
 MCP tool. Legacy `path` remains an advisory compatibility input for
@@ -203,6 +205,7 @@ names.
 | `loci_graph_references` | Inspect bounded resolved and unresolved imported-symbol references |
 | `loci_graph_calls` | Inspect bounded resolved and unresolved definite-call records |
 | `loci_graph_health` | Report loaded graph profiles, active record counts, and diagnostics |
+| `loci_store_health` | Diagnose bounded read-only repository freshness, liveness, corruption, and overlaps |
 | `loci_verify` | Verify index integrity and content drift |
 | `loci_list` | List indexed repos |
 | `loci_stats` | Return structured retrieval savings stats |
@@ -250,6 +253,7 @@ loci grep "TODO|FIXME" --repo /path/to/repo
 loci verify /path/to/repo          # check for content drift
 loci list                           # all indexed repos
 loci invalidate /path/to/repo      # clear stale cache
+loci store health                  # bounded read-only store diagnosis
 loci store repair-catalog          # explicitly migrate/repair legacy inventory
 
 # Human token savings analytics
@@ -265,6 +269,23 @@ of a possibly stale inventory. Run `loci store repair-catalog` explicitly to
 rebuild it. Repair is non-destructive and bounded by `--max-repositories` and
 `--max-total-index-bytes`; raise those limits deliberately when a known legacy
 store exceeds them.
+
+`loci store health` and the `loci_store_health` MCP tool return the same
+versioned projection. Repository entries carry a `states` array so findings
+such as `stale` and `overlapping` remain visible together, plus structured
+reason codes and details. A repository is `healthy` only after its complete
+index and freshness probes succeed. Missing or exhausted evidence instead
+sets `probe.status` to `unavailable` and `complete` to `false`. The top-level
+`status` remains `unhealthy` when the page also contains a known unhealthy
+finding; otherwise incomplete evidence makes it `incomplete`.
+
+The projection is bounded by catalog bytes, page offset/limit, index bytes,
+repository paths, and repository bytes. Defaults are 4 MiB, 100 entries,
+64 MiB per index, 100,000 repository paths, and 512 MiB per repository probe.
+Use `--max-catalog-bytes`, `--offset`, `--limit`, `--max-index-bytes`,
+`--max-probe-paths`, and `--max-probe-bytes` to change those bounds
+deliberately. Health reads never run `repair-catalog`, refresh an index, or
+remove an entry.
 
 ## Symbol fields
 
