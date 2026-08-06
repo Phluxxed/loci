@@ -130,10 +130,13 @@ and mtime.
 
 Resolved records materialize directed `namespace="loci"`,
 `resolution="import-resolved"` edges: runtime `type="references"` and
-explicitly type-only TypeScript `type="references_type"`. The source is the
-unique smallest indexed owner of the use (or the file node for module-level
-code). The target is one exact indexed symbol reached through the matched
-definite import and supported export surface.
+explicitly type-only TypeScript `type="references_type"`. Source ownership
+follows the nearest named executable body, matching call ownership: references
+in decorators, annotations, defaults, and other definition-time expressions
+belong to the enclosing executable scope, or the file node at repository top
+level; they never inherit the callable being defined. The target is one exact
+indexed symbol reached through the matched definite import and supported
+export surface.
 
 Reference records retain raw syntax, the selected import binding, source and
 import endpoints, exact target, support records, control provenance, and

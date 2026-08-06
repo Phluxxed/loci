@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import PurePosixPath
-from typing import Any, Literal, Mapping, TypeAlias
+from typing import TYPE_CHECKING, Any, Literal, Mapping, TypeAlias
+
+if TYPE_CHECKING:
+    from loci.parser._binding_context import ExecutableOwner
 
 
 ImportBindingKind: TypeAlias = Literal[
@@ -244,6 +247,7 @@ class RawSymbolReference:
     candidate_bindings: tuple[ImportBinding, ...]
     binding_state: BindingState
     source_hash: str
+    owner: ExecutableOwner
 
     def __post_init__(self) -> None:
         _relative_path(self.source_file, "source_file")
@@ -293,6 +297,10 @@ class RawSymbolReference:
             if binding.local_name is not None and binding.local_name != self.path[0]:
                 raise ValueError("candidate binding local name must match the path root")
         _sha256(self.source_hash, "source_hash")
+        from loci.parser._binding_context import ExecutableOwner
+
+        if not isinstance(self.owner, ExecutableOwner):
+            raise ValueError("owner must be an ExecutableOwner")
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -309,6 +317,7 @@ class RawSymbolReference:
             ],
             "binding_state": self.binding_state,
             "source_hash": self.source_hash,
+            "owner": self.owner.to_dict(),
         }
 
     @classmethod
@@ -327,11 +336,14 @@ class RawSymbolReference:
                 "candidate_bindings",
                 "binding_state",
                 "source_hash",
+                "owner",
             },
             "symbol reference",
         )
         path = _list(value["path"], "path")
         candidates = _list(value["candidate_bindings"], "candidate_bindings")
+        from loci.parser._binding_context import ExecutableOwner
+
         return cls(
             source_file=value["source_file"],
             language=value["language"],
@@ -346,6 +358,7 @@ class RawSymbolReference:
             ),
             binding_state=value["binding_state"],
             source_hash=value["source_hash"],
+            owner=ExecutableOwner.from_dict(value["owner"]),
         )
 
 

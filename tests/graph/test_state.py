@@ -219,6 +219,13 @@ def _symbol_reference() -> SymbolReferenceRecord:
         candidate_bindings=(binding,),
         binding_state="definite",
         source_hash="d" * 64,
+        owner=ExecutableOwner(
+            kind="callable",
+            definition_start_byte=50,
+            definition_end_byte=130,
+            body_start_byte=70,
+            body_end_byte=130,
+        ),
     )
     return SymbolReferenceRecord(
         raw=raw,
@@ -772,8 +779,8 @@ def test_empty_graph_state_has_complete_envelope():
     }
 
 
-def test_graph_state_uses_schema_version_eight():
-    assert GRAPH_STATE_SCHEMA_VERSION == 8
+def test_graph_state_uses_schema_version_nine():
+    assert GRAPH_STATE_SCHEMA_VERSION == 9
 
 
 def test_graph_state_rejects_schema_version_two_as_stale():

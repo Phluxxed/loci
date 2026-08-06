@@ -804,13 +804,21 @@ def _source_owner(
     if file_node.language != raw.language or file_node.content_hash != raw.source_hash:
         raise _error("Reference source evidence is stale", file=raw.source_file)
     spans = index._source_spans.get(raw.source_file)
-    candidates = (
-        spans.containing(raw.start_byte, raw.end_byte)
-        if spans is not None
-        else []
-    )
-    if not candidates:
+    if raw.owner.kind == "file":
         return _SourceOwner(file_node, False)
+    if raw.owner.kind != "callable":
+        return _SourceOwner(file_node, True)
+    assert raw.owner.definition_start_byte is not None
+    assert raw.owner.definition_end_byte is not None
+    candidates = [
+        symbol
+        for symbol in (spans.symbols if spans is not None else ())
+        if symbol.kind in {"function", "method"}
+        and symbol.byte_offset == raw.owner.definition_start_byte
+        and symbol.byte_offset + symbol.byte_length == raw.owner.definition_end_byte
+    ]
+    if not candidates:
+        return _SourceOwner(file_node, True)
     smallest_length = min(symbol.byte_length for symbol in candidates)
     smallest = [
         symbol for symbol in candidates if symbol.byte_length == smallest_length
