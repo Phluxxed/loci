@@ -40,6 +40,9 @@ touches repository/source roots.
   definition-time expressions belong to their enclosing executable scope, or
   the file node at repository top level; they never inherit the callable they
   define.
+- Preserve ambiguous reference evidence as explicitly ambiguous/unresolved.
+  Ambiguity must neither be promoted into a resolved relationship nor abort a
+  current-source index refresh.
 
 ## Commands
 
@@ -246,6 +249,26 @@ Verification:
 - Focused Python reference-owner and call-materialization regression tests.
 - One disposable-store stale-refresh proof using current source.
 
+<a id="ambiguous-reference-refresh-task"></a>
+#### Task 1.5: Make ambiguous reference evidence non-fatal during stale refresh
+
+Correct the separate graph-materialization failure exposed after Task 1.4:
+current-source refresh can encounter an ambiguous reference source and abort
+instead of retaining that evidence as explicitly ambiguous/unresolved.
+
+Acceptance:
+
+- Ambiguous reference sources remain ambiguous/unresolved and do not abort
+  index construction or stale refresh.
+- Ambiguity is never promoted into a resolved relationship, while uniquely
+  resolved relationships and strict graph validation remain unchanged.
+- A stale read refreshes the current Loci checkout in an isolated store.
+
+Verification:
+
+- A focused regression for the exact current-source ambiguous-reference shape.
+- One isolated-store stale-refresh proof using the current Loci checkout.
+
 <a id="store-thread"></a>
 ### Thread 2: Make store inventory and lifecycle healthy
 
@@ -387,8 +410,8 @@ Verification:
 
 - Task 1.1 blocks Tasks 1.2 and 1.3.
 - Task 1.2 blocks Task 1.3.
-- Task 1.4 blocks remaining delivery while current-source stale refresh cannot
-  satisfy the call/reference ownership invariant.
+- Task 1.5 blocks remaining delivery while ambiguous reference evidence can
+  abort current-source stale refresh.
 - Task 2.1 blocks Tasks 2.2, 2.3, and 2.4.
 - Task 2.2 blocks Tasks 2.3 and 2.4.
 - Task 3.1 can proceed independently after the plan is accepted.
@@ -402,7 +425,8 @@ Verification:
 | Test indexing materially increases store size | Medium | Measure real delta; optimize representation rather than deleting maintained code |
 | Catalog and index commit diverge after interruption | High | Atomic write protocol plus deterministic repair |
 | Compatibility aliases preserve confusing MCP schemas | High | Contract-first migration with one canonical public name |
-| Prune removes a temporarily unavailable repository | High | Missing-root finding is read-only; apply requires exact reviewed targets |
+| Startup cleanup drops a temporarily unavailable index | Medium | Remove only derived cache; reindex when the repository returns |
+| Ambiguous reference evidence aborts refresh | High | Preserve typed ambiguity and validate only uniquely resolved relationships |
 | Overlap rejection blocks a legitimate workflow | Medium | Report the conflict; require an evidence-backed exception design rather than guessing |
 | Hook enforcement overclaims equivalence | High | Shared coverage contract and explicit root-scope regression cases |
 
@@ -421,5 +445,5 @@ Verification:
 
 ### Integration checkpoint
 
-- Tasks 1.3, 2.3, 2.4, 3.1, and 3.2 complete with focused proofs.
+- Tasks 1.3, 1.5, 2.3, 2.4, 3.1, and 3.2 complete with focused proofs.
 - Review residual risks before final qualification.

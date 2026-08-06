@@ -12,6 +12,8 @@ recoverable lifecycle.
 - One authoritative coverage policy owns indexing, diagnostics, and hook
   enforcement.
 - Search and grep state what they covered, including empty results.
+- Ambiguous graph evidence remains explicitly ambiguous and cannot abort index
+  refresh.
 - A small atomic catalog serves inventory without parsing every index.
 - Health detection is read-only; normal store opens automatically remove only
   entries whose canonical repository roots no longer exist.
@@ -28,6 +30,8 @@ recoverable lifecycle.
 - [x] Task 1.3: Make Claude enforcement coverage-equivalent.
 - [x] Task 1.4: Align definition-time reference and call ownership and restore
   stale-index refresh.
+- [ ] Task 1.5: Make ambiguous reference evidence non-fatal during stale
+  refresh.
 
 ### Thread 2: Store lifecycle
 
@@ -56,7 +60,8 @@ recoverable lifecycle.
 | --- | --- | --- |
 | Test indexing grows stores | Medium | Measure the real delta; optimize representation instead of deleting maintained code |
 | Catalog/index interruption | High | Atomic protocol and deterministic repair |
-| Prune removes unavailable work | High | Read-only detection plus exact reviewed apply targets |
+| Startup cleanup drops a temporarily unavailable index | Medium | Delete only derived cache; reindex when the repository returns |
+| Ambiguous reference evidence aborts refresh | High | Preserve typed ambiguity and validate only uniquely resolved relationships |
 | MCP aliases preserve confusion | High | One canonical contract with tested migration |
 | Hook redirects beyond coverage | High | Shared policy and repository-root regression cases |
 

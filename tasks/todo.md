@@ -24,6 +24,15 @@
   - Verify: focused reference-owner and call-materialization regressions plus
     one disposable-store stale-refresh proof.
 
+- [ ] Task 1.5: Make ambiguous reference evidence non-fatal during stale
+  refresh.
+  - Acceptance: ambiguous reference sources remain explicitly
+    ambiguous/unresolved instead of being treated as resolved or aborting the
+    refresh; uniquely resolved relationships and strict validation remain
+    unchanged.
+  - Verify: a focused regression for the current ambiguous-reference shape and
+    one isolated-store stale-refresh proof using the current Loci checkout.
+
 - [x] Task 2.1: Build an atomic repository catalog and fast inventory.
   - Acceptance: list cost scales with catalog entries and legacy repair is
     deterministic.
