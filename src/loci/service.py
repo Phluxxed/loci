@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import hashlib
 import os
 import re
 import time
 import uuid
 from collections import defaultdict
 from dataclasses import dataclass, field
+from functools import partial
+from itertools import islice
 from pathlib import Path, PurePosixPath
 from typing import Any, Literal, TypedDict
 
@@ -65,6 +68,18 @@ from loci.query_coverage import (
 )
 from loci.storage.index_store import IndexStore, index_versions_current
 from loci.storage.repository_catalog import RepositoryCatalogError
+from loci.storage.store_health import (
+    DEFAULT_HEALTH_LIMIT,
+    DEFAULT_MAX_CATALOG_BYTES,
+    DEFAULT_MAX_INDEX_BYTES,
+    DEFAULT_MAX_PROBE_BYTES,
+    DEFAULT_MAX_PROBE_PATHS,
+    MAX_HEALTH_LIMIT,
+    FreshnessProbe,
+    HealthReason,
+    RepositoryProbeLimitExceeded,
+    diagnose_store,
+)
 from loci.storage.store_resolver import StoreResolution, resolve_store_base_dir
 
 REFRESH_LOCK_POLL_SECONDS = 0.05
@@ -88,6 +103,8 @@ class RepositoryScan:
     javascript_control_candidates: tuple[Path, ...]
     cargo_control_candidates: tuple[Path, ...]
     coverage: StoredQueryCoverage
+    paths_scanned: int
+    bytes_scanned: int
 
 
 @dataclass
@@ -1356,6 +1373,90 @@ def list_repos() -> list[dict[str, Any]]:
         raise LociError(exc.code, exc.message, exc.details) from exc
 
 
+def store_health(
+    *,
+    offset: int = 0,
+    limit: int = DEFAULT_HEALTH_LIMIT,
+    max_catalog_bytes: int = DEFAULT_MAX_CATALOG_BYTES,
+    max_index_bytes: int = DEFAULT_MAX_INDEX_BYTES,
+    max_probe_paths: int = DEFAULT_MAX_PROBE_PATHS,
+    max_probe_bytes: int = DEFAULT_MAX_PROBE_BYTES,
+) -> dict[str, Any]:
+    _validate_store_health_bounds(
+        offset=offset,
+        limit=limit,
+        max_catalog_bytes=max_catalog_bytes,
+        max_index_bytes=max_index_bytes,
+        max_probe_paths=max_probe_paths,
+        max_probe_bytes=max_probe_bytes,
+    )
+    resolution = resolve_store_base_dir()
+    store = IndexStore(
+        base_dir=resolution.base_dir,
+        create_base_dir=False,
+    )
+    return diagnose_store(
+        store,
+        freshness_probe=partial(_probe_repository_freshness, store),
+        offset=offset,
+        limit=limit,
+        max_catalog_bytes=max_catalog_bytes,
+        max_index_bytes=max_index_bytes,
+        max_probe_paths=max_probe_paths,
+        max_probe_bytes=max_probe_bytes,
+    )
+
+
+def _validate_store_health_bounds(
+    *,
+    offset: int,
+    limit: int,
+    max_catalog_bytes: int,
+    max_index_bytes: int,
+    max_probe_paths: int,
+    max_probe_bytes: int,
+) -> None:
+    values = {
+        "offset": offset,
+        "limit": limit,
+        "max_catalog_bytes": max_catalog_bytes,
+        "max_index_bytes": max_index_bytes,
+        "max_probe_paths": max_probe_paths,
+        "max_probe_bytes": max_probe_bytes,
+    }
+    for parameter, value in values.items():
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise LociError(
+                "INVALID_INPUT",
+                f"{parameter} must be an integer",
+                {"parameter": parameter, "value": value},
+            )
+    if offset < 0:
+        raise LociError(
+            "INVALID_INPUT",
+            "offset must be greater than or equal to 0",
+            {"parameter": "offset", "value": offset},
+        )
+    if limit < 1 or limit > MAX_HEALTH_LIMIT:
+        raise LociError(
+            "INVALID_INPUT",
+            f"limit must be between 1 and {MAX_HEALTH_LIMIT}",
+            {"parameter": "limit", "value": limit},
+        )
+    for parameter, value in (
+        ("max_catalog_bytes", max_catalog_bytes),
+        ("max_index_bytes", max_index_bytes),
+        ("max_probe_paths", max_probe_paths),
+        ("max_probe_bytes", max_probe_bytes),
+    ):
+        if value < 0:
+            raise LociError(
+                "INVALID_INPUT",
+                f"{parameter} must be greater than or equal to 0",
+                {"parameter": parameter, "value": value},
+            )
+
+
 def session_stats(
     repo: str | Path | None = None,
     since_days: int | None = 7,
@@ -1438,15 +1539,102 @@ def _index_is_stale(repo_path: Path, store: IndexStore, index: dict[str, Any]) -
     if stored_coverage is None:
         return True
     repository_scan = _scan_repository_files(repo_path, store)
-    if repository_scan.coverage != stored_coverage:
-        return True
+    return bool(_current_index_staleness_reasons(
+        repo_path,
+        store,
+        index,
+        repository_scan,
+        stored_coverage=stored_coverage,
+        stop_after_first=True,
+    ))
+
+
+def _probe_repository_freshness(
+    store: IndexStore,
+    repo_path: Path,
+    index: dict[str, Any],
+    max_probe_paths: int,
+    max_probe_bytes: int,
+) -> FreshnessProbe:
+    try:
+        persisted_graph = store.validate_graph_state(index)
+    except GraphContractError as exc:
+        return FreshnessProbe.complete(reasons=(HealthReason(
+            "corrupt",
+            "INDEX_GRAPH_INVALID",
+            {
+                "error_code": exc.code,
+                "error": exc.message,
+                "error_details": exc.details,
+            },
+        ),))
+    try:
+        repository_scan = _scan_repository_files(
+            repo_path,
+            store,
+            max_probe_paths=max_probe_paths,
+            max_probe_bytes=max_probe_bytes,
+        )
+    except RepositoryProbeLimitExceeded as exc:
+        return FreshnessProbe.unavailable(
+            exc.code,
+            {
+                "limit": exc.limit,
+                "observed": exc.observed,
+            },
+        )
+    stored_coverage = stored_query_coverage(index)
+    reasons = _current_index_staleness_reasons(
+        repo_path,
+        store,
+        index,
+        repository_scan,
+        stored_coverage=stored_coverage,
+        persisted_graph=persisted_graph,
+    )
+    return FreshnessProbe.complete(
+        reasons=reasons,
+        paths_scanned=repository_scan.paths_scanned,
+        bytes_scanned=repository_scan.bytes_scanned,
+    )
+
+
+def _current_index_staleness_reasons(
+    repo_path: Path,
+    store: IndexStore,
+    index: dict[str, Any],
+    repository_scan: RepositoryScan,
+    *,
+    stored_coverage: StoredQueryCoverage | None,
+    persisted_graph: GraphIndexState | None = None,
+    stop_after_first: bool = False,
+) -> tuple[HealthReason, ...]:
+    reasons: list[HealthReason] = []
+    if stored_coverage is None:
+        reasons.append(HealthReason(
+            "stale",
+            "INDEX_COVERAGE_MISSING",
+        ))
+    elif repository_scan.coverage != stored_coverage:
+        reasons.append(HealthReason(
+            "stale",
+            "INDEX_COVERAGE_CHANGED",
+        ))
+    if reasons and stop_after_first:
+        return tuple(reasons)
     current_hashes = {
         rel_path: file_hash
         for _, rel_path, file_hash in repository_scan.indexable_files
     }
     indexed_hashes = index.get("file_hashes", {})
     if current_hashes != indexed_hashes:
-        return True
+        reasons.append(HealthReason(
+            "stale",
+            "SOURCE_CONTENT_CHANGED",
+            _hash_change_details(indexed_hashes, current_hashes),
+        ))
+    if reasons and stop_after_first:
+        return tuple(reasons)
     current_graph_hashes = {
         **load_graph_extensions(repo_path).input_hashes,
         **load_go_module_context(
@@ -1464,15 +1652,69 @@ def _index_is_stale(repo_path: Path, store: IndexStore, index: dict[str, Any]) -
     }
     graph = index.get("graph")
     if not isinstance(graph, dict):
-        return True
-    try:
-        persisted_graph = store.validate_graph_state(index)
-    except GraphContractError:
-        return True
-    indexed_graph_hashes = persisted_graph.input_hashes
-    if current_graph_hashes != indexed_graph_hashes:
-        return True
-    return not _active_graph_paths_are_safe(repo_path, index)
+        reasons.append(HealthReason(
+            "stale",
+            "INDEX_GRAPH_MISSING",
+        ))
+    else:
+        if persisted_graph is None:
+            try:
+                persisted_graph = store.validate_graph_state(index)
+            except GraphContractError as exc:
+                reasons.append(HealthReason(
+                    "stale",
+                    "INDEX_GRAPH_INVALID",
+                    {"error_code": exc.code},
+                ))
+        if persisted_graph is not None:
+            indexed_graph_hashes = persisted_graph.input_hashes
+            if current_graph_hashes != indexed_graph_hashes:
+                reasons.append(HealthReason(
+                    "stale",
+                    "GRAPH_INPUTS_CHANGED",
+                    _hash_change_details(
+                        indexed_graph_hashes,
+                        current_graph_hashes,
+                    ),
+                ))
+    if reasons and stop_after_first:
+        return tuple(reasons)
+    if not _active_graph_paths_are_safe(repo_path, index):
+        reasons.append(HealthReason(
+            "stale",
+            "GRAPH_ACTIVE_PATH_UNSAFE",
+        ))
+    return tuple(reasons)
+
+
+def _hash_change_details(
+    previous: Any,
+    current: dict[str, str],
+) -> dict[str, Any]:
+    previous_hashes = previous if isinstance(previous, dict) else {}
+    previous_paths = {
+        path
+        for path, content_hash in previous_hashes.items()
+        if isinstance(path, str) and isinstance(content_hash, str)
+    }
+    current_paths = set(current)
+    added = sorted(current_paths - previous_paths)
+    removed = sorted(previous_paths - current_paths)
+    changed = sorted(
+        path
+        for path in current_paths & previous_paths
+        if previous_hashes[path] != current[path]
+    )
+    return {
+        "added": added[:20],
+        "changed": changed[:20],
+        "removed": removed[:20],
+        "omitted": {
+            "added": max(0, len(added) - 20),
+            "changed": max(0, len(changed) - 20),
+            "removed": max(0, len(removed) - 20),
+        },
+    }
 
 
 def _active_graph_paths_are_safe(
@@ -1620,8 +1862,46 @@ def _reclaim_abandoned_refresh_lock(lock_path: Path) -> bool:
 def _scan_repository_files(
     repo_path: Path,
     store: IndexStore,
+    *,
+    max_probe_paths: int | None = None,
+    max_probe_bytes: int | None = None,
 ) -> RepositoryScan:
-    gitignore = _load_gitignore(repo_path)
+    bytes_scanned = 0
+    charged_paths: set[Path] = set()
+
+    def charge(path: Path) -> None:
+        nonlocal bytes_scanned
+        if path in charged_paths:
+            return
+        size = path.stat().st_size
+        observed = bytes_scanned + size
+        if max_probe_bytes is not None and observed > max_probe_bytes:
+            raise RepositoryProbeLimitExceeded(
+                "REPOSITORY_BYTES_LIMIT_EXCEEDED",
+                max_probe_bytes,
+                observed,
+            )
+        charged_paths.add(path)
+        bytes_scanned = observed
+
+    gitignore_path = repo_path / ".gitignore"
+    if max_probe_bytes is not None and gitignore_path.is_file():
+        with gitignore_path.open("rb") as handle:
+            gitignore_bytes = handle.read(max_probe_bytes + 1)
+        if len(gitignore_bytes) > max_probe_bytes:
+            raise RepositoryProbeLimitExceeded(
+                "REPOSITORY_BYTES_LIMIT_EXCEEDED",
+                max_probe_bytes,
+                len(gitignore_bytes),
+            )
+        charged_paths.add(gitignore_path)
+        bytes_scanned = len(gitignore_bytes)
+        gitignore = pathspec.PathSpec.from_lines(
+            "gitwildmatch",
+            gitignore_bytes.decode("utf-8", errors="replace").splitlines(),
+        )
+    else:
+        gitignore = _load_gitignore(repo_path)
     files: list[tuple[Path, str, str]] = []
     go_controls: list[Path] = []
     javascript_controls: list[Path] = []
@@ -1629,7 +1909,20 @@ def _scan_repository_files(
     coverage = QueryCoverageRecorder()
     ignored_roots: set[PurePosixPath] = set()
 
-    for candidate in sorted(repo_path.rglob("*")):
+    candidate_iterator = repo_path.rglob("*")
+    if max_probe_paths is None:
+        candidates = sorted(candidate_iterator)
+    else:
+        bounded_candidates = list(islice(candidate_iterator, max_probe_paths + 1))
+        if len(bounded_candidates) > max_probe_paths:
+            raise RepositoryProbeLimitExceeded(
+                "REPOSITORY_PATHS_LIMIT_EXCEEDED",
+                max_probe_paths,
+                len(bounded_candidates),
+            )
+        candidates = sorted(bounded_candidates)
+
+    for candidate in candidates:
         rel_path = candidate.relative_to(repo_path).as_posix()
         repository_path = PurePosixPath(rel_path)
         exclusion_root = repository_path_exclusion_root(repository_path)
@@ -1646,7 +1939,20 @@ def _scan_repository_files(
             if is_directory:
                 ignored_roots.add(repository_path)
             continue
+        is_graph_extension = (
+            candidate.suffix == ".json"
+            and (
+                repository_path.is_relative_to(
+                    PurePosixPath(".loci/graph/profiles")
+                )
+                or repository_path.is_relative_to(
+                    PurePosixPath(".loci/graph/contributions")
+                )
+            )
+        )
         if candidate.name in {"go.mod", "go.work"}:
+            if max_probe_bytes is not None:
+                charge(candidate)
             go_controls.append(candidate)
         if candidate.name in {
             "package.json",
@@ -1654,23 +1960,60 @@ def _scan_repository_files(
             "tsconfig.json",
             "jsconfig.json",
         }:
+            if max_probe_bytes is not None:
+                charge(candidate)
             javascript_controls.append(candidate)
         if candidate.name == "Cargo.toml":
+            if max_probe_bytes is not None:
+                charge(candidate)
             cargo_controls.append(candidate)
+        if max_probe_bytes is not None and is_graph_extension:
+            charge(candidate)
         if not is_file:
             continue
         exclusion_reason = source_exclusion_reason(repository_path)
         if exclusion_reason is not None:
             coverage.record(exclusion_reason, rel_path)
             continue
-        files.append((candidate, rel_path, store.hash_file(candidate)))
+        if max_probe_bytes is not None:
+            remaining = max_probe_bytes - bytes_scanned
+            file_hash, file_bytes = _bounded_file_hash(candidate, remaining)
+            observed = bytes_scanned + file_bytes
+            if file_bytes > remaining:
+                raise RepositoryProbeLimitExceeded(
+                    "REPOSITORY_BYTES_LIMIT_EXCEEDED",
+                    max_probe_bytes,
+                    observed,
+                )
+            charged_paths.add(candidate)
+            bytes_scanned = observed
+        else:
+            file_hash = store.hash_file(candidate)
+        files.append((candidate, rel_path, file_hash))
     return RepositoryScan(
         indexable_files=tuple(files),
         go_control_candidates=tuple(go_controls),
         javascript_control_candidates=tuple(javascript_controls),
         cargo_control_candidates=tuple(cargo_controls),
         coverage=coverage.build(len(files)),
+        paths_scanned=len(candidates),
+        bytes_scanned=bytes_scanned,
     )
+
+
+def _bounded_file_hash(path: Path, max_bytes: int) -> tuple[str, int]:
+    digest = hashlib.sha256()
+    total = 0
+    with path.open("rb") as handle:
+        while True:
+            chunk = handle.read(min(64 * 1024, max_bytes - total + 1))
+            if not chunk:
+                break
+            total += len(chunk)
+            if total > max_bytes:
+                return "", total
+            digest.update(chunk)
+    return digest.hexdigest(), total
 
 
 def _go_problem_diagnostic(problem: GoModuleProblem) -> GraphDiagnostic:

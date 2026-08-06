@@ -99,9 +99,15 @@ def _validate_graph_state(
 
 
 class IndexStore:
-    def __init__(self, base_dir: Optional[Path] = None) -> None:
+    def __init__(
+        self,
+        base_dir: Optional[Path] = None,
+        *,
+        create_base_dir: bool = True,
+    ) -> None:
         self.base_dir = base_dir or Path.home() / ".codeindex"
-        self.base_dir.mkdir(parents=True, exist_ok=True)
+        if create_base_dir:
+            self.base_dir.mkdir(parents=True, exist_ok=True)
         self._catalog = RepositoryCatalog(self.base_dir)
         self._worktree_cache: dict[str, str] = {}
 
