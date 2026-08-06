@@ -23,20 +23,22 @@ recoverable lifecycle.
 ### Thread 1: Repository coverage
 
 - [x] Task 1.1: Centralize indexability and restore maintained test coverage.
-- [ ] Task 1.2: Expose query coverage and honest empty-result semantics.
-- [ ] Task 1.3: Make Claude enforcement coverage-equivalent.
+- [x] Task 1.2: Expose query coverage and honest empty-result semantics.
+- [x] Task 1.3: Make Claude enforcement coverage-equivalent.
+- [ ] Task 1.4: Align definition-time reference and call ownership and restore
+  stale-index refresh.
 
 ### Thread 2: Store lifecycle
 
-- [ ] Task 2.1: Build an atomic repository catalog and fast inventory.
-- [ ] Task 2.2: Diagnose freshness, dead roots, corruption, and overlaps.
+- [x] Task 2.1: Build an atomic repository catalog and fast inventory.
+- [x] Task 2.2: Diagnose freshness, dead roots, corruption, and overlaps.
 - [ ] Task 2.3: Add explicit dead-root pruning.
 - [ ] Task 2.4: Prevent new overlapping repository roots.
 
 ### Thread 3: Harness and public contracts
 
 - [ ] Task 3.1: Guarantee test-store isolation.
-- [ ] Task 3.2: Normalize MCP repository-root parameters.
+- [x] Task 3.2: Normalize MCP repository-root parameters.
 - [ ] Task 3.3: Qualify the complete trust contract.
 
 ## Checkpoints
