@@ -1,4 +1,5 @@
 import json
+import shutil
 from pathlib import Path
 
 import pytest
@@ -83,11 +84,48 @@ def test_store_health_preserves_missing_corrupt_and_overlapping_findings(
     health_store: Path,
 ) -> None:
     parent = _repo(tmp_path, "parent")
-    child = _repo(parent, "child")
+    child = parent / "child"
     missing = _repo(tmp_path, "missing")
     corrupt = _repo(tmp_path, "corrupt")
-    for repo in (parent, child, missing, corrupt):
+    for repo in (parent, missing, corrupt):
         index_repo(repo, incremental=False)
+
+    # Create the nested repository after indexing the parent so the parent
+    # fixture does not accidentally own the child's source path.
+    child.mkdir()
+    (child / "example.py").write_text(
+        "def example():\n    return 1\n",
+        encoding="utf-8",
+    )
+
+    # Preserve a historical overlap for health diagnostics without asking the
+    # current index path to create a duplicate root that it now rejects.
+    parent_entry = health_store / repository_cache_key(parent)
+    child_entry = health_store / repository_cache_key(child)
+    shutil.copytree(parent_entry, child_entry)
+    child_index_path = child_entry / "index.json"
+    child_index = json.loads(child_index_path.read_text(encoding="utf-8"))
+    child_index["repo_path"] = str(child.resolve())
+    child_index_path.write_text(json.dumps(child_index), encoding="utf-8")
+    child_metadata_path = child_entry / ".loci-repository.json"
+    if child_metadata_path.exists():
+        child_metadata = json.loads(
+            child_metadata_path.read_text(encoding="utf-8")
+        )
+        child_metadata["cache_key"] = repository_cache_key(child)
+        child_metadata["path"] = str(child.resolve())
+        child_metadata_path.write_text(
+            json.dumps(child_metadata),
+            encoding="utf-8",
+        )
+    catalog_path = health_store / CATALOG_FILE_NAME
+    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    catalog["repositories"].append({
+        "cache_key": repository_cache_key(child),
+        "symbols": len(child_index["symbols"]),
+        "path": str(child.resolve()),
+    })
+    catalog_path.write_text(json.dumps(catalog), encoding="utf-8")
 
     missing.rename(tmp_path / "missing-moved")
     corrupt_index = (
@@ -106,6 +144,7 @@ def test_store_health_preserves_missing_corrupt_and_overlapping_findings(
     parent_item = _item_for(result, parent)
     assert parent_item["states"] == ["stale", "overlapping"]
     assert {reason["code"] for reason in parent_item["reasons"]} == {
+        "INDEX_COVERAGE_CHANGED",
         "SOURCE_CONTENT_CHANGED",
         "REPOSITORY_ROOT_CONTAINS_INDEXED_ROOT",
     }

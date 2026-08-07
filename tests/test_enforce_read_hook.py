@@ -11,6 +11,7 @@ from pathlib import Path
 import pytest
 
 from loci.indexability import is_indexable_source_path
+from loci.storage.repository_catalog import CATALOG_FILE_NAME
 from loci.storage.store_layout import repository_cache_key
 
 
@@ -30,6 +31,7 @@ def _write_store(store: Path, namespace: str, repos: list[Path]) -> None:
             "store_id": "ae5cab56-c999-4bb1-b0cf-b258f7c3e5dc",
         })
     )
+    catalog_entries: list[dict[str, object]] = []
     for repo in repos:
         entry = store / _cache_key(repo)
         entry.mkdir()
@@ -55,6 +57,14 @@ def _write_store(store: Path, namespace: str, repos: list[Path]) -> None:
                 }
             )
         )
+        catalog_entries.append({
+            "cache_key": _cache_key(repo),
+            "symbols": 0,
+            "path": str(repo.resolve()),
+        })
+    (store / CATALOG_FILE_NAME).write_text(
+        json.dumps({"schema_version": 1, "repositories": catalog_entries})
+    )
 
 
 def _write_legacy_store(store: Path, repo: Path) -> None:

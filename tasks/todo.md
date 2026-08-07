@@ -67,7 +67,7 @@
     first-party guidance.
   - Verify: focused schema snapshots and installed stdio smoke.
 
-- [ ] Task 3.3: Qualify the complete trust contract.
+- [x] Task 3.3: Qualify the complete trust contract.
   - Acceptance: every Objective criterion has bounded evidence and no required
     review finding remains.
   - Verify: focused end-to-end coverage, store, hook, and MCP scenarios; wider

@@ -44,14 +44,14 @@ recoverable lifecycle.
 
 - [x] Task 3.1: Guarantee test-store isolation.
 - [x] Task 3.2: Normalize MCP repository-root parameters.
-- [ ] Task 3.3: Qualify the complete trust contract.
+- [x] Task 3.3: Qualify the complete trust contract.
 
 ## Checkpoints
 
 - [x] Coverage: maintained tests are discoverable and empty results are honest.
 - [x] Store: catalog recovery, health diagnosis, startup dead-root cleanup, and
   canonical-root overlap admission pass focused disposable-store proofs.
-- [ ] Integration: hook, cleanup, overlap, isolation, and MCP migration pass
+- [x] Integration: hook, cleanup, overlap, isolation, and MCP migration pass
   focused end-to-end proofs.
 
 ## Risks and Mitigations
