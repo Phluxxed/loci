@@ -58,7 +58,7 @@
     reindex and sibling roots remain valid.
   - Verify: focused path, symlink, and worktree overlap tests.
 
-- [ ] Task 3.1: Guarantee test-store isolation.
+- [x] Task 3.1: Guarantee test-store isolation.
   - Acceptance: in-process and subprocess tests cannot resolve operator stores.
   - Verify: focused isolation sentinels and subprocess proofs.
 

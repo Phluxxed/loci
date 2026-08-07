@@ -755,6 +755,11 @@ pip install -e ".[dev]"
 python -m pytest tests/
 ```
 
+The pytest harness replaces ambient Loci store configuration before test
+collection with a temporary `pytest`-namespaced store. In-process, subprocess,
+and MCP tests inherit that boundary, and the store is removed when the session
+finishes, so tests cannot read or write an operator store by default.
+
 ## License
 
 MIT

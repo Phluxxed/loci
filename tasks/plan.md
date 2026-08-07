@@ -42,7 +42,7 @@ recoverable lifecycle.
 
 ### Thread 3: Harness and public contracts
 
-- [ ] Task 3.1: Guarantee test-store isolation.
+- [x] Task 3.1: Guarantee test-store isolation.
 - [x] Task 3.2: Normalize MCP repository-root parameters.
 - [ ] Task 3.3: Qualify the complete trust contract.
 
