@@ -124,7 +124,52 @@ class IndexStore:
         return self._worktree_cache[repo_path]
 
     def _cache_key(self, repo_path: Path) -> str:
-        return repository_cache_key(repo_path)
+        return repository_cache_key(self._canonical_repo(str(repo_path)))
+
+    def ensure_root_available(
+        self,
+        repo_path: Path,
+        *,
+        catalog_entries: Mapping[str, RepositoryCatalogEntry] | None = None,
+    ) -> None:
+        """Reject a root that contains or is contained by an indexed root."""
+        requested_root = str(Path(self._canonical_repo(str(repo_path))).resolve())
+        entries = (
+            catalog_entries
+            if catalog_entries is not None
+            else self._catalog.entries_for_mutation()
+        )
+        requested_path = Path(requested_root)
+        canonical_existing = {
+            Path(self._canonical_repo(entry.path)).resolve()
+            for entry in entries.values()
+        }
+        if requested_path in canonical_existing:
+            return
+        for entry in entries.values():
+            existing_root = str(
+                Path(self._canonical_repo(entry.path)).resolve()
+            )
+            existing_path = Path(existing_root)
+            if existing_path in requested_path.parents:
+                relationship = "requested_descendant"
+            elif requested_path in existing_path.parents:
+                relationship = "requested_ancestor"
+            else:
+                continue
+            raise RepositoryCatalogError(
+                "REPOSITORY_ROOT_OVERLAP",
+                "Repository root overlaps an indexed repository root",
+                {
+                    "requested_root": requested_root,
+                    "existing_root": existing_root,
+                    "relationship": relationship,
+                    "action": (
+                        "Remove the unwanted derived index or choose a "
+                        "non-overlapping root."
+                    ),
+                },
+            )
 
     def _repo_dir(self, repo_path: Path) -> Path:
         return self.base_dir / self._cache_key(repo_path)
@@ -208,6 +253,7 @@ class IndexStore:
 
         cache_key = self._cache_key(repo_path)
         catalog_entries = self._catalog.entries_for_mutation()
+        self.ensure_root_available(repo_path, catalog_entries=catalog_entries)
         self._catalog.begin_mutation("write", cache_key)
 
         repo_dir = self._repo_dir(repo_path)
@@ -235,7 +281,9 @@ class IndexStore:
             "extractor_version": EXTRACTOR_VERSION,
             "symbols": [s.to_dict() for s in symbols],
             "file_hashes": file_hashes,
-            "repo_path": str(repo_path.resolve()),
+            "repo_path": str(
+                Path(self._canonical_repo(str(repo_path))).resolve()
+            ),
             "graph": persisted_graph.to_dict(),
         }
         if coverage is not None:
@@ -247,7 +295,7 @@ class IndexStore:
         catalog_entry = RepositoryCatalogEntry(
             cache_key=cache_key,
             symbols=len(symbols),
-            path=str(repo_path.resolve()),
+            path=str(Path(self._canonical_repo(str(repo_path))).resolve()),
         )
         self._catalog.write_repository_metadata(catalog_entry)
         catalog_entries[cache_key] = catalog_entry
