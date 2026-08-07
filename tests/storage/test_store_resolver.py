@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pytest
@@ -41,6 +42,22 @@ def test_resolve_store_base_dir_env_wins(
 
     assert resolution.base_dir == override
     assert resolution.source == "env"
+
+
+def test_resolve_store_base_dir_override_restores_suite_boundary(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    suite_root = Path(os.environ["LOCI_BASE_DIR"]).resolve()
+    override = tmp_path / "override"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(override))
+
+    assert resolve_store_base_dir().base_dir == override
+
+    monkeypatch.undo()
+
+    assert resolve_store_base_dir().base_dir.resolve() == suite_root
+    assert os.environ["LOCI_STORE_NAMESPACE"] == "pytest"
 
 
 def test_resolve_store_base_dir_reads_codex_mcp_config(
