@@ -38,7 +38,7 @@ recoverable lifecycle.
 - [x] Task 2.1: Build an atomic repository catalog and fast inventory.
 - [x] Task 2.2: Diagnose freshness, dead roots, corruption, and overlaps.
 - [x] Task 2.3: Automatically prune dead roots during normal store startup.
-- [ ] Task 2.4: Prevent new overlapping repository roots.
+- [x] Task 2.4: Prevent new overlapping repository roots.
 
 ### Thread 3: Harness and public contracts
 
@@ -49,8 +49,8 @@ recoverable lifecycle.
 ## Checkpoints
 
 - [x] Coverage: maintained tests are discoverable and empty results are honest.
-- [x] Store: catalog recovery, health diagnosis, and startup dead-root cleanup
-  pass focused disposable-store proofs.
+- [x] Store: catalog recovery, health diagnosis, startup dead-root cleanup, and
+  canonical-root overlap admission pass focused disposable-store proofs.
 - [ ] Integration: hook, cleanup, overlap, isolation, and MCP migration pass
   focused end-to-end proofs.
 

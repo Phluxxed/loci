@@ -53,7 +53,7 @@
   - Verify: focused disposable-store startup, preservation, summary, and
     pending-mutation tests.
 
-- [ ] Task 2.4: Prevent new overlapping repository roots.
+- [x] Task 2.4: Prevent new overlapping repository roots.
   - Acceptance: structured conflicts for ancestor/descendant roots; exact-root
     reindex and sibling roots remain valid.
   - Verify: focused path, symlink, and worktree overlap tests.

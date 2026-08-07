@@ -169,6 +169,10 @@ def _index_repo_unlocked(
         )
 
     store = get_store()
+    try:
+        store.ensure_root_available(repo_path)
+    except RepositoryCatalogError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
     existing = store.load(repo_path) if incremental else None
     if existing is not None and not index_versions_current(existing):
         existing = None

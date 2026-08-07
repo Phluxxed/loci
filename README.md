@@ -279,6 +279,14 @@ there is no manual, dry-run, apply, age, size, stale, corrupt, overlap, or
 indexability pruning policy. `loci store health` and `loci_store_health` remain
 read-only diagnostics and do not run startup cleanup.
 
+New index requests are checked against the catalog before Loci scans source
+files. An ancestor or descendant of an indexed canonical root fails with
+`REPOSITORY_ROOT_OVERLAP`; the structured error names the requested root, the
+existing root, their relationship, and the safe next action. Exact-root
+reindexing, sibling roots, and symlink or linked-worktree paths that resolve to
+the same canonical root remain valid. Existing overlaps remain read-only
+health findings and are never removed automatically.
+
 `loci store health` and the `loci_store_health` MCP tool return the same
 versioned projection. Repository entries carry a `states` array so findings
 such as `stale` and `overlapping` remain visible together, plus structured
