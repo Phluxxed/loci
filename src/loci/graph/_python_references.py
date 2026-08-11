@@ -45,11 +45,18 @@ class _PythonReexportRule:
 
 
 @dataclass(frozen=True, slots=True)
+class _PythonImportFailure:
+    reason: ImportUnresolvedReason
+    support: tuple[ReferenceSupport, ...]
+    control_files: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class PythonReferenceIndex:
     surfaces: Mapping[_ExportKey, tuple[_PythonExportTarget, ...]]
     ambiguous: frozenset[_ExportKey]
     cyclic: frozenset[_ExportKey]
-    import_failures: Mapping[_ExportKey, frozenset[ImportUnresolvedReason]]
+    import_failures: Mapping[_ExportKey, frozenset[_PythonImportFailure]]
 
 
 @dataclass(frozen=True, slots=True)
@@ -149,7 +156,12 @@ def build_python_reference_index(
         record, binding = matches[0]
         if record.status == "unresolved":
             if record.unresolved_reason is not None:
-                failures.setdefault(key, set()).add(record.unresolved_reason)
+                _add_import_failure(
+                    failures,
+                    key,
+                    _import_failure(record),
+                    ambiguous=ambiguous,
+                )
             continue
         if (
             record.target_file is None
@@ -196,8 +208,29 @@ def build_python_reference_index(
     ]
     for _ in range(MAX_REFERENCE_REEXPORT_PASSES):
         snapshot = {key: dict(value) for key, value in surfaces.items()}
+        snapshot_failures = {
+            key: frozenset(value) for key, value in failures.items()
+        }
         changed = False
         for rule in rules:
+            for target_failure in snapshot_failures.get(rule.target, frozenset()):
+                support = (rule.support, *target_failure.support)
+                if len(support) >= MAX_REFERENCE_SUPPORT_RECORDS:
+                    ambiguous.add(rule.source)
+                    continue
+                changed |= _add_import_failure(
+                    failures,
+                    rule.source,
+                    _PythonImportFailure(
+                        reason=target_failure.reason,
+                        support=support,
+                        control_files=tuple(sorted(set((
+                            *rule.control_files,
+                            *target_failure.control_files,
+                        )))),
+                    ),
+                    ambiguous=ambiguous,
+                )
             for target in snapshot.get(rule.target, {}).values():
                 support = (rule.support, *target.support)
                 # The common resolver prepends the importing reference's support.
@@ -262,9 +295,12 @@ def resolve_python_reference(
     if not targets:
         failures = index.import_failures.get(key, frozenset())
         if len(failures) == 1:
+            failure = next(iter(failures))
             return _unresolved(
                 "import_unresolved",
-                import_reason=next(iter(failures)),
+                import_reason=failure.reason,
+                support=failure.support,
+                control_files=failure.control_files,
             )
         if len(failures) > 1 or key in index.cyclic:
             return _unresolved("ambiguous_target")
@@ -354,6 +390,39 @@ def _reexport_evidence_key(
         export.text,
         export.local_name,
     )
+
+
+def _import_failure(record: ImportRecord) -> _PythonImportFailure:
+    if record.unresolved_reason is None:
+        raise _error("Python re-export failure has no unresolved reason")
+    return _PythonImportFailure(
+        reason=record.unresolved_reason,
+        support=(ReferenceSupport(
+            kind="reexport",
+            file=record.raw.source_file,
+            line=record.raw.line,
+            content_hash=record.raw.source_hash,
+            endpoint_id=record.source_id,
+        ),),
+        control_files=record.resolution_control_files,
+    )
+
+
+def _add_import_failure(
+    failures: dict[_ExportKey, set[_PythonImportFailure]],
+    key: _ExportKey,
+    failure: _PythonImportFailure,
+    *,
+    ambiguous: set[_ExportKey],
+) -> bool:
+    values = failures.setdefault(key, set())
+    if failure in values:
+        return False
+    if len(values) >= MAX_REFERENCE_RESOLUTION_CANDIDATES:
+        ambiguous.add(key)
+        return False
+    values.add(failure)
+    return True
 
 
 def _is_imported_submodule(
@@ -489,14 +558,16 @@ def _unresolved(
     reason: ReferenceUnresolvedReason,
     *,
     import_reason: ImportUnresolvedReason | None = None,
+    support: tuple[ReferenceSupport, ...] = (),
+    control_files: tuple[str, ...] = (),
 ) -> PythonReferenceOutcome:
     return PythonReferenceOutcome(
         target=None,
         reason=reason,
         import_unresolved_reason=import_reason,
         basis=None,
-        support=(),
-        resolution_control_files=(),
+        support=support,
+        resolution_control_files=control_files,
     )
 
 

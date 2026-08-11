@@ -138,6 +138,58 @@ def test_service_preserves_external_reexport_failure_behind_resolved_local_impor
     assert incremental == full
 
 
+def test_service_preserves_python_external_reexport_failure_behind_resolved_local_import(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    source = repo / "phluxxed_framework" / "strategies"
+    source.mkdir(parents=True)
+    (source / "base.py").write_text(
+        "from pandas import DataFrame\n",
+        encoding="utf-8",
+    )
+    (source / "baseline.py").write_text(
+        "from .base import DataFrame\n"
+        "\n"
+        "class Strategy:\n"
+        "    def build(self):\n"
+        "        base_df: DataFrame\n"
+        "        return base_df\n",
+        encoding="utf-8",
+    )
+
+    indexed = index_repo(repo, incremental=False)
+    graph = _load_graph(base, repo)
+    record = next(
+        item
+        for item in graph["symbol_references"]
+        if item["raw"]["source_file"]
+        == "phluxxed_framework/strategies/baseline.py"
+    )
+
+    assert indexed["graph_symbol_references_unresolved"] == 1
+    assert record["unresolved_reason"] == "import_unresolved"
+    assert record["import_unresolved_reason"] == "not_indexed"
+    assert [
+        (support["kind"], support["file"], support["endpoint_id"])
+        for support in record["support"]
+    ] == [
+        (
+            "import_binding",
+            "phluxxed_framework/strategies/baseline.py",
+            "phluxxed_framework/strategies/base.py::__file__#file",
+        ),
+        (
+            "reexport",
+            "phluxxed_framework/strategies/base.py",
+            "phluxxed_framework/strategies/base.py::__file__#file",
+        ),
+    ]
+
+
 def test_service_noop_incremental_reuses_reference_evidence_without_reparse(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

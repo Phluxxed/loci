@@ -329,8 +329,24 @@ def _build_validation_index(
                 ))
         elif (
             record.status == "unresolved"
-            and record.raw.is_reexport
             and record.unresolved_reason is not None
+            and (
+                record.raw.is_reexport
+                or (
+                    record.raw.language == "python"
+                    and any(
+                        (
+                            record.raw.source_file,
+                            record.raw.source_hash,
+                            binding.import_line,
+                            binding.import_text,
+                            binding.local_name,
+                        )
+                        in python_reexport_evidence
+                        for binding in record.raw.bindings
+                    )
+                )
+            )
         ):
             failed_reexport_support.add((
                 record.raw.source_file,
