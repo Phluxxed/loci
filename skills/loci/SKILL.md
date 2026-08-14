@@ -14,7 +14,9 @@ Prefer the local MCP server whenever its tools are available. Use the
 repository root named by the task, not the shell cwd or an arbitrary parent:
 
 ```text
+# Unindexed repository, explicit rebuild, or large change only:
 loci_index(repo, incremental=true)
+# Normal navigation, including stale cached indexes:
 loci_outline(repo) or loci_search(repo, query)
 loci_get(repo, symbol_ids)
 loci_analyze(repo) when diagnostics are needed
