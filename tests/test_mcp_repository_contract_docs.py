@@ -11,7 +11,9 @@ def test_first_party_guidance_uses_canonical_repository_parameter() -> None:
     ]
     for path in skill_paths:
         text = path.read_text()
+        assert "# Unindexed repository, explicit rebuild, or large change only:" in text
         assert "loci_index(repo, incremental=true)" in text
+        assert "# Normal navigation, including stale cached indexes:" in text
         assert "loci_outline(repo)" in text
         assert "loci_index(path" not in text
         assert "loci_outline(path" not in text
