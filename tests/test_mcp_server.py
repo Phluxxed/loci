@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from mcp import ClientSession, StdioServerParameters
+from mcp import Client, ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 from loci.storage.store_identity import initialize_store
@@ -130,6 +130,32 @@ def test_mcp_index_outline_get_round_trip(tmp_path: Path, fixtures_dir: Path):
     assert "summary" in result["analyze"]
     assert result["analyze"]["store"]["base_dir"] == str((tmp_path / ".codeindex").resolve())
     assert result["invalid_grep"]["error"]["code"] == "INVALID_REGEX"
+
+
+def test_mcp_modern_protocol_index_read_error_round_trip(tmp_path: Path) -> None:
+    result = asyncio.run(
+        _modern_protocol_round_trip(
+            tmp_path / "repo",
+            tmp_path / ".codeindex",
+        )
+    )
+
+    assert result["protocol_version"] == "2026-07-28"
+    assert result["indexed"]["symbols_indexed"] > 0
+    assert result["outline"]["files"][0]["file"] == "sample.py"
+    assert result["error_is_error"] is True
+    assert result["error"]["code"] == "INVALID_REGEX"
+
+
+def test_mcp_legacy_initialize_remains_supported(tmp_path: Path) -> None:
+    indexed = asyncio.run(
+        _legacy_initialize_round_trip(
+            tmp_path / "repo",
+            tmp_path / ".codeindex",
+        )
+    )
+
+    assert indexed["symbols_indexed"] > 0
 
 
 def test_mcp_repository_scoped_tools_use_one_root_parameter(tmp_path: Path) -> None:
@@ -642,113 +668,149 @@ async def _round_trip(
         cwd=Path.cwd(),
     )
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            tools = await session.list_tools()
-            tool_names = sorted(tool.name for tool in tools.tools)
+    async with Client(stdio_client(server_params)) as session:
+        tools = await session.list_tools()
+        tool_names = sorted(tool.name for tool in tools.tools)
 
-            indexed = await session.call_tool(
-                "loci_index",
-                arguments={"repo": str(repo), "incremental": False},
-            )
-            outline = await session.call_tool(
-                "loci_outline",
-                arguments={"repo": str(repo)},
-            )
-            symbol_id = next(
-                symbol["id"]
-                for entry in outline.structuredContent["files"]
-                for symbol in entry["symbols"]
-                if symbol["name"] == "add"
-            )
-            source = await session.call_tool(
-                "loci_get",
-                arguments={
-                    "repo": str(repo),
-                    "symbol_ids": [symbol_id],
-                    "context": 1,
-                },
-            )
-            search = await session.call_tool(
-                "loci_search",
-                arguments={"repo": str(repo), "query": "add", "limit": 5},
-            )
-            file_result = await session.call_tool(
-                "loci_file",
-                arguments={
-                    "repo": str(repo),
-                    "file_path": "sample.py",
-                    "start_line": 4,
-                    "end_line": 5,
-                },
-            )
-            grep = await session.call_tool(
-                "loci_grep",
-                arguments={"repo": str(repo), "pattern": r"def add"},
-            )
-            graph = await session.call_tool(
-                "loci_graph_neighbors",
-                arguments={"repo": str(repo), "seed_ids": [symbol_id]},
-            )
-            anchors = await session.call_tool(
-                "loci_graph_anchors",
-                arguments={"repo": str(repo), "question": "add"},
-            )
-            health = await session.call_tool(
-                "loci_graph_health",
-                arguments={"repo": str(repo)},
-            )
-            store_health = await session.call_tool(
-                "loci_store_health",
-                arguments={"offset": 0, "limit": 10},
-            )
-            invalid_store_health = await session.call_tool(
-                "loci_store_health",
-                arguments={"limit": 0},
-            )
-            assert invalid_store_health.isError is True
-            verify = await session.call_tool(
-                "loci_verify",
-                arguments={"repo": str(repo)},
-            )
-            repos = await session.call_tool("loci_list", arguments={})
-            stats = await session.call_tool(
-                "loci_stats",
-                arguments={"repo": str(repo), "since_days": 7},
-            )
-            analyze = await session.call_tool(
-                "loci_analyze",
-                arguments={"repo": str(repo), "since_days": 7},
-            )
-            invalid_grep = await session.call_tool(
-                "loci_grep",
-                arguments={"repo": str(repo), "pattern": "["},
-            )
-            assert invalid_grep.isError is True
+        indexed = await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(repo), "incremental": False},
+        )
+        outline = await session.call_tool(
+            "loci_outline",
+            arguments={"repo": str(repo)},
+        )
+        symbol_id = next(
+            symbol["id"]
+            for entry in outline.structured_content["files"]
+            for symbol in entry["symbols"]
+            if symbol["name"] == "add"
+        )
+        source = await session.call_tool(
+            "loci_get",
+            arguments={
+                "repo": str(repo),
+                "symbol_ids": [symbol_id],
+                "context": 1,
+            },
+        )
+        search = await session.call_tool(
+            "loci_search",
+            arguments={"repo": str(repo), "query": "add", "limit": 5},
+        )
+        file_result = await session.call_tool(
+            "loci_file",
+            arguments={
+                "repo": str(repo),
+                "file_path": "sample.py",
+                "start_line": 4,
+                "end_line": 5,
+            },
+        )
+        grep = await session.call_tool(
+            "loci_grep",
+            arguments={"repo": str(repo), "pattern": r"def add"},
+        )
+        graph = await session.call_tool(
+            "loci_graph_neighbors",
+            arguments={"repo": str(repo), "seed_ids": [symbol_id]},
+        )
+        anchors = await session.call_tool(
+            "loci_graph_anchors",
+            arguments={"repo": str(repo), "question": "add"},
+        )
+        health = await session.call_tool(
+            "loci_graph_health",
+            arguments={"repo": str(repo)},
+        )
+        store_health = await session.call_tool(
+            "loci_store_health",
+            arguments={"offset": 0, "limit": 10},
+        )
+        invalid_store_health = await session.call_tool(
+            "loci_store_health",
+            arguments={"limit": 0},
+        )
+        assert invalid_store_health.is_error is True
+        verify = await session.call_tool(
+            "loci_verify",
+            arguments={"repo": str(repo)},
+        )
+        repos = await session.call_tool("loci_list", arguments={})
+        stats = await session.call_tool(
+            "loci_stats",
+            arguments={"repo": str(repo), "since_days": 7},
+        )
+        analyze = await session.call_tool(
+            "loci_analyze",
+            arguments={"repo": str(repo), "since_days": 7},
+        )
+        invalid_grep = await session.call_tool(
+            "loci_grep",
+            arguments={"repo": str(repo), "pattern": "["},
+        )
+        assert invalid_grep.is_error is True
 
     return {
         "tools": tool_names,
-        "indexed": indexed.structuredContent,
-        "outline": outline.structuredContent,
-        "get": source.structuredContent,
-        "search": search.structuredContent,
-        "file": file_result.structuredContent,
-        "grep": grep.structuredContent,
-        "anchors": anchors.structuredContent,
-        "graph": graph.structuredContent,
-        "health": health.structuredContent,
-        "store_health": store_health.structuredContent,
-        "invalid_store_health": invalid_store_health.structuredContent,
-        "verify": verify.structuredContent,
-        "list": repos.structuredContent,
-        "stats": stats.structuredContent,
-        "analyze": analyze.structuredContent,
-        "invalid_grep": invalid_grep.structuredContent,
+        "indexed": indexed.structured_content,
+        "outline": outline.structured_content,
+        "get": source.structured_content,
+        "search": search.structured_content,
+        "file": file_result.structured_content,
+        "grep": grep.structured_content,
+        "anchors": anchors.structured_content,
+        "graph": graph.structured_content,
+        "health": health.structured_content,
+        "store_health": store_health.structured_content,
+        "invalid_store_health": invalid_store_health.structured_content,
+        "verify": verify.structured_content,
+        "list": repos.structured_content,
+        "stats": stats.structured_content,
+        "analyze": analyze.structured_content,
+        "invalid_grep": invalid_grep.structured_content,
     }
 
 
-async def _repository_parameter_round_trip(
+async def _modern_protocol_round_trip(
+    repo: Path,
+    cache_dir: Path,
+) -> dict[str, Any]:
+    repo.mkdir()
+    (repo / "sample.py").write_text("def sample():\n    return 1\n")
+
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["LOCI_STORE_NAMESPACE"] = "test"
+    env["PYTHONPATH"] = str(Path.cwd() / "src")
+    server_params = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "loci.mcp_server"],
+        env=env,
+        cwd=Path.cwd(),
+    )
+
+    async with Client(stdio_client(server_params)) as client:
+        indexed = await client.call_tool(
+            "loci_index",
+            {"repo": str(repo), "incremental": False},
+        )
+        outline = await client.call_tool("loci_outline", {"repo": str(repo)})
+        invalid = await client.call_tool(
+            "loci_grep",
+            {"repo": str(repo), "pattern": "["},
+        )
+
+        return {
+            "protocol_version": client.protocol_version,
+            "indexed": indexed.structured_content,
+            "outline": outline.structured_content,
+            "error_is_error": invalid.is_error,
+            "error": invalid.structured_content["error"],
+        }
+
+
+async def _legacy_initialize_round_trip(
     repo: Path,
     cache_dir: Path,
 ) -> dict[str, Any]:
@@ -769,52 +831,80 @@ async def _repository_parameter_round_trip(
     async with stdio_client(server_params) as (read, write):
         async with ClientSession(read, write) as session:
             await session.initialize()
-            tools = await session.list_tools()
-            schemas = {tool.name: tool.inputSchema for tool in tools.tools}
-
             indexed = await session.call_tool(
                 "loci_index",
                 arguments={"repo": str(repo), "incremental": False},
             )
-            outline = await session.call_tool(
-                "loci_outline",
-                arguments={"repo": str(repo)},
-            )
-            verify = await session.call_tool(
-                "loci_verify",
-                arguments={"repo": str(repo)},
-            )
-            legacy_indexed = await session.call_tool(
-                "loci_index",
-                arguments={"path": str(repo), "incremental": True},
-            )
-            legacy_outline = await session.call_tool(
-                "loci_outline",
-                arguments={"path": str(repo)},
-            )
-            legacy_verify = await session.call_tool(
-                "loci_verify",
-                arguments={"path": str(repo)},
-            )
-            duplicate = await session.call_tool(
-                "loci_outline",
-                arguments={"repo": str(repo), "path": str(repo)},
-            )
+
+    assert indexed.structured_content is not None
+    return indexed.structured_content
+
+
+async def _repository_parameter_round_trip(
+    repo: Path,
+    cache_dir: Path,
+) -> dict[str, Any]:
+    repo.mkdir()
+    (repo / "sample.py").write_text("def sample():\n    return 1\n")
+
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["LOCI_STORE_NAMESPACE"] = "test"
+    env["PYTHONPATH"] = str(Path.cwd() / "src")
+    server_params = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "loci.mcp_server"],
+        env=env,
+        cwd=Path.cwd(),
+    )
+
+    async with Client(stdio_client(server_params)) as session:
+        tools = await session.list_tools()
+        schemas = {tool.name: tool.input_schema for tool in tools.tools}
+
+        indexed = await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(repo), "incremental": False},
+        )
+        outline = await session.call_tool(
+            "loci_outline",
+            arguments={"repo": str(repo)},
+        )
+        verify = await session.call_tool(
+            "loci_verify",
+            arguments={"repo": str(repo)},
+        )
+        legacy_indexed = await session.call_tool(
+            "loci_index",
+            arguments={"path": str(repo), "incremental": True},
+        )
+        legacy_outline = await session.call_tool(
+            "loci_outline",
+            arguments={"path": str(repo)},
+        )
+        legacy_verify = await session.call_tool(
+            "loci_verify",
+            arguments={"path": str(repo)},
+        )
+        duplicate = await session.call_tool(
+            "loci_outline",
+            arguments={"repo": str(repo), "path": str(repo)},
+        )
 
     return {
         "schemas": schemas,
         "canonical": {
-            "indexed": indexed.structuredContent,
-            "outline": outline.structuredContent,
-            "verify": verify.structuredContent,
+            "indexed": indexed.structured_content,
+            "outline": outline.structured_content,
+            "verify": verify.structured_content,
         },
         "legacy": {
-            "indexed": legacy_indexed.structuredContent,
-            "outline": legacy_outline.structuredContent,
-            "verify": legacy_verify.structuredContent,
+            "indexed": legacy_indexed.structured_content,
+            "outline": legacy_outline.structured_content,
+            "verify": legacy_verify.structured_content,
         },
         "duplicate": {
-            "is_error": duplicate.isError,
+            "is_error": duplicate.is_error,
             "message": duplicate.content[0].text,
         },
     }
@@ -832,11 +922,9 @@ async def _store_stats(cache_dir: Path, namespace: str) -> dict[str, Any]:
         cwd=Path.cwd(),
     )
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            stats = await session.call_tool("loci_stats", arguments={})
-            return stats.structuredContent["store"]
+    async with Client(stdio_client(server_params)) as session:
+        stats = await session.call_tool("loci_stats", arguments={})
+        return stats.structured_content["store"]
 
 
 async def _query_coverage_round_trip(
@@ -864,36 +952,34 @@ async def _query_coverage_round_trip(
         cwd=Path.cwd(),
     )
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            await session.call_tool(
-                "loci_index",
-                arguments={"repo": str(repo), "incremental": False},
-            )
-            calls = {
-                "search_present": (
-                    "loci_search",
-                    {"repo": str(repo), "query": "present_symbol"},
-                ),
-                "search_absent": (
-                    "loci_search",
-                    {"repo": str(repo), "query": "xyzzy_no_match_ever_12345"},
-                ),
-                "grep_present": (
-                    "loci_grep",
-                    {"repo": str(repo), "pattern": "present_symbol"},
-                ),
-                "grep_absent": (
-                    "loci_grep",
-                    {"repo": str(repo), "pattern": "absent_symbol"},
-                ),
-            }
-            results: dict[str, dict[str, Any]] = {}
-            for name, (tool, arguments) in calls.items():
-                response = await session.call_tool(tool, arguments=arguments)
-                results[name] = response.structuredContent
-            return results
+    async with Client(stdio_client(server_params)) as session:
+        await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(repo), "incremental": False},
+        )
+        calls = {
+            "search_present": (
+                "loci_search",
+                {"repo": str(repo), "query": "present_symbol"},
+            ),
+            "search_absent": (
+                "loci_search",
+                {"repo": str(repo), "query": "xyzzy_no_match_ever_12345"},
+            ),
+            "grep_present": (
+                "loci_grep",
+                {"repo": str(repo), "pattern": "present_symbol"},
+            ),
+            "grep_absent": (
+                "loci_grep",
+                {"repo": str(repo), "pattern": "absent_symbol"},
+            ),
+        }
+        results: dict[str, dict[str, Any]] = {}
+        for name, (tool, arguments) in calls.items():
+            response = await session.call_tool(tool, arguments=arguments)
+            results[name] = response.structured_content
+        return results
 
 
 async def _graph_neighbors_after_restart(repo: Path, cache_dir: Path) -> dict[str, Any]:
@@ -912,37 +998,33 @@ async def _graph_neighbors_after_restart(repo: Path, cache_dir: Path) -> dict[st
         cwd=Path.cwd(),
     )
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            indexed = await session.call_tool(
-                "loci_index",
-                arguments={"repo": str(repo), "incremental": False},
-            )
-            assert indexed.structuredContent["graph_edges_indexed"] == 1
+    async with Client(stdio_client(server_params)) as session:
+        indexed = await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(repo), "incremental": False},
+        )
+        assert indexed.structured_content["graph_edges_indexed"] == 1
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            valid = await session.call_tool(
-                "loci_graph_neighbors",
-                arguments={
-                    "repo": str(repo),
-                    "seed_ids": ["guide.md::Guide#section"],
-                },
-            )
-            invalid = await session.call_tool(
-                "loci_graph_neighbors",
-                arguments={
-                    "repo": str(repo),
-                    "seed_ids": ["guide.md::Missing#section"],
-                },
-            )
-            assert invalid.isError is True
-            return {
-                "valid": valid.structuredContent,
-                "invalid": invalid.structuredContent,
-            }
+    async with Client(stdio_client(server_params)) as session:
+        valid = await session.call_tool(
+            "loci_graph_neighbors",
+            arguments={
+                "repo": str(repo),
+                "seed_ids": ["guide.md::Guide#section"],
+            },
+        )
+        invalid = await session.call_tool(
+            "loci_graph_neighbors",
+            arguments={
+                "repo": str(repo),
+                "seed_ids": ["guide.md::Missing#section"],
+            },
+        )
+        assert invalid.is_error is True
+        return {
+            "valid": valid.structured_content,
+            "invalid": invalid.structured_content,
+        }
 
 
 async def _graph_health_after_restart(
@@ -969,22 +1051,18 @@ async def _graph_health_after_restart(
         cwd=Path.cwd(),
     )
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            await session.call_tool(
-                "loci_index",
-                arguments={"repo": str(repo), "incremental": False},
-            )
+    async with Client(stdio_client(server_params)) as session:
+        await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(repo), "incremental": False},
+        )
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            health = await session.call_tool(
-                "loci_graph_health",
-                arguments={"repo": str(repo)},
-            )
-            return health.structuredContent
+    async with Client(stdio_client(server_params)) as session:
+        health = await session.call_tool(
+            "loci_graph_health",
+            arguments={"repo": str(repo)},
+        )
+        return health.structured_content
 
 
 async def _graph_anchors_after_restart(
@@ -1007,13 +1085,11 @@ async def _graph_anchors_after_restart(
         cwd=Path.cwd(),
     )
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            await session.call_tool(
-                "loci_index",
-                arguments={"repo": str(repo), "incremental": False},
-            )
+    async with Client(stdio_client(server_params)) as session:
+        await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(repo), "incremental": False},
+        )
 
     guide.write_text(
         "# Guide\n\n"
@@ -1021,38 +1097,36 @@ async def _graph_anchors_after_restart(
         "## Query Aware Traversal\n\nUse bounded graph anchors.\n",
         encoding="utf-8",
     )
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            inferred = await session.call_tool(
-                "loci_graph_anchors",
-                arguments={
-                    "repo": str(repo),
-                    "question": "query aware traversal anchors",
-                },
-            )
-            explicit = await session.call_tool(
-                "loci_graph_anchors",
-                arguments={
-                    "repo": str(repo),
-                    "question": "",
-                    "seed_ids": ["guide.md::Guide > Install#section"],
-                },
-            )
-            invalid = await session.call_tool(
-                "loci_graph_anchors",
-                arguments={
-                    "repo": str(repo),
-                    "question": "",
-                    "seed_ids": ["guide.md::Missing#section"],
-                },
-            )
-            assert invalid.isError is True
-            return {
-                "inferred": inferred.structuredContent,
-                "explicit": explicit.structuredContent,
-                "invalid": invalid.structuredContent,
-            }
+    async with Client(stdio_client(server_params)) as session:
+        inferred = await session.call_tool(
+            "loci_graph_anchors",
+            arguments={
+                "repo": str(repo),
+                "question": "query aware traversal anchors",
+            },
+        )
+        explicit = await session.call_tool(
+            "loci_graph_anchors",
+            arguments={
+                "repo": str(repo),
+                "question": "",
+                "seed_ids": ["guide.md::Guide > Install#section"],
+            },
+        )
+        invalid = await session.call_tool(
+            "loci_graph_anchors",
+            arguments={
+                "repo": str(repo),
+                "question": "",
+                "seed_ids": ["guide.md::Missing#section"],
+            },
+        )
+        assert invalid.is_error is True
+        return {
+            "inferred": inferred.structured_content,
+            "explicit": explicit.structured_content,
+            "invalid": invalid.structured_content,
+        }
 
 
 async def _graph_paths_after_restart(
@@ -1074,59 +1148,55 @@ async def _graph_paths_after_restart(
         cwd=Path.cwd(),
     )
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            await session.call_tool(
-                "loci_index",
-                arguments={"repo": str(repo), "incremental": False},
-            )
+    async with Client(stdio_client(server_params)) as session:
+        await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(repo), "incremental": False},
+        )
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            tools = await session.list_tools()
-            schemas = {tool.name: tool.inputSchema for tool in tools.tools}
-            root_id = "guide.md::Guide#section"
-            child_id = "guide.md::Guide > Install#section"
-            paths = await session.call_tool(
-                "loci_graph_paths",
-                arguments={
-                    "repo": str(repo),
-                    "source_ids": [root_id],
-                    "target_ids": [child_id],
-                    "namespaces": ["loci"],
-                    "edge_types": ["contains"],
-                    "resolutions": ["exact"],
-                },
-            )
-            retrieve = await session.call_tool(
-                "loci_graph_retrieve",
-                arguments={
-                    "repo": str(repo),
-                    "question": "How are Guide and Install related?",
-                    "seed_ids": [root_id, child_id],
-                    "namespaces": ["loci"],
-                    "edge_types": ["contains"],
-                    "resolutions": ["exact"],
-                },
-            )
-            neighbors = await session.call_tool(
-                "loci_graph_traverse_neighbors",
-                arguments={
-                    "repo": str(repo),
-                    "seed_ids": [root_id],
-                    "namespaces": ["loci"],
-                    "edge_types": ["contains"],
-                    "resolutions": ["exact"],
-                },
-            )
-            return {
-                "paths": paths.structuredContent,
-                "retrieve": retrieve.structuredContent,
-                "neighbors": neighbors.structuredContent,
-                "schemas": schemas,
-            }
+    async with Client(stdio_client(server_params)) as session:
+        tools = await session.list_tools()
+        schemas = {tool.name: tool.input_schema for tool in tools.tools}
+        root_id = "guide.md::Guide#section"
+        child_id = "guide.md::Guide > Install#section"
+        paths = await session.call_tool(
+            "loci_graph_paths",
+            arguments={
+                "repo": str(repo),
+                "source_ids": [root_id],
+                "target_ids": [child_id],
+                "namespaces": ["loci"],
+                "edge_types": ["contains"],
+                "resolutions": ["exact"],
+            },
+        )
+        retrieve = await session.call_tool(
+            "loci_graph_retrieve",
+            arguments={
+                "repo": str(repo),
+                "question": "How are Guide and Install related?",
+                "seed_ids": [root_id, child_id],
+                "namespaces": ["loci"],
+                "edge_types": ["contains"],
+                "resolutions": ["exact"],
+            },
+        )
+        neighbors = await session.call_tool(
+            "loci_graph_traverse_neighbors",
+            arguments={
+                "repo": str(repo),
+                "seed_ids": [root_id],
+                "namespaces": ["loci"],
+                "edge_types": ["contains"],
+                "resolutions": ["exact"],
+            },
+        )
+        return {
+            "paths": paths.structured_content,
+            "retrieve": retrieve.structured_content,
+            "neighbors": neighbors.structured_content,
+            "schemas": schemas,
+        }
 
 
 async def _graph_imports_after_restart(
@@ -1149,58 +1219,54 @@ async def _graph_imports_after_restart(
         cwd=Path.cwd(),
     )
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            indexed = await session.call_tool(
-                "loci_index",
-                arguments={"repo": str(repo), "incremental": False},
-            )
-            assert indexed.structuredContent["graph_imports_resolved"] == 1
-            assert indexed.structuredContent["graph_imports_unresolved"] == 1
+    async with Client(stdio_client(server_params)) as session:
+        indexed = await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(repo), "incremental": False},
+        )
+        assert indexed.structured_content["graph_imports_resolved"] == 1
+        assert indexed.structured_content["graph_imports_unresolved"] == 1
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            tools = await session.list_tools()
-            schema = next(
-                tool.inputSchema
-                for tool in tools.tools
-                if tool.name == "loci_graph_imports"
-            )
-            imports = await session.call_tool(
+    async with Client(stdio_client(server_params)) as session:
+        tools = await session.list_tools()
+        schema = next(
+            tool.input_schema
+            for tool in tools.tools
+            if tool.name == "loci_graph_imports"
+        )
+        imports = await session.call_tool(
+            "loci_graph_imports",
+            arguments={"repo": str(repo)},
+        )
+        neighbors = await session.call_tool(
+            "loci_graph_traverse_neighbors",
+            arguments={
+                "repo": str(repo),
+                "seed_ids": ["consumer.py::__file__#file"],
+                "namespaces": ["loci"],
+                "edge_types": ["imports"],
+                "resolutions": ["import-resolved"],
+            },
+        )
+        errors = {}
+        for field, arguments in (
+            ("status", {"status": "invalid"}),
+            ("offset", {"offset": -1}),
+            ("limit", {"limit": 501}),
+        ):
+            error = await session.call_tool(
                 "loci_graph_imports",
-                arguments={"repo": str(repo)},
+                arguments={"repo": str(repo), **arguments},
             )
-            neighbors = await session.call_tool(
-                "loci_graph_traverse_neighbors",
-                arguments={
-                    "repo": str(repo),
-                    "seed_ids": ["consumer.py::__file__#file"],
-                    "namespaces": ["loci"],
-                    "edge_types": ["imports"],
-                    "resolutions": ["import-resolved"],
-                },
-            )
-            errors = {}
-            for field, arguments in (
-                ("status", {"status": "invalid"}),
-                ("offset", {"offset": -1}),
-                ("limit", {"limit": 501}),
-            ):
-                error = await session.call_tool(
-                    "loci_graph_imports",
-                    arguments={"repo": str(repo), **arguments},
-                )
-                assert error.isError is True
-                errors[field] = error.structuredContent
+            assert error.is_error is True
+            errors[field] = error.structured_content
 
-            return {
-                "schema": schema,
-                "imports": imports.structuredContent,
-                "neighbors": neighbors.structuredContent,
-                "errors": errors,
-            }
+        return {
+            "schema": schema,
+            "imports": imports.structured_content,
+            "neighbors": neighbors.structured_content,
+            "errors": errors,
+        }
 
 
 async def _javascript_workspace_import_after_restart(
@@ -1246,41 +1312,37 @@ async def _javascript_workspace_import_after_restart(
     )
     source_id = "apps/web/page.ts::__file__#file"
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            indexed = await session.call_tool(
-                "loci_index",
-                arguments={"repo": str(repo), "incremental": False},
-            )
-            assert indexed.structuredContent["graph_imports_resolved"] == 1
+    async with Client(stdio_client(server_params)) as session:
+        indexed = await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(repo), "incremental": False},
+        )
+        assert indexed.structured_content["graph_imports_resolved"] == 1
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            tools = await session.list_tools()
-            imports_tool = next(
-                tool for tool in tools.tools if tool.name == "loci_graph_imports"
-            )
-            imports = await session.call_tool(
-                "loci_graph_imports",
-                arguments={"repo": str(repo)},
-            )
-            neighbors = await session.call_tool(
-                "loci_graph_traverse_neighbors",
-                arguments={
-                    "repo": str(repo),
-                    "seed_ids": [source_id],
-                    "namespaces": ["loci"],
-                    "edge_types": ["imports"],
-                    "resolutions": ["import-resolved"],
-                },
-            )
-            return {
-                "input_properties": set(imports_tool.inputSchema["properties"]),
-                "imports": imports.structuredContent,
-                "neighbors": neighbors.structuredContent,
-            }
+    async with Client(stdio_client(server_params)) as session:
+        tools = await session.list_tools()
+        imports_tool = next(
+            tool for tool in tools.tools if tool.name == "loci_graph_imports"
+        )
+        imports = await session.call_tool(
+            "loci_graph_imports",
+            arguments={"repo": str(repo)},
+        )
+        neighbors = await session.call_tool(
+            "loci_graph_traverse_neighbors",
+            arguments={
+                "repo": str(repo),
+                "seed_ids": [source_id],
+                "namespaces": ["loci"],
+                "edge_types": ["imports"],
+                "resolutions": ["import-resolved"],
+            },
+        )
+        return {
+            "input_properties": set(imports_tool.input_schema["properties"]),
+            "imports": imports.structured_content,
+            "neighbors": neighbors.structured_content,
+        }
 
 
 async def _go_package_target_after_restart(
@@ -1312,95 +1374,91 @@ async def _go_package_target_after_restart(
     source_id = "cmd/server/main.go::__file__#file"
     package_id = "internal/store::example.com/project/internal/store#package"
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            indexed = await session.call_tool(
-                "loci_index",
-                arguments={"repo": str(repo), "incremental": False},
-            )
-            initial_imports = await session.call_tool(
-                "loci_graph_imports",
-                arguments={"repo": str(repo)},
-            )
-            initial_outgoing = await session.call_tool(
-                "loci_graph_traverse_neighbors",
-                arguments={
-                    "repo": str(repo),
-                    "seed_ids": [source_id],
-                    "namespaces": ["loci"],
-                    "edge_types": ["imports"],
-                    "resolutions": ["import-resolved"],
-                },
-            )
+    async with Client(stdio_client(server_params)) as session:
+        indexed = await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(repo), "incremental": False},
+        )
+        initial_imports = await session.call_tool(
+            "loci_graph_imports",
+            arguments={"repo": str(repo)},
+        )
+        initial_outgoing = await session.call_tool(
+            "loci_graph_traverse_neighbors",
+            arguments={
+                "repo": str(repo),
+                "seed_ids": [source_id],
+                "namespaces": ["loci"],
+                "edge_types": ["imports"],
+                "resolutions": ["import-resolved"],
+            },
+        )
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            tools = await session.list_tools()
-            imports_tool = next(
-                tool for tool in tools.tools if tool.name == "loci_graph_imports"
-            )
-            imports = await session.call_tool(
-                "loci_graph_imports",
-                arguments={"repo": str(repo)},
-            )
-            health = await session.call_tool(
-                "loci_graph_health",
-                arguments={"repo": str(repo)},
-            )
-            outgoing = await session.call_tool(
-                "loci_graph_traverse_neighbors",
-                arguments={
-                    "repo": str(repo),
-                    "seed_ids": [source_id],
-                    "namespaces": ["loci"],
-                    "edge_types": ["imports"],
-                    "resolutions": ["import-resolved"],
-                },
-            )
-            incoming = await session.call_tool(
-                "loci_graph_traverse_neighbors",
-                arguments={
-                    "repo": str(repo),
-                    "seed_ids": [package_id],
-                    "namespaces": ["loci"],
-                    "edge_types": ["imports"],
-                    "resolutions": ["import-resolved"],
-                    "direction": "incoming",
-                },
-            )
-            paths = await session.call_tool(
-                "loci_graph_paths",
-                arguments={
-                    "repo": str(repo),
-                    "source_ids": [source_id],
-                    "target_ids": [package_id],
-                    "namespaces": ["loci"],
-                    "edge_types": ["imports"],
-                    "resolutions": ["import-resolved"],
-                    "max_hops": 1,
-                    "max_nodes": 2,
-                    "max_paths": 1,
-                },
-            )
-            compatibility = await session.call_tool(
-                "loci_graph_neighbors",
-                arguments={"repo": str(repo), "seed_ids": [source_id]},
-            )
-            return {
-                "indexed": indexed.structuredContent,
-                "initial_imports": initial_imports.structuredContent,
-                "initial_outgoing": initial_outgoing.structuredContent,
-                "tool_names": [tool.name for tool in tools.tools],
-                "imports_schema": imports_tool.inputSchema,
-                "imports": imports.structuredContent,
-                "health": health.structuredContent,
-                "outgoing": outgoing.structuredContent,
-                "incoming": incoming.structuredContent,
-                "paths": paths.structuredContent,
-                "compatibility": compatibility.structuredContent,
-            }
+    async with Client(stdio_client(server_params)) as session:
+        tools = await session.list_tools()
+        imports_tool = next(
+            tool for tool in tools.tools if tool.name == "loci_graph_imports"
+        )
+        imports = await session.call_tool(
+            "loci_graph_imports",
+            arguments={"repo": str(repo)},
+        )
+        health = await session.call_tool(
+            "loci_graph_health",
+            arguments={"repo": str(repo)},
+        )
+        outgoing = await session.call_tool(
+            "loci_graph_traverse_neighbors",
+            arguments={
+                "repo": str(repo),
+                "seed_ids": [source_id],
+                "namespaces": ["loci"],
+                "edge_types": ["imports"],
+                "resolutions": ["import-resolved"],
+            },
+        )
+        incoming = await session.call_tool(
+            "loci_graph_traverse_neighbors",
+            arguments={
+                "repo": str(repo),
+                "seed_ids": [package_id],
+                "namespaces": ["loci"],
+                "edge_types": ["imports"],
+                "resolutions": ["import-resolved"],
+                "direction": "incoming",
+            },
+        )
+        paths = await session.call_tool(
+            "loci_graph_paths",
+            arguments={
+                "repo": str(repo),
+                "source_ids": [source_id],
+                "target_ids": [package_id],
+                "namespaces": ["loci"],
+                "edge_types": ["imports"],
+                "resolutions": ["import-resolved"],
+                "max_hops": 1,
+                "max_nodes": 2,
+                "max_paths": 1,
+            },
+        )
+        compatibility = await session.call_tool(
+            "loci_graph_neighbors",
+            arguments={"repo": str(repo), "seed_ids": [source_id]},
+        )
+        return {
+            "indexed": indexed.structured_content,
+            "initial_imports": initial_imports.structured_content,
+            "initial_outgoing": initial_outgoing.structured_content,
+            "tool_names": [tool.name for tool in tools.tools],
+            "imports_schema": imports_tool.input_schema,
+            "imports": imports.structured_content,
+            "health": health.structured_content,
+            "outgoing": outgoing.structured_content,
+            "incoming": incoming.structured_content,
+            "paths": paths.structured_content,
+            "compatibility": compatibility.structured_content,
+        }
 
 
 async def _rust_crate_target_after_restart(
@@ -1433,98 +1491,94 @@ async def _rust_crate_target_after_restart(
     source_id = "src/main.rs::__file__#file"
     crate_id = "Cargo.toml::lib:app#crate"
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            indexed = await session.call_tool(
-                "loci_index",
-                arguments={"repo": str(repo), "incremental": False},
-            )
-            initial_imports = await session.call_tool(
-                "loci_graph_imports",
-                arguments={"repo": str(repo)},
-            )
-            initial_outgoing = await session.call_tool(
-                "loci_graph_traverse_neighbors",
-                arguments={
-                    "repo": str(repo),
-                    "seed_ids": [source_id],
-                    "namespaces": ["loci"],
-                    "edge_types": ["imports"],
-                    "resolutions": ["import-resolved"],
-                },
-            )
+    async with Client(stdio_client(server_params)) as session:
+        indexed = await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(repo), "incremental": False},
+        )
+        initial_imports = await session.call_tool(
+            "loci_graph_imports",
+            arguments={"repo": str(repo)},
+        )
+        initial_outgoing = await session.call_tool(
+            "loci_graph_traverse_neighbors",
+            arguments={
+                "repo": str(repo),
+                "seed_ids": [source_id],
+                "namespaces": ["loci"],
+                "edge_types": ["imports"],
+                "resolutions": ["import-resolved"],
+            },
+        )
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            tools = await session.list_tools()
-            imports_tool = next(
-                tool for tool in tools.tools if tool.name == "loci_graph_imports"
-            )
-            imports = await session.call_tool(
-                "loci_graph_imports",
-                arguments={"repo": str(repo)},
-            )
-            health = await session.call_tool(
-                "loci_graph_health",
-                arguments={"repo": str(repo)},
-            )
-            outgoing = await session.call_tool(
-                "loci_graph_traverse_neighbors",
-                arguments={
-                    "repo": str(repo),
-                    "seed_ids": [source_id],
-                    "namespaces": ["loci"],
-                    "edge_types": ["imports"],
-                    "resolutions": ["import-resolved"],
-                },
-            )
-            paths = await session.call_tool(
-                "loci_graph_paths",
-                arguments={
-                    "repo": str(repo),
-                    "source_ids": [source_id],
-                    "target_ids": [crate_id],
-                    "namespaces": ["loci"],
-                    "edge_types": ["imports"],
-                    "resolutions": ["import-resolved"],
-                    "max_hops": 1,
-                    "max_nodes": 2,
-                    "max_paths": 1,
-                },
-            )
-            retrieved = await session.call_tool(
-                "loci_graph_retrieve",
-                arguments={
-                    "repo": str(repo),
-                    "question": "How does the Rust binary import its library crate?",
-                    "seed_ids": [source_id, crate_id],
-                    "namespaces": ["loci"],
-                    "edge_types": ["imports"],
-                    "resolutions": ["import-resolved"],
-                    "max_hops": 1,
-                    "max_nodes": 2,
-                    "max_paths": 1,
-                },
-            )
-            compatibility = await session.call_tool(
-                "loci_graph_neighbors",
-                arguments={"repo": str(repo), "seed_ids": [source_id]},
-            )
-            return {
-                "indexed": indexed.structuredContent,
-                "initial_imports": initial_imports.structuredContent,
-                "initial_outgoing": initial_outgoing.structuredContent,
-                "tool_names": [tool.name for tool in tools.tools],
-                "imports_schema": imports_tool.inputSchema,
-                "imports": imports.structuredContent,
-                "health": health.structuredContent,
-                "outgoing": outgoing.structuredContent,
-                "paths": paths.structuredContent,
-                "retrieved": retrieved.structuredContent,
-                "compatibility": compatibility.structuredContent,
-            }
+    async with Client(stdio_client(server_params)) as session:
+        tools = await session.list_tools()
+        imports_tool = next(
+            tool for tool in tools.tools if tool.name == "loci_graph_imports"
+        )
+        imports = await session.call_tool(
+            "loci_graph_imports",
+            arguments={"repo": str(repo)},
+        )
+        health = await session.call_tool(
+            "loci_graph_health",
+            arguments={"repo": str(repo)},
+        )
+        outgoing = await session.call_tool(
+            "loci_graph_traverse_neighbors",
+            arguments={
+                "repo": str(repo),
+                "seed_ids": [source_id],
+                "namespaces": ["loci"],
+                "edge_types": ["imports"],
+                "resolutions": ["import-resolved"],
+            },
+        )
+        paths = await session.call_tool(
+            "loci_graph_paths",
+            arguments={
+                "repo": str(repo),
+                "source_ids": [source_id],
+                "target_ids": [crate_id],
+                "namespaces": ["loci"],
+                "edge_types": ["imports"],
+                "resolutions": ["import-resolved"],
+                "max_hops": 1,
+                "max_nodes": 2,
+                "max_paths": 1,
+            },
+        )
+        retrieved = await session.call_tool(
+            "loci_graph_retrieve",
+            arguments={
+                "repo": str(repo),
+                "question": "How does the Rust binary import its library crate?",
+                "seed_ids": [source_id, crate_id],
+                "namespaces": ["loci"],
+                "edge_types": ["imports"],
+                "resolutions": ["import-resolved"],
+                "max_hops": 1,
+                "max_nodes": 2,
+                "max_paths": 1,
+            },
+        )
+        compatibility = await session.call_tool(
+            "loci_graph_neighbors",
+            arguments={"repo": str(repo), "seed_ids": [source_id]},
+        )
+        return {
+            "indexed": indexed.structured_content,
+            "initial_imports": initial_imports.structured_content,
+            "initial_outgoing": initial_outgoing.structured_content,
+            "tool_names": [tool.name for tool in tools.tools],
+            "imports_schema": imports_tool.input_schema,
+            "imports": imports.structured_content,
+            "health": health.structured_content,
+            "outgoing": outgoing.structured_content,
+            "paths": paths.structured_content,
+            "retrieved": retrieved.structured_content,
+            "compatibility": compatibility.structured_content,
+        }
 
 
 async def _search_after_repo_change(repo: Path, cache_dir: Path) -> dict[str, Any]:
@@ -1542,19 +1596,17 @@ async def _search_after_repo_change(repo: Path, cache_dir: Path) -> dict[str, An
         cwd=Path.cwd(),
     )
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            await session.call_tool(
-                "loci_index",
-                arguments={"repo": str(repo), "incremental": False},
-            )
-            source.write_text("def fresh_symbol():\n    return 2\n")
-            search = await session.call_tool(
-                "loci_search",
-                arguments={"repo": str(repo), "query": "fresh_symbol"},
-            )
-            return search.structuredContent
+    async with Client(stdio_client(server_params)) as session:
+        await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(repo), "incremental": False},
+        )
+        source.write_text("def fresh_symbol():\n    return 2\n")
+        search = await session.call_tool(
+            "loci_search",
+            arguments={"repo": str(repo), "query": "fresh_symbol"},
+        )
+        return search.structured_content
 
 
 async def _grep_after_indexed_file_deleted(repo: Path, cache_dir: Path) -> dict[str, Any]:
@@ -1572,19 +1624,17 @@ async def _grep_after_indexed_file_deleted(repo: Path, cache_dir: Path) -> dict[
         cwd=Path.cwd(),
     )
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            await session.call_tool(
-                "loci_index",
-                arguments={"repo": str(repo), "incremental": False},
-            )
-            source.unlink()
-            grep = await session.call_tool(
-                "loci_grep",
-                arguments={"repo": str(repo), "pattern": "deleted_symbol"},
-            )
-            return grep.structuredContent
+    async with Client(stdio_client(server_params)) as session:
+        await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(repo), "incremental": False},
+        )
+        source.unlink()
+        grep = await session.call_tool(
+            "loci_grep",
+            arguments={"repo": str(repo), "pattern": "deleted_symbol"},
+        )
+        return grep.structured_content
 
 
 async def _markdown_search_and_outline(repo: Path, cache_dir: Path) -> dict[str, Any]:
@@ -1611,30 +1661,28 @@ async def _markdown_search_and_outline(repo: Path, cache_dir: Path) -> dict[str,
         cwd=Path.cwd(),
     )
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            await session.call_tool(
-                "loci_index",
-                arguments={"repo": str(repo), "incremental": False},
-            )
-            outline = await session.call_tool(
-                "loci_outline",
-                arguments={"repo": str(repo), "file": "README.md"},
-            )
-            search = await session.call_tool(
-                "loci_search",
-                arguments={
-                    "repo": str(repo),
-                    "query": "retrieval-governance",
-                    "lang": "markdown",
-                    "limit": 5,
-                },
-            )
-            return {
-                "outline": outline.structuredContent,
-                "search": search.structuredContent,
-            }
+    async with Client(stdio_client(server_params)) as session:
+        await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(repo), "incremental": False},
+        )
+        outline = await session.call_tool(
+            "loci_outline",
+            arguments={"repo": str(repo), "file": "README.md"},
+        )
+        search = await session.call_tool(
+            "loci_search",
+            arguments={
+                "repo": str(repo),
+                "query": "retrieval-governance",
+                "lang": "markdown",
+                "limit": 5,
+            },
+        )
+        return {
+            "outline": outline.structured_content,
+            "search": search.structured_content,
+        }
 
 
 async def _outline_missing_repo(cache_dir: Path, repo: Path) -> dict[str, Any]:
@@ -1648,11 +1696,9 @@ async def _outline_missing_repo(cache_dir: Path, repo: Path) -> dict[str, Any]:
         cwd=Path.cwd(),
     )
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            result = await session.call_tool("loci_outline", arguments={"repo": str(repo)})
-            assert result.isError is True
-            return result.structuredContent["error"]
+    async with Client(stdio_client(server_params)) as session:
+        result = await session.call_tool("loci_outline", arguments={"repo": str(repo)})
+        assert result.is_error is True
+        return result.structured_content["error"]
 
     raise AssertionError("Expected loci_outline to return an error result")

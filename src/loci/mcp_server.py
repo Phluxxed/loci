@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import json
 import sys
-from collections.abc import Sequence
 from typing import Any, Literal, cast
 
-from mcp.server.fastmcp import FastMCP
-from mcp.server.fastmcp.exceptions import ToolError
-from mcp.types import CallToolResult, ContentBlock, TextContent
+from mcp.server.mcpserver import Context, MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult, InputRequiredResult, TextContent
 
 from loci.graph.traversal import GraphDirection
 from loci.service import (
@@ -51,15 +50,17 @@ _LEGACY_PATH_PARAMETER_TOOLS = frozenset({
 })
 
 
-class LociMCP(FastMCP):
+class LociMCP(MCPServer):
     async def call_tool(
         self,
         name: str,
         arguments: dict[str, Any],
-    ) -> Sequence[ContentBlock] | dict[str, Any]:
+        context: Context | None = None,
+    ) -> CallToolResult | InputRequiredResult:
         return await super().call_tool(
             name,
             _normalize_repository_arguments(name, arguments),
+            context,
         )
 
 
@@ -78,7 +79,7 @@ def _normalize_repository_arguments(
     return normalized
 
 
-def create_server() -> FastMCP:
+def create_server() -> MCPServer:
     mcp = LociMCP(
         "loci",
         instructions=(
@@ -420,16 +421,16 @@ def _handle_loci_error(operation):
                     text=f"{exc.code}: {exc.message}",
                 )
             ],
-            structuredContent={"error": exc.to_dict()},
-            isError=True,
+            structured_content={"error": exc.to_dict()},
+            is_error=True,
         )
 
 
 def _success(payload: dict[str, Any]) -> CallToolResult:
     return CallToolResult(
         content=[],
-        structuredContent=payload,
-        isError=False,
+        structured_content=payload,
+        is_error=False,
     )
 
 

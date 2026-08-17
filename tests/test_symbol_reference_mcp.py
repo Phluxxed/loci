@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from mcp import ClientSession, StdioServerParameters
+from mcp import Client, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 from loci.graph.contracts import GRAPH_SCHEMA_VERSION
@@ -273,17 +273,15 @@ async def _reference_mcp_after_restart(
         cwd=Path.cwd(),
     )
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            indexed = await session.call_tool(
-                "loci_index",
-                arguments={"repo": str(repo), "incremental": False},
-            )
-            indexed_content = indexed.structuredContent
-            assert indexed_content is not None
-            assert indexed_content["graph_symbol_references_resolved"] == 1
-            assert indexed_content["graph_symbol_references_unresolved"] == 1
+    async with Client(stdio_client(server_params)) as session:
+        indexed = await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(repo), "incremental": False},
+        )
+        indexed_content = indexed.structured_content
+        assert indexed_content is not None
+        assert indexed_content["graph_symbol_references_resolved"] == 1
+        assert indexed_content["graph_symbol_references_unresolved"] == 1
 
     index_path = IndexStore(base_dir=cache_dir)._index_path(repo.resolve())
     index_before = (
@@ -291,87 +289,85 @@ async def _reference_mcp_after_restart(
         index_path.stat().st_mtime_ns,
     )
 
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            tools = await session.list_tools()
-            schema = next(
-                tool.inputSchema
-                for tool in tools.tools
-                if tool.name == "loci_graph_references"
-            )
-            first = await session.call_tool(
-                "loci_graph_references",
-                arguments={"repo": str(repo), "limit": 1},
-            )
-            second = await session.call_tool(
-                "loci_graph_references",
-                arguments={"repo": str(repo), "offset": 1, "limit": 1},
-            )
-            unresolved = await session.call_tool(
-                "loci_graph_references",
-                arguments={
-                    "repo": str(repo),
-                    "file": "consumer.py",
-                    "status": "unresolved",
-                },
-            )
-            edge_arguments = {
+    async with Client(stdio_client(server_params)) as session:
+        tools = await session.list_tools()
+        schema = next(
+            tool.input_schema
+            for tool in tools.tools
+            if tool.name == "loci_graph_references"
+        )
+        first = await session.call_tool(
+            "loci_graph_references",
+            arguments={"repo": str(repo), "limit": 1},
+        )
+        second = await session.call_tool(
+            "loci_graph_references",
+            arguments={"repo": str(repo), "offset": 1, "limit": 1},
+        )
+        unresolved = await session.call_tool(
+            "loci_graph_references",
+            arguments={
                 "repo": str(repo),
-                "namespaces": ["loci"],
-                "edge_types": ["references", "references_type"],
-                "resolutions": ["import-resolved"],
-            }
-            outgoing = await session.call_tool(
-                "loci_graph_traverse_neighbors",
-                arguments={
-                    **edge_arguments,
-                    "seed_ids": ["consumer.py::build#function"],
-                },
+                "file": "consumer.py",
+                "status": "unresolved",
+            },
+        )
+        edge_arguments = {
+            "repo": str(repo),
+            "namespaces": ["loci"],
+            "edge_types": ["references", "references_type"],
+            "resolutions": ["import-resolved"],
+        }
+        outgoing = await session.call_tool(
+            "loci_graph_traverse_neighbors",
+            arguments={
+                **edge_arguments,
+                "seed_ids": ["consumer.py::build#function"],
+            },
+        )
+        incoming = await session.call_tool(
+            "loci_graph_traverse_neighbors",
+            arguments={
+                **edge_arguments,
+                "seed_ids": ["target.py::Thing#class"],
+                "direction": "incoming",
+            },
+        )
+        paths = await session.call_tool(
+            "loci_graph_paths",
+            arguments={
+                **edge_arguments,
+                "source_ids": ["consumer.py::build#function"],
+                "target_ids": ["target.py::Thing#class"],
+            },
+        )
+        target = await session.call_tool(
+            "loci_get",
+            arguments={
+                "repo": str(repo),
+                "symbol_ids": ["target.py::Thing#class"],
+            },
+        )
+        compatibility = await session.call_tool(
+            "loci_graph_neighbors",
+            arguments={
+                "repo": str(repo),
+                "seed_ids": ["consumer.py::build#function"],
+            },
+        )
+        errors = {}
+        for field, arguments in (
+            ("file", {"file": "../consumer.py"}),
+            ("status", {"status": "invalid"}),
+            ("offset", {"offset": -1}),
+            ("limit", {"limit": 501}),
+        ):
+            error = await session.call_tool(
+                "loci_graph_references",
+                arguments={"repo": str(repo), **arguments},
             )
-            incoming = await session.call_tool(
-                "loci_graph_traverse_neighbors",
-                arguments={
-                    **edge_arguments,
-                    "seed_ids": ["target.py::Thing#class"],
-                    "direction": "incoming",
-                },
-            )
-            paths = await session.call_tool(
-                "loci_graph_paths",
-                arguments={
-                    **edge_arguments,
-                    "source_ids": ["consumer.py::build#function"],
-                    "target_ids": ["target.py::Thing#class"],
-                },
-            )
-            target = await session.call_tool(
-                "loci_get",
-                arguments={
-                    "repo": str(repo),
-                    "symbol_ids": ["target.py::Thing#class"],
-                },
-            )
-            compatibility = await session.call_tool(
-                "loci_graph_neighbors",
-                arguments={
-                    "repo": str(repo),
-                    "seed_ids": ["consumer.py::build#function"],
-                },
-            )
-            errors = {}
-            for field, arguments in (
-                ("file", {"file": "../consumer.py"}),
-                ("status", {"status": "invalid"}),
-                ("offset", {"offset": -1}),
-                ("limit", {"limit": 501}),
-            ):
-                error = await session.call_tool(
-                    "loci_graph_references",
-                    arguments={"repo": str(repo), **arguments},
-                )
-                assert error.isError is True
-                errors[field] = error.structuredContent
+            assert error.is_error is True
+            errors[field] = error.structured_content
 
     index_after = (
         hashlib.sha256(index_path.read_bytes()).hexdigest(),
@@ -379,14 +375,14 @@ async def _reference_mcp_after_restart(
     )
     return {
         "schema": schema,
-        "first": first.structuredContent,
-        "second": second.structuredContent,
-        "unresolved": unresolved.structuredContent,
-        "outgoing": outgoing.structuredContent,
-        "incoming": incoming.structuredContent,
-        "paths": paths.structuredContent,
-        "target": target.structuredContent,
-        "compatibility": compatibility.structuredContent,
+        "first": first.structured_content,
+        "second": second.structured_content,
+        "unresolved": unresolved.structured_content,
+        "outgoing": outgoing.structured_content,
+        "incoming": incoming.structured_content,
+        "paths": paths.structured_content,
+        "target": target.structured_content,
+        "compatibility": compatibility.structured_content,
         "errors": errors,
         "index_before": index_before,
         "index_after": index_after,
