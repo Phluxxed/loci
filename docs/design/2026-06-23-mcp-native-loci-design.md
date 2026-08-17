@@ -4,7 +4,7 @@
 
 **Architecture:** Add a local stdio-only MCP server over a small core service layer. The service layer owns indexing, outline, retrieval, search, file reads, grep, and verification as typed Python functions that return structured values. The MCP server exposes those functions as tools with explicit input/output/error schemas. The CLI remains as legacy/debug tooling, but it is no longer the design center.
 
-**Tech Stack:** Python (existing). MCP transport = local stdio only. MCP SDK = official Python SDK pinned to the stable v1 line (`mcp>=1.27,<2`) unless a later audit says v2 is stable and worth adopting. No HTTP server, daemon lifecycle, auth layer, or remote multi-user model.
+**Tech Stack:** Python (existing). MCP transport = local stdio only. MCP SDK = official Python SDK stable v2 line (`mcp>=2,<3`). No HTTP server, daemon lifecycle, auth layer, or remote multi-user model.
 
 ---
 
@@ -22,6 +22,14 @@ The intended production shape is different: an MCP client should launch loci loc
 - No attempt to preserve CLI flags/output as the MCP contract.
 - No silent auto-indexing before read tools.
 - No broad graph/relationship work in this migration.
+
+## SDK selection history
+
+The original 2026-06-23 implementation deliberately selected the stable v1
+SDK line (`mcp>=1.27,<2`) while v2 was not yet ready for production adoption.
+A later audit on 2026-08-17 confirmed v2 as the stable SDK line and selected
+`mcp>=2,<3` for the live implementation. This changes the SDK integration,
+not the local-stdio-only architecture or the established tool contracts.
 
 ## Starting state (audit, 2026-06-23)
 
@@ -179,7 +187,7 @@ Output:
 }
 ```
 
-`loci_get` always returns a `symbols` list, even for one id. This is intentionally different from the CLI, whose single-id output is an object. MCP callers benefit from one stable shape. `loci_outline` similarly returns a `files` list. These explicit object wrappers avoid relying on FastMCP's generic list wrapping behavior.
+`loci_get` always returns a `symbols` list, even for one id. This is intentionally different from the CLI, whose single-id output is an object. MCP callers benefit from one stable shape. `loci_outline` similarly returns a `files` list. These explicit object wrappers avoid relying on MCPServer's generic list wrapping behavior.
 
 ### `loci_search`
 

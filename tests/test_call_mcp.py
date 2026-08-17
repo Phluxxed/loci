@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from mcp import ClientSession, StdioServerParameters
+from mcp import Client, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 from loci.storage.index_store import IndexStore
@@ -197,15 +197,13 @@ async def _call_diagnostics_after_restart(
     fixture = _write_fixture(repo, language)
     server = _server(cache_dir)
 
-    async with stdio_client(server) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            indexed = await session.call_tool(
-                "loci_index",
-                arguments={"repo": str(repo), "incremental": False},
-            )
-            assert indexed.structuredContent is not None
-            assert indexed.structuredContent["graph_calls_resolved"] == 1
+    async with Client(stdio_client(server)) as session:
+        indexed = await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(repo), "incremental": False},
+        )
+        assert indexed.structured_content is not None
+        assert indexed.structured_content["graph_calls_resolved"] == 1
 
     index_path = IndexStore(base_dir=cache_dir)._index_path(repo.resolve())
     index_before = (
@@ -213,50 +211,48 @@ async def _call_diagnostics_after_restart(
         index_path.stat().st_mtime_ns,
     )
 
-    async with stdio_client(server) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            listed = await session.list_tools()
-            tools = [tool.name for tool in listed.tools]
-            schemas = {tool.name: tool.inputSchema for tool in listed.tools}
-            calls = await session.call_tool(
-                "loci_graph_calls",
-                arguments={"repo": str(repo), "file": fixture["file"]},
-            )
-            empty = await session.call_tool(
-                "loci_graph_calls",
-                arguments={"repo": str(repo), "file": "not-indexed.py"},
-            )
-            edge_filters = {
-                "repo": str(repo),
-                "namespaces": ["loci"],
-                "edge_types": ["calls"],
-                "resolutions": ["exact"],
-            }
-            outgoing = await session.call_tool(
-                "loci_graph_traverse_neighbors",
-                arguments={**edge_filters, "seed_ids": [fixture["caller_id"]]},
-            )
-            incoming = await session.call_tool(
-                "loci_graph_traverse_neighbors",
-                arguments={
-                    **edge_filters,
-                    "seed_ids": [fixture["target_id"]],
-                    "direction": "incoming",
-                },
-            )
-            compatibility = await session.call_tool(
-                "loci_graph_neighbors",
-                arguments={"repo": str(repo), "seed_ids": [fixture["caller_id"]]},
-            )
-            health = await session.call_tool(
-                "loci_graph_health",
-                arguments={"repo": str(repo)},
-            )
-            verify = await session.call_tool(
-                "loci_verify",
-                arguments={"repo": str(repo)},
-            )
+    async with Client(stdio_client(server)) as session:
+        listed = await session.list_tools()
+        tools = [tool.name for tool in listed.tools]
+        schemas = {tool.name: tool.input_schema for tool in listed.tools}
+        calls = await session.call_tool(
+            "loci_graph_calls",
+            arguments={"repo": str(repo), "file": fixture["file"]},
+        )
+        empty = await session.call_tool(
+            "loci_graph_calls",
+            arguments={"repo": str(repo), "file": "not-indexed.py"},
+        )
+        edge_filters = {
+            "repo": str(repo),
+            "namespaces": ["loci"],
+            "edge_types": ["calls"],
+            "resolutions": ["exact"],
+        }
+        outgoing = await session.call_tool(
+            "loci_graph_traverse_neighbors",
+            arguments={**edge_filters, "seed_ids": [fixture["caller_id"]]},
+        )
+        incoming = await session.call_tool(
+            "loci_graph_traverse_neighbors",
+            arguments={
+                **edge_filters,
+                "seed_ids": [fixture["target_id"]],
+                "direction": "incoming",
+            },
+        )
+        compatibility = await session.call_tool(
+            "loci_graph_neighbors",
+            arguments={"repo": str(repo), "seed_ids": [fixture["caller_id"]]},
+        )
+        health = await session.call_tool(
+            "loci_graph_health",
+            arguments={"repo": str(repo)},
+        )
+        verify = await session.call_tool(
+            "loci_verify",
+            arguments={"repo": str(repo)},
+        )
 
     index_after = (
         hashlib.sha256(index_path.read_bytes()).hexdigest(),
@@ -267,13 +263,13 @@ async def _call_diagnostics_after_restart(
         "schema": schemas["loci_graph_calls"],
         "imports_schema": schemas["loci_graph_imports"],
         "references_schema": schemas["loci_graph_references"],
-        "calls": calls.structuredContent,
-        "empty": empty.structuredContent,
-        "outgoing": outgoing.structuredContent,
-        "incoming": incoming.structuredContent,
-        "compatibility": compatibility.structuredContent,
-        "health": health.structuredContent,
-        "verify": verify.structuredContent,
+        "calls": calls.structured_content,
+        "empty": empty.structured_content,
+        "outgoing": outgoing.structured_content,
+        "incoming": incoming.structured_content,
+        "compatibility": compatibility.structured_content,
+        "health": health.structured_content,
+        "verify": verify.structured_content,
         "index_before": index_before,
         "index_after": index_after,
     }
@@ -282,50 +278,44 @@ async def _call_diagnostics_after_restart(
 async def _call_errors(repo: Path, cache_dir: Path) -> dict[str, Any]:
     _write_fixture(repo, "python")
     server = _server(cache_dir)
-    async with stdio_client(server) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            await session.call_tool(
-                "loci_index",
-                arguments={"repo": str(repo), "incremental": False},
+    async with Client(stdio_client(server)) as session:
+        await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(repo), "incremental": False},
+        )
+        errors = {}
+        for field, arguments in (
+            ("file", {"file": "../main.py"}),
+            ("status", {"status": "invalid"}),
+            ("offset", {"offset": -1}),
+            ("limit", {"limit": 501}),
+        ):
+            result = await session.call_tool(
+                "loci_graph_calls",
+                arguments={"repo": str(repo), **arguments},
             )
-            errors = {}
-            for field, arguments in (
-                ("file", {"file": "../main.py"}),
-                ("status", {"status": "invalid"}),
-                ("offset", {"offset": -1}),
-                ("limit", {"limit": 501}),
-            ):
-                result = await session.call_tool(
-                    "loci_graph_calls",
-                    arguments={"repo": str(repo), **arguments},
-                )
-                assert result.isError is True
-                errors[field] = result.structuredContent
+            assert result.is_error is True
+            errors[field] = result.structured_content
     return errors
 
 
 async def _call_refresh_after_change(repo: Path, cache_dir: Path) -> dict[str, Any]:
     _write_fixture(repo, "python")
     server = _server(cache_dir)
-    async with stdio_client(server) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            await session.call_tool(
-                "loci_index",
-                arguments={"repo": str(repo), "incremental": False},
-            )
+    async with Client(stdio_client(server)) as session:
+        await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(repo), "incremental": False},
+        )
 
     (repo / "main.py").write_text(
         "def caller():\n    return missing()\n",
         encoding="utf-8",
     )
-    async with stdio_client(server) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            calls = await session.call_tool(
-                "loci_graph_calls",
-                arguments={"repo": str(repo)},
-            )
-    assert calls.structuredContent is not None
-    return calls.structuredContent
+    async with Client(stdio_client(server)) as session:
+        calls = await session.call_tool(
+            "loci_graph_calls",
+            arguments={"repo": str(repo)},
+        )
+    assert calls.structured_content is not None
+    return calls.structured_content
