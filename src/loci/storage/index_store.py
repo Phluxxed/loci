@@ -428,6 +428,7 @@ class IndexStore:
         kind: Optional[str] = None,
         lang: Optional[str] = None,
         limit: int = 20,
+        file_paths: frozenset[str] | None = None,
     ) -> list[dict[str, Any]]:
         index = self.load(repo_path)
         if index is None:
@@ -443,6 +444,8 @@ class IndexStore:
         }
 
         for sym in index["symbols"]:
+            if file_paths is not None and sym.get("file_path") not in file_paths:
+                continue
             if kind and sym.get("kind") != kind:
                 continue
             if lang and sym.get("language") != lang:

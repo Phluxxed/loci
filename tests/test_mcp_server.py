@@ -269,6 +269,45 @@ def test_mcp_search_and_grep_expose_honest_coverage(tmp_path: Path):
     }
 
 
+def test_mcp_search_file_allowlist_schema_filtering_and_errors(tmp_path: Path):
+    result = asyncio.run(
+        _search_file_allowlist_round_trip(
+            tmp_path / "repo",
+            tmp_path / ".codeindex",
+        )
+    )
+
+    file_paths_schema = result["schema"]["properties"]["file_paths"]
+    assert any(
+        option.get("type") == "array" and option["items"]["type"] == "string"
+        for option in file_paths_schema["anyOf"]
+    )
+    assert result["unscoped"]["symbols"][0]["file_path"] == "excluded.py"
+    assert result["scoped"]["symbols"][0]["file_path"] == "allowed.py"
+    assert result["empty"]["symbols"] == []
+    assert (
+        result["unscoped"]["coverage"]
+        == result["scoped"]["coverage"]
+        == result["empty"]["coverage"]
+    )
+    assert result["invalid"]["error"] == {
+        "code": "INVALID_INPUT",
+        "message": "Each file path must be a normalized repository-relative POSIX path",
+        "details": {"field": "file_paths", "index": 0},
+    }
+    assert result["non_string"]["error"]["code"] == "INVALID_INPUT"
+    assert result["non_string"]["error"]["details"] == {
+        "field": "file_paths",
+        "index": 0,
+    }
+    assert result["oversized"]["error"]["code"] == "INVALID_INPUT"
+    assert result["oversized"]["error"]["details"] == {
+        "field": "file_paths",
+        "count": 501,
+        "maximum": 500,
+    }
+
+
 def test_mcp_loci_mcp_command_round_trip(tmp_path: Path, fixtures_dir: Path):
     if shutil.which("loci-mcp") is None:
         pytest.skip("loci-mcp is not installed on PATH")
@@ -980,6 +1019,79 @@ async def _query_coverage_round_trip(
             response = await session.call_tool(tool, arguments=arguments)
             results[name] = response.structured_content
         return results
+
+
+async def _search_file_allowlist_round_trip(
+    repo: Path,
+    cache_dir: Path,
+) -> dict[str, Any]:
+    repo.mkdir()
+    (repo / "excluded.py").write_text("def target():\n    return True\n")
+    (repo / "allowed.py").write_text("def target_helper():\n    return True\n")
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["LOCI_STORE_NAMESPACE"] = "test"
+    env["PYTHONPATH"] = str(Path.cwd() / "src")
+    server_params = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "loci.mcp_server"],
+        env=env,
+        cwd=Path.cwd(),
+    )
+
+    async with Client(stdio_client(server_params)) as session:
+        await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(repo), "incremental": False},
+        )
+        tools = await session.list_tools()
+        schema = next(tool.input_schema for tool in tools.tools if tool.name == "loci_search")
+        unscoped = await session.call_tool(
+            "loci_search",
+            arguments={"repo": str(repo), "query": "target", "limit": 1},
+        )
+        scoped = await session.call_tool(
+            "loci_search",
+            arguments={
+                "repo": str(repo),
+                "query": "target",
+                "limit": 1,
+                "file_paths": ["allowed.py", "allowed.py"],
+            },
+        )
+        empty = await session.call_tool(
+            "loci_search",
+            arguments={"repo": str(repo), "query": "target", "file_paths": []},
+        )
+        invalid = await session.call_tool(
+            "loci_search",
+            arguments={"repo": str(repo), "query": "target", "file_paths": ["/absolute.py"]},
+        )
+        non_string = await session.call_tool(
+            "loci_search",
+            arguments={"repo": str(repo), "query": "target", "file_paths": [7]},
+        )
+        oversized = await session.call_tool(
+            "loci_search",
+            arguments={
+                "repo": str(repo),
+                "query": "target",
+                "file_paths": [f"pages/{index}.md" for index in range(501)],
+            },
+        )
+
+        assert invalid.is_error is True
+        assert non_string.is_error is True
+        assert oversized.is_error is True
+        return {
+            "schema": schema,
+            "unscoped": unscoped.structured_content,
+            "scoped": scoped.structured_content,
+            "empty": empty.structured_content,
+            "invalid": invalid.structured_content,
+            "non_string": non_string.structured_content,
+            "oversized": oversized.structured_content,
+        }
 
 
 async def _graph_neighbors_after_restart(repo: Path, cache_dir: Path) -> dict[str, Any]:

@@ -84,6 +84,7 @@ from loci.storage.store_resolver import StoreResolution, resolve_store_base_dir
 
 REFRESH_LOCK_POLL_SECONDS = 0.05
 REFRESH_LOCK_RECLAIM_GRACE_SECONDS = 1.0
+MAX_SEARCH_FILE_PATHS = 500
 
 
 class SearchSymbolsResult(TypedDict):
@@ -576,6 +577,7 @@ def search_symbols(
     kind: str | None = None,
     lang: str | None = None,
     limit: int = 20,
+    file_paths: list[str] | None = None,
     ensure_fresh: bool = False,
 ) -> list[dict[str, Any]]:
     return search_symbols_result(
@@ -584,8 +586,57 @@ def search_symbols(
         kind=kind,
         lang=lang,
         limit=limit,
+        file_paths=file_paths,
         ensure_fresh=ensure_fresh,
     )["symbols"]
+
+
+def _normalize_search_file_paths(
+    file_paths: list[str] | None,
+) -> frozenset[str] | None:
+    if file_paths is None:
+        return None
+    if not isinstance(file_paths, list):
+        raise LociError(
+            "INVALID_INPUT",
+            "File paths must be a list of normalized repository-relative paths",
+            {"field": "file_paths", "type": type(file_paths).__name__},
+        )
+    if len(file_paths) > MAX_SEARCH_FILE_PATHS:
+        raise LociError(
+            "INVALID_INPUT",
+            "Too many file paths",
+            {
+                "field": "file_paths",
+                "count": len(file_paths),
+                "maximum": MAX_SEARCH_FILE_PATHS,
+            },
+        )
+
+    normalized: set[str] = set()
+    for index, file_path in enumerate(file_paths):
+        valid_path = (
+            isinstance(file_path, str)
+            and bool(file_path)
+            and "\x00" not in file_path
+            and "\\" not in file_path
+        )
+        if valid_path:
+            path = PurePosixPath(file_path)
+            valid_path = (
+                not path.is_absolute()
+                and path != PurePosixPath(".")
+                and ".." not in path.parts
+                and path.as_posix() == file_path
+            )
+        if not valid_path:
+            raise LociError(
+                "INVALID_INPUT",
+                "Each file path must be a normalized repository-relative POSIX path",
+                {"field": "file_paths", "index": index},
+            )
+        normalized.add(file_path)
+    return frozenset(normalized)
 
 
 def search_symbols_result(
@@ -594,6 +645,7 @@ def search_symbols_result(
     kind: str | None = None,
     lang: str | None = None,
     limit: int = 20,
+    file_paths: list[str] | None = None,
     ensure_fresh: bool = False,
 ) -> SearchSymbolsResult:
     repo_path = Path(repo).resolve()
@@ -603,13 +655,21 @@ def search_symbols_result(
             "Limit must be greater than 0",
             {"limit": limit},
         )
+    normalized_file_paths = _normalize_search_file_paths(file_paths)
 
     store = get_store()
     if ensure_fresh:
         ensure_fresh_index(repo_path)
     index = _load_required_index(store, repo_path)
 
-    results = store.search(repo_path, query, kind=kind, lang=lang, limit=limit)
+    results = store.search(
+        repo_path,
+        query,
+        kind=kind,
+        lang=lang,
+        limit=limit,
+        file_paths=normalized_file_paths,
+    )
     if results:
         search_id = str(uuid.uuid4())
         store.log_search(search_id, query, str(repo_path), [result["id"] for result in results])

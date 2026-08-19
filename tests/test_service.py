@@ -12,6 +12,7 @@ import loci.service as service_module
 from loci.graph.contracts import GRAPH_SCHEMA_VERSION, GRAPH_STATE_SCHEMA_VERSION
 from loci.parser.imports import ImportExtractionError
 from loci.service import (
+    MAX_SEARCH_FILE_PATHS,
     LociError,
     analyze_usage,
     ensure_fresh_index,
@@ -369,6 +370,91 @@ def test_service_query_results_report_complete_coverage(
     assert grep_result["coverage"] == {
         **common_coverage,
         "query_scope": "indexed_source_text",
+    }
+
+
+def test_service_search_file_allowlist_preserves_coverage_and_logs_only_results(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "excluded.py").write_text("def target():\n    return True\n")
+    (repo / "allowed.py").write_text("def target_helper():\n    return True\n")
+    index_repo(repo, incremental=False)
+
+    unscoped = search_symbols_result(repo, "target", limit=1)
+    scoped = search_symbols_result(
+        repo,
+        "target",
+        limit=1,
+        file_paths=["allowed.py", "allowed.py"],
+    )
+    empty = search_symbols_result(repo, "target", file_paths=[])
+
+    assert unscoped["symbols"][0]["file_path"] == "excluded.py"
+    assert scoped["symbols"][0]["file_path"] == "allowed.py"
+    assert empty["symbols"] == []
+    assert scoped["coverage"] == unscoped["coverage"] == empty["coverage"]
+
+    log_entries = [
+        json.loads(line)
+        for line in service_module.get_store().base_dir.joinpath("session.jsonl").read_text().splitlines()
+    ]
+    scoped_search = next(
+        entry
+        for entry in reversed(log_entries)
+        if entry["event"] == "search" and entry["result_ids"] == [scoped["symbols"][0]["id"]]
+    )
+    assert "file_paths" not in scoped_search
+    assert all("excluded.py" not in result_id for result_id in scoped_search["result_ids"])
+
+
+@pytest.mark.parametrize(
+    "file_paths",
+    [
+        "allowed.py",
+        [""],
+        ["/absolute.py"],
+        ["../parent.py"],
+        ["src/\x00bad.py"],
+        ["src\\windows.py"],
+        ["src/./unnormalized.py"],
+        [7],
+    ],
+)
+def test_service_search_rejects_invalid_file_allowlists(
+    sample_repo: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    file_paths: object,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+
+    with pytest.raises(LociError) as exc_info:
+        search_symbols_result(sample_repo, "add", file_paths=file_paths)  # type: ignore[arg-type]
+
+    assert exc_info.value.code == "INVALID_INPUT"
+    assert exc_info.value.details["field"] == "file_paths"
+
+
+def test_service_search_rejects_oversized_file_allowlist(
+    sample_repo: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    file_paths = [f"pages/{index}.md" for index in range(MAX_SEARCH_FILE_PATHS + 1)]
+
+    with pytest.raises(LociError) as exc_info:
+        search_symbols_result(sample_repo, "add", file_paths=file_paths)
+
+    assert exc_info.value.code == "INVALID_INPUT"
+    assert exc_info.value.details == {
+        "field": "file_paths",
+        "count": MAX_SEARCH_FILE_PATHS + 1,
+        "maximum": MAX_SEARCH_FILE_PATHS,
     }
 
 
