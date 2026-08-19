@@ -7,6 +7,7 @@ from typing import Any, Literal, cast
 from mcp.server.mcpserver import Context, MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import CallToolResult, InputRequiredResult, TextContent
+from pydantic import SkipValidation
 
 from loci.graph.traversal import GraphDirection
 from loci.service import (
@@ -317,6 +318,7 @@ def create_server() -> MCPServer:
         kind: str | None = None,
         lang: str | None = None,
         limit: int = 20,
+        file_paths: SkipValidation[list[str] | None] = None,
     ) -> CallToolResult:
         """Search indexed symbols and report bounded repository coverage."""
         return _handle_loci_error(
@@ -326,6 +328,7 @@ def create_server() -> MCPServer:
                 kind=kind,
                 lang=lang,
                 limit=limit,
+                file_paths=file_paths,
                 ensure_fresh=True,
             )
         )

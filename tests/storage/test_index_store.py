@@ -726,6 +726,48 @@ def test_search_empty_query_returns_all(store_with_data):
     assert len(results) == 3
 
 
+def test_search_file_allowlist_filters_before_ranking_and_limit(store_with_data):
+    store, path = store_with_data
+
+    unscoped = store.search(path, "password", limit=1)
+    scoped = store.search(
+        path,
+        "password",
+        limit=1,
+        file_paths=frozenset({"src/auth.py"}),
+    )
+
+    assert unscoped[0]["id"] == "src/utils.py::hash_password#function"
+    assert scoped[0]["id"] == "src/auth.py::login#function"
+
+
+def test_search_empty_file_allowlist_matches_no_symbols(store_with_data):
+    store, path = store_with_data
+
+    assert store.search(path, "", file_paths=frozenset()) == []
+
+
+def test_search_file_allowlist_keeps_all_sections_from_allowed_markdown_page(
+    store: IndexStore,
+    tmp_path: Path,
+):
+    source_path = tmp_path / "repo"
+    source_path.mkdir()
+    (source_path / "guide.md").write_text("# Guide\n\n## Install\n\nBody.\n")
+    store.write(source_path, _markdown_symbols(), file_hashes={"guide.md": "abc123"})
+
+    results = store.search(
+        source_path,
+        "",
+        file_paths=frozenset({"guide.md"}),
+    )
+
+    assert [result["id"] for result in results] == [
+        "guide.md::Guide#section",
+        "guide.md::Guide > Install#section",
+    ]
+
+
 def test_search_tokenizes_hyphenated_query_words(store: IndexStore, tmp_path: Path):
     source_path = tmp_path / "repo"
     source_path.mkdir()
