@@ -26,6 +26,15 @@
 {"symbols":[{"id":"...","name":"...","kind":"function","score":20.0,"signature":"...","summary":""}],"coverage":{"schema_version":1,"state":"partial","scope":"repository","source_scope":"indexed_supported_source","query_scope":"indexed_symbols","indexed_files":12,"excluded_paths":3,"exclusions":[{"reason":"ignored","paths":1,"samples":["local.py"],"omitted_samples":0},{"reason":"policy_excluded","paths":2,"samples":[".git","build"],"omitted_samples":0}],"unknown_reason":null}}
 ```
 
+`loci_search.file_paths` is an optional caller-supplied exact-file eligibility
+allowlist. Omission or `null` searches the complete indexed repository; an empty
+list makes no files eligible. Entries must be normalized repository-relative
+POSIX paths, and the bounded list accepts at most 500 entries. Eligibility is
+applied before scoring, sorting, search logging, and `limit`, while coverage
+continues to describe the complete repository index. Invalid paths, values, or
+list sizes return structured `INVALID_INPUT` errors. This is a generic search
+scope; callers retain ownership of any domain meaning attached to the paths.
+
 `loci_grep` returns matching lines with context and the same coverage shape:
 
 ```json
