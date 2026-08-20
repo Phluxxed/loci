@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import sys
-from typing import Any, Literal, cast
+from typing import Annotated, Any, Literal, cast
 
 from mcp.server.mcpserver import Context, MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -10,6 +10,28 @@ from mcp.types import CallToolResult, InputRequiredResult, TextContent
 from pydantic import SkipValidation
 
 from loci.graph.traversal import GraphDirection
+from loci.mcp_output_models import (
+    LociAnalyzeOutput,
+    LociFileOutput,
+    LociGetOutput,
+    LociGraphAnchorsOutput,
+    LociGraphCallsOutput,
+    LociGraphHealthOutput,
+    LociGraphImportsOutput,
+    LociGraphNeighborsOutput,
+    LociGraphPathsOutput,
+    LociGraphReferencesOutput,
+    LociGraphRetrieveOutput,
+    LociGraphTraverseNeighborsOutput,
+    LociGrepOutput,
+    LociIndexOutput,
+    LociListOutput,
+    LociOutlineOutput,
+    LociSearchOutput,
+    LociStatsOutput,
+    LociStoreHealthOutput,
+    LociVerifyOutput,
+)
 from loci.service import (
     LociError,
     analyze_usage,
@@ -93,19 +115,29 @@ def create_server() -> MCPServer:
     )
 
     @mcp.tool()
-    def loci_index(repo: str, incremental: bool = True) -> CallToolResult:
+    def loci_index(
+        repo: str,
+        incremental: bool = True,
+    ) -> Annotated[CallToolResult, LociIndexOutput]:
         """Index a local repository path into the loci cache."""
         return _handle_loci_error(lambda: index_repo(repo, incremental=incremental))
 
     @mcp.tool()
-    def loci_outline(repo: str, file: str | None = None) -> CallToolResult:
+    def loci_outline(
+        repo: str,
+        file: str | None = None,
+    ) -> Annotated[CallToolResult, LociOutlineOutput]:
         """Return indexed symbols grouped by file."""
         return _handle_loci_error(
             lambda: {"files": outline_repo(repo, file=file, ensure_fresh=True)}
         )
 
     @mcp.tool()
-    def loci_get(repo: str, symbol_ids: list[str], context: int = 0) -> CallToolResult:
+    def loci_get(
+        repo: str,
+        symbol_ids: list[str],
+        context: int = 0,
+    ) -> Annotated[CallToolResult, LociGetOutput]:
         """Return exact source for one or more indexed symbol ids."""
         return _handle_loci_error(
             lambda: {
@@ -124,7 +156,7 @@ def create_server() -> MCPServer:
         question: str,
         seed_ids: list[str] | None = None,
         max_anchors: int = 10,
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, LociGraphAnchorsOutput]:
         """Select a small, explained set of graph anchors for a question."""
         return _handle_loci_error(
             lambda: graph_anchors(
@@ -140,7 +172,7 @@ def create_server() -> MCPServer:
     def loci_graph_neighbors(
         repo: str,
         seed_ids: list[str],
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, LociGraphNeighborsOutput]:
         """Return exact outgoing one-hop graph neighbours for indexed seed nodes."""
         return _handle_loci_error(
             lambda: graph_neighbors(repo, seed_ids, ensure_fresh=True)
@@ -155,7 +187,7 @@ def create_server() -> MCPServer:
         resolutions: list[str] | None = None,
         direction: str = "outgoing",
         max_neighbors: int = 64,
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, LociGraphTraverseNeighborsOutput]:
         """Return filtered one-hop graph neighbours without widening exact reads."""
         return _handle_loci_error(
             lambda: graph_traverse_neighbors(
@@ -185,7 +217,7 @@ def create_server() -> MCPServer:
         path_offset: int = 0,
         max_evidence_bytes: int = 32_768,
         max_estimated_tokens: int = 8_192,
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, LociGraphPathsOutput]:
         """Find bounded endpoint paths with exact edge evidence."""
         return _handle_loci_error(
             lambda: graph_paths(
@@ -222,7 +254,7 @@ def create_server() -> MCPServer:
         path_offset: int = 0,
         max_evidence_bytes: int = 32_768,
         max_estimated_tokens: int = 8_192,
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, LociGraphRetrieveOutput]:
         """Retrieve bounded question-shaped graph evidence and rejected paths."""
         return _handle_loci_error(
             lambda: graph_retrieve(
@@ -245,7 +277,9 @@ def create_server() -> MCPServer:
         )
 
     @mcp.tool()
-    def loci_graph_health(repo: str) -> CallToolResult:
+    def loci_graph_health(
+        repo: str,
+    ) -> Annotated[CallToolResult, LociGraphHealthOutput]:
         """Inspect loaded graph profiles, active record counts, and diagnostics."""
         return _handle_loci_error(
             lambda: graph_health(repo, ensure_fresh=True)
@@ -258,7 +292,7 @@ def create_server() -> MCPServer:
         status: str = "all",
         offset: int = 0,
         limit: int = 100,
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, LociGraphImportsOutput]:
         """Inspect bounded resolved and unresolved built-in import records."""
         return _handle_loci_error(
             lambda: graph_imports(
@@ -278,7 +312,7 @@ def create_server() -> MCPServer:
         status: str = "all",
         offset: int = 0,
         limit: int = 100,
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, LociGraphReferencesOutput]:
         """Inspect bounded resolved and unresolved imported-symbol references."""
         return _handle_loci_error(
             lambda: graph_references(
@@ -298,7 +332,7 @@ def create_server() -> MCPServer:
         status: str = "all",
         offset: int = 0,
         limit: int = 100,
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, LociGraphCallsOutput]:
         """Inspect bounded resolved and unresolved definite-call records."""
         return _handle_loci_error(
             lambda: graph_calls(
@@ -319,7 +353,7 @@ def create_server() -> MCPServer:
         lang: str | None = None,
         limit: int = 20,
         file_paths: SkipValidation[list[str] | None] = None,
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, LociSearchOutput]:
         """Search indexed symbols and report bounded repository coverage."""
         return _handle_loci_error(
             lambda: search_symbols_result(
@@ -339,7 +373,7 @@ def create_server() -> MCPServer:
         file_path: str,
         start_line: int | None = None,
         end_line: int | None = None,
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, LociFileOutput]:
         """Return cached file content by relative path and optional line range."""
         return _handle_loci_error(
             lambda: get_cached_file(
@@ -352,19 +386,22 @@ def create_server() -> MCPServer:
         )
 
     @mcp.tool()
-    def loci_grep(repo: str, pattern: str) -> CallToolResult:
+    def loci_grep(
+        repo: str,
+        pattern: str,
+    ) -> Annotated[CallToolResult, LociGrepOutput]:
         """Regex-search cached files and report bounded repository coverage."""
         return _handle_loci_error(
             lambda: grep_repo_result(repo, pattern, ensure_fresh=True)
         )
 
     @mcp.tool()
-    def loci_verify(repo: str) -> CallToolResult:
+    def loci_verify(repo: str) -> Annotated[CallToolResult, LociVerifyOutput]:
         """Verify index integrity and content drift for an indexed repository."""
         return _handle_loci_error(lambda: verify_repo(repo))
 
     @mcp.tool()
-    def loci_list() -> CallToolResult:
+    def loci_list() -> Annotated[CallToolResult, LociListOutput]:
         """List repositories present in the loci cache."""
         return _handle_loci_error(lambda: {"repos": list_repos()})
 
@@ -376,7 +413,7 @@ def create_server() -> MCPServer:
         max_index_bytes: int = DEFAULT_MAX_INDEX_BYTES,
         max_probe_paths: int = DEFAULT_MAX_PROBE_PATHS,
         max_probe_bytes: int = DEFAULT_MAX_PROBE_BYTES,
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, LociStoreHealthOutput]:
         """Inspect bounded read-only freshness, liveness, integrity, and overlaps."""
         return _handle_loci_error(
             lambda: store_health(
@@ -394,7 +431,7 @@ def create_server() -> MCPServer:
         repo: str | None = None,
         since_days: int = 7,
         all_time: bool = False,
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, LociStatsOutput]:
         """Return structured session retrieval stats for the active loci store."""
         return _handle_loci_error(
             lambda: session_stats(
@@ -404,7 +441,10 @@ def create_server() -> MCPServer:
         )
 
     @mcp.tool()
-    def loci_analyze(repo: str | None = None, since_days: int = 30) -> CallToolResult:
+    def loci_analyze(
+        repo: str | None = None,
+        since_days: int = 30,
+    ) -> Annotated[CallToolResult, LociAnalyzeOutput]:
         """Analyze loci usage logs and return actionable tool-quality findings."""
         return _handle_loci_error(
             lambda: analyze_usage(repo=repo, since_days=since_days)

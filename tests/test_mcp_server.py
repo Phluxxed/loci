@@ -10,6 +10,7 @@ from typing import Any
 import pytest
 from mcp import Client, ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+from mcp.types import CallToolResult
 
 from loci.storage.store_identity import initialize_store
 
@@ -105,10 +106,19 @@ def test_mcp_index_outline_get_round_trip(tmp_path: Path, fixtures_dir: Path):
         "loci_store_health",
         "loci_verify",
     ]
+    assert result["missing_output_schemas"] == []
     assert result["outline"]["files"][0]["file"] == "sample.py"
     assert any(symbol["name"] == "add" for symbol in result["search"]["symbols"])
     assert "def add" in result["get"]["symbols"][0]["source"]
     assert "def add" in result["file"]["content"]
+    assert result["file_output_schema"] is not None
+    assert "result" not in result["file_output_schema"].get("properties", {})
+    assert len(result["file_output_schema"]["anyOf"]) == 2
+    assert result["file_result_type"] == CallToolResult.__name__
+    assert result["file_wire"]["structuredContent"] == result["file"]
+    assert "result" not in result["file_wire"]["structuredContent"]
+    assert result["missing_file_is_error"] is True
+    assert result["missing_file"]["error"]["code"] == "FILE_NOT_FOUND"
     assert result["grep"]["matches"][0]["file"] == "sample.py"
     assert result["anchors"]["selection"] == "inferred"
     assert result["anchors"]["anchors"][0]["node"]["id"] == (
@@ -710,6 +720,12 @@ async def _round_trip(
     async with Client(stdio_client(server_params)) as session:
         tools = await session.list_tools()
         tool_names = sorted(tool.name for tool in tools.tools)
+        missing_output_schemas = [
+            tool.name for tool in tools.tools if tool.output_schema is None
+        ]
+        file_output_schema = next(
+            tool.output_schema for tool in tools.tools if tool.name == "loci_file"
+        )
 
         indexed = await session.call_tool(
             "loci_index",
@@ -744,6 +760,13 @@ async def _round_trip(
                 "file_path": "sample.py",
                 "start_line": 4,
                 "end_line": 5,
+            },
+        )
+        missing_file = await session.call_tool(
+            "loci_file",
+            arguments={
+                "repo": str(repo),
+                "file_path": "missing.py",
             },
         )
         grep = await session.call_tool(
@@ -792,11 +815,21 @@ async def _round_trip(
 
     return {
         "tools": tool_names,
+        "missing_output_schemas": missing_output_schemas,
+        "file_output_schema": file_output_schema,
         "indexed": indexed.structured_content,
         "outline": outline.structured_content,
         "get": source.structured_content,
         "search": search.structured_content,
         "file": file_result.structured_content,
+        "file_result_type": type(file_result).__name__,
+        "file_wire": file_result.model_dump(
+            mode="json",
+            by_alias=True,
+            exclude_none=True,
+        ),
+        "missing_file_is_error": missing_file.is_error,
+        "missing_file": missing_file.structured_content,
         "grep": grep.structured_content,
         "anchors": anchors.structured_content,
         "graph": graph.structured_content,
