@@ -393,7 +393,6 @@ class AnalyzeFinding(StrictOutputModel):
         "search_ranking_poor",
         "kind_dead_weight",
         "poor_extraction",
-        "refetch_hotspot",
     ]
     severity: Literal["high", "medium", "low"]
     data: dict[str, JSONValue]

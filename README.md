@@ -649,8 +649,7 @@ reads that log and surfaces actionable findings:
 | `search_miss` | Symbol exists but search returned nothing — fix keyword extraction |
 | `search_blind_spot` | Repeated explicit selections were not surfaced in the search results returned to the agent |
 | `search_ranking_poor` | Repeated explicit selections appeared fourth or lower too often |
-| `poor_extraction` | High refetch rate on a symbol kind |
-| `refetch_hotspot` | Same symbol fetched repeatedly in a session |
+| `poor_extraction` | At least ten eligible retrievals for a language averaged less than 50% byte savings |
 | `kind_dead_weight` | A symbol kind is indexed but never retrieved |
 
 Search quality uses explicit agent-declared lineage. A non-empty `loci_search`

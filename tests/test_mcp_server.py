@@ -4,6 +4,7 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Any
 
@@ -12,6 +13,7 @@ from mcp import Client, ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from mcp.types import CallToolResult
 
+from loci.storage.index_store import IndexStore
 from loci.storage.store_identity import initialize_store
 
 
@@ -140,6 +142,109 @@ def test_mcp_index_outline_get_round_trip(tmp_path: Path, fixtures_dir: Path):
     assert "summary" in result["analyze"]
     assert result["analyze"]["store"]["base_dir"] == str((tmp_path / ".codeindex").resolve())
     assert result["invalid_grep"]["error"]["code"] == "INVALID_REGEX"
+
+
+def test_mcp_analyze_reports_only_supported_findings(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    other_repo = tmp_path / "other-repo"
+    other_repo.mkdir()
+    cache_dir = tmp_path / ".codeindex"
+    initialize_store(cache_dir, "test")
+    store = IndexStore(cache_dir)
+
+    for index in range(9):
+        store.log_retrieval(
+            symbol_id="src/foo.rs::hotspot" if index < 3 else f"src/foo.rs::item_{index}",
+            symbol_bytes=800,
+            file_bytes=1000,
+            repo_path=str(repo),
+            kind="function",
+            language="rust",
+        )
+    for index in range(10):
+        store.log_retrieval(
+            symbol_id=f"src/efficient.py::item_{index}",
+            symbol_bytes=100,
+            file_bytes=1000,
+            repo_path=str(repo),
+            kind="function",
+            language="python",
+        )
+    store.log_retrieval(
+        symbol_id="src/other.rs::item",
+        symbol_bytes=800,
+        file_bytes=1000,
+        repo_path=str(other_repo),
+        kind="function",
+        language="rust",
+    )
+    with (cache_dir / "session.jsonl").open("a", encoding="utf-8") as log:
+        log.write(json.dumps({
+            "ts": time.time() - 8 * 86400,
+            "event": "get",
+            "symbol_id": "src/old.rs::item",
+            "symbol_bytes": 800,
+            "file_bytes": 1000,
+            "repo": str(repo.resolve()),
+            "kind": "function",
+            "language": "rust",
+        }) + "\n")
+        log.write(json.dumps({
+            "ts": time.time(),
+            "event": "get",
+            "symbol_id": "src/invalid.rs::item",
+            "symbol_bytes": 800,
+            "file_bytes": 0,
+            "repo": str(repo.resolve()),
+            "kind": "function",
+            "language": "rust",
+        }) + "\n")
+        log.write(json.dumps({
+            "ts": time.time(),
+            "event": "get",
+            "symbol_id": "src/unknown::item",
+            "symbol_bytes": 800,
+            "file_bytes": 1000,
+            "repo": str(repo.resolve()),
+            "kind": "function",
+            "language": None,
+        }) + "\n")
+
+    result = asyncio.run(_analyze_findings_round_trip(repo, cache_dir))
+
+    assert not any(
+        finding["type"] == "poor_extraction"
+        for finding in result["before"]["findings"]
+    )
+    assert not any(
+        finding["type"] == "refetch_hotspot"
+        for response in (result["before"], result["after"])
+        for finding in response["findings"]
+    )
+    poor_extraction = [
+        finding
+        for finding in result["after"]["findings"]
+        if finding["type"] == "poor_extraction"
+    ]
+    assert poor_extraction == [{
+        "type": "poor_extraction",
+        "severity": "medium",
+        "data": {
+            "language": "rust",
+            "get_count": 10,
+            "symbol_bytes": 8000,
+            "file_bytes": 10000,
+            "avg_ratio_pct": 20,
+        },
+        "suggestion": (
+            "rust symbols average 20% savings ratio across 10 eligible retrievals. "
+            "Extractor may be including too much context per symbol."
+        ),
+    }]
+    schema_text = json.dumps(result["output_schema"], sort_keys=True)
+    assert "poor_extraction" in schema_text
+    assert "refetch_hotspot" not in schema_text
 
 
 def test_mcp_modern_protocol_index_read_error_round_trip(tmp_path: Path) -> None:
@@ -1010,6 +1115,50 @@ async def _round_trip(
         "stats": stats.structured_content,
         "analyze": analyze.structured_content,
         "invalid_grep": invalid_grep.structured_content,
+    }
+
+
+async def _analyze_findings_round_trip(
+    repo: Path,
+    cache_dir: Path,
+) -> dict[str, Any]:
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["LOCI_STORE_NAMESPACE"] = "test"
+    env["PYTHONPATH"] = str(Path.cwd() / "src")
+    server_params = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "loci.mcp_server"],
+        env=env,
+        cwd=Path.cwd(),
+    )
+
+    async with Client(stdio_client(server_params)) as session:
+        tools = await session.list_tools()
+        output_schema = next(
+            tool.output_schema for tool in tools.tools if tool.name == "loci_analyze"
+        )
+        before = await session.call_tool(
+            "loci_analyze",
+            arguments={"repo": str(repo), "since_days": 7},
+        )
+        IndexStore(cache_dir).log_retrieval(
+            symbol_id="src/foo.rs::item_9",
+            symbol_bytes=800,
+            file_bytes=1000,
+            repo_path=str(repo),
+            kind="function",
+            language="rust",
+        )
+        after = await session.call_tool(
+            "loci_analyze",
+            arguments={"repo": str(repo), "since_days": 7},
+        )
+
+    return {
+        "before": before.structured_content,
+        "after": after.structured_content,
+        "output_schema": output_schema,
     }
 
 

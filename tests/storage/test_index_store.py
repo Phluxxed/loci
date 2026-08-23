@@ -1321,36 +1321,6 @@ def test_analyze_kind_dead_weight_finding(tmp_path):
     assert finding["severity"] == "low"
 
 
-def test_analyze_poor_extraction_finding(tmp_path):
-    store = IndexStore(tmp_path)
-    _write_log(tmp_path, [
-        {"ts": time.time(), "event": "get", "symbol_id": "src/foo.rs::bar",
-         "symbol_bytes": 800, "file_bytes": 1000, "repo": "/r",
-         "kind": "function", "language": "rust",
-         "search_id": None, "search_rank": None},
-    ] * 5)
-    result = store.analyze()
-    finding = next((f for f in result["findings"] if f["type"] == "poor_extraction"), None)
-    assert finding is not None
-    assert finding["data"]["language"] == "rust"
-    assert finding["severity"] == "medium"
-
-
-def test_analyze_refetch_hotspot_finding(tmp_path):
-    store = IndexStore(tmp_path)
-    _write_log(tmp_path, [
-        {"ts": time.time(), "event": "get", "symbol_id": "src/foo.py::bar",
-         "symbol_bytes": 100, "file_bytes": 1000, "repo": "/r",
-         "kind": "function", "language": "python",
-         "search_id": None, "search_rank": None},
-    ] * 4)
-    result = store.analyze()
-    finding = next((f for f in result["findings"] if f["type"] == "refetch_hotspot"), None)
-    assert finding is not None
-    assert finding["data"]["symbols"][0]["symbol_id"] == "src/foo.py::bar"
-    assert finding["data"]["symbols"][0]["fetch_count"] == 4
-
-
 def test_analyze_summary_reports_explicit_selection_counts(tmp_path):
     store = IndexStore(tmp_path)
     _write_log(tmp_path, [
