@@ -29,6 +29,7 @@ INDEX_SCHEMA_VERSION = 6
 EXTRACTOR_VERSION = 12
 MIN_SEARCH_SELECTIONS = 10
 MIN_ADVERSE_SEARCH_SELECTIONS = 3
+MIN_EXTRACTION_RETRIEVALS = 10
 SEARCH_NOT_SURFACED_THRESHOLD = 0.15
 SEARCH_POOR_RANK_THRESHOLD = 0.20
 
@@ -1119,44 +1120,53 @@ class IndexStore:
                     ),
                 })
 
-        # --- poor_extraction: language avg savings ratio < 50% ---
-        lang_bytes: dict[str, dict[str, int]] = defaultdict(lambda: {"symbol": 0, "file": 0})
+        # --- poor_extraction: qualified language savings ratio < 50% ---
+        lang_bytes: dict[str, dict[str, int]] = defaultdict(
+            lambda: {"count": 0, "symbol": 0, "file": 0}
+        )
         for g in gets:
             lang = g.get("language")
-            if lang:
-                lang_bytes[lang]["symbol"] += g.get("symbol_bytes", 0)
-                lang_bytes[lang]["file"] += g.get("file_bytes", 0)
+            symbol_bytes = g.get("symbol_bytes", 0)
+            file_bytes = g.get("file_bytes")
+            if not isinstance(lang, str) or not lang.strip():
+                continue
+            if (
+                not isinstance(file_bytes, int)
+                or isinstance(file_bytes, bool)
+                or file_bytes <= 0
+            ):
+                continue
+            if (
+                not isinstance(symbol_bytes, int)
+                or isinstance(symbol_bytes, bool)
+                or symbol_bytes < 0
+            ):
+                continue
+            lang_bytes[lang]["count"] += 1
+            lang_bytes[lang]["symbol"] += symbol_bytes
+            lang_bytes[lang]["file"] += file_bytes
         for lang, b in lang_bytes.items():
-            if b["file"] == 0:
+            if b["count"] < MIN_EXTRACTION_RETRIEVALS:
                 continue
             ratio = (b["file"] - b["symbol"]) / b["file"]
             if ratio < 0.50:
+                ratio_pct = round(ratio * 100)
                 findings.append({
                     "type": "poor_extraction",
                     "severity": "medium",
-                    "data": {"language": lang, "avg_ratio_pct": round(ratio * 100)},
+                    "data": {
+                        "language": lang,
+                        "get_count": b["count"],
+                        "symbol_bytes": b["symbol"],
+                        "file_bytes": b["file"],
+                        "avg_ratio_pct": ratio_pct,
+                    },
                     "suggestion": (
-                        f"{lang} symbols average {round(ratio * 100)}% savings ratio. "
+                        f"{lang} symbols average {ratio_pct}% savings ratio across "
+                        f"{b['count']} eligible retrievals. "
                         "Extractor may be including too much context per symbol."
                     ),
                 })
-
-        # --- refetch_hotspot: same symbol fetched 3+ times ---
-        fetch_counts = Counter(g["symbol_id"] for g in gets if g.get("symbol_id"))
-        hotspots = sorted(
-            [{"symbol_id": sid, "fetch_count": cnt} for sid, cnt in fetch_counts.items() if cnt >= 3],
-            key=lambda x: x["fetch_count"], reverse=True,
-        )
-        if hotspots:
-            findings.append({
-                "type": "refetch_hotspot",
-                "severity": "low",
-                "data": {"symbols": hotspots[:10]},
-                "suggestion": (
-                    f"{len(hotspots)} symbol(s) fetched 3+ times. "
-                    "They may be too large to stay in context — consider splitting or summarizing."
-                ),
-            })
 
         # --- Summary ---
         all_ts = [e["ts"] for e in gets + searches + selections + misses if e.get("ts")]

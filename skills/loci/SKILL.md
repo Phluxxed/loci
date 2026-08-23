@@ -77,9 +77,9 @@ resolver guarantees and limits, read
   stale outcomes as bounded evidence that loci did not prove a relationship.
   Do not replace a failed resolution with repository-wide filename, package,
   or symbol-name guesses.
-- Use `loci_analyze` when search misses, ranking is poor, extraction quality
-  looks suspect, or repeated refetches suggest a blind spot. Treat findings as
-  diagnostics to inspect, not orders to follow blindly.
+- Use `loci_analyze` when search misses, ranking is poor, or extraction quality
+  looks suspect. Treat findings as diagnostics to inspect, not orders to
+  follow blindly.
 - Prefer `loci_stats` for structured retrieval/savings evidence. Use
   `loci stats --pretty` only for a human-readable shell or tmux view.
 - Use `loci_list` when choosing among indexed roots, `loci_verify` for index
