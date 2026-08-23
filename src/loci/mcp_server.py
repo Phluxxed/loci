@@ -137,8 +137,9 @@ def create_server() -> MCPServer:
         repo: str,
         symbol_ids: list[str],
         context: int = 0,
+        selected_from_search_id: str | None = None,
     ) -> Annotated[CallToolResult, LociGetOutput]:
-        """Return exact source for one or more indexed symbol ids."""
+        """Return exact source. Set lineage only for deliberate search selections; omit it for direct, outline, or hydration gets."""
         return _handle_loci_error(
             lambda: {
                 "symbols": get_symbols(
@@ -146,6 +147,7 @@ def create_server() -> MCPServer:
                     symbol_ids,
                     context=context,
                     ensure_fresh=True,
+                    selected_from_search_id=selected_from_search_id,
                 )
             }
         )
@@ -354,7 +356,7 @@ def create_server() -> MCPServer:
         limit: int = 20,
         file_paths: SkipValidation[list[str] | None] = None,
     ) -> Annotated[CallToolResult, LociSearchOutput]:
-        """Search indexed symbols and report bounded repository coverage."""
+        """Search indexed symbols and return an opaque id for explicit downstream selections."""
         return _handle_loci_error(
             lambda: search_symbols_result(
                 repo,

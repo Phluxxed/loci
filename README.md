@@ -192,8 +192,8 @@ names.
 |---|---|
 | `loci_index` | Index a local repo path, optionally incrementally |
 | `loci_outline` | Return indexed symbols grouped by file |
-| `loci_search` | Search indexed symbols by query |
-| `loci_get` | Return exact source for one or more symbol IDs |
+| `loci_search` | Search indexed symbols and return an opaque ID for explicit downstream selections |
+| `loci_get` | Return exact source; optionally declare deliberate selection from a specific search |
 | `loci_file` | Return cached file content with optional line range |
 | `loci_grep` | Regex-search cached files |
 | `loci_graph_anchors` | Select a bounded, explained set of graph start nodes from a question or exact seeds |
@@ -647,11 +647,21 @@ reads that log and surfaces actionable findings:
 | Finding type | What it means |
 |---|---|
 | `search_miss` | Symbol exists but search returned nothing — fix keyword extraction |
-| `search_blind_spot` | A symbol kind is never surfaced by search |
-| `search_ranking_poor` | Correct symbol exists but ranked too low |
+| `search_blind_spot` | Repeated explicit selections were not surfaced in the search results returned to the agent |
+| `search_ranking_poor` | Repeated explicit selections appeared fourth or lower too often |
 | `poor_extraction` | High refetch rate on a symbol kind |
 | `refetch_hotspot` | Same symbol fetched repeatedly in a session |
 | `kind_dead_weight` | A symbol kind is indexed but never retrieved |
+
+Search quality uses explicit agent-declared lineage. A non-empty `loci_search`
+returns `search_id`; pass it as `selected_from_search_id` to `loci_get` only
+when every requested symbol was deliberately selected because of that search.
+Direct, outline-driven, and hydration gets omit it. Loci validates the search
+against the same repository and derives rank from the recorded returned-result
+order. Analysis ignores legacy time-correlated get fields, requires at least
+ten eligible selections and three adverse selections before reporting either
+search-quality finding, and reports factual selection counts instead of an
+inferred correlation percentage.
 
 For a shell or tmux stats readout, use `loci stats --pretty`. Without
 `LOCI_BASE_DIR`, CLI stats prefer the configured Codex MCP store when it is

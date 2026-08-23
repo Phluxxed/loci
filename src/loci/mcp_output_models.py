@@ -189,6 +189,7 @@ class SearchSymbol(StoredSymbol):
 class LociSearchSuccess(StrictOutputModel):
     symbols: list[SearchSymbol]
     coverage: QueryCoverage
+    search_id: str | None
 
 
 class LociSearchOutput(RootModel[LociSearchSuccess | LociErrorOutput]):
@@ -380,7 +381,9 @@ class AnalyzeSummary(StrictOutputModel):
     total_searches: int
     total_misses: int
     miss_rate: float
-    correlated_pct: float
+    explicit_search_selections: int
+    ranked_search_selections: int
+    not_surfaced_search_selections: int
 
 
 class AnalyzeFinding(StrictOutputModel):

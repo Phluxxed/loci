@@ -1,7 +1,6 @@
 import hashlib
 import json
 import time
-import time as time_module
 from dataclasses import replace
 from pathlib import Path
 
@@ -1071,24 +1070,31 @@ def test_log_retrieval_includes_kind_and_language(tmp_path):
     assert entries[0]["language"] == "python"
 
 
-def test_log_retrieval_includes_search_correlation(tmp_path):
+def test_log_retrieval_does_not_include_search_lineage(tmp_path):
     store = IndexStore(tmp_path)
     store.log_retrieval(
         "src/foo.py::bar", symbol_bytes=100, file_bytes=1000,
-        repo_path="/repo", kind="function", language="python",
-        search_id="abc123", search_rank=2
+        repo_path="/repo", kind="function", language="python"
     )
     entry = json.loads((tmp_path / "session.jsonl").read_text().strip())
-    assert entry["search_id"] == "abc123"
-    assert entry["search_rank"] == 2
+    assert "search_id" not in entry
+    assert "search_rank" not in entry
 
 
-def test_log_retrieval_search_correlation_defaults_to_null(tmp_path):
+def test_log_search_selection_records_explicit_provenance(tmp_path):
     store = IndexStore(tmp_path)
-    store.log_retrieval("src/foo.py::bar", symbol_bytes=100, file_bytes=1000, repo_path="/repo")
+    store.log_search_selection("abc123", "src/foo.py::bar", "/repo", 2)
     entry = json.loads((tmp_path / "session.jsonl").read_text().strip())
-    assert entry["search_id"] is None
-    assert entry["search_rank"] is None
+    assert entry == {
+        "ts": entry["ts"],
+        "event": "search_selection",
+        "schema_version": 1,
+        "provenance": "explicit",
+        "search_id": "abc123",
+        "symbol_id": "src/foo.py::bar",
+        "repo": "/repo",
+        "search_rank": 2,
+    }
 
 
 def test_log_retrieval_old_stats_aggregation_unaffected(tmp_path):
@@ -1142,10 +1148,9 @@ def test_reset_session_consecutive_resets_do_not_clobber(tmp_path):
     assert "two" in second.read_text()
 
 
-def test_log_search_writes_event_and_last_search_file(tmp_path):
+def test_log_search_writes_durable_event_without_latest_search_cache(tmp_path):
     store = IndexStore(tmp_path)
     store.log_search("abc123", "get_user", "/repo", ["src/users.py::get_user", "src/auth.py::get_user_by_id"])
-    # Check session.jsonl
     entry = json.loads((tmp_path / "session.jsonl").read_text().strip())
     assert entry["event"] == "search"
     assert entry["search_id"] == "abc123"
@@ -1153,10 +1158,7 @@ def test_log_search_writes_event_and_last_search_file(tmp_path):
     assert entry["repo"] == "/repo"
     assert entry["result_ids"] == ["src/users.py::get_user", "src/auth.py::get_user_by_id"]
     assert entry["result_count"] == 2
-    # Check last_search.json was also written
-    last = json.loads((tmp_path / "last_search.json").read_text())
-    assert last["search_id"] == "abc123"
-    assert last["result_ids"] == ["src/users.py::get_user", "src/auth.py::get_user_by_id"]
+    assert not (tmp_path / "last_search.json").exists()
 
 
 def test_log_miss_search_empty(tmp_path):
@@ -1177,57 +1179,43 @@ def test_log_miss_get_not_found(tmp_path):
     assert entry["symbol_id"] == "src/foo.py::missing"
 
 
-def test_last_search_path(tmp_path):
+def test_resolve_search_selection_found(tmp_path):
     store = IndexStore(tmp_path)
-    assert store._last_search_path() == tmp_path / "last_search.json"
+    store.log_search("abc123", "get_user", "/repo", ["id1", "id2", "id3"])
+
+    resolution = store.resolve_search_selection("abc123", ["id2"], "/repo")
+
+    assert resolution == {"status": "found", "ranks": [1]}
 
 
-def test_write_and_read_last_search(tmp_path):
+def test_resolve_search_selection_not_surfaced(tmp_path):
     store = IndexStore(tmp_path)
-    store._write_last_search("abc123", "get_user", ["id1", "id2"])
-    data = store._read_last_search()
-    assert data is not None
-    assert data["search_id"] == "abc123"
-    assert data["query"] == "get_user"
-    assert data["result_ids"] == ["id1", "id2"]
+    store.log_search("abc123", "get_user", "/repo", ["id1", "id2"])
+
+    resolution = store.resolve_search_selection("abc123", ["id_other"], "/repo")
+
+    assert resolution == {"status": "found", "ranks": [None]}
 
 
-def test_read_last_search_returns_none_when_missing(tmp_path):
+def test_resolve_search_selection_rejects_repo_mismatch(tmp_path):
     store = IndexStore(tmp_path)
-    assert store._read_last_search() is None
+    store.log_search("abc123", "get_user", "/repo-a", ["id1"])
+
+    resolution = store.resolve_search_selection("abc123", ["id1"], "/repo-b")
+
+    assert resolution == {
+        "status": "repo_mismatch",
+        "search_repo": "/repo-a",
+        "requested_repo": "/repo-b",
+    }
 
 
-def test_read_last_search_returns_none_when_stale(tmp_path):
+def test_resolve_search_selection_rejects_unknown_search(tmp_path):
     store = IndexStore(tmp_path)
-    store._write_last_search("abc123", "q", ["id1"])
-    stale_ts = time_module.time() - 400
-    data = json.loads((tmp_path / "last_search.json").read_text())
-    data["ts"] = stale_ts
-    (tmp_path / "last_search.json").write_text(json.dumps(data))
-    assert store._read_last_search() is None
 
+    resolution = store.resolve_search_selection("missing", ["id1"], "/repo")
 
-def test_resolve_search_correlation_found(tmp_path):
-    store = IndexStore(tmp_path)
-    store._write_last_search("abc123", "get_user", ["id1", "id2", "id3"])
-    search_id, rank = store.resolve_search_correlation("id2")
-    assert search_id == "abc123"
-    assert rank == 1
-
-
-def test_resolve_search_correlation_not_in_results(tmp_path):
-    store = IndexStore(tmp_path)
-    store._write_last_search("abc123", "get_user", ["id1", "id2"])
-    search_id, rank = store.resolve_search_correlation("id_other")
-    assert search_id == "abc123"
-    assert rank is None  # preceded by a search but symbol not in results
-
-
-def test_resolve_search_correlation_no_recent_search(tmp_path):
-    store = IndexStore(tmp_path)
-    search_id, rank = store.resolve_search_correlation("id1")
-    assert search_id is None
-    assert rank is None
+    assert resolution == {"status": "not_found"}
 
 
 def _write_log(path, entries):
@@ -1251,7 +1239,7 @@ def test_analyze_search_miss_finding(tmp_path):
     assert "suggestion" in finding
 
 
-def test_analyze_search_blind_spot_finding(tmp_path):
+def test_analyze_does_not_infer_blind_spots_from_temporal_correlation(tmp_path):
     store = IndexStore(tmp_path)
     _write_log(tmp_path, [
         {"ts": time.time(), "event": "get", "symbol_id": "c", "symbol_bytes": 100,
@@ -1266,11 +1254,10 @@ def test_analyze_search_blind_spot_finding(tmp_path):
     ])
     result = store.analyze()
     finding = next((f for f in result["findings"] if f["type"] == "search_blind_spot"), None)
-    assert finding is not None
-    assert finding["severity"] == "high"
+    assert finding is None
 
 
-def test_analyze_search_ranking_poor_finding(tmp_path):
+def test_analyze_does_not_infer_ranking_quality_from_hydration(tmp_path):
     store = IndexStore(tmp_path)
     entries = []
     for i in range(5):
@@ -1281,8 +1268,23 @@ def test_analyze_search_ranking_poor_finding(tmp_path):
     _write_log(tmp_path, entries)
     result = store.analyze()
     finding = next((f for f in result["findings"] if f["type"] == "search_ranking_poor"), None)
-    assert finding is not None
-    assert finding["severity"] == "medium"
+    assert finding is None
+
+
+def test_analyze_requires_durable_explicit_selection_floor(tmp_path):
+    store = IndexStore(tmp_path)
+    _write_log(tmp_path, [
+        {"ts": time.time(), "event": "search_selection", "schema_version": 1,
+         "provenance": "explicit", "search_id": "s1", "symbol_id": f"id{i}",
+         "repo": "/r", "search_rank": None}
+        for i in range(3)
+    ])
+
+    result = store.analyze()
+
+    finding = next((f for f in result["findings"] if f["type"] == "search_blind_spot"), None)
+    assert finding is None
+    assert result["summary"]["explicit_search_selections"] == 3
 
 
 def test_analyze_kind_dead_weight_finding(tmp_path):
@@ -1349,8 +1351,7 @@ def test_analyze_refetch_hotspot_finding(tmp_path):
     assert finding["data"]["symbols"][0]["fetch_count"] == 4
 
 
-def test_analyze_summary_fields_are_floats(tmp_path):
-    """miss_rate and correlated_pct are floats 0.0–1.0 per spec schema."""
+def test_analyze_summary_reports_explicit_selection_counts(tmp_path):
     store = IndexStore(tmp_path)
     _write_log(tmp_path, [
         {"ts": time.time(), "event": "get", "symbol_id": "s1",
@@ -1358,6 +1359,9 @@ def test_analyze_summary_fields_are_floats(tmp_path):
          "kind": "function", "language": "python", "search_id": "x", "search_rank": 0},
         {"ts": time.time(), "event": "search", "search_id": "x", "query": "foo",
          "repo": "/r", "result_ids": ["s1"], "result_count": 1},
+        {"ts": time.time(), "event": "search_selection", "schema_version": 1,
+         "provenance": "explicit", "search_id": "x", "symbol_id": "s1",
+         "repo": "/r", "search_rank": 0},
         {"ts": time.time(), "event": "miss", "miss_type": "search_empty",
          "query": "bar", "repo": "/r"},
     ])
@@ -1367,8 +1371,10 @@ def test_analyze_summary_fields_are_floats(tmp_path):
     assert result["summary"]["total_misses"] == 1
     assert isinstance(result["summary"]["miss_rate"], float)
     assert 0.0 <= result["summary"]["miss_rate"] <= 1.0
-    assert isinstance(result["summary"]["correlated_pct"], float)
-    assert 0.0 <= result["summary"]["correlated_pct"] <= 1.0
+    assert "correlated_pct" not in result["summary"]
+    assert result["summary"]["explicit_search_selections"] == 1
+    assert result["summary"]["ranked_search_selections"] == 1
+    assert result["summary"]["not_surfaced_search_selections"] == 0
     assert "period" in result
     assert "findings" in result
 

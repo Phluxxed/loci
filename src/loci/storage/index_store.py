@@ -25,9 +25,12 @@ from loci.storage.repository_catalog import (
 )
 from loci.storage.store_layout import repository_cache_key
 
-LAST_SEARCH_TTL = 300  # 5 minutes
 INDEX_SCHEMA_VERSION = 6
 EXTRACTOR_VERSION = 12
+MIN_SEARCH_SELECTIONS = 10
+MIN_ADVERSE_SEARCH_SELECTIONS = 3
+SEARCH_NOT_SURFACED_THRESHOLD = 0.15
+SEARCH_POOR_RANK_THRESHOLD = 0.20
 
 
 def _resolve_worktree_root(path: str) -> str:
@@ -506,8 +509,6 @@ class IndexStore:
         repo_path: str = "",
         kind: Optional[str] = None,
         language: Optional[str] = None,
-        search_id: Optional[str] = None,
-        search_rank: Optional[int] = None,
     ) -> None:
         repo_path = self._canonical_repo(repo_path)
         entry = {
@@ -519,8 +520,6 @@ class IndexStore:
             "repo": repo_path,
             "kind": kind,
             "language": language,
-            "search_id": search_id,
-            "search_rank": search_rank,
         }
         with open(self._session_log_path(), "a") as f:
             f.write(json.dumps(entry) + "\n")
@@ -876,43 +875,63 @@ class IndexStore:
             "failed": failed,
         }
 
-    def _last_search_path(self) -> Path:
-        return self.base_dir / "last_search.json"
+    def resolve_search_selection(
+        self,
+        search_id: str,
+        symbol_ids: list[str],
+        repo: str,
+    ) -> dict[str, Any]:
+        """Resolve explicit selection lineage against a persisted search event."""
+        canonical_repo = self._canonical_repo(repo)
+        log_path = self._session_log_path()
+        if not log_path.exists():
+            return {"status": "not_found"}
 
-    def _write_last_search(self, search_id: str, query: str, result_ids: list[str], repo: str = "") -> None:
-        data = {"search_id": search_id, "ts": time.time(), "query": query, "result_ids": result_ids, "repo": repo}
-        self._last_search_path().write_text(json.dumps(data))
+        for line in reversed(log_path.read_text().splitlines()):
+            if not line.strip():
+                continue
+            try:
+                entry = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if entry.get("event") != "search" or entry.get("search_id") != search_id:
+                continue
+            search_repo = entry.get("repo", "")
+            if search_repo != canonical_repo:
+                return {
+                    "status": "repo_mismatch",
+                    "search_repo": search_repo,
+                    "requested_repo": canonical_repo,
+                }
+            rank_by_symbol = {
+                result_id: rank
+                for rank, result_id in enumerate(entry.get("result_ids", []))
+            }
+            return {
+                "status": "found",
+                "ranks": [rank_by_symbol.get(symbol_id) for symbol_id in symbol_ids],
+            }
+        return {"status": "not_found"}
 
-    def _read_last_search(self) -> Optional[dict]:
-        p = self._last_search_path()
-        if not p.exists():
-            return None
-        try:
-            data = json.loads(p.read_text())
-            if time.time() - data["ts"] > LAST_SEARCH_TTL:
-                return None
-            return data
-        except (json.JSONDecodeError, KeyError):
-            return None
-
-    def resolve_search_correlation(self, symbol_id: str, repo: str = "") -> tuple[Optional[str], Optional[int]]:
-        """Return (search_id, rank) for symbol_id against last search, or (None, None).
-
-        Returns (None, None) if the last search was for a different repo, preventing
-        cross-repo correlation noise in analyze findings.
-        """
-        data = self._read_last_search()
-        if data is None:
-            return None, None
-        if repo and data.get("repo", "") != repo:
-            return None, None
-        search_id = data["search_id"]
-        result_ids = data["result_ids"]
-        try:
-            rank = result_ids.index(symbol_id)
-        except ValueError:
-            rank = None
-        return search_id, rank
+    def log_search_selection(
+        self,
+        search_id: str,
+        symbol_id: str,
+        repo_path: str,
+        search_rank: Optional[int],
+    ) -> None:
+        entry = {
+            "ts": time.time(),
+            "event": "search_selection",
+            "schema_version": 1,
+            "provenance": "explicit",
+            "search_id": search_id,
+            "symbol_id": symbol_id,
+            "repo": self._canonical_repo(repo_path),
+            "search_rank": search_rank,
+        }
+        with open(self._session_log_path(), "a") as f:
+            f.write(json.dumps(entry) + "\n")
 
     def log_search(
         self,
@@ -935,7 +954,6 @@ class IndexStore:
         }
         with open(self._session_log_path(), "a") as f:
             f.write(json.dumps(entry) + "\n")
-        self._write_last_search(search_id, query, result_ids, repo=repo_path)
 
     def log_miss(
         self,
@@ -984,6 +1002,7 @@ class IndexStore:
 
         gets: list[dict] = []
         searches: list[dict] = []
+        selections: list[dict] = []
         misses: list[dict] = []
 
         if log_path.exists():
@@ -1003,6 +1022,9 @@ class IndexStore:
                     gets.append(entry)
                 elif event == "search":
                     searches.append(entry)
+                elif event == "search_selection":
+                    if entry.get("schema_version") == 1 and entry.get("provenance") == "explicit":
+                        selections.append(entry)
                 elif event == "miss":
                     misses.append(entry)
 
@@ -1023,58 +1045,53 @@ class IndexStore:
                 ),
             })
 
-        # --- search_blind_spot: fetched symbol not returned by preceding search ---
-        # 15% threshold suppresses noise when a few gets happen to precede unrelated searches.
-        # Below 15%, individual outliers are more likely than a systemic gap.
-        # When a search event is present, only correlate gets to searches in the same repo —
-        # cross-repo correlations are an artifact of stale last_search state, not a real signal.
-        # Older logs only stored search_id/search_rank on get events; keep those analyzable.
-        search_by_id: dict[str, dict] = {s["search_id"]: s for s in searches if s.get("search_id")}
-        correlated_gets = [
-            g for g in gets
-            if g.get("search_id") is not None
-            and (
-                g["search_id"] not in search_by_id
-                or search_by_id[g["search_id"]].get("repo", "") == g.get("repo", "")
-            )
-        ]
-        blind_spots = [g for g in correlated_gets if g.get("search_rank") is None]
-        if correlated_gets and len(blind_spots) / len(correlated_gets) >= 0.15:
-            blind_pct = len(blind_spots) / len(correlated_gets)
+        ranked_selections = [e for e in selections if e.get("search_rank") is not None]
+        not_surfaced_selections = [e for e in selections if e.get("search_rank") is None]
+
+        if (
+            len(selections) >= MIN_SEARCH_SELECTIONS
+            and len(not_surfaced_selections) >= MIN_ADVERSE_SEARCH_SELECTIONS
+            and len(not_surfaced_selections) / len(selections) >= SEARCH_NOT_SURFACED_THRESHOLD
+        ):
+            not_surfaced_pct = len(not_surfaced_selections) / len(selections)
             findings.append({
                 "type": "search_blind_spot",
                 "severity": "high",
                 "data": {
-                    "blind_spot_count": len(blind_spots),
-                    "correlated_gets": len(correlated_gets),
-                    "blind_pct": round(blind_pct, 3),
+                    "not_surfaced_count": len(not_surfaced_selections),
+                    "explicit_selections": len(selections),
+                    "not_surfaced_pct": round(not_surfaced_pct, 3),
                 },
                 "suggestion": (
-                    f"{round(blind_pct * 100)}% of gets fetch symbols not returned by "
-                    "the preceding search. Search is missing entire symbol classes — "
-                    "check indexing and scoring."
+                    f"{round(not_surfaced_pct * 100)}% of explicit search selections were "
+                    "not surfaced in the returned result envelope. Check indexing and scoring."
                 ),
             })
 
-        # --- search_ranking_poor: fetched symbol ranked ≥3 too often ---
-        ranked_gets = [g for g in correlated_gets if g.get("search_rank") is not None]
-        poor_ranked = [g for g in ranked_gets if g["search_rank"] >= 3]
-        if ranked_gets and len(poor_ranked) / len(ranked_gets) >= 0.20:
-            poor_pct = len(poor_ranked) / len(ranked_gets)
-            avg_rank = sum(g["search_rank"] for g in ranked_gets) / len(ranked_gets)
+        poor_ranked = [e for e in ranked_selections if e["search_rank"] >= 3]
+        if (
+            len(ranked_selections) >= MIN_SEARCH_SELECTIONS
+            and len(poor_ranked) >= MIN_ADVERSE_SEARCH_SELECTIONS
+            and len(poor_ranked) / len(ranked_selections) >= SEARCH_POOR_RANK_THRESHOLD
+        ):
+            poor_pct = len(poor_ranked) / len(ranked_selections)
+            average_position = (
+                sum(e["search_rank"] + 1 for e in ranked_selections)
+                / len(ranked_selections)
+            )
             findings.append({
                 "type": "search_ranking_poor",
                 "severity": "medium",
                 "data": {
                     "poor_ranked_count": len(poor_ranked),
-                    "ranked_gets": len(ranked_gets),
+                    "ranked_selections": len(ranked_selections),
                     "poor_pct": round(poor_pct, 3),
-                    "avg_rank": round(avg_rank, 1),
+                    "avg_result_position": round(average_position, 1),
                 },
                 "suggestion": (
-                    f"Fetched symbols ranked \u22653 in {round(poor_pct * 100)}% of correlated "
-                    f"searches (avg rank {avg_rank:.1f}). Adjust scoring weights for "
-                    "name/keyword matches."
+                    f"Explicitly selected symbols appeared fourth or lower in "
+                    f"{round(poor_pct * 100)}% of ranked selections "
+                    f"(average result position {average_position:.1f}). Adjust scoring weights."
                 ),
             })
 
@@ -1142,13 +1159,11 @@ class IndexStore:
             })
 
         # --- Summary ---
-        all_ts = [e["ts"] for e in gets + searches + misses if e.get("ts")]
+        all_ts = [e["ts"] for e in gets + searches + selections + misses if e.get("ts")]
         period_from = min(all_ts) if all_ts else time.time()
         period_to = max(all_ts) if all_ts else time.time()
         total_events = len(gets) + len(misses)
         miss_rate = len(misses) / total_events if total_events > 0 else 0.0
-        correlated_pct = len(correlated_gets) / len(gets) if gets else 0.0
-
         return {
             "period": {
                 "from": _ts_to_iso(period_from),
@@ -1159,7 +1174,9 @@ class IndexStore:
                 "total_searches": len(searches),
                 "total_misses": len(misses),
                 "miss_rate": round(miss_rate, 3),
-                "correlated_pct": round(correlated_pct, 3),
+                "explicit_search_selections": len(selections),
+                "ranked_search_selections": len(ranked_selections),
+                "not_surfaced_search_selections": len(not_surfaced_selections),
             },
             "findings": findings,
         }

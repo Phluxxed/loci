@@ -335,6 +335,40 @@ def test_mcp_loci_mcp_command_round_trip(tmp_path: Path, fixtures_dir: Path):
     assert result["verify"]["failed"] == []
 
 
+def test_mcp_explicit_search_selection_lineage_round_trip(tmp_path: Path):
+    result = asyncio.run(
+        _explicit_search_selection_round_trip(
+            tmp_path / "repo",
+            tmp_path / ".codeindex",
+        )
+    )
+
+    assert result["search_id"]
+    assert result["empty_search_id"] is None
+    assert "selected_from_search_id" in result["get_input_schema"]["properties"]
+    assert "search_id" in json.dumps(result["search_output_schema"])
+    assert result["selected"]["symbols"][0]["id"] == result["selected_symbol_id"]
+    assert result["direct"]["symbols"][0]["id"] == result["direct_symbol_id"]
+    assert result["unknown_lineage"]["error"]["code"] == "INVALID_SEARCH_LINEAGE"
+    assert result["cross_repo_lineage"]["error"]["code"] == "INVALID_SEARCH_LINEAGE"
+    assert result["analyze"]["summary"]["total_gets"] == 14
+    assert result["analyze"]["summary"]["explicit_search_selections"] == 13
+    assert result["analyze"]["summary"]["ranked_search_selections"] == 10
+    assert result["analyze"]["summary"]["not_surfaced_search_selections"] == 3
+    findings = {finding["type"]: finding for finding in result["analyze"]["findings"]}
+    assert findings["search_blind_spot"]["data"] == {
+        "not_surfaced_count": 3,
+        "explicit_selections": 13,
+        "not_surfaced_pct": 0.231,
+    }
+    assert findings["search_ranking_poor"]["data"] == {
+        "poor_ranked_count": 3,
+        "ranked_selections": 10,
+        "poor_pct": 0.3,
+        "avg_result_position": 1.9,
+    }
+
+
 def test_mcp_errors_include_loci_error_data(tmp_path: Path):
     error_data = asyncio.run(_outline_missing_repo(tmp_path / ".codeindex", tmp_path / "repo"))
 
@@ -699,6 +733,141 @@ def test_mcp_rust_crate_target_survives_fresh_process(tmp_path: Path):
     ]
     assert result["retrieved"]["paths"][0]["nodes"][1] == crate_ref
     assert result["compatibility"]["results"][0]["neighbors"] == []
+
+
+async def _explicit_search_selection_round_trip(
+    repo: Path,
+    cache_dir: Path,
+) -> dict[str, Any]:
+    repo.mkdir()
+    (repo / "sample.py").write_text(
+        "def target_alpha():\n"
+        "    return 'alpha'\n\n"
+        "def target_beta():\n"
+        "    return 'beta'\n\n"
+        "def target_gamma():\n"
+        "    return 'gamma'\n\n"
+        "def target_delta():\n"
+        "    return 'delta'\n\n"
+        "def direct_only():\n"
+        "    return 'direct'\n"
+    )
+    other_repo = repo.parent / "other-repo"
+    other_repo.mkdir()
+    (other_repo / "other.py").write_text(
+        "def other_target():\n"
+        "    return 'other'\n"
+    )
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["LOCI_STORE_NAMESPACE"] = "test"
+    env["PYTHONPATH"] = str(Path.cwd() / "src")
+    server_params = StdioServerParameters(
+        command="loci-mcp",
+        args=[],
+        env=env,
+        cwd=Path.cwd(),
+    )
+
+    async with Client(stdio_client(server_params)) as session:
+        tools = await session.list_tools()
+        get_input_schema = next(
+            tool.input_schema for tool in tools.tools if tool.name == "loci_get"
+        )
+        search_output_schema = next(
+            tool.output_schema for tool in tools.tools if tool.name == "loci_search"
+        )
+        await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(repo), "incremental": False},
+        )
+        await session.call_tool(
+            "loci_index",
+            arguments={"repo": str(other_repo), "incremental": False},
+        )
+        outline = await session.call_tool(
+            "loci_outline",
+            arguments={"repo": str(repo)},
+        )
+        symbols = {
+            symbol["name"]: symbol["id"]
+            for entry in outline.structured_content["files"]
+            for symbol in entry["symbols"]
+        }
+        search = await session.call_tool(
+            "loci_search",
+            arguments={"repo": str(repo), "query": "target", "limit": 4},
+        )
+        search_id = search.structured_content["search_id"]
+        search_results = search.structured_content["symbols"]
+        assert len(search_results) == 4
+        selected_symbol_id = search_results[0]["id"]
+        poor_ranked_symbol_id = search_results[3]["id"]
+        selected = await session.call_tool(
+            "loci_get",
+            arguments={
+                "repo": str(repo),
+                "symbol_ids": [selected_symbol_id] * 7 + [poor_ranked_symbol_id] * 3,
+                "selected_from_search_id": search_id,
+            },
+        )
+        await session.call_tool(
+            "loci_get",
+            arguments={
+                "repo": str(repo),
+                "symbol_ids": [symbols["direct_only"]] * 3,
+                "selected_from_search_id": search_id,
+            },
+        )
+        direct = await session.call_tool(
+            "loci_get",
+            arguments={
+                "repo": str(repo),
+                "symbol_ids": [symbols["direct_only"]],
+            },
+        )
+        empty_search = await session.call_tool(
+            "loci_search",
+            arguments={"repo": str(repo), "query": "no_match_xyz_12345"},
+        )
+        unknown_lineage = await session.call_tool(
+            "loci_get",
+            arguments={
+                "repo": str(repo),
+                "symbol_ids": [selected_symbol_id],
+                "selected_from_search_id": "missing-search-id",
+            },
+        )
+        other_search = await session.call_tool(
+            "loci_search",
+            arguments={"repo": str(other_repo), "query": "other_target"},
+        )
+        cross_repo_lineage = await session.call_tool(
+            "loci_get",
+            arguments={
+                "repo": str(repo),
+                "symbol_ids": [selected_symbol_id],
+                "selected_from_search_id": other_search.structured_content["search_id"],
+            },
+        )
+        analyze = await session.call_tool(
+            "loci_analyze",
+            arguments={"repo": str(repo), "since_days": 7},
+        )
+
+    return {
+        "search_id": search_id,
+        "empty_search_id": empty_search.structured_content["search_id"],
+        "get_input_schema": get_input_schema,
+        "search_output_schema": search_output_schema,
+        "selected_symbol_id": selected_symbol_id,
+        "direct_symbol_id": symbols["direct_only"],
+        "selected": selected.structured_content,
+        "direct": direct.structured_content,
+        "unknown_lineage": unknown_lineage.structured_content,
+        "cross_repo_lineage": cross_repo_lineage.structured_content,
+        "analyze": analyze.structured_content,
+    }
 
 
 async def _round_trip(
