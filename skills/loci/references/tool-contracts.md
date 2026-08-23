@@ -20,11 +20,21 @@
 {"symbols":[{"id":"...","source":"...","line":1,"end_line":10,"byte_offset":0,"byte_length":200,"signature":"...","kind":"function","language":"python"}]}
 ```
 
-`loci_search` returns ranked symbols and coverage:
+`selected_from_search_id` is optional. Supply it only when every requested
+symbol was deliberately selected because of that exact search. Direct,
+outline-driven, hydration, and mixed-purpose gets omit it. Unknown or
+cross-repository lineage fails with `INVALID_SEARCH_LINEAGE` before retrieval
+or selection telemetry is recorded.
+
+`loci_search` returns ranked symbols, coverage, and an opaque selection id:
 
 ```json
-{"symbols":[{"id":"...","name":"...","kind":"function","score":20.0,"signature":"...","summary":""}],"coverage":{"schema_version":1,"state":"partial","scope":"repository","source_scope":"indexed_supported_source","query_scope":"indexed_symbols","indexed_files":12,"excluded_paths":3,"exclusions":[{"reason":"ignored","paths":1,"samples":["local.py"],"omitted_samples":0},{"reason":"policy_excluded","paths":2,"samples":[".git","build"],"omitted_samples":0}],"unknown_reason":null}}
+{"symbols":[{"id":"...","name":"...","kind":"function","score":20.0,"signature":"...","summary":""}],"coverage":{"schema_version":1,"state":"partial","scope":"repository","source_scope":"indexed_supported_source","query_scope":"indexed_symbols","indexed_files":12,"excluded_paths":3,"exclusions":[{"reason":"ignored","paths":1,"samples":["local.py"],"omitted_samples":0},{"reason":"policy_excluded","paths":2,"samples":[".git","build"],"omitted_samples":0}],"unknown_reason":null},"search_id":"opaque-id"}
 ```
+
+`search_id` is non-null for a non-empty result envelope and null for an empty
+search. It has no expiry. Loci resolves any declared selection rank from the
+ordered symbols returned for that identifier; callers never supply rank.
 
 `loci_search.file_paths` is an optional caller-supplied exact-file eligibility
 allowlist. Omission or `null` searches the complete indexed repository; an empty

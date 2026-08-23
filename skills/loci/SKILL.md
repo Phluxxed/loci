@@ -17,8 +17,8 @@ repository root named by the task, not the shell cwd or an arbitrary parent:
 # Unindexed repository, explicit rebuild, or large change only:
 loci_index(repo, incremental=true)
 # Normal navigation, including stale cached indexes:
-loci_outline(repo) or loci_search(repo, query)
-loci_get(repo, symbol_ids)
+loci_outline(repo) or loci_search(repo, query) -> optional search_id
+loci_get(repo, symbol_ids, selected_from_search_id=search_id) only for deliberate search selections
 loci_analyze(repo) when diagnostics are needed
 ```
 
@@ -47,8 +47,12 @@ use a targeted normal read.
    task requires a fresh cache.
 2. Use `loci_outline` when the file is known, or `loci_search` when only a
    symbol name or concept is known.
-3. Use `loci_get` for the exact symbol IDs returned by outline/search. Do not
-   fetch an entire file when a symbol will answer the question.
+3. Use `loci_get` for the exact symbol IDs returned by outline/search. When a
+   get is a deliberate selection from a non-empty search, pass that search's
+   `search_id` as `selected_from_search_id`. Omit it for direct navigation,
+   outline-driven navigation, bulk hydration, or any mixed-purpose batch; split
+   mixed batches so only genuinely selected symbols carry lineage. Do not fetch
+   an entire file when a symbol will answer the question.
 4. Use `loci_file` only for targeted non-symbol ranges after locating the
    relevant file; use `loci_grep` for string literals, errors, or config keys.
 5. Use `context` on focused retrieval when nearby lines are required, then

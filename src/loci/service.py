@@ -90,6 +90,7 @@ MAX_SEARCH_FILE_PATHS = 500
 class SearchSymbolsResult(TypedDict):
     symbols: list[dict[str, Any]]
     coverage: QueryCoverage
+    search_id: str | None
 
 
 class GrepRepoResult(TypedDict):
@@ -548,6 +549,7 @@ def get_symbols(
     symbol_ids: list[str],
     context: int = 0,
     ensure_fresh: bool = False,
+    selected_from_search_id: str | None = None,
 ) -> list[dict[str, Any]]:
     repo_path = Path(repo).resolve()
     if not symbol_ids:
@@ -567,8 +569,37 @@ def get_symbols(
     if ensure_fresh:
         ensure_fresh_index(repo_path)
     index = _load_required_index(store, repo_path)
+    selection_ranks: list[int | None] | None = None
+    if selected_from_search_id is not None:
+        resolution = store.resolve_search_selection(
+            selected_from_search_id,
+            symbol_ids,
+            str(repo_path),
+        )
+        if resolution["status"] != "found":
+            raise LociError(
+                "INVALID_SEARCH_LINEAGE",
+                "Selected-from search lineage is invalid",
+                {
+                    "repo": str(repo_path),
+                    "search_id": selected_from_search_id,
+                    **resolution,
+                },
+            )
+        selection_ranks = resolution["ranks"]
 
-    return [_get_symbol(repo_path, store, index, symbol_id, context) for symbol_id in symbol_ids]
+    return [
+        _get_symbol(
+            repo_path,
+            store,
+            index,
+            symbol_id,
+            context,
+            selected_from_search_id=selected_from_search_id,
+            selected_search_rank=(selection_ranks[position] if selection_ranks is not None else None),
+        )
+        for position, symbol_id in enumerate(symbol_ids)
+    ]
 
 
 def search_symbols(
@@ -670,6 +701,7 @@ def search_symbols_result(
         limit=limit,
         file_paths=normalized_file_paths,
     )
+    search_id: str | None = None
     if results:
         search_id = str(uuid.uuid4())
         store.log_search(search_id, query, str(repo_path), [result["id"] for result in results])
@@ -678,6 +710,7 @@ def search_symbols_result(
     return {
         "symbols": results,
         "coverage": query_coverage_from_index(index, "indexed_symbols"),
+        "search_id": search_id,
     }
 
 
@@ -2143,6 +2176,8 @@ def _get_symbol(
     index: dict[str, Any],
     symbol_id: str,
     context: int,
+    selected_from_search_id: str | None = None,
+    selected_search_rank: int | None = None,
 ) -> dict[str, Any]:
     meta = next((s for s in index["symbols"] if s["id"] == symbol_id), None)
     if meta is None:
@@ -2165,7 +2200,6 @@ def _get_symbol(
     symbol_bytes = len(content.encode("utf-8"))
     file_bytes = store.get_symbol_file_size(repo_path, symbol_id)
     if file_bytes is not None:
-        search_id, search_rank = store.resolve_search_correlation(symbol_id, repo=str(repo_path))
         store.log_retrieval(
             symbol_id,
             symbol_bytes,
@@ -2173,8 +2207,13 @@ def _get_symbol(
             repo_path=str(repo_path),
             kind=meta.get("kind"),
             language=meta.get("language"),
-            search_id=search_id,
-            search_rank=search_rank,
+        )
+    if selected_from_search_id is not None:
+        store.log_search_selection(
+            selected_from_search_id,
+            symbol_id,
+            str(repo_path),
+            selected_search_rank,
         )
 
     result: dict[str, Any] = {

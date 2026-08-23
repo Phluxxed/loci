@@ -1213,6 +1213,7 @@ def test_cmd_search_logs_search_event(tmp_path: Path):
     assert search_events[0]["query"] == "add"
     assert "search_id" in search_events[0]
     assert "result_ids" in search_events[0]
+    assert not (Path(base) / "last_search.json").exists()
 
 
 def test_cmd_search_logs_miss_on_empty_results(tmp_path: Path):
@@ -1226,8 +1227,8 @@ def test_cmd_search_logs_miss_on_empty_results(tmp_path: Path):
     assert all(e.get("event") != "search" for e in entries)
 
 
-def test_cmd_search_empty_does_not_write_last_search(tmp_path: Path):
-    """Empty search result must not write last_search.json (prevents false blind_spot)."""
+def test_cmd_search_never_writes_latest_search_cache(tmp_path: Path):
+    """Search lineage is durable and explicit, never ambient latest-search state."""
     repo = tmp_path / "repo"
     base = _index_repo(repo)
     run_loci("search", "--repo", str(repo), "zzz_nonexistent_xyz", env_extra={"LOCI_BASE_DIR": base})
@@ -1266,8 +1267,8 @@ def test_cmd_get_logs_miss_on_not_found(tmp_path: Path):
     assert any(e.get("event") == "miss" and e["miss_type"] == "get_not_found" for e in entries)
 
 
-def test_cmd_get_records_search_correlation(tmp_path: Path):
-    """get after search records search_id on the get event."""
+def test_cmd_get_after_search_does_not_infer_lineage(tmp_path: Path):
+    """The human CLI has no explicit lineage input, so ordering is not causal."""
     repo = tmp_path / "repo"
     base = _index_repo(repo)
     # Get a real symbol ID from the outline
@@ -1283,4 +1284,6 @@ def test_cmd_get_records_search_correlation(tmp_path: Path):
     entries = [json.loads(l) for l in log_path.read_text().splitlines() if l.strip()]
     get_events = [e for e in entries if e.get("event") == "get"]
     assert len(get_events) == 1
-    assert get_events[0]["search_id"] is not None
+    assert "search_id" not in get_events[0]
+    assert "search_rank" not in get_events[0]
+    assert all(e.get("event") != "search_selection" for e in entries)
