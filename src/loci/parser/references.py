@@ -53,7 +53,7 @@ def extract_reference_batch(
     context: SyntaxContext | None = None,
 ) -> ReferenceExtractionBatch:
     """Extract local exports and import-rooted references from an existing tree."""
-    if language not in {"python", "javascript", "typescript", "go", "rust"}:
+    if language not in {"python", "javascript", "typescript", "go", "rust", "swift"}:
         raise ValueError(f"unsupported reference language: {language}")
 
     if context is None:
@@ -397,6 +397,10 @@ def _path_observation(
     if language == "go":
         path = _go_path(node, source)
         return _PathObservation(node=node, path=path) if path is not None else None
+    if language == "swift":
+        # Swift path observation lands with swift-local; observing nothing keeps
+        # the extractor from claiming references it cannot bind.
+        return None
     if language != "rust":
         raise ValueError(f"unsupported path observation language: {language}")
     if node.type == "macro_invocation":

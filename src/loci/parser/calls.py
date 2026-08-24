@@ -19,13 +19,21 @@ from loci.parser.call_models import (
 )
 
 
-_SUPPORTED_LANGUAGES = {"python", "javascript", "typescript", "go", "rust"}
+_SUPPORTED_LANGUAGES = {
+    "python",
+    "javascript",
+    "typescript",
+    "go",
+    "rust",
+    "swift",
+}
 _CALL_NODE_TYPES = {
     "python": {"call"},
     "javascript": {"call_expression"},
     "typescript": {"call_expression"},
     "go": {"call_expression"},
     "rust": {"call_expression"},
+    "swift": {"call_expression"},
 }
 
 StaticPath: TypeAlias = tuple[str, ...]
@@ -50,7 +58,7 @@ def extract_call_sites(
     for node in _walk_nodes(root_node):
         if node.type not in _CALL_NODE_TYPES[language]:
             continue
-        callee = node.child_by_field_name("function")
+        callee = _callee_node(node, language)
         if callee is None or callee.start_byte >= callee.end_byte:
             continue
         if language in {"javascript", "typescript"} and any(
@@ -102,12 +110,26 @@ def extract_call_sites(
     )
 
 
+def _callee_node(node, language: str):
+    """Return the callee node of one call expression.
+
+    Every grammar but Swift exposes the callee under a ``function`` field; Swift
+    models a call as the callee followed by a ``call_suffix`` sibling.
+    """
+    if language != "swift":
+        return node.child_by_field_name("function")
+    return next(
+        (child for child in node.named_children if child.type != "call_suffix"),
+        None,
+    )
+
+
 def _classify_callee(
     node: Any,
     source: bytes,
     language: str,
 ) -> tuple[CallCalleeForm, StaticPath]:
-    if node.type == "identifier":
+    if node.type in {"identifier", "simple_identifier"}:
         return "identifier", (_node_text(node, source),)
     path: StaticPath | None
     if language == "python":
@@ -118,6 +140,10 @@ def _classify_callee(
         path = _go_path(node, source)
     elif language == "rust":
         path = _rust_path(node, source)
+    elif language == "swift":
+        # Swift callee paths land with swift-local; an unclassified callee is
+        # recorded as dynamic rather than guessed.
+        path = None
     else:
         raise ValueError(f"unsupported callee language: {language}")
     if path is not None and len(path) > 1:
