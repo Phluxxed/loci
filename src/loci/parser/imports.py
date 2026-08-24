@@ -431,6 +431,18 @@ def _extract_go_import(node, source: bytes, common: dict) -> list[RawImport]:
     ]
 
 
+_SWIFT_IMPORT_DECLARATION_KINDS = {
+    "struct",
+    "class",
+    "enum",
+    "protocol",
+    "typealias",
+    "func",
+    "var",
+    "let",
+}
+
+
 def _extract_swift_import(node, source: bytes, common: dict) -> list[RawImport]:
     """Extract one flat Swift module import.
 
@@ -446,14 +458,25 @@ def _extract_swift_import(node, source: bytes, common: dict) -> list[RawImport]:
     if identifier is None:
         return []
     specifier = _node_text(identifier, source)
-    module_name = specifier.split(".", 1)[0]
-    if not module_name:
+    declaration_kind = any(
+        child.type in _SWIFT_IMPORT_DECLARATION_KINDS for child in node.children
+    )
+    if declaration_kind:
+        # import struct Foundation.Data binds the declaration, not the module.
+        local_name = specifier.rsplit(".", 1)[-1]
+        kind = "symbol"
+        imported_name: str | None = local_name
+    else:
+        local_name = specifier.split(".", 1)[0]
+        kind = "module"
+        imported_name = None
+    if not local_name:
         return []
     return [
         RawImport(
             **common,
             specifier=specifier,
-            imported_name=None,
+            imported_name=imported_name,
             type_only=False,
             is_reexport=False,
             bindings=(
@@ -461,10 +484,10 @@ def _extract_swift_import(node, source: bytes, common: dict) -> list[RawImport]:
                     node,
                     common,
                     specifier=specifier,
-                    local_name=module_name,
-                    imported_name=None,
+                    local_name=local_name,
+                    imported_name=imported_name,
                     exported_name=None,
-                    kind="module",
+                    kind=kind,
                     type_only=False,
                     module_level=True,
                 ),

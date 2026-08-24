@@ -925,3 +925,47 @@ def test_rejects_languages_without_import_extraction_support(tmp_path: Path):
             language="cobol",
             source_hash=SOURCE_HASH,
         )
+
+
+def test_swift_module_imports_bind_the_module_name(tmp_path: Path):
+    imports = _extract(
+        tmp_path,
+        name="a.swift",
+        source=(
+            "import Foundation\n"
+            "@preconcurrency import RxSwift\n"
+            "import UIKit.UIView\n"
+        ),
+        language="swift",
+    )
+
+    assert [item.specifier for item in imports] == [
+        "Foundation",
+        "RxSwift",
+        "UIKit.UIView",
+    ]
+    bindings = [item.bindings[0] for item in imports]
+    assert [binding.kind for binding in bindings] == ["module", "module", "module"]
+    assert [binding.local_name for binding in bindings] == [
+        "Foundation",
+        "RxSwift",
+        "UIKit",
+    ]
+    assert all(binding.module_level for binding in bindings)
+
+
+def test_swift_declaration_import_binds_the_declaration_not_the_module(
+    tmp_path: Path,
+):
+    imports = _extract(
+        tmp_path,
+        name="a.swift",
+        source="import struct Foundation.Data\n",
+        language="swift",
+    )
+
+    binding = imports[0].bindings[0]
+    assert imports[0].specifier == "Foundation.Data"
+    assert binding.kind == "symbol"
+    assert binding.local_name == "Data"
+    assert binding.imported_name == "Data"

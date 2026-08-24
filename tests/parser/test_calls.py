@@ -477,3 +477,65 @@ def test_import_batch_reuses_one_parse_and_returns_calls(
     assert [call.callee_text for call in batch.calls] == ["work"]
     assert batch.references[0].start_byte == batch.calls[0].callee_start_byte
     assert batch.references[0].end_byte == batch.calls[0].callee_end_byte
+
+
+def test_swift_same_file_call_carries_a_definite_local_candidate():
+    calls = _extract_calls(
+        source=(
+            "func helper(_ value: Int) -> Int { return value }\n"
+            "public func run() { helper(1) }\n"
+        ),
+        language="swift",
+    )
+
+    call = next(item for item in calls if item.callee_text == "helper")
+    assert call.callee_form == "identifier"
+    assert call.callee_path == ("helper",)
+    assert call.local_binding_state == "definite"
+    assert [binding.name for binding in call.local_candidates] == ["helper"]
+    assert [binding.callable_kind for binding in call.local_candidates] == ["function"]
+
+
+def test_swift_navigation_callee_is_a_static_path():
+    calls = _extract_calls(
+        source="public func run(values: [Int]) { values.first(where: isEven) }\n",
+        language="swift",
+    )
+
+    call = calls[0]
+    assert call.callee_form == "static_path"
+    assert call.callee_path == ("values", "first")
+
+
+def test_swift_self_receiver_is_not_given_a_guessed_root():
+    calls = _extract_calls(
+        source=(
+            "class Widget {\n"
+            "    func run() { self.record() }\n"
+            "    func record() {}\n"
+            "}\n"
+        ),
+        language="swift",
+    )
+
+    call = calls[0]
+    assert call.callee_text == "self.record"
+    assert call.callee_form == "dynamic"
+    assert call.callee_path == ()
+
+
+def test_swift_method_is_not_a_file_scope_callable_binding():
+    calls = _extract_calls(
+        source=(
+            "class Widget {\n"
+            "    func run() { record() }\n"
+            "    func record() {}\n"
+            "}\n"
+        ),
+        language="swift",
+    )
+
+    call = calls[0]
+    assert call.callee_text == "record"
+    assert call.local_candidates == ()
+    assert call.local_binding_state == "absent"

@@ -8,6 +8,7 @@ from loci.parser._binding_context import (
     nearest_executable_owner,
 )
 from loci.parser._reference_exports import _node_text, _walk_nodes
+from loci.parser._reference_paths import _swift_path
 from loci.parser.call_models import (
     MAX_CALL_BINDING_CANDIDATES,
     MAX_CALL_PATH_SEGMENTS,
@@ -141,9 +142,7 @@ def _classify_callee(
     elif language == "rust":
         path = _rust_path(node, source)
     elif language == "swift":
-        # Swift callee paths land with swift-local; an unclassified callee is
-        # recorded as dynamic rather than guessed.
-        path = None
+        path = _swift_path(node, source)
     else:
         raise ValueError(f"unsupported callee language: {language}")
     if path is not None and len(path) > 1:

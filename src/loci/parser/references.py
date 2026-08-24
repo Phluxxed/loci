@@ -21,6 +21,7 @@ from loci.parser._reference_paths import (
     _javascript_path,
     _python_path,
     _rust_path,
+    _swift_path,
 )
 from loci.parser.reference_models import (
     MAX_REFERENCE_RESOLUTION_CANDIDATES,
@@ -398,9 +399,8 @@ def _path_observation(
         path = _go_path(node, source)
         return _PathObservation(node=node, path=path) if path is not None else None
     if language == "swift":
-        # Swift path observation lands with swift-local; observing nothing keeps
-        # the extractor from claiming references it cannot bind.
-        return None
+        path = _swift_path(node, source)
+        return _PathObservation(node=node, path=path) if path is not None else None
     if language != "rust":
         raise ValueError(f"unsupported path observation language: {language}")
     if node.type == "macro_invocation":
