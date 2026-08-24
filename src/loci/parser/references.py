@@ -397,6 +397,8 @@ def _path_observation(
     if language == "go":
         path = _go_path(node, source)
         return _PathObservation(node=node, path=path) if path is not None else None
+    if language != "rust":
+        raise ValueError(f"unsupported path observation language: {language}")
     if node.type == "macro_invocation":
         macro = node.child_by_field_name("macro")
         path = _rust_path(macro, source)

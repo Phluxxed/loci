@@ -116,8 +116,10 @@ def _classify_callee(
         path = _javascript_path(node, source)
     elif language == "go":
         path = _go_path(node, source)
-    else:
+    elif language == "rust":
         path = _rust_path(node, source)
+    else:
+        raise ValueError(f"unsupported callee language: {language}")
     if path is not None and len(path) > 1:
         return "static_path", path
     return "dynamic", ()

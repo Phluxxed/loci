@@ -149,8 +149,10 @@ def collect_syntax_context(
         _collect_javascript_context(root, source, context)
     elif language == "go":
         _collect_go_context(root, source, context)
-    else:
+    elif language == "rust":
         _collect_rust_context(root, source, context)
+    else:
+        raise ValueError(f"unsupported syntax context language: {language}")
     return SyntaxContext(
         local_bindings=tuple(context.local_bindings),
         executable_owners=tuple(context.executable_owners),
