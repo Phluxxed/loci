@@ -108,6 +108,14 @@ class ImportExtractionError(RuntimeError):
     """Import observations could not be extracted reliably from a source file."""
 
 
+class SourceParseError(ImportExtractionError):
+    """A source file is beyond the bundled grammar and yielded an error tree.
+
+    This is a limitation of the grammar, not a defect in the graph: nothing can
+    be observed in the file, and nothing about the rest of the graph is wrong.
+    """
+
+
 def extract_imports(
     path: Path,
     *,
@@ -159,7 +167,7 @@ def extract_import_batch(
         ) from exc
 
     if tree.root_node.has_error:
-        raise ImportExtractionError(
+        raise SourceParseError(
             f"{source_file} could not be parsed for {language} imports"
         )
 

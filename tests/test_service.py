@@ -10,7 +10,7 @@ import pytest
 
 import loci.service as service_module
 from loci.graph.contracts import GRAPH_SCHEMA_VERSION, GRAPH_STATE_SCHEMA_VERSION
-from loci.parser.imports import ImportExtractionError
+from loci.parser.imports import ImportExtractionError, SourceParseError
 from loci.service import (
     MAX_SEARCH_FILE_PATHS,
     LociError,
@@ -2487,6 +2487,45 @@ def test_service_incremental_source_change_replaces_then_deletion_drops_imports(
     assert deleted["graph_imports_indexed"] == 0
     assert deleted_graph["imports"] == []
     assert deleted_graph["edges"] == []
+
+
+def test_service_reports_unparsed_source_as_info_and_stays_healthy(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    base = tmp_path / ".codeindex"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "consumer.py").write_text(
+        "def keep_navigation():\n    return True\n",
+        encoding="utf-8",
+    )
+
+    def unparsed(*args, **kwargs):
+        raise SourceParseError("consumer.py could not be parsed for python imports")
+
+    monkeypatch.setattr(service_module, "extract_import_batch", unparsed)
+
+    initial = index_repo(repo, incremental=False)
+    incremental = index_repo(repo, incremental=True)
+    health = graph_health(repo)
+
+    assert initial["graph_status"] == "healthy"
+    assert incremental["graph_status"] == "healthy"
+    assert health["status"] == "healthy"
+    assert incremental["graph_diagnostics"] == [{
+        "severity": "info",
+        "code": "GRAPH_SOURCE_UNPARSED",
+        "message": "Source could not be parsed by the bundled grammar",
+        "source": "consumer.py",
+        "details": {
+            "reason": "consumer.py could not be parsed for python imports",
+        },
+    }]
+    assert [symbol["name"] for symbol in search_symbols(repo, "keep_navigation")] == [
+        "keep_navigation",
+    ]
 
 
 def test_service_retains_import_extraction_warning_for_unchanged_source(
