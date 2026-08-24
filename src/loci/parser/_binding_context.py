@@ -134,7 +134,7 @@ def collect_syntax_context(
     source: bytes,
     language: str,
 ) -> SyntaxContext:
-    if language not in {"python", "javascript", "typescript", "go", "rust"}:
+    if language not in {"python", "javascript", "typescript", "go", "rust", "swift"}:
         raise ValueError(f"unsupported syntax context language: {language}")
     context = _SyntaxContextBuilder(
         local_bindings=[],
@@ -151,6 +151,10 @@ def collect_syntax_context(
         _collect_go_context(root, source, context)
     elif language == "rust":
         _collect_rust_context(root, source, context)
+    elif language == "swift":
+        # Swift lexical bindings are modelled by swift-local; executable owners
+        # are collected for every language above.
+        pass
     else:
         raise ValueError(f"unsupported syntax context language: {language}")
     return SyntaxContext(
@@ -241,6 +245,7 @@ def _collect_executable_owners(
         "typescript": {"function_declaration", "method_definition"},
         "go": {"function_declaration", "method_declaration"},
         "rust": {"function_item"},
+        "swift": {"function_declaration", "init_declaration"},
     }[language]
     unindexed_types = {
         "python": {"lambda"},
@@ -258,6 +263,7 @@ def _collect_executable_owners(
         },
         "go": {"func_literal"},
         "rust": {"closure_expression"},
+        "swift": {"lambda_literal"},
     }[language]
     for node in _walk_nodes(root):
         if node.type not in callable_types | unindexed_types:

@@ -39,7 +39,14 @@ _CALL_BINDING_STATES = {
     "unsupported",
 }
 _CALLABLE_KINDS = {"function", "method"}
-_SUPPORTED_LANGUAGES = {"python", "javascript", "typescript", "go", "rust"}
+_SUPPORTED_LANGUAGES = {
+    "python",
+    "javascript",
+    "typescript",
+    "go",
+    "rust",
+    "swift",
+}
 
 
 @dataclass(frozen=True, slots=True)

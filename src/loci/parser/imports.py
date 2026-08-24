@@ -250,6 +250,8 @@ def _extract_node_imports(
         return _extract_go_import(node, source, common)
     if language == "rust":
         return _extract_rust_import(node, source, common)
+    if language == "swift":
+        return _extract_swift_import(node, source, common)
     raise ImportExtractionError(f"unsupported language: {language}")
 
 
@@ -413,6 +415,48 @@ def _extract_go_import(node, source: bytes, common: dict) -> list[RawImport]:
                     imported_name=None,
                     exported_name=None,
                     kind=kind,
+                    type_only=False,
+                    module_level=True,
+                ),
+            ),
+        )
+    ]
+
+
+def _extract_swift_import(node, source: bytes, common: dict) -> list[RawImport]:
+    """Extract one flat Swift module import.
+
+    Swift imports name a module, optionally a submodule (``import UIKit.UIView``)
+    and optionally a single declaration (``import struct Foundation.Data``).
+    Attributes such as ``@testable`` sit in a preceding ``modifiers`` child and
+    do not change the binding.
+    """
+    identifier = next(
+        (child for child in node.named_children if child.type == "identifier"),
+        None,
+    )
+    if identifier is None:
+        return []
+    specifier = _node_text(identifier, source)
+    module_name = specifier.split(".", 1)[0]
+    if not module_name:
+        return []
+    return [
+        RawImport(
+            **common,
+            specifier=specifier,
+            imported_name=None,
+            type_only=False,
+            is_reexport=False,
+            bindings=(
+                _import_binding(
+                    node,
+                    common,
+                    specifier=specifier,
+                    local_name=module_name,
+                    imported_name=None,
+                    exported_name=None,
+                    kind="module",
                     type_only=False,
                     module_level=True,
                 ),
@@ -891,7 +935,7 @@ def _import_binding(
 
 
 def _import_is_module_level(node, language: str) -> bool:
-    if language in {"javascript", "typescript", "go"}:
+    if language in {"javascript", "typescript", "go", "swift"}:
         return True
     ancestor = node.parent
     if language == "python":

@@ -549,6 +549,10 @@ def _resolve_import(
             resolution_control_files=resolution.control_files,
             resolution_configuration=resolution.configuration,
         )
+    elif raw.language == "swift":
+        # No Swift module index exists yet (swift-modules), so no import target
+        # can be cited.
+        return _unresolved(raw, source.id, "external")
     else:
         return _unresolved(raw, source.id, "unsupported_language")
     if target_file is None:

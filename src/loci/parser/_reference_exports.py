@@ -92,6 +92,10 @@ def _extract_local_exports(
             source_file=source_file,
             source_hash=source_hash,
         )
+    elif language == "swift":
+        # Swift visibility levels are modelled by swift-local; until then no
+        # export is claimed for a Swift file.
+        pass
     else:
         raise ValueError(f"unsupported local export language: {language}")
     return exports
