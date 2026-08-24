@@ -129,6 +129,33 @@ _SPECS: dict[str, LanguageSpec] = {
         decorator_child_type="decorator",
         import_node_types=("import_statement", "export_statement"),
     ),
+    "swift": LanguageSpec(
+        ts_language="swift",
+        symbol_node_types={
+            "function_declaration": "function",
+            # tree-sitter-swift emits class, struct, enum and extension all as
+            # class_declaration, distinguished by a keyword child.
+            "class_declaration": "class",
+            "protocol_declaration": "protocol",
+            "init_declaration": "method",
+            "subscript_declaration": "method",
+            "typealias_declaration": "type",
+            "associatedtype_declaration": "type",
+            "property_declaration": "constant",
+        },
+        name_fields=["name"],
+        param_fields=["parameters"],
+        return_type_fields=["return_type"],
+        docstring_strategy="preceding_comment",
+        container_node_types=[
+            "class_declaration",
+            "class_body",
+            "enum_class_body",
+            "protocol_body",
+        ],
+        constant_name_pattern=r"^[A-Z][A-Z0-9_]*$",
+        import_node_types=("import_declaration",),
+    ),
 }
 
 EXTENSION_MAP: dict[str, str] = {
@@ -139,6 +166,7 @@ EXTENSION_MAP: dict[str, str] = {
     ".cts": "typescript",
     ".go": "go",
     ".rs": "rust",
+    ".swift": "swift",
     ".js": "javascript",
     ".jsx": "javascript",
     ".mjs": "javascript",
