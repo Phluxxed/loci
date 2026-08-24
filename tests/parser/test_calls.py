@@ -539,3 +539,63 @@ def test_swift_method_is_not_a_file_scope_callable_binding():
     assert call.callee_text == "record"
     assert call.local_candidates == ()
     assert call.local_binding_state == "absent"
+
+
+def test_python_deferred_call_sees_a_later_module_level_function():
+    calls = _extract_calls(
+        source=(
+            "def caller():\n"
+            "    early()\n"
+            "    late()\n"
+            "def early(): pass\n"
+            "def late(): pass\n"
+        ),
+        language="python",
+    )
+
+    states = {call.callee_text: call.local_binding_state for call in calls}
+    assert states == {"early": "definite", "late": "definite"}
+    late = next(call for call in calls if call.callee_text == "late")
+    assert [binding.name for binding in late.local_candidates] == ["late"]
+
+
+def test_python_module_level_call_still_cannot_see_a_later_function():
+    calls = _extract_calls(
+        source="late()\ndef late(): pass\n",
+        language="python",
+    )
+
+    call = calls[0]
+    assert call.owner.kind == "file"
+    assert call.local_binding_state == "absent"
+    assert call.local_candidates == ()
+
+
+def test_python_call_cannot_see_a_later_sibling_in_its_own_body():
+    calls = _extract_calls(
+        source=(
+            "def outer():\n"
+            "    inner()\n"
+            "    def inner(): pass\n"
+        ),
+        language="python",
+    )
+
+    call = calls[0]
+    assert call.callee_text == "inner"
+    assert call.local_binding_state == "absent"
+
+
+def test_python_deeper_callable_sees_a_later_sibling_of_its_parent():
+    calls = _extract_calls(
+        source=(
+            "def outer():\n"
+            "    def deepest():\n"
+            "        inner()\n"
+            "    def inner(): pass\n"
+        ),
+        language="python",
+    )
+
+    call = next(item for item in calls if item.callee_text == "inner")
+    assert call.local_binding_state == "definite"

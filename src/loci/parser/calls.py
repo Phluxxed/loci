@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, TypeAlias
 
 from loci.parser._binding_context import (
+    ExecutableOwner,
     LexicalBinding,
     SyntaxContext,
     nearest_executable_owner,
@@ -68,12 +69,14 @@ def extract_call_sites(
             callee_form, callee_path = "dynamic", ()
         else:
             callee_form, callee_path = _classify_callee(callee, source, language)
+        owner = nearest_executable_owner(context, node)
         local_candidates, local_binding_state = _local_call_binding(
             callee,
             callee_path,
             callee_form,
             source,
             context,
+            owner,
         )
         observations.append(
             RawCallSite(
@@ -90,7 +93,7 @@ def extract_call_sites(
                 callee_form=callee_form,
                 local_candidates=local_candidates,
                 local_binding_state=local_binding_state,
-                owner=nearest_executable_owner(context, node),
+                owner=owner,
                 source_hash=source_hash,
             )
         )
@@ -248,6 +251,7 @@ def _local_call_binding(
     form: CallCalleeForm,
     source: bytes,
     context: SyntaxContext,
+    owner: ExecutableOwner,
 ) -> tuple[tuple[LocalCallableBinding, ...], CallBindingState]:
     if form == "dynamic":
         return (), "unsupported"
@@ -261,7 +265,10 @@ def _local_call_binding(
         if binding.name == name
         and binding.scope_start_byte <= callee.start_byte
         and callee.end_byte <= binding.scope_end_byte
-        and binding.active_start_byte <= callee.start_byte
+        and (
+            binding.active_start_byte <= callee.start_byte
+            or _visible_to_deferred_call(binding, owner)
+        )
     ]
     if not visible:
         return (), "absent"
@@ -308,6 +315,35 @@ def _local_call_binding(
     if len(candidates) == 1:
         return candidates, "definite"
     return candidates, "ambiguous"
+
+
+def _visible_to_deferred_call(
+    binding: LexicalBinding,
+    owner: ExecutableOwner,
+) -> bool:
+    """Whether a declaration below the call site is still visible to it.
+
+    A call inside a function body does not run until that body is invoked, by
+    which time a sibling declared further down the enclosing scope exists. That
+    only holds across a function boundary: a call and a declaration sitting in
+    the *same* body still run in source order, so the owner's own scope is
+    excluded.
+    """
+    if not binding.deferred_visible or owner.kind == "file":
+        return False
+    definition_start = owner.definition_start_byte
+    definition_end = owner.definition_end_byte
+    assert definition_start is not None
+    assert definition_end is not None
+    if (
+        binding.scope_start_byte == definition_start
+        and binding.scope_end_byte == definition_end
+    ):
+        return False
+    return (
+        binding.scope_start_byte <= definition_start
+        and definition_end <= binding.scope_end_byte
+    )
 
 
 def _callable_candidate(
