@@ -1,6 +1,6 @@
 # Plan: Member-Scope Call Resolution
 
-**Status:** proposed — not authorized for implementation
+**Status:** approved; Task 1 implemented, Checkpoint A passed
 
 **Date:** 2026-08-25
 
@@ -205,16 +205,17 @@ These are additive to persisted models and therefore need an
 
 ### `src/loci/parser/_binding_context.py`
 
-- `LexicalBinding` gains `deferred_visible: bool`, set for callable
-  declarations, meaning "visible to `callable`-owned sites regardless of
-  `active_start_byte`".
+- `LexicalBinding` gains `deferred_visible: bool`, set for Python callable
+  declarations only, meaning "visible to a call site whose owning definition is
+  nested inside this binding's scope, regardless of `active_start_byte`".
+  *(Done in `b8bac76`.)*
 - New member-scope collection per language, keyed by owning type declaration
   rather than by lexical scope.
 
 ### `src/loci/parser/calls.py`
 
-- `_local_call_binding` honours `deferred_visible` when the call site's
-  `ExecutableOwner.kind == "callable"`.
+- `_local_call_binding` honours `deferred_visible` via
+  `_visible_to_deferred_call`. *(Done in `b8bac76`.)*
 - New `_member_call_binding` producing `member_candidates`.
 - Swift `_swift_path` returns a path for `self`-rooted navigation instead of
   `None`.
@@ -254,23 +255,40 @@ same file, with a member call from each half reaching the right target.
 
 ## Incremental Tasks
 
-### Task 1 — Deferred callable visibility
+### Task 1 — Deferred callable visibility — **done** (`b8bac76`)
 
-Add `deferred_visible` to `LexicalBinding`, set it for callable declarations in
-all six collectors, honour it in `_local_call_binding` only when the call
-site's owner is `callable`. No new resolution tier — these sites simply become
-`definite` and flow through the existing `exact` path.
+Built as specified with one correction found on contact: **only Python was
+affected.** JavaScript, TypeScript, Go, Rust and Swift already bind a callable
+declaration with `active_start_byte=scope.start_byte`, so they hoist already.
+Verified with a forward-reference fixture in each of the five.
 
-*Acceptance:* the `early`/`late` fixture above yields `definite` for both; a
-module-level forward call (`late()` at file scope, before the declaration)
-stays `absent`; `_error` sites in `src/loci/graph/calls.py` resolve.
+The rule shipped is narrower than "the owner is a callable". `python_scope`
+returns the enclosing *definition node*, not its body, so an owner-body test
+would have wrongly admitted a nested `def` called earlier in the very same
+body — a real `NameError`. `_visible_to_deferred_call`
+(`src/loci/parser/calls.py`) therefore requires the call site's owner
+definition to be contained in, and not identical to, the binding's scope.
 
-### Checkpoint A — re-measure
+`EXTRACTOR_VERSION` went 13 to 14: extraction output changes, so existing
+indexes must be rebuilt.
 
-Re-run the baseline tally on both corpora. Record the delta. If Task 1 alone
-does not move the Swift bare-lowercase bucket materially, that says the Swift
-17,346 are module-level rather than same-file, and Task 3's sizing needs
-revisiting before it is built.
+### Checkpoint A — re-measured 2026-08-25
+
+| Corpus | definite before | definite after | absent before | absent after |
+|---|---:|---:|---:|---:|
+| Python (`src/loci`, 9,335 sites) | 374 | 2,171 | 5,312 | 3,516 |
+| Swift (lott-ios, 126,406 sites) | 592 | 592 | 60,112 | 60,112 |
+
+**Consequence for the rest of this plan.** Swift gained nothing, so its 17,346
+bare-lowercase unresolved calls are *not* forward references — they are member
+calls under implicit self, or calls into other files in the same module. That
+confirms Task 3 and the Swift module work as the only routes to them, and
+removes forward-referencing as a candidate explanation.
+
+Full suite: 1,355 passed, 2 failed. Both failures
+(`test_enforce_read_hook::test_nested_indexed_repo_uses_longest_matching_root`,
+`test_store_isolation::test_mcp_binding_uses_inherited_suite_store_boundary`)
+reproduce identically on the unmodified tree and are unrelated to this work.
 
 ### Task 2 — Member candidate collection
 
