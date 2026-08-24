@@ -43,6 +43,10 @@ class LexicalBinding:
     declaration_end_byte: int
     active_start_byte: int
     callable_kind: CallableKind | None
+    # A call that runs later than the declaration can still see it. True only
+    # where a language defers execution rather than hoisting the name, so
+    # active_start_byte alone cannot express the visibility.
+    deferred_visible: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -296,6 +300,7 @@ def _add_local_binding(
     kind: str = "value",
     declaration_end_byte: int | None = None,
     callable_kind: CallableKind | None = None,
+    deferred_visible: bool = False,
 ) -> None:
     name = _node_text(name_node, source)
     if not name or name == "_":
@@ -315,6 +320,7 @@ def _add_local_binding(
             ),
             active_start_byte=active_start_byte,
             callable_kind=callable_kind,
+            deferred_visible=deferred_visible,
         )
     )
 
@@ -382,6 +388,7 @@ def _collect_python_context(
                     kind="callable" if callable_kind is not None else "value",
                     declaration_end_byte=definition_end,
                     callable_kind=callable_kind,
+                    deferred_visible=callable_kind is not None,
                 )
             parameters = node.child_by_field_name("parameters")
             if parameters is not None:
