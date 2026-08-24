@@ -84,7 +84,7 @@ def _extract_local_exports(
             source_file=source_file,
             source_hash=source_hash,
         )
-    else:
+    elif language == "rust":
         _extract_rust_exports(
             root,
             source,
@@ -92,6 +92,8 @@ def _extract_local_exports(
             source_file=source_file,
             source_hash=source_hash,
         )
+    else:
+        raise ValueError(f"unsupported local export language: {language}")
     return exports
 
 

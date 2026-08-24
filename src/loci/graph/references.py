@@ -725,7 +725,7 @@ def _resolve_symbol_reference(
             import_record=import_record,
             index=index._go,
         )
-    else:
+    elif raw.language == "rust":
         from ._rust_references import resolve_rust_reference
 
         rust_outcome = resolve_rust_reference(
@@ -736,6 +736,8 @@ def _resolve_symbol_reference(
         )
         outcome = rust_outcome
         resolution_configuration = rust_outcome.resolution_configuration
+    else:
+        raise ValueError(f"unsupported reference language: {raw.language}")
     import_support = _import_binding_support(raw, import_record)
     if outcome.target is None:
         return _unresolved_record(
