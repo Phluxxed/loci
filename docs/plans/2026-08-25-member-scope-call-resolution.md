@@ -232,16 +232,25 @@ These are additive to persisted models and therefore need an
 - New unresolved reasons: `member_target_not_indexed`,
   `member_binding_ambiguous`.
 
-## Known Complication — duplicate type symbols
+## Known Complication — a type is not one symbol
 
 `parse_file` on `tests/fixtures/sample.swift` emits **two** symbols with
 qualified name `Widget` and kind `class` — one for the declaration, one for the
-`extension Widget` block. `make_symbol_id` is
-`f"{file_path}::{qualified_name}#{kind}"`, so both take the same id. Member
-resolution keyed on the owning type must therefore key on the type's
-*declaration byte range*, not its id, and the id collision itself should be
-investigated before this work starts — it may already be corrupting the symbol
-index for Swift, C#-style partial types, and Rust `impl` blocks.
+`extension Widget` block. Their ids do not collide: `_dedupe_ids`
+(`src/loci/parser/extractor.py:1363`) appends a `~N` suffix, giving
+`…::Widget#class` and `…::Widget#class~1`. Scanned across the whole lott-ios
+corpus (4,486 files, 36,932 symbols) and loci's own source, there are zero id
+collisions, so nothing is being lost today.
+
+The consequence for this plan is different: **there is no single node meaning
+"the type `Widget`"**. Member resolution must therefore key a member on its
+owning type *declaration byte range*, and treat "which type am I inside" as a
+lexical question answered from the enclosing declaration — never as a lookup by
+type name or symbol id. The same shape appears for Rust `impl` blocks and for
+any language allowing a type to be declared in more than one place.
+
+Task 3's test matrix must include a type declared once and extended once in the
+same file, with a member call from each half reaching the right target.
 
 ## Incremental Tasks
 
