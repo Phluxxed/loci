@@ -93,9 +93,13 @@ def _extract_local_exports(
             source_hash=source_hash,
         )
     elif language == "swift":
-        # Swift visibility levels are modelled by swift-local; until then no
-        # export is claimed for a Swift file.
-        pass
+        _extract_swift_exports(
+            root,
+            source,
+            exports,
+            source_file=source_file,
+            source_hash=source_hash,
+        )
     else:
         raise ValueError(f"unsupported local export language: {language}")
     return exports
@@ -386,6 +390,80 @@ def _extract_go_exports(
                 type_only=False,
                 definition_node=node,
             )
+
+
+_SWIFT_EXPORTED_VISIBILITY = {"public", "open", "package"}
+_SWIFT_DECLARATION_TYPES = {
+    "function_declaration",
+    "class_declaration",
+    "protocol_declaration",
+    "typealias_declaration",
+    "property_declaration",
+}
+
+
+def _swift_visibility(node: Any, source: bytes) -> str:
+    for child in node.named_children:
+        if child.type != "modifiers":
+            continue
+        for modifier in child.named_children:
+            if modifier.type == "visibility_modifier":
+                return _node_text(modifier, source)
+    # Swift's default is internal: visible across the module, never importable
+    # from another one.
+    return "internal"
+
+
+def _swift_file_level(node: Any) -> bool:
+    """Only a top-level declaration is importable under a bare name.
+
+    A member of a type is reached through its type, so recording it as a bare
+    exported name would invite a resolution nothing can back.
+    """
+    return node.parent is not None and node.parent.type == "source_file"
+
+
+def _extract_swift_exports(
+    root: Any,
+    source: bytes,
+    exports: list[RawLocalExport],
+    *,
+    source_file: str,
+    source_hash: str,
+) -> None:
+    """Record the Swift declarations another module can import.
+
+    Only public, open and package declarations cross a module boundary;
+    internal (the default), fileprivate and private do not.
+    """
+    for node in _walk_nodes(root):
+        if node.type not in _SWIFT_DECLARATION_TYPES or not _swift_file_level(node):
+            continue
+        if _swift_visibility(node, source) not in _SWIFT_EXPORTED_VISIBILITY:
+            continue
+        name = node.child_by_field_name("name")
+        if name is None:
+            continue
+        if name.type == "pattern":
+            bound = name.child_by_field_name("bound_identifier")
+            if bound is None:
+                continue
+            name = bound
+        value = _node_text(name, source)
+        if not value:
+            continue
+        _append_export(
+            exports,
+            evidence_node=node,
+            source=source,
+            source_file=source_file,
+            language="swift",
+            source_hash=source_hash,
+            local_name=value,
+            exported_name=value,
+            type_only=False,
+            definition_node=node,
+        )
 
 
 def _rust_module_item(node: Any) -> bool:

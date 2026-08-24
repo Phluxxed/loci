@@ -77,3 +77,11 @@ def test_python_docstring_strategy():
 def test_typescript_docstring_strategy():
     spec = get_language_spec("typescript")
     assert spec.docstring_strategy == "preceding_comment"
+
+
+def test_swift_spec_exists():
+    spec = get_language_spec("swift")
+    assert spec is not None
+    assert spec.ts_language == "swift"
+    assert spec.import_node_types == ("import_declaration",)
+    assert EXTENSION_MAP[".swift"] == "swift"

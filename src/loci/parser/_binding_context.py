@@ -152,9 +152,7 @@ def collect_syntax_context(
     elif language == "rust":
         _collect_rust_context(root, source, context)
     elif language == "swift":
-        # Swift lexical bindings are modelled by swift-local; executable owners
-        # are collected for every language above.
-        pass
+        _collect_swift_context(root, source, context)
     else:
         raise ValueError(f"unsupported syntax context language: {language}")
     return SyntaxContext(
@@ -776,6 +774,204 @@ def _rust_callable_kind(node: Any) -> CallableKind:
             break
         current = current.parent
     return "function"
+
+
+_SWIFT_SCOPE_TYPES = {
+    "statements",
+    "function_body",
+    "lambda_literal",
+    "class_body",
+    "enum_class_body",
+    "protocol_body",
+    "source_file",
+}
+_SWIFT_MEMBER_SCOPES = {"class_body", "enum_class_body", "protocol_body"}
+_SWIFT_CALLABLE_DECLARATIONS = {
+    "function_declaration",
+    "init_declaration",
+    "subscript_declaration",
+    "deinit_declaration",
+}
+
+
+def _swift_scope(node: Any) -> Any:
+    return _scope_node(node, _SWIFT_SCOPE_TYPES)
+
+
+def _swift_block(node: Any) -> Any | None:
+    return next(
+        (child for child in node.named_children if child.type == "statements"),
+        None,
+    )
+
+
+def _swift_pattern_names(node: Any) -> list[Any]:
+    """Return the identifiers a Swift pattern binds.
+
+    A pattern binds either through an explicit ``bound_identifier`` field or, in
+    tuple and case-let patterns, through the identifiers of its nested patterns.
+    """
+    names: list[Any] = []
+    for candidate in _walk_nodes(node):
+        if candidate.type != "pattern":
+            continue
+        bound = candidate.child_by_field_name("bound_identifier")
+        if bound is not None:
+            names.append(bound)
+            continue
+        names.extend(
+            child
+            for child in candidate.named_children
+            if child.type == "simple_identifier"
+        )
+    return names
+
+
+def _collect_swift_context(
+    root: Any,
+    source: bytes,
+    context: _SyntaxContextBuilder,
+) -> None:
+    for node in _walk_nodes(root):
+        if node.type == "import_declaration":
+            _exclude(context, node)
+            continue
+        if node.type in _SWIFT_CALLABLE_DECLARATIONS:
+            name = node.child_by_field_name("name")
+            _exclude(context, name)
+            scope = _swift_scope(node)
+            if (
+                node.type == "function_declaration"
+                and name is not None
+                and scope.type not in _SWIFT_MEMBER_SCOPES
+            ):
+                _add_local_binding(
+                    context,
+                    name_node=name,
+                    source=source,
+                    scope=scope,
+                    declaration_start_byte=node.start_byte,
+                    active_start_byte=scope.start_byte,
+                    kind="callable",
+                    declaration_end_byte=node.end_byte,
+                    callable_kind="function",
+                )
+            body = node.child_by_field_name("body")
+            if body is None:
+                continue
+            for parameter in node.named_children:
+                if parameter.type != "parameter":
+                    continue
+                # An argument label is part of the call syntax, never a binding.
+                _exclude(context, parameter.child_by_field_name("external_name"))
+                internal = parameter.child_by_field_name("name")
+                if internal is None:
+                    continue
+                _exclude(context, internal)
+                _add_local_binding(
+                    context,
+                    name_node=internal,
+                    source=source,
+                    scope=body,
+                    declaration_start_byte=parameter.start_byte,
+                    active_start_byte=body.start_byte,
+                )
+            continue
+        if node.type == "property_declaration":
+            target = node.child_by_field_name("name")
+            if target is None:
+                continue
+            scope = _swift_scope(node)
+            member = scope.type in _SWIFT_MEMBER_SCOPES
+            for name in _swift_pattern_names(target):
+                _exclude(context, name)
+                if member:
+                    # Stored and computed properties are members resolved
+                    # through a type, not lexical names.
+                    continue
+                _add_local_binding(
+                    context,
+                    name_node=name,
+                    source=source,
+                    scope=scope,
+                    declaration_start_byte=node.start_byte,
+                    active_start_byte=node.end_byte,
+                )
+            continue
+        if node.type in {"guard_statement", "if_statement", "while_statement"}:
+            names = _field_children(node, "bound_identifier")
+            if not names:
+                continue
+            if node.type == "guard_statement":
+                # A guard binding stays live for the rest of the enclosing
+                # scope; if and while bind only inside their own block.
+                scope = _swift_scope(node)
+                active_start = node.end_byte
+            else:
+                block = _swift_block(node)
+                if block is None:
+                    continue
+                scope = block
+                active_start = block.start_byte
+            for name in names:
+                _exclude(context, name)
+                _add_local_binding(
+                    context,
+                    name_node=name,
+                    source=source,
+                    scope=scope,
+                    declaration_start_byte=node.start_byte,
+                    active_start_byte=active_start,
+                )
+            continue
+        if node.type in {"for_statement", "switch_entry"}:
+            block = _swift_block(node)
+            if block is None:
+                continue
+            patterns = [
+                child
+                for child in node.named_children
+                if child.type in {"pattern", "switch_pattern"}
+            ]
+            for pattern in patterns:
+                for name in _swift_pattern_names(pattern):
+                    _exclude(context, name)
+                    _add_local_binding(
+                        context,
+                        name_node=name,
+                        source=source,
+                        scope=block,
+                        declaration_start_byte=pattern.start_byte,
+                        active_start_byte=block.start_byte,
+                    )
+            continue
+        if node.type == "lambda_literal":
+            block = _swift_block(node)
+            if block is None:
+                continue
+            for parameter in _walk_nodes(node):
+                if parameter.type != "lambda_parameter":
+                    continue
+                name = parameter.child_by_field_name("name") or next(
+                    (
+                        child
+                        for child in parameter.named_children
+                        if child.type == "simple_identifier"
+                    ),
+                    None,
+                )
+                if name is None:
+                    continue
+                _exclude(context, name)
+                _add_local_binding(
+                    context,
+                    name_node=name,
+                    source=source,
+                    scope=block,
+                    declaration_start_byte=parameter.start_byte,
+                    active_start_byte=block.start_byte,
+                )
+            continue
 
 
 def _collect_rust_context(

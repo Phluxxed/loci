@@ -991,3 +991,75 @@ def test_reference_path_segment_limit_fails_atomically(tmp_path: Path):
             source=f"import pkg\n{path}\n",
             language="python",
         )
+
+
+def test_swift_guard_let_shadows_an_imported_name(tmp_path: Path):
+    batch = _extract_batch(
+        tmp_path,
+        name="a.swift",
+        source=(
+            "import Foundation\n"
+            "public func run(values: [Int]) {\n"
+            "    guard let Foundation = values.first else { return }\n"
+            "    record(Foundation)\n"
+            "}\n"
+        ),
+        language="swift",
+    )
+
+    states = [(reference.path, reference.binding_state) for reference in batch.references]
+    assert states == [(("Foundation",), "shadowed")]
+
+
+def test_swift_exports_only_importable_visibility(tmp_path: Path):
+    batch = _extract_batch(
+        tmp_path,
+        name="a.swift",
+        source=(
+            "public func exported() {}\n"
+            "open class Opened {}\n"
+            "package struct Packaged {}\n"
+            "internal func implicitlyInternal() {}\n"
+            "func defaulted() {}\n"
+            "private func hidden() {}\n"
+            "fileprivate func alsoHidden() {}\n"
+        ),
+        language="swift",
+    )
+
+    assert [export.exported_name for export in batch.exports] == [
+        "exported",
+        "Opened",
+        "Packaged",
+    ]
+
+
+def test_swift_members_are_not_exported_under_a_bare_name(tmp_path: Path):
+    batch = _extract_batch(
+        tmp_path,
+        name="a.swift",
+        source=(
+            "public class Widget {\n"
+            "    public func describe() -> String { return \"w\" }\n"
+            "}\n"
+        ),
+        language="swift",
+    )
+
+    assert [export.exported_name for export in batch.exports] == ["Widget"]
+
+
+def test_swift_closure_shorthand_argument_is_not_a_reference(tmp_path: Path):
+    batch = _extract_batch(
+        tmp_path,
+        name="a.swift",
+        source=(
+            "import Foundation\n"
+            "public func run(values: [Int]) -> [Int] {\n"
+            "    return values.map { $0 * 2 }\n"
+            "}\n"
+        ),
+        language="swift",
+    )
+
+    assert [reference.path for reference in batch.references] == []

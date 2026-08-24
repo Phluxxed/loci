@@ -419,6 +419,11 @@ def test_call_record_rejects_unbounded_support():
             "rust",
             "fn target() {}\nfn caller() { target(); }\n",
         ),
+        (
+            "src/example.swift",
+            "swift",
+            "func target() {}\nfunc caller() { target() }\n",
+        ),
     ],
 )
 def test_resolves_exact_same_file_calls_for_supported_languages(

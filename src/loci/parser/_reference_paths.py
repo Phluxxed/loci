@@ -83,6 +83,39 @@ def _go_path(
     return None
 
 
+def _swift_path(
+    node: Any | None,
+    source: bytes,
+    remaining: int = MAX_REFERENCE_PATH_SEGMENTS,
+) -> tuple[str, ...] | None:
+    """Return the static name path of one Swift expression.
+
+    Closure shorthand arguments (``$0``) name no declaration, so they are not
+    observed. A navigation target that is not itself a name path — ``self``, a
+    call result, a literal — yields nothing rather than a guessed root.
+    """
+    if node is None:
+        return None
+    if remaining <= 0:
+        raise ValueError("reference path exceeds the segment limit")
+    if node.type == "simple_identifier":
+        name = _node_text(node, source)
+        return None if name.startswith("$") else (name,)
+    if node.type == "navigation_expression":
+        target = node.child_by_field_name("target")
+        suffix = node.child_by_field_name("suffix")
+        if target is None or suffix is None:
+            return None
+        member = suffix.child_by_field_name("suffix")
+        if member is None or member.type != "simple_identifier":
+            return None
+        prefix = _swift_path(target, source, remaining - 1)
+        if prefix is None:
+            return None
+        return (*prefix, _node_text(member, source))
+    return None
+
+
 def _rust_path(
     node: Any | None,
     source: bytes,
