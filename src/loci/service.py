@@ -53,6 +53,7 @@ from loci.parser.call_models import RawCallSite
 from loci.parser.extractor import parse_file
 from loci.parser.imports import (
     ImportExtractionError,
+    SourceParseError,
     RawImport,
     extract_import_batch,
 )
@@ -211,6 +212,7 @@ def _index_repo_unlocked(
                 diagnostic.code in {
                     "GRAPH_IMPORT_EXTRACTION_FAILED",
                     "GRAPH_REFERENCE_EXTRACTION_FAILED",
+                    "GRAPH_SOURCE_UNPARSED",
                 }
                 and diagnostic.source is not None
             ):
@@ -2149,6 +2151,14 @@ def _extraction_diagnostic(
     source: str,
     error: ImportExtractionError,
 ) -> GraphDiagnostic:
+    if isinstance(error, SourceParseError):
+        return GraphDiagnostic(
+            severity="info",
+            code="GRAPH_SOURCE_UNPARSED",
+            message="Source could not be parsed by the bundled grammar",
+            source=source,
+            details={"reason": str(error)},
+        )
     reference_failed = (
         isinstance(error.__cause__, ValueError)
         and " reference extraction failed: " in str(error)
