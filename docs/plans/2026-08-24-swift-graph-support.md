@@ -1,6 +1,8 @@
 # Swift graph support
 
-**Status:** spec, awaiting review. Not started.
+**Status:** `swift-extract` and `swift-local` landed on branch `swift-graph-support`
+(`265a08f`, `a4d6c4e`, `c56c83d`, after the `else`-chain conversion in `c79147c`).
+`swift-modules` and `swift-resolve` not started.
 **Author:** Claude, 2026-08-24, at Vik's request.
 **Prior art:** `docs/plans/2026-07-15-extensible-graph-retrieval-stage-7-go-import-resolution.md` — read its "Exact File Plan" (lines 888–919) before writing code. Swift should mirror Go, not Rust.
 
@@ -38,6 +40,40 @@ loci's reference graph is **import-rooted**: `RawSymbolReference.candidate_bindi
 binding. Swift files in the same module reference each other with no `import` statement at all. Intra-module
 cross-file references will therefore be structurally invisible — exactly as intra-package Go references are
 today. This is a property of the architecture, not of the Swift implementation, and it is not in scope to change.
+
+## What landed, and where the spec was wrong
+
+Measured, not estimated. All figures are `lott-ios` after the work below.
+
+| | |
+|---|---|
+| Swift files extracting cleanly | 4,410 of 4,486 |
+| Imports recorded | 12,126 |
+| Call sites recorded | 126,897, of which 656 resolve |
+| References recorded | 437, of which 37 resolve |
+| Edges | 1,100 |
+| `graph_status` | `healthy` |
+
+Four corrections to this document, each forced by something the build hit:
+
+1. **`swift-extract` could not reach `healthy` as specified.** 116 files (2.6%) hit
+   `tree.root_node.has_error`, which raised `ImportExtractionError` and degraded the whole
+   repository. That conflates a grammar gap with a graph defect. `extract_import_batch` now raises
+   `SourceParseError`, reported as an **`info`** `GRAPH_SOURCE_UNPARSED` diagnostic; genuine
+   extraction failures keep `warning` severity and still degrade.
+2. **The grammar was nine months stale.** `tree-sitter-language-pack` was pinned `>=0.7.0` with no
+   lockfile, so the venv sat on 0.13.0 (2025-11-26) against 1.15.8. Upgrading dropped Swift parse
+   failures from 116 to 76 (47 fixed, 7 newly broken) with **zero** node-type drift over the
+   python, javascript, typescript, go and rust fixtures. 1.x downloads grammars on first use, so a
+   cold cache needs network.
+3. **Spec item 7 (split `extension` and `actor` from `class`) is not a spec edit.**
+   `symbol_node_types` is a flat node-type-to-kind dict, and tree-sitter-swift emits
+   `class_declaration` for class, struct, enum, extension **and** actor, distinguished only by the
+   first keyword child. This needs a keyword-dispatch mechanism or an extractor branch. Not done;
+   struct and enum are also still mislabelled `class`.
+4. **`import struct Foundation.Data` binds the declaration, not the module.** Binding it as
+   `Foundation` collided with a real `import Foundation` and turned shadow detection into
+   `ambiguous`. Declaration-kind imports now bind the last component with `kind="symbol"`.
 
 ## Capability map
 
@@ -251,8 +287,37 @@ across two, JS's ~2,770 across three — Swift lands between Go and Rust.
 
 ## Open questions
 
-1. Does the 58% of files in the xcodeproj app target get a synthesized implicit module, or stay module-less? This
-   decides whether the largest module participates.
+1. ~~Does the 58% of files in the xcodeproj app target get a synthesized implicit module, or stay
+   module-less?~~ **Answered, and it does not decide whether the largest module participates.**
+   Measured over the citation corpus: of 47,843 cited file-pairs, 34.6% are intra-module, 44.9%
+   pair an app-target file with a package file, and 20.5% pair two packages — reproducing the 65%
+   cross-module figure above exactly. `resolve_go_reference` (`graph/_go_references.py:195-229`),
+   the model Swift copies, keys only on `import_record.target_id` and the name; it never consults
+   the importing file's own module. A Swift package cannot import an app target, so the app-target
+   file is always the importer. Those 44.9% therefore resolve with **no** synthesized app-target
+   module, and the ceiling stays near 65%. Module synthesis is an optimisation, not a gate.
 2. Ship `swift-extract` alone first to clear the `degraded` status, or hold everything until `swift-resolve`?
 3. Is the ≥50% cross-module citation-recovery target the right bar, and is `lott-ios` the right eval corpus given
    it is the only large Swift repo we have ground truth for?
+
+## After implementation: member-scope resolution
+
+Not Swift work, and deliberately out of scope here — recorded because `swift-local` is what exposed
+it.
+
+Over `lott-ios`, 126,897 Swift call sites yield 656 resolved. The reason is not Swift: a call's
+candidates come only from import bindings and file-scope lexical bindings, so loci has no concept of
+**member scope** at all. A bare `record(value)` inside `Widget`, meaning `self.record`, has nowhere
+to resolve to, and neither does `self.record()`. Every language whose dominant call form is a method
+on a receiver hits the same wall — Python `self.x`, Rust `impl` blocks, Go methods, TypeScript class
+members.
+
+The general fix is to let the enclosing type contribute candidates, driven by the parent/container
+information the symbol table already records, rather than adding a Swift rule to the resolver. It
+changes the call resolver's scope model, so it wants its own spec, and it must be measured across
+all six languages rather than on Swift alone. Two things to settle first:
+
+- Confirm how parent/container is stored for Swift methods, and whether extensions of the same type
+  in other files break the parent link.
+- A type's members can also arrive from an extension elsewhere or an inherited superclass, so where
+  one file cannot settle the target the record must say `ambiguous` rather than pick.
