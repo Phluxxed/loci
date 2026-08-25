@@ -1,6 +1,7 @@
 # Plan: Member-Scope Call Resolution
 
-**Status:** approved; Task 1 implemented, Checkpoint A passed
+**Status:** in progress on `swift-graph-support`; Tasks 1-3 implemented.
+Tasks 4-8 re-verified against the code on 2026-08-25 — see **Plan Audit**.
 
 **Date:** 2026-08-25
 
@@ -44,13 +45,38 @@ Rust too.
 
 ## Authorization and Review Posture
 
-This document authorizes no production-code change. Its commit may update only
-this plan. Vik must explicitly approve implementation.
+Each task needs Vik's explicit go before implementation. Work proceeds task by
+task, tests first, on `swift-graph-support` — this is part of the Swift graph
+work, not a separate line of development. The branch stays unpushed until the
+whole language ships as one coherent unit.
 
-Work proceeds on its own branch off `master`, task by task, tests first. The
-Swift branch `swift-graph-support` stays unpushed and unmerged until this lands
-underneath it; Swift is then finished on top and the whole language ships as one
-coherent unit.
+## Plan Audit — 2026-08-25
+
+Tasks 1-3 were implemented, and Task 3 contradicted this document's own
+contract section. The cause was a method error worth naming: the contract
+claims were written by reading type definitions in isolation, without tracing
+the values they describe into their callers. `CallResolution` was read in
+`graph/calls.py` without following `record.resolution` into
+`materialize_call_edges` and out to `GraphEdge.resolution`, which is the
+graph-wide `ResolutionTier`.
+
+Every remaining claim has now been re-checked against the code and, where it
+asserted a payoff, re-measured. Four were wrong; they are corrected in place
+below and listed here:
+
+1. **A new resolution tier was never the right lever** (Task 3, corrected).
+2. **The bare `Uppercase(...)` and `Type.member()` buckets are shape counts,
+   not payoffs.** Measured same-file yield is 953 and 220 sites respectively,
+   against 44,196 and 9,334 observed. Tasks 5 and 6 are close to worthless
+   until Swift module resolution exists.
+3. **`EXTRACTOR_VERSION` is not a Task 7 concern.** Persisted graph state is
+   re-validated against the current resolver on every graph read, so *any*
+   resolver change invalidates existing indexes. Proven by feeding a
+   pre-Task-3 record to `validate_call_records`, which rejects it with
+   `Resolved call outcome does not match current local/reference evidence`.
+   Task 3 therefore carries a bump to `EXTRACTOR_VERSION = 16`.
+4. **`_swift_path` is shared with Stage 10 reference extraction**
+   (`parser/references.py:402`), so Task 4 changes reference output too.
 
 ## Measured Baseline
 
@@ -73,6 +99,10 @@ Only the 592 definite-binding sites can currently produce an `exact` edge.
 
 ### Swift — where the 101,422 unresolvable sites actually live
 
+These are **shape** counts. They say how call sites are written, not how many
+could be resolved, and the original version of this plan wrongly read them as
+payoff estimates.
+
 | Bucket | Sites | Share |
 |---|---:|---:|
 | bare `Uppercase(...)` — initializer calls | 42,766 | 42.2% |
@@ -81,7 +111,44 @@ Only the 592 definite-binding sites can currently produce an `exact` edge.
 | static path, `Type.member()` | 8,777 | 8.7% |
 
 `self.foo()` does not appear as a static path because `_swift_path` returns
-`None` for a `self` target, so those sites are classified `dynamic` today.
+`None` for a `self` target — `self` parses as `self_expression`, not
+`simple_identifier` — so those sites are classified `dynamic` today.
+
+### Swift — how much of that is reachable without cross-file resolution
+
+Measured 2026-08-25 by walking every Swift tree and checking each callee
+against the symbols parsed from *that same file*.
+
+| Shape | Observed | Target declared here | Same-file resolvable |
+|---|---:|---:|---:|
+| bare `Uppercase(...)` | 44,196 | 5,130 | **953** |
+| `Type.member()` | 9,334 | 962 | **220** |
+| `self.member()` | 2,084 | 2,084 | **1,410** |
+
+The gap between "declared here" and "resolvable" is types with no explicit
+`init` (4,177 sites) and heads whose named member is not in the file (742).
+Swift structs mostly use the implicit memberwise initializer, which produces no
+`Type.init` symbol, so `Widget()` correctly stays unresolved.
+
+The 39,066 bare-uppercase sites naming a type declared *elsewhere* are led by
+`XCTAssertEqual` (9,153), `XCTAssertTrue` (2,453) and `XCTFail` (773) — which
+are not constructors at all but global XCTest functions. That bucket is a
+module-resolution problem, not an initializer problem.
+
+### Swift — what the 21,926 `dynamic` sites actually are
+
+| Callee shape | Sites |
+|---|---:|
+| `foo().bar()` — navigation off a call result | 10,536 |
+| `.foo()` — leading-dot implicit member syntax | 4,645 |
+| navigation off another unresolvable navigation | 2,231 |
+| `self.foo()` | 2,084 |
+| `super.foo()` | 1,268 |
+| `try x.foo()` | 535 |
+
+Only the `self` row is in scope. Everything above it needs receiver type
+inference or contextual typing; `super` needs inheritance. Task 4 therefore
+addresses 2,084 of these sites, not the whole bucket.
 
 ### Python — 55 files, 9,334 call sites
 
@@ -152,12 +219,15 @@ channel: a candidate qualified by its owning type.
 
 ## Root Cause 3 — Type names are not callable targets
 
-`Widget(...)` is 42.2% of Swift's unresolvable sites. The callee is a type
-name, and the target is that type's initializer. Symbols already carry what is
-needed — `parse_file` on `tests/fixtures/sample.swift` yields
-`Widget.init`, `Widget.describe`, `Widget.run` as `method` symbols with
-`Type.member` qualified names — but nothing joins a bare `Widget` callee to
-`Widget.init`.
+`Widget(...)` is 42.2% of Swift's unresolvable sites by shape. The callee is a
+type name, and the target is that type's initializer. Symbols already carry
+what is needed — `parse_file` yields `Widget.init` as a `method` symbol with a
+`Type.member` qualified name, for `class`, `struct` and `enum` alike — but
+nothing joins a bare `Widget` callee to `Widget.init`.
+
+The measured same-file yield is 953 Swift sites and 41 in loci's own Python.
+This root cause is real but small on its own; it becomes valuable only once a
+type name can be resolved across files.
 
 ## Scope
 
@@ -218,12 +288,20 @@ These are additive to persisted models and therefore need an
   `_visible_to_deferred_call`. *(Done in `b8bac76`.)*
 - New `_member_call_binding` producing `member_candidates`.
 - Swift `_swift_path` returns a path for `self`-rooted navigation instead of
-  `None`.
+  `None`. Note that this function lives in `parser/_reference_paths.py` and is
+  shared with `parser/references.py:402`, so the change alters Stage 10
+  reference observations as well as calls.
 
 ### `src/loci/graph/calls.py`
 
-- `CallResolution` gains `"member-resolved"`; `CallResolutionBasis` gains
-  `"member_callable"` and `"type_initializer"`.
+- ~~`CallResolution` gains `"member-resolved"`~~ — **wrong, see Plan Audit.**
+  `CallRecord.resolution` is passed straight into `GraphEdge.resolution`
+  (`_call_validation.materialize_call_edges`), which is the graph-wide
+  `ResolutionTier` shared with import, reference and contains edges and
+  filtered on by `SAFE_GRAPH_RESOLUTIONS`. Member calls carry the same proof
+  strength as local ones, so they stay at the `exact` tier and are
+  distinguished by basis alone. `CallResolutionBasis` gains
+  `"member_callable"` and, in Task 5, `"type_initializer"`.
 - `_resolve_call` gains a member branch, ordered after `_local_target` and
   before the imported-reference branch, and must fail closed with
   `conflicting_resolution` when both a local and a member target survive.
@@ -358,8 +436,19 @@ Two new unresolved reasons, both reported only after the local and reference
 branches have failed, so they never displace an existing outcome:
 `member_binding_ambiguous` and `member_target_not_indexed`.
 
-No `EXTRACTOR_VERSION` bump: extraction output is unchanged and call records are
-re-resolved from persisted raw calls at materialization time.
+`EXTRACTOR_VERSION` 15 to 16. The first version of this note said no bump was
+needed because extraction output is unchanged. That was wrong: graph state is
+persisted in the index and re-validated against the *current* resolver on every
+graph read (`service.py` lines 822, 1382, 1659, 1761, 1894 all call
+`store.validate_graph_state`). A graph built by the old resolver against an
+index whose version still matched would therefore hard-fail on read rather than
+be rebuilt. Verified by handing `validate_call_records` the record the
+pre-Task-3 resolver produced for a `self.helper()` site and watching it raise
+`Resolved call outcome does not match current local/reference evidence`.
+
+`EXTRACTOR_VERSION` is the wrong name for this gate — it forces a full
+re-extraction to invalidate a purely resolver-side change. A separate graph
+resolver version belongs in Task 7.
 
 #### Measured after Task 3
 
@@ -380,22 +469,89 @@ that is pre-existing and unrelated.
 Full suite: 1,371 passed, 6 failed — the same six pre-existing failures in
 `tests/test_enforce_read_hook.py` and `tests/test_store_isolation.py`.
 
-### Task 4 — Swift `self` paths
+### Task 4 — Swift `self` paths — next
 
-Stop discarding `self`-rooted navigation as dynamic.
+Make `_swift_path` return `("self", name)` for `self`-rooted navigation instead
+of `None`, so `self.foo()` becomes a `static_path` callee and reaches the
+member branch built in Task 3 rather than being discarded as `dynamic`.
+
+Measured payoff: 2,084 sites, of which 1,410 name a member declared in the
+enclosing type in the same file. That is the whole of it — the other 21,293
+`dynamic` Swift sites are navigation off call results, leading-dot implicit
+member syntax, and `super`, none of which this task touches.
+
+Two things the original one-line task description hid:
+
+- `_swift_path` is shared with `parser/references.py`, so Stage 10 reference
+  observations change too. Reference extraction must be re-checked, not just
+  calls.
+- `RawCallSite` forbids a `dynamic` callee from carrying candidates and forces
+  `member_binding_state="unsupported"` there. Reclassifying these sites as
+  `static_path` changes extraction output, so this task needs its own
+  `EXTRACTOR_VERSION` bump.
+
+`super.foo()` (1,268 sites) must stay `dynamic`: its target is in a superclass,
+which is out of scope.
+
+### Checkpoint B — re-measure and decide the order of Tasks 5-8
+
+Tasks 5 and 6 as originally written assumed same-file yields that do not exist.
+The decision at this checkpoint is whether to run them now for 1,173 combined
+sites, or to finish Swift module resolution first — `swift-modules` and
+`swift-resolve` in `docs/plans/2026-08-24-swift-graph-support.md` — after which
+the same two tasks reach the 39,066 and 8,372 sites whose targets are declared
+in another file.
+
+Current recommendation: module resolution first. Tasks 5 and 6 are cheap to
+build either way, and building them second means building them once against the
+resolved-type path rather than twice.
 
 ### Task 5 — Type initializer resolution
 
-`Widget(...)` → `Widget.init`, under `type_initializer` basis. Language-gated:
-Swift and Python yes, Go no, Rust no, JS/TS only via `new`.
+`Widget(...)` → `Widget.init` (Swift) or `Widget.__init__` (Python), under a
+new `type_initializer` basis at the `exact` tier. The basis is a call-local
+field, so unlike a tier it adds no graph-wide surface.
 
-### Checkpoint B — resolver review
+Measured same-file payoff: 953 Swift sites, 41 Python sites.
+
+Language gating, verified against the grammars:
+
+- **Swift and Python** — the callee is a plain `identifier` / `simple_identifier`,
+  so these are `identifier`-form call sites and need a type-name binding
+  channel alongside the member one.
+- **JavaScript and TypeScript** — `new Widget()` parses as `new_expression`,
+  which is **not** in `_CALL_NODE_TYPES` and is therefore not observed as a
+  call site at all today. Supporting it means adding a node type to call
+  extraction, not just a resolution rule. That is a larger change than this
+  task assumed and should be its own decision.
+- **Go and Rust** — no constructor call syntax; nothing to do.
+
+A type with no explicit initializer produces no `init` symbol, so `Widget()`
+stays unresolved for 4,177 Swift and 228 Python sites where the type is
+declared in the file. That is correct — call edges may only point at
+`function` or `method` symbols — and must be asserted by a test rather than
+left to chance.
 
 ### Task 6 — `Type.member()` static paths
 
-### Task 7 — Persistence, `EXTRACTOR_VERSION` bump, incremental integrity
+Measured same-file payoff: 220 Swift sites. Depends on the same type-name
+binding channel as Task 5, so the two should be built together.
+
+### Task 7 — Persistence and a real resolver version
+
+The `EXTRACTOR_VERSION` bumps in Tasks 1-4 are the blunt instrument. Persisted
+graph state is validated against the live resolver on every read, so a resolver
+change with no version change turns into a read-time contract error for anyone
+holding an index. This task introduces a version that names what it gates and
+covers incremental re-index integrity.
 
 ### Task 8 — Service, health, MCP diagnostics, documentation
+
+Smaller than it reads. `graph_calls` serialises through `record.to_dict()`, so
+new record fields already reach the MCP surface once the output model allows
+them — which is why only `mcp_output_models.py` needed touching in Task 3.
+What is genuinely missing is a breakdown by `resolution_basis` in
+`graph_health`, which today counts only resolved versus unresolved.
 
 ## Required Test Matrix
 
@@ -406,7 +562,14 @@ Swift and Python yes, Go no, Rust no, JS/TS only via `new`.
 - A member call inside a type body does not resolve to a same-named member of a
   *different* type in the same file.
 - `self.x()` where `x` is a stored property holding a closure resolves to
-  nothing, not to a same-named method.
+  nothing, not to a same-named method. **Not met as of Task 3.** Verified: a
+  Python class that assigns `self.helper = fn` in `__init__` *and* defines a
+  method `helper` resolves `self.helper()` to the method, which is wrong —
+  at runtime the instance attribute wins. Closing it needs a stored-property
+  channel that forces `member_binding_state="shadowed"` when an attribute
+  assignment in the same type body collides with a member name. Rare enough in
+  practice to defer, real enough to record; it belongs with Task 7 or later,
+  and the matrix line stays here until it passes.
 - A protocol requirement call stays unresolved.
 - An `extension` member and a declaration member of the same type both resolve.
 - A call to an inherited member stays unresolved.
@@ -425,9 +588,11 @@ with the before/after table recorded here on completion.
 
 ## Rollback
 
-Each task is a separate commit on a branch off `master`. The
-`EXTRACTOR_VERSION` bump in Task 7 is the only irreversible step for existing
-indexes; before it, revert is a branch delete.
+Each task is a separate commit on `swift-graph-support`. The original claim
+that Task 7 held the only irreversible step was wrong — Tasks 1, 2 and 3 each
+bumped `EXTRACTOR_VERSION` (13 to 16), and Task 4 will too, because every one
+of them changes what a persisted index must contain to validate. Since the
+branch is unpushed, revert remains a branch delete plus a re-index.
 
 ## Owner Review Decision
 
