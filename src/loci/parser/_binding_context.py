@@ -50,6 +50,25 @@ class LexicalBinding:
 
 
 @dataclass(frozen=True, slots=True)
+class MemberBinding:
+    """One callable member reachable from inside its own type body.
+
+    Members are keyed by the body that lexically contains a call, never by type
+    name, because a type extended in the same file is more than one symbol.
+    """
+
+    name: str
+    callable_kind: CallableKind
+    owner_type_name: str
+    owner_declaration_start_byte: int
+    owner_declaration_end_byte: int
+    owner_body_start_byte: int
+    owner_body_end_byte: int
+    declaration_start_byte: int
+    declaration_end_byte: int
+
+
+@dataclass(frozen=True, slots=True)
 class ExecutableOwner:
     kind: ExecutableOwnerKind
     definition_start_byte: int | None
@@ -120,6 +139,7 @@ class ExecutableOwner:
 @dataclass(frozen=True, slots=True)
 class SyntaxContext:
     local_bindings: tuple[LexicalBinding, ...]
+    member_bindings: tuple[MemberBinding, ...]
     executable_owners: tuple[ExecutableOwner, ...]
     excluded_subtrees: frozenset[tuple[int, int, str]]
     unsupported_import_starts: frozenset[int]
@@ -128,6 +148,7 @@ class SyntaxContext:
 @dataclass(slots=True)
 class _SyntaxContextBuilder:
     local_bindings: list[LexicalBinding]
+    member_bindings: list[MemberBinding]
     executable_owners: list[ExecutableOwner]
     excluded_subtrees: set[tuple[int, int, str]]
     unsupported_import_starts: set[int]
@@ -142,11 +163,13 @@ def collect_syntax_context(
         raise ValueError(f"unsupported syntax context language: {language}")
     context = _SyntaxContextBuilder(
         local_bindings=[],
+        member_bindings=[],
         executable_owners=[],
         excluded_subtrees=set(),
         unsupported_import_starts=set(),
     )
     _collect_executable_owners(root, language, context)
+    _collect_member_bindings(root, source, language, context)
     if language == "python":
         _collect_python_context(root, source, context)
     elif language in {"javascript", "typescript"}:
@@ -161,6 +184,7 @@ def collect_syntax_context(
         raise ValueError(f"unsupported syntax context language: {language}")
     return SyntaxContext(
         local_bindings=tuple(context.local_bindings),
+        member_bindings=tuple(context.member_bindings),
         executable_owners=tuple(context.executable_owners),
         excluded_subtrees=frozenset(context.excluded_subtrees),
         unsupported_import_starts=frozenset(context.unsupported_import_starts),
@@ -286,6 +310,176 @@ def _collect_executable_owners(
                 body_end_byte=body.end_byte,
             )
         )
+
+
+_MEMBER_TYPE_DECLARATIONS: dict[str, set[str]] = {
+    "python": {"class_definition"},
+    "javascript": {"class_declaration"},
+    "typescript": {"class_declaration"},
+    # Go methods hang off a receiver rather than a type body, and Rust
+    # self-calls are not yet given a static path. Both need their own work.
+    "go": set(),
+    "rust": set(),
+    # class_declaration covers class, struct, enum, actor and extension.
+    "swift": {"class_declaration"},
+}
+_MEMBER_BODY_TYPES: dict[str, set[str]] = {
+    "python": {"block"},
+    "javascript": {"class_body"},
+    "typescript": {"class_body"},
+    "go": set(),
+    "rust": set(),
+    "swift": {"class_body", "enum_class_body"},
+}
+_MEMBER_CALLABLE_TYPES: dict[str, set[str]] = {
+    "python": {"function_definition"},
+    "javascript": {"method_definition"},
+    "typescript": {"method_definition"},
+    "go": set(),
+    "rust": set(),
+    "swift": {"function_declaration", "init_declaration"},
+}
+# A Swift type may be declared once and extended again in the same file. Both
+# halves are one type, so their members pool. No other supported language lets
+# a second declaration of the same name extend the first.
+_MEMBER_POOLED_LANGUAGES = {"swift"}
+
+
+@dataclass(slots=True)
+class _MemberScope:
+    type_name: str
+    declaration_start_byte: int
+    declaration_end_byte: int
+    body_start_byte: int
+    body_end_byte: int
+    file_level: bool
+    members: list[tuple[str, CallableKind, int, int]]
+
+
+def _collect_member_bindings(
+    root: Any,
+    source: bytes,
+    language: str,
+    context: _SyntaxContextBuilder,
+) -> None:
+    declarations = _MEMBER_TYPE_DECLARATIONS[language]
+    if not declarations:
+        return
+    bodies = _MEMBER_BODY_TYPES[language]
+    callables = _MEMBER_CALLABLE_TYPES[language]
+    scopes: list[_MemberScope] = []
+    for node in _walk_nodes(root):
+        if node.type not in declarations:
+            continue
+        type_name = _member_type_name(node, source)
+        body = next(
+            (child for child in node.named_children if child.type in bodies),
+            None,
+        )
+        if type_name is None or body is None or body.start_byte >= body.end_byte:
+            continue
+        scopes.append(
+            _MemberScope(
+                type_name=type_name,
+                declaration_start_byte=node.start_byte,
+                declaration_end_byte=node.end_byte,
+                body_start_byte=body.start_byte,
+                body_end_byte=body.end_byte,
+                file_level=node.parent is not None and node.parent.parent is None,
+                members=_member_callables(body, callables, language, source),
+            )
+        )
+
+    pooled: dict[str, list[tuple[str, CallableKind, int, int]]] = {}
+    if language in _MEMBER_POOLED_LANGUAGES:
+        for scope in scopes:
+            if scope.file_level:
+                pooled.setdefault(scope.type_name, []).extend(scope.members)
+
+    for scope in scopes:
+        members = pooled.get(scope.type_name, scope.members) if scope.file_level else scope.members
+        seen: set[tuple[str, CallableKind, int, int]] = set()
+        for name, callable_kind, start, end in members:
+            key = (name, callable_kind, start, end)
+            if key in seen:
+                continue
+            seen.add(key)
+            context.member_bindings.append(
+                MemberBinding(
+                    name=name,
+                    callable_kind=callable_kind,
+                    owner_type_name=scope.type_name,
+                    owner_declaration_start_byte=scope.declaration_start_byte,
+                    owner_declaration_end_byte=scope.declaration_end_byte,
+                    owner_body_start_byte=scope.body_start_byte,
+                    owner_body_end_byte=scope.body_end_byte,
+                    declaration_start_byte=start,
+                    declaration_end_byte=end,
+                )
+            )
+
+
+def _member_callables(
+    body: Any,
+    callable_types: set[str],
+    language: str,
+    source: bytes,
+) -> list[tuple[str, CallableKind, int, int]]:
+    members: list[tuple[str, CallableKind, int, int]] = []
+    for child in body.named_children:
+        declaration = child
+        if child.type == "decorated_definition":
+            inner = child.child_by_field_name("definition")
+            if inner is None:
+                continue
+            child = inner
+        if child.type not in callable_types:
+            continue
+        # A requirement without a body has no provable target.
+        if child.child_by_field_name("body") is None:
+            continue
+        if language in {"javascript", "typescript"} and any(
+            token.type in {"get", "set"} for token in child.children
+        ):
+            continue
+        if child.type == "init_declaration":
+            name = "init"
+        else:
+            name_node = child.child_by_field_name("name")
+            if name_node is None:
+                continue
+            name = _node_text(name_node, source)
+        if not name:
+            continue
+        members.append((name, "method", declaration.start_byte, declaration.end_byte))
+    return members
+
+
+def _member_type_name(node: Any, source: bytes) -> str | None:
+    name_node = node.child_by_field_name("name")
+    if name_node is None:
+        name_node = next(
+            (
+                child
+                for child in node.named_children
+                if child.type in {"type_identifier", "user_type"}
+            ),
+            None,
+        )
+    if name_node is None:
+        return None
+    if name_node.type == "user_type":
+        name_node = next(
+            (
+                child
+                for child in name_node.named_children
+                if child.type == "type_identifier"
+            ),
+            None,
+        )
+        if name_node is None:
+            return None
+    return _node_text(name_node, source) or None
 
 
 def _add_local_binding(

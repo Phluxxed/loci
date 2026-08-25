@@ -5,6 +5,7 @@ from typing import Any, TypeAlias
 from loci.parser._binding_context import (
     ExecutableOwner,
     LexicalBinding,
+    MemberBinding,
     SyntaxContext,
     nearest_executable_owner,
 )
@@ -17,6 +18,7 @@ from loci.parser.call_models import (
     CallBindingState,
     CallCalleeForm,
     LocalCallableBinding,
+    MemberCallableBinding,
     RawCallSite,
 )
 
@@ -78,6 +80,14 @@ def extract_call_sites(
             context,
             owner,
         )
+        member_candidates, member_binding_state = _member_call_binding(
+            callee,
+            callee_path,
+            callee_form,
+            source,
+            context,
+            language,
+        )
         observations.append(
             RawCallSite(
                 source_file=source_file,
@@ -93,6 +103,8 @@ def extract_call_sites(
                 callee_form=callee_form,
                 local_candidates=local_candidates,
                 local_binding_state=local_binding_state,
+                member_candidates=member_candidates,
+                member_binding_state=member_binding_state,
                 owner=owner,
                 source_hash=source_hash,
             )
@@ -315,6 +327,97 @@ def _local_call_binding(
     if len(candidates) == 1:
         return candidates, "definite"
     return candidates, "ambiguous"
+
+
+_IMPLICIT_SELF_LANGUAGES = {"swift"}
+_EXPLICIT_SELF_ROOTS = {
+    "python": {"self", "cls"},
+    "javascript": {"this"},
+    "typescript": {"this"},
+}
+
+
+def _member_call_binding(
+    callee: Any,
+    path: StaticPath,
+    form: CallCalleeForm,
+    source: bytes,
+    context: SyntaxContext,
+    language: str,
+) -> tuple[tuple[MemberCallableBinding, ...], CallBindingState]:
+    """Match a call against the members of the type body that contains it."""
+    if form == "dynamic":
+        return (), "unsupported"
+    name = _member_call_name(path, form, language)
+    if name is None:
+        return (), "absent"
+    visible = [
+        binding
+        for binding in context.member_bindings
+        if binding.name == name
+        and binding.owner_body_start_byte <= callee.start_byte
+        and callee.end_byte <= binding.owner_body_end_byte
+    ]
+    if not visible:
+        return (), "absent"
+    # A nested type body wins over the type that encloses it.
+    nearest_span = min(
+        binding.owner_body_end_byte - binding.owner_body_start_byte
+        for binding in visible
+    )
+    nearest = [
+        binding
+        for binding in visible
+        if binding.owner_body_end_byte - binding.owner_body_start_byte == nearest_span
+    ]
+    candidates = tuple(
+        sorted(
+            {_member_candidate(binding, source) for binding in nearest},
+            key=lambda candidate: (
+                candidate.definition_start_byte,
+                candidate.definition_end_byte,
+                candidate.name,
+            ),
+        )
+    )
+    if len(candidates) > MAX_CALL_BINDING_CANDIDATES:
+        raise ValueError("member call candidates exceeds the candidate limit")
+    if len(candidates) == 1:
+        return candidates, "definite"
+    return candidates, "ambiguous"
+
+
+def _member_call_name(
+    path: StaticPath,
+    form: CallCalleeForm,
+    language: str,
+) -> str | None:
+    """The member name a call is asking for, or None if the shape cannot say."""
+    if form == "identifier":
+        # Only languages with implicit self can reach a member by a bare name.
+        return path[0] if language in _IMPLICIT_SELF_LANGUAGES else None
+    roots = _EXPLICIT_SELF_ROOTS.get(language)
+    if roots is None or len(path) != 2 or path[0] not in roots:
+        return None
+    return path[1]
+
+
+def _member_candidate(
+    binding: MemberBinding,
+    source: bytes,
+) -> MemberCallableBinding:
+    return MemberCallableBinding(
+        name=binding.name,
+        callable_kind=binding.callable_kind,
+        owner_type_name=binding.owner_type_name,
+        owner_declaration_start_byte=binding.owner_declaration_start_byte,
+        owner_declaration_end_byte=binding.owner_declaration_end_byte,
+        owner_body_start_byte=binding.owner_body_start_byte,
+        owner_body_end_byte=binding.owner_body_end_byte,
+        definition_start_byte=binding.declaration_start_byte,
+        definition_end_byte=binding.declaration_end_byte,
+        definition_line=source.count(b"\n", 0, binding.declaration_start_byte) + 1,
+    )
 
 
 def _visible_to_deferred_call(

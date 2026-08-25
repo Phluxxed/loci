@@ -66,6 +66,8 @@ def _call(**overrides) -> RawCallSite:
         "callee_form": "identifier",
         "local_candidates": (_binding(),),
         "local_binding_state": "definite",
+        "member_candidates": (),
+        "member_binding_state": "absent",
         "owner": _owner(),
         "source_hash": SOURCE_HASH,
     }
@@ -599,3 +601,136 @@ def test_python_deeper_callable_sees_a_later_sibling_of_its_parent():
 
     call = next(item for item in calls if item.callee_text == "inner")
     assert call.local_binding_state == "definite"
+
+
+def test_swift_implicit_self_call_carries_a_definite_member_candidate():
+    calls = _extract_calls(
+        source=(
+            "class Widget {\n"
+            "    func run() { record() }\n"
+            "    func record() {}\n"
+            "}\n"
+        ),
+        language="swift",
+    )
+
+    call = calls[0]
+    assert call.local_binding_state == "absent"
+    assert call.member_binding_state == "definite"
+    member = call.member_candidates[0]
+    assert (member.name, member.owner_type_name) == ("record", "Widget")
+    assert member.callable_kind == "method"
+
+
+def test_python_self_call_carries_a_definite_member_candidate():
+    calls = _extract_calls(
+        source=(
+            "class Widget:\n"
+            "    def run(self):\n"
+            "        self.record()\n"
+            "    def record(self): pass\n"
+        ),
+        language="python",
+    )
+
+    call = calls[0]
+    assert call.callee_form == "static_path"
+    assert call.local_binding_state == "absent"
+    assert call.member_binding_state == "definite"
+    assert call.member_candidates[0].name == "record"
+
+
+def test_javascript_this_call_carries_a_definite_member_candidate():
+    calls = _extract_calls(
+        source=(
+            "class Widget {\n"
+            "  run() { this.record(); }\n"
+            "  record() {}\n"
+            "}\n"
+        ),
+        language="javascript",
+    )
+
+    call = calls[0]
+    assert call.member_binding_state == "definite"
+    assert call.member_candidates[0].owner_type_name == "Widget"
+
+
+def test_member_call_does_not_reach_another_type_in_the_same_file():
+    calls = _extract_calls(
+        source=(
+            "class Widget:\n"
+            "    def run(self):\n"
+            "        self.record()\n"
+            "class Other:\n"
+            "    def record(self): pass\n"
+        ),
+        language="python",
+    )
+
+    call = calls[0]
+    assert call.member_binding_state == "absent"
+    assert call.member_candidates == ()
+
+
+def test_swift_extension_members_join_their_type_declaration():
+    calls = _extract_calls(
+        source=(
+            "class Widget {\n"
+            "    func run() { reset() }\n"
+            "}\n"
+            "extension Widget {\n"
+            "    func reset() {}\n"
+            "    func again() { run() }\n"
+            "}\n"
+        ),
+        language="swift",
+    )
+
+    states = {call.callee_text: call.member_binding_state for call in calls}
+    assert states == {"reset": "definite", "run": "definite"}
+
+
+def test_swift_protocol_requirement_is_not_a_member_candidate():
+    calls = _extract_calls(
+        source=(
+            "protocol Describable { func describe() }\n"
+            "class Widget {\n"
+            "    func run() { describe() }\n"
+            "}\n"
+        ),
+        language="swift",
+    )
+
+    call = calls[0]
+    assert call.member_binding_state == "absent"
+
+
+def test_bare_call_outside_a_type_body_has_no_member_candidate():
+    calls = _extract_calls(
+        source=(
+            "class Widget:\n"
+            "    def record(self): pass\n"
+            "def run():\n"
+            "    record()\n"
+        ),
+        language="python",
+    )
+
+    call = calls[0]
+    assert call.member_binding_state == "absent"
+
+
+def test_dynamic_callee_reports_unsupported_member_binding():
+    calls = _extract_calls(
+        source=(
+            "class Widget:\n"
+            "    def run(self):\n"
+            "        items[0]()\n"
+        ),
+        language="python",
+    )
+
+    call = calls[0]
+    assert call.callee_form == "dynamic"
+    assert call.member_binding_state == "unsupported"

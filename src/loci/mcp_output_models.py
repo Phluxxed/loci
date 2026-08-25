@@ -960,6 +960,19 @@ class LocalCallableBinding(StrictOutputModel):
     scope_end_byte: int
 
 
+class MemberCallableBinding(StrictOutputModel):
+    name: str
+    callable_kind: Literal["function", "method"]
+    owner_type_name: str
+    owner_declaration_start_byte: int
+    owner_declaration_end_byte: int
+    owner_body_start_byte: int
+    owner_body_end_byte: int
+    definition_start_byte: int
+    definition_end_byte: int
+    definition_line: int
+
+
 class RawCallSite(StrictOutputModel):
     source_file: str
     language: Literal[
@@ -976,6 +989,10 @@ class RawCallSite(StrictOutputModel):
     callee_form: Literal["identifier", "static_path", "dynamic"]
     local_candidates: list[LocalCallableBinding]
     local_binding_state: Literal[
+        "definite", "shadowed", "ambiguous", "absent", "unsupported"
+    ]
+    member_candidates: list[MemberCallableBinding]
+    member_binding_state: Literal[
         "definite", "shadowed", "ambiguous", "absent", "unsupported"
     ]
     owner: ExecutableOwner
