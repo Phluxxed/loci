@@ -278,6 +278,8 @@ def _call_record() -> CallRecord:
             callee_form="identifier",
             local_candidates=(),
             local_binding_state="absent",
+            member_candidates=(),
+            member_binding_state="absent",
             owner=ExecutableOwner(
                 kind="callable",
                 definition_start_byte=50,

@@ -123,6 +123,104 @@ class LocalCallableBinding:
 
 
 @dataclass(frozen=True, slots=True)
+class MemberCallableBinding:
+    name: str
+    callable_kind: CallableKind
+    owner_type_name: str
+    owner_declaration_start_byte: int
+    owner_declaration_end_byte: int
+    owner_body_start_byte: int
+    owner_body_end_byte: int
+    definition_start_byte: int
+    definition_end_byte: int
+    definition_line: int
+
+    def __post_init__(self) -> None:
+        _nonempty_string(self.name, "name")
+        _nonempty_string(self.owner_type_name, "owner_type_name")
+        if self.callable_kind not in _CALLABLE_KINDS:
+            raise ValueError("callable_kind must be function or method")
+        owner_start = _integer(
+            self.owner_declaration_start_byte,
+            "owner_declaration_start_byte",
+            minimum=0,
+        )
+        owner_end = _integer(
+            self.owner_declaration_end_byte,
+            "owner_declaration_end_byte",
+            minimum=1,
+        )
+        body_start = _integer(
+            self.owner_body_start_byte,
+            "owner_body_start_byte",
+            minimum=0,
+        )
+        body_end = _integer(self.owner_body_end_byte, "owner_body_end_byte", minimum=1)
+        definition_start = _integer(
+            self.definition_start_byte,
+            "definition_start_byte",
+            minimum=0,
+        )
+        definition_end = _integer(
+            self.definition_end_byte,
+            "definition_end_byte",
+            minimum=1,
+        )
+        if owner_start >= owner_end or body_start >= body_end:
+            raise ValueError("owner byte ranges must be non-empty and ordered")
+        if not (owner_start <= body_start and body_end <= owner_end):
+            raise ValueError("owner body must sit inside its declaration")
+        if definition_start >= definition_end:
+            raise ValueError("member byte range must be non-empty and ordered")
+        _integer(self.definition_line, "definition_line", minimum=1)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "name": self.name,
+            "callable_kind": self.callable_kind,
+            "owner_type_name": self.owner_type_name,
+            "owner_declaration_start_byte": self.owner_declaration_start_byte,
+            "owner_declaration_end_byte": self.owner_declaration_end_byte,
+            "owner_body_start_byte": self.owner_body_start_byte,
+            "owner_body_end_byte": self.owner_body_end_byte,
+            "definition_start_byte": self.definition_start_byte,
+            "definition_end_byte": self.definition_end_byte,
+            "definition_line": self.definition_line,
+        }
+
+    @classmethod
+    def from_dict(cls, value: Mapping[str, Any]) -> MemberCallableBinding:
+        _require_fields(
+            value,
+            {
+                "name",
+                "callable_kind",
+                "owner_type_name",
+                "owner_declaration_start_byte",
+                "owner_declaration_end_byte",
+                "owner_body_start_byte",
+                "owner_body_end_byte",
+                "definition_start_byte",
+                "definition_end_byte",
+                "definition_line",
+            },
+            "member callable binding",
+        )
+        return cls(
+            name=value["name"],
+            callable_kind=value["callable_kind"],
+            owner_type_name=value["owner_type_name"],
+            owner_declaration_start_byte=value["owner_declaration_start_byte"],
+            owner_declaration_end_byte=value["owner_declaration_end_byte"],
+            owner_body_start_byte=value["owner_body_start_byte"],
+            owner_body_end_byte=value["owner_body_end_byte"],
+            definition_start_byte=value["definition_start_byte"],
+            definition_end_byte=value["definition_end_byte"],
+            definition_line=value["definition_line"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class RawCallSite:
     source_file: str
     language: str
@@ -137,6 +235,8 @@ class RawCallSite:
     callee_form: CallCalleeForm
     local_candidates: tuple[LocalCallableBinding, ...]
     local_binding_state: CallBindingState
+    member_candidates: tuple[MemberCallableBinding, ...]
+    member_binding_state: CallBindingState
     owner: ExecutableOwner
     source_hash: str
 
@@ -215,9 +315,49 @@ class RawCallSite:
                 raise ValueError("local candidate scope must contain the callee")
             if candidate.name != self.callee_path[0]:
                 raise ValueError("local candidate name must match the callee root")
+        self._validate_member_candidates(callee_start, callee_end)
         if not isinstance(self.owner, ExecutableOwner):
             raise ValueError("owner must be an ExecutableOwner")
         _sha256(self.source_hash, "source_hash")
+
+    def _validate_member_candidates(self, callee_start: int, callee_end: int) -> None:
+        _typed_tuple(
+            self.member_candidates,
+            "member_candidates",
+            MemberCallableBinding,
+        )
+        if len(self.member_candidates) > MAX_CALL_BINDING_CANDIDATES:
+            raise ValueError("member_candidates exceeds the candidate limit")
+        if len(set(self.member_candidates)) != len(self.member_candidates):
+            raise ValueError("member_candidates must be unique")
+        if self.member_binding_state not in _CALL_BINDING_STATES:
+            raise ValueError("member_binding_state must be a supported state")
+        count = len(self.member_candidates)
+        if self.member_binding_state == "definite" and count != 1:
+            raise ValueError("definite member calls require exactly one candidate")
+        if self.member_binding_state == "ambiguous" and count < 2:
+            raise ValueError("ambiguous member calls require multiple candidates")
+        if self.member_binding_state in {"shadowed", "absent", "unsupported"} and count:
+            raise ValueError(
+                f"{self.member_binding_state} member calls cannot carry candidates"
+            )
+        if self.callee_form == "dynamic":
+            if self.member_binding_state != "unsupported":
+                raise ValueError(
+                    "dynamic calls must use unsupported member binding state"
+                )
+        elif self.member_binding_state == "unsupported":
+            raise ValueError(
+                "static callees cannot use unsupported member binding state"
+            )
+        for candidate in self.member_candidates:
+            if candidate.name != self.callee_path[-1]:
+                raise ValueError("member candidate name must match the called name")
+            if not (
+                candidate.owner_body_start_byte <= callee_start
+                and callee_end <= candidate.owner_body_end_byte
+            ):
+                raise ValueError("member candidate owner body must contain the callee")
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -236,6 +376,10 @@ class RawCallSite:
                 candidate.to_dict() for candidate in self.local_candidates
             ],
             "local_binding_state": self.local_binding_state,
+            "member_candidates": [
+                candidate.to_dict() for candidate in self.member_candidates
+            ],
+            "member_binding_state": self.member_binding_state,
             "owner": self.owner.to_dict(),
             "source_hash": self.source_hash,
         }
@@ -258,6 +402,8 @@ class RawCallSite:
                 "callee_form",
                 "local_candidates",
                 "local_binding_state",
+                "member_candidates",
+                "member_binding_state",
                 "owner",
                 "source_hash",
             },
@@ -265,6 +411,7 @@ class RawCallSite:
         )
         path = _list(value["callee_path"], "callee_path")
         candidates = _list(value["local_candidates"], "local_candidates")
+        members = _list(value["member_candidates"], "member_candidates")
         return cls(
             source_file=value["source_file"],
             language=value["language"],
@@ -281,6 +428,10 @@ class RawCallSite:
                 LocalCallableBinding.from_dict(candidate) for candidate in candidates
             ),
             local_binding_state=value["local_binding_state"],
+            member_candidates=tuple(
+                MemberCallableBinding.from_dict(member) for member in members
+            ),
+            member_binding_state=value["member_binding_state"],
             owner=ExecutableOwner.from_dict(value["owner"]),
             source_hash=value["source_hash"],
         )

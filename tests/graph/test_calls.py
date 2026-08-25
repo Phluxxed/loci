@@ -71,6 +71,8 @@ def _raw_call(**overrides) -> RawCallSite:
         "callee_form": "identifier",
         "local_candidates": (_binding(),),
         "local_binding_state": "definite",
+        "member_candidates": (),
+        "member_binding_state": "absent",
         "owner": _owner(),
         "source_hash": SOURCE_HASH,
     }
@@ -701,6 +703,7 @@ def test_dynamic_and_unproven_import_like_calls_remain_unresolved():
         callee_form="dynamic",
         local_candidates=(),
         local_binding_state="unsupported",
+        member_binding_state="unsupported",
     )
     imported = _raw_call(
         local_candidates=(),

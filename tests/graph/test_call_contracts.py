@@ -73,6 +73,8 @@ def _raw_call(**overrides) -> RawCallSite:
         "callee_form": "identifier",
         "local_candidates": (_binding(),),
         "local_binding_state": "definite",
+        "member_candidates": (),
+        "member_binding_state": "absent",
         "owner": _owner(),
         "source_hash": SOURCE_HASH,
     }
