@@ -16,7 +16,11 @@ from loci.graph.contracts import GraphContractError
 from loci.graph.references import ReferenceSupport, SymbolReferenceRecord
 from loci.graph.rust_crates import RustResolutionConfiguration
 from loci.parser._binding_context import ExecutableOwner
-from loci.parser.call_models import LocalCallableBinding, RawCallSite
+from loci.parser.call_models import (
+    LocalCallableBinding,
+    MemberCallableBinding,
+    RawCallSite,
+)
 from loci.parser.extractor import parse_file
 from loci.parser.imports import extract_import_batch
 from loci.parser.symbols import Symbol, make_file_symbol, make_symbol_id
@@ -1073,3 +1077,296 @@ def test_local_and_imported_proof_conflict_fails_closed(tmp_path: Path):
 
     assert record.status == "unresolved"
     assert record.unresolved_reason == "conflicting_resolution"
+
+
+def _member_binding(**overrides) -> MemberCallableBinding:
+    values = {
+        "name": "target",
+        "callable_kind": "method",
+        "owner_type_name": "Runner",
+        "owner_declaration_start_byte": 0,
+        "owner_declaration_end_byte": 200,
+        "owner_body_start_byte": 10,
+        "owner_body_end_byte": 200,
+        "definition_start_byte": 20,
+        "definition_end_byte": 40,
+        "definition_line": 2,
+    }
+    values.update(overrides)
+    return MemberCallableBinding(**values)
+
+
+def test_python_self_call_resolves_to_its_own_method(tmp_path: Path):
+    records, _ = _resolve_source(
+        tmp_path,
+        relative_path=SOURCE_FILE,
+        language="python",
+        source=(
+            "class Runner:\n"
+            "    def run(self):\n"
+            "        return self.helper()\n"
+            "\n"
+            "    def helper(self):\n"
+            "        return 1\n"
+        ),
+    )
+
+    assert len(records) == 1
+    record = records[0]
+    assert record.status == "resolved"
+    assert record.resolution == "exact"
+    assert record.resolution_basis == "member_callable"
+    assert record.target_id is not None
+    assert record.target_id.endswith("::Runner.helper#method")
+    assert record.caller_id is not None
+    assert record.caller_id.endswith("::Runner.run#method")
+    assert [support.kind for support in record.support] == [
+        "call_site",
+        "caller_definition",
+        "local_definition",
+    ]
+
+
+def test_swift_implicit_self_call_resolves_to_its_own_method(tmp_path: Path):
+    records, _ = _resolve_source(
+        tmp_path,
+        relative_path="src/example.swift",
+        language="swift",
+        source=(
+            "class Widget {\n"
+            "    func run() -> Int {\n"
+            "        return helper()\n"
+            "    }\n"
+            "\n"
+            "    func helper() -> Int {\n"
+            "        return 1\n"
+            "    }\n"
+            "}\n"
+        ),
+    )
+
+    by_name = {record.raw.callee_text: record for record in records}
+    record = by_name["helper"]
+    assert record.status == "resolved"
+    assert record.resolution_basis == "member_callable"
+    assert record.target_id is not None
+    assert record.target_id.endswith("::Widget.helper#method")
+
+
+def test_javascript_this_call_resolves_to_its_own_method(tmp_path: Path):
+    records, _ = _resolve_source(
+        tmp_path,
+        relative_path="src/example.js",
+        language="javascript",
+        source=(
+            "class Runner {\n"
+            "  run() { return this.helper(); }\n"
+            "  helper() { return 1; }\n"
+            "}\n"
+        ),
+    )
+
+    by_name = {record.raw.callee_text: record for record in records}
+    record = by_name["this.helper"]
+    assert record.status == "resolved"
+    assert record.resolution_basis == "member_callable"
+    assert record.target_id is not None
+    assert record.target_id.endswith("::Runner.helper#method")
+
+
+def test_member_call_does_not_reach_a_same_named_member_of_another_type(
+    tmp_path: Path,
+):
+    records, _ = _resolve_source(
+        tmp_path,
+        relative_path=SOURCE_FILE,
+        language="python",
+        source=(
+            "class Caller:\n"
+            "    def run(self):\n"
+            "        return self.helper()\n"
+            "\n"
+            "class Other:\n"
+            "    def helper(self):\n"
+            "        return 1\n"
+        ),
+    )
+
+    assert [(record.status, record.unresolved_reason) for record in records] == [
+        ("unresolved", "callee_not_proven")
+    ]
+
+
+def test_swift_member_colliding_with_a_file_scope_function_fails_closed(
+    tmp_path: Path,
+):
+    records, _ = _resolve_source(
+        tmp_path,
+        relative_path="src/example.swift",
+        language="swift",
+        source=(
+            "func helper() -> Int {\n"
+            "    return 0\n"
+            "}\n"
+            "\n"
+            "class Widget {\n"
+            "    func run() -> Int {\n"
+            "        return helper()\n"
+            "    }\n"
+            "\n"
+            "    func helper() -> Int {\n"
+            "        return 1\n"
+            "    }\n"
+            "}\n"
+        ),
+    )
+
+    by_name = {record.raw.callee_text: record for record in records}
+    record = by_name["helper"]
+    assert record.status == "unresolved"
+    assert record.unresolved_reason == "conflicting_resolution"
+
+
+def test_swift_extension_and_declaration_members_both_resolve(tmp_path: Path):
+    records, _ = _resolve_source(
+        tmp_path,
+        relative_path="src/example.swift",
+        language="swift",
+        source=(
+            "class Widget {\n"
+            "    func run() -> Int {\n"
+            "        return helper()\n"
+            "    }\n"
+            "\n"
+            "    func helper() -> Int {\n"
+            "        return 1\n"
+            "    }\n"
+            "}\n"
+            "\n"
+            "extension Widget {\n"
+            "    func alternate() -> Int {\n"
+            "        return helper()\n"
+            "    }\n"
+            "}\n"
+        ),
+    )
+
+    resolved = [record for record in records if record.raw.callee_text == "helper"]
+    assert len(resolved) == 2
+    assert {record.status for record in resolved} == {"resolved"}
+    assert {record.resolution_basis for record in resolved} == {"member_callable"}
+    assert {record.target_id for record in resolved} == {
+        "src/example.swift::Widget.helper#method"
+    }
+    assert {record.caller_id for record in resolved} == {
+        "src/example.swift::Widget.run#method",
+        "src/example.swift::Widget.alternate#method",
+    }
+
+
+def test_inherited_member_call_stays_unresolved(tmp_path: Path):
+    records, _ = _resolve_source(
+        tmp_path,
+        relative_path=SOURCE_FILE,
+        language="python",
+        source=(
+            "class Base:\n"
+            "    def helper(self):\n"
+            "        return 1\n"
+            "\n"
+            "class Child(Base):\n"
+            "    def run(self):\n"
+            "        return self.helper()\n"
+        ),
+    )
+
+    assert [(record.status, record.unresolved_reason) for record in records] == [
+        ("unresolved", "callee_not_proven")
+    ]
+
+
+def test_swift_protocol_requirement_call_stays_unresolved(tmp_path: Path):
+    records, _ = _resolve_source(
+        tmp_path,
+        relative_path="src/example.swift",
+        language="swift",
+        source=(
+            "protocol Runnable {\n"
+            "    func helper() -> Int\n"
+            "}\n"
+            "\n"
+            "class Widget: Runnable {\n"
+            "    func run() -> Int {\n"
+            "        return helper()\n"
+            "    }\n"
+            "}\n"
+        ),
+    )
+
+    by_name = {record.raw.callee_text: record for record in records}
+    assert by_name["helper"].status == "unresolved"
+
+
+def test_self_attribute_without_a_matching_method_stays_unresolved(tmp_path: Path):
+    records, _ = _resolve_source(
+        tmp_path,
+        relative_path=SOURCE_FILE,
+        language="python",
+        source=(
+            "class Runner:\n"
+            "    def __init__(self, callback):\n"
+            "        self.callback = callback\n"
+            "\n"
+            "    def run(self):\n"
+            "        return self.callback()\n"
+        ),
+    )
+
+    by_name = {record.raw.callee_text: record for record in records}
+    assert by_name["self.callback"].status == "unresolved"
+    assert by_name["self.callback"].raw.member_binding_state == "absent"
+
+
+def test_member_target_outside_the_indexed_set_is_not_resolved():
+    raw = _raw_call(
+        callee_text="self.target",
+        callee_path=("self", "target"),
+        callee_form="static_path",
+        local_candidates=(),
+        local_binding_state="absent",
+        member_candidates=(_member_binding(),),
+        member_binding_state="definite",
+    )
+    records = resolve_calls(
+        [raw],
+        symbols=_manual_symbols(),
+        symbol_references=(),
+        file_hashes={SOURCE_FILE: SOURCE_HASH},
+    )
+
+    assert records[0].status == "unresolved"
+    assert records[0].unresolved_reason == "member_target_not_indexed"
+
+
+def test_ambiguous_member_binding_is_reported_separately():
+    raw = _raw_call(
+        callee_text="self.target",
+        callee_path=("self", "target"),
+        callee_form="static_path",
+        local_candidates=(),
+        local_binding_state="absent",
+        member_candidates=(
+            _member_binding(),
+            _member_binding(definition_start_byte=60, definition_end_byte=80),
+        ),
+        member_binding_state="ambiguous",
+    )
+    records = resolve_calls(
+        [raw],
+        symbols=_manual_symbols(),
+        symbol_references=(),
+        file_hashes={SOURCE_FILE: SOURCE_HASH},
+    )
+
+    assert records[0].status == "unresolved"
+    assert records[0].unresolved_reason == "member_binding_ambiguous"

@@ -324,11 +324,61 @@ output for any Swift repository. The schema fixture only ever indexed Python,
 so nothing caught it. A new test ties the literal to the parser's supported
 set.
 
-### Task 3 — Implicit-self and explicit-self member resolution
+### Task 3 — Implicit-self and explicit-self member resolution — **done**
 
-Add the graph-side member branch, the `member-resolved` resolution and the
-`member_callable` basis. Covers bare names inside a type body and `self.x()` /
-`this.x()`.
+Member candidates now become call edges. Covers bare names inside a type body
+(Swift implicit self), `self.x()` / `cls.x()` (Python) and `this.x()`
+(JavaScript, TypeScript).
+
+**Deviation from this document: no new resolution tier was added.** The spec
+said `CallResolution` gains `"member-resolved"`. That is the wrong lever.
+`CallRecord.resolution` feeds straight into `GraphEdge.resolution`, which is a
+`ResolutionTier` — the graph-wide vocabulary shared by import, reference and
+contains edges, filtered on by `SAFE_GRAPH_RESOLUTIONS` in `traversal.py` and
+exposed on the neighbours, paths and anchors MCP schemas. A member call is
+proven the same way a local call is — lexically, in one file, against an
+indexed definition — so it is the same *tier*; what differs is the *route*, and
+`resolution_basis` is the field that already carries the route. Member calls
+therefore resolve as `resolution="exact"` with
+`resolution_basis="member_callable"`, and nothing outside `graph/calls.py`,
+`graph/_call_validation.py` and the MCP call schema had to change.
+
+The consumer-visible consequence to keep in mind: `member_callable` edges point
+at the lexically visible definition. Where a subclass overrides the member,
+runtime dispatch may go elsewhere. Inheritance is out of scope, so that risk is
+carried by the basis field rather than by a weaker tier.
+
+Resolution order is local, then member, then imported reference — but any two
+surviving targets fail closed as `conflicting_resolution` rather than being
+ranked. That is what makes a Swift member colliding with a file-scope function
+of the same name unresolved instead of silently member-resolved: proving
+Swift's shadowing rule is not in scope.
+
+Two new unresolved reasons, both reported only after the local and reference
+branches have failed, so they never displace an existing outcome:
+`member_binding_ambiguous` and `member_target_not_indexed`.
+
+No `EXTRACTOR_VERSION` bump: extraction output is unchanged and call records are
+re-resolved from persisted raw calls at materialization time.
+
+#### Measured after Task 3
+
+| Corpus | resolved before | resolved after | local basis | member basis |
+|---|---:|---:|---:|---:|
+| Swift (lott-ios, 126,406 sites) | 586 | 8,820 | 586 | 8,234 |
+| Python (`src/loci`, 9,437 sites) | 2,183 | 2,263 | 2,183 | 80 |
+
+Swift resolved calls rise 15-fold. The remaining Swift unresolved mass is
+92,619 `callee_not_proven` (cross-file module calls and receiver-typed
+`obj.method()`) and 21,926 `unsupported_callee` (dynamic callees, which Task 4
+reduces). 567 sites are `member_binding_ambiguous` — a real overload or a
+same-named member in a pooled extension.
+
+Swift parsing still fails outright on 76 of 4,486 files with `SourceParseError`;
+that is pre-existing and unrelated.
+
+Full suite: 1,371 passed, 6 failed — the same six pre-existing failures in
+`tests/test_enforce_read_hook.py` and `tests/test_store_isolation.py`.
 
 ### Task 4 — Swift `self` paths
 

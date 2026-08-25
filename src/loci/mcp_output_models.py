@@ -1016,6 +1016,8 @@ CallUnresolvedReason = Literal[
     "local_binding_shadowed",
     "local_binding_ambiguous",
     "local_target_not_indexed",
+    "member_binding_ambiguous",
+    "member_target_not_indexed",
     "callee_not_proven",
     "reference_unresolved",
     "target_not_callable",
@@ -1034,7 +1036,9 @@ class CallItem(StrictOutputModel):
     resolution: Literal["exact", "import-resolved"] | None
     unresolved_reason: CallUnresolvedReason | None
     reference_unresolved_reason: ReferenceUnresolvedReason | None
-    resolution_basis: Literal["local_callable", "imported_reference"] | None
+    resolution_basis: (
+        Literal["local_callable", "member_callable", "imported_reference"] | None
+    )
     support: list[CallSupport]
     resolution_control_files: list[str]
     resolution_configuration: Literal["unconditional", "declared_possible"] | None

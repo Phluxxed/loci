@@ -252,6 +252,7 @@ def _validate_outcome(
     )
     reference = exact_references[0] if len(exact_references) == 1 else None
     local_target, local_reason = _current_local_target(raw, callables=callables)
+    member_target, member_reason = _current_member_target(raw, callables=callables)
     imported_reference = (
         reference
         if reference is not None
@@ -261,14 +262,29 @@ def _validate_outcome(
         and reference.target_kind in _CALLABLE_KINDS
         else None
     )
-    if local_target is not None and imported_reference is not None:
+    survivors = [
+        candidate
+        for candidate in (local_target, member_target, imported_reference)
+        if candidate is not None
+    ]
+    if len(survivors) > 1:
         _require_unresolved(record, "conflicting_resolution", record_index=record_index)
         return caller, True
     if local_target is not None:
         _require_resolved(
             record,
             resolution="exact",
+            basis="local_callable",
             target=local_target,
+            record_index=record_index,
+        )
+        return caller, False
+    if member_target is not None:
+        _require_resolved(
+            record,
+            resolution="exact",
+            basis="member_callable",
+            target=member_target,
             record_index=record_index,
         )
         return caller, False
@@ -276,6 +292,7 @@ def _validate_outcome(
         _require_resolved(
             record,
             resolution="import-resolved",
+            basis="imported_reference",
             target=imported_reference,
             record_index=record_index,
         )
@@ -299,6 +316,9 @@ def _validate_outcome(
         return caller, True
     if local_reason is not None:
         _require_unresolved(record, local_reason, record_index=record_index)
+        return caller, True
+    if member_reason is not None:
+        _require_unresolved(record, member_reason, record_index=record_index)
         return caller, True
     _require_unresolved(record, "callee_not_proven", record_index=record_index)
     return caller, True
@@ -335,10 +355,44 @@ def _current_local_target(
     return candidates[0], None
 
 
+def _current_member_target(
+    raw: RawCallSite,
+    *,
+    callables: Mapping[
+        tuple[str, int, int, str],
+        Sequence[Mapping[str, Any]],
+    ],
+) -> tuple[Mapping[str, Any] | None, str | None]:
+    if raw.member_binding_state == "ambiguous":
+        return None, "member_binding_ambiguous"
+    if raw.member_binding_state != "definite":
+        return None, None
+    binding = raw.member_candidates[0]
+    candidates = [
+        node
+        for node in callables.get(
+            (
+                raw.source_file,
+                binding.definition_start_byte,
+                binding.definition_end_byte,
+                binding.callable_kind,
+            ),
+            (),
+        )
+        if node.get("name") == binding.name and node.get("language") == raw.language
+    ]
+    if not candidates:
+        return None, "member_target_not_indexed"
+    if len(candidates) != 1:
+        return None, "member_binding_ambiguous"
+    return candidates[0], None
+
+
 def _require_resolved(
     record: CallRecord,
     *,
     resolution: str,
+    basis: str,
     target: Mapping[str, Any] | SymbolReferenceRecord,
     record_index: int,
 ) -> None:
@@ -357,13 +411,10 @@ def _require_resolved(
         if isinstance(target, SymbolReferenceRecord)
         else target.get("kind")
     )
-    expected_basis = (
-        "local_callable" if resolution == "exact" else "imported_reference"
-    )
     if (
         record.status != "resolved"
         or record.resolution != resolution
-        or record.resolution_basis != expected_basis
+        or record.resolution_basis != basis
         or record.target_id != target_id
         or record.target_file != target_file
         or record.target_kind != target_kind
