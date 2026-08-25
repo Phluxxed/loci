@@ -278,7 +278,7 @@ def _index_repo_unlocked(
                 for symbol in existing_symbols
                 if (
                     symbol["file_path"] == rel_path
-                    and symbol["kind"] not in {"package", "crate"}
+                    and symbol["kind"] not in {"package", "crate", "module"}
                 )
             ]
             all_symbols.extend(kept)

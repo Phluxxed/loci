@@ -1009,7 +1009,11 @@ def test_swift_guard_let_shadows_an_imported_name(tmp_path: Path):
 
     states = [(reference.path, reference.binding_state) for reference in batch.references]
     # ``record`` names no local, so it defers to the file's module imports.
-    assert states == [(("record",), "deferred"), (("Foundation",), "shadowed")]
+    assert states == [
+        (("Int",), "deferred"),
+        (("record",), "deferred"),
+        (("Foundation",), "shadowed"),
+    ]
 
 
 def test_swift_exports_only_importable_visibility(tmp_path: Path):
@@ -1063,7 +1067,11 @@ def test_swift_closure_shorthand_argument_is_not_a_reference(tmp_path: Path):
         language="swift",
     )
 
-    assert [reference.path for reference in batch.references] == []
+    # ``Int`` is a real type position; the shorthand argument is not observed.
+    assert [reference.path for reference in batch.references] == [
+        ("Int",),
+        ("Int",),
+    ]
 
 
 def test_swift_bare_name_defers_to_the_files_module_imports(tmp_path: Path):
@@ -1112,3 +1120,73 @@ def test_swift_extension_is_not_exported_under_the_extended_name(tmp_path: Path)
     )
 
     assert [export.exported_name for export in batch.exports] == ["Ticket"]
+
+
+def test_swift_type_positions_are_observed(tmp_path: Path):
+    batch = _extract_batch(
+        tmp_path,
+        name="a.swift",
+        source=(
+            "import Feature\n"
+            "public class Ticket: BaseTicket {\n"
+            "    var store: TicketStore\n"
+            "    var rows: [Entry]\n"
+            "    func make(a: Alpha) -> Feature.Beta { return a.beta }\n"
+            "}\n"
+            "extension Ticket: Printable {}\n"
+        ),
+        language="swift",
+    )
+
+    paths = [reference.path for reference in batch.references]
+    assert ("BaseTicket",) in paths
+    assert ("TicketStore",) in paths
+    assert ("Entry",) in paths
+    assert ("Alpha",) in paths
+    assert ("Feature", "Beta") in paths
+    assert ("Printable",) in paths
+    # The extension names a type declared elsewhere, so it is a reference.
+    assert paths.count(("Ticket",)) == 1
+
+
+def test_swift_declaring_a_type_is_not_a_reference_to_it(tmp_path: Path):
+    batch = _extract_batch(
+        tmp_path,
+        name="a.swift",
+        source="import Feature\npublic class Ticket {}\npublic protocol Printer {}\n",
+        language="swift",
+    )
+
+    assert [reference.path for reference in batch.references] == []
+
+
+def test_swift_generic_and_associated_type_names_are_not_deferred(tmp_path: Path):
+    batch = _extract_batch(
+        tmp_path,
+        name="a.swift",
+        source=(
+            "import Feature\n"
+            "public protocol Store { associatedtype Item\n"
+            "    func first() -> Item }\n"
+            "public class Box<Element> { var value: Element? }\n"
+        ),
+        language="swift",
+    )
+
+    paths = [reference.path for reference in batch.references]
+    assert ("Item",) not in paths
+    assert ("Element",) not in paths
+
+
+def test_swift_generic_arguments_are_observed_separately(tmp_path: Path):
+    batch = _extract_batch(
+        tmp_path,
+        name="a.swift",
+        source="import Feature\npublic var rows: Feature.Box<Entry>?\n",
+        language="swift",
+    )
+
+    assert [reference.path for reference in batch.references] == [
+        ("Feature", "Box"),
+        ("Entry",),
+    ]

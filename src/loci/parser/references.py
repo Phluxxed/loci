@@ -360,18 +360,35 @@ def _python_import_scope_is_visible(binding: ImportBinding, node: Any) -> bool:
     return False
 
 
+# A node that yields a path consumes its own subtree, because the path already
+# spells every name in it. Swift generic arguments are the exception: they hang
+# off the ``user_type`` that names the generic, but ``Box<Entry>`` references
+# both ``Box`` and ``Entry``, so that branch is still walked.
+_UNCONSUMED_CHILDREN: dict[str, dict[str, set[str]]] = {
+    "swift": {"user_type": {"type_arguments"}},
+}
+
+
 def _iter_path_observations(
     root: Any,
     source: bytes,
     language: str,
     excluded_subtrees: AbstractSet[tuple[int, int, str]],
 ):
+    unconsumed = _UNCONSUMED_CHILDREN.get(language, {})
+
     def visit(node: Any):
         if node_key(node) in excluded_subtrees:
             return
         observation = _path_observation(node, source, language)
         if observation is not None:
             yield observation
+            remaining = unconsumed.get(node.type)
+            if remaining is None:
+                return
+            for child in node.named_children:
+                if child.type in remaining:
+                    yield from visit(child)
             return
         for child in node.named_children:
             yield from visit(child)

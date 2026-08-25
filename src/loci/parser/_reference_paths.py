@@ -113,6 +113,24 @@ def _swift_path(
         if prefix is None:
             return None
         return (*prefix, _node_text(member, source))
+    if node.type == "user_type":
+        # A type position is a ``user_type`` whose direct ``type_identifier``
+        # children spell the dotted path. Generic arguments hang off a nested
+        # ``type_arguments`` node and are observed in their own right, so only
+        # direct children belong to this path. A declaration's own name is a
+        # bare ``type_identifier``, never a ``user_type``, so declaring a type
+        # is not observed as a reference to it — but ``extension Alpha`` is,
+        # because there the name really does name a type declared elsewhere.
+        names = tuple(
+            _node_text(child, source)
+            for child in node.named_children
+            if child.type == "type_identifier"
+        )
+        if not names:
+            return None
+        if len(names) > remaining:
+            raise ValueError("reference path exceeds the segment limit")
+        return names
     return None
 
 

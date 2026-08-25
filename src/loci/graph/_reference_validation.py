@@ -703,7 +703,7 @@ def _contains_reference(
 
 
 def _is_synthetic_node(node: Mapping[str, Any]) -> bool:
-    if node.get("kind") in {"file", "package", "crate"}:
+    if node.get("kind") in {"file", "package", "crate", "module"}:
         return True
     if node.get("language") == "markdown":
         return True
@@ -711,7 +711,7 @@ def _is_synthetic_node(node: Mapping[str, Any]) -> bool:
     loci = metadata.get("loci") if isinstance(metadata, Mapping) else None
     return isinstance(loci, Mapping) and any(
         loci.get(key) is True
-        for key in ("file_node", "go_package", "rust_crate")
+        for key in ("file_node", "go_package", "rust_crate", "swift_module_node")
     )
 
 

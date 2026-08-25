@@ -2027,3 +2027,19 @@ def test_swift_own_module_wins_over_an_imported_name(tmp_path: Path):
     assert [(record.status, record.unresolved_reason) for record in records] == [
         ("unresolved", "ambiguous_binding")
     ]
+
+
+def test_swift_module_qualified_name_resolves_past_the_module_segment(
+    tmp_path: Path,
+):
+    records, _, _ = _resolve_swift_tree(
+        tmp_path,
+        _swift_tree(
+            "import Feature\nvar held: Feature.Ticket?\n",
+            feature="public class Ticket {}\n",
+        ),
+    )
+
+    resolved = [record for record in records if record.status == "resolved"]
+    assert [record.raw.path for record in resolved] == [("Feature", "Ticket")]
+    assert resolved[0].target_file == "Feature/Sources/Feature/Model.swift"
