@@ -387,3 +387,13 @@ def test_every_loci_tool_advertises_an_object_root_success_or_error_schema() -> 
         assert "LociErrorOutput" in branch_names
         for branch_name in branch_names:
             assert schema["$defs"][branch_name]["type"] == "object"
+
+
+def test_raw_call_site_language_matches_the_parser_contract():
+    from typing import get_args
+
+    from loci.mcp_output_models import RawCallSite
+    from loci.parser.call_models import _SUPPORTED_LANGUAGES
+
+    declared = set(get_args(RawCallSite.model_fields["language"].annotation))
+    assert declared == _SUPPORTED_LANGUAGES

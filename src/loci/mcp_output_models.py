@@ -962,7 +962,9 @@ class LocalCallableBinding(StrictOutputModel):
 
 class RawCallSite(StrictOutputModel):
     source_file: str
-    language: Literal["python", "javascript", "typescript", "go", "rust"]
+    language: Literal[
+        "python", "javascript", "typescript", "go", "rust", "swift"
+    ]
     line: int
     column: int
     start_byte: int
