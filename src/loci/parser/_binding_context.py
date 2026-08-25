@@ -579,7 +579,9 @@ def _collect_python_context(
                     scope=scope,
                     declaration_start_byte=definition_start,
                     active_start_byte=node.end_byte,
-                    kind="callable" if callable_kind is not None else "value",
+                    # A class name is not a value that shadows a callable; in
+                    # callee position it names a constructor.
+                    kind="callable" if callable_kind is not None else "type",
                     declaration_end_byte=definition_end,
                     callable_kind=callable_kind,
                     deferred_visible=callable_kind is not None,

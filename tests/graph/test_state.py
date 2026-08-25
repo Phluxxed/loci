@@ -790,7 +790,7 @@ def test_empty_graph_state_has_complete_envelope():
 
 
 def test_graph_state_uses_schema_version_ten():
-    assert GRAPH_STATE_SCHEMA_VERSION == 11
+    assert GRAPH_STATE_SCHEMA_VERSION == 12
 
 
 def test_graph_state_rejects_schema_version_two_as_stale():

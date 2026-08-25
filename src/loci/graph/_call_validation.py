@@ -5,7 +5,7 @@ from collections.abc import Mapping, Sequence
 from types import MappingProxyType
 from typing import Any, cast
 
-from loci.graph.calls import CallRecord
+from loci.graph.calls import _INITIALIZER_NAMES, CallRecord
 from loci.graph.contracts import (
     GraphContractError,
     GraphEdge,
@@ -75,7 +75,7 @@ def validate_call_records(
 ) -> None:
     """Cross-check call records against current indexed evidence."""
     references = _index_references(symbol_references, file_hashes=file_hashes)
-    file_nodes, callables, type_members = _index_nodes(indexed_nodes)
+    file_nodes, callables, type_members, types_by_name = _index_nodes(indexed_nodes)
     for record_index, record in enumerate(records):
         if not isinstance(record, CallRecord):
             raise _record_error(record_index, "Call record has an invalid type")
@@ -92,6 +92,7 @@ def validate_call_records(
             file_node=source_nodes[0],
             callables=callables,
             type_members=type_members,
+            types_by_name=types_by_name,
             references=references,
             record_index=record_index,
         )
@@ -147,6 +148,7 @@ def _index_nodes(
     Mapping[str, tuple[Mapping[str, Any], ...]],
     Mapping[tuple[str, int, int, str], tuple[Mapping[str, Any], ...]],
     Mapping[str, Mapping[str, tuple[Mapping[str, Any], ...]]],
+    Mapping[tuple[str, str], tuple[Mapping[str, Any], ...]],
 ]:
     file_nodes: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
     callables: dict[
@@ -185,7 +187,23 @@ def _index_nodes(
         MappingProxyType({key: tuple(values) for key, values in file_nodes.items()}),
         MappingProxyType({key: tuple(values) for key, values in callables.items()}),
         _index_type_members(owners, callables_by_file),
+        _index_types_by_name(owners),
     )
+
+
+def _index_types_by_name(
+    owners: Sequence[Mapping[str, Any]],
+) -> Mapping[tuple[str, str], tuple[Mapping[str, Any], ...]]:
+    named: dict[tuple[str, str], list[Mapping[str, Any]]] = defaultdict(list)
+    for owner in owners:
+        file_path = owner.get("file_path")
+        name = owner.get("name")
+        if isinstance(file_path, str) and isinstance(name, str):
+            named[(file_path, name)].append(owner)
+    return MappingProxyType({
+        key: tuple(sorted(values, key=lambda item: cast(str, item.get("id"))))
+        for key, values in sorted(named.items())
+    })
 
 
 def _is_synthetic_owner(node: Mapping[str, Any]) -> bool:
@@ -255,6 +273,7 @@ def _validate_outcome(
         Sequence[Mapping[str, Any]],
     ],
     type_members: Mapping[str, Mapping[str, Sequence[Mapping[str, Any]]]],
+    types_by_name: Mapping[tuple[str, str], Sequence[Mapping[str, Any]]],
     references: Mapping[
         tuple[str, str, int, int],
         Sequence[SymbolReferenceRecord],
@@ -335,6 +354,11 @@ def _validate_outcome(
         reference=reference,
         type_members=type_members,
     )
+    type_member, type_member_reason = _current_type_member(
+        raw,
+        types_by_name=types_by_name,
+        type_members=type_members,
+    )
     survivors = [
         candidate
         for candidate in (
@@ -342,6 +366,7 @@ def _validate_outcome(
             member_target,
             imported_reference,
             imported_member,
+            type_member,
         )
         if candidate is not None
     ]
@@ -390,6 +415,18 @@ def _validate_outcome(
             imported_member_reason,
             record_index=record_index,
         )
+        return caller, True
+    if type_member is not None:
+        _require_resolved(
+            record,
+            resolution="exact",
+            basis="type_member",
+            target=type_member,
+            record_index=record_index,
+        )
+        return caller, False
+    if type_member_reason is not None:
+        _require_unresolved(record, type_member_reason, record_index=record_index)
         return caller, True
     if reference is not None and reference.status == "unresolved":
         _require_unresolved(
@@ -498,7 +535,10 @@ def _current_imported_member(
     ):
         return None, None
     if len(raw.callee_path) == 1:
-        name = "init"
+        initializer = _INITIALIZER_NAMES.get(raw.language)
+        if initializer is None:
+            return None, None
+        name = initializer
     elif len(raw.callee_path) == 2:
         name = raw.callee_path[1]
     else:
@@ -508,6 +548,34 @@ def _current_imported_member(
         return None, None
     if len(candidates) > 1:
         return None, "imported_member_ambiguous"
+    return candidates[0], None
+
+
+def _current_type_member(
+    raw: RawCallSite,
+    *,
+    types_by_name: Mapping[tuple[str, str], Sequence[Mapping[str, Any]]],
+    type_members: Mapping[str, Mapping[str, Sequence[Mapping[str, Any]]]],
+) -> tuple[Mapping[str, Any] | None, str | None]:
+    if raw.local_binding_state != "absent":
+        return None, None
+    if len(raw.callee_path) == 1:
+        initializer = _INITIALIZER_NAMES.get(raw.language)
+        if initializer is None:
+            return None, None
+        name = initializer
+    elif len(raw.callee_path) == 2:
+        name = raw.callee_path[1]
+    else:
+        return None, None
+    owners = types_by_name.get((raw.source_file, raw.callee_path[0]), ())
+    if len(owners) != 1 or owners[0].get("language") != raw.language:
+        return None, None
+    candidates = type_members.get(cast(str, owners[0].get("id")), {}).get(name, ())
+    if not candidates:
+        return None, None
+    if len(candidates) > 1:
+        return None, "type_member_ambiguous"
     return candidates[0], None
 
 

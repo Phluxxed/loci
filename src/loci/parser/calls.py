@@ -314,6 +314,11 @@ def _local_call_binding(
         for binding in visible
         if binding.scope_end_byte - binding.scope_start_byte == nearest_span
     ]
+    if all(binding.kind == "type" for binding in nearest):
+        # A type name in callee position names its initializer, which the
+        # resolver proves from the type's own members rather than from a
+        # lexical callable binding.
+        return (), "absent"
     if any(
         binding.kind != "callable" or binding.callable_kind is None
         for binding in nearest
