@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from loci.graph.contracts import (
+    GRAPH_RESOLVER_VERSION,
     GRAPH_STATE_SCHEMA_VERSION,
     GraphContractError,
     GraphEdge,
@@ -441,6 +442,7 @@ def test_store_write_persists_index_versions(store: IndexStore, tmp_path: Path, 
     data = json.loads(store._index_path(source_path).read_text())
     assert data["schema_version"] == INDEX_SCHEMA_VERSION
     assert data["extractor_version"] == EXTRACTOR_VERSION
+    assert data["graph_resolver_version"] == GRAPH_RESOLVER_VERSION
 
 
 def test_index_versions_rejects_old_extractor_version():
@@ -448,7 +450,41 @@ def test_index_versions_rejects_old_extractor_version():
     assert index_versions_current({
         "schema_version": INDEX_SCHEMA_VERSION,
         "extractor_version": EXTRACTOR_VERSION - 1,
+        "graph_resolver_version": GRAPH_RESOLVER_VERSION,
     }) is False
+
+
+def test_index_versions_rejects_old_graph_resolver_version():
+    assert index_versions_current({
+        "schema_version": INDEX_SCHEMA_VERSION,
+        "extractor_version": EXTRACTOR_VERSION,
+        "graph_resolver_version": GRAPH_RESOLVER_VERSION - 1,
+    }) is False
+
+
+def test_store_rebuild_replaces_stale_graph_resolver_version(
+    store: IndexStore,
+    tmp_path: Path,
+    sample_symbols,
+):
+    source_path = tmp_path / "repo"
+    source_path.mkdir()
+    (source_path / "src").mkdir()
+    (source_path / "src" / "auth.py").write_text("def login(): pass")
+    store.write(source_path, sample_symbols, file_hashes={})
+
+    index_path = store._index_path(source_path)
+    stale_index = json.loads(index_path.read_text())
+    stale_index["graph_resolver_version"] = GRAPH_RESOLVER_VERSION - 1
+    index_path.write_text(json.dumps(stale_index))
+
+    assert index_versions_current(stale_index) is False
+
+    store.write(source_path, sample_symbols, file_hashes={})
+
+    rebuilt_index = json.loads(index_path.read_text())
+    assert rebuilt_index["graph_resolver_version"] == GRAPH_RESOLVER_VERSION
+    assert index_versions_current(rebuilt_index) is True
 
 
 def test_verify_index_uses_whole_file_hash_for_file_nodes(

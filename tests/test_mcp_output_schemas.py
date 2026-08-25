@@ -357,6 +357,15 @@ def test_graph_tool_schemas_validate_resolved_real_payloads(tmp_path: Path) -> N
         models[name].model_validate(result.structured_content)
         assert advertised[name].output_schema is not None
 
+    health = calls["loci_graph_health"]
+    health_result = asyncio.run(server.call_tool("loci_graph_health", health))
+    assert health_result.structured_content["counts"][
+        "graph_symbol_references_resolved_by_basis"
+    ] == {"direct_binding": 1}
+    assert health_result.structured_content["counts"][
+        "graph_calls_resolved_by_basis"
+    ] == {"imported_reference": 1}
+
 
 def test_graph_structured_error_uses_the_declared_union(tmp_path: Path) -> None:
     repo = tmp_path / "missing"

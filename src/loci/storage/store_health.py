@@ -618,6 +618,7 @@ def _inspect_repository_index(
             {
                 "schema_version": index.get("schema_version"),
                 "extractor_version": index.get("extractor_version"),
+                "graph_resolver_version": index.get("graph_resolver_version"),
             },
         )
         return None, index_bytes, (reason,), FreshnessProbe.complete()

@@ -1,9 +1,10 @@
 # Swift graph support
 
-**Status:** all four modules landed on branch `swift-graph-support`. `swift-extract`
-and `swift-local` in `265a08f`, `a4d6c4e`, `c56c83d` (after the `else`-chain
-conversion in `c79147c`); `swift-modules` in `0f72853` and `ab449a1`;
-`swift-resolve` below. Nothing pushed.
+**Status:** all four modules and the owner-review fixes are implemented on branch
+`swift-graph-support`. `swift-extract` and `swift-local` landed in `265a08f`,
+`a4d6c4e`, `c56c83d` (after the `else`-chain conversion in `c79147c`);
+`swift-modules` landed in `0f72853` and `ab449a1`; `swift-resolve` is recorded
+below.
 **Author:** Claude, 2026-08-24, at Vik's request.
 **Prior art:** `docs/plans/2026-07-15-extensible-graph-retrieval-stage-7-go-import-resolution.md` — read its "Exact File Plan" (lines 888–919) before writing code. Swift should mirror Go, not Rust.
 
@@ -62,8 +63,9 @@ Four corrections to this document, each forced by something the build hit:
    repository. That conflates a grammar gap with a graph defect. `extract_import_batch` now raises
    `SourceParseError`, reported as an **`info`** `GRAPH_SOURCE_UNPARSED` diagnostic; genuine
    extraction failures keep `warning` severity and still degrade.
-2. **The grammar was nine months stale.** `tree-sitter-language-pack` was pinned `>=0.7.0` with no
-   lockfile, so the venv sat on 0.13.0 (2025-11-26) against 1.15.8. Upgrading dropped Swift parse
+2. **The grammar was nine months stale.** `tree-sitter-language-pack` was pinned `>=0.7.0`, and
+   `uv.lock` still resolved 0.13.0 (2025-11-26) against 1.15.8. Upgrading both the declaration and
+   lockfile dropped Swift parse
    failures from 116 to 76 (47 fixed, 7 newly broken) with **zero** node-type drift over the
    python, javascript, typescript, go and rust fixtures. 1.x downloads grammars on first use, so a
    cold cache needs network.
@@ -74,7 +76,9 @@ Four corrections to this document, each forced by something the build hit:
    struct and enum are also still mislabelled `class`.
 4. **`import struct Foundation.Data` binds the declaration, not the module.** Binding it as
    `Foundation` collided with a real `import Foundation` and turned shadow detection into
-   `ambiguous`. Declaration-kind imports now bind the last component with `kind="symbol"`.
+   `ambiguous`. Declaration-kind imports now bind the last component with `kind="symbol"`; the
+   Swift resolver accepts that exact binding while the resolved module import still proves the
+   owning module.
 
 ## Capability map
 

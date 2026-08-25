@@ -49,6 +49,9 @@ def test_service_indexes_resolved_symbol_references_and_health_counts(
     assert health["counts"]["graph_symbol_references_indexed"] == 1
     assert health["counts"]["graph_symbol_references_resolved"] == 1
     assert health["counts"]["graph_symbol_references_unresolved"] == 0
+    assert health["counts"]["graph_symbol_references_resolved_by_basis"] == {
+        "direct_binding": 1,
+    }
     assert len(graph["exports"]) == 4
     assert graph["symbol_references"][0]["status"] == "resolved"
     assert graph["symbol_references"][0]["source_id"] == (

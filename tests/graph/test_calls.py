@@ -1425,6 +1425,51 @@ def test_swift_type_static_path_resolves_to_the_named_member(tmp_path: Path):
     ]
 
 
+def test_swift_declaration_import_calls_reach_the_imported_type_members(
+    tmp_path: Path,
+):
+    from tests.graph.test_references import _resolve_swift_tree, _swift_tree
+
+    references, symbols, batches = _resolve_swift_tree(
+        tmp_path,
+        _swift_tree(
+            "import struct Feature.Ticket\n"
+            "func run() { let made = Ticket(); Ticket.stamp() }\n",
+            feature=(
+                "public struct Ticket {\n"
+                "    public init() {}\n"
+                "    public func stamp() {}\n"
+                "}\n"
+            ),
+        ),
+    )
+    source_batch = next(batch for batch in batches if batch.calls)
+    file_hashes = {
+        relative_path: hashlib.sha256(
+            (tmp_path / relative_path).read_bytes()
+        ).hexdigest()
+        for relative_path in (
+            "App/Main.swift",
+            "Feature/Sources/Feature/Model.swift",
+        )
+    }
+
+    records = resolve_calls(
+        source_batch.calls,
+        symbols=symbols,
+        symbol_references=references,
+        file_hashes=file_hashes,
+    )
+
+    assert [
+        (record.raw.callee_path, record.status, record.resolution_basis)
+        for record in records
+    ] == [
+        (("Ticket",), "resolved", "imported_member"),
+        (("Ticket", "stamp"), "resolved", "imported_member"),
+    ]
+
+
 def test_a_type_without_an_initializer_leaves_the_call_unresolved(tmp_path: Path):
     records, _ = _resolve_source(
         tmp_path,

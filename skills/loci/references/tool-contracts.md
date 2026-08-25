@@ -71,7 +71,7 @@ answerability claims:
 `loci_graph_health` returns persisted extension status and diagnostics:
 
 ```json
-{"schema_version":1,"repo":"...","status":"healthy|degraded","profiles":[],"counts":{"profiles":0,"node_overlays":0,"edges":0,"contributions":0,"diagnostics":0,"graph_file_nodes_indexed":0,"graph_go_packages_indexed":0,"graph_rust_crates_indexed":0,"graph_imports_indexed":0,"graph_imports_resolved":0,"graph_imports_unresolved":0,"graph_symbol_references_indexed":0,"graph_symbol_references_resolved":0,"graph_symbol_references_unresolved":0,"graph_calls_indexed":0,"graph_calls_resolved":0,"graph_calls_unresolved":0},"diagnostics":[]}
+{"schema_version":1,"repo":"...","status":"healthy|degraded","profiles":[],"counts":{"profiles":0,"node_overlays":0,"edges":0,"contributions":0,"diagnostics":0,"graph_file_nodes_indexed":0,"graph_swift_modules_indexed":0,"graph_go_packages_indexed":0,"graph_rust_crates_indexed":0,"graph_imports_indexed":0,"graph_imports_resolved":0,"graph_imports_unresolved":0,"graph_symbol_references_indexed":0,"graph_symbol_references_resolved":0,"graph_symbol_references_unresolved":0,"graph_symbol_references_resolved_by_basis":{},"graph_calls_indexed":0,"graph_calls_resolved":0,"graph_calls_unresolved":0,"graph_calls_resolved_by_basis":{}},"diagnostics":[]}
 ```
 
 `loci_store_health` returns a bounded read-only store page:

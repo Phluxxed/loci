@@ -32,6 +32,9 @@ ResolutionTier: TypeAlias = Literal[
 
 GRAPH_SCHEMA_VERSION = 1  # Public contribution and retrieval envelopes.
 GRAPH_STATE_SCHEMA_VERSION = 12  # Persisted index.json.graph envelope only.
+# Gates persisted graph reuse when resolver semantics change independently of
+# extraction.
+GRAPH_RESOLVER_VERSION = 1
 MAX_GRAPH_CONTRIBUTION_RECORDS = 10_000
 RESOLUTION_TIERS = frozenset({
     "exact",

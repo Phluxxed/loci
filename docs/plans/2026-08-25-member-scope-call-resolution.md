@@ -1,7 +1,7 @@
 # Plan: Member-Scope Call Resolution
 
-**Status:** in progress on `swift-graph-support`; Tasks 1-3 implemented.
-Tasks 4-8 re-verified against the code on 2026-08-25 — see **Plan Audit**.
+**Status:** implementation complete on `swift-graph-support`; Tasks 1-8 implemented
+and the owner-review findings addressed on 2026-08-25.
 
 **Date:** 2026-08-25
 
@@ -604,6 +604,14 @@ change with no version change turns into a read-time contract error for anyone
 holding an index. This task introduces a version that names what it gates and
 covers incremental re-index integrity.
 
+#### Landed, 2026-08-25
+
+`GRAPH_RESOLVER_VERSION` is persisted in the outer index envelope and checked at
+the same persistence seam as the index and extractor versions. Resolver-only
+semantic changes can now invalidate stale graph output under their own name,
+before live contract validation. The outer index schema moved from 6 to 7;
+`EXTRACTOR_VERSION` remains 21 and the graph-state schema remains 12.
+
 ### Task 8 — Service, health, MCP diagnostics, documentation
 
 Smaller than it reads. `graph_calls` serialises through `record.to_dict()`, so
@@ -611,6 +619,12 @@ new record fields already reach the MCP surface once the output model allows
 them — which is why only `mcp_output_models.py` needed touching in Task 3.
 What is genuinely missing is a breakdown by `resolution_basis` in
 `graph_health`, which today counts only resolved versus unresolved.
+
+#### Landed, 2026-08-25
+
+`graph_health.counts` now includes deterministic, observed-only maps for
+resolved symbol references and calls by `resolution_basis`. The strict MCP
+output model and representative service/MCP payload tests cover both maps.
 
 ## Required Test Matrix
 
@@ -688,4 +702,7 @@ branch is unpushed, revert remains a branch delete plus a re-index.
 
 ## Owner Review Decision
 
-Pending.
+Approved for completion by Vik on 2026-08-25. The review's declaration-import,
+resolver-version, graph-health, and dependency-lock findings are addressed on
+the branch; the explicitly deferred stored-property-shadowing case remains as
+documented above.
