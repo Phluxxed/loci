@@ -469,31 +469,49 @@ that is pre-existing and unrelated.
 Full suite: 1,371 passed, 6 failed — the same six pre-existing failures in
 `tests/test_enforce_read_hook.py` and `tests/test_store_isolation.py`.
 
-### Task 4 — Swift `self` paths — next
+### Task 4 — Swift `self` paths — **done**
 
-Make `_swift_path` return `("self", name)` for `self`-rooted navigation instead
-of `None`, so `self.foo()` becomes a `static_path` callee and reaches the
-member branch built in Task 3 rather than being discarded as `dynamic`.
+`self.foo()` is now a `static_path` callee with path `("self", "foo")`, so it
+reaches the member branch built in Task 3 instead of being discarded as
+`dynamic`. Swift joins Python and JavaScript in `_EXPLICIT_SELF_ROOTS`.
 
-Measured payoff: 2,084 sites, of which 1,410 name a member declared in the
-enclosing type in the same file. That is the whole of it — the other 21,293
-`dynamic` Swift sites are navigation off call results, leading-dot implicit
-member syntax, and `super`, none of which this task touches.
+**Deviation: `_swift_path` was left alone.** This document said to change it.
+That would have altered Stage 10 reference observation too, because
+`parser/references.py:402` shares the function — and the two consumers want
+opposite answers. For a *reference*, `self` names no declaration, and the
+function's own docstring says it refuses to guess a root; for a *callee*,
+`self` is a definite receiver the member scope can prove. So `calls.py` gained
+`_swift_callee_path`, which handles the `self` case and delegates everything
+else. Stage 10 output is unchanged, and a test asserts that the shared builder
+still returns `None` for every `self`-rooted navigation.
 
-Two things the original one-line task description hid:
+Only a direct `self.<name>` is recognised. `self.inner.record()` calls through
+a property whose type is unknown, so it stays `dynamic`; `super.foo()` (1,268
+sites) stays `dynamic` because its target is in a superclass.
 
-- `_swift_path` is shared with `parser/references.py`, so Stage 10 reference
-  observations change too. Reference extraction must be re-checked, not just
-  calls.
-- `RawCallSite` forbids a `dynamic` callee from carrying candidates and forces
-  `member_binding_state="unsupported"` there. Reclassifying these sites as
-  `static_path` changes extraction output, so this task needs its own
-  `EXTRACTOR_VERSION` bump.
+`EXTRACTOR_VERSION` 16 to 17 — reclassifying a callee changes extraction
+output.
 
-`super.foo()` (1,268 sites) must stay `dynamic`: its target is in a superclass,
-which is out of scope.
+#### Measured after Task 4
 
-### Checkpoint B — re-measure and decide the order of Tasks 5-8
+| Corpus | resolved before | resolved after | member basis | `unsupported_callee` |
+|---|---:|---:|---:|---:|
+| Swift (lott-ios, 126,406 sites) | 8,820 | 9,932 | 9,346 | 21,926 → 20,097 |
+
+1,829 `self.` call sites were observed, against a prediction of 2,084; the
+difference is the 76 files that fail to parse at all. Of those 1,829: 1,112
+definite, 113 ambiguous, 604 absent. The 1,112 is the exact gain in resolved
+calls.
+
+The prediction was 1,410 resolvable and the outcome is 1,112. The estimate was
+optimistic because it credited any method in the file whose qualified-name
+prefix matched the enclosing type, whereas member scope only pools an extension
+with its declaration when both sit at file scope. The 604 absent sites call
+members declared in another file, inherited, or required by a protocol.
+
+### Checkpoint B — re-measure and decide the order of Tasks 5-8 — decided
+
+Modules first. Recorded 2026-08-25 after Task 4.
 
 Tasks 5 and 6 as originally written assumed same-file yields that do not exist.
 The decision at this checkpoint is whether to run them now for 1,173 combined
