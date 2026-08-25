@@ -580,19 +580,52 @@ What is genuinely missing is a breakdown by `resolution_basis` in
 - A member call inside a type body does not resolve to a same-named member of a
   *different* type in the same file.
 - `self.x()` where `x` is a stored property holding a closure resolves to
-  nothing, not to a same-named method. **Not met as of Task 3.** Verified: a
-  Python class that assigns `self.helper = fn` in `__init__` *and* defines a
-  method `helper` resolves `self.helper()` to the method, which is wrong —
-  at runtime the instance attribute wins. Closing it needs a stored-property
-  channel that forces `member_binding_state="shadowed"` when an attribute
-  assignment in the same type body collides with a member name. Rare enough in
-  practice to defer, real enough to record; it belongs with Task 7 or later,
-  and the matrix line stays here until it passes.
+  nothing, not to a same-named method. **Not met, and deliberately deferred —
+  see Stored-Property Shadowing below.**
 - A protocol requirement call stays unresolved.
 - An `extension` member and a declaration member of the same type both resolve.
 - A call to an inherited member stays unresolved.
 - `Widget()` resolves to `Widget.init` only when that initializer is indexed.
 - Every existing Stage 11 call test still passes unchanged.
+
+## Stored-Property Shadowing — measured, deferred
+
+Task 3 shipped a real defect: a call to `self.x()` resolves to a member named
+`x` even when a property of the same name shadows it. Verified in Python — a
+class that assigns `self.helper = fn` in `__init__` and also defines a method
+`helper` resolves `self.helper()` to the method, which is wrong, because at
+runtime the instance attribute wins.
+
+The obvious fix — mark `member_binding_state="shadowed"` whenever a property
+name in the type body collides with a member name — was measured before being
+built, and the measurement killed it.
+
+| Corpus | definite member calls | name collisions | genuine shadows |
+|---|---:|---:|---:|
+| Swift (lott-ios) | 9,352 | 3 | 1 |
+| Python (`src/loci`) | 80 | 0 | 0 |
+
+A first count said 314 Swift collisions. That was a measurement error worth
+recording: it walked the whole type body, so it swept up local `let` bindings
+inside method bodies. `let degrees = degrees(fromRadians: yaw)` is not a
+property shadowing a method — the local is not in scope in its own initialiser,
+so the call resolves to the method and loci is already right. Restricting the
+scan to direct children of the type body drops 314 to 3.
+
+Of those 3, only one is a genuine shadow —
+`PurchaseErrorView.swift:35`, where `actionButtonDidTap?()` calls a
+`(() -> Void)?` property from inside the same-named `@IBAction` method, and
+loci draws a false self-recursive edge. The other two are a
+`CurrentValueSubject` constant and a computed `NSAttributedString` property,
+neither callable; suppressing those would *lose* correct edges.
+
+So the naive rule would trade one false edge for two lost true ones, against a
+defect that occurs roughly once per 126,000 call sites. Deferred, and if it is
+ever built the rule must be narrow: shadow only a stored property declared
+directly in the type body whose annotation is a function type or whose
+initialiser is a closure. Python has no type information at the assignment, so
+Python can only ever use the name-collision rule — acceptable there, since the
+pattern is a code smell and occurs zero times in loci's own source.
 
 ## Verification
 
