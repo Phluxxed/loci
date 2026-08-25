@@ -12,7 +12,7 @@ from loci.graph.contracts import (
     GraphEvidence,
 )
 from loci.graph.references import SymbolReferenceRecord
-from loci.parser.call_models import RawCallSite
+from loci.parser.call_models import MAX_CALL_BINDING_CANDIDATES, RawCallSite
 
 
 _CALLER_KINDS = frozenset({"file", "function", "method"})
@@ -75,7 +75,7 @@ def validate_call_records(
 ) -> None:
     """Cross-check call records against current indexed evidence."""
     references = _index_references(symbol_references, file_hashes=file_hashes)
-    file_nodes, callables = _index_nodes(indexed_nodes)
+    file_nodes, callables, type_members = _index_nodes(indexed_nodes)
     for record_index, record in enumerate(records):
         if not isinstance(record, CallRecord):
             raise _record_error(record_index, "Call record has an invalid type")
@@ -91,6 +91,7 @@ def validate_call_records(
             record,
             file_node=source_nodes[0],
             callables=callables,
+            type_members=type_members,
             references=references,
             record_index=record_index,
         )
@@ -114,6 +115,7 @@ def validate_call_records(
                 record,
                 references=references,
                 file_hashes=file_hashes,
+                indexed_nodes=indexed_nodes,
                 target=target,
                 record_index=record_index,
             )
@@ -144,12 +146,15 @@ def _index_nodes(
 ) -> tuple[
     Mapping[str, tuple[Mapping[str, Any], ...]],
     Mapping[tuple[str, int, int, str], tuple[Mapping[str, Any], ...]],
+    Mapping[str, Mapping[str, tuple[Mapping[str, Any], ...]]],
 ]:
     file_nodes: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
     callables: dict[
         tuple[str, int, int, str],
         list[Mapping[str, Any]],
     ] = defaultdict(list)
+    callables_by_file: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
+    owners: list[Mapping[str, Any]] = []
     for node_id, node in indexed_nodes.items():
         if node.get("id") != node_id:
             raise _error("Call validation node identity is inconsistent")
@@ -161,6 +166,8 @@ def _index_nodes(
             file_nodes[file_path].append(node)
             continue
         if kind not in _CALLABLE_KINDS:
+            if not _is_synthetic_owner(node):
+                owners.append(node)
             continue
         start = node.get("byte_offset")
         length = node.get("byte_length")
@@ -173,10 +180,70 @@ def _index_nodes(
         ):
             raise _error("Call validation callable span is invalid", endpoint_id=node_id)
         callables[(file_path, start, start + length, kind)].append(node)
+        callables_by_file[file_path].append(node)
     return (
         MappingProxyType({key: tuple(values) for key, values in file_nodes.items()}),
         MappingProxyType({key: tuple(values) for key, values in callables.items()}),
+        _index_type_members(owners, callables_by_file),
     )
+
+
+def _is_synthetic_owner(node: Mapping[str, Any]) -> bool:
+    if node.get("kind") in {"package", "crate", "module"}:
+        return True
+    metadata = node.get("metadata")
+    loci = metadata.get("loci") if isinstance(metadata, Mapping) else None
+    return isinstance(loci, Mapping) and any(
+        loci.get(key) is True
+        for key in ("file_node", "go_package", "rust_crate", "swift_module_node")
+    )
+
+
+def _index_type_members(
+    owners: Sequence[Mapping[str, Any]],
+    callables_by_file: Mapping[str, Sequence[Mapping[str, Any]]],
+) -> Mapping[str, Mapping[str, tuple[Mapping[str, Any], ...]]]:
+    """Mirror the resolver's index of the callables each type declaration holds."""
+    members: dict[str, dict[str, list[Mapping[str, Any]]]] = {}
+    for owner in owners:
+        start = owner.get("byte_offset")
+        length = owner.get("byte_length")
+        if (
+            not isinstance(start, int)
+            or isinstance(start, bool)
+            or not isinstance(length, int)
+            or isinstance(length, bool)
+            or length < 0
+        ):
+            continue
+        end = start + length
+        contained: dict[str, list[Mapping[str, Any]]] = {}
+        for node in callables_by_file.get(cast(str, owner.get("file_path")), ()):
+            node_start = node.get("byte_offset")
+            node_length = node.get("byte_length")
+            if not isinstance(node_start, int) or not isinstance(node_length, int):
+                continue
+            if (
+                node_start < start
+                or node_start + node_length > end
+                or node.get("language") != owner.get("language")
+            ):
+                continue
+            name = node.get("name")
+            if not isinstance(name, str):
+                continue
+            names = contained.setdefault(name, [])
+            if len(names) <= MAX_CALL_BINDING_CANDIDATES:
+                names.append(node)
+        if contained:
+            members[cast(str, owner.get("id"))] = contained
+    return MappingProxyType({
+        owner_id: MappingProxyType({
+            name: tuple(sorted(values, key=lambda item: cast(str, item.get("id"))))
+            for name, values in sorted(names.items())
+        })
+        for owner_id, names in sorted(members.items())
+    })
 
 
 def _validate_outcome(
@@ -187,6 +254,7 @@ def _validate_outcome(
         tuple[str, int, int, str],
         Sequence[Mapping[str, Any]],
     ],
+    type_members: Mapping[str, Mapping[str, Sequence[Mapping[str, Any]]]],
     references: Mapping[
         tuple[str, str, int, int],
         Sequence[SymbolReferenceRecord],
@@ -262,9 +330,19 @@ def _validate_outcome(
         and reference.target_kind in _CALLABLE_KINDS
         else None
     )
+    imported_member, imported_member_reason = _current_imported_member(
+        raw,
+        reference=reference,
+        type_members=type_members,
+    )
     survivors = [
         candidate
-        for candidate in (local_target, member_target, imported_reference)
+        for candidate in (
+            local_target,
+            member_target,
+            imported_reference,
+            imported_member,
+        )
         if candidate is not None
     ]
     if len(survivors) > 1:
@@ -297,6 +375,22 @@ def _validate_outcome(
             record_index=record_index,
         )
         return caller, False
+    if imported_member is not None:
+        _require_resolved(
+            record,
+            resolution="import-resolved",
+            basis="imported_member",
+            target=imported_member,
+            record_index=record_index,
+        )
+        return caller, False
+    if imported_member_reason is not None:
+        _require_unresolved(
+            record,
+            imported_member_reason,
+            record_index=record_index,
+        )
+        return caller, True
     if reference is not None and reference.status == "unresolved":
         _require_unresolved(
             record,
@@ -385,6 +479,35 @@ def _current_member_target(
         return None, "member_target_not_indexed"
     if len(candidates) != 1:
         return None, "member_binding_ambiguous"
+    return candidates[0], None
+
+
+def _current_imported_member(
+    raw: RawCallSite,
+    *,
+    reference: SymbolReferenceRecord | None,
+    type_members: Mapping[str, Mapping[str, Sequence[Mapping[str, Any]]]],
+) -> tuple[Mapping[str, Any] | None, str | None]:
+    if (
+        reference is None
+        or reference.status != "resolved"
+        or reference.binding is None
+        or reference.binding.type_only
+        or reference.target_id is None
+        or reference.target_kind in _CALLABLE_KINDS
+    ):
+        return None, None
+    if len(raw.callee_path) == 1:
+        name = "init"
+    elif len(raw.callee_path) == 2:
+        name = raw.callee_path[1]
+    else:
+        return None, None
+    candidates = type_members.get(reference.target_id, {}).get(name, ())
+    if not candidates:
+        return None, None
+    if len(candidates) > 1:
+        return None, "imported_member_ambiguous"
     return candidates[0], None
 
 
@@ -623,6 +746,7 @@ def _validate_reference(
         Sequence[SymbolReferenceRecord],
     ],
     file_hashes: Mapping[str, str],
+    indexed_nodes: Mapping[str, Mapping[str, Any]],
     target: Mapping[str, Any],
     record_index: int,
 ) -> None:
@@ -637,6 +761,7 @@ def _validate_reference(
         ),
         (),
     )
+    member_basis = record.resolution_basis == "imported_member"
     matches = [
         reference
         for reference in candidates
@@ -646,11 +771,16 @@ def _validate_reference(
             and not reference.binding.type_only
             and reference.source_id == record.caller_id
             and reference.source_kind == record.caller_kind
-            and reference.target_file == record.target_file
-            and reference.target_id == record.target_id
-            and reference.target_kind == record.target_kind
             and reference.resolution_control_files == record.resolution_control_files
             and reference.resolution_configuration == record.resolution_configuration
+            and (
+                member_basis
+                or (
+                    reference.target_file == record.target_file
+                    and reference.target_id == record.target_id
+                    and reference.target_kind == record.target_kind
+                )
+            )
         )
     ]
     if len(candidates) != 1 or len(matches) != 1:
@@ -658,19 +788,51 @@ def _validate_reference(
             record_index,
             "Import-resolved call has no unique matching symbol reference",
         )
+    reference = matches[0]
+    proven_id = cast(str, reference.target_id)
+    if member_basis:
+        owner = indexed_nodes.get(proven_id)
+        if owner is None or not _contains_node(owner, target):
+            raise _record_error(
+                record_index,
+                "Imported member call target is not declared by its proven type",
+            )
+        proven_node: Mapping[str, Any] = owner
+    else:
+        proven_node = target
     definition_support = [
         item
-        for item in matches[0].support
-        if item.kind == "definition" and item.endpoint_id == record.target_id
+        for item in reference.support
+        if item.kind == "definition" and item.endpoint_id == proven_id
     ]
     if (
         len(definition_support) != 1
-        or definition_support[0].file != record.target_file
-        or definition_support[0].line != target.get("line")
+        or definition_support[0].file != reference.target_file
+        or definition_support[0].line != proven_node.get("line")
         or definition_support[0].content_hash
-        != file_hashes.get(cast(str, record.target_file))
+        != file_hashes.get(cast(str, reference.target_file))
     ):
         raise _record_error(record_index, "Symbol reference target support is stale")
+
+
+def _contains_node(owner: Mapping[str, Any], node: Mapping[str, Any]) -> bool:
+    """Report whether ``node`` lies inside ``owner``'s declaration span."""
+    start = owner.get("byte_offset")
+    length = owner.get("byte_length")
+    node_start = node.get("byte_offset")
+    node_length = node.get("byte_length")
+    if any(
+        not isinstance(value, int) or isinstance(value, bool)
+        for value in (start, length, node_start, node_length)
+    ):
+        return False
+    return (
+        owner.get("file_path") == node.get("file_path")
+        and owner.get("id") != node.get("id")
+        and cast(int, node_start) >= cast(int, start)
+        and cast(int, node_start) + cast(int, node_length)
+        <= cast(int, start) + cast(int, length)
+    )
 
 
 def _supports_node(support: Any, node: Mapping[str, Any]) -> bool:

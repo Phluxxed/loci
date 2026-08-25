@@ -17,6 +17,7 @@ from loci.service import (
     analyze_usage,
     ensure_fresh_index,
     graph_anchors,
+    graph_calls,
     graph_health,
     graph_imports,
     graph_neighbors,
@@ -3669,11 +3670,19 @@ def _swift_package_repo(tmp_path: Path) -> Path:
         'let package = Package(name: "Feature", targets: [.target(name: "Feature")])\n'
     )
     (repo / "Feature/Sources/Feature/Model.swift").write_text(
-        "public class Ticket {}\n"
+        "public class Ticket {\n"
+        "    public init() {}\n"
+        "    public func stamp() {}\n"
+        "}\n"
     )
     (repo / "App").mkdir()
     (repo / "App/Main.swift").write_text(
-        "import Feature\nvar held: Ticket?\n"
+        "import Feature\n"
+        "var held: Ticket?\n"
+        "func run() {\n"
+        "    let made = Ticket()\n"
+        "    Ticket.stamp()\n"
+        "}\n"
     )
     return repo
 
@@ -3691,7 +3700,7 @@ def test_swift_module_nodes_survive_an_incremental_reindex(
     assert first["graph_swift_modules_indexed"] == 1
     assert second["graph_swift_modules_indexed"] == 1
     assert second["graph_status"] == "healthy"
-    assert second["graph_symbol_references_resolved"] == 1
+    assert second["graph_symbol_references_resolved"] == 3
 
 
 def test_swift_module_import_satisfies_the_mcp_import_contract(
@@ -3711,3 +3720,31 @@ def test_swift_module_import_satisfies_the_mcp_import_contract(
         for item in output.root.items
         if item.target_kind is not None
     ] == [("Feature", "module", "Feature")]
+
+
+def test_swift_cross_module_member_and_initializer_calls_resolve(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = _swift_package_repo(tmp_path)
+
+    index_repo(repo, incremental=False)
+    calls = graph_calls(repo, status="resolved")
+
+    resolved = sorted(
+        (item["raw"]["callee_path"][-1], item["resolution_basis"], item["target_id"])
+        for item in calls["items"]
+    )
+    assert resolved == [
+        (
+            "Ticket",
+            "imported_member",
+            "Feature/Sources/Feature/Model.swift::Ticket.init#method",
+        ),
+        (
+            "stamp",
+            "imported_member",
+            "Feature/Sources/Feature/Model.swift::Ticket.stamp#method",
+        ),
+    ]
