@@ -1037,6 +1037,53 @@ def _collect_swift_context(
         if node.type == "import_declaration":
             _exclude(context, node)
             continue
+        if node.type == "type_parameters":
+            # A generic parameter names no importable declaration, so its uses
+            # inside the declaration must not defer to the file's imports.
+            scope = node.parent if node.parent is not None else root
+            for parameter in node.named_children:
+                if parameter.type != "type_parameter":
+                    continue
+                name = next(
+                    (
+                        child
+                        for child in parameter.named_children
+                        if child.type == "type_identifier"
+                    ),
+                    None,
+                )
+                if name is None:
+                    continue
+                _add_local_binding(
+                    context,
+                    name_node=name,
+                    source=source,
+                    scope=scope,
+                    declaration_start_byte=parameter.start_byte,
+                    active_start_byte=scope.start_byte,
+                )
+            continue
+        if node.type == "associatedtype_declaration":
+            name = next(
+                (
+                    child
+                    for child in node.named_children
+                    if child.type == "type_identifier"
+                ),
+                None,
+            )
+            if name is None:
+                continue
+            scope = _swift_scope(node)
+            _add_local_binding(
+                context,
+                name_node=name,
+                source=source,
+                scope=scope,
+                declaration_start_byte=node.start_byte,
+                active_start_byte=scope.start_byte,
+            )
+            continue
         if node.type in _SWIFT_CALLABLE_DECLARATIONS:
             name = node.child_by_field_name("name")
             _exclude(context, name)

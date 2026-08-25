@@ -820,7 +820,7 @@ class ImportItem(StrictOutputModel):
     target_package: str | None
     target_crate: str | None
     target_module: str | None
-    target_kind: Literal["file", "package", "crate"] | None
+    target_kind: Literal["file", "package", "crate", "module"] | None
     target_id: str | None
     specifier: str
     imported_name: str | None

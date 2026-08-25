@@ -391,12 +391,69 @@ Two measures that do discriminate:
 | Graph Swift file-pairs that are co-cited somewhere | 9.1% |
 | Cited files linked to at least one co-cited file | 497 / 2,647 = 18.8% |
 
-A third structural ceiling, verified not assumed: `_swift_path` observes only
+A third structural ceiling, verified not assumed: `_swift_path` observed only
 `simple_identifier` and `navigation_expression`, so type positions —
 `let x: Ticket`, `func f() -> Ticket`, conformance lists, `extension Ticket` —
-are invisible. A large share of real Swift coupling is exactly that. Extending
-observation to type positions is the highest-value follow-up and is not in this
-plan.
+were invisible. A large share of real Swift coupling is exactly that. Closed
+below.
+
+### Type positions — landed, 2026-08-25
+
+The grammar makes this cleaner than expected. Every type usage is a `user_type`
+whose direct `type_identifier` children spell the dotted path; a declaration's
+own name is a bare `type_identifier` that is never wrapped in a `user_type`.
+So observing `user_type` picks up annotations, return types, parameter types,
+inheritance and conformance lists, and `extension Alpha` — while `class Alpha`
+is not observed as a reference to itself. No exclusion list was needed.
+
+Three details the grammar forced:
+
+- Generic arguments hang off a `type_arguments` child of the `user_type` that
+  names the generic, and the observation walker stops descending once a node
+  yields a path. `Box<Entry>` would have lost `Entry`. `_UNCONSUMED_CHILDREN`
+  names that one branch as still walkable.
+- Generic parameters and `associatedtype` declarations name no importable
+  declaration, so they are registered as local bindings and their uses never
+  defer to the file's imports.
+- A module-qualified reference (`Feature.Ticket`) binds by the module's own
+  name, so its declaration is `path[1]`, not `path[0]`. Resolving it as
+  `path[0]` produced 2,245 spurious `target_not_indexed` records.
+
+Measured on `lott-ios`:
+
+| | Bare names only | With type positions |
+|---|---:|---:|
+| Symbol references recorded | 9,758 | 21,740 |
+| — resolved | 9,092 | 20,919 |
+| — unresolved | 666 | 821 |
+| Graph edges | 22,438 | 27,860 |
+| Distinct Swift file-to-file pairs | 2,916 | 6,893 |
+
+Against the citation corpus, with the broken-index control still scoring 0.0%:
+
+| | Bare names only | With type positions |
+|---|---:|---:|
+| Cited files linked to a co-cited file | 18.8% | **42.7%** |
+| Graph file-pairs that are co-cited | 9.1% | 13.3% |
+| Cross-module co-cited pairs recovered | 1.4% | 4.6% |
+
+The cross-module pair figure is still governed by the denominator error above:
+6,893 graph pairs against 25,334 co-cited pairs caps it at 27%.
+
+### Four defects in the landed `swift-modules` work, found while building this
+
+Each was invisible to the tests that shipped with it, and each now has one:
+
+1. Manifest `content_hash` held the manifest's *path*, so `loci index` over
+   `lott-ios` failed outright on the state round-trip.
+2. `_is_synthetic_symbol` and `_is_synthetic_node` did not recognise
+   `kind="module"` or `swift_module_node`, so a module node was treated as a
+   source symbol needing a file node.
+3. The incremental keep-list excluded `package` and `crate` nodes but not
+   `module`, so any *incremental* reindex of a Swift repository raised
+   "Reference index contains duplicate symbol IDs". Only full reindexes worked.
+4. `ImportItem.target_kind` was `Literal["file", "package", "crate"]`, so
+   `loci_graph_imports` failed schema validation on any Swift module import.
 
 ---
 

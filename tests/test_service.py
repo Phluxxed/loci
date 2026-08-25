@@ -3658,3 +3658,56 @@ def test_service_invalid_grep_pattern_raises_structured_error(
         grep_repo(sample_repo, "[")
 
     assert exc_info.value.code == "INVALID_REGEX"
+
+
+def _swift_package_repo(tmp_path: Path) -> Path:
+    repo = tmp_path / "repo"
+    (repo / "Feature/Sources/Feature").mkdir(parents=True)
+    (repo / "Feature/Package.swift").write_text(
+        '// swift-tools-version:5.9\n'
+        'import PackageDescription\n\n'
+        'let package = Package(name: "Feature", targets: [.target(name: "Feature")])\n'
+    )
+    (repo / "Feature/Sources/Feature/Model.swift").write_text(
+        "public class Ticket {}\n"
+    )
+    (repo / "App").mkdir()
+    (repo / "App/Main.swift").write_text(
+        "import Feature\nvar held: Ticket?\n"
+    )
+    return repo
+
+
+def test_swift_module_nodes_survive_an_incremental_reindex(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = _swift_package_repo(tmp_path)
+
+    first = index_repo(repo, incremental=False)
+    second = index_repo(repo, incremental=True)
+
+    assert first["graph_swift_modules_indexed"] == 1
+    assert second["graph_swift_modules_indexed"] == 1
+    assert second["graph_status"] == "healthy"
+    assert second["graph_symbol_references_resolved"] == 1
+
+
+def test_swift_module_import_satisfies_the_mcp_import_contract(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    from loci.mcp_output_models import LociGraphImportsOutput
+
+    monkeypatch.setenv("LOCI_BASE_DIR", str(tmp_path / ".codeindex"))
+    repo = _swift_package_repo(tmp_path)
+    index_repo(repo, incremental=False)
+
+    output = LociGraphImportsOutput.model_validate(graph_imports(repo))
+
+    assert [
+        (item.specifier, item.target_kind, item.target_module)
+        for item in output.root.items
+        if item.target_kind is not None
+    ] == [("Feature", "module", "Feature")]

@@ -232,7 +232,16 @@ def resolve_swift_reference(
         or import_record.target_id is None
     ):
         return _unresolved("unsupported_reference")
-    key = (import_record.target_id, raw.path[0])
+    if raw.binding_state == "deferred":
+        # A deferred name is bare, so the declaration is the path root.
+        name = raw.path[0]
+    elif len(raw.path) >= 2:
+        # The binding matched the module's own name, so the reference is
+        # module-qualified and the declaration is the segment after it.
+        name = raw.path[1]
+    else:
+        return _unresolved("unsupported_reference")
+    key = (import_record.target_id, name)
     if key in index.ambiguous:
         return _unresolved("ambiguous_target")
     targets = index.surfaces.get(key, ())
