@@ -290,11 +290,39 @@ Full suite: 1,355 passed, 2 failed. Both failures
 `test_store_isolation::test_mcp_binding_uses_inherited_suite_store_boundary`)
 reproduce identically on the unmodified tree and are unrelated to this work.
 
-### Task 2 — Member candidate collection
+### Task 2 — Member candidate collection — **done** (`5fcbcda`)
 
-Collect members per type declaration in `_binding_context`, emit
-`member_candidates` / `member_binding_state` from `calls.py`. Parser only — no
-graph change, no new edges.
+`SyntaxContext` gains `member_bindings`; `RawCallSite` gains
+`member_candidates` and `member_binding_state`. Observation only — no edge
+changes and no graph code touched. `EXTRACTOR_VERSION` 14 to 15.
+
+Members are keyed by the body that lexically contains the call, never by type
+name, per the constraint recorded above. Swift is the one exception: extension
+members pool with their declaration when both sit at file scope, which is safe
+because no other supported language lets a second declaration of the same name
+extend the first.
+
+Covered shapes: Swift implicit self (bare name inside a type body), Python
+`self.` / `cls.`, JavaScript and TypeScript `this.`. Go receivers and Rust
+`self` are not covered — Go binds a receiver name rather than a type body, and
+Rust `self.x()` is still classified `dynamic`, so both need their own work.
+Protocol requirements and other body-less declarations are excluded outright.
+
+Measured yield over the same corpora:
+
+| Corpus | definite local | definite member | ambiguous member |
+|---|---:|---:|---:|
+| Swift (lott-ios, 126,406 sites) | 592 | 8,240 | 567 |
+| Python (`src/loci`, 9,418 sites) | 2,177 | 80 | 0 |
+
+The Python figure is low because loci's own source is mostly module-level
+functions, not methods — it is not evidence about Python generally.
+
+Also fixed in passing (`20ea7cf`): the MCP `loci_graph_calls` output model
+pinned `language` to the five pre-Swift languages, so it rejected its own
+output for any Swift repository. The schema fixture only ever indexed Python,
+so nothing caught it. A new test ties the literal to the parser's supported
+set.
 
 ### Task 3 — Implicit-self and explicit-self member resolution
 
