@@ -226,13 +226,27 @@ def resolve_swift_reference(
 ) -> SwiftReferenceOutcome:
     """Resolve one bare Swift name inside its proven module endpoint."""
     if (
-        binding.kind != "module"
+        binding.kind not in {"module", "symbol"}
         or not raw.path
         or import_record.target_kind != "module"
         or import_record.target_id is None
     ):
         return _unresolved("unsupported_reference")
-    if raw.binding_state == "deferred":
+
+    if binding.kind == "symbol":
+        # Declaration imports bind their final component directly.  The
+        # module import record still proves the owning module; the indexed
+        # export surface proves the declaration itself.
+        if (
+            raw.binding_state == "deferred"
+            or binding.local_name != raw.path[0]
+            or binding.imported_name != raw.path[0]
+            or binding not in import_record.raw.bindings
+            or import_record.raw.imported_name != binding.imported_name
+        ):
+            return _unresolved("unsupported_reference")
+        name = binding.imported_name
+    elif raw.binding_state == "deferred":
         # A deferred name is bare, so the declaration is the path root.
         name = raw.path[0]
     elif len(raw.path) >= 2:
@@ -241,6 +255,7 @@ def resolve_swift_reference(
         name = raw.path[1]
     else:
         return _unresolved("unsupported_reference")
+    assert name is not None
     key = (import_record.target_id, name)
     if key in index.ambiguous:
         return _unresolved("ambiguous_target")

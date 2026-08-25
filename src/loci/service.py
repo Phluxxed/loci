@@ -1419,6 +1419,14 @@ def graph_health(
     diagnostic_values = [
         diagnostic.to_dict() for diagnostic in state.diagnostics
     ]
+    reference_resolution_basis_counts: dict[str, int] = defaultdict(int)
+    for record in state.symbol_references:
+        if record.status == "resolved" and record.resolution_basis is not None:
+            reference_resolution_basis_counts[record.resolution_basis] += 1
+    call_resolution_basis_counts: dict[str, int] = defaultdict(int)
+    for record in state.calls:
+        if record.status == "resolved" and record.resolution_basis is not None:
+            call_resolution_basis_counts[record.resolution_basis] += 1
     return {
         "schema_version": GRAPH_SCHEMA_VERSION,
         "repo": str(repo_path),
@@ -1460,12 +1468,18 @@ def graph_health(
             "graph_symbol_references_unresolved": sum(
                 record.status == "unresolved" for record in state.symbol_references
             ),
+            "graph_symbol_references_resolved_by_basis": dict(
+                sorted(reference_resolution_basis_counts.items())
+            ),
             "graph_calls_indexed": len(state.calls),
             "graph_calls_resolved": sum(
                 record.status == "resolved" for record in state.calls
             ),
             "graph_calls_unresolved": sum(
                 record.status == "unresolved" for record in state.calls
+            ),
+            "graph_calls_resolved_by_basis": dict(
+                sorted(call_resolution_basis_counts.items())
             ),
         },
         "diagnostics": diagnostic_values,

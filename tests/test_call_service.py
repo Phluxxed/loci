@@ -49,6 +49,9 @@ def test_service_persists_resolved_calls_and_edges(
     assert health["counts"]["graph_calls_indexed"] == 1
     assert health["counts"]["graph_calls_resolved"] == 1
     assert health["counts"]["graph_calls_unresolved"] == 0
+    assert health["counts"]["graph_calls_resolved_by_basis"] == {
+        "imported_reference": 1,
+    }
     assert len(graph["calls"]) == 1
     assert graph["calls"][0]["status"] == "resolved"
     assert graph["calls"][0]["caller_id"] == "use.py::caller#function"

@@ -1940,7 +1940,7 @@ def test_swift_bare_name_resolves_to_its_imported_module(tmp_path: Path):
         tmp_path,
         _swift_tree(
             "import Feature\nfunc run() { record(Ticket) }\n",
-            feature="public class Ticket {}\n",
+            feature="public struct Ticket {}\n",
         ),
     )
 
@@ -1949,6 +1949,26 @@ def test_swift_bare_name_resolves_to_its_imported_module(tmp_path: Path):
         (("Ticket",), "direct_binding")
     ]
     assert resolved[0].target_file == "Feature/Sources/Feature/Model.swift"
+
+
+def test_swift_declaration_import_resolves_to_its_imported_symbol(
+    tmp_path: Path,
+):
+    records, _, _ = _resolve_swift_tree(
+        tmp_path,
+        _swift_tree(
+            "import struct Feature.Ticket\nfunc run() { record(Ticket) }\n",
+            feature="public class Ticket {}\n",
+        ),
+    )
+
+    resolved = [record for record in records if record.status == "resolved"]
+    assert len(resolved) == 1
+    assert resolved[0].binding is not None
+    assert resolved[0].binding.kind == "symbol"
+    assert resolved[0].raw.path == ("Ticket",)
+    assert resolved[0].target_file == "Feature/Sources/Feature/Model.swift"
+    assert resolved[0].target_kind == "class"
 
 
 def test_swift_bare_name_no_module_declares_is_not_recorded(tmp_path: Path):

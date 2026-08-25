@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Mapping, Optional
 
 from loci.graph.contracts import (
+    GRAPH_RESOLVER_VERSION,
     GraphContractError,
     GraphEdge,
     validate_graph_edges,
@@ -25,7 +26,7 @@ from loci.storage.repository_catalog import (
 )
 from loci.storage.store_layout import repository_cache_key
 
-INDEX_SCHEMA_VERSION = 6
+INDEX_SCHEMA_VERSION = 7
 EXTRACTOR_VERSION = 21
 MIN_SEARCH_SELECTIONS = 10
 MIN_ADVERSE_SEARCH_SELECTIONS = 3
@@ -56,6 +57,7 @@ def index_versions_current(index: dict[str, Any]) -> bool:
     return (
         index.get("schema_version") == INDEX_SCHEMA_VERSION
         and index.get("extractor_version") == EXTRACTOR_VERSION
+        and index.get("graph_resolver_version") == GRAPH_RESOLVER_VERSION
     )
 
 
@@ -283,6 +285,7 @@ class IndexStore:
         index_data = {
             "schema_version": INDEX_SCHEMA_VERSION,
             "extractor_version": EXTRACTOR_VERSION,
+            "graph_resolver_version": GRAPH_RESOLVER_VERSION,
             "symbols": [s.to_dict() for s in symbols],
             "file_hashes": file_hashes,
             "repo_path": str(

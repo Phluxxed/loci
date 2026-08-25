@@ -733,9 +733,11 @@ class GraphHealthCounts(StrictOutputModel):
     graph_symbol_references_indexed: int
     graph_symbol_references_resolved: int
     graph_symbol_references_unresolved: int
+    graph_symbol_references_resolved_by_basis: dict[str, int]
     graph_calls_indexed: int
     graph_calls_resolved: int
     graph_calls_unresolved: int
+    graph_calls_resolved_by_basis: dict[str, int]
 
 
 class LociGraphHealthSuccess(StrictOutputModel):

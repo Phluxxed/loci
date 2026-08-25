@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from loci.graph.contracts import GRAPH_RESOLVER_VERSION
 from loci.service import index_repo, store_health
 from loci.storage.repository_catalog import CATALOG_FILE_NAME
 from loci.storage.store_layout import repository_cache_key
@@ -77,6 +78,32 @@ def test_store_health_reports_healthy_and_stale_with_exact_reasons(
     assert stale["reasons"][0]["state"] == "stale"
     assert stale["reasons"][0]["code"] == "SOURCE_CONTENT_CHANGED"
     assert stale["reasons"][0]["details"]["changed"] == ["example.py"]
+
+
+def test_store_health_reports_stale_graph_resolver_version(
+    tmp_path: Path,
+    health_store: Path,
+) -> None:
+    repo = _repo(tmp_path, "stale-resolver")
+    index_repo(repo, incremental=False)
+    index_path = health_store / repository_cache_key(repo) / "index.json"
+    index = json.loads(index_path.read_text(encoding="utf-8"))
+    index["graph_resolver_version"] = GRAPH_RESOLVER_VERSION - 1
+    index_path.write_text(json.dumps(index), encoding="utf-8")
+
+    result = store_health(limit=10)
+
+    item = _item_for(result, repo)
+    assert item["states"] == ["stale"]
+    assert item["reasons"] == [{
+        "state": "stale",
+        "code": "INDEX_VERSION_OUTDATED",
+        "details": {
+            "schema_version": index["schema_version"],
+            "extractor_version": index["extractor_version"],
+            "graph_resolver_version": GRAPH_RESOLVER_VERSION - 1,
+        },
+    }]
 
 
 def test_store_health_preserves_missing_corrupt_and_overlapping_findings(
