@@ -1,9 +1,9 @@
 # Swift graph support
 
-**Status:** `swift-extract` and `swift-local` landed on branch `swift-graph-support`
-(`265a08f`, `a4d6c4e`, `c56c83d`, after the `else`-chain conversion in `c79147c`).
-`swift-modules` stage 1 (manifest reader and module index) landed; its contract
-widening and `swift-resolve` not started.
+**Status:** all four modules landed on branch `swift-graph-support`. `swift-extract`
+and `swift-local` in `265a08f`, `a4d6c4e`, `c56c83d` (after the `else`-chain
+conversion in `c79147c`); `swift-modules` in `0f72853` and `ab449a1`;
+`swift-resolve` below. Nothing pushed.
 **Author:** Claude, 2026-08-24, at Vik's request.
 **Prior art:** `docs/plans/2026-07-15-extensible-graph-retrieval-stage-7-go-import-resolution.md` — read its "Exact File Plan" (lines 888–919) before writing code. Swift should mirror Go, not Rust.
 
@@ -295,6 +295,59 @@ contiguous span, so `(module_id, name)` may legitimately map to many files. Deci
 extension member resolves to the extension's own span or to the base type's declaration, and record `ambiguous`
 rather than guessing when both are plausible.
 
+### Landed, 2026-08-25
+
+Bare-name deferral, not qualified-path resolution. The plan assumed Swift would
+mirror Go's `pkg.Name` shape. It does not: Swift names an imported declaration
+bare, so nothing in the file ties the name to a module. `RawSymbolReference` now
+admits a Swift `deferred` state whose candidates are every module-kind import
+binding in the file, and `graph/_swift_references.py` picks the one module whose
+surface declares that name.
+
+Three decisions the code had to make, each settled by measurement over
+`lott-ios` rather than by preference:
+
+1. **An `extension` never exports the name it extends.** `extension Alpha` does
+   not declare `Alpha`, so recording it as an export mapped one importable name
+   onto every file extending it — 294 spurious export entries over 175 names,
+   `UIColor` alone in 21 places. With extensions excluded, **zero** of the 1,258
+   `(module, name)` surface keys carry more than one target. That answers the
+   open question in this section: the ambiguity the plan feared does not arise,
+   because the base declaration is the only declaration.
+2. **A name no imported module declares is not recorded at all.** 401,506 Swift
+   path observations, of which 194,579 match no imported module surface — they
+   are members, locals and system framework names. Emitting an unresolved record
+   for each would have grown the reference table 400× to say nothing. They are
+   reported out of scope and dropped, so `resolve_symbol_references` no longer
+   returns one record per observation.
+3. **The referencing file's own module wins.** Swift resolves the current module
+   before any import, so a name the file's own module also exports is left
+   unattributed rather than pointed at the import. Measured at 20 sites; a name
+   declared *internally* in the own module is still a residual gap, since
+   internal declarations are not in the surface.
+
+Measured on `lott-ios` (4,410 of 4,486 files parsed):
+
+| | Before `swift-resolve` | After |
+|---|---:|---:|
+| Symbol references recorded | 437 | 9,758 |
+| — resolved | 37 | 9,092 |
+| Calls resolved | 9,932 | 11,849 |
+| Graph edges | 1,100 | 22,438 |
+| `graph_status` | `healthy` | `healthy` |
+
+Two defects in already-committed `swift-modules` surfaced here and are fixed:
+
+- `_read_control_candidate` returns `(bytes, relative_path)`, but the caller
+  named the second element `content_hash`. Every `Package.swift` input hash and
+  every module node's `content_hash` was the manifest's path. `loci index` over
+  `lott-ios` failed outright on the state round-trip (`Invalid graph input
+  hash`). Now hashed with `hashlib.sha256`, pinned by a test.
+- `_is_synthetic_symbol` did not recognise `kind="module"` or
+  `swift_module_node`, so a module node was treated as a source symbol needing a
+  file node. It only stayed hidden because `Package.swift` is itself an indexed
+  Swift file.
+
 ### Acceptance — this is the eval, and it has real ground truth
 
 The 96 finished feature specs in `palo-discovery` cite 13,631 exact `file#Lnnn` locations. For the 65% of cited
@@ -304,6 +357,46 @@ file-pairs that cross a module boundary, measure what share the graph recovers a
 - Report intra-module pairs separately as the known-invisible 35%; they are not failures.
 - Run the eval against a deliberately broken index first and confirm it scores near zero — a check that has never
   failed is unverified.
+
+#### Result — the target was unreachable by construction
+
+Built and run over the 99 features in
+`palo-discovery/docs/pforensic-out/lott-ios/domains`, 13,237 `file#Lnnn`
+citations across 2,647 distinct Swift files, all of them indexed.
+
+| | |
+|---|---:|
+| Co-cited file pairs | 39,656 |
+| — cross-module | 25,334 |
+| — intra-module | 14,322 |
+| Cross-module pairs recovered as an edge | 347 (**1.4%**) |
+| Intra-module pairs recovered | 0 (0.0%, as predicted) |
+
+Against a deliberately emptied edge set the eval scores 0.0% on every measure,
+so it is not vacuous.
+
+**The ≥50% bar could never have been met, and the resolver is not the reason.**
+The whole graph contains 2,916 distinct Swift file-to-file pairs. Meeting the
+target needs 12,667. Even if every edge in the graph landed on a cited pair the
+ceiling would be 11.5%. The metric assumes a spec's cited files are pairwise
+coupled; they are not — a spec cites files because they are topically related,
+and combinations of 40 cited files give 780 pairs where the real coupling is a
+few dozen. This was written without checking the denominator, the same method
+error the member-scope plan audit recorded.
+
+Two measures that do discriminate:
+
+| | |
+|---|---:|
+| Graph Swift file-pairs that are co-cited somewhere | 9.1% |
+| Cited files linked to at least one co-cited file | 497 / 2,647 = 18.8% |
+
+A third structural ceiling, verified not assumed: `_swift_path` observes only
+`simple_identifier` and `navigation_expression`, so type positions —
+`let x: Ticket`, `func f() -> Ticket`, conformance lists, `extension Ticket` —
+are invisible. A large share of real Swift coupling is exactly that. Extending
+observation to type positions is the highest-value follow-up and is not in this
+plan.
 
 ---
 

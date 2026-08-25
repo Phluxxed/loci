@@ -414,6 +414,18 @@ def _swift_visibility(node: Any, source: bytes) -> str:
     return "internal"
 
 
+def _swift_is_extension(node: Any) -> bool:
+    """Report whether one ``class_declaration`` is really an ``extension``.
+
+    tree-sitter-swift emits ``class_declaration`` for class, struct, enum,
+    actor and extension alike, distinguished only by the keyword token. An
+    ``extension Alpha`` does not declare ``Alpha`` — it adds members to a type
+    declared elsewhere — so recording it as an export of that name would map
+    one importable name onto every file that extends it.
+    """
+    return any(child.type == "extension" for child in node.children)
+
+
 def _swift_file_level(node: Any) -> bool:
     """Only a top-level declaration is importable under a bare name.
 
@@ -438,6 +450,8 @@ def _extract_swift_exports(
     """
     for node in _walk_nodes(root):
         if node.type not in _SWIFT_DECLARATION_TYPES or not _swift_file_level(node):
+            continue
+        if _swift_is_extension(node):
             continue
         if _swift_visibility(node, source) not in _SWIFT_EXPORTED_VISIBILITY:
             continue

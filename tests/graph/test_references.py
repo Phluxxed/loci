@@ -19,6 +19,10 @@ from loci.graph.go_modules import (
     build_go_package_index,
 )
 from loci.graph.imports import resolve_imports
+from loci.graph.swift_modules import (
+    build_swift_module_index,
+    load_swift_module_context,
+)
 from loci.graph.javascript_modules import (
     build_javascript_resolution_index,
     load_javascript_module_context,
@@ -1849,3 +1853,177 @@ def test_reference_index_rejects_stale_python_export_evidence(tmp_path: Path):
 
     with pytest.raises(GraphContractError, match="stale"):
         build_reference_resolver_index(symbols, imports, [stale, *exports[1:]])
+
+
+def _resolve_swift_tree(
+    tmp_path: Path,
+    files: dict[str, str],
+) -> tuple[list, list[Symbol], list[ImportExtractionBatch]]:
+    symbols: list[Symbol] = []
+    batches: list[ImportExtractionBatch] = []
+    file_nodes: dict[str, Symbol] = {}
+    manifests: list[Path] = []
+    for relative_path, source in files.items():
+        path = tmp_path / relative_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(source, encoding="utf-8")
+        if path.name == "Package.swift":
+            manifests.append(path)
+            continue
+        source_hash = hashlib.sha256(source.encode()).hexdigest()
+        file_node = make_file_symbol(
+            relative_path,
+            language="swift",
+            content_hash=source_hash,
+        )
+        file_nodes[relative_path] = file_node
+        symbols.append(file_node)
+        symbols.extend(
+            replace(
+                symbol,
+                id=make_symbol_id(relative_path, symbol.qualified_name, symbol.kind),
+                file_path=relative_path,
+            )
+            for symbol in parse_file(path)
+        )
+        batches.append(
+            extract_import_batch(
+                path,
+                source_file=relative_path,
+                language="swift",
+                source_hash=source_hash,
+            )
+        )
+
+    module_build = build_swift_module_index(
+        load_swift_module_context(tmp_path, manifests).context
+    )
+    assert module_build.problems == ()
+    symbols.extend(module_build.index.module_nodes)
+    imports = resolve_imports(
+        [raw for batch in batches for raw in batch.imports],
+        file_nodes=file_nodes,
+        swift_modules=module_build.index,
+    )
+    exports = [export for batch in batches for export in batch.exports]
+    observations = [reference for batch in batches for reference in batch.references]
+    index = build_reference_resolver_index(
+        symbols,
+        imports,
+        exports,
+        swift_modules=module_build.index,
+    )
+    return (
+        resolve_symbol_references(observations, imports=imports, index=index),
+        symbols,
+        batches,
+    )
+
+
+_SWIFT_MANIFEST = """// swift-tools-version:5.9
+import PackageDescription
+
+let package = Package(name: "Feature", targets: [.target(name: "Feature")])
+"""
+
+
+def _swift_tree(consumer: str, *, feature: str) -> dict[str, str]:
+    return {
+        "Feature/Package.swift": _SWIFT_MANIFEST,
+        "Feature/Sources/Feature/Model.swift": feature,
+        "App/Main.swift": consumer,
+    }
+
+
+def test_swift_bare_name_resolves_to_its_imported_module(tmp_path: Path):
+    records, _, _ = _resolve_swift_tree(
+        tmp_path,
+        _swift_tree(
+            "import Feature\nfunc run() { record(Ticket) }\n",
+            feature="public class Ticket {}\n",
+        ),
+    )
+
+    resolved = [record for record in records if record.status == "resolved"]
+    assert [(record.raw.path, record.resolution_basis) for record in resolved] == [
+        (("Ticket",), "direct_binding")
+    ]
+    assert resolved[0].target_file == "Feature/Sources/Feature/Model.swift"
+
+
+def test_swift_bare_name_no_module_declares_is_not_recorded(tmp_path: Path):
+    records, _, _ = _resolve_swift_tree(
+        tmp_path,
+        _swift_tree(
+            "import Feature\nfunc run() { record(Missing) }\n",
+            feature="public class Ticket {}\n",
+        ),
+    )
+
+    assert [record.raw.path for record in records] == []
+
+
+def test_swift_internal_declaration_is_not_importable(tmp_path: Path):
+    records, _, _ = _resolve_swift_tree(
+        tmp_path,
+        _swift_tree(
+            "import Feature\nfunc run() { record(Ticket) }\n",
+            feature="class Ticket {}\n",
+        ),
+    )
+
+    assert records == []
+
+
+def test_swift_extension_does_not_declare_the_type_it_extends(tmp_path: Path):
+    files = _swift_tree(
+        "import Feature\nfunc run() { record(Ticket) }\n",
+        feature="public class Ticket {}\n",
+    )
+    files["Feature/Sources/Feature/Ticket+Extra.swift"] = (
+        "public extension Ticket { func extra() {} }\n"
+    )
+
+    records, _, _ = _resolve_swift_tree(tmp_path, files)
+
+    resolved = [record for record in records if record.status == "resolved"]
+    assert len(resolved) == 1
+    assert resolved[0].target_file == "Feature/Sources/Feature/Model.swift"
+
+
+def test_swift_name_two_imported_modules_declare_is_not_attributed(tmp_path: Path):
+    records, _, _ = _resolve_swift_tree(
+        tmp_path,
+        {
+            "Alpha/Package.swift": _SWIFT_MANIFEST.replace("Feature", "Alpha"),
+            "Alpha/Sources/Alpha/Model.swift": "public class Ticket {}\n",
+            "Beta/Package.swift": _SWIFT_MANIFEST.replace("Feature", "Beta"),
+            "Beta/Sources/Beta/Model.swift": "public class Ticket {}\n",
+            "App/Main.swift": (
+                "import Alpha\nimport Beta\nfunc run() { record(Ticket) }\n"
+            ),
+        },
+    )
+
+    assert [(record.status, record.unresolved_reason) for record in records] == [
+        ("unresolved", "ambiguous_binding")
+    ]
+
+
+def test_swift_own_module_wins_over_an_imported_name(tmp_path: Path):
+    records, _, _ = _resolve_swift_tree(
+        tmp_path,
+        {
+            "Alpha/Package.swift": _SWIFT_MANIFEST.replace("Feature", "Alpha"),
+            "Alpha/Sources/Alpha/Model.swift": "public class Ticket {}\n",
+            "Beta/Package.swift": _SWIFT_MANIFEST.replace("Feature", "Beta"),
+            "Beta/Sources/Beta/Model.swift": "public class Ticket {}\n",
+            "Beta/Sources/Beta/Use.swift": (
+                "import Alpha\nfunc run() { record(Ticket) }\n"
+            ),
+        },
+    )
+
+    assert [(record.status, record.unresolved_reason) for record in records] == [
+        ("unresolved", "ambiguous_binding")
+    ]

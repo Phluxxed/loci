@@ -9,6 +9,7 @@ becoming a manifest we guess at.
 
 from __future__ import annotations
 
+import hashlib
 import os
 import stat
 from collections.abc import Mapping
@@ -151,7 +152,8 @@ def load_swift_module_context(
     for candidate in sorted(set(control_candidates), key=str):
         source = _candidate_source(root, candidate)
         try:
-            data, content_hash = _read_control_candidate(root, candidate)
+            data, _ = _read_control_candidate(root, candidate)
+            content_hash = hashlib.sha256(data).hexdigest()
         except _SwiftControlError as error:
             problems.append(_package_problem(source, error.reason, limit=error.limit))
             continue

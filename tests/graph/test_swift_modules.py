@@ -1,4 +1,5 @@
 from __future__ import annotations
+import hashlib
 
 from pathlib import Path
 
@@ -499,3 +500,18 @@ def test_a_module_edge_is_rejected_when_its_endpoint_is_not_a_module_node(
         )
 
     assert error.value.code == "INVALID_GRAPH_EDGE"
+
+
+def test_a_manifest_input_hash_is_the_hash_of_its_content(tmp_path: Path):
+    manifest = """// swift-tools-version:5.9
+import PackageDescription
+
+let package = Package(name: "Feature", targets: [.target(name: "Feature")])
+"""
+    _package(tmp_path, "pkg", manifest, sources=("Sources/Feature/a.swift",))
+
+    load, _ = _load(tmp_path)
+
+    assert load.input_hashes == {
+        "pkg/Package.swift": hashlib.sha256(manifest.encode()).hexdigest()
+    }

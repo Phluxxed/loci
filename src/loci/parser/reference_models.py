@@ -279,12 +279,25 @@ class RawSymbolReference:
         if self.binding_state == "ambiguous" and len(self.candidate_bindings) < 2:
             raise ValueError("ambiguous references require multiple candidates")
         if self.binding_state == "deferred":
-            if self.language != "go" or any(
-                binding.kind != "namespace" or binding.local_name is not None
-                for binding in self.candidate_bindings
-            ):
+            # Go defers a qualified root whose package name the manifest has
+            # not yet supplied; Swift defers a bare name whose owning module
+            # is only knowable once the module surfaces are indexed.
+            if self.language == "go":
+                deferrable = all(
+                    binding.kind == "namespace" and binding.local_name is None
+                    for binding in self.candidate_bindings
+                )
+            elif self.language == "swift":
+                deferrable = all(
+                    binding.kind == "module"
+                    for binding in self.candidate_bindings
+                )
+            else:
+                deferrable = False
+            if not deferrable:
                 raise ValueError(
-                    "deferred references require unresolved Go package bindings"
+                    "deferred references require Go package or Swift module "
+                    "bindings"
                 )
         elif any(binding.local_name is None for binding in self.candidate_bindings):
             raise ValueError("non-deferred reference candidates must bind a local name")
@@ -294,7 +307,11 @@ class RawSymbolReference:
                 and end <= binding.scope_end_byte
             ):
                 raise ValueError("candidate binding scope must contain the reference")
-            if binding.local_name is not None and binding.local_name != self.path[0]:
+            if (
+                self.binding_state != "deferred"
+                and binding.local_name is not None
+                and binding.local_name != self.path[0]
+            ):
                 raise ValueError("candidate binding local name must match the path root")
         _sha256(self.source_hash, "source_hash")
         from loci.parser._binding_context import ExecutableOwner
