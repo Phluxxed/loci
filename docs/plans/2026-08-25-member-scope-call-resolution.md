@@ -555,6 +555,47 @@ left to chance.
 Measured same-file payoff: 220 Swift sites. Depends on the same type-name
 binding channel as Task 5, so the two should be built together.
 
+#### Tasks 5 and 6 — landed, 2026-08-25, as one basis
+
+Built together, as the plan required, but under **one** `type_member` basis
+rather than a separate `type_initializer` one. `Widget()` and `Widget.make()`
+are the same question — which member of a named type does this callee name —
+and the cross-module `imported_member` basis landed a commit earlier already
+answers both with one basis. Two bases would have split one concept across the
+graph surface for no consumer benefit.
+
+No new parser binding channel was needed either. The type-name channel the plan
+called for only mattered for shadowing, and the existing local-binding channel
+already reports `shadowed` when a value of the type's name is in scope. One
+parser change was required: Python bound a `class_definition` as a `value`,
+which made every `Widget()` call `local_binding_shadowed`. A class name in
+callee position is not a value shadowing a callable — it names a constructor —
+so it now binds as `type`, and a `type` binding in callee position reports
+`absent` rather than `shadowed`.
+
+Generalising the initializer name to `_INITIALIZER_NAMES` (`init` for Swift,
+`__init__` for Python) also fixed the cross-module case shipped a commit
+earlier, which had hardcoded `init` and so never resolved a Python
+`Widget()` across modules.
+
+Measured over `lott-ios`, resolved calls by basis:
+
+| Basis | Swift | Python |
+|---|---:|---:|
+| `member_callable` | 9,346 | 27 |
+| `imported_member` | 3,676 | 8 |
+| `imported_reference` | 1,853 | 27 |
+| `type_member` | **1,319** | **7** |
+| `local_callable` | 586 | 42 |
+
+Total resolved calls 15,560 → 16,891 and edges 30,386 → 31,613. The 1,319 Swift
+figure lands on the plan's measured estimate of 953 initializer plus 220
+`Type.member()` sites, plus the initializer calls the type-name channel reaches
+that the earlier same-file-only measurement did not count.
+
+A type with no explicit initializer stays unresolved, as the plan requires, and
+a test asserts it.
+
 ### Task 7 — Persistence and a real resolver version
 
 The `EXTRACTOR_VERSION` bumps in Tasks 1-4 are the blunt instrument. Persisted

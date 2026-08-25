@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from collections import Counter, defaultdict
+from types import MappingProxyType
 from dataclasses import dataclass
 from pathlib import PurePosixPath
 from typing import Any, Literal, Mapping, Sequence, TypeAlias, cast
@@ -29,6 +30,7 @@ CallResolutionBasis: TypeAlias = Literal[
     "member_callable",
     "imported_reference",
     "imported_member",
+    "type_member",
 ]
 CallUnresolvedReason: TypeAlias = Literal[
     "unsupported_callee",
@@ -43,6 +45,7 @@ CallUnresolvedReason: TypeAlias = Literal[
     "reference_unresolved",
     "target_not_callable",
     "imported_member_ambiguous",
+    "type_member_ambiguous",
     "conflicting_resolution",
 ]
 CallSupportKind: TypeAlias = Literal[
@@ -60,6 +63,7 @@ _CALL_RESOLUTION_BASES = frozenset(
         "member_callable",
         "imported_reference",
         "imported_member",
+        "type_member",
     }
 )
 _CALL_UNRESOLVED_REASONS = frozenset({
@@ -75,6 +79,7 @@ _CALL_UNRESOLVED_REASONS = frozenset({
     "reference_unresolved",
     "target_not_callable",
     "imported_member_ambiguous",
+    "type_member_ambiguous",
     "conflicting_resolution",
 })
 _REFERENCE_UNRESOLVED_REASONS = frozenset({
@@ -95,6 +100,10 @@ _CALL_SUPPORT_KINDS = frozenset({
     "symbol_reference",
 })
 _CALLABLE_KINDS = frozenset({"function", "method"})
+# The member a bare ``Widget(...)`` calls. Go and Rust have no constructor call
+# syntax, and `new Widget()` is a `new_expression` that call extraction does not
+# observe at all, so neither language has an entry.
+_INITIALIZER_NAMES = {"swift": "init", "python": "__init__"}
 _CALLER_KINDS = frozenset({"file", *_CALLABLE_KINDS})
 _RUST_RESOLUTION_CONFIGURATIONS = frozenset({
     "unconditional",
@@ -305,8 +314,14 @@ class CallRecord:
             raise _error("Resolved call caller must be a file or callable")
         self._validate_resolved_support()
         if self.resolution == "exact":
-            binding: LocalCallableBinding | MemberCallableBinding
-            if self.resolution_basis == "local_callable":
+            binding: LocalCallableBinding | MemberCallableBinding | None
+            if self.resolution_basis == "type_member":
+                binding = None
+                if len(self.raw.callee_path) not in {1, 2}:
+                    raise _error("Type member call requires a one or two part callee")
+                if self.raw.local_binding_state != "absent":
+                    raise _error("Type member call requires an unbound callee root")
+            elif self.resolution_basis == "local_callable":
                 if self.raw.local_binding_state != "definite":
                     raise _error("Exact call requires one definite local binding")
                 binding = self.raw.local_candidates[0]
@@ -318,7 +333,7 @@ class CallRecord:
                 raise _error("Exact call requires a lexical resolution basis")
             if self.target_file != self.raw.source_file:
                 raise _error("Exact call target must stay in the source file")
-            if self.target_kind != binding.callable_kind:
+            if binding is not None and self.target_kind != binding.callable_kind:
                 raise _error("Exact call target kind does not match its binding")
             if (
                 self.resolution_control_files
@@ -330,9 +345,11 @@ class CallRecord:
             ]
             if len(local_support) != 1:
                 raise _error("Exact call requires exactly one local definition support")
+            if local_support[0].file != self.target_file:
+                raise _error("Local definition support does not match its binding")
             if (
-                local_support[0].file != self.target_file
-                or local_support[0].line != binding.definition_line
+                binding is not None
+                and local_support[0].line != binding.definition_line
             ):
                 raise _error("Local definition support does not match its binding")
             if any(item.kind == "symbol_reference" for item in self.support):
@@ -592,6 +609,7 @@ def resolve_calls(
         ].append(reference)
 
     type_members = _build_type_members(symbols)
+    types_by_name = _build_types_by_name(symbols)
 
     return [
         _resolve_call(
@@ -599,6 +617,7 @@ def resolve_calls(
             file_nodes=file_nodes,
             callables=callables,
             type_members=type_members,
+            types_by_name=types_by_name,
             symbols_by_id=symbols_by_id,
             references=references,
             file_hashes=file_hashes,
@@ -655,6 +674,25 @@ def _build_type_members(
     }
 
 
+def _build_types_by_name(
+    symbols: Sequence[Symbol],
+) -> Mapping[tuple[str, str], tuple[Symbol, ...]]:
+    """Index the type declarations each file makes, by the name it declares."""
+    named: dict[tuple[str, str], list[Symbol]] = defaultdict(list)
+    for symbol in symbols:
+        if (
+            symbol.kind == "file"
+            or symbol.kind in _CALLABLE_KINDS
+            or _is_synthetic_endpoint(symbol)
+        ):
+            continue
+        named[(symbol.file_path, symbol.name)].append(symbol)
+    return MappingProxyType({
+        key: tuple(sorted(values, key=lambda item: item.id))
+        for key, values in sorted(named.items())
+    })
+
+
 def _is_synthetic_endpoint(symbol: Symbol) -> bool:
     if symbol.kind in {"package", "crate", "module"}:
         return True
@@ -696,6 +734,7 @@ def _resolve_call(
     file_nodes: Mapping[str, list[Symbol]],
     callables: Mapping[tuple[str, int, int, str], list[Symbol]],
     type_members: Mapping[str, Mapping[str, tuple[Symbol, ...]]],
+    types_by_name: Mapping[tuple[str, str], tuple[Symbol, ...]],
     symbols_by_id: Mapping[str, list[Symbol]],
     references: Mapping[
         tuple[str, str, int, int],
@@ -765,6 +804,11 @@ def _resolve_call(
         reference=reference,
         type_members=type_members,
     )
+    type_member, type_member_reason = _type_member_target(
+        raw,
+        types_by_name=types_by_name,
+        type_members=type_members,
+    )
 
     survivors = [
         candidate
@@ -773,6 +817,7 @@ def _resolve_call(
             member_target,
             imported_reference,
             imported_member,
+            type_member,
         )
         if candidate is not None
     ]
@@ -801,6 +846,10 @@ def _resolve_call(
         )
     if imported_member_reason is not None:
         return _unresolved(raw, caller=caller, reason=imported_member_reason)
+    if type_member is not None:
+        return _resolved_type_member(raw, caller=caller, target=type_member)
+    if type_member_reason is not None:
+        return _unresolved(raw, caller=caller, reason=type_member_reason)
     if reference is not None and reference.status == "unresolved":
         assert reference.unresolved_reason is not None
         return _unresolved(
@@ -956,7 +1005,10 @@ def _imported_member_target(
     if raw.callee_form != "static_path" and len(raw.callee_path) != 1:
         return None, None
     if len(raw.callee_path) == 1:
-        name = "init"
+        initializer = _INITIALIZER_NAMES.get(raw.language)
+        if initializer is None:
+            return None, None
+        name = initializer
     elif len(raw.callee_path) == 2:
         name = raw.callee_path[1]
     else:
@@ -967,6 +1019,65 @@ def _imported_member_target(
     if len(candidates) > 1:
         return None, "imported_member_ambiguous"
     return candidates[0], None
+
+
+def _type_member_target(
+    raw: RawCallSite,
+    *,
+    types_by_name: Mapping[tuple[str, str], tuple[Symbol, ...]],
+    type_members: Mapping[str, Mapping[str, tuple[Symbol, ...]]],
+) -> tuple[Symbol | None, CallUnresolvedReason | None]:
+    """Resolve ``Widget()`` or ``Widget.member()`` against a type in this file.
+
+    The same shape as the imported case, proven lexically instead: the callee
+    root names a type the source file declares, and the member is looked up
+    inside that type's own span. A local value of the same name already makes
+    the call ``shadowed`` before this route is reached, so a name that survives
+    to here is not bound to anything else in scope.
+    """
+    if raw.local_binding_state != "absent":
+        return None, None
+    if len(raw.callee_path) == 1:
+        name = _INITIALIZER_NAMES.get(raw.language)
+        if name is None:
+            return None, None
+    elif len(raw.callee_path) == 2:
+        name = raw.callee_path[1]
+    else:
+        return None, None
+    owners = types_by_name.get((raw.source_file, raw.callee_path[0]), ())
+    if len(owners) != 1 or owners[0].language != raw.language:
+        return None, None
+    candidates = type_members.get(owners[0].id, {}).get(name, ())
+    if not candidates:
+        return None, None
+    if len(candidates) > 1:
+        return None, "type_member_ambiguous"
+    return candidates[0], None
+
+
+def _resolved_type_member(
+    raw: RawCallSite,
+    *,
+    caller: Symbol,
+    target: Symbol,
+) -> CallRecord:
+    return CallRecord(
+        raw=raw,
+        caller_id=caller.id,
+        caller_kind=caller.kind,
+        target_file=target.file_path,
+        target_id=target.id,
+        target_kind=target.kind,
+        status="resolved",
+        resolution="exact",
+        unresolved_reason=None,
+        reference_unresolved_reason=None,
+        resolution_basis="type_member",
+        support=_resolved_support(raw, caller=caller, target=target),
+        resolution_control_files=(),
+        resolution_configuration=None,
+    )
 
 
 def _resolved_imported_member(

@@ -1025,6 +1025,7 @@ CallUnresolvedReason = Literal[
     "reference_unresolved",
     "target_not_callable",
     "imported_member_ambiguous",
+    "type_member_ambiguous",
     "conflicting_resolution",
 ]
 
@@ -1046,6 +1047,7 @@ class CallItem(StrictOutputModel):
             "member_callable",
             "imported_reference",
             "imported_member",
+            "type_member",
         ]
         | None
     )

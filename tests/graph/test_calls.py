@@ -1370,3 +1370,128 @@ def test_ambiguous_member_binding_is_reported_separately():
 
     assert records[0].status == "unresolved"
     assert records[0].unresolved_reason == "member_binding_ambiguous"
+
+
+def _outcomes(records: list[CallRecord]) -> list[tuple]:
+    return [
+        (
+            record.raw.callee_path,
+            record.status,
+            record.resolution_basis or record.unresolved_reason,
+            record.target_id,
+        )
+        for record in records
+    ]
+
+
+def test_swift_type_initializer_resolves_to_the_declared_init(tmp_path: Path):
+    records, _ = _resolve_source(
+        tmp_path,
+        relative_path="a.swift",
+        language="swift",
+        source=(
+            "class Widget {\n"
+            "    init() {}\n"
+            "    static func make() -> Widget { return Widget() }\n"
+            "}\n"
+        ),
+    )
+
+    assert _outcomes(records) == [
+        (("Widget",), "resolved", "type_member", "a.swift::Widget.init#method"),
+    ]
+
+
+def test_swift_type_static_path_resolves_to_the_named_member(tmp_path: Path):
+    records, _ = _resolve_source(
+        tmp_path,
+        relative_path="a.swift",
+        language="swift",
+        source=(
+            "class Widget {\n"
+            "    static func make() {}\n"
+            "}\n"
+            "func run() { Widget.make() }\n"
+        ),
+    )
+
+    assert _outcomes(records) == [
+        (
+            ("Widget", "make"),
+            "resolved",
+            "type_member",
+            "a.swift::Widget.make#method",
+        ),
+    ]
+
+
+def test_a_type_without_an_initializer_leaves_the_call_unresolved(tmp_path: Path):
+    records, _ = _resolve_source(
+        tmp_path,
+        relative_path="a.swift",
+        language="swift",
+        source="struct Widget { var value: Int }\nfunc run() { _ = Widget() }\n",
+    )
+
+    assert _outcomes(records) == [
+        (("Widget",), "unresolved", "callee_not_proven", None),
+    ]
+
+
+def test_python_type_initializer_resolves_to_dunder_init(tmp_path: Path):
+    records, _ = _resolve_source(
+        tmp_path,
+        relative_path="a.py",
+        language="python",
+        source=(
+            "class Widget:\n"
+            "    def __init__(self):\n"
+            "        pass\n"
+            "\n"
+            "def run():\n"
+            "    return Widget()\n"
+        ),
+    )
+
+    assert _outcomes(records) == [
+        (
+            ("Widget",),
+            "resolved",
+            "type_member",
+            "a.py::Widget.__init__#method",
+        ),
+    ]
+
+
+def test_a_local_value_of_the_type_name_shadows_the_initializer(tmp_path: Path):
+    records, _ = _resolve_source(
+        tmp_path,
+        relative_path="a.swift",
+        language="swift",
+        source=(
+            "class Widget {\n"
+            "    init() {}\n"
+            "}\n"
+            "func run(make: () -> Void) {\n"
+            "    let Widget = make\n"
+            "    Widget()\n"
+            "}\n"
+        ),
+    )
+
+    assert _outcomes(records) == [
+        (("Widget",), "unresolved", "local_binding_shadowed", None),
+    ]
+
+
+def test_a_member_of_another_file_is_not_a_type_member_of_this_one(tmp_path: Path):
+    records, _ = _resolve_source(
+        tmp_path,
+        relative_path="a.swift",
+        language="swift",
+        source="func run() { Widget.make() }\n",
+    )
+
+    assert _outcomes(records) == [
+        (("Widget", "make"), "unresolved", "callee_not_proven", None),
+    ]
