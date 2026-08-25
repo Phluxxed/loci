@@ -36,6 +36,11 @@ from loci.graph.rust_crates import (
 )
 from loci.graph.anchors import select_graph_anchors
 from loci.graph.materialize import load_graph_extensions, materialize_graph
+from loci.graph.swift_modules import (
+    SWIFT_MANIFEST_NAME,
+    build_swift_module_index,
+    load_swift_module_context,
+)
 from loci.graph.profiles import required_frontmatter_fields
 from loci.graph.state import GraphDiagnostic, GraphIndexState
 from loci.graph.retrieval import (
@@ -105,6 +110,7 @@ class RepositoryScan:
     go_control_candidates: tuple[Path, ...]
     javascript_control_candidates: tuple[Path, ...]
     cargo_control_candidates: tuple[Path, ...]
+    swift_control_candidates: tuple[Path, ...]
     coverage: StoredQueryCoverage
     paths_scanned: int
     bytes_scanned: int
@@ -225,6 +231,10 @@ def _index_repo_unlocked(
     javascript_module_load = load_javascript_module_context(
         repo_path,
         repository_scan.javascript_control_candidates,
+    )
+    swift_module_load = load_swift_module_context(
+        repo_path,
+        repository_scan.swift_control_candidates,
     )
     cargo_load = load_cargo_context(
         repo_path,
@@ -369,7 +379,9 @@ def _index_repo_unlocked(
         file_nodes=file_nodes,
         observations=raw_imports,
     )
+    swift_module_build = build_swift_module_index(swift_module_load.context)
     all_symbols.extend(go_package_build.index.package_nodes)
+    all_symbols.extend(swift_module_build.index.module_nodes)
     all_symbols.extend(rust_crate_build.index.crate_nodes)
     go_diagnostics = tuple(
         _go_problem_diagnostic(problem)
@@ -391,6 +403,7 @@ def _index_repo_unlocked(
         **go_module_load.input_hashes,
         **javascript_module_load.input_hashes,
         **cargo_load.input_hashes,
+        **swift_module_load.input_hashes,
     }
 
     graph_state = materialize_graph(
@@ -404,6 +417,7 @@ def _index_repo_unlocked(
         raw_symbol_references=raw_symbol_references,
         raw_calls=raw_calls,
         go_packages=go_package_build.index,
+        swift_modules=swift_module_build.index,
         javascript_modules=javascript_resolution_build.index,
         rust_crates=rust_crate_build.index,
         input_hashes=graph_input_hashes,
@@ -438,6 +452,7 @@ def _index_repo_unlocked(
             symbol.kind == "file" for symbol in all_symbols
         ),
         "graph_go_packages_indexed": len(go_package_build.index.package_nodes),
+        "graph_swift_modules_indexed": len(swift_module_build.index.module_nodes),
         "graph_rust_crates_indexed": len(rust_crate_build.index.crate_nodes),
         "graph_imports_indexed": len(graph_state.imports),
         "graph_imports_resolved": sum(
@@ -1173,6 +1188,7 @@ def graph_imports(
             "target_file": record.target_file,
             "target_package": record.target_package,
             "target_crate": record.target_crate,
+            "target_module": record.target_module,
             "target_kind": record.target_kind,
             "target_id": record.target_id,
             "specifier": raw.specifier,
@@ -1416,6 +1432,10 @@ def graph_health(
             "diagnostics": len(state.diagnostics),
             "graph_file_nodes_indexed": sum(
                 isinstance(symbol, dict) and symbol.get("kind") == "file"
+                for symbol in index.get("symbols", [])
+            ),
+            "graph_swift_modules_indexed": sum(
+                isinstance(symbol, dict) and symbol.get("kind") == "module"
                 for symbol in index.get("symbols", [])
             ),
             "graph_go_packages_indexed": sum(
@@ -1748,6 +1768,10 @@ def _current_index_staleness_reasons(
             repo_path,
             repository_scan.cargo_control_candidates,
         ).input_hashes,
+        **load_swift_module_context(
+            repo_path,
+            repository_scan.swift_control_candidates,
+        ).input_hashes,
     }
     graph = index.get("graph")
     if not isinstance(graph, dict):
@@ -2005,6 +2029,7 @@ def _scan_repository_files(
     go_controls: list[Path] = []
     javascript_controls: list[Path] = []
     cargo_controls: list[Path] = []
+    swift_controls: list[Path] = []
     coverage = QueryCoverageRecorder()
     ignored_roots: set[PurePosixPath] = set()
 
@@ -2066,6 +2091,10 @@ def _scan_repository_files(
             if max_probe_bytes is not None:
                 charge(candidate)
             cargo_controls.append(candidate)
+        if candidate.name == SWIFT_MANIFEST_NAME:
+            if max_probe_bytes is not None:
+                charge(candidate)
+            swift_controls.append(candidate)
         if max_probe_bytes is not None and is_graph_extension:
             charge(candidate)
         if not is_file:
@@ -2094,6 +2123,7 @@ def _scan_repository_files(
         go_control_candidates=tuple(go_controls),
         javascript_control_candidates=tuple(javascript_controls),
         cargo_control_candidates=tuple(cargo_controls),
+        swift_control_candidates=tuple(swift_controls),
         coverage=coverage.build(len(files)),
         paths_scanned=len(candidates),
         bytes_scanned=bytes_scanned,

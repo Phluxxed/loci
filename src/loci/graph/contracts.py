@@ -31,7 +31,7 @@ ResolutionTier: TypeAlias = Literal[
 ]
 
 GRAPH_SCHEMA_VERSION = 1  # Public contribution and retrieval envelopes.
-GRAPH_STATE_SCHEMA_VERSION = 9  # Persisted index.json.graph envelope only.
+GRAPH_STATE_SCHEMA_VERSION = 10  # Persisted index.json.graph envelope only.
 MAX_GRAPH_CONTRIBUTION_RECORDS = 10_000
 RESOLUTION_TIERS = frozenset({
     "exact",
@@ -534,10 +534,12 @@ def _validate_import_edge(
                 "source_kind": cast(JSONValue, source.get("kind")),
             },
         )
-    if target.get("kind") in {"package", "crate"} and edge.type != "imports":
-        target_description = (
-            "Go package" if target.get("kind") == "package" else "Rust crate"
-        )
+    if target.get("kind") in {"package", "crate", "module"} and edge.type != "imports":
+        target_description = {
+            "package": "Go package",
+            "crate": "Rust crate",
+            "module": "Swift module",
+        }[cast(str, target.get("kind"))]
         raise GraphContractError(
             "INVALID_GRAPH_EDGE",
             f"{target_description} imports cannot use the type-only edge type",
@@ -615,6 +617,28 @@ def _validate_import_edge(
             package_path=next(iter(package_paths)),
             edge_index=edge_index,
         )
+    elif target_kinds == {"module"}:
+        module_names = {
+            record.target_module
+            for record in candidates
+            if (
+                record.target_file is None
+                and record.target_package is None
+                and record.target_crate is None
+                and record.target_module is not None
+            )
+        }
+        if len(module_names) != 1:
+            raise GraphContractError(
+                "GRAPH_EVIDENCE_INVALID",
+                "Import edge has inconsistent module target records",
+                {"edge_index": edge_index, "field": "import_record"},
+            )
+        _validate_swift_module_endpoint(
+            target,
+            module_name=next(iter(module_names)),
+            edge_index=edge_index,
+        )
     elif target_kinds == {"crate"}:
         crate_names = {
             record.target_crate
@@ -678,6 +702,29 @@ def _validate_import_edge(
             "content_hash",
             expected=sorted({record.raw.source_hash for record in line_candidates}),
             actual=edge.evidence.content_hash,
+        )
+
+
+def _validate_swift_module_endpoint(
+    target: Mapping[str, Any],
+    *,
+    module_name: str,
+    edge_index: int,
+) -> None:
+    """A Swift module endpoint must be a manifest-declared target node."""
+    metadata = target.get("metadata")
+    loci = metadata.get("loci") if isinstance(metadata, Mapping) else None
+    if (
+        target.get("kind") != "module"
+        or target.get("language") != "swift"
+        or target.get("name") != module_name
+        or not isinstance(loci, Mapping)
+        or loci.get("swift_module_node") is not True
+    ):
+        raise GraphContractError(
+            "INVALID_GRAPH_EDGE",
+            "Swift import target must be the matching declared module node",
+            {"edge_index": edge_index, "field": "endpoints"},
         )
 
 

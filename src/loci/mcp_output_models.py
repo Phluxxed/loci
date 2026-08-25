@@ -86,6 +86,7 @@ class LociIndexSuccess(StrictOutputModel):
     graph_edges_indexed: int
     graph_file_nodes_indexed: int
     graph_go_packages_indexed: int
+    graph_swift_modules_indexed: int
     graph_rust_crates_indexed: int
     graph_imports_indexed: int
     graph_imports_resolved: int
@@ -724,6 +725,7 @@ class GraphHealthCounts(StrictOutputModel):
     diagnostics: int
     graph_file_nodes_indexed: int
     graph_go_packages_indexed: int
+    graph_swift_modules_indexed: int
     graph_rust_crates_indexed: int
     graph_imports_indexed: int
     graph_imports_resolved: int
@@ -817,6 +819,7 @@ class ImportItem(StrictOutputModel):
     target_file: str | None
     target_package: str | None
     target_crate: str | None
+    target_module: str | None
     target_kind: Literal["file", "package", "crate"] | None
     target_id: str | None
     specifier: str

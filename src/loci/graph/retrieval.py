@@ -1020,6 +1020,7 @@ def _graph_node_ref(symbol: dict[str, Any]) -> dict[str, Any]:
         "end_line": symbol.get("end_line", 0),
     }
     _add_go_package_node_attributes(attributes, symbol)
+    _add_swift_module_node_attributes(attributes, symbol)
     _add_rust_crate_node_attributes(attributes, symbol)
     return GraphNodeRef(
         id=symbol["id"],
@@ -1052,6 +1053,30 @@ def _add_go_package_node_attributes(
         symbol.get("qualified_name") != values["import_path"]
         or symbol.get("name") != values["package_name"]
     ):
+        return
+    attributes.update(values)
+
+
+def _add_swift_module_node_attributes(
+    attributes: dict[str, Any],
+    symbol: dict[str, Any],
+) -> None:
+    metadata = symbol.get("metadata")
+    loci_metadata = metadata.get("loci") if isinstance(metadata, dict) else None
+    if not (
+        symbol.get("kind") == "module"
+        and symbol.get("language") == "swift"
+        and isinstance(loci_metadata, dict)
+        and loci_metadata.get("swift_module_node") is True
+    ):
+        return
+    values = {
+        key: loci_metadata.get(key)
+        for key in ("package_name", "target_kind", "directory")
+    }
+    if not all(isinstance(value, str) and value for value in values.values()):
+        return
+    if symbol.get("qualified_name") != symbol.get("name"):
         return
     attributes.update(values)
 

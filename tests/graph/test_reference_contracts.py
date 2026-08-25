@@ -176,6 +176,7 @@ def _import_record(**overrides) -> ImportRecord:
         "target_file": "src/model.py",
         "target_package": None,
         "target_crate": None,
+        "target_module": None,
         "target_kind": "file",
         "target_id": IMPORT_TARGET_ID,
         "status": "resolved",
