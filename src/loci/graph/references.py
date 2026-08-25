@@ -13,11 +13,13 @@ from loci.parser.symbols import Symbol
 
 from .contracts import GraphContractError, GraphEdge, JSONValue
 from .go_modules import GoPackageIndex
+from .swift_modules import SwiftModuleIndex
 from .imports import ImportRecord
 from .rust_crates import RustCrateIndex, RustResolutionConfiguration
 
 if TYPE_CHECKING:
     from ._go_references import GoReferenceIndex
+    from ._swift_references import SwiftReferenceIndex
     from ._javascript_references import JavaScriptReferenceIndex
     from ._python_references import PythonReferenceIndex
     from ._rust_references import RustReferenceIndex
@@ -412,6 +414,7 @@ class ReferenceResolverIndex:
     _python: PythonReferenceIndex
     _javascript: JavaScriptReferenceIndex
     _go: GoReferenceIndex
+    _swift: SwiftReferenceIndex
     _rust: RustReferenceIndex
 
 
@@ -472,6 +475,7 @@ def build_reference_resolver_index(
     exports: Sequence[RawLocalExport],
     *,
     go_packages: GoPackageIndex | None = None,
+    swift_modules: SwiftModuleIndex | None = None,
     rust_crates: RustCrateIndex | None = None,
 ) -> ReferenceResolverIndex:
     """Build bounded immutable reference lookups without repository I/O."""
@@ -566,6 +570,14 @@ def build_reference_resolver_index(
         file_nodes=file_nodes,
         go_packages=go_packages,
     )
+    from ._swift_references import build_swift_reference_index
+
+    swift_index = build_swift_reference_index(
+        tuple(symbols_by_id.values()),
+        tuple(exports),
+        file_nodes=file_nodes,
+        swift_modules=swift_modules,
+    )
     from ._rust_references import build_rust_reference_index
 
     rust_index = build_rust_reference_index(
@@ -584,6 +596,7 @@ def build_reference_resolver_index(
         _python=python_index,
         _javascript=javascript_index,
         _go=go_index,
+        _swift=swift_index,
         _rust=rust_index,
     )
 
@@ -599,7 +612,12 @@ def resolve_symbol_references(
         raise _error("Reference resolver index has an invalid type")
     if tuple(imports) != index._imports:
         raise _error("Reference resolver imports do not match its frozen index")
-    return [_resolve_symbol_reference(raw, index) for raw in observations]
+    records: list[SymbolReferenceRecord] = []
+    for raw in observations:
+        record = _resolve_symbol_reference(raw, index)
+        if record is not None:
+            records.append(record)
+    return records
 
 
 def materialize_reference_edges(
@@ -636,11 +654,17 @@ def validate_symbol_reference_records(
 def _resolve_symbol_reference(
     raw: RawSymbolReference,
     index: ReferenceResolverIndex,
-) -> SymbolReferenceRecord:
+) -> SymbolReferenceRecord | None:
     if not isinstance(raw, RawSymbolReference):
         raise _error("Reference observation must be a RawSymbolReference")
     owner = _source_owner(raw, index)
-    binding, import_record, import_is_ambiguous = _select_reference_import(raw, index)
+    binding, import_record, import_is_ambiguous, out_of_scope = (
+        _select_reference_import(raw, index)
+    )
+    if out_of_scope:
+        # No imported module declares this bare name, so it is a member, a
+        # local or a system framework name — not a cross-module reference.
+        return None
 
     binding_reason = {
         "shadowed": "binding_shadowed",
@@ -688,7 +712,7 @@ def _resolve_symbol_reference(
             import_record=import_record,
             reason="ambiguous_source",
         )
-    if raw.language not in {"python", "javascript", "typescript", "go", "rust"}:
+    if raw.language not in {"python", "javascript", "typescript", "go", "swift", "rust"}:
         return _unresolved_record(
             raw,
             binding=binding,
@@ -724,6 +748,15 @@ def _resolve_symbol_reference(
             binding=binding,
             import_record=import_record,
             index=index._go,
+        )
+    elif raw.language == "swift":
+        from ._swift_references import resolve_swift_reference
+
+        outcome = resolve_swift_reference(
+            raw,
+            binding=binding,
+            import_record=import_record,
+            index=index._swift,
         )
     elif raw.language == "rust":
         from ._rust_references import resolve_rust_reference
@@ -772,7 +805,21 @@ def _resolve_symbol_reference(
 def _select_reference_import(
     raw: RawSymbolReference,
     index: ReferenceResolverIndex,
-) -> tuple[ImportBinding | None, ImportRecord | None, bool]:
+) -> tuple[ImportBinding | None, ImportRecord | None, bool, bool]:
+    if raw.language == "swift" and raw.binding_state == "deferred":
+        from ._swift_references import select_swift_reference_binding
+
+        selection = select_swift_reference_binding(
+            raw,
+            imports_by_binding=index._imports_by_binding,
+            index=index._swift,
+        )
+        return (
+            selection.binding,
+            selection.import_record,
+            False,
+            selection.out_of_scope,
+        )
     if raw.language == "go" and raw.binding_state == "deferred":
         from ._go_references import select_go_reference_binding
 
@@ -781,7 +828,7 @@ def _select_reference_import(
             imports_by_binding=index._imports_by_binding,
             index=index._go,
         )
-        return binding, record, False
+        return binding, record, False, False
 
     binding = raw.candidate_bindings[0] if len(raw.candidate_bindings) == 1 else None
     matched = (
@@ -793,6 +840,7 @@ def _select_reference_import(
         binding,
         matched[0] if len(matched) == 1 else None,
         len(matched) > 1,
+        False,
     )
 
 
@@ -912,12 +960,15 @@ def _is_file_node(symbol: Symbol) -> bool:
 
 
 def _is_synthetic_symbol(symbol: Symbol) -> bool:
-    if symbol.kind in {"file", "package", "crate"} or symbol.language == "markdown":
+    if (
+        symbol.kind in {"file", "package", "crate", "module"}
+        or symbol.language == "markdown"
+    ):
         return True
     loci = symbol.metadata.get("loci")
     return isinstance(loci, Mapping) and any(
         loci.get(key) is True
-        for key in ("file_node", "go_package", "rust_crate")
+        for key in ("file_node", "go_package", "rust_crate", "swift_module_node")
     )
 
 

@@ -1008,7 +1008,8 @@ def test_swift_guard_let_shadows_an_imported_name(tmp_path: Path):
     )
 
     states = [(reference.path, reference.binding_state) for reference in batch.references]
-    assert states == [(("Foundation",), "shadowed")]
+    # ``record`` names no local, so it defers to the file's module imports.
+    assert states == [(("record",), "deferred"), (("Foundation",), "shadowed")]
 
 
 def test_swift_exports_only_importable_visibility(tmp_path: Path):
@@ -1063,3 +1064,51 @@ def test_swift_closure_shorthand_argument_is_not_a_reference(tmp_path: Path):
     )
 
     assert [reference.path for reference in batch.references] == []
+
+
+def test_swift_bare_name_defers_to_the_files_module_imports(tmp_path: Path):
+    batch = _extract_batch(
+        tmp_path,
+        name="a.swift",
+        source=(
+            "import Feature\n"
+            "import Support\n"
+            "public func run() { record(Ticket) }\n"
+        ),
+        language="swift",
+    )
+
+    deferred = [
+        (reference.path, sorted(b.import_specifier for b in reference.candidate_bindings))
+        for reference in batch.references
+        if reference.binding_state == "deferred"
+    ]
+    assert deferred == [
+        (("record",), ["Feature", "Support"]),
+        (("Ticket",), ["Feature", "Support"]),
+    ]
+
+
+def test_swift_bare_name_with_no_module_import_is_not_deferred(tmp_path: Path):
+    batch = _extract_batch(
+        tmp_path,
+        name="a.swift",
+        source="public func run() { record(Ticket) }\n",
+        language="swift",
+    )
+
+    assert batch.references == ()
+
+
+def test_swift_extension_is_not_exported_under_the_extended_name(tmp_path: Path):
+    batch = _extract_batch(
+        tmp_path,
+        name="a.swift",
+        source=(
+            "public class Ticket {}\n"
+            "public extension Ticket { func extra() {} }\n"
+        ),
+        language="swift",
+    )
+
+    assert [export.exported_name for export in batch.exports] == ["Ticket"]

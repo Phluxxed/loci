@@ -70,13 +70,17 @@ def extract_reference_batch(
         imports=imports,
     )
     bindings_by_name: dict[str, list[ImportBinding]] = {}
-    go_deferred: list[ImportBinding] = []
+    deferred_bindings: list[ImportBinding] = []
     for raw_import in imports:
         for binding in raw_import.bindings:
+            if language == "swift" and binding.kind == "module":
+                # Swift names an imported declaration bare, so the module that
+                # owns it is only known once the module surface is indexed.
+                deferred_bindings.append(binding)
             if binding.local_name is not None:
                 bindings_by_name.setdefault(binding.local_name, []).append(binding)
             elif language == "go" and binding.kind == "namespace":
-                go_deferred.append(binding)
+                deferred_bindings.append(binding)
     local_bindings_by_name: dict[str, list[LexicalBinding]] = {}
     for binding in context.local_bindings:
         local_bindings_by_name.setdefault(binding.name, []).append(binding)
@@ -95,7 +99,7 @@ def extract_reference_batch(
             language=language,
             source_hash=source_hash,
             named_bindings=bindings_by_name.get(observation.path[0], ()),
-            deferred_bindings=go_deferred,
+            deferred_bindings=deferred_bindings,
             local_bindings=local_bindings_by_name.get(observation.path[0], ()),
             unsupported_import_starts=context.unsupported_import_starts,
         )
@@ -175,7 +179,12 @@ def _match_observation(
             state=state,
         )
 
-    if language != "go" or not observation.supported or len(observation.path) < 2:
+    if not observation.supported:
+        return None
+    if language == "go":
+        if len(observation.path) < 2:
+            return None
+    elif language != "swift":
         return None
 
     deferred = [
@@ -183,7 +192,7 @@ def _match_observation(
         for binding in deferred_bindings
         if _binding_contains(binding, node)
     ]
-    if not deferred or _unbound_go_root_is_shadowed(
+    if not deferred or _unbound_root_is_shadowed(
         node,
         local_bindings,
     ):
@@ -317,7 +326,7 @@ def _binding_is_shadowed(
     return any(local.active_start_byte <= node.start_byte for local in matching_locals)
 
 
-def _unbound_go_root_is_shadowed(
+def _unbound_root_is_shadowed(
     node: Any,
     local_bindings: Sequence[LexicalBinding],
 ) -> bool:

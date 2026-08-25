@@ -304,6 +304,7 @@ def materialize_graph(
             import_records,
             raw_exports,
             go_packages=go_packages,
+            swift_modules=swift_modules,
             rust_crates=rust_crates,
         )
         reference_records = tuple(resolve_symbol_references(
