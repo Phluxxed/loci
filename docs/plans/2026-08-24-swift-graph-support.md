@@ -440,6 +440,42 @@ Against the citation corpus, with the broken-index control still scoring 0.0%:
 The cross-module pair figure is still governed by the denominator error above:
 6,893 graph pairs against 25,334 co-cited pairs caps it at 27%.
 
+### Cross-module calls — landed, 2026-08-25
+
+The call half of `swift-resolve`. A call whose callee resolves cross-module
+proves the *type*, never the callable: `Ticket.stamp()` proves `Ticket`, and
+`Ticket()` proves `Ticket` too. A new `imported_member` basis looks the member
+up inside that type's own declaration span — the named member for a two-part
+callee, `init` for a one-part one — and records `imported_member_ambiguous`
+rather than choosing between overloads.
+
+Members an `extension` adds in another file are deliberately not indexed as
+members of the type. They sit outside its span, and the symbol reference proves
+only the declaration, so attributing them would resolve a call to a definition
+the evidence does not reach.
+
+Measured before building, so the payoff was known rather than hoped for: of
+115,016 unresolved Swift calls, exactly 1,320 were `Type.member()` with a
+single matching member and 2,357 were `Type()` with a single declared `init`.
+The build recovered 3,677 — the whole achievable set.
+
+| | Before | After |
+|---|---:|---:|
+| Swift calls resolved | 11,881 | 15,560 |
+| — `imported_member` | 0 | 3,677 |
+| `target_not_callable` | 5,956 | 1,838 |
+| Graph edges | 27,860 | 30,386 |
+
+**The remaining gap is not cross-module and cannot be closed here.** 85,086
+calls are `callee_not_proven` and 20,084 are dynamic; 108,665 unresolved calls
+have no resolved reference at their callee at all, because the callee root is
+same-module, a local, or a system framework name. That is the import-rooted
+ceiling this document opens with, not a Swift defect. Citation-corpus coverage
+is unchanged at 42.7%, since these calls join file pairs the references already
+connected.
+
+`GRAPH_STATE_SCHEMA_VERSION` went 10 → 11 for the new persisted basis.
+
 ### Four defects in the landed `swift-modules` work, found while building this
 
 Each was invisible to the tests that shipped with it, and each now has one:

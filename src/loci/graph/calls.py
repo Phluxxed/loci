@@ -7,6 +7,7 @@ from pathlib import PurePosixPath
 from typing import Any, Literal, Mapping, Sequence, TypeAlias, cast
 
 from loci.parser.call_models import (
+    MAX_CALL_BINDING_CANDIDATES,
     MAX_CALL_SITES_PER_FILE,
     LocalCallableBinding,
     MemberCallableBinding,
@@ -27,6 +28,7 @@ CallResolutionBasis: TypeAlias = Literal[
     "local_callable",
     "member_callable",
     "imported_reference",
+    "imported_member",
 ]
 CallUnresolvedReason: TypeAlias = Literal[
     "unsupported_callee",
@@ -40,6 +42,7 @@ CallUnresolvedReason: TypeAlias = Literal[
     "callee_not_proven",
     "reference_unresolved",
     "target_not_callable",
+    "imported_member_ambiguous",
     "conflicting_resolution",
 ]
 CallSupportKind: TypeAlias = Literal[
@@ -52,7 +55,12 @@ CallSupportKind: TypeAlias = Literal[
 _CALL_STATUSES = frozenset({"resolved", "unresolved"})
 _CALL_RESOLUTIONS = frozenset({"exact", "import-resolved"})
 _CALL_RESOLUTION_BASES = frozenset(
-    {"local_callable", "member_callable", "imported_reference"}
+    {
+        "local_callable",
+        "member_callable",
+        "imported_reference",
+        "imported_member",
+    }
 )
 _CALL_UNRESOLVED_REASONS = frozenset({
     "unsupported_callee",
@@ -66,6 +74,7 @@ _CALL_UNRESOLVED_REASONS = frozenset({
     "callee_not_proven",
     "reference_unresolved",
     "target_not_callable",
+    "imported_member_ambiguous",
     "conflicting_resolution",
 })
 _REFERENCE_UNRESOLVED_REASONS = frozenset({
@@ -329,8 +338,8 @@ class CallRecord:
             if any(item.kind == "symbol_reference" for item in self.support):
                 raise _error("Exact call cannot carry symbol reference support")
             return
-        if self.resolution_basis != "imported_reference":
-            raise _error("Import-resolved call requires imported_reference basis")
+        if self.resolution_basis not in {"imported_reference", "imported_member"}:
+            raise _error("Import-resolved call requires an import resolution basis")
         if any(item.kind == "local_definition" for item in self.support):
             raise _error("Import-resolved call cannot carry local definition support")
         references = [
@@ -345,9 +354,19 @@ class CallRecord:
             reference.file != self.raw.source_file
             or reference.line != self.raw.line
             or reference.content_hash != self.raw.source_hash
-            or reference.endpoint_id != self.target_id
         ):
-            raise _error("Symbol reference support does not match the call target")
+            raise _error("Symbol reference support does not match the call site")
+        if self.resolution_basis == "imported_reference":
+            if reference.endpoint_id != self.target_id:
+                raise _error("Symbol reference support does not match the call target")
+        else:
+            # The reference proves the type; the target is a member it declares,
+            # so the two endpoints must differ and the callee must name the
+            # member (``Type.member()``) or the initializer (``Type()``).
+            if reference.endpoint_id == self.target_id:
+                raise _error("Imported member call must target a member of its type")
+            if len(self.raw.callee_path) not in {1, 2}:
+                raise _error("Imported member call requires a one or two part callee")
         if self.raw.language not in {"javascript", "typescript", "rust"} and (
             self.resolution_control_files
             or self.resolution_configuration is not None
@@ -572,17 +591,78 @@ def resolve_calls(
             )
         ].append(reference)
 
+    type_members = _build_type_members(symbols)
+
     return [
         _resolve_call(
             raw,
             file_nodes=file_nodes,
             callables=callables,
+            type_members=type_members,
             symbols_by_id=symbols_by_id,
             references=references,
             file_hashes=file_hashes,
         )
         for raw in observations
     ]
+
+
+def _build_type_members(
+    symbols: Sequence[Symbol],
+) -> Mapping[str, Mapping[str, tuple[Symbol, ...]]]:
+    """Index the callables each type declaration lexically contains.
+
+    A cross-module ``Type.member()`` or ``Type()`` proves only the type; the
+    member it calls is found by containment inside that type's own span, in
+    the file the type is declared in. Members an extension adds elsewhere are
+    deliberately not indexed here — they sit outside the type's span, and
+    attributing them would resolve a call to a definition the proof does not
+    reach.
+    """
+    by_file: dict[str, list[Symbol]] = defaultdict(list)
+    types: list[Symbol] = []
+    for symbol in symbols:
+        if symbol.kind == "file":
+            continue
+        if symbol.kind in _CALLABLE_KINDS:
+            by_file[symbol.file_path].append(symbol)
+        elif not _is_synthetic_endpoint(symbol):
+            types.append(symbol)
+
+    members: dict[str, dict[str, list[Symbol]]] = {}
+    for owner in types:
+        start = owner.byte_offset
+        end = start + owner.byte_length
+        contained: dict[str, list[Symbol]] = {}
+        for candidate in by_file.get(owner.file_path, ()):
+            if (
+                candidate.byte_offset < start
+                or candidate.byte_offset + candidate.byte_length > end
+                or candidate.language != owner.language
+            ):
+                continue
+            names = contained.setdefault(candidate.name, [])
+            if len(names) <= MAX_CALL_BINDING_CANDIDATES:
+                names.append(candidate)
+        if contained:
+            members[owner.id] = contained
+    return {
+        owner_id: {
+            name: tuple(sorted(values, key=lambda item: item.id))
+            for name, values in sorted(names.items())
+        }
+        for owner_id, names in sorted(members.items())
+    }
+
+
+def _is_synthetic_endpoint(symbol: Symbol) -> bool:
+    if symbol.kind in {"package", "crate", "module"}:
+        return True
+    loci = symbol.metadata.get("loci")
+    return isinstance(loci, Mapping) and any(
+        loci.get(key) is True
+        for key in ("file_node", "go_package", "rust_crate", "swift_module_node")
+    )
 
 
 def materialize_call_edges(records: Sequence[CallRecord]) -> list[GraphEdge]:
@@ -615,6 +695,7 @@ def _resolve_call(
     *,
     file_nodes: Mapping[str, list[Symbol]],
     callables: Mapping[tuple[str, int, int, str], list[Symbol]],
+    type_members: Mapping[str, Mapping[str, tuple[Symbol, ...]]],
     symbols_by_id: Mapping[str, list[Symbol]],
     references: Mapping[
         tuple[str, str, int, int],
@@ -679,10 +760,20 @@ def _resolve_call(
         and reference.target_kind in _CALLABLE_KINDS
         else None
     )
+    imported_member, imported_member_reason = _imported_member_target(
+        raw,
+        reference=reference,
+        type_members=type_members,
+    )
 
     survivors = [
         candidate
-        for candidate in (local_target, member_target, imported_reference)
+        for candidate in (
+            local_target,
+            member_target,
+            imported_reference,
+            imported_member,
+        )
         if candidate is not None
     ]
     if len(survivors) > 1:
@@ -699,6 +790,17 @@ def _resolve_call(
             symbols_by_id=symbols_by_id,
             file_hashes=file_hashes,
         )
+    if imported_member is not None:
+        assert reference is not None
+        return _resolved_imported_member(
+            raw,
+            caller=caller,
+            reference=reference,
+            target=imported_member,
+            file_hashes=file_hashes,
+        )
+    if imported_member_reason is not None:
+        return _unresolved(raw, caller=caller, reason=imported_member_reason)
     if reference is not None and reference.status == "unresolved":
         assert reference.unresolved_reason is not None
         return _unresolved(
@@ -827,6 +929,74 @@ def _resolved_local(
         support=support,
         resolution_control_files=(),
         resolution_configuration=None,
+    )
+
+
+def _imported_member_target(
+    raw: RawCallSite,
+    *,
+    reference: SymbolReferenceRecord | None,
+    type_members: Mapping[str, Mapping[str, tuple[Symbol, ...]]],
+) -> tuple[Symbol | None, CallUnresolvedReason | None]:
+    """Find the callable a proven cross-module type declares for this callee.
+
+    ``Type.member()`` names the member after the type; ``Type()`` names the
+    type's initializer. Either way the reference proves the type, never the
+    callable, so the member is looked up inside the type's own span.
+    """
+    if (
+        reference is None
+        or reference.status != "resolved"
+        or reference.binding is None
+        or reference.binding.type_only
+        or reference.target_id is None
+        or reference.target_kind in _CALLABLE_KINDS
+    ):
+        return None, None
+    if raw.callee_form != "static_path" and len(raw.callee_path) != 1:
+        return None, None
+    if len(raw.callee_path) == 1:
+        name = "init"
+    elif len(raw.callee_path) == 2:
+        name = raw.callee_path[1]
+    else:
+        return None, None
+    candidates = type_members.get(reference.target_id, {}).get(name, ())
+    if not candidates:
+        return None, None
+    if len(candidates) > 1:
+        return None, "imported_member_ambiguous"
+    return candidates[0], None
+
+
+def _resolved_imported_member(
+    raw: RawCallSite,
+    *,
+    caller: Symbol,
+    reference: SymbolReferenceRecord,
+    target: Symbol,
+    file_hashes: Mapping[str, str],
+) -> CallRecord:
+    if target.file_path not in file_hashes:
+        raise _error(
+            "Call member target file is not indexed",
+            endpoint_id=target.id,
+        )
+    return CallRecord(
+        raw=raw,
+        caller_id=caller.id,
+        caller_kind=caller.kind,
+        target_file=target.file_path,
+        target_id=target.id,
+        target_kind=target.kind,
+        status="resolved",
+        resolution="import-resolved",
+        unresolved_reason=None,
+        reference_unresolved_reason=None,
+        resolution_basis="imported_member",
+        support=_resolved_support(raw, caller=caller, reference=reference),
+        resolution_control_files=reference.resolution_control_files,
+        resolution_configuration=reference.resolution_configuration,
     )
 
 

@@ -1024,6 +1024,7 @@ CallUnresolvedReason = Literal[
     "callee_not_proven",
     "reference_unresolved",
     "target_not_callable",
+    "imported_member_ambiguous",
     "conflicting_resolution",
 ]
 
@@ -1040,7 +1041,13 @@ class CallItem(StrictOutputModel):
     unresolved_reason: CallUnresolvedReason | None
     reference_unresolved_reason: ReferenceUnresolvedReason | None
     resolution_basis: (
-        Literal["local_callable", "member_callable", "imported_reference"] | None
+        Literal[
+            "local_callable",
+            "member_callable",
+            "imported_reference",
+            "imported_member",
+        ]
+        | None
     )
     support: list[CallSupport]
     resolution_control_files: list[str]
