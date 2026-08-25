@@ -2,7 +2,8 @@
 
 **Status:** `swift-extract` and `swift-local` landed on branch `swift-graph-support`
 (`265a08f`, `a4d6c4e`, `c56c83d`, after the `else`-chain conversion in `c79147c`).
-`swift-modules` and `swift-resolve` not started.
+`swift-modules` stage 1 (manifest reader and module index) landed; its contract
+widening and `swift-resolve` not started.
 **Author:** Claude, 2026-08-24, at Vik's request.
 **Prior art:** `docs/plans/2026-07-15-extensible-graph-retrieval-stage-7-go-import-resolution.md` — read its "Exact File Plan" (lines 888–919) before writing code. Swift should mirror Go, not Rust.
 
@@ -211,6 +212,54 @@ Swift, so the grammar already in place parses it.
 - All 51 `lott-ios` packages resolve to module nodes with correct target→directory mappings.
 - `import LegacyLottoKit` from an app-target file produces a resolved import edge to that module node.
 - A `Package.swift` that computes its targets dynamically yields `unsupported_configuration`, not a crash.
+
+### Stage 1 landed — manifest reader and module index
+
+`src/loci/graph/swift_modules.py`. Measured over `lott-ios`, 2026-08-25:
+
+| | |
+|---|---|
+| Manifests read | 51 |
+| Packages accepted | 50 |
+| Module nodes | 87 |
+| Swift files under a module directory | 1,873 of 4,486 (41.8%) |
+| `import` statements naming a declared target | 4,071 of 10,763 (37.8%) |
+
+That 37.8% is the ceiling for module import edges; the remainder are system
+frameworks (`Foundation` 2,316, `XCTest` 1,107, `UIKit` 1,006) and external SPM
+dependencies, which correctly stay `external`.
+
+Four problems, all genuine, none a crash:
+
+- `DangerSwiftPeriphery/Package.swift` builds its target list as
+  `[.target(...)] + developTargets`, where `developTargets` is computed from a
+  variable. This is risk 1 above, occurring exactly once in 51 manifests. The
+  whole package is refused as `unsupported_configuration` rather than
+  partially read — a partial read silently omits targets.
+- `LottoRESTUtil` declares two targets and ships no sources at all
+  (`target_directory_missing`). The module nodes are kept, since the module is
+  still importable, with `has_sources: false`.
+- `LottoRESTConfig` is declared by two different manifests, so an `import` of
+  that name cannot be attributed. Both are dropped, not arbitrated.
+
+Two layout details the plan did not anticipate, both found by measurement:
+
+- A target with no `path:` does not always live in `Sources/<name>`. SwiftPM
+  also accepts the bare `Sources` directory when the package declares one
+  target of that class, which is how `FeatureRetail` and several others are
+  laid out. Without that fallback, 15 of 103 targets resolved to nothing.
+- `path: ""` means the package directory, and appears in this corpus.
+
+The target scan is deliberately confined to the elements of the `targets:`
+array. A first version walked the whole manifest and read the
+`.plugin(name: "OpenAPIGenerator")` entries inside a target's own `plugins:`
+list as target declarations — eight false modules. A test pins the scoping.
+
+Stage 2 is the contract widening: `ImportTargetKind="module"`, the
+`ImportRecord` language rules, a module endpoint validator, the
+`materialize_import_edges` branch, the `GraphIndexState` field and
+`GRAPH_STATE_SCHEMA_VERSION` bump, the `graph_health` count, the `retrieval.py`
+enricher, and the `Package.swift` control-file channel in `RepositoryScan`.
 
 ---
 
