@@ -6,7 +6,12 @@ from dataclasses import dataclass
 from pathlib import PurePosixPath
 from typing import Any, Literal, Mapping, Sequence, TypeAlias, cast
 
-from loci.parser.call_models import MAX_CALL_SITES_PER_FILE, RawCallSite
+from loci.parser.call_models import (
+    MAX_CALL_SITES_PER_FILE,
+    LocalCallableBinding,
+    MemberCallableBinding,
+    RawCallSite,
+)
 from loci.parser.symbols import Symbol
 
 from .contracts import GraphContractError, GraphEdge, JSONValue
@@ -18,7 +23,11 @@ MAX_CALL_SUPPORT_RECORDS = 256
 
 CallStatus: TypeAlias = Literal["resolved", "unresolved"]
 CallResolution: TypeAlias = Literal["exact", "import-resolved"]
-CallResolutionBasis: TypeAlias = Literal["local_callable", "imported_reference"]
+CallResolutionBasis: TypeAlias = Literal[
+    "local_callable",
+    "member_callable",
+    "imported_reference",
+]
 CallUnresolvedReason: TypeAlias = Literal[
     "unsupported_callee",
     "caller_not_indexed",
@@ -26,6 +35,8 @@ CallUnresolvedReason: TypeAlias = Literal[
     "local_binding_shadowed",
     "local_binding_ambiguous",
     "local_target_not_indexed",
+    "member_binding_ambiguous",
+    "member_target_not_indexed",
     "callee_not_proven",
     "reference_unresolved",
     "target_not_callable",
@@ -40,7 +51,9 @@ CallSupportKind: TypeAlias = Literal[
 
 _CALL_STATUSES = frozenset({"resolved", "unresolved"})
 _CALL_RESOLUTIONS = frozenset({"exact", "import-resolved"})
-_CALL_RESOLUTION_BASES = frozenset({"local_callable", "imported_reference"})
+_CALL_RESOLUTION_BASES = frozenset(
+    {"local_callable", "member_callable", "imported_reference"}
+)
 _CALL_UNRESOLVED_REASONS = frozenset({
     "unsupported_callee",
     "caller_not_indexed",
@@ -48,6 +61,8 @@ _CALL_UNRESOLVED_REASONS = frozenset({
     "local_binding_shadowed",
     "local_binding_ambiguous",
     "local_target_not_indexed",
+    "member_binding_ambiguous",
+    "member_target_not_indexed",
     "callee_not_proven",
     "reference_unresolved",
     "target_not_callable",
@@ -281,13 +296,19 @@ class CallRecord:
             raise _error("Resolved call caller must be a file or callable")
         self._validate_resolved_support()
         if self.resolution == "exact":
-            if self.resolution_basis != "local_callable":
-                raise _error("Exact call requires local_callable resolution basis")
+            binding: LocalCallableBinding | MemberCallableBinding
+            if self.resolution_basis == "local_callable":
+                if self.raw.local_binding_state != "definite":
+                    raise _error("Exact call requires one definite local binding")
+                binding = self.raw.local_candidates[0]
+            elif self.resolution_basis == "member_callable":
+                if self.raw.member_binding_state != "definite":
+                    raise _error("Exact call requires one definite member binding")
+                binding = self.raw.member_candidates[0]
+            else:
+                raise _error("Exact call requires a lexical resolution basis")
             if self.target_file != self.raw.source_file:
                 raise _error("Exact call target must stay in the source file")
-            if self.raw.local_binding_state != "definite":
-                raise _error("Exact call requires one definite local binding")
-            binding = self.raw.local_candidates[0]
             if self.target_kind != binding.callable_kind:
                 raise _error("Exact call target kind does not match its binding")
             if (
@@ -359,6 +380,16 @@ class CallRecord:
             and self.raw.local_binding_state != "absent"
         ):
             raise _error("Unproven callee requires an absent local binding")
+        if (
+            self.unresolved_reason == "member_target_not_indexed"
+            and self.raw.member_binding_state != "definite"
+        ):
+            raise _error("Call failure does not match its member binding state")
+        if (
+            self.unresolved_reason == "member_binding_ambiguous"
+            and self.raw.member_binding_state not in {"ambiguous", "definite"}
+        ):
+            raise _error("Ambiguous member call requires ambiguous binding evidence")
 
     def _validate_resolved_support(self) -> None:
         assert self.caller_id is not None
@@ -638,6 +669,7 @@ def _resolve_call(
     )
     reference = exact_references[0] if len(exact_references) == 1 else None
     local_target, local_reason = _local_target(raw, callables=callables)
+    member_target, member_reason = _member_target(raw, callables=callables)
     imported_reference = (
         reference
         if reference is not None
@@ -648,10 +680,17 @@ def _resolve_call(
         else None
     )
 
-    if local_target is not None and imported_reference is not None:
+    survivors = [
+        candidate
+        for candidate in (local_target, member_target, imported_reference)
+        if candidate is not None
+    ]
+    if len(survivors) > 1:
         return _unresolved(raw, caller=caller, reason="conflicting_resolution")
     if local_target is not None:
         return _resolved_local(raw, caller=caller, target=local_target)
+    if member_target is not None:
+        return _resolved_member(raw, caller=caller, target=member_target)
     if imported_reference is not None:
         return _resolved_import(
             raw,
@@ -678,6 +717,8 @@ def _resolve_call(
         return _unresolved(raw, caller=caller, reason="target_not_callable")
     if local_reason is not None:
         return _unresolved(raw, caller=caller, reason=local_reason)
+    if member_reason is not None:
+        return _unresolved(raw, caller=caller, reason=member_reason)
     return _unresolved(raw, caller=caller, reason="callee_not_proven")
 
 
@@ -707,6 +748,61 @@ def _local_target(
     if len(candidates) != 1:
         return None, "local_binding_ambiguous"
     return candidates[0], None
+
+
+def _member_target(
+    raw: RawCallSite,
+    *,
+    callables: Mapping[tuple[str, int, int, str], list[Symbol]],
+) -> tuple[Symbol | None, CallUnresolvedReason | None]:
+    if raw.member_binding_state == "ambiguous":
+        return None, "member_binding_ambiguous"
+    if raw.member_binding_state != "definite":
+        return None, None
+    binding = raw.member_candidates[0]
+    candidates = [
+        symbol
+        for symbol in callables.get(
+            (
+                raw.source_file,
+                binding.definition_start_byte,
+                binding.definition_end_byte,
+                binding.callable_kind,
+            ),
+            [],
+        )
+        if symbol.name == binding.name and symbol.language == raw.language
+    ]
+    if not candidates:
+        return None, "member_target_not_indexed"
+    if len(candidates) != 1:
+        return None, "member_binding_ambiguous"
+    return candidates[0], None
+
+
+def _resolved_member(
+    raw: RawCallSite,
+    *,
+    caller: Symbol,
+    target: Symbol,
+) -> CallRecord:
+    support = _resolved_support(raw, caller=caller, target=target)
+    return CallRecord(
+        raw=raw,
+        caller_id=caller.id,
+        caller_kind=caller.kind,
+        target_file=target.file_path,
+        target_id=target.id,
+        target_kind=target.kind,
+        status="resolved",
+        resolution="exact",
+        unresolved_reason=None,
+        reference_unresolved_reason=None,
+        resolution_basis="member_callable",
+        support=support,
+        resolution_control_files=(),
+        resolution_configuration=None,
+    )
 
 
 def _resolved_local(
