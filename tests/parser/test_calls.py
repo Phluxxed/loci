@@ -509,7 +509,7 @@ def test_swift_navigation_callee_is_a_static_path():
     assert call.callee_path == ("values", "first")
 
 
-def test_swift_self_receiver_is_not_given_a_guessed_root():
+def test_swift_self_call_carries_a_self_rooted_path():
     calls = _extract_calls(
         source=(
             "class Widget {\n"
@@ -522,8 +522,85 @@ def test_swift_self_receiver_is_not_given_a_guessed_root():
 
     call = calls[0]
     assert call.callee_text == "self.record"
+    assert call.callee_form == "static_path"
+    assert call.callee_path == ("self", "record")
+    assert call.local_candidates == ()
+    assert call.local_binding_state == "absent"
+    assert call.member_binding_state == "definite"
+    assert call.member_candidates[0].name == "record"
+    assert call.member_candidates[0].owner_type_name == "Widget"
+
+
+def test_swift_self_call_through_a_property_stays_dynamic():
+    calls = _extract_calls(
+        source=(
+            "class Widget {\n"
+            "    func run() { self.inner.record() }\n"
+            "    func record() {}\n"
+            "}\n"
+        ),
+        language="swift",
+    )
+
+    call = calls[0]
+    assert call.callee_text == "self.inner.record"
     assert call.callee_form == "dynamic"
     assert call.callee_path == ()
+    assert call.member_binding_state == "unsupported"
+
+
+def test_swift_super_call_is_not_a_member_candidate():
+    calls = _extract_calls(
+        source=(
+            "class Widget: Base {\n"
+            "    func record() { super.record() }\n"
+            "}\n"
+        ),
+        language="swift",
+    )
+
+    call = calls[0]
+    assert call.callee_text == "super.record"
+    assert call.callee_form == "dynamic"
+    assert call.member_candidates == ()
+
+
+def test_swift_self_call_does_not_reach_another_type_in_the_same_file():
+    calls = _extract_calls(
+        source=(
+            "class Widget {\n"
+            "    func run() { self.record() }\n"
+            "}\n"
+            "class Other {\n"
+            "    func record() {}\n"
+            "}\n"
+        ),
+        language="swift",
+    )
+
+    call = calls[0]
+    assert call.callee_path == ("self", "record")
+    assert call.member_binding_state == "absent"
+    assert call.member_candidates == ()
+
+
+def test_swift_reference_observation_still_refuses_a_self_root():
+    """The shared reference path builder must not gain a ``self`` root."""
+    from loci.parser._reference_paths import _swift_path
+    from tree_sitter_language_pack import get_parser
+
+    source = b"class Widget {\n    func run() { self.record() }\n}\n"
+    tree = get_parser("swift").parse(source)
+    navigations = []
+    stack = [tree.root_node]
+    while stack:
+        node = stack.pop()
+        stack.extend(node.children)
+        if node.type == "navigation_expression":
+            navigations.append(node)
+
+    assert navigations
+    assert all(_swift_path(node, source) is None for node in navigations)
 
 
 def test_swift_method_is_not_a_file_scope_callable_binding():

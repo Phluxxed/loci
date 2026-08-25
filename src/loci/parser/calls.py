@@ -157,12 +157,34 @@ def _classify_callee(
     elif language == "rust":
         path = _rust_path(node, source)
     elif language == "swift":
-        path = _swift_path(node, source)
+        path = _swift_callee_path(node, source)
     else:
         raise ValueError(f"unsupported callee language: {language}")
     if path is not None and len(path) > 1:
         return "static_path", path
     return "dynamic", ()
+
+
+def _swift_callee_path(node: Any, source: bytes) -> StaticPath | None:
+    """The static name path of a Swift callee, including ``self``-rooted ones.
+
+    ``_swift_path`` deliberately refuses ``self`` because it also feeds Stage 10
+    reference observation, where ``self`` names no declaration and a guessed
+    root would be worse than nothing. A callee is the other case: ``self.run()``
+    names a member of the type the call sits in, which the member scope can
+    prove. Only a direct ``self.<name>`` is recognised — ``self.a.b()`` calls
+    through a property whose type is unknown, so it stays dynamic.
+    """
+    if node.type != "navigation_expression":
+        return _swift_path(node, source)
+    target = node.child_by_field_name("target")
+    suffix = node.child_by_field_name("suffix")
+    if target is None or suffix is None or target.type != "self_expression":
+        return _swift_path(node, source)
+    member = suffix.child_by_field_name("suffix")
+    if member is None or member.type != "simple_identifier":
+        return _swift_path(node, source)
+    return ("self", _node_text(member, source))
 
 
 def _python_path(
@@ -331,6 +353,7 @@ def _local_call_binding(
 
 _IMPLICIT_SELF_LANGUAGES = {"swift"}
 _EXPLICIT_SELF_ROOTS = {
+    "swift": {"self"},
     "python": {"self", "cls"},
     "javascript": {"this"},
     "typescript": {"this"},
