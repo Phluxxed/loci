@@ -445,6 +445,7 @@ def test_reports_duplicate_valid_package_roots_as_ambiguous():
         target_file=None,
         target_package=None,
         target_crate=None,
+        target_module=None,
         target_kind=None,
         target_id=None,
         status="unresolved",

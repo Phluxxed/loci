@@ -30,6 +30,7 @@ from loci.graph.imports import (
     resolve_imports,
 )
 from loci.graph.go_modules import GoPackageIndex
+from loci.graph.swift_modules import SwiftModuleIndex
 from loci.graph.javascript_modules import JavaScriptResolutionIndex
 from loci.graph.profiles import (
     GraphNodeAttributeRule,
@@ -238,6 +239,7 @@ def materialize_graph(
     raw_symbol_references: Sequence[RawSymbolReference] = (),
     raw_calls: Sequence[RawCallSite] = (),
     go_packages: GoPackageIndex | None = None,
+    swift_modules: SwiftModuleIndex | None = None,
     javascript_modules: JavaScriptResolutionIndex | None = None,
     rust_crates: RustCrateIndex | None = None,
     input_hashes: Mapping[str, str] | None = None,
@@ -264,6 +266,7 @@ def materialize_graph(
             go_packages=go_packages,
             javascript_modules=javascript_modules,
             rust_crates=rust_crates,
+            swift_modules=swift_modules,
         ),
         key=lambda record: (
             record.raw.source_file,
@@ -353,6 +356,7 @@ def materialize_graph(
         file_nodes=file_nodes,
         go_packages=go_packages,
         rust_crates=rust_crates,
+        swift_modules=swift_modules,
     ))
     active_edges.extend(reference_edges)
     active_edges.extend(call_edges)

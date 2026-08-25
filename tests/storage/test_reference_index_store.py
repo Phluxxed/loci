@@ -94,6 +94,7 @@ def _reference_fixture(
         target_file=TARGET_FILE,
         target_package=None,
         target_crate=None,
+        target_module=None,
         target_kind="file",
         target_id=TARGET_FILE_ID,
         status="resolved",

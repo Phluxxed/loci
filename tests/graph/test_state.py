@@ -59,6 +59,7 @@ def _resolved_import() -> ImportRecord:
         target_file="src/package/target.py",
         target_package=None,
         target_crate=None,
+        target_module=None,
         target_kind="file",
         target_id="src/package/target.py::__file__#file",
         status="resolved",
@@ -85,6 +86,7 @@ def _resolved_go_import() -> ImportRecord:
         target_file=None,
         target_package="example.com/project/internal/store",
         target_crate=None,
+        target_module=None,
         target_kind="package",
         target_id=(
             "internal/store::example.com/project/internal/store#package"
@@ -146,6 +148,7 @@ def _resolved_rust_file_import() -> ImportRecord:
         target_file="src/api.rs",
         target_package=None,
         target_crate=None,
+        target_module=None,
         target_kind="file",
         target_id="src/api.rs::__file__#file",
         status="resolved",
@@ -163,6 +166,7 @@ def _resolved_rust_crate_import() -> ImportRecord:
         target_file=None,
         target_package=None,
         target_crate="Cargo.toml::lib:demo",
+        target_module=None,
         target_kind="crate",
         target_id="Cargo.toml::lib:demo#crate",
         status="resolved",
@@ -403,6 +407,7 @@ def test_import_record_round_trip_is_exact_and_stable():
         "target_file": "src/package/target.py",
         "target_package": None,
         "target_crate": None,
+        "target_module": None,
         "target_kind": "file",
         "target_id": "src/package/target.py::__file__#file",
         "status": "resolved",
@@ -417,6 +422,7 @@ def test_import_record_round_trip_is_exact_and_stable():
         "target_file",
         "target_package",
         "target_crate",
+        "target_module",
         "target_kind",
         "target_id",
         "status",
@@ -507,6 +513,7 @@ def test_javascript_import_record_round_trip_preserves_resolution_provenance():
         target_file="packages/core/src/format.ts",
         target_package=None,
         target_crate=None,
+        target_module=None,
         target_kind="file",
         target_id="packages/core/src/format.ts::__file__#file",
         status="resolved",
@@ -745,6 +752,7 @@ def test_unresolved_rust_import_rejects_control_or_configuration_provenance():
     payload = _resolved_rust_crate_import().to_dict()
     payload.update({
         "target_crate": None,
+        "target_module": None,
         "target_kind": None,
         "target_id": None,
         "status": "unresolved",
@@ -781,8 +789,8 @@ def test_empty_graph_state_has_complete_envelope():
     }
 
 
-def test_graph_state_uses_schema_version_nine():
-    assert GRAPH_STATE_SCHEMA_VERSION == 9
+def test_graph_state_uses_schema_version_ten():
+    assert GRAPH_STATE_SCHEMA_VERSION == 10
 
 
 def test_graph_state_rejects_schema_version_two_as_stale():

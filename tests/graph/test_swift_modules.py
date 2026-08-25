@@ -329,3 +329,173 @@ def test_a_manifest_without_a_package_call_is_unsupported(tmp_path: Path):
     assert [problem.details["reason"] for problem in load.problems] == [
         "unsupported_configuration"
     ]
+
+
+def _swift_repo(root: Path) -> None:
+    _package(
+        root,
+        "Core",
+        """// swift-tools-version:5.9
+import PackageDescription
+
+let package = Package(name: "Core", targets: [.target(name: "LottoCore")])
+""",
+        sources=("Sources/LottoCore/core.swift",),
+    )
+    app = root / "App"
+    app.mkdir(parents=True, exist_ok=True)
+    (app / "main.swift").write_text(
+        "import Foundation\nimport LottoCore\nimport struct LottoCore.Ticket\n",
+        encoding="utf-8",
+    )
+
+
+def test_a_swift_import_of_a_declared_target_resolves_to_its_module(tmp_path: Path):
+    import hashlib
+
+    from loci.graph.imports import materialize_import_edges, resolve_imports
+    from loci.parser.imports import extract_import_batch
+    from loci.parser.symbols import make_file_symbol
+
+    _swift_repo(tmp_path)
+    _, build = _load(tmp_path)
+
+    source = tmp_path / "App" / "main.swift"
+    body = source.read_bytes()
+    source_hash = hashlib.sha256(body).hexdigest()
+    file_nodes = {
+        "App/main.swift": make_file_symbol(
+            "App/main.swift",
+            language="swift",
+            content_hash=source_hash,
+        )
+    }
+    batch = extract_import_batch(
+        source,
+        source_file="App/main.swift",
+        language="swift",
+        source_hash=source_hash,
+    )
+
+    records = resolve_imports(
+        batch.imports,
+        file_nodes=file_nodes,
+        swift_modules=build.index,
+    )
+    outcomes = {
+        record.raw.specifier: (record.status, record.target_kind, record.target_module)
+        for record in records
+    }
+    assert outcomes == {
+        "Foundation": ("unresolved", None, None),
+        "LottoCore": ("resolved", "module", "LottoCore"),
+        "LottoCore.Ticket": ("resolved", "module", "LottoCore"),
+    }
+
+    edges = materialize_import_edges(
+        records,
+        file_nodes=file_nodes,
+        swift_modules=build.index,
+    )
+    assert [(edge.type, edge.to_id) for edge in edges] == [
+        ("imports", make_swift_module_id("Core", "LottoCore"))
+    ]
+    assert edges[0].resolution == "import-resolved"
+    assert edges[0].evidence.file == "App/main.swift"
+
+
+def test_a_swift_import_stays_external_without_a_module_index(tmp_path: Path):
+    import hashlib
+
+    from loci.graph.imports import resolve_imports
+    from loci.parser.imports import extract_import_batch
+    from loci.parser.symbols import make_file_symbol
+
+    _swift_repo(tmp_path)
+    source = tmp_path / "App" / "main.swift"
+    body = source.read_bytes()
+    source_hash = hashlib.sha256(body).hexdigest()
+    file_nodes = {
+        "App/main.swift": make_file_symbol(
+            "App/main.swift",
+            language="swift",
+            content_hash=source_hash,
+        )
+    }
+    batch = extract_import_batch(
+        source,
+        source_file="App/main.swift",
+        language="swift",
+        source_hash=source_hash,
+    )
+
+    records = resolve_imports(batch.imports, file_nodes=file_nodes)
+
+    assert {record.status for record in records} == {"unresolved"}
+    assert {record.unresolved_reason for record in records} == {"external"}
+
+
+def test_a_module_edge_is_rejected_when_its_endpoint_is_not_a_module_node(
+    tmp_path: Path,
+):
+    import hashlib
+
+    import pytest
+
+    from loci.graph.contracts import GraphContractError, validate_graph_edges
+    from loci.graph.imports import materialize_import_edges, resolve_imports
+    from loci.parser.imports import extract_import_batch
+    from loci.parser.symbols import make_file_symbol
+
+    _swift_repo(tmp_path)
+    _, build = _load(tmp_path)
+    source = tmp_path / "App" / "main.swift"
+    body = source.read_bytes()
+    source_hash = hashlib.sha256(body).hexdigest()
+    file_node = make_file_symbol(
+        "App/main.swift",
+        language="swift",
+        content_hash=source_hash,
+    )
+    file_nodes = {"App/main.swift": file_node}
+    batch = extract_import_batch(
+        source,
+        source_file="App/main.swift",
+        language="swift",
+        source_hash=source_hash,
+    )
+    records = resolve_imports(
+        batch.imports,
+        file_nodes=file_nodes,
+        swift_modules=build.index,
+    )
+    edges = materialize_import_edges(
+        records,
+        file_nodes=file_nodes,
+        swift_modules=build.index,
+    )
+    module = build.index.modules_by_name["LottoCore"]
+    nodes = {
+        file_node.id: file_node.to_dict(),
+        module.id: module.to_dict(),
+    }
+    hashes = {"App/main.swift": source_hash, "Core/Package.swift": module.content_hash}
+
+    validate_graph_edges(
+        edges,
+        indexed_nodes=nodes,
+        file_hashes=hashes,
+        imports=records,
+    )
+
+    stripped = dict(module.to_dict())
+    stripped["metadata"] = {"loci": {"swift_module_node": False}}
+    with pytest.raises(GraphContractError) as error:
+        validate_graph_edges(
+            edges,
+            indexed_nodes={file_node.id: file_node.to_dict(), module.id: stripped},
+            file_hashes=hashes,
+            imports=records,
+        )
+
+    assert error.value.code == "INVALID_GRAPH_EDGE"

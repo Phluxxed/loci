@@ -156,6 +156,7 @@ def _import_graph(
         target_file="src/target.py",
         target_package=None,
         target_crate=None,
+        target_module=None,
         target_kind="file",
         target_id=target.id,
         status="resolved",

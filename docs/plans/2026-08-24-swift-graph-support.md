@@ -255,11 +255,30 @@ array. A first version walked the whole manifest and read the
 `.plugin(name: "OpenAPIGenerator")` entries inside a target's own `plugins:`
 list as target declarations — eight false modules. A test pins the scoping.
 
-Stage 2 is the contract widening: `ImportTargetKind="module"`, the
-`ImportRecord` language rules, a module endpoint validator, the
-`materialize_import_edges` branch, the `GraphIndexState` field and
-`GRAPH_STATE_SCHEMA_VERSION` bump, the `graph_health` count, the `retrieval.py`
-enricher, and the `Package.swift` control-file channel in `RepositoryScan`.
+### Stage 2 landed — contract widening and module import edges
+
+`ImportTargetKind` gains `"module"`, `ImportRecord` gains `target_module`, and
+a Swift `import` naming a declared target resolves to that module node. A
+declaration import (`import struct LottoCore.Ticket`) still names its module
+first, so the leading dotted component is the module either way.
+
+| | before | after |
+|---|---:|---:|
+| Swift imports recorded (lott-ios) | 12,062 | 12,062 |
+| Resolved | ~0 | 5,029 |
+| Module import edges | 0 | 5,011 |
+
+The remaining 7,033 are `external` — system frameworks and third-party SPM
+packages, which is the correct answer, not a failure.
+
+One claim in the plan was wrong: **no `GraphIndexState` field is needed.**
+Module nodes ride in the index's `symbols` exactly as Go package nodes do, and
+the go/rust indexes are rebuilt from control files at index time rather than
+persisted. `GRAPH_STATE_SCHEMA_VERSION` still goes 9 to 10, but for a different
+reason than the plan gave — the persisted `ImportRecord` gained a key.
+
+`_validate_swift_module_endpoint` refuses any module edge whose endpoint is not
+a manifest-declared target node, mirroring the Go package check.
 
 ---
 

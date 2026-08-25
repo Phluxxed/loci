@@ -32,6 +32,7 @@ from .go_modules import (
     GoPackageIndex,
     _valid_go_identifier,
 )
+from .swift_modules import SwiftModuleIndex
 from .javascript_modules import (
     JavaScriptResolutionBasis,
     JavaScriptResolutionIndex,
@@ -48,12 +49,12 @@ from .rust_crates import (
 
 
 ImportStatus: TypeAlias = Literal["resolved", "unresolved"]
-ImportTargetKind: TypeAlias = Literal["file", "package", "crate"]
+ImportTargetKind: TypeAlias = Literal["file", "package", "crate", "module"]
 ImportResolutionBasis: TypeAlias = (
     JavaScriptResolutionBasis | RustResolutionBasis
 )
 _IMPORT_STATUSES = frozenset({"resolved", "unresolved"})
-_IMPORT_TARGET_KINDS = frozenset({"file", "package", "crate"})
+_IMPORT_TARGET_KINDS = frozenset({"file", "package", "crate", "module"})
 _UNRESOLVED_REASONS = frozenset({
     "external",
     "not_indexed",
@@ -82,6 +83,7 @@ _IMPORT_RECORD_FIELDS = {
     "target_file",
     "target_package",
     "target_crate",
+    "target_module",
     "target_kind",
     "target_id",
     "status",
@@ -122,6 +124,7 @@ class ImportRecord:
     target_file: str | None
     target_package: str | None
     target_crate: str | None
+    target_module: str | None
     target_kind: ImportTargetKind | None
     target_id: str | None
     status: ImportStatus
@@ -137,6 +140,8 @@ class ImportRecord:
             _relative_path(self.target_file, "target_file")
         if self.target_package is not None:
             _nonempty_string(self.target_package, "target_package")
+        if self.target_module is not None:
+            _nonempty_string(self.target_module, "target_module")
         if self.target_crate is not None:
             _nonempty_string(self.target_crate, "target_crate")
         if (
@@ -203,6 +208,8 @@ class ImportRecord:
                     raise _error("Resolved file import cannot have a target package")
                 if self.target_crate is not None:
                     raise _error("Resolved file import cannot have a target crate")
+                if self.target_module is not None:
+                    raise _error("Resolved file import cannot have a target module")
                 if self.raw.language == "go":
                     raise _error("Go imports must target packages")
             elif self.target_kind == "package":
@@ -210,14 +217,36 @@ class ImportRecord:
                     raise _error("Resolved package import cannot have a target file")
                 if self.target_crate is not None:
                     raise _error("Resolved package import cannot have a target crate")
+                if self.target_module is not None:
+                    raise _error("Resolved package import cannot have a target module")
                 if self.target_package is None or self.target_id is None:
                     raise _error(
                         "Resolved package import requires a target package and ID"
                     )
                 if self.raw.language != "go":
                     raise _error("Only Go imports may target packages")
+            elif self.target_kind == "module":
+                if (
+                    self.target_file is not None
+                    or self.target_package is not None
+                    or self.target_crate is not None
+                ):
+                    raise _error(
+                        "Resolved module import cannot have a file, package "
+                        "or crate target"
+                    )
+                if self.target_module is None or self.target_id is None:
+                    raise _error(
+                        "Resolved module import requires a target module and ID"
+                    )
+                if self.raw.language != "swift":
+                    raise _error("Only Swift imports may target modules")
             else:
-                if self.target_file is not None or self.target_package is not None:
+                if (
+                    self.target_file is not None
+                    or self.target_package is not None
+                    or self.target_module is not None
+                ):
                     raise _error(
                         "Resolved crate import cannot have a file or package target"
                     )
@@ -248,6 +277,7 @@ class ImportRecord:
                 self.target_file is not None,
                 self.target_package is not None,
                 self.target_crate is not None,
+                self.target_module is not None,
                 self.target_kind is not None,
                 self.target_id is not None,
             )):
@@ -270,6 +300,7 @@ class ImportRecord:
             "target_file": self.target_file,
             "target_package": self.target_package,
             "target_crate": self.target_crate,
+            "target_module": self.target_module,
             "target_kind": self.target_kind,
             "target_id": self.target_id,
             "status": self.status,
@@ -293,6 +324,10 @@ class ImportRecord:
         target_crate = _optional_nonempty_string(
             value["target_crate"],
             "target_crate",
+        )
+        target_module = _optional_nonempty_string(
+            value["target_module"],
+            "target_module",
         )
         target_kind = value["target_kind"]
         if target_kind is not None and (
@@ -341,6 +376,7 @@ class ImportRecord:
             target_file=target_file,
             target_package=target_package,
             target_crate=target_crate,
+            target_module=target_module,
             target_kind=cast(ImportTargetKind | None, target_kind),
             target_id=target_id,
             status=cast(ImportStatus, status),
@@ -375,6 +411,7 @@ def resolve_import(
     go_packages: GoPackageIndex | None = None,
     javascript_modules: JavaScriptResolutionIndex | None = None,
     rust_crates: RustCrateIndex | None = None,
+    swift_modules: SwiftModuleIndex | None = None,
 ) -> ImportRecord:
     """Resolve one raw import against deterministic indexed graph targets."""
     if _is_inline_rust_module(raw):
@@ -388,6 +425,7 @@ def resolve_import(
         go_packages=go_packages,
         javascript_modules=javascript_modules,
         rust_crates=rust_crates,
+        swift_modules=swift_modules,
     )[0]
 
 
@@ -398,6 +436,7 @@ def resolve_imports(
     go_packages: GoPackageIndex | None = None,
     javascript_modules: JavaScriptResolutionIndex | None = None,
     rust_crates: RustCrateIndex | None = None,
+    swift_modules: SwiftModuleIndex | None = None,
 ) -> list[ImportRecord]:
     """Resolve a batch while deriving indexed language layouts only once."""
     indexed_python_files = _indexed_python_files(file_nodes)
@@ -426,6 +465,7 @@ def resolve_imports(
             go_resolver=go_resolver,
             rust_crates=rust_crates,
             rust_resolver=rust_resolver,
+            swift_modules=swift_modules,
         )
         for raw in raw_imports
         if not _is_inline_rust_module(raw)
@@ -451,6 +491,7 @@ def _resolve_import(
     go_resolver: _GoResolverIndex | None,
     rust_crates: RustCrateIndex | None,
     rust_resolver: RustImportResolverIndex | None,
+    swift_modules: SwiftModuleIndex | None,
 ) -> ImportRecord:
     _validate_raw_import(raw)
     source = _require_file_node(file_nodes, raw.source_file, field="source_file")
@@ -481,6 +522,7 @@ def _resolve_import(
             target_file=resolution.target_file,
             target_package=None,
             target_crate=None,
+            target_module=None,
             target_kind="file",
             target_id=target.id,
             status="resolved",
@@ -503,6 +545,7 @@ def _resolve_import(
             target_file=None,
             target_package=target_package.qualified_name,
             target_crate=None,
+            target_module=None,
             target_kind="package",
             target_id=target_package.id,
             status="resolved",
@@ -541,6 +584,7 @@ def _resolve_import(
             target_file=resolution.target_file,
             target_package=None,
             target_crate=resolution.target_crate,
+            target_module=None,
             target_kind=target_kind,
             target_id=resolution.target_id,
             status="resolved",
@@ -550,9 +594,24 @@ def _resolve_import(
             resolution_configuration=resolution.configuration,
         )
     elif raw.language == "swift":
-        # No Swift module index exists yet (swift-modules), so no import target
-        # can be cited.
-        return _unresolved(raw, source.id, "external")
+        if swift_modules is None:
+            return _unresolved(raw, source.id, "external")
+        target_module, unresolved_reason = _resolve_swift_target(raw, swift_modules)
+        if target_module is None:
+            assert unresolved_reason is not None
+            return _unresolved(raw, source.id, unresolved_reason)
+        return ImportRecord(
+            raw=raw,
+            source_id=source.id,
+            target_file=None,
+            target_package=None,
+            target_crate=None,
+            target_module=target_module.name,
+            target_kind="module",
+            target_id=target_module.id,
+            status="resolved",
+            unresolved_reason=None,
+        )
     else:
         return _unresolved(raw, source.id, "unsupported_language")
     if target_file is None:
@@ -565,6 +624,7 @@ def _resolve_import(
         target_file=target_file,
         target_package=None,
         target_crate=None,
+        target_module=None,
         target_kind="file",
         target_id=target.id,
         status="resolved",
@@ -578,6 +638,7 @@ def materialize_import_edges(
     file_nodes: Mapping[str, Symbol],
     go_packages: GoPackageIndex | None = None,
     rust_crates: RustCrateIndex | None = None,
+    swift_modules: SwiftModuleIndex | None = None,
 ) -> list[GraphEdge]:
     """Build one deterministic evidence-backed edge per resolved dependency."""
     edges: dict[tuple[str, str, str, str], GraphEdge] = {}
@@ -589,6 +650,10 @@ def materialize_import_edges(
     crate_nodes = {
         node.id: node
         for node in (rust_crates.crate_nodes if rust_crates is not None else ())
+    }
+    module_nodes = {
+        node.id: node
+        for node in (swift_modules.module_nodes if swift_modules is not None else ())
     }
 
     for record in records:
@@ -638,6 +703,17 @@ def materialize_import_edges(
                     target_id=record.target_id,
                 )
             _validate_go_package_target(target, record.target_package)
+        elif record.target_kind == "module":
+            if record.target_module is None:
+                raise _error("Resolved module import requires a target module")
+            target = module_nodes.get(record.target_id)
+            if target is None:
+                raise _error(
+                    "Import record target is not present in the Swift module index",
+                    field="target_id",
+                    target_id=record.target_id,
+                )
+            _validate_swift_module_target(target, record.target_module)
         elif record.target_kind == "crate":
             if record.raw.type_only:
                 raise _error(
@@ -668,6 +744,7 @@ def materialize_import_edges(
                 target,
                 crate,
                 target_crate=record.target_crate,
+                target_module=None,
                 root=root,
             )
             if record.raw.source_file == crate.target.root_file:
@@ -950,6 +1027,42 @@ def _go_internal_import_allowed(
     )
 
 
+def _resolve_swift_target(
+    raw: RawImport,
+    swift_modules: SwiftModuleIndex,
+) -> tuple[Symbol | None, ImportUnresolvedReason | None]:
+    """Join a Swift import to a declared package target.
+
+    A declaration import — ``import struct Foundation.Data`` — still names its
+    module first, so the leading dotted component is the module either way.
+    Anything not declared by a manifest in this repository is a system
+    framework or an external package, which is ``external``, not a failure.
+    """
+    module_name = raw.specifier.split(".", 1)[0]
+    if not module_name:
+        return None, "unresolved_specifier"
+    target = swift_modules.modules_by_name.get(module_name)
+    if target is None:
+        return None, "external"
+    return target, None
+
+
+def _validate_swift_module_target(target: Symbol, target_module: str) -> None:
+    metadata = target.metadata.get("loci") if isinstance(target.metadata, dict) else None
+    if (
+        target.kind != "module"
+        or target.language != "swift"
+        or target.name != target_module
+        or not isinstance(metadata, dict)
+        or metadata.get("swift_module_node") is not True
+    ):
+        raise _error(
+            "Swift module target node is inconsistent",
+            field="target_id",
+            target_id=target.id,
+        )
+
+
 def _validate_go_package_target(target: Symbol, import_path: str) -> None:
     loci = target.metadata.get("loci")
     package_name = loci.get("package_name") if isinstance(loci, Mapping) else None
@@ -977,6 +1090,7 @@ def _validate_rust_crate_target(
     crate: RustCrate,
     *,
     target_crate: str,
+    target_module=None,
     root: Symbol,
 ) -> None:
     loci = target.metadata.get("loci")
@@ -1119,6 +1233,7 @@ def _unresolved(
         target_file=None,
         target_package=None,
         target_crate=None,
+        target_module=None,
         target_kind=None,
         target_id=None,
         status="unresolved",
