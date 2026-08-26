@@ -440,6 +440,38 @@ def test_mcp_loci_mcp_command_round_trip(tmp_path: Path, fixtures_dir: Path):
     assert result["verify"]["failed"] == []
 
 
+def test_mcp_wrapper_initializes_when_path_python_is_stalled(tmp_path: Path):
+    wrapper_repo = tmp_path / "wrapper-repo"
+    shared_dir = wrapper_repo / ".shared"
+    venv_bin = wrapper_repo / ".venv" / "bin"
+    fake_bin = tmp_path / "fake-bin"
+    shared_dir.mkdir(parents=True)
+    venv_bin.mkdir(parents=True)
+    fake_bin.mkdir()
+
+    wrapper = shared_dir / "loci-mcp-wrapper.sh"
+    wrapper.write_text(
+        (Path.cwd() / ".shared" / "loci-mcp-wrapper.sh").read_text()
+    )
+    wrapper.chmod(wrapper.stat().st_mode | 0o100)
+    (venv_bin / "loci-mcp").symlink_to(Path.cwd() / ".venv" / "bin" / "loci-mcp")
+
+    stalled_python = fake_bin / "python3"
+    stalled_python.write_text("#!/usr/bin/env bash\nsleep 5\n")
+    stalled_python.chmod(stalled_python.stat().st_mode | 0o100)
+
+    tools = asyncio.run(
+        _list_tools_through_wrapper(
+            wrapper,
+            tmp_path / "index",
+            path=f"{fake_bin}:{os.environ['PATH']}",
+            startup_timeout=2,
+        )
+    )
+
+    assert "loci_search" in tools
+
+
 def test_mcp_explicit_search_selection_lineage_round_trip(tmp_path: Path):
     result = asyncio.run(
         _explicit_search_selection_round_trip(
@@ -1116,6 +1148,30 @@ async def _round_trip(
         "analyze": analyze.structured_content,
         "invalid_grep": invalid_grep.structured_content,
     }
+
+
+async def _list_tools_through_wrapper(
+    wrapper: Path,
+    cache_dir: Path,
+    *,
+    path: str,
+    startup_timeout: float,
+) -> list[str]:
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["LOCI_STORE_NAMESPACE"] = "test"
+    env["PATH"] = path
+    server_params = StdioServerParameters(
+        command=str(wrapper),
+        args=[],
+        env=env,
+        cwd=Path.cwd(),
+    )
+
+    async with asyncio.timeout(startup_timeout):
+        async with Client(stdio_client(server_params)) as session:
+            tools = await session.list_tools()
+            return sorted(tool.name for tool in tools.tools)
 
 
 async def _analyze_findings_round_trip(

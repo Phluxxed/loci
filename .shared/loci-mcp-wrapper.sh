@@ -9,7 +9,18 @@
 set -euo pipefail
 
 # Resolve this script through any symlink so we can find the repo's .venv,
-# regardless of where the runtime symlink lives.
-_self="$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "${BASH_SOURCE[0]}")"
-_repo_root="$(cd "$(dirname "$_self")/.." && pwd)"
+# regardless of where the runtime symlink lives. Keep the launcher independent
+# of an ambient Python command: Codex cannot complete the MCP handshake until
+# this wrapper reaches the repo-owned interpreter.
+_self="${BASH_SOURCE[0]}"
+while [[ -L "$_self" ]]; do
+    _self_dir="$(cd -P "$(dirname "$_self")" && pwd)"
+    _link_target="$(readlink "$_self")"
+    if [[ "$_link_target" = /* ]]; then
+        _self="$_link_target"
+    else
+        _self="$_self_dir/$_link_target"
+    fi
+done
+_repo_root="$(cd -P "$(dirname "$_self")/.." && pwd)"
 exec "$_repo_root/.venv/bin/loci-mcp" "$@"

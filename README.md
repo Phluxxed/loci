@@ -64,6 +64,13 @@ codex mcp add --env LOCI_BASE_DIR="$HOME/.codex/loci-index" --env LOCI_STORE_NAM
 codex mcp get --json loci
 ```
 
+Give the local interpreter enough room for a cold or contended process launch:
+
+```toml
+[mcp_servers.loci]
+startup_timeout_sec = 60
+```
+
 If `loci-mcp` is not on `PATH`, fix the install first. For repo-local
 dogfooding, `~/.local/bin/loci-mcp` should symlink to
 `.shared/loci-mcp-wrapper.sh`.
