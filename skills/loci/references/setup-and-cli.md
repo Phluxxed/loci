@@ -25,6 +25,10 @@ codex mcp add --env LOCI_BASE_DIR="$HOME/.codex/loci-index" --env LOCI_STORE_NAM
 codex mcp get --json loci
 ```
 
+Set `startup_timeout_sec = 60` under `[mcp_servers.loci]` in the Codex
+`config.toml`. This bounds cold or contended local interpreter startup without
+changing per-tool execution budgets.
+
 MCP storage is process-bound. Set both `LOCI_BASE_DIR` and
 `LOCI_STORE_NAMESPACE`; the namespace must match the store's versioned
 identity marker. The server refuses missing configuration, cross-namespace
