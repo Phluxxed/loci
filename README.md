@@ -60,16 +60,23 @@ Codex has a built-in MCP server manager. After installing loci, register the loc
 
 ```bash
 loci store init --base-dir "$HOME/.codex/loci-index" --namespace codex
-codex mcp add --env LOCI_BASE_DIR="$HOME/.codex/loci-index" --env LOCI_STORE_NAMESPACE=codex loci -- loci-mcp
+codex mcp add --env LOCI_BASE_DIR="$HOME/.codex/loci-index" --env LOCI_STORE_NAMESPACE=codex --env LOCI_MCP_STARTUP_TRACE="$HOME/.codex/loci-index/mcp-startup.jsonl" loci -- loci-mcp
 codex mcp get --json loci
 ```
 
-Give the local interpreter enough room for a cold or contended process launch:
+Keep a bounded deadline for cold or contended host startup:
 
 ```toml
 [mcp_servers.loci]
 startup_timeout_sec = 60
 ```
+
+The timeout is defense in depth, not a diagnosis. With
+`LOCI_MCP_STARTUP_TRACE` set, Loci writes bounded JSONL phase records that
+distinguish wrapper entry, Python/module loading, tool-schema creation, store
+binding, and entry into the stdio run loop. A timeout after
+`stdio_run_entered` is outside Loci's pre-stdio startup path. The trace
+self-bounds after 256 KiB and contains no repository or environment values.
 
 If `loci-mcp` is not on `PATH`, fix the install first. For repo-local
 dogfooding, `~/.local/bin/loci-mcp` should symlink to
