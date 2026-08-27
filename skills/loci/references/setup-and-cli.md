@@ -21,13 +21,27 @@ For Codex:
 
 ```bash
 loci store init --base-dir "$HOME/.codex/loci-index" --namespace codex
-codex mcp add --env LOCI_BASE_DIR="$HOME/.codex/loci-index" --env LOCI_STORE_NAMESPACE=codex loci -- loci-mcp
+codex mcp add --env LOCI_BASE_DIR="$HOME/.codex/loci-index" --env LOCI_STORE_NAMESPACE=codex --env LOCI_MCP_STARTUP_TRACE="$HOME/.codex/loci-index/mcp-startup.jsonl" loci -- loci-mcp
 codex mcp get --json loci
 ```
 
 Set `startup_timeout_sec = 60` under `[mcp_servers.loci]` in the Codex
-`config.toml`. This bounds cold or contended local interpreter startup without
-changing per-tool execution budgets.
+`config.toml`. This bounds cold or contended host startup without changing
+per-tool execution budgets; it does not identify which startup phase consumed
+the deadline.
+
+When `LOCI_MCP_STARTUP_TRACE` is set, inspect its bounded JSONL after a startup
+failure. Interpret the last phase for the failed PID:
+
+- `wrapper_exec`: the tracked wrapper ran.
+- `module_entered`: the repo Python process entered Loci before MCP imports.
+- `tool_schemas_ready`: MCP tool registration completed.
+- `store_bind_started` / `store_bound`: explicit store validation began or
+  completed.
+- `stdio_run_entered`: Loci entered the SDK stdio loop; a later client timeout
+  is outside Loci's pre-stdio path.
+
+The trace truncates after 256 KiB and records only phase, PID, and elapsed time.
 
 MCP storage is process-bound. Set both `LOCI_BASE_DIR` and
 `LOCI_STORE_NAMESPACE`; the namespace must match the store's versioned

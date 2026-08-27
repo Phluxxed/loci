@@ -22,6 +22,10 @@ def _explicit_test_store_namespace(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("LOCI_STORE_NAMESPACE", "test")
 
 
+def _stderr_json_records(stderr: str) -> list[dict[str, Any]]:
+    return [json.loads(line) for line in stderr.splitlines() if line.strip()]
+
+
 def test_mcp_process_requires_explicit_store_configuration(tmp_path: Path):
     env = os.environ.copy()
     env.pop("LOCI_BASE_DIR", None)
@@ -36,7 +40,7 @@ def test_mcp_process_requires_explicit_store_configuration(tmp_path: Path):
     )
 
     assert result.returncode == 78
-    error = json.loads(result.stderr)["error"]
+    error = _stderr_json_records(result.stderr)[-1]["error"]
     assert error["code"] == "MCP_STORE_CONFIG_MISSING"
     assert error["details"]["missing"] == [
         "LOCI_BASE_DIR",
@@ -60,8 +64,89 @@ def test_mcp_process_refuses_store_from_another_namespace(tmp_path: Path):
     )
 
     assert result.returncode == 78
-    error = json.loads(result.stderr)["error"]
+    error = _stderr_json_records(result.stderr)[-1]["error"]
     assert error["code"] == "STORE_NAMESPACE_MISMATCH"
+
+
+def test_mcp_module_defers_service_import_until_a_tool_call():
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            (
+                "import sys; import loci.mcp_server; "
+                "print('loci.service' in sys.modules)"
+            ),
+        ],
+        capture_output=True,
+        text=True,
+        timeout=5,
+        check=True,
+    )
+
+    assert result.stdout.strip() == "False"
+
+
+def test_mcp_wrapper_reports_ordered_startup_phases(tmp_path: Path):
+    root = tmp_path / "index"
+    initialize_store(root, "test")
+    trace_path = tmp_path / "startup.jsonl"
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(root)
+    env["LOCI_STORE_NAMESPACE"] = "test"
+    env["LOCI_MCP_STARTUP_TRACE"] = str(trace_path)
+
+    result = subprocess.run(
+        [str(Path.cwd() / ".shared" / "loci-mcp-wrapper.sh")],
+        input="",
+        capture_output=True,
+        text=True,
+        env=env,
+        timeout=5,
+        check=True,
+    )
+
+    records = _stderr_json_records(result.stderr)
+    assert [record["phase"] for record in records] == [
+        "wrapper_exec",
+        "module_entered",
+        "tool_schemas_ready",
+        "store_bind_started",
+        "store_bound",
+        "stdio_run_entered",
+    ]
+    assert all(record["event"] == "loci_mcp_startup" for record in records)
+    elapsed = [record["elapsed_ms"] for record in records[1:]]
+    assert elapsed == sorted(elapsed)
+    assert len({record["pid"] for record in records}) == 1
+    assert _stderr_json_records(trace_path.read_text()) == records
+    assert result.stdout == ""
+
+
+def test_mcp_startup_trace_truncates_at_its_size_bound(tmp_path: Path):
+    root = tmp_path / "index"
+    initialize_store(root, "test")
+    trace_path = tmp_path / "startup.jsonl"
+    trace_path.write_bytes(b"x" * (256 * 1024 + 1))
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(root)
+    env["LOCI_STORE_NAMESPACE"] = "test"
+    env["LOCI_MCP_STARTUP_TRACE"] = str(trace_path)
+
+    subprocess.run(
+        [sys.executable, "-m", "loci.mcp_server"],
+        input="",
+        capture_output=True,
+        text=True,
+        env=env,
+        timeout=5,
+        check=True,
+    )
+
+    records = _stderr_json_records(trace_path.read_text())
+    assert records[0]["phase"] == "module_entered"
+    assert records[-1]["phase"] == "stdio_run_entered"
+    assert trace_path.stat().st_size <= 256 * 1024
 
 
 def test_mcp_processes_bind_distinct_harness_stores(tmp_path: Path):

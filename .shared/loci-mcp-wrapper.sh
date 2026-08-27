@@ -23,4 +23,9 @@ while [[ -L "$_self" ]]; do
     fi
 done
 _repo_root="$(cd -P "$(dirname "$_self")/.." && pwd)"
+if [[ -n "${LOCI_MCP_STARTUP_TRACE:-}" ]]; then
+    _startup_record="{\"event\":\"loci_mcp_startup\",\"phase\":\"wrapper_exec\",\"pid\":$$,\"elapsed_ms\":0}"
+    printf '%s\n' "$_startup_record" >&2
+    printf '%s\n' "$_startup_record" >>"$LOCI_MCP_STARTUP_TRACE" 2>/dev/null || true
+fi
 exec "$_repo_root/.venv/bin/loci-mcp" "$@"
