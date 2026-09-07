@@ -1,6 +1,6 @@
 ---
 name: loci
-description: Agent-owned codebase navigation infrastructure. Use at the start of any codebase task to navigate symbols efficiently, reduce broad file reads, and fetch targeted source from indexed repos.
+description: Agent-owned codebase navigation infrastructure. Use for non-trivial repository navigation, dependency tracing, review, or implementation that needs symbol or relationship retrieval. Skip standalone documentation, configuration, conceptual work, and edits confined to already-targeted files that need no further navigation.
 ---
 
 # loci - Codex Workflow Guide
