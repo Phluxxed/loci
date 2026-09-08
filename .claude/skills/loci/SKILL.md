@@ -1,6 +1,6 @@
 ---
 name: loci
-description: Agent-owned codebase navigation infrastructure. Use for non-trivial repository navigation, dependency tracing, review, or implementation that needs symbol or relationship retrieval. Skip standalone documentation, configuration, conceptual work, and edits confined to already-targeted files that need no further navigation.
+description: Agent-owned codebase navigation infrastructure. Use when repository work needs source retrieval or relationship tracing. A named target or small edit still needs inspection. Skip redundant retrieval only when relevant source has already been retrieved, remains current, and is sufficient for the action; task or file type alone is not an exemption.
 ---
 
 # loci - Codex Workflow Guide
@@ -12,6 +12,29 @@ own the maintained guidance; links below are relative to this source file.
 
 loci is agent-owned codebase navigation infrastructure. Run it yourself so
 that codebase work uses bounded, exact retrieval instead of broad file reads.
+
+## Evidence before action
+
+First identify the source evidence the action needs, then choose the retrieval
+route. A startup index summary, filename, function name, or recalled summary
+is not source inspection. Named functions, README text and configuration values
+still need their actual contents retrieved before acting on them.
+
+Skip a redundant retrieval only when all three conditions hold:
+
+- **Observed:** relevant source from the actual target checkout has been
+  retrieved and is available in context, rather than only its name or a summary.
+- **Current:** subsequent edits or checkout changes have not invalidated that
+  evidence. Refresh affected source when freshness is uncertain.
+- **Sufficient:** the retrieved material covers what this particular action
+  depends on. A function's body alone does not establish its callers or the
+  consequences of an interface change.
+
+Use the bounded navigation routes below to obtain missing evidence. A justified
+direct read under the fallback below can also supply evidence; choosing that
+route still requires inspection. Reassess when the task or source changes.
+Task size and file type do not establish these conditions. Pure conceptual work
+without repository-source claims needs no repository retrieval.
 
 ## Core workflow
 
