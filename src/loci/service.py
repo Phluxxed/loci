@@ -490,18 +490,20 @@ def _index_repo_unlocked(
 
 def ensure_fresh_index(repo: str | Path) -> dict[str, Any]:
     repo_path = Path(repo).resolve()
-    store = get_store()
-    index = _load_required_index(store, repo_path)
     _validate_repo_path(repo_path)
-    if not _index_is_stale(repo_path, store, index):
+    store = get_store()
+    index = store.load(repo_path)
+    if index is not None and not _index_is_stale(repo_path, store, index):
         return {"repo": str(repo_path), "refreshed": False}
 
     lock_path = store.refresh_lock_path(repo_path)
     timeout = float(os.environ.get("LOCI_REFRESH_LOCK_TIMEOUT", "10"))
     _acquire_refresh_lock(lock_path, timeout=timeout)
     try:
-        index = _load_required_index(store, repo_path)
-        if not _index_is_stale(repo_path, store, index):
+        # Another reader or explicit index operation may have built it while
+        # we waited. First use and stale refresh share the same writer lock.
+        index = store.load(repo_path)
+        if index is not None and not _index_is_stale(repo_path, store, index):
             return {"repo": str(repo_path), "refreshed": False}
         result = _index_repo_unlocked(repo_path, incremental=True)
         return {"repo": str(repo_path), "refreshed": True, "index": result}
@@ -509,8 +511,8 @@ def ensure_fresh_index(repo: str | Path) -> dict[str, Any]:
         raise
     except Exception as exc:
         raise LociError(
-            "STALE_INDEX_REFRESH_FAILED",
-            "Failed to refresh stale index",
+            "INDEX_CREATION_FAILED" if index is None else "STALE_INDEX_REFRESH_FAILED",
+            "Failed to create initial index" if index is None else "Failed to refresh stale index",
             {"repo": str(repo_path), "error": str(exc)},
         ) from exc
     finally:
@@ -1652,6 +1654,19 @@ def _validate_repo_path(repo_path: Path) -> None:
             "Path is not a directory",
             {"path": str(repo_path)},
         )
+    # Path.rglob can silently skip an unreadable root, producing an empty
+    # index. Validate access before allowing either first use or refresh.
+    try:
+        with os.scandir(repo_path) as entries:
+            next(entries, None)
+        if not os.access(repo_path, os.R_OK | os.X_OK):
+            raise PermissionError(f"Cannot read or traverse {repo_path}")
+    except OSError as exc:
+        raise LociError(
+            "REPOSITORY_UNREADABLE",
+            "Cannot read repository directory",
+            {"path": str(repo_path), "error": str(exc)},
+        ) from exc
 
 
 def _load_required_index(store: IndexStore, repo_path: Path) -> dict[str, Any]:

@@ -44,6 +44,14 @@ try:
     from loci.indexability import is_indexable_source_path
     from loci.storage.store_layout import repository_cache_key
 except Exception:
+    # `#!/usr/bin/env python3` is usually a system interpreter without the loci
+    # package, which silently turned this guard into a no-op. Re-exec once under
+    # the repo's own virtualenv (this file is symlinked from <loci>/.claude/hooks).
+    if os.environ.get("LOCI_HOOK_REEXEC") != "1":
+        _venv_python = Path(__file__).resolve().parents[2] / ".venv" / "bin" / "python3"
+        if _venv_python.is_file():
+            os.environ["LOCI_HOOK_REEXEC"] = "1"
+            os.execv(str(_venv_python), [str(_venv_python), str(Path(__file__).resolve()), *sys.argv[1:]])
     is_indexable_source_path = None
     repository_cache_key = None
 
@@ -157,6 +165,125 @@ def loci_recipe(target: IndexedSourceTarget) -> str:
     )
 
 
+READ_COMMANDS = frozenset({"cat", "head", "tail", "sed", "awk", "less", "more"})
+SEARCH_COMMANDS = frozenset({"grep", "egrep", "fgrep", "rg", "ag", "ack"})
+SEGMENT_OPERATORS = frozenset({"|", "||", "&&", ";", "&", "\n"})
+
+
+def git_repo_root(path: Path) -> Path | None:
+    """Nearest ancestor (or self) holding a .git entry, else None."""
+    for candidate in (path, *path.parents):
+        if (candidate / ".git").exists():
+            return candidate
+    return None
+
+
+def repo_is_indexed(base_dir: Path, repo: Path) -> bool:
+    if repository_cache_key is None:
+        return False
+    return (base_dir / repository_cache_key(repo) / "index.json").is_file()
+
+
+def unindexed_repo_recipe(repo: Path) -> str:
+    return (
+        f"  loci_index path={json.dumps(str(repo))}\n"
+        "      → index this repository once, then use loci_grep / loci_search for "
+        "content, loci_outline → loci_get for symbols, loci_file for a whole file\n"
+    )
+
+
+def search_recipe(repo: Path) -> str:
+    r = json.dumps(str(repo))
+    return (
+        f"  loci_grep repo={r} pattern=<regex>\n"
+        "      → exact content matches with file:line, scoped to the indexed repo\n"
+        f"  loci_search repo={r} query=<terms>\n"
+        "      → symbol / semantic search when you don't know the literal\n"
+        f"  loci_outline repo={r} file=<relative path> → loci_get\n"
+        "      → read one symbol or section instead of a whole file\n"
+    )
+
+
+def command_segments(command: str) -> list[list[str]] | None:
+    """Split a shell command into pipeline/list segments of tokens.
+
+    Returns None when the command cannot be tokenised (heredocs, unbalanced
+    quotes) — callers fail open on None.
+    """
+    try:
+        lexer = shlex.shlex(command, posix=True, punctuation_chars=True)
+        lexer.whitespace_split = True
+        tokens = list(lexer)
+    except ValueError:
+        return None
+    segments: list[list[str]] = [[]]
+    for tok in tokens:
+        if tok in SEGMENT_OPERATORS or tok in ("<", ">", ">>", "<<"):
+            if segments[-1]:
+                segments.append([])
+            continue
+        segments[-1].append(tok)
+    return [s for s in segments if s]
+
+
+def strip_assignments(tokens: list[str]) -> list[str]:
+    index = 0
+    while index < len(tokens) and "=" in tokens[index] and not tokens[index].startswith("-"):
+        name = tokens[index].partition("=")[0]
+        if not name.replace("_", "a").isalnum() or name[:1].isdigit():
+            break
+        index += 1
+    return tokens[index:]
+
+
+def repo_read_targets(command: str, cwd: str) -> tuple[str, Path, bool] | None:
+    """Find the first read/search segment aimed at source inside a git repo.
+
+    Returns (command_name, repo_root, is_search) or None. Tracks `cd` across
+    segments so `cd repo && grep …` resolves against the right directory.
+    """
+    if is_indexable_source_path is None:
+        return None
+    segments = command_segments(command)
+    if not segments:
+        return None
+    current = Path(cwd)
+    for seg in segments:
+        seg = strip_assignments(seg)
+        if not seg:
+            continue
+        name = os.path.basename(seg[0])
+        if name == "cd" and len(seg) >= 2:
+            dest = Path(seg[1]).expanduser()
+            current = (dest if dest.is_absolute() else current / dest)
+            continue
+        if name not in READ_COMMANDS and name not in SEARCH_COMMANDS:
+            continue
+        is_search = name in SEARCH_COMMANDS
+        args = [a for a in seg[1:] if not a.startswith("-") and a != "--"]
+        if is_search and args:
+            args = args[1:]  # first positional is the pattern
+        for arg in args:
+            candidate = Path(arg).expanduser()
+            if not candidate.is_absolute():
+                candidate = current / candidate
+            try:
+                candidate = candidate.resolve()
+            except OSError:
+                continue
+            if not candidate.exists():
+                continue
+            repo = git_repo_root(candidate)
+            if repo is None:
+                continue
+            if candidate.is_file():
+                relative = candidate.relative_to(repo)
+                if not is_indexable_source_path(PurePosixPath(relative.as_posix())):
+                    continue
+            return name, repo, is_search
+    return None
+
+
 def handle_read(payload: dict, base_dir: Path) -> None:
     tool_input = payload.get("tool_input") or {}
     file_path = tool_input.get("file_path", "")
@@ -168,7 +295,23 @@ def handle_read(payload: dict, base_dir: Path) -> None:
         allow()
 
     target = indexed_source_target(base_dir, file_path)
-    if target is None or not loci_can_answer(base_dir, target):
+    if target is None:
+        source = Path(file_path).expanduser()
+        if source.is_file() and is_indexable_source_path is not None:
+            repo = git_repo_root(source.resolve())
+            if repo is not None and not repo_is_indexed(base_dir, repo):
+                relative = source.resolve().relative_to(repo)
+                if is_indexable_source_path(PurePosixPath(relative.as_posix())):
+                    deny(
+                        f"Read blocked: '{relative.as_posix()}' is source in a git "
+                        f"repository that Loci has not indexed yet ('{repo}'). "
+                        "Index it first, then navigate through Loci:\n"
+                        + unindexed_repo_recipe(repo)
+                        + f"  Read {file_path} offset=<line> limit=<n>\n"
+                        "      → targeted read, only when you intend to Edit\n"
+                    )
+        allow()
+    if not loci_can_answer(base_dir, target):
         allow()
 
     deny(
@@ -219,10 +362,42 @@ def handle_bash(payload: dict, base_dir: Path) -> None:
     cwd = payload.get("cwd") or os.getcwd()
     source = simple_cat_target(command, cwd)
     if source is None:
-        allow()
+        # Not a plain `cat FILE`: look for grep/sed/head/tail/awk… aimed at
+        # repository source, including inside pipelines and after `cd`.
+        found = repo_read_targets(command, cwd)
+        if found is None:
+            allow()
+        name, repo, is_search = found
+        if not repo_is_indexed(base_dir, repo):
+            deny(
+                f"Bash `{name}` blocked: it targets source in a git repository "
+                f"Loci has not indexed yet ('{repo}'). Index it, then search "
+                "through Loci:\n" + unindexed_repo_recipe(repo)
+            )
+        deny(
+            f"Bash `{name}` blocked: it targets source inside a Loci-indexed "
+            f"repository ('{repo}'). Use Loci instead of shell "
+            f"{'search' if is_search else 'reads'}:\n" + search_recipe(repo)
+            + "find/ls/Glob by name still pass through — filesystem discovery "
+            "is not what Loci replaces."
+        )
 
     target = indexed_source_target(base_dir, source)
-    if target is None or not loci_can_answer(base_dir, target):
+    if target is None:
+        repo = git_repo_root(source)
+        if (
+            repo is not None
+            and not repo_is_indexed(base_dir, repo)
+            and is_indexable_source_path is not None
+            and is_indexable_source_path(PurePosixPath(source.relative_to(repo).as_posix()))
+        ):
+            deny(
+                f"Bash `cat` blocked: '{source}' is in a git repository Loci has "
+                f"not indexed yet ('{repo}'). Index it first:\n"
+                + unindexed_repo_recipe(repo)
+            )
+        allow()
+    if not loci_can_answer(base_dir, target):
         allow()
 
     deny(

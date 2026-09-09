@@ -418,6 +418,31 @@ def test_store_mirrors_source(store: IndexStore, tmp_path: Path, sample_symbols)
     assert "login" in mirror.read_text()
 
 
+def test_store_mirrors_readonly_multisection_file(store: IndexStore, tmp_path: Path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    source = repo / "guide.md"
+    original = b"# Guide\n\n## Install\n\nRead-only instructions.\n"
+    source.write_bytes(original)
+    source.chmod(0o400)
+    symbols = _markdown_symbols()
+    symbols = [
+        replace(symbol, byte_length=len(original) - symbol.byte_offset)
+        for symbol in symbols
+    ]
+
+    # A second write also exercises replacement of an existing read-only mirror.
+    for _ in range(2):
+        store.write(repo, symbols, file_hashes={"guide.md": store.hash_file(source)})
+        for symbol in symbols:
+            assert store.get_symbol_content(repo, symbol.id) == original[
+                symbol.byte_offset: symbol.byte_offset + symbol.byte_length
+            ].decode()
+        assert (store._sources_dir(repo) / "guide.md").read_bytes() == original
+        assert source.read_bytes() == original
+        assert source.stat().st_mode & 0o777 == 0o400
+
+
 def test_store_atomic_write(store: IndexStore, tmp_path: Path, sample_symbols):
     source_path = tmp_path / "repo"
     source_path.mkdir()

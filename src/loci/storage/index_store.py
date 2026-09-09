@@ -271,10 +271,12 @@ class IndexStore:
         if tmp_sources_dir.exists():
             shutil.rmtree(tmp_sources_dir)
         tmp_sources_dir.mkdir(parents=True, exist_ok=True)
-        for sym in symbols:
-            src = repo_path / sym.file_path
+        # Copy once per file: copy2 preserves read-only modes, so a repeated
+        # copy for another symbol would try to overwrite a read-only mirror.
+        for file_path in dict.fromkeys(sym.file_path for sym in symbols):
+            src = repo_path / file_path
             if src.exists():
-                dest = tmp_sources_dir / sym.file_path
+                dest = tmp_sources_dir / file_path
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(src, dest)
         if sources_dir.exists():

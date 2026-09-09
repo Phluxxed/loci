@@ -42,9 +42,9 @@ Prefer the local MCP server whenever its tools are available. Use the
 repository root named by the task, not the shell cwd or an arbitrary parent:
 
 ```text
-# Unindexed repository, explicit rebuild, or large change only:
+# Explicit rebuild or large change only:
 loci_index(repo, incremental=true)
-# Normal navigation, including stale cached indexes:
+# Normal navigation, including unindexed roots and stale cached indexes:
 loci_outline(repo) or loci_search(repo, query) -> optional search_id
 loci_get(repo, symbol_ids, selected_from_search_id=search_id) only for deliberate search selections
 loci_analyze(repo) when diagnostics are needed
@@ -54,12 +54,12 @@ Pass `repo` to every repository-scoped MCP tool. Do not introduce the legacy
 `path` parameter in new guidance; it is advisory compatibility only for
 `loci_index`, `loci_outline`, and `loci_verify`.
 
-MCP read tools refresh stale indexes before returning cached data. This
+MCP retrieval tools create missing indexes and refresh stale indexes before
+returning data, completing first-use indexing and retrieval in one call. This
 freshness includes repository-local graph profiles and contributions, built-in
 imports, references, and calls, Go module/workspace controls,
 JavaScript/TypeScript package, workspace, and project controls, and Cargo
-manifests. Run `loci_index` for a repository that has never been indexed; use
-it again for an explicit rebuild or after large changes.
+manifests. Use `loci_index` for an explicit rebuild or after large changes.
 
 If MCP is unavailable, configure it before using the CLI as a steady-state
 route. Read [setup-and-cli.md](../../../skills/loci/references/setup-and-cli.md) for host setup,
@@ -71,8 +71,8 @@ use a targeted normal read.
 
 ## Navigate, then retrieve
 
-1. Index an unindexed target repository, or explicitly rebuild it when the
-   task requires a fresh cache.
+1. Use normal MCP retrieval for first use; explicitly rebuild only when the
+   task requires it. The CLI fallback still needs an initial `loci index`.
 2. Use `loci_outline` when the file is known, or `loci_search` when only a
    symbol name or concept is known.
 3. Use `loci_get` for the exact symbol IDs returned by outline/search. When a

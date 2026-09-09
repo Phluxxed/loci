@@ -379,6 +379,20 @@ def _build_validation_index(
                 export.source_hash,
                 endpoint_id,
             ))
+            # An export clause sits on a different line from the declaration it
+            # exports, and resolvers anchor definition support on either line
+            # depending on the language, so both anchors back the same export.
+            definition_line = indexed_nodes.get(endpoint_id, {}).get("line")
+            if isinstance(definition_line, int) and not isinstance(
+                definition_line,
+                bool,
+            ):
+                export_support.add((
+                    export.source_file,
+                    definition_line,
+                    export.source_hash,
+                    endpoint_id,
+                ))
     return _ValidationIndex(
         nodes_by_file=MappingProxyType({
             file: tuple(nodes) for file, nodes in nodes_by_file.items()
