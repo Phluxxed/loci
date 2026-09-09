@@ -3752,3 +3752,93 @@ def test_swift_cross_module_member_and_initializer_calls_resolve(
             "Feature/Sources/Feature/Model.swift::Ticket.stamp#method",
         ),
     ]
+
+
+def test_concurrent_first_use_builds_once_and_warm_read_reuses_index(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+):
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "sample.py").write_text("def cold_fixture():\n    return 1\n")
+    base = tmp_path / "store"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    store = IndexStore(base)
+    assert store.load(repo) is None
+    original_acquire = service_module._acquire_refresh_lock
+    original_index = service_module._index_repo_unlocked
+    ready = Barrier(2)
+    builds = []
+
+    def acquire(lock_path, timeout):
+        ready.wait(timeout=5)
+        original_acquire(lock_path, timeout)
+
+    def build(path, incremental=True):
+        builds.append(path)
+        return original_index(path, incremental)
+
+    monkeypatch.setattr(service_module, "_acquire_refresh_lock", acquire)
+    monkeypatch.setattr(service_module, "_index_repo_unlocked", build)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(pool.map(
+            lambda _: search_symbols(repo, "cold_fixture", ensure_fresh=True),
+            range(2),
+        ))
+    assert all(any(s["name"] == "cold_fixture" for s in result) for result in results)
+    assert builds == [repo.resolve()]
+    assert store.load(repo) is not None
+    assert not store.refresh_lock_path(repo).exists()
+    assert ensure_fresh_index(repo) == {"repo": str(repo), "refreshed": False}
+    assert builds == [repo.resolve()]
+
+
+@pytest.mark.parametrize("failure", [RuntimeError("broken extractor"), LociError("TEST_FAILURE", "index failed", {})])
+def test_first_use_preserves_failure_and_releases_lock(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, failure: Exception,
+):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    base = tmp_path / "store"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    attempts = []
+
+    def fail(*args, **kwargs):
+        attempts.append(1)
+        raise failure
+
+    monkeypatch.setattr(service_module, "_index_repo_unlocked", fail)
+    with pytest.raises(LociError) as caught:
+        ensure_fresh_index(repo)
+    assert caught.value.code == ("TEST_FAILURE" if isinstance(failure, LociError) else "INDEX_CREATION_FAILED")
+    assert attempts == [1]
+    store = IndexStore(base)
+    assert store.load(repo) is None
+    assert not store.refresh_lock_path(repo).exists()
+
+
+@pytest.mark.parametrize("kind,code", [("missing", "PATH_NOT_FOUND"), ("file", "INVALID_INPUT"), ("unreadable", "REPOSITORY_UNREADABLE")])
+def test_first_use_rejects_invalid_roots(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, kind: str, code: str,
+):
+    repo = tmp_path / "repo"
+    base = tmp_path / "store"
+    monkeypatch.setenv("LOCI_BASE_DIR", str(base))
+    if kind == "file":
+        repo.write_text("not a directory")
+    elif kind == "unreadable":
+        repo.mkdir()
+        original_scandir = os.scandir
+
+        def scandir(path):
+            if Path(path) == repo:
+                raise PermissionError("access denied")
+            return original_scandir(path)
+
+        monkeypatch.setattr(os, "scandir", scandir)
+    with pytest.raises(LociError) as caught:
+        ensure_fresh_index(repo)
+    assert caught.value.code == code
+    assert not base.exists()

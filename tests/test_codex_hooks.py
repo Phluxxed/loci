@@ -312,6 +312,58 @@ def test_codex_install_hooks_patches_hooks_json_idempotently(tmp_path: Path):
     assert linked_hook.is_symlink()
     assert linked_hook.resolve() == (REPO_ROOT / ".codex" / "hooks" / "loci-session-start.sh").resolve()
 
+    linked_skill = codex_home / "skills" / "loci"
+    assert linked_skill.is_symlink()
+    assert linked_skill.resolve() == (REPO_ROOT / "skills" / "loci").resolve()
+
+
+def test_codex_install_hooks_replaces_wrong_skill_symlink(tmp_path: Path):
+    codex_home = tmp_path / ".codex"
+    skill_link = codex_home / "skills" / "loci"
+    skill_link.parent.mkdir(parents=True)
+    wrong_target = tmp_path / "wrong-skill"
+    wrong_target.mkdir()
+    skill_link.symlink_to(wrong_target, target_is_directory=True)
+
+    env = os.environ.copy()
+    env["CODEX_HOME"] = str(codex_home)
+    result = subprocess.run(
+        [sys.executable, str(REPO_ROOT / ".codex" / "install-hooks.py")],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        env=env,
+        check=True,
+    )
+
+    assert "linked skill" in result.stdout
+    assert skill_link.is_symlink()
+    assert skill_link.resolve() == (REPO_ROOT / "skills" / "loci").resolve()
+
+
+def test_codex_install_hooks_refuses_real_skill_directory(tmp_path: Path):
+    codex_home = tmp_path / ".codex"
+    skill_dir = codex_home / "skills" / "loci"
+    skill_dir.mkdir(parents=True)
+    marker = skill_dir / "keep-me.txt"
+    marker.write_text("user content")
+
+    env = os.environ.copy()
+    env["CODEX_HOME"] = str(codex_home)
+    result = subprocess.run(
+        [sys.executable, str(REPO_ROOT / ".codex" / "install-hooks.py")],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+
+    assert result.returncode != 0
+    assert "refusing to replace" in result.stderr
+    assert skill_dir.is_dir()
+    assert not skill_dir.is_symlink()
+    assert marker.read_text() == "user content"
+
 
 def test_codex_session_start_hook_uses_root_direnv_python(tmp_path: Path):
     repo = tmp_path / "repo"

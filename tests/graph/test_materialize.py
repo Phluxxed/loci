@@ -1286,3 +1286,99 @@ def test_materialize_graph_threads_javascript_resolution_index_into_exact_edge(
         ),
     ),)
     assert state.input_hashes == loaded.input_hashes
+
+
+# Regression fixtures for the export-clause indexing failure: a TypeScript
+# declaration exported through an export clause resolves like an inline export,
+# and its support anchors stay current (definition on the declaration line,
+# local_export on the export statement line).
+_TYPESCRIPT_EXPORT_SHAPES = (
+    pytest.param(
+        "export function num(v: unknown): number { return Number(v) }\n",
+        1,
+        None,
+        id="inline-export-function",
+    ),
+    pytest.param(
+        "function num(v: unknown): number { return Number(v) }\nexport { num }\n",
+        1,
+        2,
+        id="export-clause-same-name",
+    ),
+    pytest.param(
+        "function numHelper(v: unknown): number { return Number(v) }\n"
+        "export { numHelper as num }\n",
+        1,
+        2,
+        id="export-clause-aliased",
+    ),
+)
+
+
+@pytest.mark.parametrize(
+    ("definition_source", "definition_line", "export_line"),
+    _TYPESCRIPT_EXPORT_SHAPES,
+)
+def test_typescript_export_shapes_resolve_references_with_current_support(
+    tmp_path: Path,
+    definition_source: str,
+    definition_line: int,
+    export_line: int | None,
+):
+    files = {
+        "a.ts": definition_source,
+        "b.ts": "import { num } from './a'\nexport const x = num(1)\n",
+    }
+    symbols: list[Symbol] = []
+    batches = []
+    file_hashes = {}
+    for relative_path, source in files.items():
+        path = tmp_path / relative_path
+        path.write_text(source, encoding="utf-8")
+        source_hash = hashlib.sha256(source.encode()).hexdigest()
+        file_hashes[relative_path] = source_hash
+        symbols.append(make_file_symbol(
+            relative_path,
+            language="typescript",
+            content_hash=source_hash,
+        ))
+        symbols.extend(
+            replace(
+                symbol,
+                id=make_symbol_id(relative_path, symbol.qualified_name, symbol.kind),
+                file_path=relative_path,
+            )
+            for symbol in parse_file(path)
+        )
+        batches.append(extract_import_batch(
+            path,
+            source_file=relative_path,
+            language="typescript",
+            source_hash=source_hash,
+        ))
+
+    state = materialize_graph(
+        tmp_path,
+        symbols,
+        file_hashes,
+        [],
+        [],
+        raw_imports=[raw for batch in batches for raw in batch.imports],
+        raw_exports=[raw for batch in batches for raw in batch.exports],
+        raw_symbol_references=[
+            raw for batch in batches for raw in batch.references
+        ],
+    )
+
+    assert [record.status for record in state.symbol_references] == ["resolved"]
+    record = state.symbol_references[0]
+    assert record.target_file == "a.ts"
+    assert [
+        support.line for support in record.support if support.kind == "definition"
+    ] == [definition_line]
+    assert [
+        support.line for support in record.support if support.kind == "local_export"
+    ] == ([] if export_line is None else [export_line])
+    assert [
+        edge.to_id for edge in state.edges if edge.type.startswith("references")
+    ] == [record.target_id]

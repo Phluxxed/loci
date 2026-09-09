@@ -594,8 +594,8 @@ def test_mcp_explicit_search_selection_lineage_round_trip(tmp_path: Path):
 def test_mcp_errors_include_loci_error_data(tmp_path: Path):
     error_data = asyncio.run(_outline_missing_repo(tmp_path / ".codeindex", tmp_path / "repo"))
 
-    assert error_data["code"] == "REPO_NOT_INDEXED"
-    assert error_data["details"]["repo"] == str((tmp_path / "repo").resolve())
+    assert error_data["code"] == "PATH_NOT_FOUND"
+    assert error_data["details"]["path"] == str((tmp_path / "repo").resolve())
 
 
 def test_mcp_search_refreshes_stale_index(tmp_path: Path):
@@ -608,6 +608,202 @@ def test_mcp_grep_refresh_removes_deleted_files(tmp_path: Path):
     result = asyncio.run(_grep_after_indexed_file_deleted(tmp_path / "repo", tmp_path / ".codeindex"))
 
     assert result["matches"] == []
+
+
+def test_mcp_search_cold_starts_python_root(tmp_path: Path):
+    repo = tmp_path / "python-root"
+    repo.mkdir()
+    fixture_name = "cold_python_fixture"
+    (repo / "fixture.py").write_text(
+        f"def {fixture_name}():\n    return 1\n",
+        encoding="utf-8",
+    )
+    cache_dir = tmp_path / ".codeindex"
+
+    result = asyncio.run(
+        _cold_mcp_call(
+            repo,
+            cache_dir,
+            "loci_search",
+            {"repo": str(repo), "query": fixture_name},
+        )
+    )
+
+    assert result["is_error"] is False
+    assert any(
+        symbol["name"] == fixture_name
+        and symbol["file_path"] == "fixture.py"
+        for symbol in result["result"]["symbols"]
+    )
+    persisted = IndexStore(cache_dir).load(repo)
+    assert persisted is not None
+    assert any(
+        symbol["name"] == fixture_name and symbol["file_path"] == "fixture.py"
+        for symbol in persisted["symbols"]
+    )
+
+
+def test_mcp_search_cold_starts_snapshot_shaped_markdown_root(tmp_path: Path):
+    repo = (
+        tmp_path
+        / "case"
+        / "state"
+        / "brain-snapshots"
+        / "anvil-brain-codex-w4-followup"
+        / "snapshots"
+        / "cc42243c659f7c79ebfa55dafbdbac184fb1eeadf2583568462c73828fa7d1ae"
+        / "wiki"
+    )
+    source = repo / "pages" / "known.md"
+    source.parent.mkdir(parents=True)
+    source.write_text(
+        "---\n"
+        "title: Snapshot Cold Start Fixture\n"
+        "tags: [snapshot-cold-start]\n"
+        "---\n\n"
+        "# Snapshot Cold Start Fixture\n\n"
+        "Known snapshot cold-start fixture body.\n",
+        encoding="utf-8",
+    )
+    cache_dir = tmp_path / ".codeindex"
+
+    result = asyncio.run(
+        _cold_mcp_call(
+            repo,
+            cache_dir,
+            "loci_search",
+            {
+                "repo": str(repo),
+                "query": "snapshot-cold-start",
+                "lang": "markdown",
+            },
+        )
+    )
+
+    assert result["is_error"] is False
+    assert any(
+        symbol["file_path"] == "pages/known.md"
+        for symbol in result["result"]["symbols"]
+    )
+    persisted = IndexStore(cache_dir).load(repo)
+    assert persisted is not None
+    assert any(
+        symbol["file_path"] == "pages/known.md"
+        for symbol in persisted["symbols"]
+    )
+
+
+def test_mcp_cold_and_warm_readonly_snapshot_sections(tmp_path: Path):
+    repo = tmp_path / "brain-snapshots" / "acceptance" / "snapshots" / ("a" * 64) / "wiki"
+    repo.mkdir(parents=True)
+    source = repo / "CONVENTIONS.md"
+    original = (
+        b"# Conventions\n\n"
+        b"## First Fixture\n\nFirst section body.\n\n"
+        b"## Second Fixture\n\nSecond section body.\n"
+    )
+    source.write_bytes(original)
+    source.chmod(0o400)
+    cache_dir = tmp_path / "store"
+    assert not cache_dir.exists()
+
+    async def retrieve():
+        env = os.environ.copy()
+        env["LOCI_BASE_DIR"] = str(cache_dir)
+        env["LOCI_STORE_NAMESPACE"] = "test"
+        env["PYTHONPATH"] = str(Path.cwd() / "src")
+        params = StdioServerParameters(
+            command=sys.executable,
+            args=["-m", "loci.mcp_server"],
+            env=env,
+            cwd=Path.cwd(),
+        )
+        async with Client(stdio_client(params)) as session:
+            for name, body in (
+                ("First Fixture", "First section body."),
+                ("Second Fixture", "Second section body."),
+            ):
+                # The first search builds the index; the second uses it warm.
+                search = await session.call_tool(
+                    "loci_search", arguments={"repo": str(repo), "query": name}
+                )
+                assert not search.is_error
+                result = search.structured_content
+                selected = next(s for s in result["symbols"] if s["name"] == name)
+                content = await session.call_tool(
+                    "loci_get",
+                    arguments={
+                        "repo": str(repo),
+                        "symbol_ids": [selected["id"]],
+                        "selected_from_search_id": result["search_id"],
+                    },
+                )
+                assert not content.is_error
+                assert body in content.structured_content["symbols"][0]["source"]
+
+    asyncio.run(retrieve())
+    persisted = IndexStore(cache_dir).load(repo)
+    assert persisted is not None
+    assert {"First Fixture", "Second Fixture"} <= {
+        symbol["name"] for symbol in persisted["symbols"]
+    }
+    assert source.read_bytes() == original
+    assert source.stat().st_mode & 0o777 == 0o400
+
+
+@pytest.mark.parametrize("entrypoint", ["outline", "file", "grep", "graph_health"])
+def test_mcp_retrieval_entrypoints_cold_start_on_empty_stores(
+    tmp_path: Path,
+    entrypoint: str,
+):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "fixture.py").write_text(
+        "def cold_entrypoint_fixture():\n    return 1\n",
+        encoding="utf-8",
+    )
+    cache_dir = tmp_path / ".codeindex"
+
+    call_arguments: dict[str, Any]
+    if entrypoint == "outline":
+        tool = "loci_outline"
+        call_arguments = {"repo": str(repo)}
+    elif entrypoint == "file":
+        tool = "loci_file"
+        call_arguments = {
+            "repo": str(repo),
+            "file_path": "fixture.py",
+            "start_line": 1,
+            "end_line": 2,
+        }
+    elif entrypoint == "grep":
+        tool = "loci_grep"
+        call_arguments = {"repo": str(repo), "pattern": "cold_entrypoint_fixture"}
+    else:
+        tool = "loci_graph_health"
+        call_arguments = {"repo": str(repo)}
+
+    result = asyncio.run(
+        _cold_mcp_call(repo, cache_dir, tool, call_arguments)
+    )
+
+    assert result["is_error"] is False
+    output = result["result"]
+    if entrypoint == "outline":
+        assert output["files"][0]["file"] == "fixture.py"
+    elif entrypoint == "file":
+        assert output["file"] == "fixture.py"
+        assert "cold_entrypoint_fixture" in output["content"]
+    elif entrypoint == "grep":
+        assert output["matches"][0]["file"] == "fixture.py"
+    else:
+        assert output["status"] == "healthy"
+
+    persisted = IndexStore(cache_dir).load(repo)
+    assert persisted is not None
+    assert any(
+        symbol["file_path"] == "fixture.py" for symbol in persisted["symbols"]
+    )
 
 
 def test_mcp_markdown_search_and_outline_include_retrieval_cost(tmp_path: Path):
@@ -1090,6 +1286,32 @@ async def _explicit_search_selection_round_trip(
         "cross_repo_lineage": cross_repo_lineage.structured_content,
         "analyze": analyze.structured_content,
     }
+
+
+async def _cold_mcp_call(
+    repo: Path,
+    cache_dir: Path,
+    tool: str,
+    arguments: dict[str, Any],
+) -> dict[str, Any]:
+    assert not cache_dir.exists()
+    env = os.environ.copy()
+    env["LOCI_BASE_DIR"] = str(cache_dir)
+    env["LOCI_STORE_NAMESPACE"] = "test"
+    env["PYTHONPATH"] = str(Path.cwd() / "src")
+    server_params = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "loci.mcp_server"],
+        env=env,
+        cwd=Path.cwd(),
+    )
+
+    async with Client(stdio_client(server_params)) as session:
+        response = await session.call_tool(tool, arguments=arguments)
+        return {
+            "is_error": response.is_error,
+            "result": response.structured_content,
+        }
 
 
 async def _round_trip(

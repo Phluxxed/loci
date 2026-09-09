@@ -31,18 +31,19 @@ Or from source:
 ```bash
 git clone https://github.com/phluxxed/loci
 cd loci
-pip install -e .
+python3 -m venv .venv
+.venv/bin/python -m pip install -e .
 ```
 
 For repo-local dogfooding, install the tracked wrappers so both commands are
-globally resolvable. The CLI wrapper retains convenience routing for legacy
-hooks and human diagnostics. The MCP wrapper performs no host guessing: every
-MCP registration must supply an explicit store root and namespace.
+globally resolvable. The MCP wrapper is the supported path: it resolves the
+repo's `.venv/bin/loci-mcp` and performs no host guessing, so every MCP
+registration must supply an explicit store root and namespace.
 
 ```bash
-mkdir -p ~/.local/bin
-ln -sf "$PWD/.shared/loci-wrapper.sh" ~/.local/bin/loci
-ln -sf "$PWD/.shared/loci-mcp-wrapper.sh" ~/.local/bin/loci-mcp
+mkdir -p "$HOME/.local/bin"
+ln -sfn "$PWD/.shared/loci-wrapper.sh" "$HOME/.local/bin/loci"
+ln -sfn "$PWD/.shared/loci-mcp-wrapper.sh" "$HOME/.local/bin/loci-mcp"
 ```
 
 This installs both command entrypoints:
@@ -54,9 +55,10 @@ This installs both command entrypoints:
 
 ## MCP Setup
 
-### Codex
+### Codex (canonical MCP setup)
 
-Codex has a built-in MCP server manager. After installing loci, register the local stdio server:
+Codex has a built-in MCP server manager. After installing the repo-local
+`.venv` and wrappers above, register the local stdio server:
 
 ```bash
 loci store init --base-dir "$HOME/.codex/loci-index" --namespace codex
@@ -90,7 +92,7 @@ Custom cache location:
 
 ```bash
 loci store init --base-dir /absolute/path/to/.codeindex --namespace my-codex
-codex mcp add --env LOCI_BASE_DIR=/absolute/path/to/.codeindex --env LOCI_STORE_NAMESPACE=my-codex loci -- loci-mcp
+codex mcp add --env LOCI_BASE_DIR=/absolute/path/to/.codeindex --env LOCI_STORE_NAMESPACE=my-codex --env LOCI_MCP_STARTUP_TRACE=/absolute/path/to/.codeindex/mcp-startup.jsonl loci -- loci-mcp
 ```
 
 ### Claude Code
@@ -183,7 +185,10 @@ legacy Codex-aware fallback when they run outside MCP mode.
 
 ### MCP Tools
 
-MCP read tools refresh stale indexes before returning cached data. `loci_index`
+MCP retrieval tools create missing indexes and refresh stale indexes before
+returning data. A first retrieval against a valid, readable root indexes it and
+completes the request in the same call, without a separate pre-index step.
+`loci_index`
 still performs explicit indexing, while `loci_outline`, `loci_search`,
 `loci_get`, `loci_file`, `loci_grep`, `loci_graph_anchors`,
 `loci_graph_neighbors`, `loci_graph_traverse_neighbors`, `loci_graph_paths`,
@@ -736,36 +741,29 @@ target path and never lists or parses sibling indexes.
 
 ## Codex integration
 
-loci can run as a local MCP server inside Codex. This is the preferred Codex integration.
+The canonical Codex MCP install sequence is the `MCP Setup` → `Codex`
+section above. It uses the repo's `.venv` through the tracked
+`~/.local/bin/loci-mcp` wrapper, an explicit Codex-owned store and namespace,
+bounded startup tracing, and a 60-second startup timeout.
 
-```bash
-loci store init --base-dir "$HOME/.codex/loci-index" --namespace codex
-codex mcp add --env LOCI_BASE_DIR="$HOME/.codex/loci-index" --env LOCI_STORE_NAMESPACE=codex loci -- loci-mcp
-codex mcp get --json loci
-```
-
-The older Codex hooks in `.codex/` can still seed uncached repos and inject a context line, but they are now optional CLI-era compatibility tooling. MCP reads enforce freshness when Codex actually uses the index.
-
-**Prerequisites**
-
-- loci installed (`pip install loci`)
-- Codex using the default `~/.codex` home
-- root direnv Python available at `~/.direnv/python-*`
-
-**Install**
+The SessionStart hook is optional CLI-era compatibility tooling; MCP reads
+enforce freshness when Codex actually uses the index. To install the repo's
+Loci skill and optional index-seeding hook, run:
 
 ```bash
 python3 .codex/install-hooks.py
 ```
 
-This symlinks the repo hooks into `~/.codex/hooks/` and patches `~/.codex/hooks.json` to register the `SessionStart` hook. Restart Codex after running it.
-
-The session-start hook sources the shared root direnv Python environment before resolving `loci`, so installing `loci` into that root environment is the intended setup.
+The installer is idempotent. It links the skill at `~/.codex/skills/loci`
+and, when the optional hook is enabled, symlinks the repo hook into
+`~/.codex/hooks/` and patches `~/.codex/hooks.json` to register `SessionStart`.
+Restart Codex after running it.
 
 **What gets installed**
 
 | Component | Location | Effect |
 |---|---|---|
+| `skills/loci` | `~/.codex/skills/loci` | Exposes the repo's Loci skill to Codex |
 | `loci-session-start.sh` | `~/.codex/hooks/` | Reports an existing index, or runs bounded initial CLI `loci index --incremental` when no cache exists |
 
 ## Development
