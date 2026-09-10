@@ -497,7 +497,7 @@ def _add_local_binding(
     deferred_visible: bool = False,
 ) -> None:
     name = _node_text(name_node, source)
-    if not name or name == "_":
+    if not name or (name == "_" and kind != "type_parameter"):
         return
     context.local_bindings.append(
         LexicalBinding(
@@ -789,6 +789,32 @@ def _collect_javascript_context(
             continue
         if node.type in {"export_clause", "namespace_export"}:
             _exclude(context, node)
+            continue
+        if node.type == "type_parameters":
+            # TypeScript attaches this list to the declaration/signature whose
+            # entire type scope it binds, including constraints and defaults.
+            # Exclude only the names: imported constraint/default types still
+            # need their own reference evidence.
+            scope = node.parent
+            if scope is None:
+                continue
+            for parameter in node.named_children:
+                if parameter.type != "type_parameter":
+                    continue
+                name = parameter.child_by_field_name("name")
+                if name is None:
+                    continue
+                _exclude(context, name)
+                _add_local_binding(
+                    context,
+                    name_node=name,
+                    source=source,
+                    scope=scope,
+                    declaration_start_byte=parameter.start_byte,
+                    declaration_end_byte=parameter.end_byte,
+                    active_start_byte=scope.start_byte,
+                    kind="type_parameter",
+                )
             continue
         if node.type in declaration_types:
             name = node.child_by_field_name("name")

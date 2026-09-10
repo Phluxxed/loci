@@ -297,6 +297,7 @@ def _local_call_binding(
         binding
         for binding in context.local_bindings
         if binding.name == name
+        and binding.kind != "type_parameter"
         and binding.scope_start_byte <= callee.start_byte
         and callee.end_byte <= binding.scope_end_byte
         and (
