@@ -1,0 +1,362 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "task_id": "exported_arrow",
+    "session_id": "109970ee-cf70-4bb4-b7dd-d91decb14a09",
+    "arm": "A",
+    "repetition": 2,
+    "snapshot": "exported_arrow",
+    "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+    "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+    "controls_version": "typescript-context-controls-v1"
+  },
+  "events": [
+    {
+      "id": "109970ee-cf70-4bb4-b7dd-d91decb14a09:1",
+      "task_id": "exported_arrow",
+      "session_id": "109970ee-cf70-4bb4-b7dd-d91decb14a09",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "exported_arrow",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Locate the useNumber definition and references to trace the existing num call.",
+      "because": null,
+      "arguments": {
+        "query": "useNumber",
+        "kind": "symbol",
+        "lang": "typescript"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":null,\"_evaluation\":{\"event_id\":\"109970ee-cf70-4bb4-b7dd-d91decb14a09:1\",\"calls_remaining\":23}}",
+      "serialized_bytes": 341,
+      "source_bytes": 0,
+      "elapsed_ms": 1.7752500025380868,
+      "spans": []
+    },
+    {
+      "id": "109970ee-cf70-4bb4-b7dd-d91decb14a09:2",
+      "task_id": "exported_arrow",
+      "session_id": "109970ee-cf70-4bb4-b7dd-d91decb14a09",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "exported_arrow",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "grep",
+      "reason": "missing_context",
+      "detail": "Search source text for useNumber and num after the symbol index found no matching symbol.",
+      "because": "109970ee-cf70-4bb4-b7dd-d91decb14a09:1",
+      "arguments": {
+        "pattern": "useNumber|num",
+        "lang": "typescript"
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"unknown operation or parameters outside the fixed tool contract\"},\"_evaluation\":{\"event_id\":\"109970ee-cf70-4bb4-b7dd-d91decb14a09:2\",\"calls_remaining\":22}}",
+      "serialized_bytes": 196,
+      "source_bytes": 0,
+      "elapsed_ms": 0.07908299812697805,
+      "spans": []
+    },
+    {
+      "id": "109970ee-cf70-4bb4-b7dd-d91decb14a09:3",
+      "task_id": "exported_arrow",
+      "session_id": "109970ee-cf70-4bb4-b7dd-d91decb14a09",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "exported_arrow",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "grep",
+      "reason": "missing_context",
+      "detail": "Retry source-text search with only the supported grep parameter to locate the requested call.",
+      "because": "109970ee-cf70-4bb4-b7dd-d91decb14a09:2",
+      "arguments": {
+        "pattern": "useNumber|num"
+      },
+      "search_id": null,
+      "response_json": "{\"matches\":[{\"file\":\"consumer.ts\",\"line\":1,\"match\":\"import { num } from \\\"./number.js\\\";\",\"context_before\":[],\"context_after\":[\"export function useNumber(): number { return num(1); }\"]},{\"file\":\"consumer.ts\",\"line\":2,\"match\":\"export function useNumber(): number { return num(1); }\",\"context_before\":[\"import { num } from \\\"./number.js\\\";\"],\"context_after\":[]},{\"file\":\"number.ts\",\"line\":1,\"match\":\"export const num = (v: unknown): number => Number(v);\",\"context_before\":[],\"context_after\":[]}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_source_text\"},\"_evaluation\":{\"event_id\":\"109970ee-cf70-4bb4-b7dd-d91decb14a09:3\",\"calls_remaining\":21}}",
+      "serialized_bytes": 808,
+      "source_bytes": 229,
+      "elapsed_ms": 4.978499997378094,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 34,
+          "sha256": "7abba161ca11098291bc3d5cb39334394b602ec16edce67e1a07a2ff8e2b0851",
+          "text": "import { num } from \"./number.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 35,
+          "end_byte": 89,
+          "sha256": "756f20c8684603a680a43f19706246a34816d2eb3fffe73934c5bd77e5671ab7",
+          "text": "export function useNumber(): number { return num(1); }"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 35,
+          "end_byte": 89,
+          "sha256": "756f20c8684603a680a43f19706246a34816d2eb3fffe73934c5bd77e5671ab7",
+          "text": "export function useNumber(): number { return num(1); }"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 34,
+          "sha256": "7abba161ca11098291bc3d5cb39334394b602ec16edce67e1a07a2ff8e2b0851",
+          "text": "import { num } from \"./number.js\";"
+        },
+        {
+          "file": "number.ts",
+          "start_byte": 0,
+          "end_byte": 53,
+          "sha256": "810dc3f8822ef78dcc52869f17bade6f841f748d4ba39c29ab0315b75bf06bd4",
+          "text": "export const num = (v: unknown): number => Number(v);"
+        }
+      ]
+    },
+    {
+      "id": "109970ee-cf70-4bb4-b7dd-d91decb14a09:4",
+      "task_id": "exported_arrow",
+      "session_id": "109970ee-cf70-4bb4-b7dd-d91decb14a09",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "exported_arrow",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "file",
+      "reason": "hydration",
+      "detail": "Retrieve the exact useNumber source and existing num call.",
+      "because": null,
+      "arguments": {
+        "file_path": "consumer.ts"
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"consumer.ts\",\"content\":\"import { num } from \\\"./number.js\\\";\\nexport function useNumber(): number { return num(1); }\\n\",\"total_lines\":2,\"start_line\":1,\"end_line\":2,\"_evaluation\":{\"event_id\":\"109970ee-cf70-4bb4-b7dd-d91decb14a09:4\",\"calls_remaining\":20}}",
+      "serialized_bytes": 262,
+      "source_bytes": 90,
+      "elapsed_ms": 2.960624999104766,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 90,
+          "sha256": "4c8f61ea9624e51834550d03c47fb41379600aabf826329e36350be3c5d95611",
+          "text": "import { num } from \"./number.js\";\nexport function useNumber(): number { return num(1); }\n"
+        }
+      ]
+    },
+    {
+      "id": "109970ee-cf70-4bb4-b7dd-d91decb14a09:5",
+      "task_id": "exported_arrow",
+      "session_id": "109970ee-cf70-4bb4-b7dd-d91decb14a09",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "exported_arrow",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "file",
+      "reason": "hydration",
+      "detail": "Retrieve the exact num declaration to determine its origin, argument type, and return type.",
+      "because": null,
+      "arguments": {
+        "file_path": "number.ts"
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"number.ts\",\"content\":\"export const num = (v: unknown): number => Number(v);\\n\",\"total_lines\":1,\"start_line\":1,\"end_line\":1,\"_evaluation\":{\"event_id\":\"109970ee-cf70-4bb4-b7dd-d91decb14a09:5\",\"calls_remaining\":19}}",
+      "serialized_bytes": 221,
+      "source_bytes": 54,
+      "elapsed_ms": 3.178417002345668,
+      "spans": [
+        {
+          "file": "number.ts",
+          "start_byte": 0,
+          "end_byte": 54,
+          "sha256": "646cca2420cc8104e90cc2a26dbed15be5968c647bc1f1b55185a45b62df5dcd",
+          "text": "export const num = (v: unknown): number => Number(v);\n"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "exported_arrow",
+    "session_id": "109970ee-cf70-4bb4-b7dd-d91decb14a09",
+    "arm": "A",
+    "repetition": 2,
+    "snapshot": "exported_arrow",
+    "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+    "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+    "controls_version": "typescript-context-controls-v1",
+    "schema_version": 1,
+    "outcome": "completed",
+    "task_correct": true,
+    "answer": {
+      "origin_file": "number.ts",
+      "declaration_name": "num",
+      "argument_type": "unknown",
+      "return_type": "number",
+      "result": 1
+    },
+    "read_count": 5,
+    "avoidable_reads": null,
+    "proven_avoidable_reads": 0,
+    "lineage_status": "inconclusive",
+    "classifications": [
+      {
+        "event_id": "109970ee-cf70-4bb4-b7dd-d91decb14a09:1",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "109970ee-cf70-4bb4-b7dd-d91decb14a09:2",
+        "classification": "unproven",
+        "reason": "missing_context",
+        "because": "109970ee-cf70-4bb4-b7dd-d91decb14a09:1",
+        "recovered_gold": []
+      },
+      {
+        "event_id": "109970ee-cf70-4bb4-b7dd-d91decb14a09:3",
+        "classification": "unproven",
+        "reason": "missing_context",
+        "because": "109970ee-cf70-4bb4-b7dd-d91decb14a09:2",
+        "recovered_gold": []
+      },
+      {
+        "event_id": "109970ee-cf70-4bb4-b7dd-d91decb14a09:4",
+        "classification": "excluded",
+        "reason": "hydration",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "109970ee-cf70-4bb4-b7dd-d91decb14a09:5",
+        "classification": "excluded",
+        "reason": "hydration",
+        "because": null,
+        "recovered_gold": []
+      }
+    ],
+    "required_context_delivered": [
+      "callee",
+      "entry",
+      "import"
+    ],
+    "required_context_total": 3,
+    "context_recall": 1.0,
+    "serialized_tool_output_bytes": 1828,
+    "source_bytes": 373,
+    "estimated_source_tokens": 94,
+    "tool_elapsed_ms": 12.971874999493593,
+    "provider_usage": {
+      "input_tokens": 32947,
+      "cached_input_tokens": 21248,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 1040,
+      "reasoning_output_tokens": 647
+    },
+    "usage_semantics": "Codex turn.completed gross input; cached_input is a subset; output includes reasoning_output_tokens.",
+    "token_status": "measured"
+  },
+  "baseline": {
+    "end_to_end_seconds": 39.937909583000874,
+    "actual_process_seconds": 39.937909583000874,
+    "exit_code": 0,
+    "provider_thread_id": "01a08a09-17b5-7d01-ae78-c0533e201b1a",
+    "failures": [],
+    "tool_delivery_verified": true,
+    "relationships": {
+      "schema_version": 1,
+      "case_id": "exported_arrow",
+      "required_semantic_dependencies_total": 1,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "calls",
+          "to": "callee",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "exact_kind",
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "consumer.ts::useNumber#function",
+              "to": "number.ts::num#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "4c8f61ea9624e51834550d03c47fb41379600aabf826329e36350be3c5d95611"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "available_dependency_links_total": 1,
+      "available_dependency_links": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "calls",
+          "to": "callee",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "exact_kind",
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "consumer.ts::useNumber#function",
+              "to": "number.ts::num#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "4c8f61ea9624e51834550d03c47fb41379600aabf826329e36350be3c5d95611"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "dependency-link recall; references_type fallback is generic and does not establish precise subtype/kind recall",
+        "required": 1,
+        "available": 1,
+        "delivered": 0,
+        "available_ratio": 1.0,
+        "delivered_ratio": 0.0
+      },
+      "precise_kind_links_available_total": 1,
+      "precise_kind_links_delivered_total": 0,
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_scope": "authored frozen forbidden_relationships only; this is not exhaustive truth about unsupported or unrecorded edges"
+    }
+  }
+}

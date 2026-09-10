@@ -1,0 +1,419 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "task_id": "imported_heritage",
+    "session_id": "56c18116-f905-4f57-af6b-d4dd10e25c6e",
+    "arm": "A",
+    "repetition": 2,
+    "snapshot": "imported_heritage",
+    "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+    "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+    "controls_version": "typescript-context-controls-v1"
+  },
+  "events": [
+    {
+      "id": "56c18116-f905-4f57-af6b-d4dd10e25c6e:1",
+      "task_id": "imported_heritage",
+      "session_id": "56c18116-f905-4f57-af6b-d4dd10e25c6e",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "imported_heritage",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Locate Processor, ChildContract, and process definitions plus explicit inheritance/implementation declarations.",
+      "because": null,
+      "arguments": {
+        "query": "Processor ChildContract process",
+        "kind": "symbol"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":null,\"_evaluation\":{\"event_id\":\"56c18116-f905-4f57-af6b-d4dd10e25c6e:1\",\"calls_remaining\":23}}",
+      "serialized_bytes": 341,
+      "source_bytes": 0,
+      "elapsed_ms": 5.193542001507012,
+      "spans": []
+    },
+    {
+      "id": "56c18116-f905-4f57-af6b-d4dd10e25c6e:2",
+      "task_id": "imported_heritage",
+      "session_id": "56c18116-f905-4f57-af6b-d4dd10e25c6e",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "imported_heritage",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "grep",
+      "reason": "task_context",
+      "detail": "Search source text because symbol indexing did not return the requested declarations.",
+      "because": null,
+      "arguments": {
+        "pattern": "Processor|ChildContract|process|extends|implements",
+        "file_paths": []
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"unknown operation or parameters outside the fixed tool contract\"},\"_evaluation\":{\"event_id\":\"56c18116-f905-4f57-af6b-d4dd10e25c6e:2\",\"calls_remaining\":21}}",
+      "serialized_bytes": 196,
+      "source_bytes": 0,
+      "elapsed_ms": 0.03162499706377275,
+      "spans": []
+    },
+    {
+      "id": "56c18116-f905-4f57-af6b-d4dd10e25c6e:3",
+      "task_id": "imported_heritage",
+      "session_id": "56c18116-f905-4f57-af6b-d4dd10e25c6e",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "imported_heritage",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "grep",
+      "reason": "task_context",
+      "detail": "Search source text because symbol indexing did not return the requested declarations.",
+      "because": null,
+      "arguments": {
+        "pattern": "Processor|ChildContract|process|extends|implements"
+      },
+      "search_id": null,
+      "response_json": "{\"matches\":[{\"file\":\"consumer.ts\",\"line\":2,\"match\":\"export interface ChildContract extends Contract { amount: number; }\",\"context_before\":[\"import { Base, type Contract } from \\\"./types.js\\\";\"],\"context_after\":[\"export class Processor extends Base implements Contract {\",\"  process(): string { return this.requestId; }\"]},{\"file\":\"consumer.ts\",\"line\":3,\"match\":\"export class Processor extends Base implements Contract {\",\"context_before\":[\"import { Base, type Contract } from \\\"./types.js\\\";\",\"export interface ChildContract extends Contract { amount: number; }\"],\"context_after\":[\"  process(): string { return this.requestId; }\",\"}\"]},{\"file\":\"consumer.ts\",\"line\":4,\"match\":\"  process(): string { return this.requestId; }\",\"context_before\":[\"export interface ChildContract extends Contract { amount: number; }\",\"export class Processor extends Base implements Contract {\"],\"context_after\":[\"}\"]}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_source_text\"},\"_evaluation\":{\"event_id\":\"56c18116-f905-4f57-af6b-d4dd10e25c6e:3\",\"calls_remaining\":20}}",
+      "serialized_bytes": 1211,
+      "source_bytes": 610,
+      "elapsed_ms": 3.9142089990491513,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 50,
+          "end_byte": 117,
+          "sha256": "b46ab4210e76d9acfd72a8091dc77c02d0974faf40d2e54a6308e0c9109e1033",
+          "text": "export interface ChildContract extends Contract { amount: number; }"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 49,
+          "sha256": "b5817ebfa12ebbc88534fe4a00497806708b7e02d4bc7ef53bfed7ac5997f6bd",
+          "text": "import { Base, type Contract } from \"./types.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 118,
+          "end_byte": 175,
+          "sha256": "9962423d45c535270bade33d795167932f6aa7274328463f85c65f96f14c4b82",
+          "text": "export class Processor extends Base implements Contract {"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 176,
+          "end_byte": 222,
+          "sha256": "d7fbe74de5568933edf4e6857206d128b6a7dbc3c29ff24594a2c66c8fddd501",
+          "text": "  process(): string { return this.requestId; }"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 118,
+          "end_byte": 175,
+          "sha256": "9962423d45c535270bade33d795167932f6aa7274328463f85c65f96f14c4b82",
+          "text": "export class Processor extends Base implements Contract {"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 49,
+          "sha256": "b5817ebfa12ebbc88534fe4a00497806708b7e02d4bc7ef53bfed7ac5997f6bd",
+          "text": "import { Base, type Contract } from \"./types.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 50,
+          "end_byte": 117,
+          "sha256": "b46ab4210e76d9acfd72a8091dc77c02d0974faf40d2e54a6308e0c9109e1033",
+          "text": "export interface ChildContract extends Contract { amount: number; }"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 176,
+          "end_byte": 222,
+          "sha256": "d7fbe74de5568933edf4e6857206d128b6a7dbc3c29ff24594a2c66c8fddd501",
+          "text": "  process(): string { return this.requestId; }"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 223,
+          "end_byte": 224,
+          "sha256": "d10b36aa74a59bcf4a88185837f658afaf3646eff2bb16c3928d0e9335e945d2",
+          "text": "}"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 176,
+          "end_byte": 222,
+          "sha256": "d7fbe74de5568933edf4e6857206d128b6a7dbc3c29ff24594a2c66c8fddd501",
+          "text": "  process(): string { return this.requestId; }"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 50,
+          "end_byte": 117,
+          "sha256": "b46ab4210e76d9acfd72a8091dc77c02d0974faf40d2e54a6308e0c9109e1033",
+          "text": "export interface ChildContract extends Contract { amount: number; }"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 118,
+          "end_byte": 175,
+          "sha256": "9962423d45c535270bade33d795167932f6aa7274328463f85c65f96f14c4b82",
+          "text": "export class Processor extends Base implements Contract {"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 223,
+          "end_byte": 224,
+          "sha256": "d10b36aa74a59bcf4a88185837f658afaf3646eff2bb16c3928d0e9335e945d2",
+          "text": "}"
+        }
+      ]
+    },
+    {
+      "id": "56c18116-f905-4f57-af6b-d4dd10e25c6e:4",
+      "task_id": "imported_heritage",
+      "session_id": "56c18116-f905-4f57-af6b-d4dd10e25c6e",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "imported_heritage",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "file",
+      "reason": "hydration",
+      "detail": "Read the complete consumer source containing the explicit declarations and process body.",
+      "because": null,
+      "arguments": {
+        "file_path": "consumer.ts"
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"consumer.ts\",\"content\":\"import { Base, type Contract } from \\\"./types.js\\\";\\nexport interface ChildContract extends Contract { amount: number; }\\nexport class Processor extends Base implements Contract {\\n  process(): string { return this.requestId; }\\n}\\n\",\"total_lines\":5,\"start_line\":1,\"end_line\":5,\"_evaluation\":{\"event_id\":\"56c18116-f905-4f57-af6b-d4dd10e25c6e:4\",\"calls_remaining\":19}}",
+      "serialized_bytes": 400,
+      "source_bytes": 225,
+      "elapsed_ms": 3.5872089974873234,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 225,
+          "sha256": "477f3fd9026e6e693fd0ea1fd91e5ed54ec316ba77367e18ef8f71b7dd4ff365",
+          "text": "import { Base, type Contract } from \"./types.js\";\nexport interface ChildContract extends Contract { amount: number; }\nexport class Processor extends Base implements Contract {\n  process(): string { return this.requestId; }\n}\n"
+        }
+      ]
+    },
+    {
+      "id": "56c18116-f905-4f57-af6b-d4dd10e25c6e:5",
+      "task_id": "imported_heritage",
+      "session_id": "56c18116-f905-4f57-af6b-d4dd10e25c6e",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "imported_heritage",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "file",
+      "reason": "hydration",
+      "detail": "Read the imported type/base definitions to identify inherited_field and initial_value used by process.",
+      "because": null,
+      "arguments": {
+        "file_path": "types.ts"
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"types.ts\",\"content\":\"export interface Contract { requestId: string; }\\nexport class Base { requestId: string = \\\"base\\\"; }\\n\",\"total_lines\":2,\"start_line\":1,\"end_line\":2,\"_evaluation\":{\"event_id\":\"56c18116-f905-4f57-af6b-d4dd10e25c6e:5\",\"calls_remaining\":18}}",
+      "serialized_bytes": 268,
+      "source_bytes": 99,
+      "elapsed_ms": 2.3032499993860256,
+      "spans": [
+        {
+          "file": "types.ts",
+          "start_byte": 0,
+          "end_byte": 99,
+          "sha256": "81c0c5b3aa4070ca36c0a1cd734dc3648f9ad2499c9244b9cc4611bfdd5c4ca2",
+          "text": "export interface Contract { requestId: string; }\nexport class Base { requestId: string = \"base\"; }\n"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "imported_heritage",
+    "session_id": "56c18116-f905-4f57-af6b-d4dd10e25c6e",
+    "arm": "A",
+    "repetition": 2,
+    "snapshot": "imported_heritage",
+    "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+    "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+    "controls_version": "typescript-context-controls-v1",
+    "schema_version": 1,
+    "outcome": "tool_failure",
+    "task_correct": false,
+    "answer": {
+      "Processor_extends": [
+        "Base"
+      ],
+      "Processor_implements": [
+        "Contract"
+      ],
+      "ChildContract_extends": [
+        "Contract"
+      ],
+      "inherited_field": "requestId",
+      "initial_value": "base"
+    },
+    "read_count": 5,
+    "avoidable_reads": 0,
+    "proven_avoidable_reads": 0,
+    "lineage_status": "complete",
+    "classifications": [
+      {
+        "event_id": "56c18116-f905-4f57-af6b-d4dd10e25c6e:1",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "56c18116-f905-4f57-af6b-d4dd10e25c6e:2",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "56c18116-f905-4f57-af6b-d4dd10e25c6e:3",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "56c18116-f905-4f57-af6b-d4dd10e25c6e:4",
+        "classification": "excluded",
+        "reason": "hydration",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "56c18116-f905-4f57-af6b-d4dd10e25c6e:5",
+        "classification": "excluded",
+        "reason": "hydration",
+        "because": null,
+        "recovered_gold": []
+      }
+    ],
+    "required_context_delivered": [
+      "base",
+      "child",
+      "contract",
+      "entry",
+      "import"
+    ],
+    "required_context_total": 5,
+    "context_recall": 1.0,
+    "serialized_tool_output_bytes": 2416,
+    "source_bytes": 934,
+    "estimated_source_tokens": 234,
+    "tool_elapsed_ms": 15.029834994493285,
+    "provider_usage": {
+      "input_tokens": 39108,
+      "cached_input_tokens": 32000,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 723,
+      "reasoning_output_tokens": 291
+    },
+    "usage_semantics": "Codex turn.completed gross input; cached_input is a subset; output includes reasoning_output_tokens.",
+    "token_status": "measured"
+  },
+  "baseline": {
+    "end_to_end_seconds": 27.362561958001606,
+    "actual_process_seconds": 27.362561958001606,
+    "exit_code": 0,
+    "provider_thread_id": "01a08a03-5c02-77e0-9f03-1349f0556914",
+    "failures": [
+      {
+        "event_id": "56c18116-f905-4f57-af6b-d4dd10e25c6e:2",
+        "category": "invalid_trace",
+        "message": "causal parent must be an earlier event in this run"
+      },
+      {
+        "category": "unaccounted_tool_output",
+        "item": "item_3"
+      }
+    ],
+    "tool_delivery_verified": false,
+    "relationships": {
+      "schema_version": 1,
+      "case_id": "imported_heritage",
+      "required_semantic_dependencies_total": 3,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "extends",
+          "to": "base",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "generic_references_type",
+          "available": false,
+          "delivered": false,
+          "available_edges": [],
+          "delivered_edges": []
+        },
+        {
+          "index": 1,
+          "from": "entry",
+          "kind": "implements",
+          "to": "contract",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "generic_references_type",
+          "available": false,
+          "delivered": false,
+          "available_edges": [],
+          "delivered_edges": []
+        },
+        {
+          "index": 2,
+          "from": "child",
+          "kind": "extends",
+          "to": "contract",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "generic_references_type",
+          "available": false,
+          "delivered": false,
+          "available_edges": [],
+          "delivered_edges": []
+        }
+      ],
+      "available_dependency_links_total": 0,
+      "available_dependency_links": [],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "dependency-link recall; references_type fallback is generic and does not establish precise subtype/kind recall",
+        "required": 3,
+        "available": 0,
+        "delivered": 0,
+        "available_ratio": 0.0,
+        "delivered_ratio": 0.0
+      },
+      "precise_kind_links_available_total": 0,
+      "precise_kind_links_delivered_total": 0,
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_scope": "authored frozen forbidden_relationships only; this is not exhaustive truth about unsupported or unrecorded edges"
+    }
+  }
+}

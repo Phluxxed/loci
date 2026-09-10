@@ -1,0 +1,316 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "task_id": "local_alias_chain",
+    "session_id": "21bd9fab-7c20-4ff8-a1b8-388933dac728",
+    "arm": "A",
+    "repetition": 2,
+    "snapshot": "local_alias_chain",
+    "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+    "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+    "controls_version": "typescript-context-controls-v1"
+  },
+  "events": [
+    {
+      "id": "21bd9fab-7c20-4ff8-a1b8-388933dac728:1",
+      "task_id": "local_alias_chain",
+      "session_id": "21bd9fab-7c20-4ff8-a1b8-388933dac728",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "local_alias_chain",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Find the processOrder declaration and related symbols before retrieving exact source.",
+      "because": null,
+      "arguments": {
+        "query": "processOrder",
+        "kind": "symbol"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":1,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":null,\"_evaluation\":{\"event_id\":\"21bd9fab-7c20-4ff8-a1b8-388933dac728:1\",\"calls_remaining\":23}}",
+      "serialized_bytes": 341,
+      "source_bytes": 0,
+      "elapsed_ms": 3.7227499997243285,
+      "spans": []
+    },
+    {
+      "id": "21bd9fab-7c20-4ff8-a1b8-388933dac728:2",
+      "task_id": "local_alias_chain",
+      "session_id": "21bd9fab-7c20-4ff8-a1b8-388933dac728",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "local_alias_chain",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "grep",
+      "reason": "missing_context",
+      "detail": "The symbol search returned no indexed symbols, so search source text for the processOrder declaration and uses.",
+      "because": "21bd9fab-7c20-4ff8-a1b8-388933dac728:1",
+      "arguments": {
+        "pattern": "processOrder",
+        "file_paths": []
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"unknown operation or parameters outside the fixed tool contract\"},\"_evaluation\":{\"event_id\":\"21bd9fab-7c20-4ff8-a1b8-388933dac728:2\",\"calls_remaining\":22}}",
+      "serialized_bytes": 196,
+      "source_bytes": 0,
+      "elapsed_ms": 0.03899999865097925,
+      "spans": []
+    },
+    {
+      "id": "21bd9fab-7c20-4ff8-a1b8-388933dac728:3",
+      "task_id": "local_alias_chain",
+      "session_id": "21bd9fab-7c20-4ff8-a1b8-388933dac728",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "local_alias_chain",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "grep",
+      "reason": "missing_context",
+      "detail": "The symbol search returned no indexed symbols, so search source text for the processOrder declaration and uses.",
+      "because": "21bd9fab-7c20-4ff8-a1b8-388933dac728:1",
+      "arguments": {
+        "pattern": "processOrder"
+      },
+      "search_id": null,
+      "response_json": "{\"matches\":[{\"file\":\"consumer.ts\",\"line\":7,\"match\":\"export function processOrder(value: Second): string {\",\"context_before\":[\"export type First = Payload;\",\"export type Second = First;\"],\"context_after\":[\"  return value.requestId;\",\"}\"]}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":1,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_source_text\"},\"_evaluation\":{\"event_id\":\"21bd9fab-7c20-4ff8-a1b8-388933dac728:3\",\"calls_remaining\":21}}",
+      "serialized_bytes": 553,
+      "source_bytes": 134,
+      "elapsed_ms": 1.793208000890445,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 125,
+          "end_byte": 178,
+          "sha256": "6a8b887ef056986559f59428ab81dbcf4e04a0b5c87602d323bad2d4c3f1da86",
+          "text": "export function processOrder(value: Second): string {"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 68,
+          "end_byte": 96,
+          "sha256": "80bef12918c55e27625164bdace3f21b02b6d7648b5fc81accba81146bc97c9a",
+          "text": "export type First = Payload;"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 97,
+          "end_byte": 124,
+          "sha256": "8982bed48e15990ae192093ccf66b7c4ea0466088d273a61d808b15826a83d20",
+          "text": "export type Second = First;"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 179,
+          "end_byte": 204,
+          "sha256": "52108b3c17d20da37a243364c69672d319e5a9514480c7eaba140541592c2abc",
+          "text": "  return value.requestId;"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 205,
+          "end_byte": 206,
+          "sha256": "d10b36aa74a59bcf4a88185837f658afaf3646eff2bb16c3928d0e9335e945d2",
+          "text": "}"
+        }
+      ]
+    },
+    {
+      "id": "21bd9fab-7c20-4ff8-a1b8-388933dac728:4",
+      "task_id": "local_alias_chain",
+      "session_id": "21bd9fab-7c20-4ff8-a1b8-388933dac728",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "local_alias_chain",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "file",
+      "reason": "hydration",
+      "detail": "Retrieve the complete small source file containing processOrder, its aliases, and the referenced field declaration.",
+      "because": null,
+      "arguments": {
+        "file_path": "consumer.ts",
+        "start_line": 1,
+        "end_line": 80
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"consumer.ts\",\"content\":\"export interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\\nexport type First = Payload;\\nexport type Second = First;\\nexport function processOrder(value: Second): string {\\n  return value.requestId;\\n}\\n\",\"total_lines\":9,\"start_line\":1,\"end_line\":9,\"_evaluation\":{\"event_id\":\"21bd9fab-7c20-4ff8-a1b8-388933dac728:4\",\"calls_remaining\":20}}",
+      "serialized_bytes": 384,
+      "source_bytes": 207,
+      "elapsed_ms": 2.270249999128282,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 207,
+          "sha256": "d320775dc9313d913ae2aae04106dbc971b7dac6034d77668ffca7606732a535",
+          "text": "export interface Payload {\n  requestId: string;\n  amount: number;\n}\nexport type First = Payload;\nexport type Second = First;\nexport function processOrder(value: Second): string {\n  return value.requestId;\n}\n"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "local_alias_chain",
+    "session_id": "21bd9fab-7c20-4ff8-a1b8-388933dac728",
+    "arm": "A",
+    "repetition": 2,
+    "snapshot": "local_alias_chain",
+    "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+    "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+    "controls_version": "typescript-context-controls-v1",
+    "schema_version": 1,
+    "outcome": "completed",
+    "task_correct": true,
+    "answer": {
+      "required_fields": {
+        "amount": "number",
+        "requestId": "string"
+      },
+      "return_type": "string",
+      "returned_field": "requestId",
+      "origin_file": "consumer.ts",
+      "alias_chain": [
+        "Second",
+        "First",
+        "Payload"
+      ]
+    },
+    "read_count": 4,
+    "avoidable_reads": null,
+    "proven_avoidable_reads": 0,
+    "lineage_status": "inconclusive",
+    "classifications": [
+      {
+        "event_id": "21bd9fab-7c20-4ff8-a1b8-388933dac728:1",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "21bd9fab-7c20-4ff8-a1b8-388933dac728:2",
+        "classification": "unproven",
+        "reason": "missing_context",
+        "because": "21bd9fab-7c20-4ff8-a1b8-388933dac728:1",
+        "recovered_gold": []
+      },
+      {
+        "event_id": "21bd9fab-7c20-4ff8-a1b8-388933dac728:3",
+        "classification": "unproven",
+        "reason": "missing_context",
+        "because": "21bd9fab-7c20-4ff8-a1b8-388933dac728:1",
+        "recovered_gold": []
+      },
+      {
+        "event_id": "21bd9fab-7c20-4ff8-a1b8-388933dac728:4",
+        "classification": "excluded",
+        "reason": "hydration",
+        "because": null,
+        "recovered_gold": []
+      }
+    ],
+    "required_context_delivered": [
+      "entry",
+      "first",
+      "payload",
+      "second"
+    ],
+    "required_context_total": 4,
+    "context_recall": 1.0,
+    "serialized_tool_output_bytes": 1474,
+    "source_bytes": 341,
+    "estimated_source_tokens": 86,
+    "tool_elapsed_ms": 7.825207998394035,
+    "provider_usage": {
+      "input_tokens": 26895,
+      "cached_input_tokens": 13568,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 657,
+      "reasoning_output_tokens": 288
+    },
+    "usage_semantics": "Codex turn.completed gross input; cached_input is a subset; output includes reasoning_output_tokens.",
+    "token_status": "measured"
+  },
+  "baseline": {
+    "end_to_end_seconds": 20.750979124997684,
+    "actual_process_seconds": 20.750979124997684,
+    "exit_code": 0,
+    "provider_thread_id": "01a089fc-7465-78d3-90a4-25cd177559f1",
+    "failures": [],
+    "tool_delivery_verified": true,
+    "relationships": {
+      "schema_version": 1,
+      "case_id": "local_alias_chain",
+      "required_semantic_dependencies_total": 3,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "second",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "generic_references_type",
+          "available": false,
+          "delivered": false,
+          "available_edges": [],
+          "delivered_edges": []
+        },
+        {
+          "index": 1,
+          "from": "second",
+          "kind": "alias_of",
+          "to": "first",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "generic_references_type",
+          "available": false,
+          "delivered": false,
+          "available_edges": [],
+          "delivered_edges": []
+        },
+        {
+          "index": 2,
+          "from": "first",
+          "kind": "alias_of",
+          "to": "payload",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "generic_references_type",
+          "available": false,
+          "delivered": false,
+          "available_edges": [],
+          "delivered_edges": []
+        }
+      ],
+      "available_dependency_links_total": 0,
+      "available_dependency_links": [],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "dependency-link recall; references_type fallback is generic and does not establish precise subtype/kind recall",
+        "required": 3,
+        "available": 0,
+        "delivered": 0,
+        "available_ratio": 0.0,
+        "delivered_ratio": 0.0
+      },
+      "precise_kind_links_available_total": 0,
+      "precise_kind_links_delivered_total": 0,
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_scope": "authored frozen forbidden_relationships only; this is not exhaustive truth about unsupported or unrecorded edges"
+    }
+  }
+}

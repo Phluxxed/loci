@@ -1,0 +1,412 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "task_id": "generic_shadow",
+    "session_id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad",
+    "arm": "A",
+    "repetition": 1,
+    "snapshot": "generic_shadow",
+    "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+    "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+    "controls_version": "typescript-context-controls-v1"
+  },
+  "events": [
+    {
+      "id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad:1",
+      "task_id": "generic_shadow",
+      "session_id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "generic_shadow",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Locate processOrder and its surrounding declarations.",
+      "because": null,
+      "arguments": {
+        "query": "processOrder",
+        "kind": "symbol"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":null,\"_evaluation\":{\"event_id\":\"a907e636-75e6-49d5-bdd7-c8fcd57b5fad:1\",\"calls_remaining\":23}}",
+      "serialized_bytes": 341,
+      "source_bytes": 0,
+      "elapsed_ms": 3.6633749987231568,
+      "spans": []
+    },
+    {
+      "id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad:2",
+      "task_id": "generic_shadow",
+      "session_id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "generic_shadow",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "grep",
+      "reason": "missing_context",
+      "detail": "The symbol search found no indexed symbol; search source text for the function and Payload declarations.",
+      "because": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad:1",
+      "arguments": {
+        "pattern": "processOrder|Payload",
+        "file_paths": [
+          "."
+        ]
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"unknown operation or parameters outside the fixed tool contract\"},\"_evaluation\":{\"event_id\":\"a907e636-75e6-49d5-bdd7-c8fcd57b5fad:2\",\"calls_remaining\":22}}",
+      "serialized_bytes": 196,
+      "source_bytes": 0,
+      "elapsed_ms": 0.07695900058024563,
+      "spans": []
+    },
+    {
+      "id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad:3",
+      "task_id": "generic_shadow",
+      "session_id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "generic_shadow",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "grep",
+      "reason": "missing_context",
+      "detail": "Retry text search with the supported grep parameters to find processOrder and Payload.",
+      "because": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad:2",
+      "arguments": {
+        "pattern": "processOrder|Payload"
+      },
+      "search_id": null,
+      "response_json": "{\"matches\":[{\"file\":\"consumer.ts\",\"line\":1,\"match\":\"import type { Payload } from \\\"./types.js\\\";\",\"context_before\":[],\"context_after\":[\"export function processOrder<Payload>(value: Payload): Payload {\",\"  return value;\"]},{\"file\":\"consumer.ts\",\"line\":2,\"match\":\"export function processOrder<Payload>(value: Payload): Payload {\",\"context_before\":[\"import type { Payload } from \\\"./types.js\\\";\"],\"context_after\":[\"  return value;\",\"}\"]},{\"file\":\"types.ts\",\"line\":1,\"match\":\"export interface Payload {\",\"context_before\":[],\"context_after\":[\"  requestId: string;\",\"  amount: number;\"]}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_source_text\"},\"_evaluation\":{\"event_id\":\"a907e636-75e6-49d5-bdd7-c8fcd57b5fad:3\",\"calls_remaining\":21}}",
+      "serialized_bytes": 897,
+      "source_bytes": 306,
+      "elapsed_ms": 3.4443330005160533,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 42,
+          "sha256": "46353b46eca358aa0745e702bd66af5611fafd57a43ff64218823ec5c4ac2c4a",
+          "text": "import type { Payload } from \"./types.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 43,
+          "end_byte": 107,
+          "sha256": "81a17bdbe16c6dd691b099bbc048e2c064023b871d3d1f381b65392dba46ab23",
+          "text": "export function processOrder<Payload>(value: Payload): Payload {"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 108,
+          "end_byte": 123,
+          "sha256": "0a9f70aef3ab5f9deb61ce3b95c9df5e5bc7bec0e1c1b8d6d8694c44b25279a8",
+          "text": "  return value;"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 43,
+          "end_byte": 107,
+          "sha256": "81a17bdbe16c6dd691b099bbc048e2c064023b871d3d1f381b65392dba46ab23",
+          "text": "export function processOrder<Payload>(value: Payload): Payload {"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 42,
+          "sha256": "46353b46eca358aa0745e702bd66af5611fafd57a43ff64218823ec5c4ac2c4a",
+          "text": "import type { Payload } from \"./types.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 108,
+          "end_byte": 123,
+          "sha256": "0a9f70aef3ab5f9deb61ce3b95c9df5e5bc7bec0e1c1b8d6d8694c44b25279a8",
+          "text": "  return value;"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 124,
+          "end_byte": 125,
+          "sha256": "d10b36aa74a59bcf4a88185837f658afaf3646eff2bb16c3928d0e9335e945d2",
+          "text": "}"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 0,
+          "end_byte": 26,
+          "sha256": "b3eae13f7db3b7d30557d5970023fad309c1b45179e52e0bd0d725b8bb90feb1",
+          "text": "export interface Payload {"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 27,
+          "end_byte": 47,
+          "sha256": "2b9b456f1b378296cf05a3073cef45eebf39d5585dc12ad96c2c10d50b20e0fe",
+          "text": "  requestId: string;"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 48,
+          "end_byte": 65,
+          "sha256": "e0c2874bd0f1502da6ed3b80183482cd366550fba16ad2f57ef8aea917b1053b",
+          "text": "  amount: number;"
+        }
+      ]
+    },
+    {
+      "id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad:4",
+      "task_id": "generic_shadow",
+      "session_id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "generic_shadow",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "outline",
+      "reason": "task_context",
+      "detail": "Inspect the consumer module structure and confirm the local generic declaration.",
+      "because": null,
+      "arguments": {
+        "file": "consumer.ts"
+      },
+      "search_id": null,
+      "response_json": "{\"files\":[{\"file\":\"consumer.ts\",\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"line\":2,\"end_line\":4,\"signature\":\"function processOrder<Payload>(value: Payload): Payload {\",\"summary\":\"\"},{\"id\":\"consumer.ts::__file__#file\",\"name\":\"consumer.ts\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"consumer.ts\",\"summary\":\"\"}]}],\"_evaluation\":{\"event_id\":\"a907e636-75e6-49d5-bdd7-c8fcd57b5fad:4\",\"calls_remaining\":20}}",
+      "serialized_bytes": 458,
+      "source_bytes": 0,
+      "elapsed_ms": 4.696415999205783,
+      "spans": []
+    },
+    {
+      "id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad:5",
+      "task_id": "generic_shadow",
+      "session_id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "generic_shadow",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "get",
+      "reason": "hydration",
+      "detail": "Retrieve the exact processOrder source, including its import and generic parameter.",
+      "because": null,
+      "arguments": {
+        "symbol_ids": [
+          "consumer.ts::processOrder#function"
+        ],
+        "context": 4
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"source\":\"function processOrder<Payload>(value: Payload): Payload {\\n  return value;\\n}\",\"byte_offset\":50,\"byte_length\":75,\"line\":2,\"end_line\":4,\"signature\":\"function processOrder<Payload>(value: Payload): Payload {\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import type { Payload } from \\\"./types.js\\\";\"],\"context_after\":[]}],\"_evaluation\":{\"event_id\":\"a907e636-75e6-49d5-bdd7-c8fcd57b5fad:5\",\"calls_remaining\":19}}",
+      "serialized_bytes": 490,
+      "source_bytes": 117,
+      "elapsed_ms": 3.369915997609496,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 50,
+          "end_byte": 125,
+          "sha256": "a7f1bd1d2f32f65dbf5e981e72b28e6a76073e527a2390f14708fda7dee1708a",
+          "text": "function processOrder<Payload>(value: Payload): Payload {\n  return value;\n}"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 42,
+          "sha256": "46353b46eca358aa0745e702bd66af5611fafd57a43ff64218823ec5c4ac2c4a",
+          "text": "import type { Payload } from \"./types.js\";"
+        }
+      ]
+    },
+    {
+      "id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad:6",
+      "task_id": "generic_shadow",
+      "session_id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "generic_shadow",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "outline",
+      "reason": "task_context",
+      "detail": "Inspect the imported Payload interface declaration and its fields.",
+      "because": null,
+      "arguments": {
+        "file": "types.ts"
+      },
+      "search_id": null,
+      "response_json": "{\"files\":[{\"file\":\"types.ts\",\"symbols\":[{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"kind\":\"interface\",\"line\":1,\"end_line\":4,\"signature\":\"interface Payload {\",\"summary\":\"\"},{\"id\":\"types.ts::__file__#file\",\"name\":\"types.ts\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"types.ts\",\"summary\":\"\"}]}],\"_evaluation\":{\"event_id\":\"a907e636-75e6-49d5-bdd7-c8fcd57b5fad:6\",\"calls_remaining\":18}}",
+      "serialized_bytes": 397,
+      "source_bytes": 0,
+      "elapsed_ms": 2.379082998231752,
+      "spans": []
+    },
+    {
+      "id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad:7",
+      "task_id": "generic_shadow",
+      "session_id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "generic_shadow",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "get",
+      "reason": "hydration",
+      "detail": "Retrieve the exact imported Payload interface fields for round-trip requirements.",
+      "because": null,
+      "arguments": {
+        "symbol_ids": [
+          "types.ts::Payload#interface"
+        ],
+        "context": 1
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"types.ts::Payload#interface\",\"source\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\",\"byte_offset\":7,\"byte_length\":60,\"line\":1,\"end_line\":4,\"signature\":\"interface Payload {\",\"kind\":\"interface\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"event_id\":\"a907e636-75e6-49d5-bdd7-c8fcd57b5fad:7\",\"calls_remaining\":17}}",
+      "serialized_bytes": 385,
+      "source_bytes": 60,
+      "elapsed_ms": 3.088290999585297,
+      "spans": [
+        {
+          "file": "types.ts",
+          "start_byte": 7,
+          "end_byte": 67,
+          "sha256": "1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d",
+          "text": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "generic_shadow",
+    "session_id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad",
+    "arm": "A",
+    "repetition": 1,
+    "snapshot": "generic_shadow",
+    "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+    "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+    "controls_version": "typescript-context-controls-v1",
+    "schema_version": 1,
+    "outcome": "completed",
+    "task_correct": true,
+    "answer": {
+      "parameter_kind": "local_generic",
+      "requires_imported_fields": false,
+      "number_round_trip": true,
+      "string_round_trip": true
+    },
+    "read_count": 7,
+    "avoidable_reads": null,
+    "proven_avoidable_reads": 0,
+    "lineage_status": "inconclusive",
+    "classifications": [
+      {
+        "event_id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad:1",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad:2",
+        "classification": "unproven",
+        "reason": "missing_context",
+        "because": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad:1",
+        "recovered_gold": []
+      },
+      {
+        "event_id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad:3",
+        "classification": "unproven",
+        "reason": "missing_context",
+        "because": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad:2",
+        "recovered_gold": []
+      },
+      {
+        "event_id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad:4",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad:5",
+        "classification": "excluded",
+        "reason": "hydration",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad:6",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "a907e636-75e6-49d5-bdd7-c8fcd57b5fad:7",
+        "classification": "excluded",
+        "reason": "hydration",
+        "because": null,
+        "recovered_gold": []
+      }
+    ],
+    "required_context_delivered": [],
+    "required_context_total": 2,
+    "context_recall": 0.0,
+    "serialized_tool_output_bytes": 3164,
+    "source_bytes": 483,
+    "estimated_source_tokens": 121,
+    "tool_elapsed_ms": 20.718372994451784,
+    "provider_usage": {
+      "input_tokens": 45893,
+      "cached_input_tokens": 35072,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 820,
+      "reasoning_output_tokens": 349
+    },
+    "usage_semantics": "Codex turn.completed gross input; cached_input is a subset; output includes reasoning_output_tokens.",
+    "token_status": "measured"
+  },
+  "baseline": {
+    "end_to_end_seconds": 26.840201750001142,
+    "actual_process_seconds": 26.840201750001142,
+    "exit_code": 0,
+    "provider_thread_id": "01a08a06-9d62-7440-8628-09f88b16642a",
+    "failures": [],
+    "tool_delivery_verified": true,
+    "relationships": {
+      "schema_version": 1,
+      "case_id": "generic_shadow",
+      "required_semantic_dependencies_total": 0,
+      "required_semantic_dependencies": [],
+      "available_dependency_links_total": 0,
+      "available_dependency_links": [],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "dependency-link recall; references_type fallback is generic and does not establish precise subtype/kind recall",
+        "required": 0,
+        "available": 0,
+        "delivered": 0,
+        "available_ratio": null,
+        "delivered_ratio": null
+      },
+      "precise_kind_links_available_total": 0,
+      "precise_kind_links_delivered_total": 0,
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_scope": "authored frozen forbidden_relationships only; this is not exhaustive truth about unsupported or unrecorded edges"
+    }
+  }
+}

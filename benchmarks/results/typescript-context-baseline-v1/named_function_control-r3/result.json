@@ -1,0 +1,351 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "task_id": "named_function_control",
+    "session_id": "dadd5fbd-4041-4584-a093-1e550930cd85",
+    "arm": "A",
+    "repetition": 3,
+    "snapshot": "named_function_control",
+    "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+    "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+    "controls_version": "typescript-context-controls-v1"
+  },
+  "events": [
+    {
+      "id": "dadd5fbd-4041-4584-a093-1e550930cd85:1",
+      "task_id": "named_function_control",
+      "session_id": "dadd5fbd-4041-4584-a093-1e550930cd85",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "named_function_control",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Locate useNumber and the num call for the requested trace.",
+      "because": null,
+      "arguments": {
+        "query": "useNumber num",
+        "kind": "symbol"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":null,\"_evaluation\":{\"event_id\":\"dadd5fbd-4041-4584-a093-1e550930cd85:1\",\"calls_remaining\":23}}",
+      "serialized_bytes": 341,
+      "source_bytes": 0,
+      "elapsed_ms": 2.624666998599423,
+      "spans": []
+    },
+    {
+      "id": "dadd5fbd-4041-4584-a093-1e550930cd85:2",
+      "task_id": "named_function_control",
+      "session_id": "dadd5fbd-4041-4584-a093-1e550930cd85",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "named_function_control",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "grep",
+      "reason": "missing_context",
+      "detail": "The symbol search found no indexed symbols; search source text for the function and call sites.",
+      "because": "dadd5fbd-4041-4584-a093-1e550930cd85:1",
+      "arguments": {
+        "pattern": "useNumber|num\\s*\\(",
+        "file_paths": []
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"unknown operation or parameters outside the fixed tool contract\"},\"_evaluation\":{\"event_id\":\"dadd5fbd-4041-4584-a093-1e550930cd85:2\",\"calls_remaining\":22}}",
+      "serialized_bytes": 196,
+      "source_bytes": 0,
+      "elapsed_ms": 0.046541998017346486,
+      "spans": []
+    },
+    {
+      "id": "dadd5fbd-4041-4584-a093-1e550930cd85:3",
+      "task_id": "named_function_control",
+      "session_id": "dadd5fbd-4041-4584-a093-1e550930cd85",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "named_function_control",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "grep",
+      "reason": "missing_context",
+      "detail": "Retry source-text search using the fixed grep contract.",
+      "because": "dadd5fbd-4041-4584-a093-1e550930cd85:2",
+      "arguments": {
+        "pattern": "useNumber|num\\s*\\("
+      },
+      "search_id": null,
+      "response_json": "{\"matches\":[{\"file\":\"consumer.ts\",\"line\":2,\"match\":\"export function useNumber(): number { return num(1); }\",\"context_before\":[\"import { num } from \\\"./number.js\\\";\"],\"context_after\":[]},{\"file\":\"number.ts\",\"line\":1,\"match\":\"export function num(v: unknown): number { return Number(v); }\",\"context_before\":[],\"context_after\":[]}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_source_text\"},\"_evaluation\":{\"event_id\":\"dadd5fbd-4041-4584-a093-1e550930cd85:3\",\"calls_remaining\":21}}",
+      "serialized_bytes": 642,
+      "source_bytes": 149,
+      "elapsed_ms": 4.172500001004664,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 35,
+          "end_byte": 89,
+          "sha256": "756f20c8684603a680a43f19706246a34816d2eb3fffe73934c5bd77e5671ab7",
+          "text": "export function useNumber(): number { return num(1); }"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 34,
+          "sha256": "7abba161ca11098291bc3d5cb39334394b602ec16edce67e1a07a2ff8e2b0851",
+          "text": "import { num } from \"./number.js\";"
+        },
+        {
+          "file": "number.ts",
+          "start_byte": 0,
+          "end_byte": 61,
+          "sha256": "83034f0261718f9fe25ff7998654abc4eadda3e9ab370161f81590c0625010eb",
+          "text": "export function num(v: unknown): number { return Number(v); }"
+        }
+      ]
+    },
+    {
+      "id": "dadd5fbd-4041-4584-a093-1e550930cd85:4",
+      "task_id": "named_function_control",
+      "session_id": "dadd5fbd-4041-4584-a093-1e550930cd85",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "named_function_control",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "file",
+      "reason": "hydration",
+      "detail": "Read the exact useNumber source and its import context.",
+      "because": null,
+      "arguments": {
+        "file_path": "consumer.ts",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"consumer.ts\",\"content\":\"import { num } from \\\"./number.js\\\";\\nexport function useNumber(): number { return num(1); }\\n\",\"total_lines\":2,\"start_line\":1,\"end_line\":2,\"_evaluation\":{\"event_id\":\"dadd5fbd-4041-4584-a093-1e550930cd85:4\",\"calls_remaining\":20}}",
+      "serialized_bytes": 262,
+      "source_bytes": 90,
+      "elapsed_ms": 3.5678749991348013,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 90,
+          "sha256": "4c8f61ea9624e51834550d03c47fb41379600aabf826329e36350be3c5d95611",
+          "text": "import { num } from \"./number.js\";\nexport function useNumber(): number { return num(1); }\n"
+        }
+      ]
+    },
+    {
+      "id": "dadd5fbd-4041-4584-a093-1e550930cd85:5",
+      "task_id": "named_function_control",
+      "session_id": "dadd5fbd-4041-4584-a093-1e550930cd85",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "named_function_control",
+      "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+      "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+      "controls_version": "typescript-context-controls-v1",
+      "operation": "file",
+      "reason": "hydration",
+      "detail": "Read the exact num declaration to determine its parameter and return types.",
+      "because": null,
+      "arguments": {
+        "file_path": "number.ts",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"number.ts\",\"content\":\"export function num(v: unknown): number { return Number(v); }\\n\",\"total_lines\":1,\"start_line\":1,\"end_line\":1,\"_evaluation\":{\"event_id\":\"dadd5fbd-4041-4584-a093-1e550930cd85:5\",\"calls_remaining\":19}}",
+      "serialized_bytes": 229,
+      "source_bytes": 62,
+      "elapsed_ms": 3.205458000593353,
+      "spans": [
+        {
+          "file": "number.ts",
+          "start_byte": 0,
+          "end_byte": 62,
+          "sha256": "fd4faf4eb61a52141f00d29b7a0106098e28da37b480e9c424bfc8247eef2871",
+          "text": "export function num(v: unknown): number { return Number(v); }\n"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "named_function_control",
+    "session_id": "dadd5fbd-4041-4584-a093-1e550930cd85",
+    "arm": "A",
+    "repetition": 3,
+    "snapshot": "named_function_control",
+    "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+    "controls_sha256": "ebc9d2b036510355bedbb58e57c89e707065516d4d6918db69fa3eb3fe67c4ef",
+    "controls_version": "typescript-context-controls-v1",
+    "schema_version": 1,
+    "outcome": "completed",
+    "task_correct": false,
+    "answer": {
+      "origin_file": "number.ts",
+      "declaration_name": "num",
+      "argument_type": "number",
+      "return_type": "number",
+      "result": 1
+    },
+    "read_count": 5,
+    "avoidable_reads": null,
+    "proven_avoidable_reads": 0,
+    "lineage_status": "inconclusive",
+    "classifications": [
+      {
+        "event_id": "dadd5fbd-4041-4584-a093-1e550930cd85:1",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "dadd5fbd-4041-4584-a093-1e550930cd85:2",
+        "classification": "unproven",
+        "reason": "missing_context",
+        "because": "dadd5fbd-4041-4584-a093-1e550930cd85:1",
+        "recovered_gold": []
+      },
+      {
+        "event_id": "dadd5fbd-4041-4584-a093-1e550930cd85:3",
+        "classification": "unproven",
+        "reason": "missing_context",
+        "because": "dadd5fbd-4041-4584-a093-1e550930cd85:2",
+        "recovered_gold": []
+      },
+      {
+        "event_id": "dadd5fbd-4041-4584-a093-1e550930cd85:4",
+        "classification": "excluded",
+        "reason": "hydration",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "dadd5fbd-4041-4584-a093-1e550930cd85:5",
+        "classification": "excluded",
+        "reason": "hydration",
+        "because": null,
+        "recovered_gold": []
+      }
+    ],
+    "required_context_delivered": [
+      "callee",
+      "entry",
+      "import"
+    ],
+    "required_context_total": 3,
+    "context_recall": 1.0,
+    "serialized_tool_output_bytes": 1670,
+    "source_bytes": 301,
+    "estimated_source_tokens": 76,
+    "tool_elapsed_ms": 13.617041997349588,
+    "provider_usage": {
+      "input_tokens": 32656,
+      "cached_input_tokens": 23296,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 663,
+      "reasoning_output_tokens": 292
+    },
+    "usage_semantics": "Codex turn.completed gross input; cached_input is a subset; output includes reasoning_output_tokens.",
+    "token_status": "measured"
+  },
+  "baseline": {
+    "end_to_end_seconds": 24.2071465409972,
+    "actual_process_seconds": 24.2071465409972,
+    "exit_code": 0,
+    "provider_thread_id": "01a08a0c-6864-7990-8e81-a7aee3149006",
+    "failures": [],
+    "tool_delivery_verified": true,
+    "relationships": {
+      "schema_version": 1,
+      "case_id": "named_function_control",
+      "required_semantic_dependencies_total": 1,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "calls",
+          "to": "callee",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "exact_kind",
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "consumer.ts::useNumber#function",
+              "to": "number.ts::num#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "4c8f61ea9624e51834550d03c47fb41379600aabf826329e36350be3c5d95611"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "available_dependency_links_total": 1,
+      "available_dependency_links": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "calls",
+          "to": "callee",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "exact_kind",
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "consumer.ts::useNumber#function",
+              "to": "number.ts::num#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "4c8f61ea9624e51834550d03c47fb41379600aabf826329e36350be3c5d95611"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "dependency-link recall; references_type fallback is generic and does not establish precise subtype/kind recall",
+        "required": 1,
+        "available": 1,
+        "delivered": 0,
+        "available_ratio": 1.0,
+        "delivered_ratio": 0.0
+      },
+      "precise_kind_links_available_total": 1,
+      "precise_kind_links_delivered_total": 0,
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_scope": "authored frozen forbidden_relationships only; this is not exhaustive truth about unsupported or unrecorded edges"
+    }
+  }
+}
