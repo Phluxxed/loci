@@ -503,7 +503,9 @@ def _definition_support(
         content_hash=export.source_hash,
         endpoint_id=target.id,
     )
-    if not _LOCAL_EXPORT_RE.match(export.text):
+    # Default exports need the authored export evidence as well as the named
+    # declaration, which may be a separate statement.
+    if not _LOCAL_EXPORT_RE.match(export.text) and export.exported_name != "default":
         return (definition,)
     return (
         ReferenceSupport(

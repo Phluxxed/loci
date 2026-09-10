@@ -34,8 +34,14 @@ checks for the absence of a `GraphContractError`, not for resolution.
 Repro: the `inline-export-const` case in `.scratch/repro-export-clause-index-failure.sh`, or
 materialize the two-file pair and assert `status == "resolved"`.
 
-### `export default <identifier>` produces no export record
+### ~~`export default <identifier>` produces no export record~~ ✓ FIXED
 Found 2026-09-07 while covering the export-clause fix.
+
+Fixed 2026-09-10 (W2.1.3): a direct default-export identifier now records its
+authored export statement and binds to a unique module-level declaration.
+Resolved support retains the export and declaration anchors separately;
+missing or ambiguous declarations remain unresolved. Extractor version 23
+refreshes old caches. The following describes the original failure.
 
 `function num(...) {...}` followed by `export default num` extracts zero export records for that file,
 so an importer resolves to `unresolved` with reason `target_not_indexed`. The inline form
