@@ -268,6 +268,8 @@ def _load_run(result_path: Path, output: Path) -> tuple[dict[str, Any] | None, d
         index_seconds = _nonnegative_number(baseline.get("index_seconds"))
     failures = _list(baseline.get("failures"))
     failure_categories = _failure_categories(baseline)
+    if measurement.get("task_correct") is False and measurement.get("outcome") == "completed":
+        failure_categories.append("incorrect_answer")
     delivery_verified = baseline.get("tool_delivery_verified") is True
     causal_inconclusive = (
         not delivery_verified
