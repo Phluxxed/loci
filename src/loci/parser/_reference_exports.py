@@ -308,6 +308,23 @@ def _extract_javascript_exports(
             continue
         if node.child_by_field_name("source") is not None:
             continue
+        value = node.child_by_field_name("value")
+        if _has_token(node, "default") and value is not None and value.type == "identifier":
+            local_name = _node_text(value, source)
+            candidates = definitions.get(local_name, [])
+            _append_export(
+                exports,
+                evidence_node=node,
+                source=source,
+                source_file=source_file,
+                language=language,
+                source_hash=source_hash,
+                local_name=local_name,
+                exported_name="default",
+                type_only=False,
+                definition_node=candidates[0] if len(candidates) == 1 else None,
+            )
+            continue
         clause = next(
             (child for child in node.named_children if child.type == "export_clause"),
             None,

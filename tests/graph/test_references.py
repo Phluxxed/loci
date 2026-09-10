@@ -1224,7 +1224,7 @@ def test_resolves_javascript_local_export_alias_and_named_reexport(
     assert [[support.kind for support in record.support] for record in selected] == [
         ["import_binding", "local_export", "definition"],
         ["import_binding", "reexport", "definition"],
-        ["import_binding", "reexport", "definition"],
+        ["import_binding", "reexport", "local_export", "definition"],
     ]
 
 
