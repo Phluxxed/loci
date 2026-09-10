@@ -294,10 +294,10 @@ def test_ts_fixture_ground_truth():
         )
 
 
-def test_ts_fixture_no_spurious_symbols():
+def test_ts_fixture_arrow_function():
     extracted = _extracted("sample.ts")
-    names = [name for name, _ in extracted]
-    assert "helper" not in names  # arrow function const, should not be extracted
+    assert ("helper", "function") in extracted
+    assert ("helper", "constant") not in extracted
 
 
 # ── Go ground-truth ─────────────────────────────────────────────────────────
@@ -463,7 +463,7 @@ def test_js_fixture_ground_truth():
         )
 
 
-def test_js_fixture_no_spurious_symbols():
+def test_js_fixture_arrow_function():
     extracted = _extracted("sample.js")
-    names = [name for name, _ in extracted]
-    assert "helper" not in names  # arrow function const, should not be extracted
+    assert ("helper", "function") in extracted
+    assert ("helper", "constant") not in extracted
