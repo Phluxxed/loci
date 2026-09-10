@@ -145,7 +145,7 @@
               "id": "task_482cd402affcc5ce45184d661745c008",
               "title": "Repair missing exported arrow-function symbols where reproduced",
               "outcome": "Common exported TypeScript arrow functions have correct indexed endpoints for required reference cases.",
-              "details": "Creation phase: Planning.\nProposed decomposition; review with Vik before agreeing the leaf boundary.\n\nKeep repairs to the reproduced indexing prerequisite; no broad extractor rewrite.\n\nW2.1.1 finding owned by this Task (10 September 2026): Cases exported_arrow and named_function_control: exported arrow num has a local export record but no num symbol; consumer is unresolved/ambiguous_target. The ordinary named function control resolves with references/calls. Repair the missing endpoint and its imported resolution; graph_status healthy is not success.\n\nExecution and evidence: graph repository /Users/brummerv/loci, Objective obj_0110c8712b21bdd2c12532f189d84a74. Code/tests in /Users/brummerv/phluxxed/loci-exploration, branch feat/evidence-backed-exploration; do not recreate .manifest there. Reproduction runner: tests/reproductions/typescript_context_gaps.py; run with worktree .venv/bin/python and --output /tmp/typescript-context-gaps.json (optional --typescript-compiler /opt/homebrew/bin/tsc for the language oracle). Exact fixtures/outputs: docs/reviews/evidence/typescript-context-gaps-2026-09-10.json. Pinned report and linked packet/runner: https://github.com/Phluxxed/loci/blob/b3f59bf73e87e05b743b0146bf2a06a353a71f74/docs/reviews/2026-09-10-typescript-context-gaps.md . Source reproduction revision6c937ba; inspect current source before repair.",
+              "details": "Creation phase: Planning.\nProposed decomposition; review with Vik before agreeing the leaf boundary.\n\nKeep repairs to the reproduced indexing prerequisite; no broad extractor rewrite.\n\nW2.1.1 finding owned by this Task (10 September 2026): Cases exported_arrow and named_function_control: exported arrow num has a local export record but no num symbol; consumer is unresolved/ambiguous_target. The ordinary named function control resolves with references/calls. Repair the missing endpoint and its imported resolution; graph_status healthy is not success.\n\nExecution and evidence: graph repository /Users/brummerv/loci, Objective obj_0110c8712b21bdd2c12532f189d84a74. Code/tests in /Users/brummerv/phluxxed/loci-exploration, branch feat/evidence-backed-exploration; do not recreate .manifest there. Reproduction runner: tests/reproductions/typescript_context_gaps.py; run with worktree .venv/bin/python and --output /tmp/typescript-context-gaps.json (optional --typescript-compiler /opt/homebrew/bin/tsc for the language oracle). Exact fixtures/outputs: docs/reviews/evidence/typescript-context-gaps-2026-09-10.json. Pinned report and linked packet/runner: https://github.com/Phluxxed/loci/blob/b3f59bf73e87e05b743b0146bf2a06a353a71f74/docs/reviews/2026-09-10-typescript-context-gaps.md . Source reproduction revision6c937ba; inspect current source before repair.\n\nW2.1.2 completion (10 September 2026): W2.1.2 repaired in isolated code commit fb8221bbd30826aff253164ccb784041fc2b23ae (pushed and remote verified). Direct identifier variable bindings to arrow functions in JavaScript, TypeScript and TSX are function symbols before constant-name filtering, with exact declaration spans. The original exported_arrow reproduction now resolves consumer.ts::useNumber#function to number.ts::num#function with both references and calls edges. Extractor version 22 refreshes old indexes. W2.1.1's original packet remains unchanged.\n\n56 focused tests passed: .venv/bin/python -m pytest tests/test_exported_arrow_functions.py tests/parser/test_extractor.py tests/storage/test_index_store.py::test_index_versions_rejects_old_extractor_version tests/test_service.py::test_service_old_extractor_cache_forces_full_reindex -q. Seven dedicated regressions cover JS/TS/TSX, uppercase arrow versus ordinary constant, exact spans, nested declarations and separate sibling binding, exact imported targets and call/reference edges with same-name wrong-file distractors. git diff --check passed. Runtime integration into master is not performed; default-identifier exports and generic-shadow resolution remain separately tracked.",
               "decompositionComplete": true,
               "completionCriteria": [
                 "The reproduced exported arrow-function case yields the correct symbol and imported target, rather than merely indexing without an exception.",
@@ -155,7 +155,29 @@
                 "task_9cc7823e30f764169e40e3ba5d1ec644"
               ],
               "externalBlocker": null,
-              "completion": null,
+              "completion": {
+                "evidence": [
+                  {
+                    "criterion": "The reproduced exported arrow-function case yields the correct symbol and imported target, rather than merely indexing without an exception.",
+                    "summary": "W2.1.2 repaired in isolated code commit fb8221bbd30826aff253164ccb784041fc2b23ae (pushed and remote verified). Direct identifier variable bindings to arrow functions in JavaScript, TypeScript and TSX are function symbols before constant-name filtering, with exact declaration spans. The original exported_arrow reproduction now resolves consumer.ts::useNumber#function to number.ts::num#function with both references and calls edges. Extractor version 22 refreshes old indexes. W2.1.1's original packet remains unchanged.",
+                    "references": [
+                      "https://github.com/Phluxxed/loci/blob/fb8221bbd30826aff253164ccb784041fc2b23ae/src/loci/parser/extractor.py",
+                      "https://github.com/Phluxxed/loci/blob/fb8221bbd30826aff253164ccb784041fc2b23ae/tests/test_exported_arrow_functions.py",
+                      "https://github.com/Phluxxed/loci/blob/fb8221bbd30826aff253164ccb784041fc2b23ae/src/loci/storage/index_store.py"
+                    ]
+                  },
+                  {
+                    "criterion": "The smallest relevant extraction/reference regression passes, including a distractor name; if already fixed, attach current proof instead of changing working code.",
+                    "summary": "56 focused tests passed: .venv/bin/python -m pytest tests/test_exported_arrow_functions.py tests/parser/test_extractor.py tests/storage/test_index_store.py::test_index_versions_rejects_old_extractor_version tests/test_service.py::test_service_old_extractor_cache_forces_full_reindex -q. Seven dedicated regressions cover JS/TS/TSX, uppercase arrow versus ordinary constant, exact spans, nested declarations and separate sibling binding, exact imported targets and call/reference edges with same-name wrong-file distractors. git diff --check passed. Runtime integration into master is not performed; default-identifier exports and generic-shadow resolution remain separately tracked.",
+                    "references": [
+                      "https://github.com/Phluxxed/loci/blob/fb8221bbd30826aff253164ccb784041fc2b23ae/tests/test_exported_arrow_functions.py",
+                      "https://github.com/Phluxxed/loci/blob/fb8221bbd30826aff253164ccb784041fc2b23ae/tests/parser/test_extractor.py",
+                      "https://github.com/Phluxxed/loci/blob/fb8221bbd30826aff253164ccb784041fc2b23ae/tests/storage/test_index_store.py",
+                      "https://github.com/Phluxxed/loci/blob/fb8221bbd30826aff253164ccb784041fc2b23ae/tests/test_service.py"
+                    ]
+                  }
+                ]
+              },
               "discontinued": null,
               "tasks": []
             },
