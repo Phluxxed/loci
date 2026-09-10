@@ -107,7 +107,37 @@
               ],
               "dependencies": [],
               "externalBlocker": null,
-              "completion": null,
+              "completion": {
+                "evidence": [
+                  {
+                    "criterion": "Reproduce imported-interface support, local type dependencies, alias chains, explicit heritage and same-name/ambiguous negatives with exact symbol/edge/output evidence.",
+                    "summary": "Captured 14 isolated fixtures with exact source/hash/symbol/span/export/reference/edge and search/get/graph service outputs. Imported interface and named type re-export controls resolve; local types/aliases and local heritage have indexed endpoints but no relation records; imported alias endpoint resolves without its local chain; imported heritage resolves file-owned generic references without inherits/implements. Same-name wrong-file and ambiguous-star controls behave conservatively. Generic-shadow negative exposes three falsely resolved records and one false references_type edge; TypeScript 6.0.3 strict no-emit language oracle passes independent number/string uses.",
+                    "references": [
+                      "https://github.com/Phluxxed/loci/blob/b3f59bf73e87e05b743b0146bf2a06a353a71f74/docs/reviews/2026-09-10-typescript-context-gaps.md",
+                      "https://github.com/Phluxxed/loci/blob/b3f59bf73e87e05b743b0146bf2a06a353a71f74/docs/reviews/evidence/typescript-context-gaps-2026-09-10.json",
+                      "https://github.com/Phluxxed/loci/blob/b3f59bf73e87e05b743b0146bf2a06a353a71f74/tests/reproductions/typescript_context_gaps.py"
+                    ]
+                  },
+                  {
+                    "criterion": "Reproduce or disprove the documented arrow-const export and default-identifier export failures; identify whether each blocks the frozen cases.",
+                    "summary": "Both documented failures reproduced against current source6c937ba: exported arrow has an export record but no num symbol and ambiguous_target; default identifier has num symbol but no export record and target_not_indexed. Named function and inline named-default controls resolve with references/calls. Report identifies common-form cases each blocks while explaining ordinary function/type fixtures remain reproducible; final corpus is not yet frozen.",
+                    "references": [
+                      "https://github.com/Phluxxed/loci/blob/b3f59bf73e87e05b743b0146bf2a06a353a71f74/docs/reviews/2026-09-10-typescript-context-gaps.md",
+                      "https://github.com/Phluxxed/loci/blob/b3f59bf73e87e05b743b0146bf2a06a353a71f74/docs/reviews/evidence/typescript-context-gaps-2026-09-10.json",
+                      "https://github.com/Phluxxed/loci/blob/b3f59bf73e87e05b743b0146bf2a06a353a71f74/tests/reproductions/typescript_context_gaps.py"
+                    ]
+                  },
+                  {
+                    "criterion": "Classify each miss as extraction, resolution, graph semantics, ranking/routing or evidence delivery; retain unsupported cases explicitly.",
+                    "summary": "Report classifies every case across symbol/export or observation extraction, binding/resolution, graph semantics/ownership, ranking/routing and evidence delivery. Successful explicit file-to-type retrieval returns the authored63-byte signature line, not interface body; function-to-type query has no path and natural dependency wording is suppressed when inferred. Retains unsupported/unmeasured cases and distinguishes deliberate hydration from causal misses. Final14-case packet consistency/hash/classification check and compiler oracle passed. No production fix or measured read-reduction gain claimed. New proposed generic-shadow repair task_e33ae657f80732bbb90fdba0c0cfd0a7 is required before comparison controls are frozen.",
+                    "references": [
+                      "https://github.com/Phluxxed/loci/blob/b3f59bf73e87e05b743b0146bf2a06a353a71f74/docs/reviews/2026-09-10-typescript-context-gaps.md",
+                      "https://github.com/Phluxxed/loci/blob/b3f59bf73e87e05b743b0146bf2a06a353a71f74/docs/reviews/evidence/typescript-context-gaps-2026-09-10.json",
+                      "https://github.com/Phluxxed/loci/blob/b3f59bf73e87e05b743b0146bf2a06a353a71f74/tests/reproductions/typescript_context_gaps.py"
+                    ]
+                  }
+                ]
+              },
               "discontinued": null,
               "tasks": []
             },
@@ -138,6 +168,25 @@
               "completionCriteria": [
                 "The reproduced function declaration plus export-default identifier produces the correct export and imported target.",
                 "The smallest relevant export/reference regression passes alongside the inline-default control; if already fixed, attach current proof instead of changing working code."
+              ],
+              "dependencies": [
+                "task_9cc7823e30f764169e40e3ba5d1ec644"
+              ],
+              "externalBlocker": null,
+              "completion": null,
+              "discontinued": null,
+              "tasks": []
+            },
+            {
+              "id": "task_e33ae657f80732bbb90fdba0c0cfd0a7",
+              "title": "Prevent generic type parameters from resolving to shadowed imports",
+              "outcome": "A local TypeScript generic parameter never becomes a proven reference to the same-named imported type.",
+              "details": "New bounded repair proposed from W2.1.1 evidence, not yet implemented. The generic_shadow fixture emits three resolved reference records and one references_type edge to types.ts::Payload#interface for processOrder<Payload>(value: Payload): Payload. TypeScript 6.0.3 accepts number and string instantiations, proving the local generic is independent of the imported interface. Current _collect_javascript_context lacks type-parameter handling; Swift has a separate guarded case. Preserve exact/candidate guarantees before recording the comparison baseline. Do not copy language rules blindly, broaden into structural compatibility, or weaken existing executable-owner semantics. Candidate leaf boundary remains for agreement when this repair is selected.",
+              "decompositionComplete": false,
+              "completionCriteria": [
+                "Reproduce the generic-shadow false edge and implement conservative TypeScript type-parameter binding/exclusion for the explicitly supported declaration forms.",
+                "Generic declaration names and uses resolve within their lexical type scope; same-named imports outside that scope and real imported constraints/defaults retain justified reference behavior.",
+                "Focused positive, negative and scope-boundary checks pass with exact raw/resolved/edge evidence; unsupported forms remain explicit and the baseline corpus retains the adversarial case."
               ],
               "dependencies": [
                 "task_9cc7823e30f764169e40e3ba5d1ec644"
@@ -196,6 +245,7 @@
                   "dependencies": [
                     "task_482cd402affcc5ce45184d661745c008",
                     "task_83dcc27459c28848d4ed078bbc354fbe",
+                    "task_e33ae657f80732bbb90fdba0c0cfd0a7",
                     "task_f3a0a3ae8198b59330304a7e996bcdba"
                   ],
                   "externalBlocker": null,
