@@ -116,13 +116,52 @@
                 "Declare required symbol IDs/source spans/relationships, allowed unresolved outcomes, task-success checks and extraction preflight independently of implementation output.",
                 "Freeze repository snapshots, K/hop/node/evidence limits, latency limits and material-improvement/nonregression thresholds before evaluating new retrieval; distinguish estimated from measured token costs."
               ],
-              "dependencies": [
-                "task_9cc7823e30f764169e40e3ba5d1ec644"
-              ],
+              "dependencies": [],
               "externalBlocker": null,
               "completion": null,
               "discontinued": null,
-              "tasks": []
+              "tasks": [
+                {
+                  "id": "task_f3a0a3ae8198b59330304a7e996bcdba",
+                  "title": "Freeze corpus, gold context and extraction preflight",
+                  "outcome": "The comparison oracle specifies required context independently of retrieval output.",
+                  "details": "Creation phase: Planning.\nProposed during the 10 September decomposition review; leaf boundary remains for joint agreement. Preserve the parent criteria and existing first-milestone scope.",
+                  "decompositionComplete": false,
+                  "completionCriteria": [
+                    "Version the accessible real-task and adversarial corpus with repository snapshots, including local/imported types, aliases, heritage, re-exports and same-name/shadowing/ambiguity cases.",
+                    "Specify required symbols, source spans and relationships, allowed unresolved outcomes and deterministic task-success checks independently of implementation output.",
+                    "Define endpoint extraction preflight; classify absent endpoints explicitly without altering gold answers to fit any comparison arm."
+                  ],
+                  "dependencies": [
+                    "task_9cc7823e30f764169e40e3ba5d1ec644"
+                  ],
+                  "externalBlocker": null,
+                  "completion": null,
+                  "discontinued": null,
+                  "tasks": []
+                },
+                {
+                  "id": "task_b06b580909127c47d74d70a28f10451d",
+                  "title": "Freeze comparison controls, budgets and acceptance thresholds",
+                  "outcome": "All comparison arms are judged under fixed, reviewable quality and resource limits.",
+                  "details": "Creation phase: Planning.\nProposed during the 10 September decomposition review; leaf boundary remains for joint agreement. Preserve the parent criteria and existing first-milestone scope.\n\nThis control decision is separate from specifying the task oracle. Causal telemetry can use the oracle while controls are finalized.",
+                  "decompositionComplete": false,
+                  "completionCriteria": [
+                    "Freeze model/tool settings, environment provenance, declared repeated-run count and the intentional implementation difference between the three comparison arms after prerequisite endpoint repairs are settled.",
+                    "Declare K/hop/node/evidence/serialized-output and latency limits, material-improvement and correctness/nonregression thresholds, and treatment of measured versus estimated token costs.",
+                    "Bind the controls to the frozen corpus and baseline revision before measuring new retrieval; later results cannot silently change corpus, gold, thresholds or controls."
+                  ],
+                  "dependencies": [
+                    "task_482cd402affcc5ce45184d661745c008",
+                    "task_83dcc27459c28848d4ed078bbc354fbe",
+                    "task_f3a0a3ae8198b59330304a7e996bcdba"
+                  ],
+                  "externalBlocker": null,
+                  "completion": null,
+                  "discontinued": null,
+                  "tasks": []
+                }
+              ]
             },
             {
               "id": "task_2aafb893323c2fa196af0b57d3a5b391",
@@ -136,7 +175,7 @@
                 "Focused trace cases prove temporal proximity alone does not create a causal miss; measurements include total context/tokens and task correctness."
               ],
               "dependencies": [
-                "task_aa153015e145500088dc29cfe80d1a3a"
+                "task_f3a0a3ae8198b59330304a7e996bcdba"
               ],
               "externalBlocker": null,
               "completion": null,
@@ -155,9 +194,7 @@
                 "Record exact environment/model/tool versions and freeze the comparison baseline without claiming the old 38% figure still applies."
               ],
               "dependencies": [
-                "task_482cd402affcc5ce45184d661745c008",
-                "task_83dcc27459c28848d4ed078bbc354fbe",
-                "task_aa153015e145500088dc29cfe80d1a3a",
+                "task_b06b580909127c47d74d70a28f10451d",
                 "task_2aafb893323c2fa196af0b57d3a5b391"
               ],
               "externalBlocker": null,
@@ -285,13 +322,52 @@
                 "Preserve exact source ownership, support/control hashes, unresolved records and candidate metadata across round trips.",
                 "Focused rebuild/incremental/source-change/config-change checks prove stale targets and edges are invalidated; unchanged relation families retain their behavior."
               ],
-              "dependencies": [
-                "task_1a4b33f09d0ec97e6cb7f08ea50cf89f"
-              ],
+              "dependencies": [],
               "externalBlocker": null,
               "completion": null,
               "discontinued": null,
-              "tasks": []
+              "tasks": [
+                {
+                  "id": "task_8a183771c6e2c7d7eafb489f0226d8ab",
+                  "title": "Implement validated type records and versioned persistence",
+                  "outcome": "Type observation records preserve the agreed semantics across index serialization and reload.",
+                  "details": "Creation phase: Planning.\nProposed during the 10 September decomposition review; leaf boundary remains for joint agreement. Preserve the parent criteria and existing first-milestone scope.",
+                  "decompositionComplete": false,
+                  "completionCriteria": [
+                    "Implement the agreed typed records, validators and versioned persisted representation using the existing storage architecture and compatible public contracts.",
+                    "Preserve source ownership, exact spans, support/control hashes, unresolved records and candidate metadata across round trips.",
+                    "Focused persistence checks cover valid, malformed and version-mismatched records using the agreed rebuild/compatibility policy; existing relation-family records retain their contracts."
+                  ],
+                  "dependencies": [
+                    "task_1a4b33f09d0ec97e6cb7f08ea50cf89f"
+                  ],
+                  "externalBlocker": null,
+                  "completion": null,
+                  "discontinued": null,
+                  "tasks": []
+                },
+                {
+                  "id": "task_91ad33df51d870b6eb9d4356a0e2199d",
+                  "title": "Prove real source changes invalidate type observations and edges",
+                  "outcome": "Incremental indexing and reload cannot retain stale resolved type or heritage relationships.",
+                  "details": "Creation phase: Planning.\nProposed during the 10 September decomposition review; leaf boundary remains for joint agreement. Preserve the parent criteria and existing first-milestone scope.\n\nThis proof follows the real extractors and resolvers. Extraction depends only on the record/persistence child, avoiding a dependency cycle.",
+                  "decompositionComplete": false,
+                  "completionCriteria": [
+                    "Exercise actual extracted and resolved type-use and heritage cases through rebuild, incremental update and reload.",
+                    "Changed or removed source owners/targets and changed configuration invalidate affected observations, support and projected edges; stable source retains deterministic results.",
+                    "Focused checks preserve unresolved/candidate metadata and unchanged import/reference/call behavior without executing repository code or redesigning storage."
+                  ],
+                  "dependencies": [
+                    "task_8a183771c6e2c7d7eafb489f0226d8ab",
+                    "task_10b83ca615d95833ae38a34a07277f7d",
+                    "task_6ed03eec4d6f027f47d7d70d5167f9ea"
+                  ],
+                  "externalBlocker": null,
+                  "completion": null,
+                  "discontinued": null,
+                  "tasks": []
+                }
+              ]
             },
             {
               "id": "task_9f58a7f3d3e7452607817478f58c7b89",
@@ -319,7 +395,7 @@
                     "Focused extraction fixtures cover the frozen positive and negative cases."
                   ],
                   "dependencies": [
-                    "task_9c4f3db09472cfdcaa5847c917effddc"
+                    "task_8a183771c6e2c7d7eafb489f0226d8ab"
                   ],
                   "externalBlocker": null,
                   "completion": null,
@@ -373,7 +449,7 @@
                     "Focused fixtures cover direct, multiple-interface and local/imported declaration forms."
                   ],
                   "dependencies": [
-                    "task_9c4f3db09472cfdcaa5847c917effddc"
+                    "task_8a183771c6e2c7d7eafb489f0226d8ab"
                   ],
                   "externalBlocker": null,
                   "completion": null,
@@ -412,14 +488,52 @@
                 "Exact and candidate policies remain separate; repeated relation sites preserve recoverable evidence even if graph edges deduplicate.",
                 "Focused persisted graph and actual MCP calls verify structured output, evidence hydration, budget/omission reporting and unchanged existing relation behavior."
               ],
-              "dependencies": [
-                "task_10b83ca615d95833ae38a34a07277f7d",
-                "task_6ed03eec4d6f027f47d7d70d5167f9ea"
-              ],
+              "dependencies": [],
               "externalBlocker": null,
               "completion": null,
               "discontinued": null,
-              "tasks": []
+              "tasks": [
+                {
+                  "id": "task_47549b7f5f36ce43491064cd4f88ec84",
+                  "title": "Integrate type relations with graph queries and diagnostics",
+                  "outcome": "Generic graph operations understand supported type relations and expose their precise meaning.",
+                  "details": "Creation phase: Planning.\nProposed during the 10 September decomposition review; leaf boundary remains for joint agreement. Preserve the parent criteria and existing first-milestone scope.",
+                  "decompositionComplete": false,
+                  "completionCriteria": [
+                    "Health/diagnostics, neighbors, traversal and paths recognize the new relation kinds and meaningful directions through existing graph contracts.",
+                    "Exact and candidate policies remain separate; deduplicated edges retain recoverable evidence for repeated relation sites.",
+                    "Focused positive/negative graph queries verify identity, direction, provenance and unchanged existing relation behavior; reuse working generic behavior rather than adding redundant special cases."
+                  ],
+                  "dependencies": [
+                    "task_10b83ca615d95833ae38a34a07277f7d",
+                    "task_6ed03eec4d6f027f47d7d70d5167f9ea"
+                  ],
+                  "externalBlocker": null,
+                  "completion": null,
+                  "discontinued": null,
+                  "tasks": []
+                },
+                {
+                  "id": "task_be887a3fc3d19dc27a79918289a99987",
+                  "title": "Integrate type context with retrieval and generic MCP output",
+                  "outcome": "The delivered type layer is queryable through the existing retrieval and MCP contracts.",
+                  "details": "Creation phase: Planning.\nProposed during the 10 September decomposition review; leaf boundary remains for joint agreement. Preserve the parent criteria and existing first-milestone scope.",
+                  "decompositionComplete": false,
+                  "completionCriteria": [
+                    "Retrieval and semantic-bridge policy use the supported relations with explicit direction, exact/candidate controls and bounded traversal.",
+                    "Focused persisted-graph and actual MCP calls verify structured type context, evidence hydration, budget/omission reporting and unchanged existing relation behavior.",
+                    "Integration includes the real-source freshness proof; no parallel type-only API is added unless an evidenced generic-contract limitation requires it."
+                  ],
+                  "dependencies": [
+                    "task_91ad33df51d870b6eb9d4356a0e2199d",
+                    "task_47549b7f5f36ce43491064cd4f88ec84"
+                  ],
+                  "externalBlocker": null,
+                  "completion": null,
+                  "discontinued": null,
+                  "tasks": []
+                }
+              ]
             }
           ]
         },
@@ -449,7 +563,7 @@
                 "Frozen cases verify relevance and preserve exact-only explanations; do not claim complete impact or affected-test coverage from missing relationships."
               ],
               "dependencies": [
-                "task_97e2e4399f10432977bdc36f98835535"
+                "task_be887a3fc3d19dc27a79918289a99987"
               ],
               "externalBlocker": null,
               "completion": null,
@@ -467,13 +581,50 @@
                 "Enforce the total serialized/evidence budget, deterministic deduplication and correct source freshness; account for framing overhead.",
                 "Focused checks cover clipping, non-ASCII evidence, empty/partial results and candidate truncation; no graph dump by default."
               ],
-              "dependencies": [
-                "task_e77d50dcbed68393b8b3ace99f9f01f2"
-              ],
+              "dependencies": [],
               "externalBlocker": null,
               "completion": null,
               "discontinued": null,
-              "tasks": []
+              "tasks": [
+                {
+                  "id": "task_0c0956f4b9a297b5211624c33b8a03c8",
+                  "title": "Select and hydrate grounded source evidence",
+                  "outcome": "Selected anchors and context carry current source spans and understandable relationship evidence.",
+                  "details": "Creation phase: Planning.\nProposed during the 10 September decomposition review; leaf boundary remains for joint agreement. Preserve the parent criteria and existing first-milestone scope.",
+                  "decompositionComplete": false,
+                  "completionCriteria": [
+                    "Select anchors, context and paths according to the agreed retrieval intent, preserving exact source provenance and why each item was selected.",
+                    "Hydrate current supporting source spans with deterministic deduplication and explicit uncertainty; stale or unavailable source is reported rather than silently substituted.",
+                    "Focused checks verify ownership, freshness, non-ASCII spans and empty/partial source evidence using existing hydration where it suffices."
+                  ],
+                  "dependencies": [
+                    "task_e77d50dcbed68393b8b3ace99f9f01f2"
+                  ],
+                  "externalBlocker": null,
+                  "completion": null,
+                  "discontinued": null,
+                  "tasks": []
+                },
+                {
+                  "id": "task_cb72a4021deabbcbc92865d273a8c414",
+                  "title": "Pack the complete response within budget and explain omissions",
+                  "outcome": "The serialized exploration result fits its total allowance while exposing omitted evidence.",
+                  "details": "Creation phase: Planning.\nProposed during the 10 September decomposition review; leaf boundary remains for joint agreement. Preserve the parent criteria and existing first-milestone scope.",
+                  "decompositionComplete": false,
+                  "completionCriteria": [
+                    "Pack selected code, relationship explanations, uncertainty and omitted branches/reasons into the agreed response shape.",
+                    "Enforce total serialized and evidence budgets including framing overhead; label token estimates accurately and retain deterministic priority, deduplication and clipping behavior.",
+                    "Focused checks cover non-ASCII payload sizes, clipping, empty/partial results, exhausted budgets and candidate truncation; default output remains compact."
+                  ],
+                  "dependencies": [
+                    "task_0c0956f4b9a297b5211624c33b8a03c8"
+                  ],
+                  "externalBlocker": null,
+                  "completion": null,
+                  "discontinued": null,
+                  "tasks": []
+                }
+              ]
             },
             {
               "id": "task_94adb4f05a60aa47d84309a927a82244",
@@ -487,7 +638,7 @@
                 "One actual host-mediated MCP navigation exercise demonstrates the delivered type context, evidence and limits on a frozen example."
               ],
               "dependencies": [
-                "task_30bcc149eac4abdc5691389949a10995"
+                "task_cb72a4021deabbcbc92865d273a8c414"
               ],
               "externalBlocker": null,
               "completion": null,
