@@ -11,8 +11,15 @@ Maintained tests and supported fixtures are indexed like other source files.
 The shared repository-relative policy excludes only generated, cached,
 vendored, build, temporary, ignored, sensitive, or unsupported material.
 
-### TypeScript arrow-function `const` exports produce no symbol
+### ~~TypeScript arrow-function `const` exports produce no symbol~~ ✓ FIXED
 Found 2026-09-07 while covering the export-clause fix.
+
+Fixed 2026-09-10 (W2.1.2): direct identifier bindings to arrow functions are
+classified as functions before the uppercase-only constant filter, preserving
+the declaration's exact source span. JavaScript, TypeScript and TSX share this
+repair. Extractor version 22 forces stale indexes to rebuild. Focused regressions
+assert the symbol, imported target and call edge with a same-name distractor.
+The following describes the original failure; W2.1.1's evidence is retained.
 
 `export const num = (v: unknown): number => Number(v)` in a `.ts` file yields no symbol from
 `parse_file` — only the file node. The export record itself is extracted correctly (`local_name`

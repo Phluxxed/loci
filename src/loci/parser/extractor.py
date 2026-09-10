@@ -628,6 +628,20 @@ def _walk(
         )
 
 
+def _symbol_kind(node, spec: LanguageSpec, language: str) -> str | None:
+    if language in {"javascript", "typescript", "tsx"} and node.type == "variable_declarator":
+        name = node.child_by_field_name("name")
+        value = node.child_by_field_name("value")
+        if (
+            name is not None
+            and name.type == "identifier"
+            and value is not None
+            and value.type == "arrow_function"
+        ):
+            return "function"
+    return spec.symbol_node_types.get(node.type)
+
+
 def _recurse_body(
     node,
     source: bytes,
@@ -639,7 +653,7 @@ def _recurse_body(
 ) -> None:
     """Find named declarations nested inside a type or callable body."""
     node_type = node.type
-    symbol_kind = spec.symbol_node_types.get(node_type)
+    symbol_kind = _symbol_kind(node, spec, language)
     is_container = node_type in spec.container_node_types
     if not is_container and symbol_kind not in {"function", "method"}:
         return
@@ -649,7 +663,12 @@ def _recurse_body(
         return
     qualified_name = f"{parent_name}.{name}" if parent_name else name
 
-    body = node.child_by_field_name("body")
+    body_node = (
+        node.child_by_field_name("value")
+        if node_type == "variable_declarator" and symbol_kind == "function"
+        else node
+    )
+    body = body_node.child_by_field_name("body")
     if body is not None:
         for child in body.children:
             _walk(
@@ -691,7 +710,7 @@ def _extract_symbol(
     if not name:
         return
 
-    kind = spec.symbol_node_types.get(node.type, "function")
+    kind = _symbol_kind(node, spec, language) or "function"
     # Functions inside a class container become methods
     if parent_is_container and kind == "function":
         kind = "method"
