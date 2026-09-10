@@ -7,7 +7,7 @@ import shutil
 import pytest
 
 from benchmarks.typescript_context_corpus import (
-    DEFAULT_ROOT, check_answer, load_corpus, materialize_snapshot, preflight,
+    DEFAULT_ROOT, check_answer, load_controls, load_corpus, materialize_snapshot, preflight,
 )
 
 
@@ -118,3 +118,46 @@ def test_preflight_keeps_missing_endpoint_and_frozen_gold(tmp_path,monkeypatch):
     import os
     assert os.environ['LOCI_BASE_DIR']=='original-store-value'
     assert os.environ['LOCI_STORE_NAMESPACE']=='original-namespace'
+
+
+def test_frozen_controls_bind_all_cases_without_starting_measurements():
+    corpus = load_corpus()
+    controls = load_controls(corpus)
+    assert controls['schedule']['planned_runs'] == 153
+    assert controls['case_ids'] == [case['id'] for case in corpus['cases']]
+    assert controls['baseline_engine'] == corpus['baseline_engine']
+    assert controls['measurement_status'].startswith('not_started')
+
+
+@pytest.mark.parametrize('filename', ['comparison-controls.json', 'comparison-controls.md'])
+def test_controls_and_protocol_corruption_are_rejected(tmp_path, filename):
+    root = _copy(tmp_path)
+    with (root / filename).open('a') as stream:
+        stream.write(' ')
+    with pytest.raises(ValueError, match='hash mismatch'):
+        load_controls(load_corpus(root))
+
+
+@pytest.mark.parametrize('change', [
+    'corpus', 'baseline', 'case_order', 'arm_order', 'run_count', 'negative_limit', 'bool_limit',
+])
+def test_rehashed_controls_cannot_break_bound_corpus_or_schedule(tmp_path, change):
+    root = _copy(tmp_path)
+    controls = json.loads((root / 'comparison-controls.json').read_text())
+    if change == 'corpus':
+        controls['corpus_sha256'] = '0' * 64
+    elif change == 'baseline':
+        controls['baseline_engine']['extractor_version'] -= 1
+    elif change == 'case_order':
+        controls['case_ids'].reverse()
+    elif change == 'arm_order':
+        controls['schedule']['arm_orders'][0] = ['A', 'A', 'C']
+    elif change == 'run_count':
+        controls['schedule']['planned_runs'] -= 1
+    else:
+        controls['limits']['max_nodes'] = -1 if change == 'negative_limit' else True
+    raw = (json.dumps(controls) + '\n').encode()
+    (root / 'comparison-controls.json').write_bytes(raw)
+    (root / 'comparison-controls.sha256').write_text(hashlib.sha256(raw).hexdigest() + '\n')
+    with pytest.raises(ValueError):
+        load_controls(load_corpus(root))

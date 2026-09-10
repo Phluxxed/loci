@@ -107,6 +107,39 @@ def materialize_snapshot(corpus: dict, snapshot_id: str, destination: Path) -> N
         path.write_bytes(data)
 
 
+def load_controls(corpus: dict) -> dict[str, Any]:
+    """Verify the frozen comparison contract; does not run or certify an arm."""
+    root = Path(corpus['_root'])
+    raw = (root / 'comparison-controls.json').read_bytes()
+    if _hash(raw) != (root / 'comparison-controls.sha256').read_text().strip():
+        raise ValueError('comparison controls hash mismatch')
+    controls = json.loads(raw)
+    if controls['schema_version'] != 1:
+        raise ValueError('unsupported comparison controls schema')
+    if (controls['corpus_sha256'] != _hash((root / 'corpus.json').read_bytes())
+            or controls['corpus_version'] != corpus['version']
+            or controls['baseline_engine'] != corpus['baseline_engine']):
+        raise ValueError('comparison controls corpus/baseline mismatch')
+    if controls['case_ids'] != [case['id'] for case in corpus['cases']]:
+        raise ValueError('comparison controls case order mismatch')
+    protocol = controls['protocol']
+    if _hash((root / _relative(protocol['file'])).read_bytes()) != protocol['sha256']:
+        raise ValueError('comparison protocol hash mismatch')
+    schedule = controls['schedule']
+    arms = set(controls['arms'])
+    repetitions = schedule['repetitions']
+    if (type(repetitions) is not int or repetitions < 1
+            or len(schedule['arm_orders']) != repetitions
+            or any(len(order) != len(arms) or set(order) != arms
+                   for order in schedule['arm_orders'])
+            or schedule['planned_runs'] != len(controls['case_ids']) * len(arms) * repetitions):
+        raise ValueError('comparison schedule mismatch')
+    if any(type(value) not in (int, float) or value <= 0
+           for value in controls['limits'].values()):
+        raise ValueError('comparison limits must be positive numbers')
+    return controls
+
+
 def check_answer(corpus: dict, case_id: str, answer: dict) -> bool:
     """Compare authored structured facts, independently of graph/retrieval output.
 
@@ -189,10 +222,20 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, default=DEFAULT_ROOT)
     parser.add_argument('--preflight-output', type=Path)
+    parser.add_argument('--controls', action='store_true',
+                        help='verify frozen comparison controls without running agents')
     parser.add_argument('--case')
     parser.add_argument('--answer', type=Path)
     args = parser.parse_args()
     corpus = load_corpus(args.root)
+    if args.controls:
+        if args.case or args.answer or args.preflight_output:
+            parser.error('--controls cannot be combined with answer/preflight options')
+        controls = load_controls(corpus)
+        print(json.dumps({'version': controls['version'], 'integrity': 'passed',
+                          'planned_runs': controls['schedule']['planned_runs'],
+                          'measurement_status': controls['measurement_status']}))
+        return
     if args.case or args.answer:
         if not (args.case and args.answer):
             parser.error('--case and --answer are required together')
