@@ -438,6 +438,8 @@ def retrieve_graph_question(
             if term in required_term_set
         )
         matched_terms = tuple(term for term in relation_terms if term in evidence_terms)
+        if not matched_terms:
+            matched_terms = _declared_type_bridge_terms(path, question)
         intermediate = path.node_ids[1:-1]
         high_degree_nodes = tuple(
             node_id for node_id in intermediate if degrees.get(node_id, 0) > threshold
@@ -585,6 +587,31 @@ def _require_graph_endpoints(
             "Graph endpoint is not indexed",
             {"repo": str(repo_path), "missing_ids": missing_ids},
         )
+
+
+def _declared_type_bridge_terms(path: GraphPath, question: str) -> tuple[str, ...]:
+    """Use validated relation meaning for a narrow forward type-chain query.
+
+    An alias chain need not contain the English word 'depends'. Its authored
+    uses_type edges provide that bridge. Reversals, calls and claimed structural
+    implementation/dispatch never acquire this justification.
+    """
+    if not path.steps or any(
+        step.traversed != "forward" or step.edge.namespace != "loci"
+        or step.edge.type not in {"uses_type", "extends", "implements"}
+        or step.edge.resolution not in {"exact", "import-resolved"}
+        for step in path.steps
+    ):
+        return ()
+    terms = set(graph_text_terms(question))
+    if terms.intersection(graph_text_terms("implement implementation dispatch override construct call runtime compatible satisfy")):
+        return ()
+    if all(step.edge.type == "extends" for step in path.steps):
+        heritage = terms.intersection(graph_text_terms("extend inheritance inherit base"))
+        if heritage:
+            return tuple(sorted(heritage))
+    dependency = terms.intersection(graph_text_terms("type types depend dependency dependencies"))
+    return tuple(sorted(dependency))
 
 
 def _validate_graph_traversal_edges(

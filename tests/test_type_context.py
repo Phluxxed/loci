@@ -41,7 +41,7 @@ def simple_repo(indexed):
     })
 
 
-def test_second_declaration_uses_its_record_despite_collapsed_edge(indexed):
+def test_second_declaration_uses_its_new_declared_type_record(indexed):
     repo = simple_repo(indexed)
     result = context(repo, ["consumer.ts::second#function"])
     assert result["status"] == "complete"
@@ -49,13 +49,27 @@ def test_second_declaration_uses_its_record_despite_collapsed_edge(indexed):
     assert result["symbols"][0]["source"] == "interface Payload { value: string; }"
     reference = result["references"][0]
     assert reference["owner_id"] == "consumer.ts::second#function"
-    assert reference["edge"]["from"] == "consumer.ts::__file__#file"
-    assert reference["edge"]["evidence"]["line"] == 2
+    assert reference["edge"]["from"] == "consumer.ts::second#function"
+    assert reference["edge"]["type"] == "uses_type"
+    assert reference["edge"]["evidence"]["line"] == 3
     raw = (repo / "consumer.ts").read_bytes()
     span = reference["reference"]
     assert raw[span["start_byte"]:span["end_byte"]] == b"Payload"
     assert span["start_byte"] > raw.index(b"function second")
     assert any(item["file"] == "consumer.ts" and item["start_line"] == 1 for item in result["evidence"])
+
+
+def test_legacy_record_still_retains_original_collapsed_edge_identity(indexed):
+    repo = simple_repo(indexed)
+    roots = service.get_symbols(repo, ["consumer.ts::second#function"])
+    store, nodes, state = service._load_graph_context(repo, ensure_fresh=False)
+    result = expand_type_context(repo, store, nodes, replace(state, type_relations=()), roots)
+    reference, = result["references"]
+    assert result["scope"] == "existing_imported_type_references"
+    assert reference["owner_id"] == "consumer.ts::second#function"
+    assert reference["edge"]["from"] == "consumer.ts::__file__#file"
+    assert reference["edge"]["evidence"]["line"] == 2
+    assert reference["edge"]["type"] == "references_type"
 
 
 def test_reexport_support_and_deduplication_are_deterministic(indexed):
@@ -94,16 +108,17 @@ def test_parent_excludes_nested_declaration_type_references(indexed):
     assert context(repo, [inner])["symbols"][0]["id"] == "types.ts::Secret#interface"
 
 
-@pytest.mark.parametrize("body", [
-    'import type { Payload } from "./types";\nexport function f<Payload>(x: Payload): Payload { return x; }\n',
-    'interface Local { value: string; }\nexport function f(x: Local): Local { return x; }\n',
-    'import { Payload } from "./types";\nexport function f(x: Payload): Payload { return x; }\n',
+@pytest.mark.parametrize(("body", "target"), [
+    ('import type { Payload } from "./types";\nexport function f<Payload>(x: Payload): Payload { return x; }\n', None),
+    ('interface Local { value: string; }\nexport function f(x: Local): Local { return x; }\n', "consumer.ts::Local#interface"),
+    ('import { Payload } from "./types";\nexport function f(x: Payload): Payload { return x; }\n', "types.ts::Payload#interface"),
 ])
-def test_missing_local_generic_or_ordinary_import_edges_are_not_invented(indexed, body):
+def test_new_local_and_ordinary_import_types_resolve_while_generics_remain_unresolved(indexed, body, target):
     repo = indexed({"types.ts": "export interface Payload { value: string; }\n", "consumer.ts": body})
     result = context(repo, ["consumer.ts::f#function"])
-    assert not result["symbols"] and not result["references"]
-    assert result["scope"] == "existing_imported_type_references"
+    assert [item["id"] for item in result["symbols"]] == ([target] if target else [])
+    assert [item["target_id"] for item in result["references"]] == ([target] if target else [])
+    assert result["scope"] == "declared_type_relations"
 
 
 def test_ambiguous_exports_remain_unresolved(indexed):

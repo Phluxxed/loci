@@ -15,6 +15,7 @@ from loci.graph.contracts import (
 )
 from loci.graph.calls import validate_call_records
 from loci.graph.references import validate_symbol_reference_records
+from loci.graph._type_validation import validate_type_projection, validate_type_records
 from loci.graph.state import GraphIndexState
 from loci.parser.symbols import Symbol
 from loci.storage.repository_catalog import (
@@ -27,7 +28,7 @@ from loci.storage.repository_catalog import (
 from loci.storage.store_layout import repository_cache_key
 
 INDEX_SCHEMA_VERSION = 7
-EXTRACTOR_VERSION = 24
+EXTRACTOR_VERSION = 25
 MIN_SEARCH_SELECTIONS = 10
 MIN_ADVERSE_SEARCH_SELECTIONS = 3
 MIN_EXTRACTION_RETRIEVALS = 10
@@ -82,6 +83,12 @@ def _validate_graph_state(
             indexed_nodes=indexed_nodes,
             file_hashes=file_hashes,
         )
+    if graph_state.type_relations:
+        validate_type_records(
+            graph_state.type_relations, imports=graph_state.imports,
+            exports=graph_state.exports, indexed_nodes=indexed_nodes,
+            file_hashes=file_hashes, input_hashes=graph_state.input_hashes,
+        )
     built_in_edges = [
         edge
         for edge in graph_state.edges
@@ -102,7 +109,9 @@ def _validate_graph_state(
         imports=graph_state.imports,
         symbol_references=graph_state.symbol_references,
         calls=graph_state.calls,
+        type_relations=graph_state.type_relations,
     )
+    validate_type_projection(graph_state.edges, graph_state.type_relations)
 
 
 class IndexStore:

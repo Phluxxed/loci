@@ -231,16 +231,18 @@ names.
 | `loci_analyze` | Return structured search and extraction diagnostics |
 
 Pass `include_type_context: true` to `loci_get` to add complete definitions from
-existing resolved type-only references. The response keeps the requested
+proven TypeScript dependencies and explicit heritage. The response keeps the requested
 `symbols` and adds `type_context` with definitions, original graph edges,
 declaration ownership, supporting source and omissions. The default remains
 exact retrieval. Search-selection lineage applies only to the requested symbols.
 
 Expansion follows at most three hops from five requested declarations, within
 fixed node, source and output limits. It excludes references owned by nested
-declarations and does not infer missing local-type or inheritance relationships.
+declarations and follows authored local/imported type uses, extends and implements
+clauses. Unsupported or ambiguous bindings remain unresolved.
 An empty expansion therefore does not prove there are no type dependencies.
-See the [selection and budget contract](docs/design/2026-09-11-existing-type-context.md).
+See the [type relation contract](docs/design/2026-09-11-type-observations.md) and
+the [selection and budget contract](docs/design/2026-09-11-existing-type-context.md).
 
 `loci_search` and `loci_grep` include a versioned `coverage` object alongside
 their existing `symbols` or `matches` arrays. It reports whether repository
@@ -619,7 +621,8 @@ default arguments, class/module initialization, nested named functions, and
 anonymous functions are not silently assigned to a broader enclosing symbol.
 Module-level calls use the source file node; named nested functions keep their
 own indexed identity. A proven recursive call may be a trusted self-edge, while
-every other graph self-edge remains invalid.
+recursive authored `uses_type` relationships are also permitted with validated
+evidence. Other graph self-edges remain invalid.
 
 Inspect every stored outcome through the MCP-only diagnostic read:
 
@@ -669,6 +672,36 @@ no trusted call edge. Loci never falls back to a repository-wide same-name
 search. There is no call CLI, model or judge call, runtime/toolchain execution,
 repository-code execution, package-manager access, or network access in this
 path.
+
+### Built-in TypeScript contract relationships
+
+Loci records declaration-owned `uses_type`, `extends` and `implements` edges
+for exact local bindings and proven contained import/export routes. Alias chains,
+annotations, properties, generic arguments and bare `typeof` queries preserve
+their authored endpoints. Generic parameter shadowing, ambiguous exports and
+unsupported computations retain diagnostics without creating trusted edges.
+
+```text
+loci_graph_references(repo="/path/to/repo", family="type", status="all", limit=100)
+loci_graph_traverse_neighbors(
+  repo="/path/to/repo",
+  seed_ids=["src/consumer.ts::processOrder#function"],
+  edge_types=["uses_type", "extends", "implements"],
+  resolutions=["exact", "import-resolved"],
+  direction="outgoing",
+)
+```
+
+The paginated type family exposes exact occurrences, ownership, candidate scope
+and completeness, supporting source hashes and unresolved reasons. Default
+reference diagnostics retain the existing symbol-reference response. Generic
+paths hydrate relationship evidence; incoming traversal answers which
+declarations depend on a target. Compatibility `loci_graph_neighbors` remains
+contains-only. Graph health includes type counts and resolution-reason summaries.
+
+These relationships describe source declarations; they do not establish
+structural compatibility, inferred implementations or runtime dispatch.
+See the [contract and supported subset](docs/design/2026-09-11-type-observations.md).
 
 ## Analytics
 

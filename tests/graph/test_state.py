@@ -783,14 +783,15 @@ def test_empty_graph_state_has_complete_envelope():
         "exports": [],
         "symbol_references": [],
         "calls": [],
+        "type_relations": [],
         "contributions": [],
         "input_hashes": {},
         "diagnostics": [],
     }
 
 
-def test_graph_state_uses_schema_version_ten():
-    assert GRAPH_STATE_SCHEMA_VERSION == 12
+def test_graph_state_uses_schema_version_thirteen():
+    assert GRAPH_STATE_SCHEMA_VERSION == 13
 
 
 def test_graph_state_rejects_schema_version_two_as_stale():
