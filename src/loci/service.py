@@ -621,6 +621,37 @@ def get_symbols(
     ]
 
 
+def get_symbols_result(
+    repo: str | Path,
+    symbol_ids: list[str],
+    context: int = 0,
+    ensure_fresh: bool = False,
+    selected_from_search_id: str | None = None,
+    include_type_context: bool = False,
+) -> dict[str, Any]:
+    """Compose exact get with optional bounded, existing type context."""
+    if type(include_type_context) is not bool:
+        raise LociError("INVALID_INPUT", "include_type_context must be a boolean", {})
+    symbols = get_symbols(
+        repo, symbol_ids, context=context, ensure_fresh=ensure_fresh,
+        selected_from_search_id=selected_from_search_id,
+    )
+    result: dict[str, Any] = {"symbols": symbols}
+    if not include_type_context:
+        return result
+
+    from .type_context import empty_type_context, expand_type_context
+
+    repo_path = Path(repo).resolve()
+    try:
+        store, indexed_nodes, graph_state = _load_graph_context(repo_path, ensure_fresh=False)
+    except LociError as exc:
+        result["type_context"] = empty_type_context(reason=exc.code, unavailable=True)
+        return result
+    result["type_context"] = expand_type_context(repo_path, store, indexed_nodes, graph_state, symbols)
+    return result
+
+
 def search_symbols(
     repo: str | Path,
     query: str,

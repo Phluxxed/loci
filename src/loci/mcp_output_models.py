@@ -151,14 +151,6 @@ class RetrievedSymbol(StrictOutputModel):
     context_after: list[str] = _OMITTED
 
 
-class LociGetSuccess(StrictOutputModel):
-    symbols: list[RetrievedSymbol]
-
-
-class LociGetOutput(RootModel[LociGetSuccess | LociErrorOutput]):
-    model_config = ConfigDict(json_schema_extra={"type": "object"})
-
-
 class StoredSymbol(StrictOutputModel):
     id: str
     name: str
@@ -435,6 +427,56 @@ class GraphEdge(StrictOutputModel):
     namespace: str
     resolution: ResolutionTier
     evidence: GraphEvidence
+
+
+class TypeContextReferenceSpan(StrictOutputModel):
+    file: str
+    start_byte: int
+    end_byte: int
+
+
+class TypeContextSupport(StrictOutputModel):
+    kind: str
+    file: str
+    line: int
+    content_hash: str
+    endpoint_id: str
+
+
+class TypeContextReference(StrictOutputModel):
+    owner_id: str
+    target_id: str
+    reference: TypeContextReferenceSpan
+    edge: GraphEdge
+    support: list[TypeContextSupport]
+
+
+class TypeContextEvidence(StrictOutputModel):
+    file: str
+    start_line: int
+    end_line: int
+    byte_offset: int
+    content: str
+    content_hash: str
+
+
+class TypeContext(StrictOutputModel):
+    scope: Literal["existing_imported_type_references"]
+    status: Literal["complete", "partial", "unavailable"]
+    symbols: list[RetrievedSymbol]
+    references: list[TypeContextReference]
+    evidence: list[TypeContextEvidence]
+    limits: dict[str, int]
+    omissions: dict[str, int]
+
+
+class LociGetSuccess(StrictOutputModel):
+    symbols: list[RetrievedSymbol]
+    type_context: TypeContext = _OMITTED
+
+
+class LociGetOutput(RootModel[LociGetSuccess | LociErrorOutput]):
+    model_config = ConfigDict(json_schema_extra={"type": "object"})
 
 
 class GraphFilters(StrictOutputModel):

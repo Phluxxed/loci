@@ -212,7 +212,7 @@ names.
 | `loci_index` | Index a local repo path, optionally incrementally |
 | `loci_outline` | Return indexed symbols grouped by file |
 | `loci_search` | Search indexed symbols and return an opaque ID for explicit downstream selections |
-| `loci_get` | Return exact source; optionally declare deliberate selection from a specific search |
+| `loci_get` | Return exact source, with optional bounded imported-type context and deliberate search-selection lineage |
 | `loci_file` | Return cached file content with optional line range |
 | `loci_grep` | Regex-search cached files |
 | `loci_graph_anchors` | Select a bounded, explained set of graph start nodes from a question or exact seeds |
@@ -229,6 +229,18 @@ names.
 | `loci_list` | List indexed repos |
 | `loci_stats` | Return structured retrieval savings stats |
 | `loci_analyze` | Return structured search and extraction diagnostics |
+
+Pass `include_type_context: true` to `loci_get` to add complete definitions from
+existing resolved type-only references. The response keeps the requested
+`symbols` and adds `type_context` with definitions, original graph edges,
+declaration ownership, supporting source and omissions. The default remains
+exact retrieval. Search-selection lineage applies only to the requested symbols.
+
+Expansion follows at most three hops from five requested declarations, within
+fixed node, source and output limits. It excludes references owned by nested
+declarations and does not infer missing local-type or inheritance relationships.
+An empty expansion therefore does not prove there are no type dependencies.
+See the [selection and budget contract](docs/design/2026-09-11-existing-type-context.md).
 
 `loci_search` and `loci_grep` include a versioned `coverage` object alongside
 their existing `symbols` or `matches` arrays. It reports whether repository
