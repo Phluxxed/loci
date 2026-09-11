@@ -348,10 +348,20 @@ def _case_group(case: Mapping[str, Any]) -> str:
 def _measurement_values(
     runs: Sequence[Mapping[str, Any]], name: str
 ) -> list[Any]:
-    return [
-        _mapping(run.get("measurement")).get(name)
-        for run in runs
-    ]
+    values = []
+    for run in runs:
+        baseline = _mapping(run.get("baseline"))
+        accounting = _mapping(baseline.get("output_accounting"))
+        if accounting.get("schema_version") == 2 and name == "serialized_tool_output_bytes":
+            value = accounting.get("recorded_payload_bytes")
+        elif accounting.get("schema_version") == 2 and name == "read_count":
+            value = accounting.get("tool_call_count")
+        elif accounting.get("schema_version") == 2 and name == "tool_elapsed_ms":
+            value = baseline.get("adapter_elapsed_ms")
+        else:
+            value = _mapping(run.get("measurement")).get(name)
+        values.append(value)
+    return values
 
 
 def _authoritative_measurement_values(
@@ -362,7 +372,7 @@ def _authoritative_measurement_values(
         if require_delivery and _mapping(run.get("derived")).get("delivery_verified") is not True:
             values.append(None)
         else:
-            values.append(_mapping(run.get("measurement")).get(name))
+            values.append(_measurement_values([run], name)[0])
     return values
 
 
@@ -621,7 +631,7 @@ def _latency_p95(runs: Sequence[Mapping[str, Any]], maintained_case_ids: set[str
     return result
 
 
-def generate_report(output: Path) -> dict[str, Any]:
+def generate_report(output: Path, corpus_root: Path = DEFAULT_ROOT) -> dict[str, Any]:
     """Aggregate all saved ``*/result.json`` artifacts below ``output``.
 
     The return value is the same object written to ``summary.json``.  Every
@@ -630,7 +640,7 @@ def generate_report(output: Path) -> dict[str, Any]:
     """
 
     output = Path(output).resolve()
-    corpus = load_corpus(DEFAULT_ROOT)
+    corpus = load_corpus(corpus_root)
     cases = list(corpus["cases"])
     case_by_id = {case["id"]: case for case in cases}
     expected_keys = [
@@ -646,6 +656,14 @@ def generate_report(output: Path) -> dict[str, Any]:
     for result_path in sorted(output.rglob("result.json")) if output.exists() else []:
         run, invalid = _load_run(result_path, output)
         if run is not None:
+            expected_hashes = {
+                "corpus_sha256": (Path(corpus["_root"]) / "corpus.sha256").read_text().strip(),
+                "controls_sha256": (Path(corpus["_root"]) / "comparison-controls.sha256").read_text().strip(),
+            }
+            identity = run["identity"]
+            if corpus["version"] == "typescript-context-v2" or any(key in identity for key in expected_hashes):
+                if any(identity.get(key) != value for key, value in expected_hashes.items()):
+                    raise ValueError("result protocol differs from selected report corpus")
             runs.append(run)
         elif invalid is not None:
             invalid_results.append(invalid)
@@ -937,8 +955,9 @@ def _write_report(output: Path, summary: Mapping[str, Any]) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--corpus-root", type=Path, default=DEFAULT_ROOT)
     args = parser.parse_args()
-    summary = generate_report(args.output)
+    summary = generate_report(args.output, args.corpus_root)
     print(json.dumps({
         "report": str((Path(args.output).resolve() / "report.md")),
         "summary": str((Path(args.output).resolve() / "summary.json")),
