@@ -1,0 +1,82 @@
+[
+  {
+    "type": "thread.started",
+    "thread_id": "01a092d5-2d81-77a2-b17d-f0323c9abc02"
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_0",
+      "type": "error",
+      "message": "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-transport-evpe4_4w/runtime/config.toml."
+    }
+  },
+  {
+    "type": "turn.started"
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_1",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_1",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "consumer.ts::processOrder#function",
+              "source": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}",
+              "byte_offset": 69,
+              "byte_length": 83,
+              "line": 2,
+              "end_line": 4,
+              "signature": "function processOrder(value: ImportedPayload): string {",
+              "kind": "function",
+              "language": "typescript"
+            }
+          ],
+          "_evaluation": {
+            "attempt_id": "c32fd058-b88b-462d-84e8-24b5c4f9f0df/attempt/1",
+            "calls_remaining": 23
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "error",
+    "message": "{\"error\":{\"message\":\"offline transport probe complete\",\"type\":\"invalid_request_error\"}}"
+  },
+  {
+    "type": "turn.failed",
+    "error": {
+      "message": "{\"error\":{\"message\":\"offline transport probe complete\",\"type\":\"invalid_request_error\"}}"
+    }
+  }
+]
