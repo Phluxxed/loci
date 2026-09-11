@@ -190,7 +190,7 @@ returning data. A first retrieval against a valid, readable root indexes it and
 completes the request in the same call, without a separate pre-index step.
 `loci_index`
 still performs explicit indexing, while `loci_outline`, `loci_search`,
-`loci_get`, `loci_file`, `loci_grep`, `loci_graph_anchors`,
+`loci_get`, `loci_explore`, `loci_file`, `loci_grep`, `loci_graph_anchors`,
 `loci_graph_neighbors`, `loci_graph_traverse_neighbors`, `loci_graph_paths`,
 `loci_graph_retrieve`, `loci_graph_imports`, `loci_graph_references`, and
 `loci_graph_calls`, and `loci_graph_health` first check indexed source, profile,
@@ -212,7 +212,8 @@ names.
 | `loci_index` | Index a local repo path, optionally incrementally |
 | `loci_outline` | Return indexed symbols grouped by file |
 | `loci_search` | Search indexed symbols and return an opaque ID for explicit downstream selections |
-| `loci_get` | Return exact source, with optional bounded imported-type context and deliberate search-selection lineage |
+| `loci_get` | Return exact source, with optional bounded type context and deliberate search-selection lineage |
+| `loci_explore` | Select compact source for locating code, TypeScript dependencies, or known static impact |
 | `loci_file` | Return cached file content with optional line range |
 | `loci_grep` | Regex-search cached files |
 | `loci_graph_anchors` | Select a bounded, explained set of graph start nodes from a question or exact seeds |
@@ -229,6 +230,23 @@ names.
 | `loci_list` | List indexed repos |
 | `loci_stats` | Return structured retrieval savings stats |
 | `loci_analyze` | Return structured search and extraction diagnostics |
+
+Use `loci_explore` for source selected by an explicit purpose:
+
+```text
+loci_explore(repo="/path/to/repo", intent="locate", query="processOrder")
+loci_explore(repo="/path/to/repo", intent="type_dependencies",
+             seed_ids=["src/order.ts::processOrder#function"], query="customer field")
+loci_explore(repo="/path/to/repo", intent="impact",
+             seed_ids=["src/order.ts::processOrder#function"])
+```
+
+The result includes source, stored proof paths and omissions. Type selection
+prioritizes immediate contracts, aliases and heritage, and uses the query to
+select deeper fields. Impact follows known static incoming relationships and
+reports non-exhaustive scope. Independent source and complete MCP-result byte
+limits keep output bounded; clipped anchors are marked incomplete. See the
+[intent and evidence contract](docs/design/2026-09-11-intent-evidence.md).
 
 Pass `include_type_context: true` to `loci_get` to add complete definitions from
 proven TypeScript dependencies and explicit heritage. The response keeps the requested

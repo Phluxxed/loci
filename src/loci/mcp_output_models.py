@@ -1432,3 +1432,120 @@ class LociGraphCallsSuccess(StrictOutputModel):
 
 class LociGraphCallsOutput(RootModel[LociGraphCallsSuccess | LociErrorOutput]):
     model_config = ConfigDict(json_schema_extra={"type": "object"})
+
+
+ExplorationIntent = Literal["locate", "type_dependencies", "impact"]
+ExplorationStatus = Literal["ok", "partial", "empty"]
+ExplorationSelection = Literal["explicit", "inferred"]
+
+
+class ExplorationScope(StrictOutputModel):
+    source: Literal["indexed_supported_source"]
+    coverage: Literal["complete", "partial", "unknown"]
+    relationships: Literal["none", "authored_types", "known_static_dependents"]
+    exhaustive: Literal[False]
+
+
+class ExplorationItem(StrictOutputModel):
+    id: str
+    name: str
+    kind: str
+    file: str
+    role: Literal["anchor", "dependency", "dependent"]
+    depth: int = Field(ge=0)
+    source_id: int = Field(ge=1)
+    complete: bool
+    why: str
+    path: list[int]
+
+
+class ExplorationRelationship(StrictOutputModel):
+    id: int = Field(ge=1)
+    edge: GraphEdge
+    traversed: Literal["forward", "reverse"]
+    source_ids: list[int] = Field(min_length=1)
+
+
+class ExplorationSource(StrictOutputModel):
+    id: int = Field(ge=1)
+    file: str
+    start_byte: int = Field(ge=0)
+    end_byte: int = Field(ge=1)
+    start_line: int = Field(ge=1)
+    end_line: int = Field(ge=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    content: str
+
+    @model_validator(mode="after")
+    def _valid_utf8_span(self) -> ExplorationSource:
+        if self.end_byte <= self.start_byte:
+            raise ValueError("source byte span must be non-empty and ordered")
+        if self.end_line < self.start_line:
+            raise ValueError("source line span must be ordered")
+        if not self.content:
+            raise ValueError("source content must be non-empty")
+        if len(self.content.encode("utf-8")) != self.end_byte - self.start_byte:
+            raise ValueError("source content does not match its UTF-8 span")
+        return self
+
+
+ExplorationOmissionReason = Literal[
+    "no_anchor",
+    "anchor_limit",
+    "unsupported_anchor",
+    "unsupported_language",
+    "unresolved_relation",
+    "not_selected",
+    "alternative_path",
+    "cycle",
+    "hop_limit",
+    "node_limit",
+    "neighbor_limit",
+    "item_limit",
+    "evidence_budget",
+    "output_budget",
+    "source_clipped",
+    "source_unavailable",
+    "ancestor_unavailable",
+]
+
+
+class ExplorationOmission(StrictOutputModel):
+    reason: ExplorationOmissionReason
+    count: int = Field(ge=1)
+
+
+class ExplorationLimits(StrictOutputModel):
+    max_hops: int = Field(ge=0, le=4)
+    max_nodes: Literal[64]
+    max_items: Literal[12]
+    max_neighbors: Literal[32]
+    max_output_bytes: int = Field(ge=2048, le=262144)
+    max_evidence_bytes: int = Field(ge=0, le=65536)
+
+
+class ExplorationUsage(StrictOutputModel):
+    nodes_examined: int = Field(ge=0)
+    evidence_bytes: int = Field(ge=0)
+    output_bytes: int = Field(ge=0)
+    estimated_tokens: int = Field(ge=0)
+    token_estimate_method: Literal["utf8_bytes_div_4"]
+    output_encoding: Literal["mcp_result_json_utf8"]
+
+
+class LociExploreSuccess(StrictOutputModel):
+    schema_version: Literal[1]
+    intent: ExplorationIntent
+    status: ExplorationStatus
+    selection: ExplorationSelection
+    scope: ExplorationScope
+    items: list[ExplorationItem]
+    relationships: list[ExplorationRelationship]
+    sources: list[ExplorationSource]
+    omissions: list[ExplorationOmission]
+    limits: ExplorationLimits
+    usage: ExplorationUsage
+
+
+class LociExploreOutput(RootModel[LociExploreSuccess | LociErrorOutput]):
+    model_config = ConfigDict(json_schema_extra={"type": "object"})

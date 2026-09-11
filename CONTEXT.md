@@ -23,3 +23,13 @@ _Avoid_: complete implementation set, inferred inheritance
 particular binding scope. Completeness within that universe does not establish
 completeness across the repository or language.
 _Avoid_: all possible targets, proven reachability
+
+**Retrieval intent**: The caller's stated purpose for selecting repository
+evidence, such as locating code, understanding type dependencies or exploring
+known dependents. It changes selection without changing relationship meaning.
+_Avoid_: inferred task, answerability decision
+
+**Selection relevance**: A reason to include evidence for the current request.
+A proven dependency can have low selection relevance, and a strong name match
+does not prove a dependency.
+_Avoid_: relationship certainty, required context

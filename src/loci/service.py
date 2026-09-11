@@ -89,6 +89,7 @@ from loci.storage.store_health import (
     diagnose_store,
 )
 from loci.storage.store_resolver import StoreResolution, resolve_store_base_dir
+from loci.exploration import explore_context
 
 REFRESH_LOCK_POLL_SECONDS = 0.05
 REFRESH_LOCK_RECLAIM_GRACE_SECONDS = 1.0
@@ -1099,6 +1100,33 @@ def graph_paths(
             path_offset=path_offset,
             max_evidence_bytes=max_evidence_bytes,
             max_estimated_tokens=max_estimated_tokens,
+        )
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+
+def explore(
+    repo: str | Path,
+    query: str = "",
+    *,
+    intent: str = "locate",
+    seed_ids: list[str] | None = None,
+    max_hops: int | None = None,
+    max_output_bytes: int = 16384,
+    max_evidence_bytes: int = 8192,
+    resolutions: list[str] | None = None,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    """Return compact source selected for an explicit static retrieval intent."""
+    repo_path = Path(repo).resolve()
+    store, nodes, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
+    coverage = query_coverage_from_index(_load_required_index(store, repo_path), "indexed_symbols")
+    try:
+        return explore_context(
+            repo_path, store, nodes, state, query, intent=intent, seed_ids=seed_ids,
+            max_hops=max_hops, max_output_bytes=max_output_bytes,
+            max_evidence_bytes=max_evidence_bytes, resolutions=resolutions,
+            coverage=coverage["state"],
         )
     except GraphContractError as exc:
         raise LociError(exc.code, exc.message, exc.details) from exc

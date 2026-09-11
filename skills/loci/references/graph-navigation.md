@@ -2,14 +2,60 @@
 
 ## Contents
 
+- Compact source by intent
 - Graph starts, neighbours, paths, and retrieval
+- Authored TypeScript dependencies and heritage
 - Built-in import relationships
 - Imported-symbol references
 - Definite calls
 
-Use these contracts only for graph-shaped questions. Read
+Use these contracts for source exploration and graph-shaped questions. Read
 [language-resolution.md](language-resolution.md) for JavaScript/TypeScript,
 Go, and Rust resolver limits.
+
+## Compact source by intent
+
+Use `loci_explore(repo, intent, query, seed_ids=None)` when you need selected
+source with its proof paths. Choose the meaning explicitly:
+
+| Intent | Use | Traversal |
+|---|---|---|
+| `locate` | Find source declarations or pages. | Anchors only. |
+| `type_dependencies` | Understand a TypeScript declaration's contract. | Outgoing authored types and heritage, three hops by default. |
+| `impact` | Inspect known static dependents before a change. | Incoming calls, references and types, one hop by default. |
+
+Pass exact symbol seeds when known; otherwise the query selects anchors.
+For a question about `processOrder`'s customer field, say so in `query`.
+Immediate types and alias/heritage continuation receive priority; deeper
+property branches need a matching query term. This is a relevance heuristic.
+Every relationship still requires an existing exact or import-resolved edge.
+
+Read `items` alongside their shared `sources` and `relationships`. Each
+relationship retains its original direction and records forward or reverse
+traversal. Treat `impact` as known static dependents, with non-exhaustive scope.
+For execution paths, affected tests or value origins, select source with
+`locate` and inspect the appropriate diagnostic tools and implementation.
+
+Inspect `omissions` before concluding. A clipped anchor has `complete=false`;
+use `loci_get` for its full definition before editing. Related definitions and
+required proof source fit together or are omitted. Use `max_hops` and the two
+byte limits for deliberate bounded follow-up, or use exact graph diagnostics
+for a particular edge or rejected binding. The [output contract](tool-contracts.md#compact-exploration-output)
+explains source IDs, coverage and byte accounting.
+
+## Authored TypeScript dependencies and heritage
+
+Use `loci_graph_references(repo, family="type", file=..., status="all")` to
+inspect declaration-owned observations and their exact sites, bindings,
+support/control hashes and unresolved reasons. This includes local type uses,
+aliases, type queries and explicit `extends`/`implements` clauses. The default
+`family="symbol"` retains executable imported-reference ownership.
+
+Traverse `uses_type`, `extends` and `implements` with `exact` or
+`import-resolved`. Heritage edges record authored clauses; a longer path does
+not establish structural compatibility or an inherited authored `implements`
+clause. Generic shadowing, ambiguous exports and unsupported computations
+remain unresolved rather than producing guessed targets.
 
 ## Graph starts and traversal
 
