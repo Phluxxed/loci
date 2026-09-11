@@ -1,0 +1,497 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "task_id": "inline_default_control",
+    "session_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d",
+    "arm": "A",
+    "repetition": 3,
+    "snapshot": "inline_default_control",
+    "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+    "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+    "controls_version": "typescript-context-controls-v2"
+  },
+  "events": [
+    {
+      "id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d:1",
+      "task_id": "inline_default_control",
+      "session_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "inline_default_control",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Locate the useNumber declaration and its initial body so I can trace the num call.",
+      "because": null,
+      "arguments": {
+        "query": "useNumber",
+        "kind": "function"
+      },
+      "search_id": "6e42c74f-64ac-4ad1-9de5-830bc77c8ffd",
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::useNumber#function\",\"name\":\"useNumber\",\"qualified_name\":\"useNumber\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":38,\"byte_length\":47,\"signature\":\"function useNumber(): number { return num(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e\",\"decorators\":[],\"keywords\":[\"number\",\"use\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"6e42c74f-64ac-4ad1-9de5-830bc77c8ffd\",\"_evaluation\":{\"attempt_id\":\"ae1de58e-2cf2-4658-a6f0-3003f481d80d/attempt/1\",\"calls_remaining\":23,\"event_id\":\"ae1de58e-2cf2-4658-a6f0-3003f481d80d:1\"}}",
+      "serialized_bytes": 892,
+      "source_bytes": 47,
+      "elapsed_ms": 2.6694169937400147,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 38,
+          "end_byte": 85,
+          "sha256": "eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e",
+          "text": "function useNumber(): number { return num(1); }"
+        }
+      ]
+    },
+    {
+      "id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d:2",
+      "task_id": "inline_default_control",
+      "session_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "inline_default_control",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "get",
+      "reason": "task_context",
+      "detail": "Retrieve the exact useNumber body to identify the callee named num and the existing call expression.",
+      "because": null,
+      "arguments": {
+        "symbol_ids": [
+          "consumer.ts::useNumber#function"
+        ],
+        "selected_from_search_id": "6e42c74f-64ac-4ad1-9de5-830bc77c8ffd",
+        "context": 2
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::useNumber#function\",\"source\":\"function useNumber(): number { return num(1); }\",\"byte_offset\":38,\"byte_length\":47,\"line\":2,\"end_line\":2,\"signature\":\"function useNumber(): number { return num(1); }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import num from \\\"./number.js\\\";\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"ae1de58e-2cf2-4658-a6f0-3003f481d80d/attempt/2\",\"calls_remaining\":22,\"event_id\":\"ae1de58e-2cf2-4658-a6f0-3003f481d80d:2\"}}",
+      "serialized_bytes": 497,
+      "source_bytes": 124,
+      "elapsed_ms": 7.312624999030959,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 38,
+          "end_byte": 85,
+          "sha256": "eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e",
+          "text": "function useNumber(): number { return num(1); }"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 30,
+          "sha256": "cb005bb93a29b5d639c6aea61820c76673a79d260f821773be61e27017316b61",
+          "text": "import num from \"./number.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 38,
+          "end_byte": 85,
+          "sha256": "eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e",
+          "text": "function useNumber(): number { return num(1); }"
+        }
+      ]
+    },
+    {
+      "id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d:3",
+      "task_id": "inline_default_control",
+      "session_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "inline_default_control",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Find candidate TypeScript function declarations named num for the imported callee.",
+      "because": null,
+      "arguments": {
+        "query": "num",
+        "kind": "function",
+        "lang": "typescript"
+      },
+      "search_id": "8ffced8e-1626-4907-be8f-30c786d1d58e",
+      "response_json": "{\"symbols\":[{\"id\":\"number.ts::num#function\",\"name\":\"num\",\"qualified_name\":\"num\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"number.ts\",\"byte_offset\":15,\"byte_length\":54,\"signature\":\"function num(v: unknown): number { return Number(v); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985\",\"decorators\":[],\"keywords\":[\"num\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":71.0},{\"id\":\"consumer.ts::useNumber#function\",\"name\":\"useNumber\",\"qualified_name\":\"useNumber\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":38,\"byte_length\":47,\"signature\":\"function useNumber(): number { return num(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e\",\"decorators\":[],\"keywords\":[\"number\",\"use\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":40.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"8ffced8e-1626-4907-be8f-30c786d1d58e\",\"_evaluation\":{\"attempt_id\":\"ae1de58e-2cf2-4658-a6f0-3003f481d80d/attempt/3\",\"calls_remaining\":21,\"event_id\":\"ae1de58e-2cf2-4658-a6f0-3003f481d80d:3\"}}",
+      "serialized_bytes": 1324,
+      "source_bytes": 101,
+      "elapsed_ms": 3.3584580014576204,
+      "spans": [
+        {
+          "file": "number.ts",
+          "start_byte": 15,
+          "end_byte": 69,
+          "sha256": "a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985",
+          "text": "function num(v: unknown): number { return Number(v); }"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 38,
+          "end_byte": 85,
+          "sha256": "eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e",
+          "text": "function useNumber(): number { return num(1); }"
+        }
+      ]
+    },
+    {
+      "id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d:4",
+      "task_id": "inline_default_control",
+      "session_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "inline_default_control",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "get",
+      "reason": "missing_context",
+      "detail": "Retry retrieval of the num declaration after the prior selected-source request failed to reference the exact search result.",
+      "because": "ae1de58e-2cf2-4658-a6f0-3003f481d80d:3",
+      "arguments": {
+        "symbol_ids": [
+          "number.ts::num#function"
+        ],
+        "selected_from_search_id": "8ffced8e-1626-4907-be8f-30c786d1d58e",
+        "context": 1
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"number.ts::num#function\",\"source\":\"function num(v: unknown): number { return Number(v); }\",\"byte_offset\":15,\"byte_length\":54,\"line\":1,\"end_line\":1,\"signature\":\"function num(v: unknown): number { return Number(v); }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"ae1de58e-2cf2-4658-a6f0-3003f481d80d/attempt/5\",\"calls_remaining\":19,\"event_id\":\"ae1de58e-2cf2-4658-a6f0-3003f481d80d:4\"}}",
+      "serialized_bytes": 469,
+      "source_bytes": 108,
+      "elapsed_ms": 8.440833000349812,
+      "spans": [
+        {
+          "file": "number.ts",
+          "start_byte": 15,
+          "end_byte": 69,
+          "sha256": "a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985",
+          "text": "function num(v: unknown): number { return Number(v); }"
+        },
+        {
+          "file": "number.ts",
+          "start_byte": 15,
+          "end_byte": 69,
+          "sha256": "a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985",
+          "text": "function num(v: unknown): number { return Number(v); }"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "inline_default_control",
+    "session_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d",
+    "arm": "A",
+    "repetition": 3,
+    "snapshot": "inline_default_control",
+    "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+    "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+    "controls_version": "typescript-context-controls-v2",
+    "schema_version": 1,
+    "outcome": "tool_failure",
+    "task_correct": false,
+    "answer": {
+      "origin_file": "number.ts",
+      "declaration_name": "num",
+      "declared_parameter_type": "unknown",
+      "return_type": "number",
+      "result": 1
+    },
+    "read_count": 4,
+    "avoidable_reads": null,
+    "proven_avoidable_reads": 0,
+    "lineage_status": "inconclusive",
+    "classifications": [
+      {
+        "event_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d:1",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d:2",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d:3",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d:4",
+        "classification": "unproven",
+        "reason": "missing_context",
+        "because": "ae1de58e-2cf2-4658-a6f0-3003f481d80d:3",
+        "recovered_gold": []
+      }
+    ],
+    "required_context_delivered": [
+      "callee",
+      "entry",
+      "import"
+    ],
+    "required_context_total": 4,
+    "context_recall": 0.75,
+    "serialized_tool_output_bytes": 3182,
+    "source_bytes": 380,
+    "estimated_source_tokens": 95,
+    "tool_elapsed_ms": 21.781332994578406,
+    "provider_usage": {
+      "input_tokens": 36615,
+      "cached_input_tokens": 28160,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 895,
+      "reasoning_output_tokens": 390
+    },
+    "usage_semantics": "Codex turn.completed gross input; cached_input is a subset; output includes reasoning_output_tokens.",
+    "token_status": "measured"
+  },
+  "baseline": {
+    "end_to_end_seconds": 31.15447879199928,
+    "actual_process_seconds": 31.15447879199928,
+    "exit_code": 0,
+    "provider_thread_id": "01a08e4b-1778-71b0-a8e9-940cd7ab96d6",
+    "failures": [
+      {
+        "attempt_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d/attempt/4",
+        "category": "tool_error",
+        "message": "Selected-from search lineage is invalid"
+      },
+      {
+        "attempt_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d/attempt/4",
+        "category": "invalid_trace",
+        "message": "selection must reference an earlier search in this run"
+      }
+    ],
+    "tool_delivery_verified": true,
+    "relationships": {
+      "schema_version": 1,
+      "case_id": "inline_default_control",
+      "required_semantic_dependencies_total": 1,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "calls",
+          "to": "callee",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "exact_kind",
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "consumer.ts::useNumber#function",
+              "to": "number.ts::num#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "271a73bf1eed83ee538b9c9d1e39c1c04a6c3765de9cb304a493f2e0e1bcff2f"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "available_dependency_links_total": 1,
+      "available_dependency_links": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "calls",
+          "to": "callee",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "exact_kind",
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "consumer.ts::useNumber#function",
+              "to": "number.ts::num#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "271a73bf1eed83ee538b9c9d1e39c1c04a6c3765de9cb304a493f2e0e1bcff2f"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "dependency-link recall; references_type fallback is generic and does not establish precise subtype/kind recall",
+        "required": 1,
+        "available": 1,
+        "delivered": 0,
+        "available_ratio": 1.0,
+        "delivered_ratio": 0.0
+      },
+      "precise_kind_links_available_total": 1,
+      "precise_kind_links_delivered_total": 0,
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_scope": "authored frozen forbidden_relationships only; this is not exhaustive truth about unsupported or unrecorded edges"
+    },
+    "output_accounting": {
+      "schema_version": 2,
+      "complete": true,
+      "calls": [
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "useNumber",
+              "kind": "function"
+            },
+            "reason": "task_context",
+            "detail": "Locate the useNumber declaration and its initial body so I can trace the num call."
+          },
+          "attempt_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d/attempt/1",
+          "trace_event_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d:1",
+          "source_bytes": 47,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::useNumber#function\",\"name\":\"useNumber\",\"qualified_name\":\"useNumber\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":38,\"byte_length\":47,\"signature\":\"function useNumber(): number { return num(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e\",\"decorators\":[],\"keywords\":[\"number\",\"use\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"6e42c74f-64ac-4ad1-9de5-830bc77c8ffd\",\"_evaluation\":{\"attempt_id\":\"ae1de58e-2cf2-4658-a6f0-3003f481d80d/attempt/1\",\"calls_remaining\":23,\"event_id\":\"ae1de58e-2cf2-4658-a6f0-3003f481d80d:1\"}}"
+          ],
+          "serialized_bytes": 892
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "get",
+            "parameters": {
+              "symbol_ids": [
+                "consumer.ts::useNumber#function"
+              ],
+              "selected_from_search_id": "6e42c74f-64ac-4ad1-9de5-830bc77c8ffd",
+              "context": 2
+            },
+            "reason": "task_context",
+            "detail": "Retrieve the exact useNumber body to identify the callee named num and the existing call expression."
+          },
+          "attempt_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d/attempt/2",
+          "trace_event_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d:2",
+          "source_bytes": 124,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::useNumber#function\",\"source\":\"function useNumber(): number { return num(1); }\",\"byte_offset\":38,\"byte_length\":47,\"line\":2,\"end_line\":2,\"signature\":\"function useNumber(): number { return num(1); }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import num from \\\"./number.js\\\";\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"ae1de58e-2cf2-4658-a6f0-3003f481d80d/attempt/2\",\"calls_remaining\":22,\"event_id\":\"ae1de58e-2cf2-4658-a6f0-3003f481d80d:2\"}}"
+          ],
+          "serialized_bytes": 497
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "num",
+              "kind": "function",
+              "lang": "typescript"
+            },
+            "reason": "task_context",
+            "detail": "Find candidate TypeScript function declarations named num for the imported callee."
+          },
+          "attempt_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d/attempt/3",
+          "trace_event_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d:3",
+          "source_bytes": 101,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"number.ts::num#function\",\"name\":\"num\",\"qualified_name\":\"num\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"number.ts\",\"byte_offset\":15,\"byte_length\":54,\"signature\":\"function num(v: unknown): number { return Number(v); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985\",\"decorators\":[],\"keywords\":[\"num\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":71.0},{\"id\":\"consumer.ts::useNumber#function\",\"name\":\"useNumber\",\"qualified_name\":\"useNumber\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":38,\"byte_length\":47,\"signature\":\"function useNumber(): number { return num(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e\",\"decorators\":[],\"keywords\":[\"number\",\"use\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":40.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"8ffced8e-1626-4907-be8f-30c786d1d58e\",\"_evaluation\":{\"attempt_id\":\"ae1de58e-2cf2-4658-a6f0-3003f481d80d/attempt/3\",\"calls_remaining\":21,\"event_id\":\"ae1de58e-2cf2-4658-a6f0-3003f481d80d:3\"}}"
+          ],
+          "serialized_bytes": 1324
+        },
+        {
+          "item_id": "item_5",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "get",
+            "parameters": {
+              "symbol_ids": [
+                "number.ts::num#function"
+              ],
+              "selected_from_search_id": "8ffced8e-1624-4907-be8f-30c786d1d58e",
+              "context": 1
+            },
+            "reason": "task_context",
+            "detail": "Retrieve the exact num declaration to report its parameter annotation, return annotation, and implementation result."
+          },
+          "attempt_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d/attempt/4",
+          "trace_event_id": null,
+          "source_bytes": 0,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"error\":{\"code\":\"INVALID_TRACE\",\"message\":\"selection must reference an earlier search in this run\"},\"_evaluation\":{\"attempt_id\":\"ae1de58e-2cf2-4658-a6f0-3003f481d80d/attempt/4\",\"calls_remaining\":20}}"
+          ],
+          "serialized_bytes": 200
+        },
+        {
+          "item_id": "item_6",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "get",
+            "parameters": {
+              "symbol_ids": [
+                "number.ts::num#function"
+              ],
+              "selected_from_search_id": "8ffced8e-1626-4907-be8f-30c786d1d58e",
+              "context": 1
+            },
+            "reason": "missing_context",
+            "because": "ae1de58e-2cf2-4658-a6f0-3003f481d80d:3",
+            "detail": "Retry retrieval of the num declaration after the prior selected-source request failed to reference the exact search result."
+          },
+          "attempt_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d/attempt/5",
+          "trace_event_id": "ae1de58e-2cf2-4658-a6f0-3003f481d80d:4",
+          "source_bytes": 108,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"number.ts::num#function\",\"source\":\"function num(v: unknown): number { return Number(v); }\",\"byte_offset\":15,\"byte_length\":54,\"line\":1,\"end_line\":1,\"signature\":\"function num(v: unknown): number { return Number(v); }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"ae1de58e-2cf2-4658-a6f0-3003f481d80d/attempt/5\",\"calls_remaining\":19,\"event_id\":\"ae1de58e-2cf2-4658-a6f0-3003f481d80d:4\"}}"
+          ],
+          "serialized_bytes": 469
+        }
+      ],
+      "tool_call_count": 5,
+      "recorded_payload_bytes": 3382,
+      "complete_payload_bytes": 3382,
+      "source_bytes": 380,
+      "failures": []
+    },
+    "lineage_valid": false,
+    "adapter_elapsed_ms": 24.21254299406428
+  }
+}

@@ -1,0 +1,862 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "task_id": "named_type_reexport_chain",
+    "session_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9",
+    "arm": "A",
+    "repetition": 1,
+    "snapshot": "named_type_reexport_chain",
+    "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+    "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+    "controls_version": "typescript-context-controls-v2"
+  },
+  "events": [
+    {
+      "id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:1",
+      "task_id": "named_type_reexport_chain",
+      "session_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "named_type_reexport_chain",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Locate the processOrder declaration and nearby typed API definitions needed to prepare the regression input.",
+      "because": null,
+      "arguments": {
+        "query": "processOrder",
+        "kind": "function"
+      },
+      "search_id": "ea671799-fbc2-4aa9-82f5-8d05f42a20ab",
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"qualified_name\":\"processOrder\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":76,\"byte_length\":83,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"10ff5e5d2a4918055984c04b730e5c8efc809afc556c79c0adf351c6d1b7d303\",\"decorators\":[],\"keywords\":[\"order\",\"process\"],\"metadata\":{},\"line\":2,\"end_line\":4,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"ea671799-fbc2-4aa9-82f5-8d05f42a20ab\",\"_evaluation\":{\"attempt_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/1\",\"calls_remaining\":23,\"event_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:1\"}}",
+      "serialized_bytes": 912,
+      "source_bytes": 55,
+      "elapsed_ms": 2.900833002058789,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 76,
+          "end_byte": 131,
+          "sha256": "08653276f18caff75a7f70cd621f7b7e923bcbbbd2cb47ed8d3ac2b68ecaeec2",
+          "text": "function processOrder(value: ImportedPayload): string {"
+        }
+      ]
+    },
+    {
+      "id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:2",
+      "task_id": "named_type_reexport_chain",
+      "session_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "named_type_reexport_chain",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "get",
+      "reason": "task_context",
+      "detail": "Retrieve the processOrder declaration body and its immediate context to identify the consumer spelling and the imported payload type.",
+      "because": null,
+      "arguments": {
+        "symbol_ids": [
+          "consumer.ts::processOrder#function"
+        ],
+        "selected_from_search_id": "ea671799-fbc2-4aa9-82f5-8d05f42a20ab",
+        "context": 3
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"source\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\",\"byte_offset\":76,\"byte_length\":83,\"line\":2,\"end_line\":4,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import type { PublicPayload as ImportedPayload } from \\\"./barrel.js\\\";\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/2\",\"calls_remaining\":22,\"event_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:2\"}}",
+      "serialized_bytes": 584,
+      "source_bytes": 206,
+      "elapsed_ms": 4.972708004061133,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 76,
+          "end_byte": 159,
+          "sha256": "10ff5e5d2a4918055984c04b730e5c8efc809afc556c79c0adf351c6d1b7d303",
+          "text": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 68,
+          "sha256": "3a2171e4ccfd4ea30910487e706ad6208ffd90ca6f99d1bf16427f0fc636228b",
+          "text": "import type { PublicPayload as ImportedPayload } from \"./barrel.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 76,
+          "end_byte": 131,
+          "sha256": "08653276f18caff75a7f70cd621f7b7e923bcbbbd2cb47ed8d3ac2b68ecaeec2",
+          "text": "function processOrder(value: ImportedPayload): string {"
+        }
+      ]
+    },
+    {
+      "id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:3",
+      "task_id": "named_type_reexport_chain",
+      "session_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "named_type_reexport_chain",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Find the original payload interface declaration to determine required fields, their types, and its defining file.",
+      "because": null,
+      "arguments": {
+        "query": "PublicPayload",
+        "kind": "interface",
+        "lang": "typescript"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":null,\"_evaluation\":{\"attempt_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/3\",\"calls_remaining\":21,\"event_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:3\"}}",
+      "serialized_bytes": 403,
+      "source_bytes": 0,
+      "elapsed_ms": 2.606416994240135,
+      "spans": []
+    },
+    {
+      "id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:4",
+      "task_id": "named_type_reexport_chain",
+      "session_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "named_type_reexport_chain",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "missing_context",
+      "detail": "The interface-kind search found no declaration, so search all TypeScript symbol kinds for the payload alias and its re-export route.",
+      "because": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:3",
+      "arguments": {
+        "query": "PublicPayload",
+        "lang": "typescript"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":null,\"_evaluation\":{\"attempt_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/4\",\"calls_remaining\":20,\"event_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:4\"}}",
+      "serialized_bytes": 403,
+      "source_bytes": 0,
+      "elapsed_ms": 2.7017079992219806,
+      "spans": []
+    },
+    {
+      "id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:5",
+      "task_id": "named_type_reexport_chain",
+      "session_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "named_type_reexport_chain",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "grep",
+      "reason": "missing_context",
+      "detail": "The symbol searches did not index the type alias, so inspect bounded source text in the known consumer and barrel files for exact alias and re-export spellings.",
+      "because": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:4",
+      "arguments": {
+        "pattern": "PublicPayload|ImportedPayload|export|interface|type ",
+        "file_paths": [
+          "consumer.ts",
+          "barrel.ts"
+        ],
+        "limit": 64
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"unknown operation or parameters outside the fixed tool contract\"},\"_evaluation\":{\"attempt_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/5\",\"calls_remaining\":19,\"event_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:5\"}}",
+      "serialized_bytes": 258,
+      "source_bytes": 0,
+      "elapsed_ms": 0.12599999899975955,
+      "spans": []
+    },
+    {
+      "id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:6",
+      "task_id": "named_type_reexport_chain",
+      "session_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "named_type_reexport_chain",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "grep",
+      "reason": "missing_context",
+      "detail": "The bounded grep parameter shape was rejected, so retry repository-wide text inspection for the alias, interface, and export declarations.",
+      "because": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:5",
+      "arguments": {
+        "pattern": "PublicPayload|ImportedPayload|export|interface|type "
+      },
+      "search_id": null,
+      "response_json": "{\"matches\":[{\"file\":\"barrel.ts\",\"line\":1,\"match\":\"export type { Payload as PublicPayload } from \\\"./types.js\\\";\",\"context_before\":[],\"context_after\":[]},{\"file\":\"consumer.ts\",\"line\":1,\"match\":\"import type { PublicPayload as ImportedPayload } from \\\"./barrel.js\\\";\",\"context_before\":[],\"context_after\":[\"export function processOrder(value: ImportedPayload): string {\",\"  return value.requestId;\"]},{\"file\":\"consumer.ts\",\"line\":2,\"match\":\"export function processOrder(value: ImportedPayload): string {\",\"context_before\":[\"import type { PublicPayload as ImportedPayload } from \\\"./barrel.js\\\";\"],\"context_after\":[\"  return value.requestId;\",\"}\"]},{\"file\":\"types.ts\",\"line\":1,\"match\":\"export interface Payload {\",\"context_before\":[],\"context_after\":[\"  requestId: string;\",\"  amount: number;\"]}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_source_text\"},\"_evaluation\":{\"attempt_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/6\",\"calls_remaining\":18,\"event_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:6\"}}",
+      "serialized_bytes": 1168,
+      "source_bytes": 433,
+      "elapsed_ms": 3.8000839995220304,
+      "spans": [
+        {
+          "file": "barrel.ts",
+          "start_byte": 0,
+          "end_byte": 59,
+          "sha256": "ff136acbc239fa676e2d7e3dac4fc891be0b634a65cce6641119c556d3134240",
+          "text": "export type { Payload as PublicPayload } from \"./types.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 68,
+          "sha256": "3a2171e4ccfd4ea30910487e706ad6208ffd90ca6f99d1bf16427f0fc636228b",
+          "text": "import type { PublicPayload as ImportedPayload } from \"./barrel.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 69,
+          "end_byte": 131,
+          "sha256": "b1c7b16e0d947001c97a357b0694159782142a5b0c38c368dc5ace895c057fd5",
+          "text": "export function processOrder(value: ImportedPayload): string {"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 132,
+          "end_byte": 157,
+          "sha256": "52108b3c17d20da37a243364c69672d319e5a9514480c7eaba140541592c2abc",
+          "text": "  return value.requestId;"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 69,
+          "end_byte": 131,
+          "sha256": "b1c7b16e0d947001c97a357b0694159782142a5b0c38c368dc5ace895c057fd5",
+          "text": "export function processOrder(value: ImportedPayload): string {"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 68,
+          "sha256": "3a2171e4ccfd4ea30910487e706ad6208ffd90ca6f99d1bf16427f0fc636228b",
+          "text": "import type { PublicPayload as ImportedPayload } from \"./barrel.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 132,
+          "end_byte": 157,
+          "sha256": "52108b3c17d20da37a243364c69672d319e5a9514480c7eaba140541592c2abc",
+          "text": "  return value.requestId;"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 158,
+          "end_byte": 159,
+          "sha256": "d10b36aa74a59bcf4a88185837f658afaf3646eff2bb16c3928d0e9335e945d2",
+          "text": "}"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 0,
+          "end_byte": 26,
+          "sha256": "b3eae13f7db3b7d30557d5970023fad309c1b45179e52e0bd0d725b8bb90feb1",
+          "text": "export interface Payload {"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 27,
+          "end_byte": 47,
+          "sha256": "2b9b456f1b378296cf05a3073cef45eebf39d5585dc12ad96c2c10d50b20e0fe",
+          "text": "  requestId: string;"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 48,
+          "end_byte": 65,
+          "sha256": "e0c2874bd0f1502da6ed3b80183482cd366550fba16ad2f57ef8aea917b1053b",
+          "text": "  amount: number;"
+        }
+      ]
+    },
+    {
+      "id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:7",
+      "task_id": "named_type_reexport_chain",
+      "session_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "named_type_reexport_chain",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "missing_context",
+      "detail": "The text scan exposed the Payload interface, so locate its indexed declaration symbol for exact source retrieval and origin metadata.",
+      "because": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:6",
+      "arguments": {
+        "query": "Payload",
+        "kind": "interface",
+        "lang": "typescript"
+      },
+      "search_id": "3b950220-7f4b-4c73-844b-5c8b899a8bbe",
+      "response_json": "{\"symbols\":[{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"qualified_name\":\"Payload\",\"kind\":\"interface\",\"language\":\"typescript\",\"file_path\":\"types.ts\",\"byte_offset\":7,\"byte_length\":60,\"signature\":\"interface Payload {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d\",\"decorators\":[],\"keywords\":[\"payload\"],\"metadata\":{},\"line\":1,\"end_line\":4,\"score\":61.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"3b950220-7f4b-4c73-844b-5c8b899a8bbe\",\"_evaluation\":{\"attempt_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/7\",\"calls_remaining\":17,\"event_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:7\"}}",
+      "serialized_bytes": 848,
+      "source_bytes": 19,
+      "elapsed_ms": 1.363209004921373,
+      "spans": [
+        {
+          "file": "types.ts",
+          "start_byte": 7,
+          "end_byte": 26,
+          "sha256": "3c35bccaf71be1031a5c44b0fa3c7771b5743bb6ebedfda88fca7b184f983641",
+          "text": "interface Payload {"
+        }
+      ]
+    },
+    {
+      "id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:8",
+      "task_id": "named_type_reexport_chain",
+      "session_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "named_type_reexport_chain",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "get",
+      "reason": "task_context",
+      "detail": "Retrieve the exact Payload interface fields and types, establishing the required regression input and declaration origin file.",
+      "because": null,
+      "arguments": {
+        "symbol_ids": [
+          "types.ts::Payload#interface"
+        ],
+        "selected_from_search_id": "3b950220-7f4b-4c73-844b-5c8b899a8bbe",
+        "context": 2
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"types.ts::Payload#interface\",\"source\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\",\"byte_offset\":7,\"byte_length\":60,\"line\":1,\"end_line\":4,\"signature\":\"interface Payload {\",\"kind\":\"interface\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/8\",\"calls_remaining\":16,\"event_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:8\"}}",
+      "serialized_bytes": 447,
+      "source_bytes": 79,
+      "elapsed_ms": 5.767750000813976,
+      "spans": [
+        {
+          "file": "types.ts",
+          "start_byte": 7,
+          "end_byte": 67,
+          "sha256": "1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d",
+          "text": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 7,
+          "end_byte": 26,
+          "sha256": "3c35bccaf71be1031a5c44b0fa3c7771b5743bb6ebedfda88fca7b184f983641",
+          "text": "interface Payload {"
+        }
+      ]
+    },
+    {
+      "id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:9",
+      "task_id": "named_type_reexport_chain",
+      "session_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "named_type_reexport_chain",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "outline",
+      "reason": "task_context",
+      "detail": "Read the narrow barrel source containing the named re-export to confirm the middle and original names in the traversal route.",
+      "because": null,
+      "arguments": {
+        "file": "barrel.ts",
+        "start_line": 1,
+        "end_line": 2
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"unknown operation or parameters outside the fixed tool contract\"},\"_evaluation\":{\"attempt_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/9\",\"calls_remaining\":15,\"event_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:9\"}}",
+      "serialized_bytes": 258,
+      "source_bytes": 0,
+      "elapsed_ms": 0.0457499991171062,
+      "spans": []
+    },
+    {
+      "id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:10",
+      "task_id": "named_type_reexport_chain",
+      "session_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "named_type_reexport_chain",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "file",
+      "reason": "missing_context",
+      "detail": "The bounded outline call rejected line parameters, so read the single barrel line directly to verify the named re-export route.",
+      "because": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:9",
+      "arguments": {
+        "file_path": "barrel.ts",
+        "start_line": 1,
+        "end_line": 1
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"barrel.ts\",\"content\":\"export type { Payload as PublicPayload } from \\\"./types.js\\\";\\n\",\"total_lines\":1,\"start_line\":1,\"end_line\":1,\"_evaluation\":{\"attempt_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/10\",\"calls_remaining\":14,\"event_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:10\"}}",
+      "serialized_bytes": 293,
+      "source_bytes": 60,
+      "elapsed_ms": 3.6112919988227077,
+      "spans": [
+        {
+          "file": "barrel.ts",
+          "start_byte": 0,
+          "end_byte": 60,
+          "sha256": "841be26434600c9360eacf2d07a564d2670915c60b6ff071700be764167f07d7",
+          "text": "export type { Payload as PublicPayload } from \"./types.js\";\n"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "named_type_reexport_chain",
+    "session_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9",
+    "arm": "A",
+    "repetition": 1,
+    "snapshot": "named_type_reexport_chain",
+    "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+    "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+    "controls_version": "typescript-context-controls-v2",
+    "schema_version": 1,
+    "outcome": "tool_failure",
+    "task_correct": false,
+    "answer": {
+      "required_fields": {
+        "amount": "number",
+        "requestId": "string"
+      },
+      "return_type": "string",
+      "returned_field": "requestId",
+      "origin_file": "types.ts",
+      "name_route": [
+        "ImportedPayload",
+        "PublicPayload",
+        "Payload"
+      ]
+    },
+    "read_count": 10,
+    "avoidable_reads": null,
+    "proven_avoidable_reads": 0,
+    "lineage_status": "inconclusive",
+    "classifications": [
+      {
+        "event_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:1",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:2",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:3",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:4",
+        "classification": "unproven",
+        "reason": "missing_context",
+        "because": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:3",
+        "recovered_gold": []
+      },
+      {
+        "event_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:5",
+        "classification": "unproven",
+        "reason": "missing_context",
+        "because": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:4",
+        "recovered_gold": []
+      },
+      {
+        "event_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:6",
+        "classification": "unproven",
+        "reason": "missing_context",
+        "because": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:5",
+        "recovered_gold": []
+      },
+      {
+        "event_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:7",
+        "classification": "unproven",
+        "reason": "missing_context",
+        "because": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:6",
+        "recovered_gold": []
+      },
+      {
+        "event_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:8",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:9",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:10",
+        "classification": "unproven",
+        "reason": "missing_context",
+        "because": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:9",
+        "recovered_gold": []
+      }
+    ],
+    "required_context_delivered": [
+      "entry",
+      "import",
+      "payload",
+      "reexport"
+    ],
+    "required_context_total": 4,
+    "context_recall": 1.0,
+    "serialized_tool_output_bytes": 5574,
+    "source_bytes": 852,
+    "estimated_source_tokens": 213,
+    "tool_elapsed_ms": 27.89575100177899,
+    "provider_usage": {
+      "input_tokens": 74684,
+      "cached_input_tokens": 55040,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 1560,
+      "reasoning_output_tokens": 608
+    },
+    "usage_semantics": "Codex turn.completed gross input; cached_input is a subset; output includes reasoning_output_tokens.",
+    "token_status": "measured"
+  },
+  "baseline": {
+    "end_to_end_seconds": 63.620432249997975,
+    "actual_process_seconds": 63.620432249997975,
+    "exit_code": 0,
+    "provider_thread_id": "01a08e3e-8c3c-7162-ba7e-42056f480652",
+    "failures": [
+      {
+        "attempt_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/5",
+        "category": "tool_error",
+        "message": "unknown operation or parameters outside the fixed tool contract"
+      },
+      {
+        "attempt_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/9",
+        "category": "tool_error",
+        "message": "unknown operation or parameters outside the fixed tool contract"
+      }
+    ],
+    "tool_delivery_verified": true,
+    "relationships": {
+      "schema_version": 1,
+      "case_id": "named_type_reexport_chain",
+      "required_semantic_dependencies_total": 1,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "payload",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "generic_references_type",
+          "available": false,
+          "delivered": false,
+          "available_edges": [],
+          "delivered_edges": []
+        }
+      ],
+      "available_dependency_links_total": 0,
+      "available_dependency_links": [],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "dependency-link recall; references_type fallback is generic and does not establish precise subtype/kind recall",
+        "required": 1,
+        "available": 0,
+        "delivered": 0,
+        "available_ratio": 0.0,
+        "delivered_ratio": 0.0
+      },
+      "precise_kind_links_available_total": 0,
+      "precise_kind_links_delivered_total": 0,
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_scope": "authored frozen forbidden_relationships only; this is not exhaustive truth about unsupported or unrecorded edges"
+    },
+    "output_accounting": {
+      "schema_version": 2,
+      "complete": true,
+      "calls": [
+        {
+          "item_id": "item_1",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "processOrder",
+              "kind": "function"
+            },
+            "reason": "task_context",
+            "detail": "Locate the processOrder declaration and nearby typed API definitions needed to prepare the regression input."
+          },
+          "attempt_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/1",
+          "trace_event_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:1",
+          "source_bytes": 55,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"qualified_name\":\"processOrder\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":76,\"byte_length\":83,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"10ff5e5d2a4918055984c04b730e5c8efc809afc556c79c0adf351c6d1b7d303\",\"decorators\":[],\"keywords\":[\"order\",\"process\"],\"metadata\":{},\"line\":2,\"end_line\":4,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"ea671799-fbc2-4aa9-82f5-8d05f42a20ab\",\"_evaluation\":{\"attempt_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/1\",\"calls_remaining\":23,\"event_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:1\"}}"
+          ],
+          "serialized_bytes": 912
+        },
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "get",
+            "parameters": {
+              "symbol_ids": [
+                "consumer.ts::processOrder#function"
+              ],
+              "selected_from_search_id": "ea671799-fbc2-4aa9-82f5-8d05f42a20ab",
+              "context": 3
+            },
+            "reason": "task_context",
+            "detail": "Retrieve the processOrder declaration body and its immediate context to identify the consumer spelling and the imported payload type."
+          },
+          "attempt_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/2",
+          "trace_event_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:2",
+          "source_bytes": 206,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"source\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\",\"byte_offset\":76,\"byte_length\":83,\"line\":2,\"end_line\":4,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import type { PublicPayload as ImportedPayload } from \\\"./barrel.js\\\";\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/2\",\"calls_remaining\":22,\"event_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:2\"}}"
+          ],
+          "serialized_bytes": 584
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "PublicPayload",
+              "kind": "interface",
+              "lang": "typescript"
+            },
+            "reason": "task_context",
+            "detail": "Find the original payload interface declaration to determine required fields, their types, and its defining file."
+          },
+          "attempt_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/3",
+          "trace_event_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:3",
+          "source_bytes": 0,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":null,\"_evaluation\":{\"attempt_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/3\",\"calls_remaining\":21,\"event_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:3\"}}"
+          ],
+          "serialized_bytes": 403
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "PublicPayload",
+              "lang": "typescript"
+            },
+            "reason": "missing_context",
+            "because": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:3",
+            "detail": "The interface-kind search found no declaration, so search all TypeScript symbol kinds for the payload alias and its re-export route."
+          },
+          "attempt_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/4",
+          "trace_event_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:4",
+          "source_bytes": 0,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":null,\"_evaluation\":{\"attempt_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/4\",\"calls_remaining\":20,\"event_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:4\"}}"
+          ],
+          "serialized_bytes": 403
+        },
+        {
+          "item_id": "item_5",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "grep",
+            "parameters": {
+              "pattern": "PublicPayload|ImportedPayload|export|interface|type ",
+              "file_paths": [
+                "consumer.ts",
+                "barrel.ts"
+              ],
+              "limit": 64
+            },
+            "reason": "missing_context",
+            "because": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:4",
+            "detail": "The symbol searches did not index the type alias, so inspect bounded source text in the known consumer and barrel files for exact alias and re-export spellings."
+          },
+          "attempt_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/5",
+          "trace_event_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:5",
+          "source_bytes": 0,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"error\":{\"code\":\"ValueError\",\"message\":\"unknown operation or parameters outside the fixed tool contract\"},\"_evaluation\":{\"attempt_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/5\",\"calls_remaining\":19,\"event_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:5\"}}"
+          ],
+          "serialized_bytes": 258
+        },
+        {
+          "item_id": "item_6",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "grep",
+            "parameters": {
+              "pattern": "PublicPayload|ImportedPayload|export|interface|type "
+            },
+            "reason": "missing_context",
+            "because": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:5",
+            "detail": "The bounded grep parameter shape was rejected, so retry repository-wide text inspection for the alias, interface, and export declarations."
+          },
+          "attempt_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/6",
+          "trace_event_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:6",
+          "source_bytes": 433,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"matches\":[{\"file\":\"barrel.ts\",\"line\":1,\"match\":\"export type { Payload as PublicPayload } from \\\"./types.js\\\";\",\"context_before\":[],\"context_after\":[]},{\"file\":\"consumer.ts\",\"line\":1,\"match\":\"import type { PublicPayload as ImportedPayload } from \\\"./barrel.js\\\";\",\"context_before\":[],\"context_after\":[\"export function processOrder(value: ImportedPayload): string {\",\"  return value.requestId;\"]},{\"file\":\"consumer.ts\",\"line\":2,\"match\":\"export function processOrder(value: ImportedPayload): string {\",\"context_before\":[\"import type { PublicPayload as ImportedPayload } from \\\"./barrel.js\\\";\"],\"context_after\":[\"  return value.requestId;\",\"}\"]},{\"file\":\"types.ts\",\"line\":1,\"match\":\"export interface Payload {\",\"context_before\":[],\"context_after\":[\"  requestId: string;\",\"  amount: number;\"]}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_source_text\"},\"_evaluation\":{\"attempt_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/6\",\"calls_remaining\":18,\"event_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:6\"}}"
+          ],
+          "serialized_bytes": 1168
+        },
+        {
+          "item_id": "item_7",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "Payload",
+              "kind": "interface",
+              "lang": "typescript"
+            },
+            "reason": "missing_context",
+            "because": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:6",
+            "detail": "The text scan exposed the Payload interface, so locate its indexed declaration symbol for exact source retrieval and origin metadata."
+          },
+          "attempt_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/7",
+          "trace_event_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:7",
+          "source_bytes": 19,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"qualified_name\":\"Payload\",\"kind\":\"interface\",\"language\":\"typescript\",\"file_path\":\"types.ts\",\"byte_offset\":7,\"byte_length\":60,\"signature\":\"interface Payload {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d\",\"decorators\":[],\"keywords\":[\"payload\"],\"metadata\":{},\"line\":1,\"end_line\":4,\"score\":61.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"3b950220-7f4b-4c73-844b-5c8b899a8bbe\",\"_evaluation\":{\"attempt_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/7\",\"calls_remaining\":17,\"event_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:7\"}}"
+          ],
+          "serialized_bytes": 848
+        },
+        {
+          "item_id": "item_8",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "get",
+            "parameters": {
+              "symbol_ids": [
+                "types.ts::Payload#interface"
+              ],
+              "selected_from_search_id": "3b950220-7f4b-4c73-844b-5c8b899a8bbe",
+              "context": 2
+            },
+            "reason": "task_context",
+            "detail": "Retrieve the exact Payload interface fields and types, establishing the required regression input and declaration origin file."
+          },
+          "attempt_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/8",
+          "trace_event_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:8",
+          "source_bytes": 79,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"types.ts::Payload#interface\",\"source\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\",\"byte_offset\":7,\"byte_length\":60,\"line\":1,\"end_line\":4,\"signature\":\"interface Payload {\",\"kind\":\"interface\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/8\",\"calls_remaining\":16,\"event_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:8\"}}"
+          ],
+          "serialized_bytes": 447
+        },
+        {
+          "item_id": "item_9",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "outline",
+            "parameters": {
+              "file": "barrel.ts",
+              "start_line": 1,
+              "end_line": 2
+            },
+            "reason": "task_context",
+            "detail": "Read the narrow barrel source containing the named re-export to confirm the middle and original names in the traversal route."
+          },
+          "attempt_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/9",
+          "trace_event_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:9",
+          "source_bytes": 0,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"error\":{\"code\":\"ValueError\",\"message\":\"unknown operation or parameters outside the fixed tool contract\"},\"_evaluation\":{\"attempt_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/9\",\"calls_remaining\":15,\"event_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:9\"}}"
+          ],
+          "serialized_bytes": 258
+        },
+        {
+          "item_id": "item_10",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "file",
+            "parameters": {
+              "file_path": "barrel.ts",
+              "start_line": 1,
+              "end_line": 1
+            },
+            "reason": "missing_context",
+            "because": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:9",
+            "detail": "The bounded outline call rejected line parameters, so read the single barrel line directly to verify the named re-export route."
+          },
+          "attempt_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/10",
+          "trace_event_id": "33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:10",
+          "source_bytes": 60,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"file\":\"barrel.ts\",\"content\":\"export type { Payload as PublicPayload } from \\\"./types.js\\\";\\n\",\"total_lines\":1,\"start_line\":1,\"end_line\":1,\"_evaluation\":{\"attempt_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9/attempt/10\",\"calls_remaining\":14,\"event_id\":\"33ae1ce6-d3b8-4f93-8a10-49b3077b6ff9:10\"}}"
+          ],
+          "serialized_bytes": 293
+        }
+      ],
+      "tool_call_count": 10,
+      "recorded_payload_bytes": 5574,
+      "complete_payload_bytes": 5574,
+      "source_bytes": 852,
+      "failures": []
+    },
+    "lineage_valid": true,
+    "adapter_elapsed_ms": 28.862207000202034
+  }
+}

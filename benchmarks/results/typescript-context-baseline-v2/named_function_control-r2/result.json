@@ -1,0 +1,461 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "task_id": "named_function_control",
+    "session_id": "4f029a46-b868-4772-8970-ddd89d8e69b5",
+    "arm": "A",
+    "repetition": 2,
+    "snapshot": "named_function_control",
+    "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+    "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+    "controls_version": "typescript-context-controls-v2"
+  },
+  "events": [
+    {
+      "id": "4f029a46-b868-4772-8970-ddd89d8e69b5:1",
+      "task_id": "named_function_control",
+      "session_id": "4f029a46-b868-4772-8970-ddd89d8e69b5",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "named_function_control",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Locate the useNumber declaration and its num call for the requested trace.",
+      "because": null,
+      "arguments": {
+        "query": "useNumber",
+        "kind": "function",
+        "lang": "typescript"
+      },
+      "search_id": "69b762d5-0962-4fae-a84e-75b5753156ea",
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::useNumber#function\",\"name\":\"useNumber\",\"qualified_name\":\"useNumber\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":42,\"byte_length\":47,\"signature\":\"function useNumber(): number { return num(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e\",\"decorators\":[],\"keywords\":[\"number\",\"use\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"69b762d5-0962-4fae-a84e-75b5753156ea\",\"_evaluation\":{\"attempt_id\":\"4f029a46-b868-4772-8970-ddd89d8e69b5/attempt/1\",\"calls_remaining\":23,\"event_id\":\"4f029a46-b868-4772-8970-ddd89d8e69b5:1\"}}",
+      "serialized_bytes": 892,
+      "source_bytes": 47,
+      "elapsed_ms": 1.783250001608394,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 42,
+          "end_byte": 89,
+          "sha256": "eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e",
+          "text": "function useNumber(): number { return num(1); }"
+        }
+      ]
+    },
+    {
+      "id": "4f029a46-b868-4772-8970-ddd89d8e69b5:2",
+      "task_id": "named_function_control",
+      "session_id": "4f029a46-b868-4772-8970-ddd89d8e69b5",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "named_function_control",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "get",
+      "reason": "task_context",
+      "detail": "Retrieve the exact useNumber body to confirm the existing num(1) call.",
+      "because": null,
+      "arguments": {
+        "symbol_ids": [
+          "consumer.ts::useNumber#function"
+        ],
+        "selected_from_search_id": "69b762d5-0962-4fae-a84e-75b5753156ea",
+        "context": 2
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::useNumber#function\",\"source\":\"function useNumber(): number { return num(1); }\",\"byte_offset\":42,\"byte_length\":47,\"line\":2,\"end_line\":2,\"signature\":\"function useNumber(): number { return num(1); }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import { num } from \\\"./number.js\\\";\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"4f029a46-b868-4772-8970-ddd89d8e69b5/attempt/2\",\"calls_remaining\":22,\"event_id\":\"4f029a46-b868-4772-8970-ddd89d8e69b5:2\"}}",
+      "serialized_bytes": 501,
+      "source_bytes": 128,
+      "elapsed_ms": 5.49216700164834,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 42,
+          "end_byte": 89,
+          "sha256": "eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e",
+          "text": "function useNumber(): number { return num(1); }"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 34,
+          "sha256": "7abba161ca11098291bc3d5cb39334394b602ec16edce67e1a07a2ff8e2b0851",
+          "text": "import { num } from \"./number.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 42,
+          "end_byte": 89,
+          "sha256": "eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e",
+          "text": "function useNumber(): number { return num(1); }"
+        }
+      ]
+    },
+    {
+      "id": "4f029a46-b868-4772-8970-ddd89d8e69b5:3",
+      "task_id": "named_function_control",
+      "session_id": "4f029a46-b868-4772-8970-ddd89d8e69b5",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "named_function_control",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Find the exported num declaration imported by useNumber.",
+      "because": null,
+      "arguments": {
+        "query": "num",
+        "kind": "function",
+        "lang": "typescript"
+      },
+      "search_id": "217a5ba0-069c-485c-8c6a-79de83f763a6",
+      "response_json": "{\"symbols\":[{\"id\":\"number.ts::num#function\",\"name\":\"num\",\"qualified_name\":\"num\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"number.ts\",\"byte_offset\":7,\"byte_length\":54,\"signature\":\"function num(v: unknown): number { return Number(v); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985\",\"decorators\":[],\"keywords\":[\"num\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":71.0},{\"id\":\"consumer.ts::useNumber#function\",\"name\":\"useNumber\",\"qualified_name\":\"useNumber\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":42,\"byte_length\":47,\"signature\":\"function useNumber(): number { return num(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e\",\"decorators\":[],\"keywords\":[\"number\",\"use\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":40.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"217a5ba0-069c-485c-8c6a-79de83f763a6\",\"_evaluation\":{\"attempt_id\":\"4f029a46-b868-4772-8970-ddd89d8e69b5/attempt/3\",\"calls_remaining\":21,\"event_id\":\"4f029a46-b868-4772-8970-ddd89d8e69b5:3\"}}",
+      "serialized_bytes": 1323,
+      "source_bytes": 101,
+      "elapsed_ms": 1.6175830023712479,
+      "spans": [
+        {
+          "file": "number.ts",
+          "start_byte": 7,
+          "end_byte": 61,
+          "sha256": "a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985",
+          "text": "function num(v: unknown): number { return Number(v); }"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 42,
+          "end_byte": 89,
+          "sha256": "eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e",
+          "text": "function useNumber(): number { return num(1); }"
+        }
+      ]
+    },
+    {
+      "id": "4f029a46-b868-4772-8970-ddd89d8e69b5:4",
+      "task_id": "named_function_control",
+      "session_id": "4f029a46-b868-4772-8970-ddd89d8e69b5",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "named_function_control",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "get",
+      "reason": "task_context",
+      "detail": "Retrieve the exact callee declaration to report its parameter annotation, return annotation, and body result.",
+      "because": null,
+      "arguments": {
+        "symbol_ids": [
+          "number.ts::num#function"
+        ],
+        "selected_from_search_id": "217a5ba0-069c-485c-8c6a-79de83f763a6",
+        "context": 1
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"number.ts::num#function\",\"source\":\"function num(v: unknown): number { return Number(v); }\",\"byte_offset\":7,\"byte_length\":54,\"line\":1,\"end_line\":1,\"signature\":\"function num(v: unknown): number { return Number(v); }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"4f029a46-b868-4772-8970-ddd89d8e69b5/attempt/4\",\"calls_remaining\":20,\"event_id\":\"4f029a46-b868-4772-8970-ddd89d8e69b5:4\"}}",
+      "serialized_bytes": 468,
+      "source_bytes": 108,
+      "elapsed_ms": 3.319375005958136,
+      "spans": [
+        {
+          "file": "number.ts",
+          "start_byte": 7,
+          "end_byte": 61,
+          "sha256": "a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985",
+          "text": "function num(v: unknown): number { return Number(v); }"
+        },
+        {
+          "file": "number.ts",
+          "start_byte": 7,
+          "end_byte": 61,
+          "sha256": "a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985",
+          "text": "function num(v: unknown): number { return Number(v); }"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "named_function_control",
+    "session_id": "4f029a46-b868-4772-8970-ddd89d8e69b5",
+    "arm": "A",
+    "repetition": 2,
+    "snapshot": "named_function_control",
+    "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+    "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+    "controls_version": "typescript-context-controls-v2",
+    "schema_version": 1,
+    "outcome": "completed",
+    "task_correct": true,
+    "answer": {
+      "origin_file": "number.ts",
+      "declaration_name": "num",
+      "declared_parameter_type": "unknown",
+      "return_type": "number",
+      "result": 1
+    },
+    "read_count": 4,
+    "avoidable_reads": 0,
+    "proven_avoidable_reads": 0,
+    "lineage_status": "complete",
+    "classifications": [
+      {
+        "event_id": "4f029a46-b868-4772-8970-ddd89d8e69b5:1",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "4f029a46-b868-4772-8970-ddd89d8e69b5:2",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "4f029a46-b868-4772-8970-ddd89d8e69b5:3",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "4f029a46-b868-4772-8970-ddd89d8e69b5:4",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      }
+    ],
+    "required_context_delivered": [
+      "callee",
+      "entry",
+      "import"
+    ],
+    "required_context_total": 4,
+    "context_recall": 0.75,
+    "serialized_tool_output_bytes": 3184,
+    "source_bytes": 384,
+    "estimated_source_tokens": 96,
+    "tool_elapsed_ms": 12.212375011586118,
+    "provider_usage": {
+      "input_tokens": 29344,
+      "cached_input_tokens": 14592,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 502,
+      "reasoning_output_tokens": 161
+    },
+    "usage_semantics": "Codex turn.completed gross input; cached_input is a subset; output includes reasoning_output_tokens.",
+    "token_status": "measured"
+  },
+  "baseline": {
+    "end_to_end_seconds": 20.286122249999607,
+    "actual_process_seconds": 20.286122249999607,
+    "exit_code": 0,
+    "provider_thread_id": "01a08e49-bfce-7442-8ee3-4099852494d2",
+    "failures": [],
+    "tool_delivery_verified": true,
+    "relationships": {
+      "schema_version": 1,
+      "case_id": "named_function_control",
+      "required_semantic_dependencies_total": 1,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "calls",
+          "to": "callee",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "exact_kind",
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "consumer.ts::useNumber#function",
+              "to": "number.ts::num#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "4c8f61ea9624e51834550d03c47fb41379600aabf826329e36350be3c5d95611"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "available_dependency_links_total": 1,
+      "available_dependency_links": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "calls",
+          "to": "callee",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "exact_kind",
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "consumer.ts::useNumber#function",
+              "to": "number.ts::num#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "4c8f61ea9624e51834550d03c47fb41379600aabf826329e36350be3c5d95611"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "dependency-link recall; references_type fallback is generic and does not establish precise subtype/kind recall",
+        "required": 1,
+        "available": 1,
+        "delivered": 0,
+        "available_ratio": 1.0,
+        "delivered_ratio": 0.0
+      },
+      "precise_kind_links_available_total": 1,
+      "precise_kind_links_delivered_total": 0,
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_scope": "authored frozen forbidden_relationships only; this is not exhaustive truth about unsupported or unrecorded edges"
+    },
+    "output_accounting": {
+      "schema_version": 2,
+      "complete": true,
+      "calls": [
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "useNumber",
+              "kind": "function",
+              "lang": "typescript"
+            },
+            "reason": "task_context",
+            "detail": "Locate the useNumber declaration and its num call for the requested trace."
+          },
+          "attempt_id": "4f029a46-b868-4772-8970-ddd89d8e69b5/attempt/1",
+          "trace_event_id": "4f029a46-b868-4772-8970-ddd89d8e69b5:1",
+          "source_bytes": 47,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::useNumber#function\",\"name\":\"useNumber\",\"qualified_name\":\"useNumber\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":42,\"byte_length\":47,\"signature\":\"function useNumber(): number { return num(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e\",\"decorators\":[],\"keywords\":[\"number\",\"use\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"69b762d5-0962-4fae-a84e-75b5753156ea\",\"_evaluation\":{\"attempt_id\":\"4f029a46-b868-4772-8970-ddd89d8e69b5/attempt/1\",\"calls_remaining\":23,\"event_id\":\"4f029a46-b868-4772-8970-ddd89d8e69b5:1\"}}"
+          ],
+          "serialized_bytes": 892
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "get",
+            "parameters": {
+              "symbol_ids": [
+                "consumer.ts::useNumber#function"
+              ],
+              "selected_from_search_id": "69b762d5-0962-4fae-a84e-75b5753156ea",
+              "context": 2
+            },
+            "reason": "task_context",
+            "detail": "Retrieve the exact useNumber body to confirm the existing num(1) call."
+          },
+          "attempt_id": "4f029a46-b868-4772-8970-ddd89d8e69b5/attempt/2",
+          "trace_event_id": "4f029a46-b868-4772-8970-ddd89d8e69b5:2",
+          "source_bytes": 128,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::useNumber#function\",\"source\":\"function useNumber(): number { return num(1); }\",\"byte_offset\":42,\"byte_length\":47,\"line\":2,\"end_line\":2,\"signature\":\"function useNumber(): number { return num(1); }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import { num } from \\\"./number.js\\\";\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"4f029a46-b868-4772-8970-ddd89d8e69b5/attempt/2\",\"calls_remaining\":22,\"event_id\":\"4f029a46-b868-4772-8970-ddd89d8e69b5:2\"}}"
+          ],
+          "serialized_bytes": 501
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "num",
+              "kind": "function",
+              "lang": "typescript"
+            },
+            "reason": "task_context",
+            "detail": "Find the exported num declaration imported by useNumber."
+          },
+          "attempt_id": "4f029a46-b868-4772-8970-ddd89d8e69b5/attempt/3",
+          "trace_event_id": "4f029a46-b868-4772-8970-ddd89d8e69b5:3",
+          "source_bytes": 101,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"number.ts::num#function\",\"name\":\"num\",\"qualified_name\":\"num\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"number.ts\",\"byte_offset\":7,\"byte_length\":54,\"signature\":\"function num(v: unknown): number { return Number(v); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985\",\"decorators\":[],\"keywords\":[\"num\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":71.0},{\"id\":\"consumer.ts::useNumber#function\",\"name\":\"useNumber\",\"qualified_name\":\"useNumber\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":42,\"byte_length\":47,\"signature\":\"function useNumber(): number { return num(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e\",\"decorators\":[],\"keywords\":[\"number\",\"use\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":40.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"217a5ba0-069c-485c-8c6a-79de83f763a6\",\"_evaluation\":{\"attempt_id\":\"4f029a46-b868-4772-8970-ddd89d8e69b5/attempt/3\",\"calls_remaining\":21,\"event_id\":\"4f029a46-b868-4772-8970-ddd89d8e69b5:3\"}}"
+          ],
+          "serialized_bytes": 1323
+        },
+        {
+          "item_id": "item_5",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "get",
+            "parameters": {
+              "symbol_ids": [
+                "number.ts::num#function"
+              ],
+              "selected_from_search_id": "217a5ba0-069c-485c-8c6a-79de83f763a6",
+              "context": 1
+            },
+            "reason": "task_context",
+            "detail": "Retrieve the exact callee declaration to report its parameter annotation, return annotation, and body result."
+          },
+          "attempt_id": "4f029a46-b868-4772-8970-ddd89d8e69b5/attempt/4",
+          "trace_event_id": "4f029a46-b868-4772-8970-ddd89d8e69b5:4",
+          "source_bytes": 108,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"number.ts::num#function\",\"source\":\"function num(v: unknown): number { return Number(v); }\",\"byte_offset\":7,\"byte_length\":54,\"line\":1,\"end_line\":1,\"signature\":\"function num(v: unknown): number { return Number(v); }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"4f029a46-b868-4772-8970-ddd89d8e69b5/attempt/4\",\"calls_remaining\":20,\"event_id\":\"4f029a46-b868-4772-8970-ddd89d8e69b5:4\"}}"
+          ],
+          "serialized_bytes": 468
+        }
+      ],
+      "tool_call_count": 4,
+      "recorded_payload_bytes": 3184,
+      "complete_payload_bytes": 3184,
+      "source_bytes": 384,
+      "failures": []
+    },
+    "lineage_valid": true,
+    "adapter_elapsed_ms": 12.527126011264045
+  }
+}
