@@ -1,0 +1,251 @@
+{
+  "schema_version": 3,
+  "identity": {
+    "task_id": "named_function_control",
+    "session_id": "named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8",
+    "arm": "B",
+    "repetition": 2,
+    "snapshot": "named_function_control",
+    "corpus_sha256": "5d8f490a820f4e326aa522c2d963c8f0a56ea0c2d472f4d2b66caaeda9834b01",
+    "controls_sha256": "994af261fcee63cfe001e98bbf78c858b5ca462c14ef7788aa8290443b2bf56b",
+    "controls_version": "typescript-context-controls-v3"
+  },
+  "events": [
+    {
+      "id": "named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8:1",
+      "task_id": "named_function_control",
+      "session_id": "named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "named_function_control",
+      "corpus_sha256": "5d8f490a820f4e326aa522c2d963c8f0a56ea0c2d472f4d2b66caaeda9834b01",
+      "controls_sha256": "994af261fcee63cfe001e98bbf78c858b5ca462c14ef7788aa8290443b2bf56b",
+      "controls_version": "typescript-context-controls-v3",
+      "operation": "graph",
+      "arguments": {
+        "question": "Find the declaration of useNumber, its num call, and the declaration reached by that call. Need callee parameter v annotation, declared return type, and existing call result."
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-rihvk6np/snapshot\",\"question\":\"Find the declaration of useNumber, its num call, and the declaration reached by that call. Need callee parameter v annotation, declared return type, and existing call result.\",\"selection\":\"inferred\",\"question_terms\":[\"find\",\"declaration\",\"usenumber\",\"num\",\"call\",\"reached\",\"need\",\"callee\",\"parameter\",\"annotation\",\"declared\",\"return\",\"type\",\"existing\"],\"anchors\":[{\"node\":{\"id\":\"consumer.ts::useNumber#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"typescript\",\"file\":\"consumer.ts\",\"line\":2,\"end_line\":2}},\"matched_symbol_id\":\"consumer.ts::useNumber#function\",\"name\":\"useNumber\",\"score\":19.71,\"reason\":{\"kind\":\"inferred\",\"matched_terms\":[\"usenumber\",\"num\",\"return\"],\"match_scope\":[\"symbol_name\",\"qualified_name\",\"signature\"]}}],\"counts\":{\"indexed_nodes\":4,\"eligible_units\":4,\"qualified_candidates\":2,\"collapsed_symbols\":0,\"returned_anchors\":1,\"omitted_candidates\":1},\"budget\":{\"requested_max_anchors\":5,\"effective_max_anchors\":1},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8/attempt/1\",\"calls_remaining\":23}}",
+      "serialized_bytes": 1232,
+      "source_bytes": 0,
+      "elapsed_ms": 8.22091699228622,
+      "spans": []
+    },
+    {
+      "id": "named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8:2",
+      "task_id": "named_function_control",
+      "session_id": "named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "named_function_control",
+      "corpus_sha256": "5d8f490a820f4e326aa522c2d963c8f0a56ea0c2d472f4d2b66caaeda9834b01",
+      "controls_sha256": "994af261fcee63cfe001e98bbf78c858b5ca462c14ef7788aa8290443b2bf56b",
+      "controls_version": "typescript-context-controls-v3",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "consumer.ts::useNumber#function"
+        ],
+        "context": 3
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::useNumber#function\",\"source\":\"function useNumber(): number { return num(1); }\",\"byte_offset\":42,\"byte_length\":47,\"line\":2,\"end_line\":2,\"signature\":\"function useNumber(): number { return num(1); }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import { num } from \\\"./number.js\\\";\"],\"context_after\":[]}],\"type_context\":{\"scope\":\"existing_imported_type_references\",\"status\":\"complete\",\"symbols\":[],\"references\":[],\"evidence\":[],\"limits\":{\"max_anchors\":5,\"max_hops\":3,\"max_nodes\":32,\"max_neighbors_per_owner\":16,\"max_references\":16,\"max_source_spans\":64,\"max_source_bytes\":16384,\"max_serialized_bytes\":32768},\"omissions\":{}},\"_evaluation\":{\"attempt_id\":\"named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8/attempt/2\",\"calls_remaining\":22}}",
+      "serialized_bytes": 796,
+      "source_bytes": 128,
+      "elapsed_ms": 11.123290998511948,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 42,
+          "end_byte": 89,
+          "sha256": "eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e",
+          "text": "function useNumber(): number { return num(1); }"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 34,
+          "sha256": "7abba161ca11098291bc3d5cb39334394b602ec16edce67e1a07a2ff8e2b0851",
+          "text": "import { num } from \"./number.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 42,
+          "end_byte": 89,
+          "sha256": "eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e",
+          "text": "function useNumber(): number { return num(1); }"
+        }
+      ]
+    },
+    {
+      "id": "named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8:3",
+      "task_id": "named_function_control",
+      "session_id": "named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "named_function_control",
+      "corpus_sha256": "5d8f490a820f4e326aa522c2d963c8f0a56ea0c2d472f4d2b66caaeda9834b01",
+      "controls_sha256": "994af261fcee63cfe001e98bbf78c858b5ca462c14ef7788aa8290443b2bf56b",
+      "controls_version": "typescript-context-controls-v3",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 20,
+        "file": "consumer.ts"
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-rihvk6np/snapshot\",\"file\":\"consumer.ts\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"consumer.ts\",\"language\":\"typescript\",\"line\":2,\"column\":46,\"start_byte\":80,\"end_byte\":86,\"callee_start_byte\":80,\"callee_end_byte\":83,\"callee_text\":\"num\",\"callee_path\":[\"num\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":42,\"definition_end_byte\":89,\"body_start_byte\":71,\"body_end_byte\":89},\"source_hash\":\"4c8f61ea9624e51834550d03c47fb41379600aabf826329e36350be3c5d95611\"},\"caller_id\":\"consumer.ts::useNumber#function\",\"caller_kind\":\"function\",\"target_file\":\"number.ts\",\"target_id\":\"number.ts::num#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"4c8f61ea9624e51834550d03c47fb41379600aabf826329e36350be3c5d95611\",\"endpoint_id\":\"consumer.ts::useNumber#function\"},{\"kind\":\"caller_definition\",\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e\",\"endpoint_id\":\"consumer.ts::useNumber#function\"},{\"kind\":\"symbol_reference\",\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"4c8f61ea9624e51834550d03c47fb41379600aabf826329e36350be3c5d95611\",\"endpoint_id\":\"number.ts::num#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":1,\"resolved\":1,\"unresolved\":0,\"returned\":1},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8/attempt/3\",\"calls_remaining\":21}}",
+      "serialized_bytes": 1881,
+      "source_bytes": 0,
+      "elapsed_ms": 2.655167001648806,
+      "spans": []
+    },
+    {
+      "id": "named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8:4",
+      "task_id": "named_function_control",
+      "session_id": "named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "named_function_control",
+      "corpus_sha256": "5d8f490a820f4e326aa522c2d963c8f0a56ea0c2d472f4d2b66caaeda9834b01",
+      "controls_sha256": "994af261fcee63cfe001e98bbf78c858b5ca462c14ef7788aa8290443b2bf56b",
+      "controls_version": "typescript-context-controls-v3",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "number.ts::num#function"
+        ],
+        "context": 3
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"number.ts::num#function\",\"source\":\"function num(v: unknown): number { return Number(v); }\",\"byte_offset\":7,\"byte_length\":54,\"line\":1,\"end_line\":1,\"signature\":\"function num(v: unknown): number { return Number(v); }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"type_context\":{\"scope\":\"existing_imported_type_references\",\"status\":\"complete\",\"symbols\":[],\"references\":[],\"evidence\":[],\"limits\":{\"max_anchors\":5,\"max_hops\":3,\"max_nodes\":32,\"max_neighbors_per_owner\":16,\"max_references\":16,\"max_source_spans\":64,\"max_source_bytes\":16384,\"max_serialized_bytes\":32768},\"omissions\":{}},\"_evaluation\":{\"attempt_id\":\"named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8/attempt/4\",\"calls_remaining\":20}}",
+      "serialized_bytes": 763,
+      "source_bytes": 108,
+      "elapsed_ms": 4.154791997279972,
+      "spans": [
+        {
+          "file": "number.ts",
+          "start_byte": 7,
+          "end_byte": 61,
+          "sha256": "a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985",
+          "text": "function num(v: unknown): number { return Number(v); }"
+        },
+        {
+          "file": "number.ts",
+          "start_byte": 7,
+          "end_byte": 61,
+          "sha256": "a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985",
+          "text": "function num(v: unknown): number { return Number(v); }"
+        }
+      ]
+    }
+  ],
+  "failures": [],
+  "attempts": 4,
+  "deliveries": [
+    {
+      "attempt_id": "named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8/attempt/1",
+      "operation": "graph_anchors",
+      "arguments": {
+        "question": "Find the declaration of useNumber, its num call, and the declaration reached by that call. Need callee parameter v annotation, declared return type, and existing call result."
+      },
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-rihvk6np/snapshot\",\"question\":\"Find the declaration of useNumber, its num call, and the declaration reached by that call. Need callee parameter v annotation, declared return type, and existing call result.\",\"selection\":\"inferred\",\"question_terms\":[\"find\",\"declaration\",\"usenumber\",\"num\",\"call\",\"reached\",\"need\",\"callee\",\"parameter\",\"annotation\",\"declared\",\"return\",\"type\",\"existing\"],\"anchors\":[{\"node\":{\"id\":\"consumer.ts::useNumber#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"typescript\",\"file\":\"consumer.ts\",\"line\":2,\"end_line\":2}},\"matched_symbol_id\":\"consumer.ts::useNumber#function\",\"name\":\"useNumber\",\"score\":19.71,\"reason\":{\"kind\":\"inferred\",\"matched_terms\":[\"usenumber\",\"num\",\"return\"],\"match_scope\":[\"symbol_name\",\"qualified_name\",\"signature\"]}}],\"counts\":{\"indexed_nodes\":4,\"eligible_units\":4,\"qualified_candidates\":2,\"collapsed_symbols\":0,\"returned_anchors\":1,\"omitted_candidates\":1},\"budget\":{\"requested_max_anchors\":5,\"effective_max_anchors\":1},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8/attempt/1\",\"calls_remaining\":23}}",
+      "serialized_bytes": 1232,
+      "source_bytes": 0,
+      "elapsed_ms": 8.306207993882708,
+      "trace_event_id": "named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8:1",
+      "status": "recorded",
+      "spans": []
+    },
+    {
+      "attempt_id": "named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8/attempt/2",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "consumer.ts::useNumber#function"
+        ],
+        "context": 3
+      },
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::useNumber#function\",\"source\":\"function useNumber(): number { return num(1); }\",\"byte_offset\":42,\"byte_length\":47,\"line\":2,\"end_line\":2,\"signature\":\"function useNumber(): number { return num(1); }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import { num } from \\\"./number.js\\\";\"],\"context_after\":[]}],\"type_context\":{\"scope\":\"existing_imported_type_references\",\"status\":\"complete\",\"symbols\":[],\"references\":[],\"evidence\":[],\"limits\":{\"max_anchors\":5,\"max_hops\":3,\"max_nodes\":32,\"max_neighbors_per_owner\":16,\"max_references\":16,\"max_source_spans\":64,\"max_source_bytes\":16384,\"max_serialized_bytes\":32768},\"omissions\":{}},\"_evaluation\":{\"attempt_id\":\"named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8/attempt/2\",\"calls_remaining\":22}}",
+      "serialized_bytes": 796,
+      "source_bytes": 128,
+      "elapsed_ms": 11.253791002673097,
+      "trace_event_id": "named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8:2",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 42,
+          "end_byte": 89,
+          "sha256": "eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e",
+          "text": "function useNumber(): number { return num(1); }"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 34,
+          "sha256": "7abba161ca11098291bc3d5cb39334394b602ec16edce67e1a07a2ff8e2b0851",
+          "text": "import { num } from \"./number.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 42,
+          "end_byte": 89,
+          "sha256": "eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e",
+          "text": "function useNumber(): number { return num(1); }"
+        }
+      ]
+    },
+    {
+      "attempt_id": "named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8/attempt/3",
+      "operation": "graph_calls",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 20,
+        "file": "consumer.ts"
+      },
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-rihvk6np/snapshot\",\"file\":\"consumer.ts\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"consumer.ts\",\"language\":\"typescript\",\"line\":2,\"column\":46,\"start_byte\":80,\"end_byte\":86,\"callee_start_byte\":80,\"callee_end_byte\":83,\"callee_text\":\"num\",\"callee_path\":[\"num\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":42,\"definition_end_byte\":89,\"body_start_byte\":71,\"body_end_byte\":89},\"source_hash\":\"4c8f61ea9624e51834550d03c47fb41379600aabf826329e36350be3c5d95611\"},\"caller_id\":\"consumer.ts::useNumber#function\",\"caller_kind\":\"function\",\"target_file\":\"number.ts\",\"target_id\":\"number.ts::num#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"4c8f61ea9624e51834550d03c47fb41379600aabf826329e36350be3c5d95611\",\"endpoint_id\":\"consumer.ts::useNumber#function\"},{\"kind\":\"caller_definition\",\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e\",\"endpoint_id\":\"consumer.ts::useNumber#function\"},{\"kind\":\"symbol_reference\",\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"4c8f61ea9624e51834550d03c47fb41379600aabf826329e36350be3c5d95611\",\"endpoint_id\":\"number.ts::num#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":1,\"resolved\":1,\"unresolved\":0,\"returned\":1},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8/attempt/3\",\"calls_remaining\":21}}",
+      "serialized_bytes": 1881,
+      "source_bytes": 0,
+      "elapsed_ms": 2.7885419985977933,
+      "trace_event_id": "named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8:3",
+      "status": "recorded",
+      "spans": []
+    },
+    {
+      "attempt_id": "named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8/attempt/4",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "number.ts::num#function"
+        ],
+        "context": 3
+      },
+      "response_json": "{\"symbols\":[{\"id\":\"number.ts::num#function\",\"source\":\"function num(v: unknown): number { return Number(v); }\",\"byte_offset\":7,\"byte_length\":54,\"line\":1,\"end_line\":1,\"signature\":\"function num(v: unknown): number { return Number(v); }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"type_context\":{\"scope\":\"existing_imported_type_references\",\"status\":\"complete\",\"symbols\":[],\"references\":[],\"evidence\":[],\"limits\":{\"max_anchors\":5,\"max_hops\":3,\"max_nodes\":32,\"max_neighbors_per_owner\":16,\"max_references\":16,\"max_source_spans\":64,\"max_source_bytes\":16384,\"max_serialized_bytes\":32768},\"omissions\":{}},\"_evaluation\":{\"attempt_id\":\"named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8/attempt/4\",\"calls_remaining\":20}}",
+      "serialized_bytes": 763,
+      "source_bytes": 108,
+      "elapsed_ms": 4.218667003442533,
+      "trace_event_id": "named_function_control-r2-B-7735d6e5-39b7-4f06-af3f-0f3ad977c9b8:4",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "number.ts",
+          "start_byte": 7,
+          "end_byte": 61,
+          "sha256": "a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985",
+          "text": "function num(v: unknown): number { return Number(v); }"
+        },
+        {
+          "file": "number.ts",
+          "start_byte": 7,
+          "end_byte": 61,
+          "sha256": "a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985",
+          "text": "function num(v: unknown): number { return Number(v); }"
+        }
+      ]
+    }
+  ]
+}
