@@ -206,7 +206,7 @@ def create_server() -> MCPServer:
         """Select bounded source for one explicit retrieval intent.
 
         ``locate`` returns anchors only; ``type_dependencies`` follows outgoing
-        proven type and heritage edges; ``impact`` follows incoming known static
+        proven TypeScript/TSX type and heritage edges; ``impact`` follows incoming known static
         dependents. Query text is at most 4096 UTF-8 bytes; seeds are at most five
         unique IDs; hops are 0..4 (defaults: locate 0, type 3, impact 1), output
         is 2048..262144 bytes for the complete MCP result, and source evidence
