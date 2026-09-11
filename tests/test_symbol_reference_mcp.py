@@ -193,7 +193,9 @@ def test_mcp_reference_diagnostics_and_traversal_survive_fresh_process(
         "status",
         "offset",
         "limit",
+        "family",
     }
+    assert schema["properties"]["family"]["default"] == "symbol"
     assert schema["properties"]["file"]["default"] is None
     assert schema["properties"]["status"]["default"] == "all"
     assert schema["properties"]["offset"]["default"] == 0

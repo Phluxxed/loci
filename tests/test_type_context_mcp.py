@@ -119,7 +119,7 @@ def test_mcp_get_type_context_is_opt_in_scoped_and_fresh(
     result = opt_in.structured_content
     context = result["type_context"]
     assert result["symbols"] == [service.get_symbols(repo, [anchor])[0]]
-    assert context["scope"] == "existing_imported_type_references"
+    assert context["scope"] == "declared_type_relations"
     assert context["status"] == "complete"
     assert [symbol["id"] for symbol in context["symbols"]] == [
         "types.ts::Payload#interface"
@@ -136,9 +136,9 @@ def test_mcp_get_type_context_is_opt_in_scoped_and_fresh(
         "end_byte": 113,
     }
     edge = GraphEdge.model_validate(reference["edge"])
-    assert edge.from_ == "consumer.ts::__file__#file"
+    assert edge.from_ == anchor
     assert edge.to == "types.ts::Payload#interface"
-    assert edge.type == "references_type"
+    assert edge.type == "uses_type"
     assert edge.directed is True
     assert edge.namespace == "loci"
     assert edge.resolution == "import-resolved"

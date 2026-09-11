@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from .calls import CallRecord
     from .imports import ImportRecord
     from .references import SymbolReferenceRecord
+    from .type_models import TypeRelationRecord
 
 
 JSONValue: TypeAlias = (
@@ -31,7 +32,7 @@ ResolutionTier: TypeAlias = Literal[
 ]
 
 GRAPH_SCHEMA_VERSION = 1  # Public contribution and retrieval envelopes.
-GRAPH_STATE_SCHEMA_VERSION = 12  # Persisted index.json.graph envelope only.
+GRAPH_STATE_SCHEMA_VERSION = 13  # Persisted index.json.graph envelope only.
 # Gates persisted graph reuse when resolver semantics change independently of
 # extraction.
 GRAPH_RESOLVER_VERSION = 1
@@ -230,7 +231,13 @@ class GraphEdge:
             resolution=cast(ResolutionTier, resolution),
             evidence=GraphEvidence.from_dict(evidence_value),
         )
-        if edge.from_id == edge.to_id and not _valid_call_self_edge_shape(edge):
+        valid_type_self_shape = (
+            edge.namespace == "loci" and edge.type == "uses_type"
+            and edge.directed and edge.resolution in {"exact", "import-resolved"}
+        )
+        if edge.from_id == edge.to_id and not (
+            _valid_call_self_edge_shape(edge) or valid_type_self_shape
+        ):
             raise GraphContractError(
                 "INVALID_GRAPH_EDGE",
                 "Graph edge endpoints must be different",
@@ -328,6 +335,7 @@ def validate_graph_edges(
     imports: Sequence[ImportRecord] = (),
     symbol_references: Sequence[SymbolReferenceRecord] = (),
     calls: Sequence[CallRecord] = (),
+    type_relations: Sequence[TypeRelationRecord] = (),
 ) -> None:
     reference_index = {}
     if symbol_references:
@@ -339,10 +347,17 @@ def validate_graph_edges(
         from ._call_validation import index_call_edge_records
 
         call_index = index_call_edge_records(calls)
+    type_index = {}
+    if type_relations:
+        from ._type_validation import index_type_edge_records
+
+        type_index = index_type_edge_records(type_relations)
     for edge_index, edge in enumerate(edges):
         _validate_evidence(edge.evidence, edge_index=edge_index)
         edge_kind = (edge.namespace, edge.type)
-        if edge.from_id == edge.to_id and edge_kind != ("loci", "calls"):
+        if edge.from_id == edge.to_id and edge_kind not in {
+            ("loci", "calls"), ("loci", "uses_type"),
+        }:
             raise GraphContractError(
                 "INVALID_GRAPH_EDGE",
                 "Graph edge endpoints must be different",
@@ -383,6 +398,15 @@ def validate_graph_edges(
                 indexed_nodes=indexed_nodes,
                 file_hashes=file_hashes,
                 call_index=call_index,
+            )
+        elif edge_kind in {
+            ("loci", "uses_type"), ("loci", "extends"), ("loci", "implements"),
+        }:
+            from ._type_validation import validate_type_edge
+
+            validate_type_edge(
+                edge, edge_index=edge_index, indexed_nodes=indexed_nodes,
+                file_hashes=file_hashes, type_index=type_index,
             )
         else:
             raise GraphContractError(

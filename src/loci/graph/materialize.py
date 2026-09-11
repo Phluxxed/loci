@@ -60,6 +60,9 @@ from loci.parser.call_models import RawCallSite
 from loci.parser.imports import RawImport
 from loci.parser.reference_models import RawLocalExport, RawSymbolReference
 from loci.parser.symbols import Symbol
+from loci.parser.type_models import RawTypeObservation
+from loci.graph.type_relations import resolve_type_relations, materialize_type_edges
+from loci.graph._type_validation import validate_type_records
 
 
 @dataclass(frozen=True, slots=True)
@@ -238,6 +241,7 @@ def materialize_graph(
     raw_exports: Sequence[RawLocalExport] = (),
     raw_symbol_references: Sequence[RawSymbolReference] = (),
     raw_calls: Sequence[RawCallSite] = (),
+    raw_type_observations: Sequence[RawTypeObservation] = (),
     go_packages: GoPackageIndex | None = None,
     swift_modules: SwiftModuleIndex | None = None,
     javascript_modules: JavaScriptResolutionIndex | None = None,
@@ -295,7 +299,7 @@ def materialize_graph(
     reference_records: tuple[SymbolReferenceRecord, ...] = ()
     serialized_nodes = (
         {symbol.id: symbol.to_dict() for symbol in symbols}
-        if raw_exports or raw_symbol_references or raw_calls
+        if raw_exports or raw_symbol_references or raw_calls or raw_type_observations
         else {}
     )
     if raw_exports or raw_symbol_references:
@@ -351,6 +355,21 @@ def materialize_graph(
             symbol_references=reference_records,
             calls=call_records,
         )
+    type_records = tuple(resolve_type_relations(
+        raw_type_observations, symbols=symbols, imports=import_records,
+        exports=raw_exports, file_hashes=file_hashes, input_hashes=input_hashes or {},
+    )) if raw_type_observations else ()
+    if type_records:
+        validate_type_records(
+            type_records, imports=import_records, exports=raw_exports,
+            indexed_nodes=serialized_nodes, file_hashes=file_hashes,
+            input_hashes=input_hashes or {},
+        )
+    type_edges = materialize_type_edges(type_records)
+    validate_graph_edges(
+        type_edges, indexed_nodes=serialized_nodes, file_hashes=file_hashes,
+        type_relations=type_records,
+    )
     active_edges = list(extract_markdown_contains_edges(symbols))
     active_edges.extend(materialize_import_edges(
         import_records,
@@ -361,6 +380,7 @@ def materialize_graph(
     ))
     active_edges.extend(reference_edges)
     active_edges.extend(call_edges)
+    active_edges.extend(type_edges)
     overlay_values: dict[tuple[str, str], dict[str, JSONValue]] = {}
     overlay_kinds: dict[tuple[str, str], str] = {}
     materialization_diagnostics = list(diagnostics)
@@ -773,6 +793,7 @@ def materialize_graph(
         exports=tuple(raw_exports),
         symbol_references=reference_records,
         calls=call_records,
+        type_relations=type_records,
         contributions=active_contributions,
         input_hashes=dict(sorted(resolved_input_hashes.items())),
         diagnostics=sorted_diagnostics,

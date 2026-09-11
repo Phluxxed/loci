@@ -343,8 +343,9 @@ def create_server() -> MCPServer:
         status: str = "all",
         offset: int = 0,
         limit: int = 100,
+        family: str = "symbol",
     ) -> Annotated[CallToolResult, LociGraphReferencesOutput]:
-        """Inspect bounded resolved and unresolved imported-symbol references."""
+        """Inspect bounded authored symbol or TypeScript type relationships."""
         return _handle_loci_error(
             lambda service: service.graph_references(
                 repo,
@@ -352,6 +353,7 @@ def create_server() -> MCPServer:
                 status=cast(Literal["all", "resolved", "unresolved"], status),
                 offset=offset,
                 limit=limit,
+                family=cast(Literal["symbol", "type"], family),
                 ensure_fresh=True,
             )
         )

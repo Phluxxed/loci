@@ -1,4 +1,4 @@
-"""Bounded source delivery over existing, resolved imported-type references."""
+"""Bounded source delivery over proven declaration and imported-type relations."""
 
 from __future__ import annotations
 
@@ -10,10 +10,12 @@ from pathlib import Path
 from typing import Any
 
 from .graph.state import GraphIndexState
+from .graph.type_models import TypeRelationRecord
 from .storage.index_store import IndexStore
 
 
 SCOPE = "existing_imported_type_references"
+DECLARED_SCOPE = "declared_type_relations"
 RESERVED_OUTPUT_BYTES = 1024
 _REASONS = (
     "no_anchor", "anchor_limit", "nested_owner", "ambiguous_owner",
@@ -143,16 +145,17 @@ def expand_type_context(
     *,
     limits: TypeContextLimits = TypeContextLimits(),
 ) -> dict[str, Any]:
-    """Select owned reference records, preserving their original graph edges."""
+    """Select declaration evidence while preserving every stored edge identity."""
     result: dict[str, Any] = {
-        "scope": SCOPE, "status": "complete", "symbols": [], "references": [],
+        "scope": DECLARED_SCOPE if graph_state.type_relations else SCOPE,
+        "status": "complete", "symbols": [], "references": [],
         "evidence": [], "limits": asdict(limits), "omissions": {},
     }
     omissions: Counter[str] = Counter()
     declarations = {key: node for key, node in indexed_nodes.items() if _real_declaration(node)}
     roots = sorted({item["id"] for item in root_symbols if item["id"] in declarations})
     if not roots or limits.max_anchors == 0:
-        return empty_type_context(reason="no_anchor", limits=limits)
+        return {**empty_type_context(reason="no_anchor", limits=limits), "scope": result["scope"]}
     if len(roots) > limits.max_anchors:
         omissions["anchor_limit"] += len(roots) - limits.max_anchors
     selected = roots[:limits.max_anchors]
@@ -185,17 +188,25 @@ def expand_type_context(
     for node in declarations.values():
         nodes_by_file[node["file_path"]].append(node)
     records_by_file: dict[str, list] = defaultdict(list)
+    typed_sites = set()
+    for record in graph_state.type_relations:
+        raw = record.raw
+        typed_sites.add((raw.source_file, raw.start_byte, raw.end_byte))
+        records_by_file[raw.source_file].append(record)
     for record in graph_state.symbol_references:
-        if any(binding.type_only for binding in record.raw.candidate_bindings):
+        raw = record.raw
+        if ((raw.source_file, raw.start_byte, raw.end_byte) not in typed_sites
+                and any(binding.type_only for binding in raw.candidate_bindings)):
             records_by_file[record.raw.source_file].append(record)
     for records in records_by_file.values():
         records.sort(key=lambda record: (record.raw.start_byte, record.raw.end_byte, record.target_id or ""))
-    edges = {(edge.from_id, edge.to_id): edge for edge in graph_state.edges
-             if edge.namespace == "loci" and edge.type == "references_type"
-             and edge.resolution == "import-resolved" and edge.directed}
+    edges = {(edge.type, edge.from_id, edge.to_id): edge for edge in graph_state.edges
+             if edge.namespace == "loci"
+             and edge.type in {"references_type", "uses_type", "extends", "implements"}
+             and edge.resolution in {"exact", "import-resolved"} and edge.directed}
     source = _CachedSource(repo_path, store)
     evidence_keys: set[tuple[str, int]] = set()
-    reference_keys: set[tuple[str, str]] = set()
+    reference_keys: set[tuple[str, str, str]] = set()
     frontier = selected
 
     def source_covers(span: dict, symbols: dict[str, dict]) -> bool:
@@ -210,40 +221,57 @@ def expand_type_context(
         for owner_id in sorted(frontier):
             owner = declarations[owner_id]
             candidates = []
-            owner_targets: set[str] = set()
+            owner_targets: set[tuple[str, str]] = set()
             for record in records_by_file.get(owner["file_path"], []):
                 raw = record.raw
                 if not _contains(owner, raw.start_byte, raw.end_byte):
                     continue
-                containers = [node for node in nodes_by_file[raw.source_file]
-                              if _contains(node, raw.start_byte, raw.end_byte)]
-                minimum = min(node["byte_length"] for node in containers)
-                narrowest = [node for node in containers if node["byte_length"] == minimum]
-                if len(narrowest) != 1:
-                    omissions["ambiguous_owner"] += 1
-                    continue
-                if narrowest[0]["id"] != owner_id:
-                    omissions["nested_owner"] += 1
-                    continue
-                if record.status != "resolved" or record.binding is None or not record.binding.type_only:
+                typed = isinstance(record, TypeRelationRecord)
+                relation = raw.relation if typed else "references_type"
+                if typed:
+                    owners = [node for node in nodes_by_file[raw.source_file]
+                              if node["byte_offset"] == raw.owner.start_byte
+                              and node["byte_offset"] + node["byte_length"] == raw.owner.end_byte
+                              and node["kind"] == raw.owner.kind]
+                    if len(owners) > 1:
+                        omissions["ambiguous_owner"] += 1
+                        continue
+                    if record.source_id != owner_id:
+                        omissions["ambiguous_owner" if record.source_id is None else "nested_owner"] += 1
+                        continue
+                else:
+                    containers = [node for node in nodes_by_file[raw.source_file]
+                                  if _contains(node, raw.start_byte, raw.end_byte)]
+                    minimum = min(node["byte_length"] for node in containers)
+                    narrowest = [node for node in containers if node["byte_length"] == minimum]
+                    if len(narrowest) != 1:
+                        omissions["ambiguous_owner"] += 1
+                        continue
+                    if narrowest[0]["id"] != owner_id:
+                        omissions["nested_owner"] += 1
+                        continue
+                if record.status != "resolved" or (
+                    not typed and (record.binding is None or not record.binding.type_only)
+                ):
                     omissions["unresolved_reference"] += 1
                     continue
                 target_id = record.target_id
                 if target_id not in declarations:
                     omissions["unsupported_target"] += 1
                     continue
-                if (record.source_id, target_id) not in edges:
+                edge = edges.get((relation, record.source_id, target_id))
+                if edge is None:
                     omissions["edge_unavailable"] += 1
                     continue
-                if target_id in owner_targets or (owner_id, target_id) in reference_keys:
+                if (target_id, relation) in owner_targets or (owner_id, target_id, relation) in reference_keys:
                     continue
-                owner_targets.add(target_id)
-                candidates.append(record)
+                owner_targets.add((target_id, relation))
+                candidates.append((record, edge))
             if depth == limits.max_hops:
                 omissions["hop_limit"] += len(candidates)
                 continue
             omissions["neighbor_limit"] += max(0, len(candidates) - limits.max_neighbors_per_owner)
-            for record in candidates[:limits.max_neighbors_per_owner]:
+            for record, edge in candidates[:limits.max_neighbors_per_owner]:
                 target_id = record.target_id
                 if len(result["references"]) >= limits.max_references:
                     omissions["reference_limit"] += 1
@@ -276,7 +304,7 @@ def expand_type_context(
                 reference = {
                     "owner_id": owner_id, "target_id": target_id,
                     "reference": {"file": raw.source_file, "start_byte": raw.start_byte, "end_byte": raw.end_byte},
-                    "edge": edges[(record.source_id, target_id)].to_dict(),
+                    "edge": edge.to_dict(),
                     "support": [support.to_dict() for support in record.support],
                 }
                 added_symbols = [] if target_id in delivered else [target]
@@ -290,7 +318,7 @@ def expand_type_context(
                     continue
                 result = candidate
                 delivered[target_id] = target
-                reference_keys.add((owner_id, target_id))
+                reference_keys.add((owner_id, target_id, edge.type))
                 evidence_keys.update(added_evidence)
                 visited.add(target_id)
                 if target_id not in scheduled:

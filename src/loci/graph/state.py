@@ -28,6 +28,7 @@ from .imports import (
 )
 from .profiles import LoadedGraphProfile
 from .references import SymbolReferenceRecord
+from .type_models import TypeRelationRecord
 
 
 GraphDiagnosticSeverity = Literal["info", "warning", "error"]
@@ -133,6 +134,7 @@ class GraphIndexState:
     contributions: tuple[LoadedGraphContribution, ...]
     input_hashes: dict[str, str]
     diagnostics: tuple[GraphDiagnostic, ...]
+    type_relations: tuple[TypeRelationRecord, ...] = ()
 
     def to_dict(self) -> dict[str, JSONValue]:
         return {
@@ -156,6 +158,7 @@ class GraphIndexState:
                 record.to_dict() for record in self.symbol_references
             ],
             "calls": [record.to_dict() for record in self.calls],
+            "type_relations": [record.to_dict() for record in self.type_relations],
             "contributions": [
                 contribution.to_dict() for contribution in self.contributions
             ],
@@ -207,6 +210,7 @@ class GraphIndexState:
                 "exports",
                 "symbol_references",
                 "calls",
+                "type_relations",
                 "contributions",
                 "input_hashes",
                 "diagnostics",
@@ -248,6 +252,10 @@ class GraphIndexState:
             _call_record_from_dict(item)
             for item in _list(value["calls"], "calls")
         )
+        type_relations = tuple(
+            _type_relation_from_dict(item)
+            for item in _list(value["type_relations"], "type_relations")
+        )
         contributions = tuple(
             LoadedGraphContribution.from_dict(
                 _mapping(item, "loaded contribution")
@@ -282,6 +290,7 @@ class GraphIndexState:
             exports=exports,
             symbol_references=symbol_references,
             calls=calls,
+            type_relations=type_relations,
             contributions=contributions,
             input_hashes=dict(sorted(input_hashes.items())),
             diagnostics=diagnostics,
@@ -330,6 +339,13 @@ def _call_record_from_dict(value: Any) -> CallRecord:
         raise
     except (KeyError, TypeError, ValueError) as exc:
         raise _error("Invalid graph call record", field="calls") from exc
+
+
+def _type_relation_from_dict(value: Any) -> TypeRelationRecord:
+    try:
+        return TypeRelationRecord.from_dict(_mapping(value, "type relation"))
+    except (TypeError, ValueError) as exc:
+        raise _error("Invalid persisted type relation") from exc
 
 
 def _require_keys(value: Mapping[str, Any], expected: set[str], record: str) -> None:
