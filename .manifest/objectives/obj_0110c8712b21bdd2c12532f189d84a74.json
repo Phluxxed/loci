@@ -1889,7 +1889,7 @@
                   "id": "task_abc93235c56d46207f7ef4bdd412b1fb",
                   "title": "Freeze and verify measurement of the delivered exploration workflow",
                   "outcome": "The new measurement observes actual exploration calls, returned source and relationship proof before any agent outcome is collected.",
-                  "details": "New versioned measurement files may reuse the old immutable harness through narrow interfaces. Retain the original corpus, task prompts, model/reasoning, budgets and acceptance numbers. Add accurate exploration exposure and scorer coverage before freezing; no model-driven tuning on measured outcomes.\n\nCompleted 12 September 2026 before measured calls. Published exploration trial protocol/freeze at 6df8645 (harness 1fa44f5). 48 focused tests, clean type checking, all 17 endpoint cases, eight actual offline host modes. Candidate exploration is available rather than mandatory; all calls/errors count. Source/index fixed to 36f5e2b for both arms. The 102-attempt measurement is the next leaf.",
+                  "details": "Reopened 12 September 2026: measured v1 exposed a reconciliation defect in legacy graph operations. A graph_anchors/graph_neighbors delivery correctly records its specific operation name, while the source trace category is graph; the new reconciler wrongly compared the ledger against that category. The v1 trial was aborted as invalid measurement, retaining 17 complete result files, one partial attempt and 84 unstarted attempts at 9856ab4. No old raw artifact or score is rescored or retried. A separate v2 measurement must correct this comparison and add actual legacy-graph transport coverage before a newly frozen full 102-attempt block. Product source, tool schemas, prompts, gold and numerical gates remain unchanged. Evidence: https://github.com/Phluxxed/loci/blob/9856ab470e691a32f758b9c66f581ace09436a94/benchmarks/results/typescript-context-explore-v1/ABORTED.md\n\nPrior preparation record:\nNew versioned measurement files may reuse the old immutable harness through narrow interfaces. Retain the original corpus, task prompts, model/reasoning, budgets and acceptance numbers. Add accurate exploration exposure and scorer coverage before freezing; no model-driven tuning on measured outcomes.\n\nCompleted 12 September 2026 before measured calls. Published exploration trial protocol/freeze at 6df8645 (harness 1fa44f5). 48 focused tests, clean type checking, all 17 endpoint cases, eight actual offline host modes. Candidate exploration is available rather than mandatory; all calls/errors count. Source/index fixed to 36f5e2b for both arms. The 102-attempt measurement is the next leaf.",
                   "decompositionComplete": true,
                   "completionCriteria": [
                     "Implement typed snapshot-bound access to the actual loci_explore service with its current supported intents, budgets and source-linked output. Both conditions use the same pinned production source and index semantics; the candidate additionally exposes the exploration workflow.",
@@ -1901,44 +1901,7 @@
                     "task_76e3c3e37e002e0497fdbcd7a4c617a4"
                   ],
                   "externalBlocker": null,
-                  "completion": {
-                    "evidence": [
-                      {
-                        "criterion": "Implement typed snapshot-bound access to the actual loci_explore service with its current supported intents, budgets and source-linked output. Both conditions use the same pinned production source and index semantics; the candidate additionally exposes the exploration workflow.",
-                        "summary": "Published A=original 13 typed tools and B=same tools plus real loci_explore; both use production 36f5e2b / extractor 25. Exact get remains unchanged. Snapshot binding, supported intents and original common caps are explicit, with native internal selection limits disclosed.",
-                        "references": [
-                          "https://github.com/Phluxxed/loci/blob/6df8645fb1a5d3dd2188d52a10fccabe860d7c06/benchmarks/typescript_context_explore_tools.py",
-                          "https://github.com/Phluxxed/loci/blob/6df8645fb1a5d3dd2188d52a10fccabe860d7c06/benchmarks/comparisons/typescript-context-explore-v1/protocol.md"
-                        ]
-                      },
-                      {
-                        "criterion": "Validate exact source spans, full delivered payload bytes, selected relationship kinds/proof, omitted/failed calls and provider accounting, including embedded uses_type/heritage records that the old scorer omitted. Preserve generic dependency proof separately from unsupported precise subtype claims.",
-                        "summary": "New trace records explore honestly and reconciles exact host payloads and every shared source/proof span. New scorer validates indexed edge identity and complete exploration support, recognizes uses_type and heritage, and separates generic endpoint links from precise subtypes. Failures/helpers and provider usage remain counted.",
-                        "references": [
-                          "https://github.com/Phluxxed/loci/blob/6df8645fb1a5d3dd2188d52a10fccabe860d7c06/benchmarks/typescript_context_explore_observed.py",
-                          "https://github.com/Phluxxed/loci/blob/6df8645fb1a5d3dd2188d52a10fccabe860d7c06/benchmarks/typescript_context_explore_relationships.py",
-                          "https://github.com/Phluxxed/loci/blob/6df8645fb1a5d3dd2188d52a10fccabe860d7c06/benchmarks/typescript_context_explore_replay.py"
-                        ]
-                      },
-                      {
-                        "criterion": "Pass focused fixture and actual offline-host transport checks for exploration success, ambiguity/unsupported cases, budget exhaustion, malformed parameters, complete raw-output reconciliation and independent replay.",
-                        "summary": "48 focused tests and clean Pyright; 23 original tool/observed tests remain passing. Fresh endpoint checks retain all 17 cases. Eight real Codex/MCP loopback modes pass with exact next-request payload equivalence and 16/17 visible tools. Replay tests reject altered/missing relationship scores and source/proof tampering. No provider model was called during preparation.",
-                        "references": [
-                          "https://github.com/Phluxxed/loci/blob/6df8645fb1a5d3dd2188d52a10fccabe860d7c06/benchmarks/comparisons/typescript-context-explore-v1/validation.md",
-                          "https://github.com/Phluxxed/loci/blob/6df8645fb1a5d3dd2188d52a10fccabe860d7c06/benchmarks/comparisons/typescript-context-explore-v1/preflight.json",
-                          "https://github.com/Phluxxed/loci/blob/6df8645fb1a5d3dd2188d52a10fccabe860d7c06/benchmarks/comparisons/typescript-context-explore-v1/transport-verification.json"
-                        ]
-                      },
-                      {
-                        "criterion": "Publish a versioned declaration and freeze binding source, tools, prompt, corpus, harness, repetitions and numerical gates before measured calls. Schedule all 17 frozen cases three times in each condition (102 attempts), serially, without correctness retries.",
-                        "summary": "Protocol code committed at 1fa44f5 and immutable declaration carried by published 6df8645 before measured calls. Freeze SHA-256 22627546ce62f41795f78ef06e2a60fad2a416570934e1c7aee5f51716b49cff binds source, old corpus/controls, new harness/catalog/proofs and exact 102-attempt serial AB/BA schedule; original numeric gates and task prompts unchanged.",
-                        "references": [
-                          "https://github.com/Phluxxed/loci/blob/6df8645fb1a5d3dd2188d52a10fccabe860d7c06/benchmarks/comparisons/typescript-context-explore-v1/freeze.json",
-                          "https://github.com/Phluxxed/loci/blob/6df8645fb1a5d3dd2188d52a10fccabe860d7c06/benchmarks/comparisons/typescript-context-explore-v1/protocol.md"
-                        ]
-                      }
-                    ]
-                  },
+                  "completion": null,
                   "discontinued": null,
                   "tasks": []
                 },
@@ -1946,7 +1909,7 @@
                   "id": "task_2727497172e9ceadea5ab07538da0b31",
                   "title": "Run and qualify the matched exploration workflow comparison",
                   "outcome": "The first useful milestone has measured actual-workflow evidence with retained correctness, useful context and bounded cost.",
-                  "details": "Run the newly published 102-attempt comparison once, preserve failed attempts, independently replay the retained evidence and report the frozen verdict. Do not make a rejected candidate successful by changing gold, thresholds or denominator after outcomes are visible. If a demonstrated delivery defect requires follow-up, record its concrete boundary before any correction or new freeze.",
+                  "details": "Reopened 12 September 2026: measured v1 exposed a reconciliation defect in legacy graph operations. A graph_anchors/graph_neighbors delivery correctly records its specific operation name, while the source trace category is graph; the new reconciler wrongly compared the ledger against that category. The v1 trial was aborted as invalid measurement, retaining 17 complete result files, one partial attempt and 84 unstarted attempts at 9856ab4. No old raw artifact or score is rescored or retried. A separate v2 measurement must correct this comparison and add actual legacy-graph transport coverage before a newly frozen full 102-attempt block. Product source, tool schemas, prompts, gold and numerical gates remain unchanged. Evidence: https://github.com/Phluxxed/loci/blob/9856ab470e691a32f758b9c66f581ace09436a94/benchmarks/results/typescript-context-explore-v1/ABORTED.md\n\nOriginal execution boundary:\nRun the newly published 102-attempt comparison once, preserve failed attempts, independently replay the retained evidence and report the frozen verdict. Do not make a rejected candidate successful by changing gold, thresholds or denominator after outcomes are visible. If a demonstrated delivery defect requires follow-up, record its concrete boundary before any correction or new freeze.",
                   "decompositionComplete": true,
                   "completionCriteria": [
                     "Execute the published repeated-run schedule with identical frozen tasks/source/model settings in both conditions, preserve every attempt and account for all observed retrieval, source/output bytes, provider tokens, elapsed time, errors and any allowed outage replacement.",
