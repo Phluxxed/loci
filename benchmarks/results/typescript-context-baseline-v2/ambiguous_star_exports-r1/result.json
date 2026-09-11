@@ -1,0 +1,776 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "task_id": "ambiguous_star_exports",
+    "session_id": "970b12e6-2133-46b4-97d1-41de80c3289f",
+    "arm": "A",
+    "repetition": 1,
+    "snapshot": "ambiguous_star_exports",
+    "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+    "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+    "controls_version": "typescript-context-controls-v2"
+  },
+  "events": [
+    {
+      "id": "970b12e6-2133-46b4-97d1-41de80c3289f:1",
+      "task_id": "ambiguous_star_exports",
+      "session_id": "970b12e6-2133-46b4-97d1-41de80c3289f",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "ambiguous_star_exports",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Find the processOrder declaration(s) and likely barrel exports to trace its Payload origin.",
+      "because": null,
+      "arguments": {
+        "query": "processOrder",
+        "kind": "declaration"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":null,\"_evaluation\":{\"attempt_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f/attempt/1\",\"calls_remaining\":23,\"event_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f:1\"}}",
+      "serialized_bytes": 403,
+      "source_bytes": 0,
+      "elapsed_ms": 1.8655420062714256,
+      "spans": []
+    },
+    {
+      "id": "970b12e6-2133-46b4-97d1-41de80c3289f:2",
+      "task_id": "ambiguous_star_exports",
+      "session_id": "970b12e6-2133-46b4-97d1-41de80c3289f",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "ambiguous_star_exports",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Search all indexed references for processOrder because no declaration symbol was returned, including barrel and re-export syntax.",
+      "because": null,
+      "arguments": {
+        "query": "processOrder"
+      },
+      "search_id": "158e4803-420d-4db2-b721-7ac27495d6cf",
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"qualified_name\":\"processOrder\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":70,\"byte_length\":83,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"10ff5e5d2a4918055984c04b730e5c8efc809afc556c79c0adf351c6d1b7d303\",\"decorators\":[],\"keywords\":[\"order\",\"process\"],\"metadata\":{},\"line\":2,\"end_line\":4,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"158e4803-420d-4db2-b721-7ac27495d6cf\",\"_evaluation\":{\"attempt_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f/attempt/2\",\"calls_remaining\":22,\"event_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f:2\"}}",
+      "serialized_bytes": 912,
+      "source_bytes": 55,
+      "elapsed_ms": 2.1145840000826865,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 70,
+          "end_byte": 125,
+          "sha256": "08653276f18caff75a7f70cd621f7b7e923bcbbbd2cb47ed8d3ac2b68ecaeec2",
+          "text": "function processOrder(value: ImportedPayload): string {"
+        }
+      ]
+    },
+    {
+      "id": "970b12e6-2133-46b4-97d1-41de80c3289f:3",
+      "task_id": "ambiguous_star_exports",
+      "session_id": "970b12e6-2133-46b4-97d1-41de80c3289f",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "ambiguous_star_exports",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "get",
+      "reason": "task_context",
+      "detail": "Retrieve processOrder and its immediate import/context to identify the type flowing through the barrel.",
+      "because": null,
+      "arguments": {
+        "symbol_ids": [
+          "consumer.ts::processOrder#function"
+        ],
+        "context": 3,
+        "selected_from_search_id": "158e4803-420d-4db2-b721-7ac27495d6cf"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"source\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\",\"byte_offset\":70,\"byte_length\":83,\"line\":2,\"end_line\":4,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import type { Payload as ImportedPayload } from \\\"./barrel.js\\\";\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f/attempt/3\",\"calls_remaining\":21,\"event_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f:3\"}}",
+      "serialized_bytes": 578,
+      "source_bytes": 200,
+      "elapsed_ms": 3.8121670004329644,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 70,
+          "end_byte": 153,
+          "sha256": "10ff5e5d2a4918055984c04b730e5c8efc809afc556c79c0adf351c6d1b7d303",
+          "text": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 62,
+          "sha256": "347c2fe966ca18ab1a97cdc147ab709c9f128e27e9742790ac8697fa1de673ee",
+          "text": "import type { Payload as ImportedPayload } from \"./barrel.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 70,
+          "end_byte": 125,
+          "sha256": "08653276f18caff75a7f70cd621f7b7e923bcbbbd2cb47ed8d3ac2b68ecaeec2",
+          "text": "function processOrder(value: ImportedPayload): string {"
+        }
+      ]
+    },
+    {
+      "id": "970b12e6-2133-46b4-97d1-41de80c3289f:4",
+      "task_id": "ambiguous_star_exports",
+      "session_id": "970b12e6-2133-46b4-97d1-41de80c3289f",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "ambiguous_star_exports",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Locate the barrel module and its export declarations that determine Payload provenance.",
+      "because": null,
+      "arguments": {
+        "query": "barrel",
+        "kind": "module"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":null,\"_evaluation\":{\"attempt_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f/attempt/4\",\"calls_remaining\":20,\"event_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f:4\"}}",
+      "serialized_bytes": 403,
+      "source_bytes": 0,
+      "elapsed_ms": 2.7672910000546835,
+      "spans": []
+    },
+    {
+      "id": "970b12e6-2133-46b4-97d1-41de80c3289f:5",
+      "task_id": "ambiguous_star_exports",
+      "session_id": "970b12e6-2133-46b4-97d1-41de80c3289f",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "ambiguous_star_exports",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Find Payload declarations and aliases across the small indexed source set to trace all possible origins.",
+      "because": null,
+      "arguments": {
+        "query": "Payload"
+      },
+      "search_id": "1fc2cdd1-7ba4-4af2-88b6-83dd700e2c91",
+      "response_json": "{\"symbols\":[{\"id\":\"left.ts::Payload#interface\",\"name\":\"Payload\",\"qualified_name\":\"Payload\",\"kind\":\"interface\",\"language\":\"typescript\",\"file_path\":\"left.ts\",\"byte_offset\":7,\"byte_length\":60,\"signature\":\"interface Payload {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d\",\"decorators\":[],\"keywords\":[\"payload\"],\"metadata\":{},\"line\":1,\"end_line\":4,\"score\":61.0},{\"id\":\"right.ts::Payload#interface\",\"name\":\"Payload\",\"qualified_name\":\"Payload\",\"kind\":\"interface\",\"language\":\"typescript\",\"file_path\":\"right.ts\",\"byte_offset\":7,\"byte_length\":60,\"signature\":\"interface Payload {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d\",\"decorators\":[],\"keywords\":[\"payload\"],\"metadata\":{},\"line\":1,\"end_line\":4,\"score\":61.0},{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"qualified_name\":\"processOrder\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":70,\"byte_length\":83,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"10ff5e5d2a4918055984c04b730e5c8efc809afc556c79c0adf351c6d1b7d303\",\"decorators\":[],\"keywords\":[\"order\",\"process\"],\"metadata\":{},\"line\":2,\"end_line\":4,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"1fc2cdd1-7ba4-4af2-88b6-83dd700e2c91\",\"_evaluation\":{\"attempt_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f/attempt/5\",\"calls_remaining\":19,\"event_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f:5\"}}",
+      "serialized_bytes": 1734,
+      "source_bytes": 93,
+      "elapsed_ms": 1.7377499971189536,
+      "spans": [
+        {
+          "file": "left.ts",
+          "start_byte": 7,
+          "end_byte": 26,
+          "sha256": "3c35bccaf71be1031a5c44b0fa3c7771b5743bb6ebedfda88fca7b184f983641",
+          "text": "interface Payload {"
+        },
+        {
+          "file": "right.ts",
+          "start_byte": 7,
+          "end_byte": 26,
+          "sha256": "3c35bccaf71be1031a5c44b0fa3c7771b5743bb6ebedfda88fca7b184f983641",
+          "text": "interface Payload {"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 70,
+          "end_byte": 125,
+          "sha256": "08653276f18caff75a7f70cd621f7b7e923bcbbbd2cb47ed8d3ac2b68ecaeec2",
+          "text": "function processOrder(value: ImportedPayload): string {"
+        }
+      ]
+    },
+    {
+      "id": "970b12e6-2133-46b4-97d1-41de80c3289f:6",
+      "task_id": "ambiguous_star_exports",
+      "session_id": "970b12e6-2133-46b4-97d1-41de80c3289f",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "ambiguous_star_exports",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "get",
+      "reason": "task_context",
+      "detail": "Retrieve both Payload interface bodies and nearby context before evaluating whether same text implies same origin.",
+      "because": null,
+      "arguments": {
+        "symbol_ids": [
+          "left.ts::Payload#interface",
+          "right.ts::Payload#interface"
+        ],
+        "context": 2,
+        "selected_from_search_id": "1fc2cdd1-7ba4-4af2-88b6-83dd700e2c91"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"left.ts::Payload#interface\",\"source\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\",\"byte_offset\":7,\"byte_length\":60,\"line\":1,\"end_line\":4,\"signature\":\"interface Payload {\",\"kind\":\"interface\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]},{\"id\":\"right.ts::Payload#interface\",\"source\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\",\"byte_offset\":7,\"byte_length\":60,\"line\":1,\"end_line\":4,\"signature\":\"interface Payload {\",\"kind\":\"interface\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f/attempt/6\",\"calls_remaining\":18,\"event_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f:6\"}}",
+      "serialized_bytes": 729,
+      "source_bytes": 158,
+      "elapsed_ms": 5.946707999100909,
+      "spans": [
+        {
+          "file": "left.ts",
+          "start_byte": 7,
+          "end_byte": 67,
+          "sha256": "1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d",
+          "text": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+        },
+        {
+          "file": "right.ts",
+          "start_byte": 7,
+          "end_byte": 67,
+          "sha256": "1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d",
+          "text": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+        },
+        {
+          "file": "left.ts",
+          "start_byte": 7,
+          "end_byte": 26,
+          "sha256": "3c35bccaf71be1031a5c44b0fa3c7771b5743bb6ebedfda88fca7b184f983641",
+          "text": "interface Payload {"
+        },
+        {
+          "file": "right.ts",
+          "start_byte": 7,
+          "end_byte": 26,
+          "sha256": "3c35bccaf71be1031a5c44b0fa3c7771b5743bb6ebedfda88fca7b184f983641",
+          "text": "interface Payload {"
+        }
+      ]
+    },
+    {
+      "id": "970b12e6-2133-46b4-97d1-41de80c3289f:7",
+      "task_id": "ambiguous_star_exports",
+      "session_id": "970b12e6-2133-46b4-97d1-41de80c3289f",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "ambiguous_star_exports",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "grep",
+      "reason": "task_context",
+      "detail": "Inspect export and import statements in the known four files to resolve the barrel's Payload sources.",
+      "because": null,
+      "arguments": {
+        "pattern": "export|from",
+        "file_paths": [
+          "barrel.ts",
+          "consumer.ts",
+          "left.ts",
+          "right.ts"
+        ]
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"unknown operation or parameters outside the fixed tool contract\"},\"_evaluation\":{\"attempt_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f/attempt/7\",\"calls_remaining\":17,\"event_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f:7\"}}",
+      "serialized_bytes": 258,
+      "source_bytes": 0,
+      "elapsed_ms": 0.04516600165516138,
+      "spans": []
+    },
+    {
+      "id": "970b12e6-2133-46b4-97d1-41de80c3289f:8",
+      "task_id": "ambiguous_star_exports",
+      "session_id": "970b12e6-2133-46b4-97d1-41de80c3289f",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "ambiguous_star_exports",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "grep",
+      "reason": "task_context",
+      "detail": "Inspect all indexed export and import statements to identify the barrel re-exports and consumer import.",
+      "because": null,
+      "arguments": {
+        "pattern": "export|from"
+      },
+      "search_id": null,
+      "response_json": "{\"matches\":[{\"file\":\"barrel.ts\",\"line\":1,\"match\":\"export * from \\\"./left.js\\\";\",\"context_before\":[],\"context_after\":[\"export * from \\\"./right.js\\\";\"]},{\"file\":\"barrel.ts\",\"line\":2,\"match\":\"export * from \\\"./right.js\\\";\",\"context_before\":[\"export * from \\\"./left.js\\\";\"],\"context_after\":[]},{\"file\":\"consumer.ts\",\"line\":1,\"match\":\"import type { Payload as ImportedPayload } from \\\"./barrel.js\\\";\",\"context_before\":[],\"context_after\":[\"export function processOrder(value: ImportedPayload): string {\",\"  return value.requestId;\"]},{\"file\":\"consumer.ts\",\"line\":2,\"match\":\"export function processOrder(value: ImportedPayload): string {\",\"context_before\":[\"import type { Payload as ImportedPayload } from \\\"./barrel.js\\\";\"],\"context_after\":[\"  return value.requestId;\",\"}\"]},{\"file\":\"left.ts\",\"line\":1,\"match\":\"export interface Payload {\",\"context_before\":[],\"context_after\":[\"  requestId: string;\",\"  amount: number;\"]},{\"file\":\"right.ts\",\"line\":1,\"match\":\"export interface Payload {\",\"context_before\":[],\"context_after\":[\"  requestId: string;\",\"  amount: number;\"]}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_source_text\"},\"_evaluation\":{\"attempt_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f/attempt/8\",\"calls_remaining\":16,\"event_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f:8\"}}",
+      "serialized_bytes": 1439,
+      "source_bytes": 531,
+      "elapsed_ms": 3.343874996062368,
+      "spans": [
+        {
+          "file": "barrel.ts",
+          "start_byte": 0,
+          "end_byte": 26,
+          "sha256": "b6849e30da06262cfa2a5f4d9438d52dcd699ff8b6091bf170e56412f3fd07f1",
+          "text": "export * from \"./left.js\";"
+        },
+        {
+          "file": "barrel.ts",
+          "start_byte": 27,
+          "end_byte": 54,
+          "sha256": "f07e59640eaf8b213b4023bf26fe939995b8509b9fdb714ea49374679608e6ba",
+          "text": "export * from \"./right.js\";"
+        },
+        {
+          "file": "barrel.ts",
+          "start_byte": 27,
+          "end_byte": 54,
+          "sha256": "f07e59640eaf8b213b4023bf26fe939995b8509b9fdb714ea49374679608e6ba",
+          "text": "export * from \"./right.js\";"
+        },
+        {
+          "file": "barrel.ts",
+          "start_byte": 0,
+          "end_byte": 26,
+          "sha256": "b6849e30da06262cfa2a5f4d9438d52dcd699ff8b6091bf170e56412f3fd07f1",
+          "text": "export * from \"./left.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 62,
+          "sha256": "347c2fe966ca18ab1a97cdc147ab709c9f128e27e9742790ac8697fa1de673ee",
+          "text": "import type { Payload as ImportedPayload } from \"./barrel.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 63,
+          "end_byte": 125,
+          "sha256": "b1c7b16e0d947001c97a357b0694159782142a5b0c38c368dc5ace895c057fd5",
+          "text": "export function processOrder(value: ImportedPayload): string {"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 126,
+          "end_byte": 151,
+          "sha256": "52108b3c17d20da37a243364c69672d319e5a9514480c7eaba140541592c2abc",
+          "text": "  return value.requestId;"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 63,
+          "end_byte": 125,
+          "sha256": "b1c7b16e0d947001c97a357b0694159782142a5b0c38c368dc5ace895c057fd5",
+          "text": "export function processOrder(value: ImportedPayload): string {"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 62,
+          "sha256": "347c2fe966ca18ab1a97cdc147ab709c9f128e27e9742790ac8697fa1de673ee",
+          "text": "import type { Payload as ImportedPayload } from \"./barrel.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 126,
+          "end_byte": 151,
+          "sha256": "52108b3c17d20da37a243364c69672d319e5a9514480c7eaba140541592c2abc",
+          "text": "  return value.requestId;"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 152,
+          "end_byte": 153,
+          "sha256": "d10b36aa74a59bcf4a88185837f658afaf3646eff2bb16c3928d0e9335e945d2",
+          "text": "}"
+        },
+        {
+          "file": "left.ts",
+          "start_byte": 0,
+          "end_byte": 26,
+          "sha256": "b3eae13f7db3b7d30557d5970023fad309c1b45179e52e0bd0d725b8bb90feb1",
+          "text": "export interface Payload {"
+        },
+        {
+          "file": "left.ts",
+          "start_byte": 27,
+          "end_byte": 47,
+          "sha256": "2b9b456f1b378296cf05a3073cef45eebf39d5585dc12ad96c2c10d50b20e0fe",
+          "text": "  requestId: string;"
+        },
+        {
+          "file": "left.ts",
+          "start_byte": 48,
+          "end_byte": 65,
+          "sha256": "e0c2874bd0f1502da6ed3b80183482cd366550fba16ad2f57ef8aea917b1053b",
+          "text": "  amount: number;"
+        },
+        {
+          "file": "right.ts",
+          "start_byte": 0,
+          "end_byte": 26,
+          "sha256": "b3eae13f7db3b7d30557d5970023fad309c1b45179e52e0bd0d725b8bb90feb1",
+          "text": "export interface Payload {"
+        },
+        {
+          "file": "right.ts",
+          "start_byte": 27,
+          "end_byte": 47,
+          "sha256": "2b9b456f1b378296cf05a3073cef45eebf39d5585dc12ad96c2c10d50b20e0fe",
+          "text": "  requestId: string;"
+        },
+        {
+          "file": "right.ts",
+          "start_byte": 48,
+          "end_byte": 65,
+          "sha256": "e0c2874bd0f1502da6ed3b80183482cd366550fba16ad2f57ef8aea917b1053b",
+          "text": "  amount: number;"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "ambiguous_star_exports",
+    "session_id": "970b12e6-2133-46b4-97d1-41de80c3289f",
+    "arm": "A",
+    "repetition": 1,
+    "snapshot": "ambiguous_star_exports",
+    "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+    "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+    "controls_version": "typescript-context-controls-v2",
+    "schema_version": 1,
+    "outcome": "tool_failure",
+    "task_correct": false,
+    "answer": {
+      "status": "ambiguous",
+      "origin_files": [
+        "left.ts",
+        "right.ts"
+      ],
+      "unique_target": null
+    },
+    "read_count": 8,
+    "avoidable_reads": 0,
+    "proven_avoidable_reads": 0,
+    "lineage_status": "complete",
+    "classifications": [
+      {
+        "event_id": "970b12e6-2133-46b4-97d1-41de80c3289f:1",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "970b12e6-2133-46b4-97d1-41de80c3289f:2",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "970b12e6-2133-46b4-97d1-41de80c3289f:3",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "970b12e6-2133-46b4-97d1-41de80c3289f:4",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "970b12e6-2133-46b4-97d1-41de80c3289f:5",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "970b12e6-2133-46b4-97d1-41de80c3289f:6",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "970b12e6-2133-46b4-97d1-41de80c3289f:7",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "970b12e6-2133-46b4-97d1-41de80c3289f:8",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      }
+    ],
+    "required_context_delivered": [
+      "entry",
+      "import",
+      "left",
+      "right"
+    ],
+    "required_context_total": 5,
+    "context_recall": 0.8,
+    "serialized_tool_output_bytes": 6456,
+    "source_bytes": 1037,
+    "estimated_source_tokens": 260,
+    "tool_elapsed_ms": 21.633083000779152,
+    "provider_usage": {
+      "input_tokens": 57985,
+      "cached_input_tokens": 43008,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 922,
+      "reasoning_output_tokens": 341
+    },
+    "usage_semantics": "Codex turn.completed gross input; cached_input is a subset; output includes reasoning_output_tokens.",
+    "token_status": "measured"
+  },
+  "baseline": {
+    "end_to_end_seconds": 32.572151416999986,
+    "actual_process_seconds": 32.572151416999986,
+    "exit_code": 0,
+    "provider_thread_id": "01a08e44-8975-7c12-9673-dc65ff19e1f8",
+    "failures": [
+      {
+        "attempt_id": "970b12e6-2133-46b4-97d1-41de80c3289f/attempt/7",
+        "category": "tool_error",
+        "message": "unknown operation or parameters outside the fixed tool contract"
+      }
+    ],
+    "tool_delivery_verified": true,
+    "relationships": {
+      "schema_version": 1,
+      "case_id": "ambiguous_star_exports",
+      "required_semantic_dependencies_total": 0,
+      "required_semantic_dependencies": [],
+      "available_dependency_links_total": 0,
+      "available_dependency_links": [],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "dependency-link recall; references_type fallback is generic and does not establish precise subtype/kind recall",
+        "required": 0,
+        "available": 0,
+        "delivered": 0,
+        "available_ratio": null,
+        "delivered_ratio": null
+      },
+      "precise_kind_links_available_total": 0,
+      "precise_kind_links_delivered_total": 0,
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_scope": "authored frozen forbidden_relationships only; this is not exhaustive truth about unsupported or unrecorded edges"
+    },
+    "output_accounting": {
+      "schema_version": 2,
+      "complete": true,
+      "calls": [
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "processOrder",
+              "kind": "declaration"
+            },
+            "reason": "task_context",
+            "detail": "Find the processOrder declaration(s) and likely barrel exports to trace its Payload origin."
+          },
+          "attempt_id": "970b12e6-2133-46b4-97d1-41de80c3289f/attempt/1",
+          "trace_event_id": "970b12e6-2133-46b4-97d1-41de80c3289f:1",
+          "source_bytes": 0,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":null,\"_evaluation\":{\"attempt_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f/attempt/1\",\"calls_remaining\":23,\"event_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f:1\"}}"
+          ],
+          "serialized_bytes": 403
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "processOrder"
+            },
+            "reason": "task_context",
+            "detail": "Search all indexed references for processOrder because no declaration symbol was returned, including barrel and re-export syntax."
+          },
+          "attempt_id": "970b12e6-2133-46b4-97d1-41de80c3289f/attempt/2",
+          "trace_event_id": "970b12e6-2133-46b4-97d1-41de80c3289f:2",
+          "source_bytes": 55,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"qualified_name\":\"processOrder\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":70,\"byte_length\":83,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"10ff5e5d2a4918055984c04b730e5c8efc809afc556c79c0adf351c6d1b7d303\",\"decorators\":[],\"keywords\":[\"order\",\"process\"],\"metadata\":{},\"line\":2,\"end_line\":4,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"158e4803-420d-4db2-b721-7ac27495d6cf\",\"_evaluation\":{\"attempt_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f/attempt/2\",\"calls_remaining\":22,\"event_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f:2\"}}"
+          ],
+          "serialized_bytes": 912
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "get",
+            "parameters": {
+              "symbol_ids": [
+                "consumer.ts::processOrder#function"
+              ],
+              "context": 3,
+              "selected_from_search_id": "158e4803-420d-4db2-b721-7ac27495d6cf"
+            },
+            "reason": "task_context",
+            "detail": "Retrieve processOrder and its immediate import/context to identify the type flowing through the barrel."
+          },
+          "attempt_id": "970b12e6-2133-46b4-97d1-41de80c3289f/attempt/3",
+          "trace_event_id": "970b12e6-2133-46b4-97d1-41de80c3289f:3",
+          "source_bytes": 200,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"source\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\",\"byte_offset\":70,\"byte_length\":83,\"line\":2,\"end_line\":4,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import type { Payload as ImportedPayload } from \\\"./barrel.js\\\";\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f/attempt/3\",\"calls_remaining\":21,\"event_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f:3\"}}"
+          ],
+          "serialized_bytes": 578
+        },
+        {
+          "item_id": "item_5",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "barrel",
+              "kind": "module"
+            },
+            "reason": "task_context",
+            "detail": "Locate the barrel module and its export declarations that determine Payload provenance."
+          },
+          "attempt_id": "970b12e6-2133-46b4-97d1-41de80c3289f/attempt/4",
+          "trace_event_id": "970b12e6-2133-46b4-97d1-41de80c3289f:4",
+          "source_bytes": 0,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":null,\"_evaluation\":{\"attempt_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f/attempt/4\",\"calls_remaining\":20,\"event_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f:4\"}}"
+          ],
+          "serialized_bytes": 403
+        },
+        {
+          "item_id": "item_6",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "Payload"
+            },
+            "reason": "task_context",
+            "detail": "Find Payload declarations and aliases across the small indexed source set to trace all possible origins."
+          },
+          "attempt_id": "970b12e6-2133-46b4-97d1-41de80c3289f/attempt/5",
+          "trace_event_id": "970b12e6-2133-46b4-97d1-41de80c3289f:5",
+          "source_bytes": 93,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"left.ts::Payload#interface\",\"name\":\"Payload\",\"qualified_name\":\"Payload\",\"kind\":\"interface\",\"language\":\"typescript\",\"file_path\":\"left.ts\",\"byte_offset\":7,\"byte_length\":60,\"signature\":\"interface Payload {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d\",\"decorators\":[],\"keywords\":[\"payload\"],\"metadata\":{},\"line\":1,\"end_line\":4,\"score\":61.0},{\"id\":\"right.ts::Payload#interface\",\"name\":\"Payload\",\"qualified_name\":\"Payload\",\"kind\":\"interface\",\"language\":\"typescript\",\"file_path\":\"right.ts\",\"byte_offset\":7,\"byte_length\":60,\"signature\":\"interface Payload {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d\",\"decorators\":[],\"keywords\":[\"payload\"],\"metadata\":{},\"line\":1,\"end_line\":4,\"score\":61.0},{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"qualified_name\":\"processOrder\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":70,\"byte_length\":83,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"10ff5e5d2a4918055984c04b730e5c8efc809afc556c79c0adf351c6d1b7d303\",\"decorators\":[],\"keywords\":[\"order\",\"process\"],\"metadata\":{},\"line\":2,\"end_line\":4,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"1fc2cdd1-7ba4-4af2-88b6-83dd700e2c91\",\"_evaluation\":{\"attempt_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f/attempt/5\",\"calls_remaining\":19,\"event_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f:5\"}}"
+          ],
+          "serialized_bytes": 1734
+        },
+        {
+          "item_id": "item_7",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "get",
+            "parameters": {
+              "symbol_ids": [
+                "left.ts::Payload#interface",
+                "right.ts::Payload#interface"
+              ],
+              "context": 2,
+              "selected_from_search_id": "1fc2cdd1-7ba4-4af2-88b6-83dd700e2c91"
+            },
+            "reason": "task_context",
+            "detail": "Retrieve both Payload interface bodies and nearby context before evaluating whether same text implies same origin."
+          },
+          "attempt_id": "970b12e6-2133-46b4-97d1-41de80c3289f/attempt/6",
+          "trace_event_id": "970b12e6-2133-46b4-97d1-41de80c3289f:6",
+          "source_bytes": 158,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"left.ts::Payload#interface\",\"source\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\",\"byte_offset\":7,\"byte_length\":60,\"line\":1,\"end_line\":4,\"signature\":\"interface Payload {\",\"kind\":\"interface\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]},{\"id\":\"right.ts::Payload#interface\",\"source\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\",\"byte_offset\":7,\"byte_length\":60,\"line\":1,\"end_line\":4,\"signature\":\"interface Payload {\",\"kind\":\"interface\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f/attempt/6\",\"calls_remaining\":18,\"event_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f:6\"}}"
+          ],
+          "serialized_bytes": 729
+        },
+        {
+          "item_id": "item_8",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "grep",
+            "parameters": {
+              "pattern": "export|from",
+              "file_paths": [
+                "barrel.ts",
+                "consumer.ts",
+                "left.ts",
+                "right.ts"
+              ]
+            },
+            "reason": "task_context",
+            "detail": "Inspect export and import statements in the known four files to resolve the barrel's Payload sources."
+          },
+          "attempt_id": "970b12e6-2133-46b4-97d1-41de80c3289f/attempt/7",
+          "trace_event_id": "970b12e6-2133-46b4-97d1-41de80c3289f:7",
+          "source_bytes": 0,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"error\":{\"code\":\"ValueError\",\"message\":\"unknown operation or parameters outside the fixed tool contract\"},\"_evaluation\":{\"attempt_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f/attempt/7\",\"calls_remaining\":17,\"event_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f:7\"}}"
+          ],
+          "serialized_bytes": 258
+        },
+        {
+          "item_id": "item_9",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "grep",
+            "parameters": {
+              "pattern": "export|from"
+            },
+            "reason": "task_context",
+            "detail": "Inspect all indexed export and import statements to identify the barrel re-exports and consumer import."
+          },
+          "attempt_id": "970b12e6-2133-46b4-97d1-41de80c3289f/attempt/8",
+          "trace_event_id": "970b12e6-2133-46b4-97d1-41de80c3289f:8",
+          "source_bytes": 531,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"matches\":[{\"file\":\"barrel.ts\",\"line\":1,\"match\":\"export * from \\\"./left.js\\\";\",\"context_before\":[],\"context_after\":[\"export * from \\\"./right.js\\\";\"]},{\"file\":\"barrel.ts\",\"line\":2,\"match\":\"export * from \\\"./right.js\\\";\",\"context_before\":[\"export * from \\\"./left.js\\\";\"],\"context_after\":[]},{\"file\":\"consumer.ts\",\"line\":1,\"match\":\"import type { Payload as ImportedPayload } from \\\"./barrel.js\\\";\",\"context_before\":[],\"context_after\":[\"export function processOrder(value: ImportedPayload): string {\",\"  return value.requestId;\"]},{\"file\":\"consumer.ts\",\"line\":2,\"match\":\"export function processOrder(value: ImportedPayload): string {\",\"context_before\":[\"import type { Payload as ImportedPayload } from \\\"./barrel.js\\\";\"],\"context_after\":[\"  return value.requestId;\",\"}\"]},{\"file\":\"left.ts\",\"line\":1,\"match\":\"export interface Payload {\",\"context_before\":[],\"context_after\":[\"  requestId: string;\",\"  amount: number;\"]},{\"file\":\"right.ts\",\"line\":1,\"match\":\"export interface Payload {\",\"context_before\":[],\"context_after\":[\"  requestId: string;\",\"  amount: number;\"]}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_source_text\"},\"_evaluation\":{\"attempt_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f/attempt/8\",\"calls_remaining\":16,\"event_id\":\"970b12e6-2133-46b4-97d1-41de80c3289f:8\"}}"
+          ],
+          "serialized_bytes": 1439
+        }
+      ],
+      "tool_call_count": 8,
+      "recorded_payload_bytes": 6456,
+      "complete_payload_bytes": 6456,
+      "source_bytes": 1037,
+      "failures": []
+    },
+    "lineage_valid": true,
+    "adapter_elapsed_ms": 22.246501001063734
+  }
+}

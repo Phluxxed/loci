@@ -1,0 +1,398 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "task_id": "generic_shadow",
+    "session_id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758",
+    "arm": "A",
+    "repetition": 2,
+    "snapshot": "generic_shadow",
+    "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+    "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+    "controls_version": "typescript-context-controls-v2"
+  },
+  "events": [
+    {
+      "id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758:1",
+      "task_id": "generic_shadow",
+      "session_id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "generic_shadow",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Locate the processOrder declaration and its likely source file.",
+      "because": null,
+      "arguments": {
+        "query": "processOrder",
+        "kind": "function",
+        "lang": "typescript"
+      },
+      "search_id": "a4ef0d57-96bf-4bc8-b8bc-97143966a328",
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"qualified_name\":\"processOrder\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":50,\"byte_length\":75,\"signature\":\"function processOrder<Payload>(value: Payload): Payload {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"a7f1bd1d2f32f65dbf5e981e72b28e6a76073e527a2390f14708fda7dee1708a\",\"decorators\":[],\"keywords\":[\"order\",\"process\"],\"metadata\":{},\"line\":2,\"end_line\":4,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"a4ef0d57-96bf-4bc8-b8bc-97143966a328\",\"_evaluation\":{\"attempt_id\":\"e2b348dc-4e9e-42b4-a628-2c9762cc1758/attempt/1\",\"calls_remaining\":23,\"event_id\":\"e2b348dc-4e9e-42b4-a628-2c9762cc1758:1\"}}",
+      "serialized_bytes": 914,
+      "source_bytes": 57,
+      "elapsed_ms": 4.470125000807457,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 50,
+          "end_byte": 107,
+          "sha256": "05a6bd61c9e8e330aee7d89ebea24f72f567a721e7486ded468df2ec1b732d44",
+          "text": "function processOrder<Payload>(value: Payload): Payload {"
+        }
+      ]
+    },
+    {
+      "id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758:2",
+      "task_id": "generic_shadow",
+      "session_id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "generic_shadow",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "get",
+      "reason": "task_context",
+      "detail": "Retrieve the exact processOrder body and nearby imports to determine what Payload denotes.",
+      "because": null,
+      "arguments": {
+        "symbol_ids": [
+          "consumer.ts::processOrder#function"
+        ],
+        "context": 3,
+        "selected_from_search_id": "a4ef0d57-96bf-4bc8-b8bc-97143966a328"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"source\":\"function processOrder<Payload>(value: Payload): Payload {\\n  return value;\\n}\",\"byte_offset\":50,\"byte_length\":75,\"line\":2,\"end_line\":4,\"signature\":\"function processOrder<Payload>(value: Payload): Payload {\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import type { Payload } from \\\"./types.js\\\";\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"e2b348dc-4e9e-42b4-a628-2c9762cc1758/attempt/2\",\"calls_remaining\":22,\"event_id\":\"e2b348dc-4e9e-42b4-a628-2c9762cc1758:2\"}}",
+      "serialized_bytes": 552,
+      "source_bytes": 174,
+      "elapsed_ms": 5.453375000797678,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 50,
+          "end_byte": 125,
+          "sha256": "a7f1bd1d2f32f65dbf5e981e72b28e6a76073e527a2390f14708fda7dee1708a",
+          "text": "function processOrder<Payload>(value: Payload): Payload {\n  return value;\n}"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 42,
+          "sha256": "46353b46eca358aa0745e702bd66af5611fafd57a43ff64218823ec5c4ac2c4a",
+          "text": "import type { Payload } from \"./types.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 50,
+          "end_byte": 107,
+          "sha256": "05a6bd61c9e8e330aee7d89ebea24f72f567a721e7486ded468df2ec1b732d44",
+          "text": "function processOrder<Payload>(value: Payload): Payload {"
+        }
+      ]
+    },
+    {
+      "id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758:3",
+      "task_id": "generic_shadow",
+      "session_id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "generic_shadow",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "missing_context",
+      "detail": "Inspect the imported Payload declaration to compare it with the local generic shadowing processOrder.",
+      "because": "e2b348dc-4e9e-42b4-a628-2c9762cc1758:2",
+      "arguments": {
+        "query": "Payload",
+        "kind": "interface",
+        "lang": "typescript"
+      },
+      "search_id": "9509d6a0-c246-4739-8c7b-3e42f7db9368",
+      "response_json": "{\"symbols\":[{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"qualified_name\":\"Payload\",\"kind\":\"interface\",\"language\":\"typescript\",\"file_path\":\"types.ts\",\"byte_offset\":7,\"byte_length\":60,\"signature\":\"interface Payload {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d\",\"decorators\":[],\"keywords\":[\"payload\"],\"metadata\":{},\"line\":1,\"end_line\":4,\"score\":61.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"9509d6a0-c246-4739-8c7b-3e42f7db9368\",\"_evaluation\":{\"attempt_id\":\"e2b348dc-4e9e-42b4-a628-2c9762cc1758/attempt/3\",\"calls_remaining\":21,\"event_id\":\"e2b348dc-4e9e-42b4-a628-2c9762cc1758:3\"}}",
+      "serialized_bytes": 848,
+      "source_bytes": 19,
+      "elapsed_ms": 2.2061670024413615,
+      "spans": [
+        {
+          "file": "types.ts",
+          "start_byte": 7,
+          "end_byte": 26,
+          "sha256": "3c35bccaf71be1031a5c44b0fa3c7771b5743bb6ebedfda88fca7b184f983641",
+          "text": "interface Payload {"
+        }
+      ]
+    },
+    {
+      "id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758:4",
+      "task_id": "generic_shadow",
+      "session_id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "generic_shadow",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "get",
+      "reason": "missing_context",
+      "detail": "Retrieve the exact imported interface fields needed to report round-trip requirements.",
+      "because": "e2b348dc-4e9e-42b4-a628-2c9762cc1758:3",
+      "arguments": {
+        "symbol_ids": [
+          "types.ts::Payload#interface"
+        ],
+        "context": 2,
+        "selected_from_search_id": "9509d6a0-c246-4739-8c7b-3e42f7db9368"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"types.ts::Payload#interface\",\"source\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\",\"byte_offset\":7,\"byte_length\":60,\"line\":1,\"end_line\":4,\"signature\":\"interface Payload {\",\"kind\":\"interface\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"e2b348dc-4e9e-42b4-a628-2c9762cc1758/attempt/4\",\"calls_remaining\":20,\"event_id\":\"e2b348dc-4e9e-42b4-a628-2c9762cc1758:4\"}}",
+      "serialized_bytes": 447,
+      "source_bytes": 79,
+      "elapsed_ms": 5.614542002149392,
+      "spans": [
+        {
+          "file": "types.ts",
+          "start_byte": 7,
+          "end_byte": 67,
+          "sha256": "1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d",
+          "text": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 7,
+          "end_byte": 26,
+          "sha256": "3c35bccaf71be1031a5c44b0fa3c7771b5743bb6ebedfda88fca7b184f983641",
+          "text": "interface Payload {"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "generic_shadow",
+    "session_id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758",
+    "arm": "A",
+    "repetition": 2,
+    "snapshot": "generic_shadow",
+    "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+    "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+    "controls_version": "typescript-context-controls-v2",
+    "schema_version": 1,
+    "outcome": "completed",
+    "task_correct": true,
+    "answer": {
+      "parameter_kind": "local_generic",
+      "requires_imported_fields": false,
+      "number_round_trip": true,
+      "string_round_trip": true
+    },
+    "read_count": 4,
+    "avoidable_reads": null,
+    "proven_avoidable_reads": 0,
+    "lineage_status": "inconclusive",
+    "classifications": [
+      {
+        "event_id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758:1",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758:2",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758:3",
+        "classification": "unproven",
+        "reason": "missing_context",
+        "because": "e2b348dc-4e9e-42b4-a628-2c9762cc1758:2",
+        "recovered_gold": []
+      },
+      {
+        "event_id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758:4",
+        "classification": "unproven",
+        "reason": "missing_context",
+        "because": "e2b348dc-4e9e-42b4-a628-2c9762cc1758:3",
+        "recovered_gold": []
+      }
+    ],
+    "required_context_delivered": [
+      "entry",
+      "import"
+    ],
+    "required_context_total": 2,
+    "context_recall": 1.0,
+    "serialized_tool_output_bytes": 2761,
+    "source_bytes": 329,
+    "estimated_source_tokens": 83,
+    "tool_elapsed_ms": 17.744209006195888,
+    "provider_usage": {
+      "input_tokens": 29196,
+      "cached_input_tokens": 20480,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 729,
+      "reasoning_output_tokens": 333
+    },
+    "usage_semantics": "Codex turn.completed gross input; cached_input is a subset; output includes reasoning_output_tokens.",
+    "token_status": "measured"
+  },
+  "baseline": {
+    "end_to_end_seconds": 22.124237041993183,
+    "actual_process_seconds": 22.124237041993183,
+    "exit_code": 0,
+    "provider_thread_id": "01a08e46-94a6-7272-b9bb-67488078047f",
+    "failures": [],
+    "tool_delivery_verified": true,
+    "relationships": {
+      "schema_version": 1,
+      "case_id": "generic_shadow",
+      "required_semantic_dependencies_total": 0,
+      "required_semantic_dependencies": [],
+      "available_dependency_links_total": 0,
+      "available_dependency_links": [],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "dependency-link recall; references_type fallback is generic and does not establish precise subtype/kind recall",
+        "required": 0,
+        "available": 0,
+        "delivered": 0,
+        "available_ratio": null,
+        "delivered_ratio": null
+      },
+      "precise_kind_links_available_total": 0,
+      "precise_kind_links_delivered_total": 0,
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_scope": "authored frozen forbidden_relationships only; this is not exhaustive truth about unsupported or unrecorded edges"
+    },
+    "output_accounting": {
+      "schema_version": 2,
+      "complete": true,
+      "calls": [
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "processOrder",
+              "kind": "function",
+              "lang": "typescript"
+            },
+            "reason": "task_context",
+            "detail": "Locate the processOrder declaration and its likely source file."
+          },
+          "attempt_id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758/attempt/1",
+          "trace_event_id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758:1",
+          "source_bytes": 57,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"qualified_name\":\"processOrder\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":50,\"byte_length\":75,\"signature\":\"function processOrder<Payload>(value: Payload): Payload {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"a7f1bd1d2f32f65dbf5e981e72b28e6a76073e527a2390f14708fda7dee1708a\",\"decorators\":[],\"keywords\":[\"order\",\"process\"],\"metadata\":{},\"line\":2,\"end_line\":4,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"a4ef0d57-96bf-4bc8-b8bc-97143966a328\",\"_evaluation\":{\"attempt_id\":\"e2b348dc-4e9e-42b4-a628-2c9762cc1758/attempt/1\",\"calls_remaining\":23,\"event_id\":\"e2b348dc-4e9e-42b4-a628-2c9762cc1758:1\"}}"
+          ],
+          "serialized_bytes": 914
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "get",
+            "parameters": {
+              "symbol_ids": [
+                "consumer.ts::processOrder#function"
+              ],
+              "context": 3,
+              "selected_from_search_id": "a4ef0d57-96bf-4bc8-b8bc-97143966a328"
+            },
+            "reason": "task_context",
+            "detail": "Retrieve the exact processOrder body and nearby imports to determine what Payload denotes."
+          },
+          "attempt_id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758/attempt/2",
+          "trace_event_id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758:2",
+          "source_bytes": 174,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"source\":\"function processOrder<Payload>(value: Payload): Payload {\\n  return value;\\n}\",\"byte_offset\":50,\"byte_length\":75,\"line\":2,\"end_line\":4,\"signature\":\"function processOrder<Payload>(value: Payload): Payload {\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import type { Payload } from \\\"./types.js\\\";\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"e2b348dc-4e9e-42b4-a628-2c9762cc1758/attempt/2\",\"calls_remaining\":22,\"event_id\":\"e2b348dc-4e9e-42b4-a628-2c9762cc1758:2\"}}"
+          ],
+          "serialized_bytes": 552
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "Payload",
+              "kind": "interface",
+              "lang": "typescript"
+            },
+            "reason": "missing_context",
+            "because": "e2b348dc-4e9e-42b4-a628-2c9762cc1758:2",
+            "detail": "Inspect the imported Payload declaration to compare it with the local generic shadowing processOrder."
+          },
+          "attempt_id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758/attempt/3",
+          "trace_event_id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758:3",
+          "source_bytes": 19,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"qualified_name\":\"Payload\",\"kind\":\"interface\",\"language\":\"typescript\",\"file_path\":\"types.ts\",\"byte_offset\":7,\"byte_length\":60,\"signature\":\"interface Payload {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d\",\"decorators\":[],\"keywords\":[\"payload\"],\"metadata\":{},\"line\":1,\"end_line\":4,\"score\":61.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"9509d6a0-c246-4739-8c7b-3e42f7db9368\",\"_evaluation\":{\"attempt_id\":\"e2b348dc-4e9e-42b4-a628-2c9762cc1758/attempt/3\",\"calls_remaining\":21,\"event_id\":\"e2b348dc-4e9e-42b4-a628-2c9762cc1758:3\"}}"
+          ],
+          "serialized_bytes": 848
+        },
+        {
+          "item_id": "item_5",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "get",
+            "parameters": {
+              "symbol_ids": [
+                "types.ts::Payload#interface"
+              ],
+              "context": 2,
+              "selected_from_search_id": "9509d6a0-c246-4739-8c7b-3e42f7db9368"
+            },
+            "reason": "missing_context",
+            "because": "e2b348dc-4e9e-42b4-a628-2c9762cc1758:3",
+            "detail": "Retrieve the exact imported interface fields needed to report round-trip requirements."
+          },
+          "attempt_id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758/attempt/4",
+          "trace_event_id": "e2b348dc-4e9e-42b4-a628-2c9762cc1758:4",
+          "source_bytes": 79,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"types.ts::Payload#interface\",\"source\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\",\"byte_offset\":7,\"byte_length\":60,\"line\":1,\"end_line\":4,\"signature\":\"interface Payload {\",\"kind\":\"interface\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"e2b348dc-4e9e-42b4-a628-2c9762cc1758/attempt/4\",\"calls_remaining\":20,\"event_id\":\"e2b348dc-4e9e-42b4-a628-2c9762cc1758:4\"}}"
+          ],
+          "serialized_bytes": 447
+        }
+      ],
+      "tool_call_count": 4,
+      "recorded_payload_bytes": 2761,
+      "complete_payload_bytes": 2761,
+      "source_bytes": 329,
+      "failures": []
+    },
+    "lineage_valid": true,
+    "adapter_elapsed_ms": 18.124499991245102
+  }
+}
