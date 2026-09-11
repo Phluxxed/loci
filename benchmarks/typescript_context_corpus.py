@@ -125,6 +125,9 @@ def load_controls(corpus: dict) -> dict[str, Any]:
     protocol = controls['protocol']
     if _hash((root / _relative(protocol['file'])).read_bytes()) != protocol['sha256']:
         raise ValueError('comparison protocol hash mismatch')
+    lineage = controls.get('read_lineage_protocol')
+    if lineage and _hash((root / _relative(lineage['file'])).read_bytes()) != lineage['sha256']:
+        raise ValueError('read-lineage protocol hash mismatch')
     schedule = controls['schedule']
     arms = set(controls['arms'])
     repetitions = schedule['repetitions']

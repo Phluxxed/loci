@@ -27,7 +27,7 @@ from loci.storage.index_store import EXTRACTOR_VERSION
 
 ROOT = Path(__file__).resolve().parents[1]
 HARNESS_FILES = [ROOT / 'benchmarks' / f'typescript_context_{name}.py'
-                 for name in ('adapter', 'baseline', 'corpus', 'relationships', 'trace')]
+                 for name in ('adapter', 'baseline', 'corpus', 'delivery', 'relationships', 'trace', 'transport_probe')]
 DISABLED_FEATURES = ['shell_tool', 'multi_agent', 'apps', 'plugins', 'hooks', 'memories',
                      'skill_search', 'skill_mcp_dependency_install', 'view_image', 'image_generation',
                      'browser_use', 'computer_use', 'in_app_browser', 'code_mode', 'code_mode_host',
@@ -177,6 +177,7 @@ def inspect_request(repo: Path, config: dict, prompt: str, runtime_home: Path) -
     visible = {k: request[k] for k in ('model', 'input', 'reasoning', 'text') if k in request}
     return {'request': visible, 'request_sha256': sha(wire(visible).encode()), 'tools': tools,
             'tool_schemas_sha256': sha(wire({'tools': [i for i in request['input'] if i['type'] == 'additional_tools']}).encode()),
+            'canonical_tool_schemas_sha256': sha(wire({'tools': [i['tools'] for i in request['input'] if i['type'] == 'additional_tools']}).encode()),
             'inspection': 'actual Codex request, local no-auth transport; no model called',
             'resource_helpers': 'Only evaluation server configured; no resources or templates exposed.'}
 
@@ -235,17 +236,31 @@ def measure(corpus: dict, case: dict, run: dict, events: list[dict], elapsed: fl
     calls = [e['item'] for e in events if e.get('type') == 'item.completed'
              and e.get('item', {}).get('type') == 'mcp_tool_call']
     delivered = []
-    for call in calls:
-        result = call.get('result') or {}
-        if call.get('server') != 'evaluation' or call.get('tool') != 'read' or not isinstance(result.get('structured_content'), dict):
-            failures.append({'category': 'unaccounted_tool_output', 'item': call['id']})
-            continue
-        delivered.append(result['structured_content'])
-    expected_results = [json.loads(e['response_json']) for e in trace.events]
-    if delivered != expected_results:
-        failures.append({'category': 'delivery_trace_mismatch'})
+    accounting = None
+    if corpus['version'] == 'typescript-context-v2':
+        from benchmarks.typescript_context_delivery import reconcile_deliveries
+        accounting = reconcile_deliveries(raw_trace, calls, trace.events)
+        delivered = accounting.pop('validated_results')
+        failures.extend(accounting['failures'])
+        if accounting['tool_call_count'] > limits['max_top_level_tool_calls_per_run']:
+            failures.append({'category': 'budget_exhausted', 'limit': 'all_tool_calls'})
+        if accounting['recorded_payload_bytes'] > limits['max_serialized_output_bytes_per_run']:
+            failures.append({'category': 'budget_exhausted', 'limit': 'all_tool_output'})
+        if any((row['serialized_bytes'] or 0) > limits['max_serialized_output_bytes_per_operation']
+               for row in accounting['calls']):
+            failures.append({'category': 'budget_exhausted', 'limit': 'host_tool_output'})
+    else:
+        for call in calls:
+            result = call.get('result') or {}
+            if call.get('server') != 'evaluation' or call.get('tool') != 'read' or not isinstance(result.get('structured_content'), dict):
+                failures.append({'category': 'unaccounted_tool_output', 'item': call['id']})
+                continue
+            delivered.append(result['structured_content'])
+        expected_results = [json.loads(e['response_json']) for e in trace.events]
+        if delivered != expected_results:
+            failures.append({'category': 'delivery_trace_mismatch'})
     if failures and outcome == 'completed':
-        outcome = 'tool_failure'
+        outcome = 'budget_exhausted' if all(f['category'] == 'budget_exhausted' for f in failures) else 'tool_failure'
     artifact = trace.artifact(answer, usage=usage,
                              usage_semantics='Codex turn.completed gross input; cached_input is a subset; output includes reasoning_output_tokens.' if usage else None,
                              outcome=outcome)
@@ -253,8 +268,13 @@ def measure(corpus: dict, case: dict, run: dict, events: list[dict], elapsed: fl
                      'actual_process_seconds': elapsed, 'exit_code': exit_code,
                      'provider_thread_id': next((e['thread_id'] for e in events if e.get('type') == 'thread.started'), None),
                      'failures': failures, 'tool_delivery_verified': not any(f['category'] in
-                      {'unaccounted_tool_output', 'delivery_trace_mismatch', 'invalid_trace'} for f in failures),
+                     {'unaccounted_tool_output', 'delivery_trace_mismatch', 'invalid_trace'} for f in failures),
                      'relationships': score_relationships(case, index, delivered)}
+    if accounting is not None:
+        artifact['baseline']['output_accounting'] = accounting
+        artifact['baseline']['tool_delivery_verified'] = accounting['complete']
+        artifact['baseline']['lineage_valid'] = not any(f['category'] == 'invalid_trace' for f in failures)
+        artifact['baseline']['adapter_elapsed_ms'] = sum(entry['elapsed_ms'] for entry in raw_trace['deliveries'])
     return artifact
 
 
@@ -277,11 +297,18 @@ def run_case(corpus: dict, controls: dict, case: dict, repetition: int, output: 
         save(run_file, run)
         # Retain a valid empty trace even when the adapter never starts.
         empty = ReadTrace(corpus, case['id'], run['session_id'], 'A', repetition)
-        save(Path(run['trace_path']), {'identity': empty.identity, 'events': [], 'failures': [], 'attempts': 0})
+        initial_trace = {'identity': empty.identity, 'events': [], 'failures': [], 'attempts': 0}
+        if corpus['version'] == 'typescript-context-v2':
+            initial_trace['deliveries'] = []
+        save(Path(run['trace_path']), initial_trace)
         config = settings(run_file, catalog, store)
         prompt = controls['agent']['common_prompt'] + case['prompt']
         inspection = inspect_request(repo, config, prompt, temp / 'inspection-runtime')
         save(destination / 'request-audit.json', inspection)
+        if corpus['version'] == 'typescript-context-v2':
+            verified_transport = json.loads((output / 'transport-verification.json').read_text())
+            if inspection['canonical_tool_schemas_sha256'] != verified_transport['canonical_tool_schemas_sha256']:
+                raise ValueError('tool schemas differ from the verified batch transport')
         save(destination / 'provenance.json', {'run': run, 'config': config,
              'config_sha256': sha(wire(config).encode()), 'prompt_sha256': sha(prompt.encode()),
              'index_seconds': index_seconds, 'extractor_version': EXTRACTOR_VERSION,
@@ -307,8 +334,11 @@ def main():
     parser.add_argument('--case', help='Run the named case only; this is not a complete baseline')
     parser.add_argument('--repetition', type=int, choices=[1, 2, 3])
     parser.add_argument('--resume', action='store_true', help='Continue missing planned runs; completed attempts are never retried')
+    parser.add_argument('--corpus-root', type=Path, default=DEFAULT_ROOT,
+                        help='Explicit frozen protocol directory; defaults to historical v1')
     args = parser.parse_args()
-    corpus = load_corpus()
+    corpus = load_corpus(args.corpus_root)
+    corpus_root = Path(corpus['_root'])
     controls = load_controls(corpus)
     if args.case and args.case not in {c['id'] for c in corpus['cases']}:
         parser.error('unknown frozen case')
@@ -328,13 +358,17 @@ def main():
     if not args.resume:
         catalog = prepare_catalog(output, controls['agent']['model'])
         save(output / 'preflight.json', preflight(corpus))
+        if corpus['version'] == 'typescript-context-v2':
+            from benchmarks.typescript_context_transport_probe import verify_transport
+            verify_transport(corpus, catalog, output / 'transport-verification.json')
         save(output / 'environment.json', {'cli_version': cli_version, **observed_environment,
              'baseline_source_tree': controls['baseline_source_tree'],
              'baseline_commit': controls['baseline_engine']['commit'],
              'harness_commit': command(['git', 'rev-parse', 'HEAD'], cwd=ROOT),
              'harness_files': {str(p.relative_to(ROOT)): sha(p.read_bytes()) for p in HARNESS_FILES},
-             'corpus_sha256': sha((DEFAULT_ROOT / 'corpus.json').read_bytes()),
-             'controls_sha256': sha((DEFAULT_ROOT / 'comparison-controls.json').read_bytes()),
+             'corpus_root': str(corpus_root),
+             'corpus_sha256': sha((corpus_root / 'corpus.json').read_bytes()),
+             'controls_sha256': sha((corpus_root / 'comparison-controls.json').read_bytes()),
              'started_at_utc': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())})
     else:
         previous = json.loads((output / 'environment.json').read_text())
@@ -343,6 +377,9 @@ def main():
         current_harness = {str(p.relative_to(ROOT)): sha(p.read_bytes()) for p in HARNESS_FILES}
         if previous['harness_files'] != current_harness:
             raise ValueError('cannot mix changed harness code into a measured batch')
+        if (previous['corpus_sha256'] != sha((corpus_root / 'corpus.json').read_bytes())
+                or previous['controls_sha256'] != sha((corpus_root / 'comparison-controls.json').read_bytes())):
+            raise ValueError('cannot mix protocols into a measured batch')
     results = []
     for case in corpus['cases']:
         if args.case and case['id'] != args.case:

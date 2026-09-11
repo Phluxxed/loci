@@ -1,0 +1,743 @@
+{
+  "schema_version": 1,
+  "probe": "typescript-context-v2-transport",
+  "meaning": "Deterministic offline transport verification; no provider model call or agent baseline measurement.",
+  "corpus_root": "/Users/brummerv/phluxxed/loci-exploration/benchmarks/corpora/typescript-context-v2",
+  "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+  "script_sha256": "061eb22befa4ece86e2f724cb16905812ecc5628a8572a7bdcd54bea95f552b4",
+  "requested_case_mode": "imported_interface",
+  "catalog_sha256": "f1c45cceac1c3ee90fa1af1007c341713e220571390c3b1eb086c443d7781062",
+  "canonical_tool_schemas_sha256": "a100f86b827a821d5352d933eed908a929f6125549cb109575e0ef60f855dffe",
+  "modes": [
+    {
+      "mode": "structured_read",
+      "case_id": "imported_interface",
+      "requested_case_mode": "imported_interface",
+      "request_count": 2,
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.6337112499968498,
+      "model": "gpt-5.6-luna",
+      "reasoning": {
+        "effort": "high",
+        "context": "all_turns"
+      },
+      "tool_set": [
+        [
+          "functions",
+          "list_mcp_resources"
+        ],
+        [
+          "functions",
+          "list_mcp_resource_templates"
+        ],
+        [
+          "functions",
+          "read_mcp_resource"
+        ],
+        [
+          "mcp__evaluation",
+          "read"
+        ]
+      ],
+      "tool_schemas_sha256": "a100f86b827a821d5352d933eed908a929f6125549cb109575e0ef60f855dffe",
+      "call_event": {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "evaluation",
+          "tool": "read",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "processOrder"
+            },
+            "reason": "task_context",
+            "detail": "Inspect the requested declaration"
+          },
+          "result": {
+            "content": [],
+            "structured_content": {
+              "symbols": [
+                {
+                  "id": "consumer.ts::processOrder#function",
+                  "name": "processOrder",
+                  "qualified_name": "processOrder",
+                  "kind": "function",
+                  "language": "typescript",
+                  "file_path": "consumer.ts",
+                  "byte_offset": 69,
+                  "byte_length": 83,
+                  "signature": "function processOrder(value: ImportedPayload): string {",
+                  "docstring": "",
+                  "summary": "",
+                  "content_hash": "10ff5e5d2a4918055984c04b730e5c8efc809afc556c79c0adf351c6d1b7d303",
+                  "decorators": [],
+                  "keywords": [
+                    "order",
+                    "process"
+                  ],
+                  "metadata": {},
+                  "line": 2,
+                  "end_line": 4,
+                  "score": 63.0
+                }
+              ],
+              "coverage": {
+                "schema_version": 1,
+                "state": "complete",
+                "scope": "repository",
+                "source_scope": "indexed_supported_source",
+                "indexed_files": 2,
+                "excluded_paths": 0,
+                "exclusions": [],
+                "unknown_reason": null,
+                "query_scope": "indexed_symbols"
+              },
+              "search_id": "faa8a6d1-fa3d-419d-a060-84f089d43cc5",
+              "_evaluation": {
+                "attempt_id": "ebe8d223-06ac-47ce-9a19-cc930eb71a6f/attempt/1",
+                "calls_remaining": 23,
+                "event_id": "ebe8d223-06ac-47ce-9a19-cc930eb71a6f:1"
+              }
+            }
+          },
+          "error": null,
+          "status": "completed"
+        }
+      },
+      "call_item": {
+        "id": "item_1",
+        "type": "mcp_tool_call",
+        "server": "evaluation",
+        "tool": "read",
+        "arguments": {
+          "operation": "search",
+          "parameters": {
+            "query": "processOrder"
+          },
+          "reason": "task_context",
+          "detail": "Inspect the requested declaration"
+        },
+        "result": {
+          "content": [],
+          "structured_content": {
+            "symbols": [
+              {
+                "id": "consumer.ts::processOrder#function",
+                "name": "processOrder",
+                "qualified_name": "processOrder",
+                "kind": "function",
+                "language": "typescript",
+                "file_path": "consumer.ts",
+                "byte_offset": 69,
+                "byte_length": 83,
+                "signature": "function processOrder(value: ImportedPayload): string {",
+                "docstring": "",
+                "summary": "",
+                "content_hash": "10ff5e5d2a4918055984c04b730e5c8efc809afc556c79c0adf351c6d1b7d303",
+                "decorators": [],
+                "keywords": [
+                  "order",
+                  "process"
+                ],
+                "metadata": {},
+                "line": 2,
+                "end_line": 4,
+                "score": 63.0
+              }
+            ],
+            "coverage": {
+              "schema_version": 1,
+              "state": "complete",
+              "scope": "repository",
+              "source_scope": "indexed_supported_source",
+              "indexed_files": 2,
+              "excluded_paths": 0,
+              "exclusions": [],
+              "unknown_reason": null,
+              "query_scope": "indexed_symbols"
+            },
+            "search_id": "faa8a6d1-fa3d-419d-a060-84f089d43cc5",
+            "_evaluation": {
+              "attempt_id": "ebe8d223-06ac-47ce-9a19-cc930eb71a6f/attempt/1",
+              "calls_remaining": 23,
+              "event_id": "ebe8d223-06ac-47ce-9a19-cc930eb71a6f:1"
+            }
+          }
+        },
+        "error": null,
+        "status": "completed"
+      },
+      "model_tool_outputs": [
+        {
+          "type": "function_call_output",
+          "id": "fco_01a08e33-192f-7e93-b1ee-f44199e331e4",
+          "call_id": "call_probe",
+          "output": "Wall time: 0.0032 seconds\nOutput:\n{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"qualified_name\":\"processOrder\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":69,\"byte_length\":83,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"10ff5e5d2a4918055984c04b730e5c8efc809afc556c79c0adf351c6d1b7d303\",\"decorators\":[],\"keywords\":[\"order\",\"process\"],\"metadata\":{},\"line\":2,\"end_line\":4,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"faa8a6d1-fa3d-419d-a060-84f089d43cc5\",\"_evaluation\":{\"attempt_id\":\"ebe8d223-06ac-47ce-9a19-cc930eb71a6f/attempt/1\",\"calls_remaining\":23,\"event_id\":\"ebe8d223-06ac-47ce-9a19-cc930eb71a6f:1\"}}"
+        }
+      ],
+      "payload_kind": "compact_json",
+      "payload_texts": [
+        "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"qualified_name\":\"processOrder\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":69,\"byte_length\":83,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"10ff5e5d2a4918055984c04b730e5c8efc809afc556c79c0adf351c6d1b7d303\",\"decorators\":[],\"keywords\":[\"order\",\"process\"],\"metadata\":{},\"line\":2,\"end_line\":4,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"faa8a6d1-fa3d-419d-a060-84f089d43cc5\",\"_evaluation\":{\"attempt_id\":\"ebe8d223-06ac-47ce-9a19-cc930eb71a6f/attempt/1\",\"calls_remaining\":23,\"event_id\":\"ebe8d223-06ac-47ce-9a19-cc930eb71a6f:1\"}}"
+      ],
+      "output_verified": true
+    },
+    {
+      "mode": "invalid_lineage_read",
+      "case_id": "imported_interface",
+      "requested_case_mode": "imported_interface",
+      "request_count": 2,
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.6080563330033328,
+      "model": "gpt-5.6-luna",
+      "reasoning": {
+        "effort": "high",
+        "context": "all_turns"
+      },
+      "tool_set": [
+        [
+          "functions",
+          "list_mcp_resources"
+        ],
+        [
+          "functions",
+          "list_mcp_resource_templates"
+        ],
+        [
+          "functions",
+          "read_mcp_resource"
+        ],
+        [
+          "mcp__evaluation",
+          "read"
+        ]
+      ],
+      "tool_schemas_sha256": "a100f86b827a821d5352d933eed908a929f6125549cb109575e0ef60f855dffe",
+      "call_event": {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "evaluation",
+          "tool": "read",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "processOrder"
+            },
+            "reason": "missing_context",
+            "detail": "Inspect a missing declaration",
+            "because": "not-an-event"
+          },
+          "result": {
+            "content": [],
+            "structured_content": {
+              "error": {
+                "code": "INVALID_TRACE",
+                "message": "causal parent must be an earlier event in this run"
+              },
+              "_evaluation": {
+                "attempt_id": "86a81834-d4ac-41c5-9f02-1648088a6bbe/attempt/1",
+                "calls_remaining": 23
+              }
+            }
+          },
+          "error": null,
+          "status": "completed"
+        }
+      },
+      "call_item": {
+        "id": "item_1",
+        "type": "mcp_tool_call",
+        "server": "evaluation",
+        "tool": "read",
+        "arguments": {
+          "operation": "search",
+          "parameters": {
+            "query": "processOrder"
+          },
+          "reason": "missing_context",
+          "detail": "Inspect a missing declaration",
+          "because": "not-an-event"
+        },
+        "result": {
+          "content": [],
+          "structured_content": {
+            "error": {
+              "code": "INVALID_TRACE",
+              "message": "causal parent must be an earlier event in this run"
+            },
+            "_evaluation": {
+              "attempt_id": "86a81834-d4ac-41c5-9f02-1648088a6bbe/attempt/1",
+              "calls_remaining": 23
+            }
+          }
+        },
+        "error": null,
+        "status": "completed"
+      },
+      "model_tool_outputs": [
+        {
+          "type": "function_call_output",
+          "id": "fco_01a08e33-1dc1-7031-8b78-62b6af554e62",
+          "call_id": "call_probe",
+          "output": "Wall time: 0.0027 seconds\nOutput:\n{\"error\":{\"code\":\"INVALID_TRACE\",\"message\":\"causal parent must be an earlier event in this run\"},\"_evaluation\":{\"attempt_id\":\"86a81834-d4ac-41c5-9f02-1648088a6bbe/attempt/1\",\"calls_remaining\":23}}"
+        }
+      ],
+      "payload_kind": "compact_json",
+      "payload_texts": [
+        "{\"error\":{\"code\":\"INVALID_TRACE\",\"message\":\"causal parent must be an earlier event in this run\"},\"_evaluation\":{\"attempt_id\":\"86a81834-d4ac-41c5-9f02-1648088a6bbe/attempt/1\",\"calls_remaining\":23}}"
+      ],
+      "output_verified": true
+    },
+    {
+      "mode": "schema_error_read",
+      "case_id": "imported_interface",
+      "requested_case_mode": "imported_interface",
+      "request_count": 2,
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.545766333998472,
+      "model": "gpt-5.6-luna",
+      "reasoning": {
+        "effort": "high",
+        "context": "all_turns"
+      },
+      "tool_set": [
+        [
+          "functions",
+          "list_mcp_resources"
+        ],
+        [
+          "functions",
+          "list_mcp_resource_templates"
+        ],
+        [
+          "functions",
+          "read_mcp_resource"
+        ],
+        [
+          "mcp__evaluation",
+          "read"
+        ]
+      ],
+      "tool_schemas_sha256": "a100f86b827a821d5352d933eed908a929f6125549cb109575e0ef60f855dffe",
+      "call_event": {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "evaluation",
+          "tool": "read",
+          "arguments": {
+            "operation": "invalid",
+            "parameters": {},
+            "reason": "task_context",
+            "detail": "Probe schema errors"
+          },
+          "result": {
+            "content": [
+              {
+                "type": "text",
+                "text": "Error executing tool read: 1 validation error for readArguments\noperation\n  Input should be 'search', 'get', 'outline', 'file', 'grep', 'graph_anchors', 'graph_neighbors', 'graph_traverse_neighbors', 'graph_paths', 'graph_retrieve', 'graph_imports', 'graph_references' or 'graph_calls' [type=literal_error, input_value='invalid', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error"
+              }
+            ],
+            "structured_content": null
+          },
+          "error": null,
+          "status": "failed"
+        }
+      },
+      "call_item": {
+        "id": "item_1",
+        "type": "mcp_tool_call",
+        "server": "evaluation",
+        "tool": "read",
+        "arguments": {
+          "operation": "invalid",
+          "parameters": {},
+          "reason": "task_context",
+          "detail": "Probe schema errors"
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Error executing tool read: 1 validation error for readArguments\noperation\n  Input should be 'search', 'get', 'outline', 'file', 'grep', 'graph_anchors', 'graph_neighbors', 'graph_traverse_neighbors', 'graph_paths', 'graph_retrieve', 'graph_imports', 'graph_references' or 'graph_calls' [type=literal_error, input_value='invalid', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error"
+            }
+          ],
+          "structured_content": null
+        },
+        "error": null,
+        "status": "failed"
+      },
+      "model_tool_outputs": [
+        {
+          "type": "function_call_output",
+          "id": "fco_01a08e33-2216-7931-b2ea-058c69203796",
+          "call_id": "call_probe",
+          "output": [
+            {
+              "type": "input_text",
+              "text": "Wall time: 0.0008 seconds\nOutput:"
+            },
+            {
+              "type": "input_text",
+              "text": "Error executing tool read: 1 validation error for readArguments\noperation\n  Input should be 'search', 'get', 'outline', 'file', 'grep', 'graph_anchors', 'graph_neighbors', 'graph_traverse_neighbors', 'graph_paths', 'graph_retrieve', 'graph_imports', 'graph_references' or 'graph_calls' [type=literal_error, input_value='invalid', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error"
+            }
+          ]
+        }
+      ],
+      "payload_kind": "text_blocks",
+      "payload_texts": [
+        "Error executing tool read: 1 validation error for readArguments\noperation\n  Input should be 'search', 'get', 'outline', 'file', 'grep', 'graph_anchors', 'graph_neighbors', 'graph_traverse_neighbors', 'graph_paths', 'graph_retrieve', 'graph_imports', 'graph_references' or 'graph_calls' [type=literal_error, input_value='invalid', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error"
+      ],
+      "output_verified": true
+    },
+    {
+      "mode": "list_resources_evaluation",
+      "case_id": "imported_interface",
+      "requested_case_mode": "imported_interface",
+      "request_count": 2,
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.5926581250023446,
+      "model": "gpt-5.6-luna",
+      "reasoning": {
+        "effort": "high",
+        "context": "all_turns"
+      },
+      "tool_set": [
+        [
+          "functions",
+          "list_mcp_resources"
+        ],
+        [
+          "functions",
+          "list_mcp_resource_templates"
+        ],
+        [
+          "functions",
+          "read_mcp_resource"
+        ],
+        [
+          "mcp__evaluation",
+          "read"
+        ]
+      ],
+      "tool_schemas_sha256": "a100f86b827a821d5352d933eed908a929f6125549cb109575e0ef60f855dffe",
+      "call_event": {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "evaluation",
+          "tool": "list_mcp_resources",
+          "arguments": {
+            "server": "evaluation"
+          },
+          "result": {
+            "content": [
+              {
+                "type": "text",
+                "text": "{\"server\":\"evaluation\",\"resources\":[]}"
+              }
+            ],
+            "structured_content": null
+          },
+          "error": null,
+          "status": "completed"
+        }
+      },
+      "call_item": {
+        "id": "item_1",
+        "type": "mcp_tool_call",
+        "server": "evaluation",
+        "tool": "list_mcp_resources",
+        "arguments": {
+          "server": "evaluation"
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"server\":\"evaluation\",\"resources\":[]}"
+            }
+          ],
+          "structured_content": null
+        },
+        "error": null,
+        "status": "completed"
+      },
+      "model_tool_outputs": [
+        {
+          "type": "function_call_output",
+          "id": "fco_01a08e33-26c2-75b1-8f2d-4f9a7bc7b91a",
+          "call_id": "call_probe",
+          "output": "{\"server\":\"evaluation\",\"resources\":[]}"
+        }
+      ],
+      "payload_kind": "text_blocks",
+      "payload_texts": [
+        "{\"server\":\"evaluation\",\"resources\":[]}"
+      ],
+      "output_verified": true
+    },
+    {
+      "mode": "list_resources_all_servers",
+      "case_id": "imported_interface",
+      "requested_case_mode": "imported_interface",
+      "request_count": 2,
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.6378890419946401,
+      "model": "gpt-5.6-luna",
+      "reasoning": {
+        "effort": "high",
+        "context": "all_turns"
+      },
+      "tool_set": [
+        [
+          "functions",
+          "list_mcp_resources"
+        ],
+        [
+          "functions",
+          "list_mcp_resource_templates"
+        ],
+        [
+          "functions",
+          "read_mcp_resource"
+        ],
+        [
+          "mcp__evaluation",
+          "read"
+        ]
+      ],
+      "tool_schemas_sha256": "a100f86b827a821d5352d933eed908a929f6125549cb109575e0ef60f855dffe",
+      "call_event": {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "codex",
+          "tool": "list_mcp_resources",
+          "arguments": {},
+          "result": {
+            "content": [
+              {
+                "type": "text",
+                "text": "{\"resources\":[]}"
+              }
+            ],
+            "structured_content": null
+          },
+          "error": null,
+          "status": "completed"
+        }
+      },
+      "call_item": {
+        "id": "item_1",
+        "type": "mcp_tool_call",
+        "server": "codex",
+        "tool": "list_mcp_resources",
+        "arguments": {},
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"resources\":[]}"
+            }
+          ],
+          "structured_content": null
+        },
+        "error": null,
+        "status": "completed"
+      },
+      "model_tool_outputs": [
+        {
+          "type": "function_call_output",
+          "id": "fco_01a08e33-2b7c-73f2-b9fd-57359fa2579d",
+          "call_id": "call_probe",
+          "output": "{\"resources\":[]}"
+        }
+      ],
+      "payload_kind": "text_blocks",
+      "payload_texts": [
+        "{\"resources\":[]}"
+      ],
+      "output_verified": true
+    },
+    {
+      "mode": "list_resource_templates_evaluation",
+      "case_id": "imported_interface",
+      "requested_case_mode": "imported_interface",
+      "request_count": 2,
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.5964747909965809,
+      "model": "gpt-5.6-luna",
+      "reasoning": {
+        "effort": "high",
+        "context": "all_turns"
+      },
+      "tool_set": [
+        [
+          "functions",
+          "list_mcp_resources"
+        ],
+        [
+          "functions",
+          "list_mcp_resource_templates"
+        ],
+        [
+          "functions",
+          "read_mcp_resource"
+        ],
+        [
+          "mcp__evaluation",
+          "read"
+        ]
+      ],
+      "tool_schemas_sha256": "a100f86b827a821d5352d933eed908a929f6125549cb109575e0ef60f855dffe",
+      "call_event": {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "evaluation",
+          "tool": "list_mcp_resource_templates",
+          "arguments": {
+            "server": "evaluation"
+          },
+          "result": {
+            "content": [
+              {
+                "type": "text",
+                "text": "{\"server\":\"evaluation\",\"resourceTemplates\":[]}"
+              }
+            ],
+            "structured_content": null
+          },
+          "error": null,
+          "status": "completed"
+        }
+      },
+      "call_item": {
+        "id": "item_1",
+        "type": "mcp_tool_call",
+        "server": "evaluation",
+        "tool": "list_mcp_resource_templates",
+        "arguments": {
+          "server": "evaluation"
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"server\":\"evaluation\",\"resourceTemplates\":[]}"
+            }
+          ],
+          "structured_content": null
+        },
+        "error": null,
+        "status": "completed"
+      },
+      "model_tool_outputs": [
+        {
+          "type": "function_call_output",
+          "id": "fco_01a08e33-3001-73d3-a788-2e4e78ebf188",
+          "call_id": "call_probe",
+          "output": "{\"server\":\"evaluation\",\"resourceTemplates\":[]}"
+        }
+      ],
+      "payload_kind": "text_blocks",
+      "payload_texts": [
+        "{\"server\":\"evaluation\",\"resourceTemplates\":[]}"
+      ],
+      "output_verified": true
+    },
+    {
+      "mode": "read_resource_missing",
+      "case_id": "imported_interface",
+      "requested_case_mode": "imported_interface",
+      "request_count": 2,
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.6633107919988106,
+      "model": "gpt-5.6-luna",
+      "reasoning": {
+        "effort": "high",
+        "context": "all_turns"
+      },
+      "tool_set": [
+        [
+          "functions",
+          "list_mcp_resources"
+        ],
+        [
+          "functions",
+          "list_mcp_resource_templates"
+        ],
+        [
+          "functions",
+          "read_mcp_resource"
+        ],
+        [
+          "mcp__evaluation",
+          "read"
+        ]
+      ],
+      "tool_schemas_sha256": "a100f86b827a821d5352d933eed908a929f6125549cb109575e0ef60f855dffe",
+      "call_event": {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "evaluation",
+          "tool": "read_mcp_resource",
+          "arguments": {
+            "server": "evaluation",
+            "uri": "missing://probe"
+          },
+          "result": null,
+          "error": {
+            "message": "resources/read failed: resources/read failed for `evaluation` (missing://probe): Mcp error: -32602: Unknown resource: missing://probe({\"uri\":\"missing://probe\"})"
+          },
+          "status": "failed"
+        }
+      },
+      "call_item": {
+        "id": "item_1",
+        "type": "mcp_tool_call",
+        "server": "evaluation",
+        "tool": "read_mcp_resource",
+        "arguments": {
+          "server": "evaluation",
+          "uri": "missing://probe"
+        },
+        "result": null,
+        "error": {
+          "message": "resources/read failed: resources/read failed for `evaluation` (missing://probe): Mcp error: -32602: Unknown resource: missing://probe({\"uri\":\"missing://probe\"})"
+        },
+        "status": "failed"
+      },
+      "model_tool_outputs": [
+        {
+          "type": "function_call_output",
+          "id": "fco_01a08e33-34cf-78f2-8e04-dbde64f55708",
+          "call_id": "call_probe",
+          "output": "resources/read failed: resources/read failed for `evaluation` (missing://probe): Mcp error: -32602: Unknown resource: missing://probe({\"uri\":\"missing://probe\"})"
+        }
+      ],
+      "payload_kind": "host_error",
+      "payload_texts": [
+        "resources/read failed: resources/read failed for `evaluation` (missing://probe): Mcp error: -32602: Unknown resource: missing://probe({\"uri\":\"missing://probe\"})"
+      ],
+      "output_verified": true
+    }
+  ]
+}
