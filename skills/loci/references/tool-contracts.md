@@ -3,6 +3,7 @@
 ## Contents
 
 - Core response envelopes
+- Compact exploration output
 - Coverage, pagination, and empty-result rules
 - Graph health and store-health contracts
 
@@ -58,6 +59,32 @@ recorded coverage. Samples are capped at 20 paths per reason and
 `omitted_samples` reports the remainder. Never interpret an empty result as
 absence outside its `query_scope`. The CLI preserves its existing bare-array
 output for compatibility.
+
+## Compact exploration output
+
+`loci_explore` requires `repo` and `intent`. It returns `items`,
+`relationships`, shared `sources`, `omissions`, `scope`, `limits` and `usage`.
+Each item's `source_id` points to its definition or a containing source span;
+`path` lists relationship IDs from its selected anchor. Relationship
+`source_ids` point to complete authored and import/re-export proof source.
+Source entries retain UTF-8 byte intervals, line bounds, full-file hashes and
+exact text. Read `complete` on each item to detect clipped anchors.
+
+`status="ok"` describes successful delivery of the selected packet;
+`partial` reports uncertainty, missing source or a work/delivery bound;
+`empty` contains no source items. Intentional pruning, cycles and alternative
+paths are reported without alone making the result partial. Source coverage
+retains the index's complete/partial/unknown state, while relationship scope
+is always non-exhaustive.
+
+`max_output_bytes` bounds the complete UTF-8 JSON MCP result, including its
+content/structuredContent/isError framing, metadata, omissions and size fields.
+It excludes the JSON-RPC request ID and transport envelope. `max_evidence_bytes`
+separately bounds the union of delivered source byte intervals, including
+definitions and supporting lines. `usage.output_bytes` is measured;
+`estimated_tokens` is only the labelled `utf8_bytes_div_4` heuristic.
+Use the tool's input schema for numeric limits. Unsupported intents return
+`INVALID_INPUT` with the supported choices and `locate` fallback.
 
 ## Graph and health envelopes
 

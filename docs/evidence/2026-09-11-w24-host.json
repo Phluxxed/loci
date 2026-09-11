@@ -1,0 +1,720 @@
+{
+  "work_id": "W2.4.3",
+  "meaning": "Actual host-mediated MCP integration, not comparative evaluation.",
+  "host": "codex-cli 0.154.0",
+  "model": "gpt-5.6-luna",
+  "reasoning_effort": "high",
+  "fixture": "imported_interface",
+  "fixture_sha256": {
+    "types.ts": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+    "consumer.ts": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+  },
+  "source_sha256": {
+    "src/loci/exploration.py": "e3131116e5b885e2865cd4b451ae7de7b1ee43371acd1d8c98ea1a861eb6601e",
+    "src/loci/_exploration_output.py": "3088c657a03f3b8724fe14f133888837f7b74edd80fbb0b726aaead75a5b2270",
+    "src/loci/service.py": "784880ed2b71f82c644cd100e030f8b33d7cc688b7338273a787ae76289c53ff",
+    "src/loci/mcp_server.py": "1b9df7b73d9e0730b1b24c580635267ecaf5b1242c29b20e38a7b0ab44daded8",
+    "src/loci/mcp_output_models.py": "480c6cc455b8ab16dd88c095f8f6161a2ecc14b813abd89d2bb4de626843e2fa"
+  },
+  "model_catalog_sha256": "f1c45cceac1c3ee90fa1af1007c341713e220571390c3b1eb086c443d7781062",
+  "prompt": "Complete this assignment directly. Do not spawn other agents. Use only the connected Loci tools on repo <temporary-host-root>/repo. This is a bounded navigation acceptance exercise. First call loci_explore with intent=locate and query=processOrder. Using its returned symbol ID, call loci_explore with intent=type_dependencies and query=\"processOrder input contract\", max_output_bytes=4096 and max_evidence_bytes=1024. Inspect the delivered source and relationship proof. Then repeat that type request with max_evidence_bytes=0 to exercise an exhausted evidence budget. Report the input type and its fields, the proven relationship and its resolution, and what the two type responses report for status, omissions and output bytes. Stop after these three calls. Use no other repository or data source and make no edits.",
+  "exit_code": 0,
+  "calls": [
+    {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "loci",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "locate",
+        "query": "processOrder",
+        "repo": "<temporary-host-root>/repo"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "intent": "locate",
+          "status": "ok",
+          "selection": "inferred",
+          "scope": {
+            "source": "indexed_supported_source",
+            "coverage": "complete",
+            "relationships": "none",
+            "exhaustive": false
+          },
+          "items": [
+            {
+              "id": "consumer.ts::processOrder#function",
+              "name": "processOrder",
+              "kind": "function",
+              "file": "consumer.ts",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Query matches processorder",
+              "source_id": 1,
+              "complete": true,
+              "path": []
+            }
+          ],
+          "relationships": [],
+          "sources": [
+            {
+              "id": 1,
+              "file": "consumer.ts",
+              "start_byte": 69,
+              "end_byte": 152,
+              "start_line": 2,
+              "end_line": 4,
+              "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+              "content": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+            }
+          ],
+          "omissions": [],
+          "limits": {
+            "max_hops": 0,
+            "max_nodes": 64,
+            "max_items": 12,
+            "max_neighbors": 32,
+            "max_output_bytes": 16384,
+            "max_evidence_bytes": 8192
+          },
+          "usage": {
+            "nodes_examined": 1,
+            "evidence_bytes": 83,
+            "output_bytes": 1067,
+            "estimated_tokens": 267,
+            "token_estimate_method": "utf8_bytes_div_4",
+            "output_encoding": "mcp_result_json_utf8"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    },
+    {
+      "id": "item_3",
+      "type": "mcp_tool_call",
+      "server": "loci",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder input contract",
+        "max_output_bytes": 4096,
+        "max_evidence_bytes": 1024,
+        "repo": "<temporary-host-root>/repo",
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "intent": "type_dependencies",
+          "status": "ok",
+          "selection": "explicit",
+          "scope": {
+            "source": "indexed_supported_source",
+            "coverage": "complete",
+            "relationships": "authored_types",
+            "exhaustive": false
+          },
+          "items": [
+            {
+              "id": "consumer.ts::processOrder#function",
+              "name": "processOrder",
+              "kind": "function",
+              "file": "consumer.ts",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Explicitly requested",
+              "source_id": 1,
+              "complete": true,
+              "path": []
+            },
+            {
+              "id": "types.ts::Payload#interface",
+              "name": "Payload",
+              "kind": "interface",
+              "file": "types.ts",
+              "role": "dependency",
+              "depth": 1,
+              "why": "Direct declared type",
+              "source_id": 2,
+              "complete": true,
+              "path": [
+                1
+              ]
+            }
+          ],
+          "relationships": [
+            {
+              "id": 1,
+              "edge": {
+                "from": "consumer.ts::processOrder#function",
+                "to": "types.ts::Payload#interface",
+                "type": "uses_type",
+                "directed": true,
+                "namespace": "loci",
+                "resolution": "import-resolved",
+                "evidence": {
+                  "file": "consumer.ts",
+                  "line": 2,
+                  "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                }
+              },
+              "traversed": "forward",
+              "source_ids": [
+                3,
+                4,
+                5
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "id": 1,
+              "file": "consumer.ts",
+              "start_byte": 69,
+              "end_byte": 152,
+              "start_line": 2,
+              "end_line": 4,
+              "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+              "content": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+            },
+            {
+              "id": 2,
+              "file": "types.ts",
+              "start_byte": 7,
+              "end_byte": 67,
+              "start_line": 1,
+              "end_line": 4,
+              "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+              "content": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+            },
+            {
+              "id": 3,
+              "file": "consumer.ts",
+              "start_byte": 62,
+              "end_byte": 125,
+              "start_line": 2,
+              "end_line": 2,
+              "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+              "content": "export function processOrder(value: ImportedPayload): string {\n"
+            },
+            {
+              "id": 4,
+              "file": "consumer.ts",
+              "start_byte": 0,
+              "end_byte": 62,
+              "start_line": 1,
+              "end_line": 1,
+              "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+              "content": "import type { Payload as ImportedPayload } from \"./types.js\";\n"
+            },
+            {
+              "id": 5,
+              "file": "types.ts",
+              "start_byte": 0,
+              "end_byte": 27,
+              "start_line": 1,
+              "end_line": 1,
+              "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+              "content": "export interface Payload {\n"
+            }
+          ],
+          "omissions": [],
+          "limits": {
+            "max_hops": 3,
+            "max_nodes": 64,
+            "max_items": 12,
+            "max_neighbors": 32,
+            "max_output_bytes": 4096,
+            "max_evidence_bytes": 1024
+          },
+          "usage": {
+            "nodes_examined": 2,
+            "evidence_bytes": 219,
+            "output_bytes": 2566,
+            "estimated_tokens": 642,
+            "token_estimate_method": "utf8_bytes_div_4",
+            "output_encoding": "mcp_result_json_utf8"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    },
+    {
+      "id": "item_4",
+      "type": "mcp_tool_call",
+      "server": "loci",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder input contract",
+        "max_output_bytes": 4096,
+        "max_evidence_bytes": 0,
+        "repo": "<temporary-host-root>/repo",
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "intent": "type_dependencies",
+          "status": "empty",
+          "selection": "explicit",
+          "scope": {
+            "source": "indexed_supported_source",
+            "coverage": "complete",
+            "relationships": "authored_types",
+            "exhaustive": false
+          },
+          "items": [],
+          "relationships": [],
+          "sources": [],
+          "omissions": [
+            {
+              "reason": "ancestor_unavailable",
+              "count": 1
+            },
+            {
+              "reason": "evidence_budget",
+              "count": 1
+            }
+          ],
+          "limits": {
+            "max_hops": 3,
+            "max_nodes": 64,
+            "max_items": 12,
+            "max_neighbors": 32,
+            "max_output_bytes": 4096,
+            "max_evidence_bytes": 0
+          },
+          "usage": {
+            "nodes_examined": 2,
+            "evidence_bytes": 0,
+            "output_bytes": 694,
+            "estimated_tokens": 174,
+            "token_estimate_method": "utf8_bytes_div_4",
+            "output_encoding": "mcp_result_json_utf8"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  ],
+  "final_messages": [
+    "I’ll perform exactly the three requested Loci calls, then summarize the returned source, relationship proof, and both response budgets.",
+    "Input type: `ImportedPayload`, resolved to `Payload`:\n\n- `requestId: string`\n- `amount: number`\n\nProven relationship: `processOrder` → `Payload`, `uses_type`, directed forward, with `import-resolved` resolution.\n\nType-dependency responses:\n\n- Evidence budget `1024`: status `ok`, omissions `[]`, output `2566` bytes.\n- Evidence budget `0`: status `empty`, omissions `ancestor_unavailable: 1` and `evidence_budget: 1`, output `694` bytes."
+  ],
+  "stderr": "Reading additional input from stdin...\n",
+  "events": [
+    {
+      "type": "thread.started",
+      "thread_id": "01a08f98-3efb-7243-ac55-f6f7b15a839a"
+    },
+    {
+      "type": "item.completed",
+      "item": {
+        "id": "item_0",
+        "type": "error",
+        "message": "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/brummerv/.codex/config.toml."
+      }
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "item": {
+        "id": "item_1",
+        "type": "agent_message",
+        "text": "I’ll perform exactly the three requested Loci calls, then summarize the returned source, relationship proof, and both response budgets."
+      }
+    },
+    {
+      "type": "item.started",
+      "item": {
+        "id": "item_2",
+        "type": "mcp_tool_call",
+        "server": "loci",
+        "tool": "loci_explore",
+        "arguments": {
+          "intent": "locate",
+          "query": "processOrder",
+          "repo": "<temporary-host-root>/repo"
+        },
+        "result": null,
+        "error": null,
+        "status": "in_progress"
+      }
+    },
+    {
+      "type": "item.completed",
+      "item": {
+        "id": "item_2",
+        "type": "mcp_tool_call",
+        "server": "loci",
+        "tool": "loci_explore",
+        "arguments": {
+          "intent": "locate",
+          "query": "processOrder",
+          "repo": "<temporary-host-root>/repo"
+        },
+        "result": {
+          "content": [],
+          "structured_content": {
+            "schema_version": 1,
+            "intent": "locate",
+            "status": "ok",
+            "selection": "inferred",
+            "scope": {
+              "source": "indexed_supported_source",
+              "coverage": "complete",
+              "relationships": "none",
+              "exhaustive": false
+            },
+            "items": [
+              {
+                "id": "consumer.ts::processOrder#function",
+                "name": "processOrder",
+                "kind": "function",
+                "file": "consumer.ts",
+                "role": "anchor",
+                "depth": 0,
+                "why": "Query matches processorder",
+                "source_id": 1,
+                "complete": true,
+                "path": []
+              }
+            ],
+            "relationships": [],
+            "sources": [
+              {
+                "id": 1,
+                "file": "consumer.ts",
+                "start_byte": 69,
+                "end_byte": 152,
+                "start_line": 2,
+                "end_line": 4,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+              }
+            ],
+            "omissions": [],
+            "limits": {
+              "max_hops": 0,
+              "max_nodes": 64,
+              "max_items": 12,
+              "max_neighbors": 32,
+              "max_output_bytes": 16384,
+              "max_evidence_bytes": 8192
+            },
+            "usage": {
+              "nodes_examined": 1,
+              "evidence_bytes": 83,
+              "output_bytes": 1067,
+              "estimated_tokens": 267,
+              "token_estimate_method": "utf8_bytes_div_4",
+              "output_encoding": "mcp_result_json_utf8"
+            }
+          }
+        },
+        "error": null,
+        "status": "completed"
+      }
+    },
+    {
+      "type": "item.started",
+      "item": {
+        "id": "item_3",
+        "type": "mcp_tool_call",
+        "server": "loci",
+        "tool": "loci_explore",
+        "arguments": {
+          "intent": "type_dependencies",
+          "query": "processOrder input contract",
+          "max_output_bytes": 4096,
+          "max_evidence_bytes": 1024,
+          "repo": "<temporary-host-root>/repo",
+          "seed_ids": [
+            "consumer.ts::processOrder#function"
+          ]
+        },
+        "result": null,
+        "error": null,
+        "status": "in_progress"
+      }
+    },
+    {
+      "type": "item.completed",
+      "item": {
+        "id": "item_3",
+        "type": "mcp_tool_call",
+        "server": "loci",
+        "tool": "loci_explore",
+        "arguments": {
+          "intent": "type_dependencies",
+          "query": "processOrder input contract",
+          "max_output_bytes": 4096,
+          "max_evidence_bytes": 1024,
+          "repo": "<temporary-host-root>/repo",
+          "seed_ids": [
+            "consumer.ts::processOrder#function"
+          ]
+        },
+        "result": {
+          "content": [],
+          "structured_content": {
+            "schema_version": 1,
+            "intent": "type_dependencies",
+            "status": "ok",
+            "selection": "explicit",
+            "scope": {
+              "source": "indexed_supported_source",
+              "coverage": "complete",
+              "relationships": "authored_types",
+              "exhaustive": false
+            },
+            "items": [
+              {
+                "id": "consumer.ts::processOrder#function",
+                "name": "processOrder",
+                "kind": "function",
+                "file": "consumer.ts",
+                "role": "anchor",
+                "depth": 0,
+                "why": "Explicitly requested",
+                "source_id": 1,
+                "complete": true,
+                "path": []
+              },
+              {
+                "id": "types.ts::Payload#interface",
+                "name": "Payload",
+                "kind": "interface",
+                "file": "types.ts",
+                "role": "dependency",
+                "depth": 1,
+                "why": "Direct declared type",
+                "source_id": 2,
+                "complete": true,
+                "path": [
+                  1
+                ]
+              }
+            ],
+            "relationships": [
+              {
+                "id": 1,
+                "edge": {
+                  "from": "consumer.ts::processOrder#function",
+                  "to": "types.ts::Payload#interface",
+                  "type": "uses_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "consumer.ts",
+                    "line": 2,
+                    "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                  }
+                },
+                "traversed": "forward",
+                "source_ids": [
+                  3,
+                  4,
+                  5
+                ]
+              }
+            ],
+            "sources": [
+              {
+                "id": 1,
+                "file": "consumer.ts",
+                "start_byte": 69,
+                "end_byte": 152,
+                "start_line": 2,
+                "end_line": 4,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+              },
+              {
+                "id": 2,
+                "file": "types.ts",
+                "start_byte": 7,
+                "end_byte": 67,
+                "start_line": 1,
+                "end_line": 4,
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                "content": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+              },
+              {
+                "id": 3,
+                "file": "consumer.ts",
+                "start_byte": 62,
+                "end_byte": 125,
+                "start_line": 2,
+                "end_line": 2,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "export function processOrder(value: ImportedPayload): string {\n"
+              },
+              {
+                "id": 4,
+                "file": "consumer.ts",
+                "start_byte": 0,
+                "end_byte": 62,
+                "start_line": 1,
+                "end_line": 1,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "import type { Payload as ImportedPayload } from \"./types.js\";\n"
+              },
+              {
+                "id": 5,
+                "file": "types.ts",
+                "start_byte": 0,
+                "end_byte": 27,
+                "start_line": 1,
+                "end_line": 1,
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                "content": "export interface Payload {\n"
+              }
+            ],
+            "omissions": [],
+            "limits": {
+              "max_hops": 3,
+              "max_nodes": 64,
+              "max_items": 12,
+              "max_neighbors": 32,
+              "max_output_bytes": 4096,
+              "max_evidence_bytes": 1024
+            },
+            "usage": {
+              "nodes_examined": 2,
+              "evidence_bytes": 219,
+              "output_bytes": 2566,
+              "estimated_tokens": 642,
+              "token_estimate_method": "utf8_bytes_div_4",
+              "output_encoding": "mcp_result_json_utf8"
+            }
+          }
+        },
+        "error": null,
+        "status": "completed"
+      }
+    },
+    {
+      "type": "item.started",
+      "item": {
+        "id": "item_4",
+        "type": "mcp_tool_call",
+        "server": "loci",
+        "tool": "loci_explore",
+        "arguments": {
+          "intent": "type_dependencies",
+          "query": "processOrder input contract",
+          "max_output_bytes": 4096,
+          "max_evidence_bytes": 0,
+          "repo": "<temporary-host-root>/repo",
+          "seed_ids": [
+            "consumer.ts::processOrder#function"
+          ]
+        },
+        "result": null,
+        "error": null,
+        "status": "in_progress"
+      }
+    },
+    {
+      "type": "item.completed",
+      "item": {
+        "id": "item_4",
+        "type": "mcp_tool_call",
+        "server": "loci",
+        "tool": "loci_explore",
+        "arguments": {
+          "intent": "type_dependencies",
+          "query": "processOrder input contract",
+          "max_output_bytes": 4096,
+          "max_evidence_bytes": 0,
+          "repo": "<temporary-host-root>/repo",
+          "seed_ids": [
+            "consumer.ts::processOrder#function"
+          ]
+        },
+        "result": {
+          "content": [],
+          "structured_content": {
+            "schema_version": 1,
+            "intent": "type_dependencies",
+            "status": "empty",
+            "selection": "explicit",
+            "scope": {
+              "source": "indexed_supported_source",
+              "coverage": "complete",
+              "relationships": "authored_types",
+              "exhaustive": false
+            },
+            "items": [],
+            "relationships": [],
+            "sources": [],
+            "omissions": [
+              {
+                "reason": "ancestor_unavailable",
+                "count": 1
+              },
+              {
+                "reason": "evidence_budget",
+                "count": 1
+              }
+            ],
+            "limits": {
+              "max_hops": 3,
+              "max_nodes": 64,
+              "max_items": 12,
+              "max_neighbors": 32,
+              "max_output_bytes": 4096,
+              "max_evidence_bytes": 0
+            },
+            "usage": {
+              "nodes_examined": 2,
+              "evidence_bytes": 0,
+              "output_bytes": 694,
+              "estimated_tokens": 174,
+              "token_estimate_method": "utf8_bytes_div_4",
+              "output_encoding": "mcp_result_json_utf8"
+            }
+          }
+        },
+        "error": null,
+        "status": "completed"
+      }
+    },
+    {
+      "type": "item.completed",
+      "item": {
+        "id": "item_5",
+        "type": "agent_message",
+        "text": "Input type: `ImportedPayload`, resolved to `Payload`:\n\n- `requestId: string`\n- `amount: number`\n\nProven relationship: `processOrder` → `Payload`, `uses_type`, directed forward, with `import-resolved` resolution.\n\nType-dependency responses:\n\n- Evidence budget `1024`: status `ok`, omissions `[]`, output `2566` bytes.\n- Evidence budget `0`: status `empty`, omissions `ancestor_unavailable: 1` and `evidence_budget: 1`, output `694` bytes."
+      }
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 29232,
+        "cached_input_tokens": 5888,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 677,
+        "reasoning_output_tokens": 240
+      }
+    }
+  ],
+  "passed": true,
+  "acceptance_note": "Host completed all three calls. The acceptance parser was corrected for Codex JSONL structured_content naming, then all source, relationship and budget assertions were verified on this retained trace without another model run."
+}

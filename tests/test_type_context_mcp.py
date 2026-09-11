@@ -7,6 +7,7 @@ from loci.mcp_server import create_server
 
 EXPECTED_LOCI_TOOLS = {
     "loci_analyze",
+    "loci_explore",
     "loci_file",
     "loci_get",
     "loci_graph_anchors",

@@ -42,6 +42,8 @@ loci_index(repo, incremental=true)
 # Normal navigation, including unindexed roots and stale cached indexes:
 loci_outline(repo) or loci_search(repo, query) -> optional search_id
 loci_get(repo, symbol_ids, selected_from_search_id=search_id) only for deliberate search selections
+# Source selected for a purpose, when loci_explore is available:
+loci_explore(repo, intent, query, seed_ids=None)
 loci_analyze(repo) when diagnostics are needed
 ```
 
@@ -81,7 +83,14 @@ use a targeted normal read.
 5. Use `context` on focused retrieval when nearby lines are required, then
    inspect the returned source, line bounds, and signatures before reasoning.
 
-For graph-shaped questions, follow the graph selection and evidence rules in
+For compact source discovery, type dependencies, or known static dependents,
+use `loci_explore` with `locate`, `type_dependencies`, or `impact`. Put the
+specific field or contract of interest in `query`; pass exact `seed_ids` when
+known. Inspect returned source, proof paths and omissions before deciding that
+the context is sufficient. If the host lacks this tool, use search/get and the
+diagnostic graph tools below. Exact edits still require the affected full source.
+
+For intent selection, budgets, and graph-shaped questions, follow the rules in
 [graph-navigation.md](references/graph-navigation.md). For exact response
 schemas, pagination, coverage, and store-health semantics, read
 [tool-contracts.md](references/tool-contracts.md). For language-specific
