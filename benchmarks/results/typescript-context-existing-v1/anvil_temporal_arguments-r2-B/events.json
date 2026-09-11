@@ -1,0 +1,975 @@
+[
+  {
+    "type": "thread.started",
+    "thread_id": "01a08f04-3a58-74d1-82f8-a50b217fb279"
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_0",
+      "type": "error",
+      "message": "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-x7o_i0xr/agent-runtime/config.toml."
+    }
+  },
+  {
+    "type": "turn.started"
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_1",
+      "type": "agent_message",
+      "text": "I’m inspecting the temporalCliArgs definition and its type/dependency context, then I’ll return the requested JSON only."
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "search",
+      "arguments": {
+        "query": "temporalCliArgs"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "search",
+      "arguments": {
+        "query": "temporalCliArgs"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "src/brain-context/temporal.ts::temporalCliArgs#function",
+              "name": "temporalCliArgs",
+              "qualified_name": "temporalCliArgs",
+              "kind": "function",
+              "language": "typescript",
+              "file_path": "src/brain-context/temporal.ts",
+              "byte_offset": 8841,
+              "byte_length": 421,
+              "signature": "function temporalCliArgs(query: TemporalQuery): string[] {",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "e50e10a6b631d827593bb94bf6863b0dd8d0014be6feaa5a58c0a9af4b1f40f8",
+              "decorators": [],
+              "keywords": [
+                "args",
+                "cli",
+                "temporal"
+              ],
+              "metadata": {},
+              "line": 222,
+              "end_line": 235,
+              "score": 63.0
+            }
+          ],
+          "coverage": {
+            "schema_version": 1,
+            "state": "partial",
+            "scope": "repository",
+            "source_scope": "indexed_supported_source",
+            "indexed_files": 163,
+            "excluded_paths": 24,
+            "exclusions": [
+              {
+                "reason": "unsupported_file_type",
+                "paths": 24,
+                "samples": [
+                  "LICENSE",
+                  "package-lock.json",
+                  "package.json",
+                  "src/browser/assets/Dockerfile.corporate",
+                  "test/fixtures/brain-context/anvil-prompt-delivery-v1.json",
+                  "test/fixtures/brain-context/evaluation-baseline.json",
+                  "test/fixtures/brain-context/invalid-manifest/brain-bootstrap.json",
+                  "test/fixtures/brain-context/missing-core-page/brain-bootstrap.json",
+                  "test/fixtures/brain-context/oversized-retrieval/brain-bootstrap.json",
+                  "test/fixtures/brain-context/oversized-retrieval/compiled-context.json",
+                  "test/fixtures/brain-context/oversized-retrieval/fake-llm-wiki.json",
+                  "test/fixtures/brain-context/real-brain-bootstrap.json",
+                  "test/fixtures/brain-context/unknown-project/brain-bootstrap.json",
+                  "test/fixtures/brain-context/unknown-project/compiled-context.json",
+                  "test/fixtures/brain-context/unknown-project/fake-llm-wiki.json",
+                  "test/fixtures/brain-context/valid-known-project/brain-bootstrap.json",
+                  "test/fixtures/brain-context/valid-known-project/compiled-context.json",
+                  "test/fixtures/brain-context/valid-known-project/fake-llm-wiki.json",
+                  "test/fixtures/browser/test-root-ca.crt",
+                  "test/fixtures/manifest-brain-view.json"
+                ],
+                "omitted_samples": 4
+              }
+            ],
+            "unknown_reason": null,
+            "query_scope": "indexed_symbols"
+          },
+          "search_id": "1c0632e1-8dea-4e61-9c0b-c28bf7d38ad4",
+          "_evaluation": {
+            "attempt_id": "anvil_temporal_arguments-r2-B-61d33efc-5210-43b1-9292-6b13028c4998/attempt/1",
+            "calls_remaining": 23
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_3",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "src/brain-context/temporal.ts::temporalCliArgs#function"
+        ],
+        "selected_from_search_id": "1c0632e1-8dea-4e61-9c0b-c28bf7d38ad4",
+        "context": 3
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_3",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "src/brain-context/temporal.ts::temporalCliArgs#function"
+        ],
+        "selected_from_search_id": "1c0632e1-8dea-4e61-9c0b-c28bf7d38ad4",
+        "context": 3
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "src/brain-context/temporal.ts::temporalCliArgs#function",
+              "source": "function temporalCliArgs(query: TemporalQuery): string[] {\n  return [\n    \"--temporal-view\",\n    query.view,\n    \"--request-time\",\n    query.request_time,\n    ...(query.world_at === undefined ? [] : [\"--world-at\", query.world_at]),\n    \"--known-at\",\n    query.known_at,\n    ...(query.transition === undefined\n      ? []\n      : [\"--transition-from\", query.transition.from, \"--transition-to\", query.transition.to]),\n  ];\n}",
+              "byte_offset": 8841,
+              "byte_length": 421,
+              "line": 222,
+              "end_line": 235,
+              "signature": "function temporalCliArgs(query: TemporalQuery): string[] {",
+              "kind": "function",
+              "language": "typescript",
+              "context_before": [
+                "  return JSON.stringify(left) === JSON.stringify(right);",
+                "}",
+                ""
+              ],
+              "context_after": []
+            }
+          ],
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "_evaluation": {
+            "attempt_id": "anvil_temporal_arguments-r2-B-61d33efc-5210-43b1-9292-6b13028c4998/attempt/2",
+            "calls_remaining": 22
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_4",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "search",
+      "arguments": {
+        "query": "TemporalQuery"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_4",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "search",
+      "arguments": {
+        "query": "TemporalQuery"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "name": "TemporalQuery",
+              "qualified_name": "TemporalQuery",
+              "kind": "type",
+              "language": "typescript",
+              "file_path": "src/brain-context/temporal.ts",
+              "byte_offset": 382,
+              "byte_length": 157,
+              "signature": "type TemporalQuery = Readonly<{",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "a2d30dd6d2b203d0de272c32237fffff5bcc434a3c6571826a1cf6eca8fb04b3",
+              "decorators": [],
+              "keywords": [
+                "query",
+                "temporal"
+              ],
+              "metadata": {},
+              "line": 13,
+              "end_line": 19,
+              "score": 61.0
+            },
+            {
+              "id": "src/brain-context/temporal.ts::parseTemporalQuery#function",
+              "name": "parseTemporalQuery",
+              "qualified_name": "parseTemporalQuery",
+              "kind": "function",
+              "language": "typescript",
+              "file_path": "src/brain-context/temporal.ts",
+              "byte_offset": 5748,
+              "byte_length": 2449,
+              "signature": "function parseTemporalQuery(value: unknown): TemporalQuery {",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "6786f356e66f12bef9ea9d47607041b1da586525defe780b1671efe8d8b0a31d",
+              "decorators": [],
+              "keywords": [
+                "parse",
+                "query",
+                "temporal"
+              ],
+              "metadata": {},
+              "line": 148,
+              "end_line": 202,
+              "score": 40.0
+            },
+            {
+              "id": "src/brain-context/temporal.ts::defaultCurrentTemporalQuery#function",
+              "name": "defaultCurrentTemporalQuery",
+              "qualified_name": "defaultCurrentTemporalQuery",
+              "kind": "function",
+              "language": "typescript",
+              "file_path": "src/brain-context/temporal.ts",
+              "byte_offset": 8206,
+              "byte_length": 176,
+              "signature": "function defaultCurrentTemporalQuery(requestTime = currentTemporalRequestTime()): TemporalQuery {",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "897cc42e75bc6fa0d3d1e79a999e5da3f084b3fe1affc2ad95807e01d4c53d1b",
+              "decorators": [],
+              "keywords": [
+                "current",
+                "default",
+                "query",
+                "temporal"
+              ],
+              "metadata": {},
+              "line": 204,
+              "end_line": 206,
+              "score": 40.0
+            },
+            {
+              "id": "src/brain-context/temporal.ts::normalizeTemporalQuery#function",
+              "name": "normalizeTemporalQuery",
+              "qualified_name": "normalizeTemporalQuery",
+              "kind": "function",
+              "language": "typescript",
+              "file_path": "src/brain-context/temporal.ts",
+              "byte_offset": 8391,
+              "byte_length": 290,
+              "signature": "function normalizeTemporalQuery(",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "1bebc1b050582a94d852e275572457ee333d851d32e2bd37a0728d140dd5f804",
+              "decorators": [],
+              "keywords": [
+                "normalize",
+                "query",
+                "temporal"
+              ],
+              "metadata": {},
+              "line": 208,
+              "end_line": 216,
+              "score": 40.0
+            },
+            {
+              "id": "src/brain-context/temporal.ts::TemporalQueryInput#type",
+              "name": "TemporalQueryInput",
+              "qualified_name": "TemporalQueryInput",
+              "kind": "type",
+              "language": "typescript",
+              "file_path": "src/brain-context/temporal.ts",
+              "byte_offset": 629,
+              "byte_length": 150,
+              "signature": "type TemporalQueryInput = Readonly<{",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "e66e18526975c5905663f16d5572992591eaae4dfb0363dc892bcd2bffe48b60",
+              "decorators": [],
+              "keywords": [
+                "input",
+                "query",
+                "temporal"
+              ],
+              "metadata": {},
+              "line": 22,
+              "end_line": 28,
+              "score": 38.0
+            }
+          ],
+          "coverage": {
+            "schema_version": 1,
+            "state": "partial",
+            "scope": "repository",
+            "source_scope": "indexed_supported_source",
+            "indexed_files": 163,
+            "excluded_paths": 24,
+            "exclusions": [
+              {
+                "reason": "unsupported_file_type",
+                "paths": 24,
+                "samples": [
+                  "LICENSE",
+                  "package-lock.json",
+                  "package.json",
+                  "src/browser/assets/Dockerfile.corporate",
+                  "test/fixtures/brain-context/anvil-prompt-delivery-v1.json",
+                  "test/fixtures/brain-context/evaluation-baseline.json",
+                  "test/fixtures/brain-context/invalid-manifest/brain-bootstrap.json",
+                  "test/fixtures/brain-context/missing-core-page/brain-bootstrap.json",
+                  "test/fixtures/brain-context/oversized-retrieval/brain-bootstrap.json",
+                  "test/fixtures/brain-context/oversized-retrieval/compiled-context.json",
+                  "test/fixtures/brain-context/oversized-retrieval/fake-llm-wiki.json",
+                  "test/fixtures/brain-context/real-brain-bootstrap.json",
+                  "test/fixtures/brain-context/unknown-project/brain-bootstrap.json",
+                  "test/fixtures/brain-context/unknown-project/compiled-context.json",
+                  "test/fixtures/brain-context/unknown-project/fake-llm-wiki.json",
+                  "test/fixtures/brain-context/valid-known-project/brain-bootstrap.json",
+                  "test/fixtures/brain-context/valid-known-project/compiled-context.json",
+                  "test/fixtures/brain-context/valid-known-project/fake-llm-wiki.json",
+                  "test/fixtures/browser/test-root-ca.crt",
+                  "test/fixtures/manifest-brain-view.json"
+                ],
+                "omitted_samples": 4
+              }
+            ],
+            "unknown_reason": null,
+            "query_scope": "indexed_symbols"
+          },
+          "search_id": "1aaf0b64-f243-4692-94ba-a2f77eb9de02",
+          "_evaluation": {
+            "attempt_id": "anvil_temporal_arguments-r2-B-61d33efc-5210-43b1-9292-6b13028c4998/attempt/3",
+            "calls_remaining": 21
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_5",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "src/brain-context/temporal.ts::TemporalQuery#type",
+          "src/brain-context/temporal.ts::TemporalQueryInput#type",
+          "src/brain-context/temporal.ts::parseTemporalQuery#function"
+        ],
+        "context": 2
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_5",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "src/brain-context/temporal.ts::TemporalQuery#type",
+          "src/brain-context/temporal.ts::TemporalQueryInput#type",
+          "src/brain-context/temporal.ts::parseTemporalQuery#function"
+        ],
+        "context": 2
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "source": "type TemporalQuery = Readonly<{\n  view: TemporalView;\n  request_time: string;\n  world_at?: string;\n  known_at: string;\n  transition?: TemporalTransition;\n}>;",
+              "byte_offset": 382,
+              "byte_length": 157,
+              "line": 13,
+              "end_line": 19,
+              "signature": "type TemporalQuery = Readonly<{",
+              "kind": "type",
+              "language": "typescript",
+              "context_before": [
+                "",
+                "/** Canonical temporal query shape shared by Anvil and llm-wiki contract 3. */"
+              ],
+              "context_after": [
+                "",
+                "/** Raw structured input accepted at the Context Harness and retrieval seams. */"
+              ]
+            },
+            {
+              "id": "src/brain-context/temporal.ts::TemporalQueryInput#type",
+              "source": "type TemporalQueryInput = Readonly<{\n  view: unknown;\n  request_time: unknown;\n  world_at?: unknown;\n  known_at?: unknown;\n  transition?: unknown;\n}>;",
+              "byte_offset": 629,
+              "byte_length": 150,
+              "line": 22,
+              "end_line": 28,
+              "signature": "type TemporalQueryInput = Readonly<{",
+              "kind": "type",
+              "language": "typescript",
+              "context_before": [
+                "",
+                "/** Raw structured input accepted at the Context Harness and retrieval seams. */"
+              ],
+              "context_after": [
+                "",
+                "const RFC3339_INSTANT = /^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2})(?:\\.(\\d+))?(Z|[+-]\\d{2}:\\d{2})$/;"
+              ]
+            },
+            {
+              "id": "src/brain-context/temporal.ts::parseTemporalQuery#function",
+              "source": "function parseTemporalQuery(value: unknown): TemporalQuery {\n  const raw = recordValue(value, \"temporal\");\n  assertAllowedFields(raw, [\"view\", \"request_time\", \"world_at\", \"known_at\", \"transition\"], \"temporal\");\n  if (typeof raw.view !== \"string\" || !TEMPORAL_VIEWS.includes(raw.view as TemporalView)) {\n    invalidTemporal(\"temporal.view\", \"must be one of current, historical, transition, lineage, or conflict\");\n  }\n  const view = raw.view as TemporalView;\n  const requestTime = parseInstant(raw.request_time, \"temporal.request_time\");\n  const hasKnownAt = Object.prototype.hasOwnProperty.call(raw, \"known_at\");\n  const hasWorldAt = Object.prototype.hasOwnProperty.call(raw, \"world_at\");\n  const hasTransition = Object.prototype.hasOwnProperty.call(raw, \"transition\");\n  const knownAt = !hasKnownAt\n    ? requestTime\n    : parseInstant(raw.known_at, \"temporal.known_at\");\n  const worldAt = !hasWorldAt\n    ? undefined\n    : parseDate(raw.world_at, \"temporal.world_at\");\n\n  let transition: TemporalTransition | undefined;\n  if (hasTransition) {\n    const transitionRaw = recordValue(raw.transition, \"temporal.transition\");\n    assertAllowedFields(transitionRaw, [\"from\", \"to\"], \"temporal.transition\");\n    if (!(\"from\" in transitionRaw) || !(\"to\" in transitionRaw)) {\n      invalidTemporal(\"temporal.transition\", \"requires from and to\");\n    }\n    const from = parseDate(transitionRaw.from, \"temporal.transition.from\");\n    const to = parseDate(transitionRaw.to, \"temporal.transition.to\");\n    if (pointKey(from) >= pointKey(to)) {\n      invalidTemporal(\"temporal.transition\", \"from must precede to\");\n    }\n    transition = { from, to };\n  }\n\n  if (view === \"historical\" && worldAt === undefined) {\n    invalidTemporal(\"temporal.world_at\", \"historical view requires world_at\");\n  }\n  if (view === \"transition\") {\n    if (worldAt !== undefined) invalidTemporal(\"temporal.world_at\", \"transition view forbids world_at\");\n    if (transition === undefined) invalidTemporal(\"temporal.transition\", \"transition view requires a range\");\n  } else if (transition !== undefined) {\n    invalidTemporal(\"temporal.transition\", \"transition range is only valid for transition view\");\n  }\n\n  return {\n    view,\n    request_time: requestTime,\n    ...(worldAt !== undefined\n      ? { world_at: worldAt }\n      : view === \"current\"\n        ? { world_at: requestTime }\n        : {}),\n    known_at: knownAt,\n    ...(transition !== undefined ? { transition } : {}),\n  };\n}",
+              "byte_offset": 5748,
+              "byte_length": 2449,
+              "line": 148,
+              "end_line": 202,
+              "signature": "function parseTemporalQuery(value: unknown): TemporalQuery {",
+              "kind": "function",
+              "language": "typescript",
+              "context_before": [
+                "}",
+                ""
+              ],
+              "context_after": [
+                "",
+                "export function defaultCurrentTemporalQuery(requestTime = currentTemporalRequestTime()): TemporalQuery {"
+              ]
+            }
+          ],
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "_evaluation": {
+            "attempt_id": "anvil_temporal_arguments-r2-B-61d33efc-5210-43b1-9292-6b13028c4998/attempt/4",
+            "calls_remaining": 20
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_6",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "search",
+      "arguments": {
+        "query": "TEMPORAL_VIEWS"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_6",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "search",
+      "arguments": {
+        "query": "TEMPORAL_VIEWS"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+              "name": "TEMPORAL_VIEWS",
+              "qualified_name": "TEMPORAL_VIEWS",
+              "kind": "constant",
+              "language": "typescript",
+              "file_path": "src/brain-context/temporal.ts",
+              "byte_offset": 65,
+              "byte_length": 88,
+              "signature": "TEMPORAL_VIEWS = [\"current\", \"historical\", \"transition\", \"lineage\", \"conflict\"] as const",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "1fe2dd16557d7483f89d63e272403872e754697c0bf3f4b0387e558faa451392",
+              "decorators": [],
+              "keywords": [
+                "temporal",
+                "views"
+              ],
+              "metadata": {},
+              "line": 3,
+              "end_line": 3,
+              "score": 66.0
+            },
+            {
+              "id": "src/brain-context/temporal.ts::TemporalView#type",
+              "name": "TemporalView",
+              "qualified_name": "TemporalView",
+              "kind": "type",
+              "language": "typescript",
+              "file_path": "src/brain-context/temporal.ts",
+              "byte_offset": 163,
+              "byte_length": 52,
+              "signature": "type TemporalView = (typeof TEMPORAL_VIEWS)[number];",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "4e33d0ac54879d43a8dd395b8de17a929e14377b0786000b94ab6eb072399697",
+              "decorators": [],
+              "keywords": [
+                "temporal",
+                "view"
+              ],
+              "metadata": {},
+              "line": 5,
+              "end_line": 5,
+              "score": 24.0
+            },
+            {
+              "id": "src/brain-context/temporal.ts::invalidTemporal#function",
+              "name": "invalidTemporal",
+              "qualified_name": "invalidTemporal",
+              "kind": "function",
+              "language": "typescript",
+              "file_path": "src/brain-context/temporal.ts",
+              "byte_offset": 920,
+              "byte_length": 287,
+              "signature": "function invalidTemporal(field: string, message: string): never {",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "49d9e399e60e0937fe7562472baa15f88cea31d106fdda16d92f032e28fb9e5c",
+              "decorators": [],
+              "keywords": [
+                "invalid",
+                "temporal"
+              ],
+              "metadata": {},
+              "line": 33,
+              "end_line": 39,
+              "score": 20.0
+            },
+            {
+              "id": "src/brain-context/temporal.ts::currentTemporalRequestTime#function",
+              "name": "currentTemporalRequestTime",
+              "qualified_name": "currentTemporalRequestTime",
+              "kind": "function",
+              "language": "typescript",
+              "file_path": "src/brain-context/temporal.ts",
+              "byte_offset": 1300,
+              "byte_length": 185,
+              "signature": "function currentTemporalRequestTime(now = new Date()): string {",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "832ba1317535cf5265572901f7c0aa6864a5be92d498b3eec0399589f716bb15",
+              "decorators": [],
+              "keywords": [
+                "current",
+                "request",
+                "temporal",
+                "time"
+              ],
+              "metadata": {},
+              "line": 42,
+              "end_line": 46,
+              "score": 20.0
+            },
+            {
+              "id": "src/brain-context/temporal.ts::parseTemporalQuery#function",
+              "name": "parseTemporalQuery",
+              "qualified_name": "parseTemporalQuery",
+              "kind": "function",
+              "language": "typescript",
+              "file_path": "src/brain-context/temporal.ts",
+              "byte_offset": 5748,
+              "byte_length": 2449,
+              "signature": "function parseTemporalQuery(value: unknown): TemporalQuery {",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "6786f356e66f12bef9ea9d47607041b1da586525defe780b1671efe8d8b0a31d",
+              "decorators": [],
+              "keywords": [
+                "parse",
+                "query",
+                "temporal"
+              ],
+              "metadata": {},
+              "line": 148,
+              "end_line": 202,
+              "score": 20.0
+            }
+          ],
+          "coverage": {
+            "schema_version": 1,
+            "state": "partial",
+            "scope": "repository",
+            "source_scope": "indexed_supported_source",
+            "indexed_files": 163,
+            "excluded_paths": 24,
+            "exclusions": [
+              {
+                "reason": "unsupported_file_type",
+                "paths": 24,
+                "samples": [
+                  "LICENSE",
+                  "package-lock.json",
+                  "package.json",
+                  "src/browser/assets/Dockerfile.corporate",
+                  "test/fixtures/brain-context/anvil-prompt-delivery-v1.json",
+                  "test/fixtures/brain-context/evaluation-baseline.json",
+                  "test/fixtures/brain-context/invalid-manifest/brain-bootstrap.json",
+                  "test/fixtures/brain-context/missing-core-page/brain-bootstrap.json",
+                  "test/fixtures/brain-context/oversized-retrieval/brain-bootstrap.json",
+                  "test/fixtures/brain-context/oversized-retrieval/compiled-context.json",
+                  "test/fixtures/brain-context/oversized-retrieval/fake-llm-wiki.json",
+                  "test/fixtures/brain-context/real-brain-bootstrap.json",
+                  "test/fixtures/brain-context/unknown-project/brain-bootstrap.json",
+                  "test/fixtures/brain-context/unknown-project/compiled-context.json",
+                  "test/fixtures/brain-context/unknown-project/fake-llm-wiki.json",
+                  "test/fixtures/brain-context/valid-known-project/brain-bootstrap.json",
+                  "test/fixtures/brain-context/valid-known-project/compiled-context.json",
+                  "test/fixtures/brain-context/valid-known-project/fake-llm-wiki.json",
+                  "test/fixtures/browser/test-root-ca.crt",
+                  "test/fixtures/manifest-brain-view.json"
+                ],
+                "omitted_samples": 4
+              }
+            ],
+            "unknown_reason": null,
+            "query_scope": "indexed_symbols"
+          },
+          "search_id": "36786fe0-a508-4cf5-960d-b924ef5d3047",
+          "_evaluation": {
+            "attempt_id": "anvil_temporal_arguments-r2-B-61d33efc-5210-43b1-9292-6b13028c4998/attempt/5",
+            "calls_remaining": 19
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_7",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "search",
+      "arguments": {
+        "query": "TemporalTransition"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_7",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "search",
+      "arguments": {
+        "query": "TemporalTransition"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "src/brain-context/temporal.ts::TemporalTransition#type",
+              "name": "TemporalTransition",
+              "qualified_name": "TemporalTransition",
+              "kind": "type",
+              "language": "typescript",
+              "file_path": "src/brain-context/temporal.ts",
+              "byte_offset": 224,
+              "byte_length": 70,
+              "signature": "type TemporalTransition = Readonly<{",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "a78edfcf8304d458692b37e4785f137f8bd3eeadb9aaffd548fff4e1589aea5e",
+              "decorators": [],
+              "keywords": [
+                "temporal",
+                "transition"
+              ],
+              "metadata": {},
+              "line": 7,
+              "end_line": 10,
+              "score": 61.0
+            }
+          ],
+          "coverage": {
+            "schema_version": 1,
+            "state": "partial",
+            "scope": "repository",
+            "source_scope": "indexed_supported_source",
+            "indexed_files": 163,
+            "excluded_paths": 24,
+            "exclusions": [
+              {
+                "reason": "unsupported_file_type",
+                "paths": 24,
+                "samples": [
+                  "LICENSE",
+                  "package-lock.json",
+                  "package.json",
+                  "src/browser/assets/Dockerfile.corporate",
+                  "test/fixtures/brain-context/anvil-prompt-delivery-v1.json",
+                  "test/fixtures/brain-context/evaluation-baseline.json",
+                  "test/fixtures/brain-context/invalid-manifest/brain-bootstrap.json",
+                  "test/fixtures/brain-context/missing-core-page/brain-bootstrap.json",
+                  "test/fixtures/brain-context/oversized-retrieval/brain-bootstrap.json",
+                  "test/fixtures/brain-context/oversized-retrieval/compiled-context.json",
+                  "test/fixtures/brain-context/oversized-retrieval/fake-llm-wiki.json",
+                  "test/fixtures/brain-context/real-brain-bootstrap.json",
+                  "test/fixtures/brain-context/unknown-project/brain-bootstrap.json",
+                  "test/fixtures/brain-context/unknown-project/compiled-context.json",
+                  "test/fixtures/brain-context/unknown-project/fake-llm-wiki.json",
+                  "test/fixtures/brain-context/valid-known-project/brain-bootstrap.json",
+                  "test/fixtures/brain-context/valid-known-project/compiled-context.json",
+                  "test/fixtures/brain-context/valid-known-project/fake-llm-wiki.json",
+                  "test/fixtures/browser/test-root-ca.crt",
+                  "test/fixtures/manifest-brain-view.json"
+                ],
+                "omitted_samples": 4
+              }
+            ],
+            "unknown_reason": null,
+            "query_scope": "indexed_symbols"
+          },
+          "search_id": "221d7f9c-8891-4f2b-b7bb-da14c9da37d9",
+          "_evaluation": {
+            "attempt_id": "anvil_temporal_arguments-r2-B-61d33efc-5210-43b1-9292-6b13028c4998/attempt/6",
+            "calls_remaining": 18
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_8",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+          "src/brain-context/temporal.ts::TemporalTransition#type",
+          "src/brain-context/temporal.ts::TemporalView#type"
+        ],
+        "context": 1
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_8",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+          "src/brain-context/temporal.ts::TemporalTransition#type",
+          "src/brain-context/temporal.ts::TemporalView#type"
+        ],
+        "context": 1
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+              "source": "TEMPORAL_VIEWS = [\"current\", \"historical\", \"transition\", \"lineage\", \"conflict\"] as const",
+              "byte_offset": 65,
+              "byte_length": 88,
+              "line": 3,
+              "end_line": 3,
+              "signature": "TEMPORAL_VIEWS = [\"current\", \"historical\", \"transition\", \"lineage\", \"conflict\"] as const",
+              "kind": "constant",
+              "language": "typescript",
+              "context_before": [
+                ""
+              ],
+              "context_after": [
+                ""
+              ]
+            },
+            {
+              "id": "src/brain-context/temporal.ts::TemporalTransition#type",
+              "source": "type TemporalTransition = Readonly<{\n  from: string;\n  to: string;\n}>;",
+              "byte_offset": 224,
+              "byte_length": 70,
+              "line": 7,
+              "end_line": 10,
+              "signature": "type TemporalTransition = Readonly<{",
+              "kind": "type",
+              "language": "typescript",
+              "context_before": [
+                ""
+              ],
+              "context_after": [
+                ""
+              ]
+            },
+            {
+              "id": "src/brain-context/temporal.ts::TemporalView#type",
+              "source": "type TemporalView = (typeof TEMPORAL_VIEWS)[number];",
+              "byte_offset": 163,
+              "byte_length": 52,
+              "line": 5,
+              "end_line": 5,
+              "signature": "type TemporalView = (typeof TEMPORAL_VIEWS)[number];",
+              "kind": "type",
+              "language": "typescript",
+              "context_before": [
+                ""
+              ],
+              "context_after": [
+                ""
+              ]
+            }
+          ],
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "_evaluation": {
+            "attempt_id": "anvil_temporal_arguments-r2-B-61d33efc-5210-43b1-9292-6b13028c4998/attempt/7",
+            "calls_remaining": 17
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_9",
+      "type": "agent_message",
+      "text": "{\"required_fields\":[\"known_at\",\"request_time\",\"view\"],\"optional_fields\":[\"transition\",\"world_at\"],\"accepted_views\":[\"conflict\",\"current\",\"historical\",\"lineage\",\"transition\"],\"transition_fields\":[\"from\",\"to\"],\"args\":[\"--temporal-view\",\"transition\",\"--request-time\",\"2026-09-10T00:00:00Z\",\"--known-at\",\"2026-09-10\",\"--transition-from\",\"2026-09-01\",\"--transition-to\",\"2026-09-09\"]}"
+    }
+  },
+  {
+    "type": "turn.completed",
+    "usage": {
+      "input_tokens": 64317,
+      "cached_input_tokens": 33280,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 834,
+      "reasoning_output_tokens": 386
+    }
+  }
+]

@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "scope": "Corrections to descriptive freeze metadata only; frozen bytes, controls, code and measurements remain unchanged.",
+  "freeze_json_sha256": "68c7194ae84add8ce74fb798bf0fb5ebfa8d9b183af3df80a04b7d2070d59a11",
+  "errata": [
+    {
+      "field": "created_at",
+      "frozen_value": "2026-09-11T05:20:00Z",
+      "correction": "The literal freeze timestamp was mistakenly set later than actual creation. Candidate and freeze commits, verified remote publication, then batch launch occurred in that order. Git commit timestamps and the first local attempt files below corroborate that sequence. File timestamps are local observations, not cryptographic attestations."
+    },
+    {
+      "field": "premeasurement_acceptance.comparison_report_and_expansion_checks_passed",
+      "frozen_value": 20,
+      "correction": "20 was the final focused type_context test count; the label is incorrect. Separate report tests: 5; expansion adapter tests: 3; actual MCP test: 1. The earlier combined core/adapter/report count was 27 before the final twentieth core test. Other accurate separate suites: 194 legacy service/MCP/generic-shadow tests and 9 comparison-runner tests. Counts overlap across combined runs; do not add repeated suite totals."
+    }
+  ],
+  "git_commits": {
+    "564c152099b13f469cb336f1046829f8e8d9d07b": "2026-09-11T15:16:58+10:00",
+    "2379278b4bc2e85623cf64e180d5a2980511517c": "2026-09-11T15:17:26+10:00"
+  },
+  "first_attempt_files": {
+    "imported_interface-r1-A/initial-trace.json": {
+      "birth_time_utc": "2026-09-11T05:18:02.951880+00:00",
+      "modified_time_utc": "2026-09-11T05:18:02.951949+00:00",
+      "sha256": "0cc72ceb21e08e3d5b325b28868537301ec9747ae9b0fdd892909c2621a670f0"
+    },
+    "imported_interface-r1-A/request-audit.json": {
+      "birth_time_utc": "2026-09-11T05:18:04.033555+00:00",
+      "modified_time_utc": "2026-09-11T05:18:04.034015+00:00",
+      "sha256": "2c15d043dbd876cf08dd22ea45ca8ac5a1e3ce34b6c396ad0f244bd349847f24"
+    },
+    "imported_interface-r1-A/events.jsonl": {
+      "birth_time_utc": "2026-09-11T05:18:25.241707+00:00",
+      "modified_time_utc": "2026-09-11T05:18:25.241941+00:00",
+      "sha256": "57c63c26109032b1f0b960fa73c4c946ccdf76263b02879833048fef5236c3c9"
+    },
+    "imported_interface-r1-A/result.json": {
+      "birth_time_utc": "2026-09-11T05:18:25.256823+00:00",
+      "modified_time_utc": "2026-09-11T05:18:25.256980+00:00",
+      "sha256": "168060bc7760daac5059c538e28c7f7c6aaabc5ff271245e0c11ff3cbb6df2d3"
+    }
+  },
+  "remote_publication_observed": "Primary observed origin feat/evidence-backed-exploration resolve to 2379278b4bc2e85623cf64e180d5a2980511517c before invoking the batch runner.",
+  "method_changed": false,
+  "frozen_files_changed": false
+}
