@@ -165,18 +165,18 @@ def create_server() -> MCPServer:
         symbol_ids: list[str],
         context: int = 0,
         selected_from_search_id: str | None = None,
+        include_type_context: bool = False,
     ) -> Annotated[CallToolResult, LociGetOutput]:
-        """Return exact source. Set lineage only for deliberate search selections; omit it for direct, outline, or hydration gets."""
+        """Return exact source; opt in to bounded existing imported-type definitions. Set lineage only for deliberate search selections, not direct or hydration gets."""
         return _handle_loci_error(
-            lambda service: {
-                "symbols": service.get_symbols(
-                    repo,
-                    symbol_ids,
-                    context=context,
-                    ensure_fresh=True,
-                    selected_from_search_id=selected_from_search_id,
-                )
-            }
+            lambda service: service.get_symbols_result(
+                repo,
+                symbol_ids,
+                context=context,
+                ensure_fresh=True,
+                selected_from_search_id=selected_from_search_id,
+                include_type_context=include_type_context,
+            )
         )
 
     @mcp.tool()
