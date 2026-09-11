@@ -1,0 +1,158 @@
+{
+  "version": "three-arm-source-audit-v1",
+  "engines": {
+    "A": {
+      "arm": "A",
+      "commit": "9acd3e3589ddc034cade36e03c26c4508e9d4434",
+      "source_tree": "9d4bbe2669f07de2e416839b171c3778bf734816",
+      "extractor_version": 24
+    },
+    "B": {
+      "arm": "B",
+      "commit": "564c152099b13f469cb336f1046829f8e8d9d07b",
+      "source_tree": "a7b0f5e94df1c25a8554a8119d3254d2c60771cc",
+      "extractor_version": 24
+    },
+    "C": {
+      "arm": "C",
+      "commit": "0ad281fbe476ab9e2b9d0f1f9fa08a817618c77b",
+      "source_tree": "965ceb9076232fdb986c9a04fbc2f31063d388ee",
+      "extractor_version": 25
+    }
+  },
+  "diffs": {
+    "B/A": {
+      "sha256": "948ac6ec73c6c0f61ac31173df8ea520487867676e01777fbfb12b85b67dc12e",
+      "paths": [
+        "src/loci/mcp_output_models.py",
+        "src/loci/mcp_server.py",
+        "src/loci/service.py",
+        "src/loci/type_context.py"
+      ]
+    },
+    "C/B": {
+      "sha256": "365f02cedfbee6d872cb2af286cdb6bb3cf14940ae7fbeab48aa4620c2cc024e",
+      "paths": [
+        "src/loci/_exploration_output.py",
+        "src/loci/exploration.py",
+        "src/loci/graph/_type_validation.py",
+        "src/loci/graph/contracts.py",
+        "src/loci/graph/materialize.py",
+        "src/loci/graph/retrieval.py",
+        "src/loci/graph/state.py",
+        "src/loci/graph/type_models.py",
+        "src/loci/graph/type_relations.py",
+        "src/loci/mcp_output_models.py",
+        "src/loci/mcp_server.py",
+        "src/loci/parser/type_models.py",
+        "src/loci/parser/type_observations.py",
+        "src/loci/service.py",
+        "src/loci/storage/index_store.py",
+        "src/loci/type_context.py"
+      ]
+    },
+    "C/A": {
+      "sha256": "553e2817eb24f250c1d0a8a73ddf37648439bedf1582fdfbb9eb8b648ee3cbec",
+      "paths": [
+        "src/loci/_exploration_output.py",
+        "src/loci/exploration.py",
+        "src/loci/graph/_type_validation.py",
+        "src/loci/graph/contracts.py",
+        "src/loci/graph/materialize.py",
+        "src/loci/graph/retrieval.py",
+        "src/loci/graph/state.py",
+        "src/loci/graph/type_models.py",
+        "src/loci/graph/type_relations.py",
+        "src/loci/mcp_output_models.py",
+        "src/loci/mcp_server.py",
+        "src/loci/parser/type_models.py",
+        "src/loci/parser/type_observations.py",
+        "src/loci/service.py",
+        "src/loci/storage/index_store.py",
+        "src/loci/type_context.py"
+      ]
+    }
+  },
+  "B_C_service_unchanged_declarations": [
+    "GrepRepoResult",
+    "LociError",
+    "RepositoryScan",
+    "SearchSymbolsResult",
+    "_acquire_refresh_lock",
+    "_active_graph_paths_are_safe",
+    "_add_markdown_retrieval_fields",
+    "_bounded_file_hash",
+    "_current_index_staleness_reasons",
+    "_extraction_diagnostic",
+    "_get_store_with_resolution",
+    "_get_symbol",
+    "_go_problem_diagnostic",
+    "_graph_status",
+    "_hash_change_details",
+    "_index_is_stale",
+    "_javascript_problem_diagnostic",
+    "_load_gitignore",
+    "_load_graph_context",
+    "_load_required_index",
+    "_normalize_search_file_paths",
+    "_probe_repository_freshness",
+    "_reclaim_abandoned_refresh_lock",
+    "_remap_markdown_hierarchy_ids",
+    "_repository_file_path_is_safe",
+    "_rust_problem_diagnostic",
+    "_scan_repository_files",
+    "_validate_graph_record_query",
+    "_validate_repo_path",
+    "_validate_store_health_bounds",
+    "analyze_usage",
+    "ensure_fresh_index",
+    "get_cached_file",
+    "get_store",
+    "get_store_resolution",
+    "get_symbols",
+    "get_symbols_result",
+    "graph_anchors",
+    "graph_calls",
+    "graph_imports",
+    "graph_neighbors",
+    "graph_paths",
+    "graph_retrieve",
+    "graph_traverse_neighbors",
+    "grep_repo",
+    "grep_repo_result",
+    "index_repo",
+    "list_repos",
+    "outline_repo",
+    "reset_session_stats",
+    "search_symbols",
+    "search_symbols_result",
+    "session_stats",
+    "store_health",
+    "verify_repo"
+  ],
+  "B_C_service_changed_declarations": [
+    "_index_repo_unlocked",
+    "graph_health",
+    "graph_references"
+  ],
+  "B_C_type_context_unchanged_declarations": [
+    "TypeContextLimits",
+    "_CachedSource",
+    "_contains",
+    "_real_declaration",
+    "_source_cost",
+    "_wire_bytes",
+    "empty_type_context"
+  ],
+  "B_C_type_context_changed_declarations": [
+    "expand_type_context"
+  ],
+  "policy": {
+    "same_limits": true,
+    "same_existing_helpers": true,
+    "selection": "Same sorted breadth-first expansion, ownership exclusion, path/hop/neighbor bounds, source verification and atomic budget packing. C accepts validated declaration-owned type records and canonical uses_type/extends/implements edges in that traversal; existing imported-reference records remain fallback.",
+    "changed": "Record ownership and deduplication keys include declared relation kind; typed records at the same authored site take precedence over the prior import-reference record. This semantic bridge is part of C, not a new topical selection policy.",
+    "A_B_audit": "benchmarks/comparisons/typescript-context-existing-v1/source-diff-audit.json",
+    "unexposed": "W2.4 loci_explore, its intent/query selection and complete-result packer are not exposed through frozen evaluation tools. No claim about that workflow follows from this comparison."
+  }
+}
