@@ -1,0 +1,573 @@
+{
+  "schema_version": 3,
+  "probe": "three-arm-exact-transport",
+  "arm": "C",
+  "meaning": "Offline Codex/MCP requests and exact next-request delivery; no provider model calls.",
+  "engine": {
+    "engine_src": "/private/tmp/loci-abc-engines/C/src",
+    "service_file": "/private/tmp/loci-abc-engines/C/src/loci/service.py",
+    "extractor_version": 25
+  },
+  "catalog_sha256": "f1c45cceac1c3ee90fa1af1007c341713e220571390c3b1eb086c443d7781062",
+  "canonical_tool_schemas_sha256": "cbe5ad1aa9f5d7be192d239989d3a3365a0d1435e6ad3178ad1b58f1cde9818d",
+  "modes": [
+    {
+      "mode": "expanded_get",
+      "case_id": "imported_interface",
+      "request_count": 2,
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.7038900829938939,
+      "model": "gpt-5.6-luna",
+      "reasoning": {
+        "effort": "high",
+        "context": "all_turns"
+      },
+      "tool_set": [
+        [
+          "functions",
+          "list_mcp_resources"
+        ],
+        [
+          "functions",
+          "list_mcp_resource_templates"
+        ],
+        [
+          "functions",
+          "read_mcp_resource"
+        ],
+        [
+          "mcp__evaluation",
+          "file"
+        ],
+        [
+          "mcp__evaluation",
+          "get"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_anchors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_calls"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_imports"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_paths"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_references"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_retrieve"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_traverse_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "grep"
+        ],
+        [
+          "mcp__evaluation",
+          "outline"
+        ],
+        [
+          "mcp__evaluation",
+          "search"
+        ]
+      ],
+      "tool_schemas_sha256": "cbe5ad1aa9f5d7be192d239989d3a3365a0d1435e6ad3178ad1b58f1cde9818d",
+      "canonical_tool_schemas_sha256": "cbe5ad1aa9f5d7be192d239989d3a3365a0d1435e6ad3178ad1b58f1cde9818d",
+      "call_event": {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "evaluation",
+          "tool": "get",
+          "arguments": {
+            "symbol_ids": [
+              "consumer.ts::processOrder#function"
+            ]
+          },
+          "result": {
+            "content": [],
+            "structured_content": {
+              "symbols": [
+                {
+                  "id": "consumer.ts::processOrder#function",
+                  "source": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}",
+                  "byte_offset": 69,
+                  "byte_length": 83,
+                  "line": 2,
+                  "end_line": 4,
+                  "signature": "function processOrder(value: ImportedPayload): string {",
+                  "kind": "function",
+                  "language": "typescript"
+                }
+              ],
+              "type_context": {
+                "scope": "declared_type_relations",
+                "status": "complete",
+                "symbols": [
+                  {
+                    "id": "types.ts::Payload#interface",
+                    "source": "interface Payload {\n  requestId: string;\n  amount: number;\n}",
+                    "byte_offset": 7,
+                    "byte_length": 60,
+                    "line": 1,
+                    "end_line": 4,
+                    "signature": "interface Payload {",
+                    "kind": "interface",
+                    "language": "typescript"
+                  }
+                ],
+                "references": [
+                  {
+                    "owner_id": "consumer.ts::processOrder#function",
+                    "target_id": "types.ts::Payload#interface",
+                    "reference": {
+                      "file": "consumer.ts",
+                      "start_byte": 98,
+                      "end_byte": 113
+                    },
+                    "edge": {
+                      "from": "consumer.ts::processOrder#function",
+                      "to": "types.ts::Payload#interface",
+                      "type": "uses_type",
+                      "directed": true,
+                      "namespace": "loci",
+                      "resolution": "import-resolved",
+                      "evidence": {
+                        "file": "consumer.ts",
+                        "line": 2,
+                        "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                      }
+                    },
+                    "support": [
+                      {
+                        "kind": "type_site",
+                        "file": "consumer.ts",
+                        "line": 2,
+                        "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                        "endpoint_id": "consumer.ts::processOrder#function"
+                      },
+                      {
+                        "kind": "owner",
+                        "file": "consumer.ts",
+                        "line": 2,
+                        "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                        "endpoint_id": "consumer.ts::processOrder#function"
+                      },
+                      {
+                        "kind": "import_binding",
+                        "file": "consumer.ts",
+                        "line": 1,
+                        "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                        "endpoint_id": "types.ts::__file__#file"
+                      },
+                      {
+                        "kind": "definition",
+                        "file": "types.ts",
+                        "line": 1,
+                        "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                        "endpoint_id": "types.ts::Payload#interface"
+                      }
+                    ]
+                  }
+                ],
+                "evidence": [
+                  {
+                    "file": "consumer.ts",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "byte_offset": 0,
+                    "content": "import type { Payload as ImportedPayload } from \"./types.js\";\n",
+                    "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                  },
+                  {
+                    "file": "consumer.ts",
+                    "start_line": 2,
+                    "end_line": 2,
+                    "byte_offset": 62,
+                    "content": "export function processOrder(value: ImportedPayload): string {\n",
+                    "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                  },
+                  {
+                    "file": "types.ts",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "byte_offset": 0,
+                    "content": "export interface Payload {\n",
+                    "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d"
+                  }
+                ],
+                "limits": {
+                  "max_anchors": 5,
+                  "max_hops": 3,
+                  "max_nodes": 32,
+                  "max_neighbors_per_owner": 16,
+                  "max_references": 16,
+                  "max_source_spans": 64,
+                  "max_source_bytes": 16384,
+                  "max_serialized_bytes": 32768
+                },
+                "omissions": {}
+              },
+              "_evaluation": {
+                "attempt_id": "5cbe865d-d92b-41b3-9f44-f0b0572d7aff/attempt/1",
+                "calls_remaining": 23
+              }
+            }
+          },
+          "error": null,
+          "status": "completed"
+        }
+      },
+      "call_item": {
+        "id": "item_1",
+        "type": "mcp_tool_call",
+        "server": "evaluation",
+        "tool": "get",
+        "arguments": {
+          "symbol_ids": [
+            "consumer.ts::processOrder#function"
+          ]
+        },
+        "result": {
+          "content": [],
+          "structured_content": {
+            "symbols": [
+              {
+                "id": "consumer.ts::processOrder#function",
+                "source": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}",
+                "byte_offset": 69,
+                "byte_length": 83,
+                "line": 2,
+                "end_line": 4,
+                "signature": "function processOrder(value: ImportedPayload): string {",
+                "kind": "function",
+                "language": "typescript"
+              }
+            ],
+            "type_context": {
+              "scope": "declared_type_relations",
+              "status": "complete",
+              "symbols": [
+                {
+                  "id": "types.ts::Payload#interface",
+                  "source": "interface Payload {\n  requestId: string;\n  amount: number;\n}",
+                  "byte_offset": 7,
+                  "byte_length": 60,
+                  "line": 1,
+                  "end_line": 4,
+                  "signature": "interface Payload {",
+                  "kind": "interface",
+                  "language": "typescript"
+                }
+              ],
+              "references": [
+                {
+                  "owner_id": "consumer.ts::processOrder#function",
+                  "target_id": "types.ts::Payload#interface",
+                  "reference": {
+                    "file": "consumer.ts",
+                    "start_byte": 98,
+                    "end_byte": 113
+                  },
+                  "edge": {
+                    "from": "consumer.ts::processOrder#function",
+                    "to": "types.ts::Payload#interface",
+                    "type": "uses_type",
+                    "directed": true,
+                    "namespace": "loci",
+                    "resolution": "import-resolved",
+                    "evidence": {
+                      "file": "consumer.ts",
+                      "line": 2,
+                      "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                    }
+                  },
+                  "support": [
+                    {
+                      "kind": "type_site",
+                      "file": "consumer.ts",
+                      "line": 2,
+                      "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                      "endpoint_id": "consumer.ts::processOrder#function"
+                    },
+                    {
+                      "kind": "owner",
+                      "file": "consumer.ts",
+                      "line": 2,
+                      "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                      "endpoint_id": "consumer.ts::processOrder#function"
+                    },
+                    {
+                      "kind": "import_binding",
+                      "file": "consumer.ts",
+                      "line": 1,
+                      "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                      "endpoint_id": "types.ts::__file__#file"
+                    },
+                    {
+                      "kind": "definition",
+                      "file": "types.ts",
+                      "line": 1,
+                      "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                      "endpoint_id": "types.ts::Payload#interface"
+                    }
+                  ]
+                }
+              ],
+              "evidence": [
+                {
+                  "file": "consumer.ts",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "byte_offset": 0,
+                  "content": "import type { Payload as ImportedPayload } from \"./types.js\";\n",
+                  "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                },
+                {
+                  "file": "consumer.ts",
+                  "start_line": 2,
+                  "end_line": 2,
+                  "byte_offset": 62,
+                  "content": "export function processOrder(value: ImportedPayload): string {\n",
+                  "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                },
+                {
+                  "file": "types.ts",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "byte_offset": 0,
+                  "content": "export interface Payload {\n",
+                  "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d"
+                }
+              ],
+              "limits": {
+                "max_anchors": 5,
+                "max_hops": 3,
+                "max_nodes": 32,
+                "max_neighbors_per_owner": 16,
+                "max_references": 16,
+                "max_source_spans": 64,
+                "max_source_bytes": 16384,
+                "max_serialized_bytes": 32768
+              },
+              "omissions": {}
+            },
+            "_evaluation": {
+              "attempt_id": "5cbe865d-d92b-41b3-9f44-f0b0572d7aff/attempt/1",
+              "calls_remaining": 23
+            }
+          }
+        },
+        "error": null,
+        "status": "completed"
+      },
+      "model_tool_outputs": [
+        {
+          "type": "function_call_output",
+          "id": "fco_01a09087-6523-7b61-8f06-08c1aaf26983",
+          "call_id": "call_probe",
+          "output": "Wall time: 0.0088 seconds\nOutput:\n{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"source\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\",\"byte_offset\":69,\"byte_length\":83,\"line\":2,\"end_line\":4,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"kind\":\"function\",\"language\":\"typescript\"}],\"type_context\":{\"scope\":\"declared_type_relations\",\"status\":\"complete\",\"symbols\":[{\"id\":\"types.ts::Payload#interface\",\"source\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\",\"byte_offset\":7,\"byte_length\":60,\"line\":1,\"end_line\":4,\"signature\":\"interface Payload {\",\"kind\":\"interface\",\"language\":\"typescript\"}],\"references\":[{\"owner_id\":\"consumer.ts::processOrder#function\",\"target_id\":\"types.ts::Payload#interface\",\"reference\":{\"file\":\"consumer.ts\",\"start_byte\":98,\"end_byte\":113},\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"}},\"support\":[{\"kind\":\"type_site\",\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"endpoint_id\":\"consumer.ts::processOrder#function\"},{\"kind\":\"owner\",\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"endpoint_id\":\"consumer.ts::processOrder#function\"},{\"kind\":\"import_binding\",\"file\":\"consumer.ts\",\"line\":1,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"endpoint_id\":\"types.ts::__file__#file\"},{\"kind\":\"definition\",\"file\":\"types.ts\",\"line\":1,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"endpoint_id\":\"types.ts::Payload#interface\"}]}],\"evidence\":[{\"file\":\"consumer.ts\",\"start_line\":1,\"end_line\":1,\"byte_offset\":0,\"content\":\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\\n\",\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"},{\"file\":\"consumer.ts\",\"start_line\":2,\"end_line\":2,\"byte_offset\":62,\"content\":\"export function processOrder(value: ImportedPayload): string {\\n\",\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"},{\"file\":\"types.ts\",\"start_line\":1,\"end_line\":1,\"byte_offset\":0,\"content\":\"export interface Payload {\\n\",\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\"}],\"limits\":{\"max_anchors\":5,\"max_hops\":3,\"max_nodes\":32,\"max_neighbors_per_owner\":16,\"max_references\":16,\"max_source_spans\":64,\"max_source_bytes\":16384,\"max_serialized_bytes\":32768},\"omissions\":{}},\"_evaluation\":{\"attempt_id\":\"5cbe865d-d92b-41b3-9f44-f0b0572d7aff/attempt/1\",\"calls_remaining\":23}}"
+        }
+      ],
+      "payload_kind": "compact_json",
+      "payload_texts": [
+        "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"source\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\",\"byte_offset\":69,\"byte_length\":83,\"line\":2,\"end_line\":4,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"kind\":\"function\",\"language\":\"typescript\"}],\"type_context\":{\"scope\":\"declared_type_relations\",\"status\":\"complete\",\"symbols\":[{\"id\":\"types.ts::Payload#interface\",\"source\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\",\"byte_offset\":7,\"byte_length\":60,\"line\":1,\"end_line\":4,\"signature\":\"interface Payload {\",\"kind\":\"interface\",\"language\":\"typescript\"}],\"references\":[{\"owner_id\":\"consumer.ts::processOrder#function\",\"target_id\":\"types.ts::Payload#interface\",\"reference\":{\"file\":\"consumer.ts\",\"start_byte\":98,\"end_byte\":113},\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"}},\"support\":[{\"kind\":\"type_site\",\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"endpoint_id\":\"consumer.ts::processOrder#function\"},{\"kind\":\"owner\",\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"endpoint_id\":\"consumer.ts::processOrder#function\"},{\"kind\":\"import_binding\",\"file\":\"consumer.ts\",\"line\":1,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"endpoint_id\":\"types.ts::__file__#file\"},{\"kind\":\"definition\",\"file\":\"types.ts\",\"line\":1,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"endpoint_id\":\"types.ts::Payload#interface\"}]}],\"evidence\":[{\"file\":\"consumer.ts\",\"start_line\":1,\"end_line\":1,\"byte_offset\":0,\"content\":\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\\n\",\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"},{\"file\":\"consumer.ts\",\"start_line\":2,\"end_line\":2,\"byte_offset\":62,\"content\":\"export function processOrder(value: ImportedPayload): string {\\n\",\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"},{\"file\":\"types.ts\",\"start_line\":1,\"end_line\":1,\"byte_offset\":0,\"content\":\"export interface Payload {\\n\",\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\"}],\"limits\":{\"max_anchors\":5,\"max_hops\":3,\"max_nodes\":32,\"max_neighbors_per_owner\":16,\"max_references\":16,\"max_source_spans\":64,\"max_source_bytes\":16384,\"max_serialized_bytes\":32768},\"omissions\":{}},\"_evaluation\":{\"attempt_id\":\"5cbe865d-d92b-41b3-9f44-f0b0572d7aff/attempt/1\",\"calls_remaining\":23}}"
+      ],
+      "observed_accounting": {
+        "schema_version": 3,
+        "complete": true,
+        "tool_call_count": 1,
+        "recorded_payload_bytes": 2797,
+        "complete_payload_bytes": 2797,
+        "source_bytes": 369,
+        "calls": [
+          {
+            "item_id": "item_1",
+            "server": "evaluation",
+            "tool": "get",
+            "arguments": {
+              "symbol_ids": [
+                "consumer.ts::processOrder#function"
+              ]
+            },
+            "status": "completed",
+            "attempt_id": "5cbe865d-d92b-41b3-9f44-f0b0572d7aff/attempt/1",
+            "trace_event_id": "5cbe865d-d92b-41b3-9f44-f0b0572d7aff:1",
+            "source_bytes": 369,
+            "serialized_bytes": 2797,
+            "payload_texts": [
+              "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"source\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\",\"byte_offset\":69,\"byte_length\":83,\"line\":2,\"end_line\":4,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"kind\":\"function\",\"language\":\"typescript\"}],\"type_context\":{\"scope\":\"declared_type_relations\",\"status\":\"complete\",\"symbols\":[{\"id\":\"types.ts::Payload#interface\",\"source\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\",\"byte_offset\":7,\"byte_length\":60,\"line\":1,\"end_line\":4,\"signature\":\"interface Payload {\",\"kind\":\"interface\",\"language\":\"typescript\"}],\"references\":[{\"owner_id\":\"consumer.ts::processOrder#function\",\"target_id\":\"types.ts::Payload#interface\",\"reference\":{\"file\":\"consumer.ts\",\"start_byte\":98,\"end_byte\":113},\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"}},\"support\":[{\"kind\":\"type_site\",\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"endpoint_id\":\"consumer.ts::processOrder#function\"},{\"kind\":\"owner\",\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"endpoint_id\":\"consumer.ts::processOrder#function\"},{\"kind\":\"import_binding\",\"file\":\"consumer.ts\",\"line\":1,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"endpoint_id\":\"types.ts::__file__#file\"},{\"kind\":\"definition\",\"file\":\"types.ts\",\"line\":1,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"endpoint_id\":\"types.ts::Payload#interface\"}]}],\"evidence\":[{\"file\":\"consumer.ts\",\"start_line\":1,\"end_line\":1,\"byte_offset\":0,\"content\":\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\\n\",\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"},{\"file\":\"consumer.ts\",\"start_line\":2,\"end_line\":2,\"byte_offset\":62,\"content\":\"export function processOrder(value: ImportedPayload): string {\\n\",\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"},{\"file\":\"types.ts\",\"start_line\":1,\"end_line\":1,\"byte_offset\":0,\"content\":\"export interface Payload {\\n\",\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\"}],\"limits\":{\"max_anchors\":5,\"max_hops\":3,\"max_nodes\":32,\"max_neighbors_per_owner\":16,\"max_references\":16,\"max_source_spans\":64,\"max_source_bytes\":16384,\"max_serialized_bytes\":32768},\"omissions\":{}},\"_evaluation\":{\"attempt_id\":\"5cbe865d-d92b-41b3-9f44-f0b0572d7aff/attempt/1\",\"calls_remaining\":23}}"
+            ],
+            "payload_format": "compact_json"
+          }
+        ],
+        "failures": [],
+        "validated_results": [
+          {
+            "symbols": [
+              {
+                "id": "consumer.ts::processOrder#function",
+                "source": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}",
+                "byte_offset": 69,
+                "byte_length": 83,
+                "line": 2,
+                "end_line": 4,
+                "signature": "function processOrder(value: ImportedPayload): string {",
+                "kind": "function",
+                "language": "typescript"
+              }
+            ],
+            "type_context": {
+              "scope": "declared_type_relations",
+              "status": "complete",
+              "symbols": [
+                {
+                  "id": "types.ts::Payload#interface",
+                  "source": "interface Payload {\n  requestId: string;\n  amount: number;\n}",
+                  "byte_offset": 7,
+                  "byte_length": 60,
+                  "line": 1,
+                  "end_line": 4,
+                  "signature": "interface Payload {",
+                  "kind": "interface",
+                  "language": "typescript"
+                }
+              ],
+              "references": [
+                {
+                  "owner_id": "consumer.ts::processOrder#function",
+                  "target_id": "types.ts::Payload#interface",
+                  "reference": {
+                    "file": "consumer.ts",
+                    "start_byte": 98,
+                    "end_byte": 113
+                  },
+                  "edge": {
+                    "from": "consumer.ts::processOrder#function",
+                    "to": "types.ts::Payload#interface",
+                    "type": "uses_type",
+                    "directed": true,
+                    "namespace": "loci",
+                    "resolution": "import-resolved",
+                    "evidence": {
+                      "file": "consumer.ts",
+                      "line": 2,
+                      "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                    }
+                  },
+                  "support": [
+                    {
+                      "kind": "type_site",
+                      "file": "consumer.ts",
+                      "line": 2,
+                      "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                      "endpoint_id": "consumer.ts::processOrder#function"
+                    },
+                    {
+                      "kind": "owner",
+                      "file": "consumer.ts",
+                      "line": 2,
+                      "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                      "endpoint_id": "consumer.ts::processOrder#function"
+                    },
+                    {
+                      "kind": "import_binding",
+                      "file": "consumer.ts",
+                      "line": 1,
+                      "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                      "endpoint_id": "types.ts::__file__#file"
+                    },
+                    {
+                      "kind": "definition",
+                      "file": "types.ts",
+                      "line": 1,
+                      "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                      "endpoint_id": "types.ts::Payload#interface"
+                    }
+                  ]
+                }
+              ],
+              "evidence": [
+                {
+                  "file": "consumer.ts",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "byte_offset": 0,
+                  "content": "import type { Payload as ImportedPayload } from \"./types.js\";\n",
+                  "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                },
+                {
+                  "file": "consumer.ts",
+                  "start_line": 2,
+                  "end_line": 2,
+                  "byte_offset": 62,
+                  "content": "export function processOrder(value: ImportedPayload): string {\n",
+                  "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                },
+                {
+                  "file": "types.ts",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "byte_offset": 0,
+                  "content": "export interface Payload {\n",
+                  "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d"
+                }
+              ],
+              "limits": {
+                "max_anchors": 5,
+                "max_hops": 3,
+                "max_nodes": 32,
+                "max_neighbors_per_owner": 16,
+                "max_references": 16,
+                "max_source_spans": 64,
+                "max_source_bytes": 16384,
+                "max_serialized_bytes": 32768
+              },
+              "omissions": {}
+            },
+            "_evaluation": {
+              "attempt_id": "5cbe865d-d92b-41b3-9f44-f0b0572d7aff/attempt/1",
+              "calls_remaining": 23
+            }
+          }
+        ]
+      },
+      "trace_schema_version": 3,
+      "expected_mode": "recorded",
+      "adapter_attempts": 1,
+      "adapter_deliveries": 1,
+      "evidence_dir": "transport-C-evidence/expanded_get",
+      "output_verified": true
+    }
+  ],
+  "artifacts": {
+    "transport-C-evidence/expanded_get/trace.json": "1b393d4098cd0f419e54489d63c3be0be4d3ae5a6b5dbcd3570a93d4ac2de6ef",
+    "transport-C-evidence/expanded_get/events.json": "d778ff667e7d650139313ecf1e8504958ce114ca74645f2b3e53013fcd0de6b1",
+    "transport-C-evidence/expanded_get/initial-trace.json": "c355a04e71bd0b9178912c3443cb3f50ff9d9201ed3301b88268c7aa7e6a9748",
+    "transport-C-evidence/expanded_get/accounting.json": "f2a5c5267579a72a6d5f3d4dbcc7a88ae9dff36faa10b74e5cfcebbcea1fd328",
+    "transport-C-evidence/expanded_get/stderr.txt": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+    "transport-C-evidence/expanded_get/effective-request.json": "2fd1ad7cb2a92d3abe1293aebcd172ac055c81a24f2b37be727098dd15352d9f",
+    "transport-C-evidence/expanded_get/stdout.jsonl": "256e69932c967f9b47b2e521da6bbb6d79bcc0ee9d0c2a4e99ce3cee8eb2c925",
+    "transport-C-evidence/expanded_get/run.json": "c80ee40e755fdf395a705d8c4a1bb692374228bb87aa224a1e81719ff936bee0",
+    "transport-C-evidence/expanded_get/next-request.json": "09b1e73733d617b8a7df4715a89cf2f9e6d5c518b6bd9e3c69200613bfc9bf7d"
+  }
+}
