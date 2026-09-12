@@ -1,0 +1,69 @@
+[
+  {
+    "type": "thread.started",
+    "thread_id": "01a092ee-fa7b-7411-aadb-58afea53749b"
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_0",
+      "type": "error",
+      "message": "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-transport-y7_3wb7k/runtime/config.toml."
+    }
+  },
+  {
+    "type": "turn.started"
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_1",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "locate",
+        "query": "processOrder",
+        "max_hops": true
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_1",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "locate",
+        "query": "processOrder",
+        "max_hops": true
+      },
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "Error executing tool loci_explore: 1 validation error for loci_exploreArguments\nmax_hops\n  Input should be a valid integer [type=int_type, input_value=True, input_type=bool]\n    For further information visit https://errors.pydantic.dev/2.13/v/int_type"
+          }
+        ],
+        "structured_content": null
+      },
+      "error": null,
+      "status": "failed"
+    }
+  },
+  {
+    "type": "error",
+    "message": "{\"error\":{\"message\":\"offline transport probe complete\",\"type\":\"invalid_request_error\"}}"
+  },
+  {
+    "type": "turn.failed",
+    "error": {
+      "message": "{\"error\":{\"message\":\"offline transport probe complete\",\"type\":\"invalid_request_error\"}}"
+    }
+  }
+]
