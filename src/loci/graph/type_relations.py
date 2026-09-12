@@ -24,11 +24,12 @@ from ._python_references import (
     PythonReferenceIndex, _is_imported_submodule, build_python_reference_index,
     resolve_python_reference,
 )
+from ._go_types import GoTypeIndex, build_go_type_index, resolve_go_type
 from .contracts import GraphContractError, GraphEdge, GraphEvidence
 from .imports import ImportRecord
 from .type_models import TypeControl, TypeRelationRecord, TypeSupport
 
-TYPE_EDGE_KINDS = frozenset({"uses_type", "extends", "implements"})
+TYPE_EDGE_KINDS = frozenset({"uses_type", "extends", "implements", "embeds"})
 TYPE_TARGET_KINDS = frozenset({"class", "interface", "type", "enum"})
 VALUE_TARGET_KINDS = frozenset({"class", "enum", "function", "constant"})
 MAX_TYPE_CANDIDATES = 16
@@ -39,6 +40,7 @@ class _ResolutionIndex:
     declarations: Mapping[tuple[str, int, int], tuple[Symbol, ...]]
     imports: Mapping[tuple[str, ImportBinding], tuple[ImportRecord, ...]]
     javascript: JavaScriptReferenceIndex
+    go: GoTypeIndex
     python: PythonReferenceIndex
     file_hashes: Mapping[str, str]
     input_hashes: Mapping[str, str]
@@ -63,14 +65,15 @@ def resolve_type_relations(
             declarations[(symbol.file_path, symbol.byte_offset,
                           symbol.byte_offset + symbol.byte_length)].append(symbol)
     for record in imports:
-        if record.raw.language not in {"typescript", "python", "javascript"}:
+        if record.raw.language not in {"typescript", "python", "javascript", "go"}:
             continue
         for binding in record.raw.bindings:
-            if binding.local_name is not None:
+            if binding.local_name is not None or record.raw.language == "go":
                 imported[(record.raw.source_file, binding)].append(record)
     index = _ResolutionIndex(
         declarations={key: tuple(value) for key, value in declarations.items()},
         imports={key: tuple(value) for key, value in imported.items()},
+        go=build_go_type_index(symbols, input_hashes),
         javascript=build_javascript_reference_index(
             symbols, imports, exports,
             file_nodes={symbol.file_path: symbol for symbol in symbols
@@ -155,10 +158,14 @@ def _resolve(raw: RawTypeObservation, index: _ResolutionIndex) -> TypeRelationRe
         return finish("unsupported_syntax")
     if raw.candidates_truncated or not raw.candidates_complete:
         return finish("binding_limit")
+    if raw.language == "go" and owner.metadata.get("loci", {}).get("go_type_configuration") != "unconditional":
+        return finish("unsupported_configuration")
     if raw.binding_state == "shadowed":
-        return finish("type_parameter")
+        return finish("binding_shadowed" if raw.language == "go" and not any(b.kind == "type_parameter" for b in raw.local_bindings) else "type_parameter")
     if raw.binding_state == "ambiguous":
         return finish("binding_ambiguous")
+    if raw.language == "go" and raw.binding_state in {"package", "imported", "deferred"}:
+        return resolve_go_type(raw, owner=owner, index=index.go, imports=index.imports, finish=finish)
     if raw.binding_state == "unbound":
         return finish("binding_not_found")
     if raw.binding_state == "local":
@@ -176,6 +183,8 @@ def _resolve(raw: RawTypeObservation, index: _ResolutionIndex) -> TypeRelationRe
         args = dict(extra_support=(definition,), candidate_ids=(target.id,),
                     candidate_universe="lexical_scope", candidate_scope_file=raw.source_file,
                     candidates_complete=True, candidates_truncated=0)
+        if raw.language == "go" and target.metadata.get("loci", {}).get("go_type_configuration") != "unconditional":
+            return finish("unsupported_configuration", **args)
         if not _target_compatible(raw, target):
             return finish("unsupported_target", **args)
         if raw.relation != "uses_type" and owner.id == target.id:

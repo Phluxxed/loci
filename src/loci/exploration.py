@@ -6,13 +6,15 @@ from dataclasses import dataclass
 import hashlib
 import heapq
 import math
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 from typing import Any, Mapping
 
 from ._exploration_output import Bundle, Relation, Span, pack_exploration
 from .graph.anchors import select_graph_anchors
 from .graph.contracts import GraphContractError, GraphEdge
+from .graph.go_modules import MAX_GO_CONTROL_BYTES
+from .graph.profiles import read_contained_file
 from .graph.state import GraphIndexState
 from .graph.traversal import filter_graph_edges, graph_adjacency, graph_hub_threshold
 from .graph.type_relations import TYPE_EDGE_KINDS, type_site_key
@@ -21,7 +23,7 @@ from .type_context import _CachedSource
 
 
 INTENTS = ("locate", "type_dependencies", "dependencies", "impact")
-TYPE_WEIGHTS = {"uses_type": .9, "extends": .95, "implements": .9}
+TYPE_WEIGHTS = {"uses_type": .9, "extends": .95, "implements": .9, "embeds": .95}
 IMPACT_WEIGHTS = {**TYPE_WEIGHTS, "calls": .9, "references": .7, "references_type": .75}
 DEPENDENCY_WEIGHTS = {**TYPE_WEIGHTS, "calls": .9, "references": .7}
 _STRUCTURAL_CONTEXTS = frozenset({"alias", "type_query", "type_argument", "constraint"})
@@ -98,7 +100,9 @@ class _Source:
         self.cache = _CachedSource(repo, store)
         self.nodes = nodes
         self.hashes = {n["file_path"]: n["content_hash"] for n in nodes.values() if n.get("kind") == "file"}
+        self.languages = {n["file_path"]: n.get("language") for n in nodes.values() if n.get("kind") == "file"}
         self.definitions: dict[str, Span] = {}
+        self.go_import_declarations: dict[str, tuple[_GoImportDeclaration, ...]] = {}
 
     def definition(self, node: dict) -> Span:
         if node["id"] not in self.definitions:
@@ -122,10 +126,62 @@ class _Source:
             if node["content_hash"] != support.content_hash or node["file_path"] != support.file:
                 raise ValueError("Call definition support differs from its indexed endpoint")
             return self.definition(node)
+        if support.kind == "import_binding" and self.languages.get(support.file) == "go":
+            return self.go_import_declaration(support)
         value = self.cache.support(support)
         return Span(value["file"], value["byte_offset"],
                     value["byte_offset"] + len(value["content"].encode("utf-8")),
                     value["start_line"], value["end_line"], value["content_hash"], value["content"])
+
+    def go_import_declaration(self, support) -> Span:
+        raw, _ = self.cache.file(support.file, support.content_hash)
+        declarations = self.go_import_declarations.get(support.file)
+        if declarations is None:
+            declarations = _go_import_declarations(raw)
+            self.go_import_declarations[support.file] = declarations
+        matches = [
+            declaration for declaration in declarations
+            if declaration.start_line <= support.line <= declaration.end_line
+        ]
+        if len(matches) != 1:
+            raise ValueError("Go import support has no unique enclosing declaration")
+        declaration = matches[0]
+        try:
+            content = raw[declaration.start_byte:declaration.end_byte].decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise ValueError("Go import declaration is not UTF-8") from exc
+        return Span(
+            support.file, declaration.start_byte, declaration.end_byte,
+            declaration.start_line, declaration.end_line,
+            support.content_hash, content,
+        )
+
+    def control(self, control) -> Span:
+        """Deliver complete, currently verified Go control bytes as evidence."""
+        file = control.file
+        if not _is_go_control_path(file):
+            raise ValueError("Go control evidence has an unsafe path")
+        try:
+            data, relative = read_contained_file(
+                self.cache.repo,
+                Path(file),
+                record="Go control evidence",
+                max_bytes=MAX_GO_CONTROL_BYTES,
+            )
+        except GraphContractError as exc:
+            raise ValueError("Go control evidence is unavailable") from exc
+        if relative != file or hashlib.sha256(data).hexdigest() != control.content_hash:
+            raise ValueError("Go control evidence differs from indexed input")
+        if not data:
+            raise ValueError("Go control evidence is empty")
+        try:
+            content = data.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise ValueError("Go control evidence is not UTF-8") from exc
+        return Span(
+            file, 0, len(data), 1, data[:-1].count(b"\n") + 1,
+            control.content_hash, content,
+        )
 
     def member_terms(self, record) -> set[str]:
         raw = record.raw
@@ -140,18 +196,125 @@ class _Source:
 
 
 @dataclass(frozen=True)
+class _GoImportDeclaration:
+    start_byte: int
+    end_byte: int
+    start_line: int
+    end_line: int
+
+
+def _go_import_declarations(source: bytes) -> tuple[_GoImportDeclaration, ...]:
+    try:
+        from tree_sitter import Parser
+        from tree_sitter_language_pack import get_language
+
+        root = Parser(get_language("go")).parse(source).root_node
+    except Exception as exc:
+        raise ValueError("Go import declaration source could not be parsed") from exc
+    if root.has_error:
+        raise ValueError("Go import declaration source has parse errors")
+    declarations = []
+    for node in root.named_children:
+        if node.type != "import_declaration":
+            continue
+        start_line = node.start_point.row + 1
+        end_line = node.end_point.row + 1
+        if node.end_point.column == 0 and node.end_byte > node.start_byte:
+            end_line -= 1
+        declarations.append(
+            _GoImportDeclaration(
+                node.start_byte, node.end_byte, start_line, end_line,
+            )
+        )
+    return tuple(declarations)
+
+
+@dataclass(frozen=True)
 class _EdgeRecord:
     record: Any
     context: str | None
     support: tuple
+    controls: tuple = ()
+
+
+@dataclass(frozen=True)
+class _ControlEvidence:
+    file: str
+    content_hash: str
+
+
+@dataclass(frozen=True)
+class _PackageClauseSupport:
+    kind: str
+    file: str
+    line: int
+    content_hash: str
+    endpoint_id: str | None = None
 
 
 def _edge_key(edge: GraphEdge) -> tuple[str, str, str, int]:
     return edge.type, edge.from_id, edge.to_id, edge.evidence.line
 
 
-def _records(state: GraphIndexState) -> dict[tuple, _EdgeRecord]:
+def _is_go_control_path(value: Any) -> bool:
+    if not isinstance(value, str) or not value or "\\" in value:
+        return False
+    path = PurePosixPath(value)
+    return (
+        not path.is_absolute()
+        and ".." not in path.parts
+        and path.as_posix() == value
+        and path.name in {"go.mod", "go.work"}
+    )
+
+
+def _go_controls(state: GraphIndexState) -> tuple[_ControlEvidence, ...]:
+    return tuple(
+        _ControlEvidence(file, content_hash)
+        for file, content_hash in sorted(state.input_hashes.items())
+        if _is_go_control_path(file)
+        and isinstance(content_hash, str)
+        and re.fullmatch(r"[0-9a-f]{64}", content_hash) is not None
+    )
+
+
+def _go_package_clause_support(record: Any, nodes: Mapping[str, dict]) -> tuple[_PackageClauseSupport, ...]:
+    target = nodes.get(getattr(record, "target_id", None))
+    target_file = getattr(record, "target_file", None)
+    if not isinstance(target_file, str) and isinstance(target, Mapping):
+        target_file = target.get("file_path")
+    if not isinstance(target_file, str):
+        return ()
+    file_node = next(
+        (node for node in nodes.values()
+         if node.get("kind") == "file" and node.get("file_path") == target_file),
+        None,
+    )
+    package = None
+    for evidence_node in (target, file_node):
+        metadata = evidence_node.get("metadata") if isinstance(evidence_node, Mapping) else None
+        loci = metadata.get("loci") if isinstance(metadata, Mapping) else None
+        candidate = loci.get("go_package") if isinstance(loci, Mapping) else None
+        if isinstance(candidate, Mapping):
+            package = candidate
+            break
+    if not isinstance(package, Mapping):
+        return ()
+    if not isinstance(package.get("name"), str) or not package["name"]:
+        return ()
+    line = package.get("line")
+    if type(line) is not int or line < 1:
+        return ()
+    evidence_node = file_node if isinstance(file_node, Mapping) else target
+    content_hash = evidence_node.get("content_hash") if isinstance(evidence_node, Mapping) else None
+    if not isinstance(content_hash, str) or re.fullmatch(r"[0-9a-f]{64}", content_hash) is None:
+        return ()
+    return (_PackageClauseSupport("package_clause", target_file, line, content_hash),)
+
+
+def _records(state: GraphIndexState, nodes: Mapping[str, dict]) -> dict[tuple, _EdgeRecord]:
     result = {}
+    go_controls = _go_controls(state)
     references = {
         (r.raw.source_file, r.raw.source_hash, r.raw.start_byte, r.raw.end_byte): r
         for r in state.symbol_references if r.status == "resolved"
@@ -159,7 +322,8 @@ def _records(state: GraphIndexState) -> dict[tuple, _EdgeRecord]:
     for record in sorted(state.type_relations, key=lambda r: type_site_key(r.raw)):
         if record.status == "resolved":
             key = record.raw.relation, record.source_id, record.target_id, record.raw.line
-            result.setdefault(key, _EdgeRecord(record, record.raw.context, record.support))
+            controls = tuple(getattr(record, "resolution_controls", ())) if record.raw.language == "go" else ()
+            result.setdefault(key, _EdgeRecord(record, record.raw.context, record.support, controls))
     for record in state.calls:
         if record.status == "resolved":
             key = "calls", record.caller_id, record.target_id, record.raw.line
@@ -172,12 +336,23 @@ def _records(state: GraphIndexState) -> dict[tuple, _EdgeRecord]:
                 if reference is None:
                     continue
                 support = (*support, *reference.support)
-            result.setdefault(key, _EdgeRecord(record, None, support))
+            if record.raw.language == "go":
+                support = (*support, *_go_package_clause_support(record, nodes))
+            result.setdefault(key, _EdgeRecord(
+                record, None, support,
+                go_controls if record.raw.language == "go" else (),
+            ))
     for record in state.symbol_references:
         if record.status == "resolved":
             kind = "references_type" if record.binding.type_only else "references"
             key = kind, record.source_id, record.target_id, record.raw.line
-            result.setdefault(key, _EdgeRecord(record, None, record.support))
+            support = record.support
+            if record.raw.language == "go":
+                support = (*support, *_go_package_clause_support(record, nodes))
+            result.setdefault(key, _EdgeRecord(
+                record, None, support,
+                go_controls if record.raw.language == "go" else (),
+            ))
     return result
 
 
@@ -191,7 +366,7 @@ def _priority(step, node, record, source, query_terms, intent, depth, degree, th
         matches |= query_terms & member_terms
         if depth == 0:
             reason, relevance = "Direct declared type", 1.0
-        elif step.edge.type in {"extends", "implements"} or (
+        elif step.edge.type in {"extends", "implements", "embeds"} or (
             record.context in _STRUCTURAL_CONTEXTS and not member_terms
         ):
             reason, relevance = "Authored type or heritage continuation", .95
@@ -252,15 +427,15 @@ def explore_context(
         edges = tuple(edge for edge in edges if edge.type in TYPE_WEIGHTS
                       or nodes[edge.from_id].get("language") == "javascript")
     adjacency = graph_adjacency(edges, direction="incoming" if intent == "impact" else "outgoing")
-    records = _records(state)
+    records = _records(state, nodes)
     degrees = Counter(endpoint for edge in edges for endpoint in (edge.from_id, edge.to_id))
     threshold = graph_hub_threshold(len(edges))
     unresolved = Counter(r.source_id for r in state.type_relations if r.status != "resolved")
     if intent == "dependencies":
         unresolved.update(r.source_id for r in state.symbol_references
-                          if r.raw.language == "javascript" and r.status != "resolved")
+                          if r.raw.language in {"javascript", "go"} and r.status != "resolved")
         unresolved.update(r.caller_id for r in state.calls
-                          if r.raw.language == "javascript" and r.status != "resolved")
+                          if r.raw.language in {"javascript", "go"} and r.status != "resolved")
     bundles = []
     visited = set()
     queue = []
@@ -285,7 +460,10 @@ def explore_context(
                 record = records.get(_edge_key(step.edge))
                 if record is None:
                     raise ValueError("A projected relationship has no source record")
-                supports = tuple(source.support(item) for item in record.support)
+                supports = (
+                    *(source.support(item) for item in record.support),
+                    *(source.control(item) for item in record.controls),
+                )
                 relation_values.append(Relation(step.edge.to_dict(), step.traversed, supports))
             role = "anchor" if not steps else "dependency" if intent in {"type_dependencies", "dependencies"} else "dependent"
             bundles.append(Bundle({"id": node_id, "name": node["name"], "kind": node["kind"],
@@ -297,7 +475,7 @@ def explore_context(
         if intent == "locate":
             continue
         if intent in {"type_dependencies", "dependencies"}:
-            supported = {"typescript", "python", "javascript"} if intent == "dependencies" else {"typescript", "python"}
+            supported = {"typescript", "python", "javascript", "go"} if intent == "dependencies" else {"typescript", "python", "go"}
             if node.get("language") not in supported:
                 omissions["unsupported_language"] += 1
                 continue

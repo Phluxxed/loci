@@ -258,6 +258,13 @@ targets and runtime dispatch are outside this subset; `type_dependencies` remain
 explicitly unsupported for JavaScript. See the
 [JavaScript acceptance record](docs/reviews/2026-09-12-javascript-context.md).
 
+For Go, `type_dependencies` and `dependencies` return declared type uses,
+aliases, generic arguments/constraints and explicit struct/interface embeddings.
+The `embeds` relationship retains Go meaning without inferring method sets or
+promoted calls. Definitions carry exact package/import proof and complete
+contained module/workspace controls. See the
+[Go acceptance record](docs/reviews/2026-09-12-go-context.md).
+
 Pass `include_type_context: true` to `loci_get` to add complete definitions from
 proven TypeScript/Python dependencies and explicit heritage. The response keeps the requested
 `symbols` and adds `type_context` with definitions, original graph edges,

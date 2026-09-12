@@ -598,7 +598,7 @@ def _declared_type_bridge_terms(path: GraphPath, question: str) -> tuple[str, ..
     """
     if not path.steps or any(
         step.traversed != "forward" or step.edge.namespace != "loci"
-        or step.edge.type not in {"uses_type", "extends", "implements"}
+        or step.edge.type not in {"uses_type", "extends", "implements", "embeds"}
         or step.edge.resolution not in {"exact", "import-resolved"}
         for step in path.steps
     ):

@@ -400,7 +400,7 @@ def validate_graph_edges(
                 call_index=call_index,
             )
         elif edge_kind in {
-            ("loci", "uses_type"), ("loci", "extends"), ("loci", "implements"),
+            ("loci", "uses_type"), ("loci", "extends"), ("loci", "implements"), ("loci", "embeds"),
         }:
             from ._type_validation import validate_type_edge
 

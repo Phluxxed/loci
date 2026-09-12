@@ -19,6 +19,12 @@ extends another named declaration, or that a class implements one. It does not
 enumerate structural compatibility, validate a program, or identify dispatch.
 _Avoid_: complete implementation set, inferred inheritance
 
+**Authored embedding**: A Go struct field or interface element explicitly names
+an embedded type. It identifies that declared dependency without establishing
+class inheritance, an inferred method set, interface satisfaction or the target
+of a promoted-member call.
+_Avoid_: inheritance, inferred implementation, promoted dispatch
+
 **Candidate universe**: The stated set of possible targets considered under a
 particular binding scope. Completeness within that universe does not establish
 completeness across the repository or language.

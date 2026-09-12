@@ -504,24 +504,24 @@ class LocalTypeBinding(StrictOutputModel):
 
 class RawTypeObservation(StrictOutputModel):
     source_file: str = Field(min_length=1)
-    language: Literal["typescript", "python", "javascript"]
+    language: Literal["typescript", "python", "javascript", "go"]
     line: int = Field(ge=1)
     column: int = Field(ge=1)
     start_byte: int = Field(ge=0)
     end_byte: int = Field(ge=1)
     text: str = Field(min_length=1)
     path: list[str] = Field(max_length=16)
-    relation: Literal["uses_type", "extends", "implements"]
+    relation: Literal["uses_type", "extends", "implements", "embeds"]
     context: Literal[
         "annotation", "return", "property", "alias", "type_argument",
-        "constraint", "type_query", "heritage",
+        "constraint", "type_query", "heritage", "struct_embedding", "interface_embedding",
     ]
     lookup_space: Literal["type", "value"]
     owner: TypeDeclarationOwner
     local_bindings: list[LocalTypeBinding] = Field(max_length=16)
     import_bindings: list[ImportBinding] = Field(max_length=16)
     binding_state: Literal[
-        "local", "imported", "shadowed", "ambiguous", "unbound", "unsupported"
+        "local", "imported", "package", "deferred", "shadowed", "ambiguous", "unbound", "unsupported"
     ]
     candidates_complete: bool
     candidates_truncated: int = Field(ge=0)
@@ -535,6 +535,16 @@ class RawTypeObservation(StrictOutputModel):
             self.relation != "extends" or self.context != "heritage" or self.lookup_space != "value"
         ):
             raise ValueError("JavaScript observations require authored value-space class heritage")
+        if self.relation == "embeds" and (self.language != "go" or self.context not in {"struct_embedding", "interface_embedding"}):
+            raise ValueError("embedding requires an authored Go embedding context")
+        if self.context in {"struct_embedding", "interface_embedding"} and self.relation != "embeds":
+            raise ValueError("embedding context requires an embeds relation")
+        if self.language == "go" and (self.relation not in {"uses_type", "embeds"} or self.lookup_space != "type"):
+            raise ValueError("Go observations require authored types or embedding")
+        if self.binding_state == "package" and (self.language != "go" or len(self.path) != 1 or self.local_bindings or self.import_bindings):
+            raise ValueError("package lookup requires a bare Go name without lexical bindings")
+        if self.binding_state == "deferred" and (self.language != "go" or len(self.path) != 2 or self.local_bindings or not self.import_bindings or any(b.kind != "namespace" or b.local_name is not None for b in self.import_bindings)):
+            raise ValueError("deferred Go lookup requires implicit package imports")
         if self.start_byte >= self.end_byte:
             raise ValueError("observation span must be non-empty and ordered")
         if len(self.text.encode("utf-8")) != self.end_byte - self.start_byte:
@@ -599,7 +609,7 @@ class RawTypeObservation(StrictOutputModel):
 
 class TypeSupport(StrictOutputModel):
     kind: Literal[
-        "type_site", "owner", "definition", "import_binding", "local_export", "reexport"
+        "type_site", "owner", "definition", "import_binding", "local_export", "reexport", "package_clause"
     ]
     file: str = Field(min_length=1)
     line: int = Field(ge=1)
@@ -1185,14 +1195,14 @@ class TypeRelationItem(StrictOutputModel):
         "unsupported_syntax", "unsupported_owner", "ambiguous_owner", "type_parameter",
         "binding_not_found", "binding_ambiguous", "binding_unindexed", "target_not_indexed",
         "ambiguous_target", "unsupported_target", "unsupported_reference", "import_unresolved",
-        "binding_limit", "self_heritage", "type_only_value",
+        "binding_limit", "self_heritage", "type_only_value", "binding_shadowed", "unsupported_configuration",
     ] | None
     resolution_basis: Literal[
-        "lexical_binding", "direct_binding", "qualified_member", "reexport_chain"
+        "lexical_binding", "package_binding", "direct_binding", "qualified_member", "reexport_chain"
     ] | None
     support: list[TypeSupport] = Field(max_length=256)
     resolution_controls: list[TypeControl] = Field(max_length=256)
-    candidate_universe: Literal["lexical_scope", "import_surface", "unavailable"]
+    candidate_universe: Literal["lexical_scope", "package_scope", "import_surface", "unavailable"]
     candidate_scope_file: str | None
     candidate_ids: list[str] = Field(max_length=16)
     candidates_complete: bool
@@ -1267,15 +1277,18 @@ class TypeRelationItem(StrictOutputModel):
                     and len(self.raw.path) == 1
                 ):
                     raise ValueError("lexical resolutions require local evidence")
+            elif self.resolution_basis == "package_binding":
+                if self.raw.language != "go" or self.raw.binding_state != "package" or self.candidate_universe != "package_scope" or "package_clause" not in support_kinds:
+                    raise ValueError("package resolutions require Go package evidence")
             else:
-                if not (
-                    self.candidate_universe == "import_surface"
-                    and self.raw.binding_state == "imported"
-                    and len(self.raw.import_bindings) == 1
-                ):
-                    raise ValueError("import resolutions require imported evidence")
-                binding = self.raw.import_bindings[0]
-                if not valid_type_import_path(self.raw.language, self.raw.path, binding):
+                if self.candidate_universe != "import_surface":
+                    raise ValueError("import resolutions require an import surface")
+                if self.raw.language == "go" and self.raw.binding_state == "deferred":
+                    if self.resolution_basis != "qualified_member" or "package_clause" not in support_kinds:
+                        raise ValueError("deferred package lookup requires qualified package evidence")
+                elif self.raw.binding_state != "imported" or len(self.raw.import_bindings) != 1:
+                    raise ValueError("import resolutions require imported binding evidence")
+                if not all(valid_type_import_path(self.raw.language, self.raw.path, binding) for binding in self.raw.import_bindings):
                     raise ValueError("resolved import paths must match their binding kind")
             if not {"owner", "definition"} <= support_kinds:
                 raise ValueError("resolved relations require owner and definition support")
