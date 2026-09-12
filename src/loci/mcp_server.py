@@ -194,12 +194,18 @@ def create_server() -> MCPServer:
             Field(json_schema_extra={"minimum": 0, "maximum": 4}),
         ] = None,
         max_output_bytes: Annotated[
-            int,
-            Field(json_schema_extra={"minimum": 2048, "maximum": 262144}),
+            int | None,
+            Field(
+                strict=True,
+                json_schema_extra={"minimum": 2048, "maximum": 262144},
+            ),
         ] = 16_384,
         max_evidence_bytes: Annotated[
-            int,
-            Field(json_schema_extra={"minimum": 0, "maximum": 65536}),
+            int | None,
+            Field(
+                strict=True,
+                json_schema_extra={"minimum": 0, "maximum": 65536},
+            ),
         ] = 8_192,
         resolutions: list[str] | None = None,
     ) -> Annotated[CallToolResult, LociExploreOutput]:
@@ -210,7 +216,8 @@ def create_server() -> MCPServer:
         dependents. Query text is at most 4096 UTF-8 bytes; seeds are at most five
         unique IDs; hops are 0..4 (defaults: locate 0, type 3, impact 1), output
         is 2048..262144 bytes for the complete MCP result, and source evidence
-        is 0..65536 bytes. Use query terms to focus deeper type fields; inspect
+        is 0..65536 bytes. Omitted or null byte limits use 16384 and 8192 bytes.
+        Use query terms to focus deeper type fields; inspect
         omissions and incomplete anchors. Impact is non-exhaustive. Use ``loci_get``
         for an exact symbol read and graph tools for diagnostics or other edges.
         """
@@ -221,8 +228,12 @@ def create_server() -> MCPServer:
                 intent=intent,
                 seed_ids=seed_ids,
                 max_hops=max_hops,
-                max_output_bytes=max_output_bytes,
-                max_evidence_bytes=max_evidence_bytes,
+                max_output_bytes=(
+                    16_384 if max_output_bytes is None else max_output_bytes
+                ),
+                max_evidence_bytes=(
+                    8_192 if max_evidence_bytes is None else max_evidence_bytes
+                ),
                 resolutions=resolutions,
                 ensure_fresh=True,
             )
