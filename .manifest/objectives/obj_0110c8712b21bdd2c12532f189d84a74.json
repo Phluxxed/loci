@@ -2665,7 +2665,7 @@
           "id": "task_b280004a5bac7e5e92970ea053b51bf8",
           "title": "Deliver JavaScript dependency and class context",
           "outcome": "Ordinary JavaScript receives useful related source for dependency questions and known static impact without invented TypeScript typing.",
-          "details": "Added to the existing Objective at Vik's direction on 12 September 2026, before further implementation. This Task is planned and unstarted.\n\nUse language-appropriate dependency evidence. Do not claim structural types or implements relationships merely because the shared machinery already exposes TypeScript type edges.\n\nFrozen W4.1 cases: javascript_value_dependencies, javascript_direct_class_base, javascript_known_call_impact, javascript_unproven_dependencies. All JavaScript fixtures are plain .js. Supply actual value/call dependencies, arrow/default-identifier and re-export proof, plus direct class extends; TypeScript-only empty context does not pass.\nContract and pinned inputs: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/docs/design/2026-09-12-multilingual-context-cases.md\nSource-only input check: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/benchmarks/corpora/multilingual-context-v1/input-check.json",
+          "details": "Completed 12 September 2026 at isolated exploration commit f5ea759f7bb699f6064fc5bd54adebdf6b7d5344. Plain JavaScript now receives exact imported-value, definite-call and direct-class-base source through dependencies, with named-arrow ownership/local calls, origin proof and conservative mutation boundaries. All four frozen cases pass within existing budgets; 16 JavaScript delivery/stdio checks and the final 151-test focused set pass. Corpus inputs and historical outcomes are unchanged. No shared runtime promotion or provider measurement.\n\nAcceptance record: https://github.com/Phluxxed/loci/blob/f5ea759f7bb699f6064fc5bd54adebdf6b7d5344/docs/reviews/2026-09-12-javascript-context.md\nNext: W4.4 Go, task_5eb1f78e6e2a876259dd9bf3b170288d.",
           "decompositionComplete": true,
           "completionCriteria": [
             "Use proven JavaScript import/re-export, reference and definite-call bindings to supply required dependency definitions; add source-proven direct class-extends context where the frozen tasks require it.",
@@ -2680,7 +2680,66 @@
             "task_20015e6a552bcd64cff4d3a003b8ba4d"
           ],
           "externalBlocker": null,
-          "completion": null,
+          "completion": {
+            "evidence": [
+              {
+                "criterion": "Use proven JavaScript import/re-export, reference and definite-call bindings to supply required dependency definitions; add source-proven direct class-extends context where the frozen tasks require it.",
+                "summary": "JavaScript dependencies now deliver proven imported values and definite callees, including named-arrow/default-export and barrel proof; direct local/imported/namespace class bases produce authored extends records.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/f5ea759f7bb699f6064fc5bd54adebdf6b7d5344/tests/test_javascript_context_delivery.py",
+                  "https://github.com/Phluxxed/loci/blob/f5ea759f7bb699f6064fc5bd54adebdf6b7d5344/src/loci/parser/type_observations.py"
+                ]
+              },
+              {
+                "criterion": "Define the JavaScript intent behavior explicitly. JavaScript's lack of TypeScript annotations must not reduce acceptance to an empty successful response. Any JSDoc support must have a separately declared and tested syntax/binding boundary; otherwise it remains explicitly unsupported.",
+                "summary": "Added the explicit dependencies intent: JavaScript uses calls, imported values and direct bases; Python/TypeScript retain type selection. JavaScript type_dependencies remains explicitly unsupported, and JSDoc creates no type-use records.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/f5ea759f7bb699f6064fc5bd54adebdf6b7d5344/docs/reviews/2026-09-12-javascript-context.md",
+                  "https://github.com/Phluxxed/loci/blob/f5ea759f7bb699f6064fc5bd54adebdf6b7d5344/src/loci/exploration.py"
+                ]
+              },
+              {
+                "criterion": "Dynamic imports/require targets, computed callees, prototype mutation, monkey-patching and unproven runtime dispatch never become exact type, inheritance or call claims.",
+                "summary": "Computed/dynamic/require/receiver/prototype cases stay unresolved. Visible mutations block local call/base proof, and mutated exported declarations lose definitive export support before importer or re-export resolution.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/f5ea759f7bb699f6064fc5bd54adebdf6b7d5344/tests/test_javascript_context_delivery.py",
+                  "https://github.com/Phluxxed/loci/blob/f5ea759f7bb699f6064fc5bd54adebdf6b7d5344/src/loci/parser/_javascript_mutations.py",
+                  "https://github.com/Phluxxed/loci/blob/f5ea759f7bb699f6064fc5bd54adebdf6b7d5344/src/loci/parser/_reference_exports.py"
+                ]
+              },
+              {
+                "criterion": "Return the required definitions with exact declaration ownership, source spans/hashes and complete binding/import/re-export evidence through the shared exploration interface; preserve relationship direction and language-specific meaning.",
+                "summary": "Shared packets retain exact declaration ownership, source byte spans/hashes, complete import/re-export support and original edge/traversal direction. Named-arrow bodies now retain exact indexed owners; actual stdio output validates strict schemas and full-result bytes.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/f5ea759f7bb699f6064fc5bd54adebdf6b7d5344/tests/test_javascript_context_mcp.py",
+                  "https://github.com/Phluxxed/loci/blob/f5ea759f7bb699f6064fc5bd54adebdf6b7d5344/tests/test_javascript_context_delivery.py"
+                ]
+              },
+              {
+                "criterion": "Required positive and same-name/wrong-origin, shadowed, ambiguous, external and unsupported negative cases pass. Unproven targets remain explicit diagnostics; no guessed exact relationship, repository/toolchain execution or network lookup is introduced.",
+                "summary": "Four frozen JavaScript cases and added CONFIG, local/namespace base, lexical, wrong-origin, mutation, anonymous/JSDoc and pre-initializer controls pass; no source execution, toolchain run or network inference was introduced.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/f5ea759f7bb699f6064fc5bd54adebdf6b7d5344/tests/test_javascript_context_delivery.py"
+                ]
+              },
+              {
+                "criterion": "Source, target and applicable resolver-control changes invalidate stale relationships and delivered proof. Existing search/get, imports, references and calls retain their documented behavior.",
+                "summary": "Source, target, barrel and jsconfig resolver-control changes refresh delivered definitions/proof; the unchanged consumer switches left-to-right targets and type control hashes. Existing call/reference, type, exploration, Python and public-schema checks pass. Extractor version 27 invalidates prior extraction.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/f5ea759f7bb699f6064fc5bd54adebdf6b7d5344/tests/test_javascript_context_delivery.py",
+                  "https://github.com/Phluxxed/loci/blob/f5ea759f7bb699f6064fc5bd54adebdf6b7d5344/src/loci/storage/index_store.py"
+                ]
+              },
+              {
+                "criterion": "The frozen plain-JavaScript tasks retain all required related definitions within budgets, with arrow/default-export controls, supported incoming-impact checks and explicit missing-context outcomes.",
+                "summary": "All required definitions and authored export proof fit the frozen 8 KiB evidence / 16 KiB result budgets. Impact includes run, make and Worker.work for add; reduced/zero evidence reports omissions. Final focused run: 151 passing tests, including 16 JavaScript delivery/stdio checks; immutable corpus integrity remains 19 cases/16 snapshots.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/f5ea759f7bb699f6064fc5bd54adebdf6b7d5344/tests/test_javascript_context_delivery.py",
+                  "https://github.com/Phluxxed/loci/blob/f5ea759f7bb699f6064fc5bd54adebdf6b7d5344/docs/reviews/2026-09-12-javascript-context.md"
+                ]
+              }
+            ]
+          },
           "discontinued": null,
           "tasks": []
         },
