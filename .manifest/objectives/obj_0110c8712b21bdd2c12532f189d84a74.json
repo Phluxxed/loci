@@ -2747,7 +2747,7 @@
           "id": "task_5eb1f78e6e2a876259dd9bf3b170288d",
           "title": "Deliver Go type and embedding context",
           "outcome": "Go exploration returns the type definitions and explicitly embedded declarations needed by the frozen Go tasks.",
-          "details": "Added to the existing Objective at Vik's direction on 12 September 2026, before further implementation. This Task is planned and unstarted.\n\nReuse existing Go import/package identity and controls; no ambient module cache, dependency download or Go execution during normal indexing.\n\nFrozen W4.1 cases: go_alias_generic_contract, go_explicit_embedding, go_known_api_impact, go_unproven_package_uses. The input check demonstrates that AliasID = UserID is not yet indexed; include alias extraction. Existing Go declaration kind is type, retaining exact type-spec source and alias equals sign. Preserve struct/interface embedding meaning, package identity and go.mod mutation proof.\nContract and pinned inputs: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/docs/design/2026-09-12-multilingual-context-cases.md\nSource-only input check: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/benchmarks/corpora/multilingual-context-v1/input-check.json",
+          "details": "Completed 12 September 2026 at isolated exploration commit daac9dab9cb883ef2164bd4d3b48dead8031e38e. Go type_dependencies/dependencies now deliver authored type definitions and explicit embeds with exact declaration ownership and complete contained package/import/module proof. All four frozen Go cases, 476 focused compatibility checks, eight stdio checks, and a final 69-test resolver/storage check pass. The latter includes package-directory replay integrity and old-extractor rejection; some focused checks overlap. Source/target/package/go.mod/go.work/replacement refresh and reduced/zero budgets pass. Extractor version 28 invalidates old caches; no persisted schema or record field changes. Immutable corpus, budgets, historical verdicts and shared runtime stay unchanged. This milestone measures source delivery; provider outcomes remain W4.7.\n\nAcceptance: https://github.com/Phluxxed/loci/blob/daac9dab9cb883ef2164bd4d3b48dead8031e38e/docs/reviews/2026-09-12-go-context.md\nNext: W4.5 Rust, task_9a6c46f91458e3b44d5a46977af6fb97.",
           "decompositionComplete": true,
           "completionCriteria": [
             "Resolve declared type uses, aliases versus defined types, generic argument/constraint uses and explicit struct/interface embedding within the frozen supported syntax and existing repository-contained package/module/workspace boundaries.",
@@ -2761,7 +2761,58 @@
             "task_20015e6a552bcd64cff4d3a003b8ba4d"
           ],
           "externalBlocker": null,
-          "completion": null,
+          "completion": {
+            "evidence": [
+              {
+                "criterion": "Resolve declared type uses, aliases versus defined types, generic argument/constraint uses and explicit struct/interface embedding within the frozen supported syntax and existing repository-contained package/module/workspace boundaries.",
+                "summary": "Declared Go signature/field/alias/defined-type/generic/constraint dependencies resolve through exact lexical or contained package/import universes. Frozen AliasID extraction is repaired with native equals-bearing spans; private cross-file and local types retain ownership.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/daac9dab9cb883ef2164bd4d3b48dead8031e38e/docs/reviews/2026-09-12-go-context.md",
+                  "https://github.com/Phluxxed/loci/blob/daac9dab9cb883ef2164bd4d3b48dead8031e38e/tests/test_go_type_resolution.py"
+                ]
+              },
+              {
+                "criterion": "Embedding is recorded with its Go meaning; it is not silently converted to class inheritance. Implicit interface satisfaction, inferred method sets/promoted-member dispatch and build/cgo variants without convergent proof remain outside exact claims.",
+                "summary": "Authored struct/interface embedding uses embeds with distinct contexts, without class inheritance or promoted dispatch. Generic parameters, approximation/union terms and configured build/cgo/platform source remain outside exact claims.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/daac9dab9cb883ef2164bd4d3b48dead8031e38e/docs/reviews/2026-09-12-go-context.md",
+                  "https://github.com/Phluxxed/loci/blob/daac9dab9cb883ef2164bd4d3b48dead8031e38e/tests/test_go_type_observations.py"
+                ]
+              },
+              {
+                "criterion": "Return the required definitions with exact declaration ownership, source spans/hashes and complete binding/import/re-export evidence through the shared exploration interface; preserve relationship direction and language-specific meaning.",
+                "summary": "The shared exploration packet returns exact definitions, spans/hashes, declared package support, complete grouped imports and full hash-verified go.mod/go.work controls. Incoming call paths retain their original direction.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/daac9dab9cb883ef2164bd4d3b48dead8031e38e/docs/reviews/2026-09-12-go-context.md",
+                  "https://github.com/Phluxxed/loci/blob/daac9dab9cb883ef2164bd4d3b48dead8031e38e/tests/test_go_context_delivery.py"
+                ]
+              },
+              {
+                "criterion": "Required positive and same-name/wrong-origin, shadowed, ambiguous, external and unsupported negative cases pass. Unproven targets remain explicit diagnostics; no guessed exact relationship, repository/toolchain execution or network lookup is introduced.",
+                "summary": "All four frozen Go cases pass, plus explicit declared-name, wrong-directory, shadow, duplicate, external, conditional and replay-corruption controls. Unproven targets remain diagnostics; no Go toolchain, repository code or network resolution is used.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/daac9dab9cb883ef2164bd4d3b48dead8031e38e/docs/reviews/2026-09-12-go-context.md",
+                  "https://github.com/Phluxxed/loci/blob/daac9dab9cb883ef2164bd4d3b48dead8031e38e/tests/test_go_type_resolution.py"
+                ]
+              },
+              {
+                "criterion": "Source, target and applicable resolver-control changes invalidate stale relationships and delivered proof. Existing search/get, imports, references and calls retain their documented behavior.",
+                "summary": "Source, target, package-candidate, go.mod/go.work and contained replacement edits invalidate prior relationships. Extractor 28 rejects stale caches. Existing type/import/reference/exploration, storage and stdio checks pass; package metadata cannot redirect an anchor to a same-name directory.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/daac9dab9cb883ef2164bd4d3b48dead8031e38e/docs/reviews/2026-09-12-go-context.md",
+                  "https://github.com/Phluxxed/loci/blob/daac9dab9cb883ef2164bd4d3b48dead8031e38e/tests/test_go_type_resolution.py"
+                ]
+              },
+              {
+                "criterion": "The frozen Go tasks retain all required definitions within budgets, including package-qualified and same-name package negatives, applicable go.mod/go.work refresh, and supported incoming-impact controls.",
+                "summary": "All required frozen definitions and origin proof fit the unchanged 8192/16384-byte limits. Reduced/zero budgets, actual stdio wire accounting and incoming Serve/Work impact controls pass. Corpus remains 19 cases/16 snapshots.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/daac9dab9cb883ef2164bd4d3b48dead8031e38e/docs/reviews/2026-09-12-go-context.md",
+                  "https://github.com/Phluxxed/loci/blob/daac9dab9cb883ef2164bd4d3b48dead8031e38e/tests/test_go_context_mcp.py"
+                ]
+              }
+            ]
+          },
           "discontinued": null,
           "tasks": []
         },
