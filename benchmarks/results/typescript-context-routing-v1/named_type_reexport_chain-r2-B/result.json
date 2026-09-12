@@ -1,0 +1,496 @@
+{
+  "schema_version": 3,
+  "protocol": "typescript-context-routing-v1",
+  "identity": {
+    "task_id": "named_type_reexport_chain",
+    "session_id": "named_type_reexport_chain-r2-B-834c66fe-bd07-419c-8b85-3b154f01f0d1",
+    "arm": "B",
+    "repetition": 2,
+    "snapshot": "named_type_reexport_chain",
+    "corpus_sha256": "5d8f490a820f4e326aa522c2d963c8f0a56ea0c2d472f4d2b66caaeda9834b01",
+    "controls_sha256": "994af261fcee63cfe001e98bbf78c858b5ca462c14ef7788aa8290443b2bf56b",
+    "controls_version": "typescript-context-controls-v3"
+  },
+  "events": [
+    {
+      "id": "named_type_reexport_chain-r2-B-834c66fe-bd07-419c-8b85-3b154f01f0d1:1",
+      "task_id": "named_type_reexport_chain",
+      "session_id": "named_type_reexport_chain-r2-B-834c66fe-bd07-419c-8b85-3b154f01f0d1",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "named_type_reexport_chain",
+      "corpus_sha256": "5d8f490a820f4e326aa522c2d963c8f0a56ea0c2d472f4d2b66caaeda9834b01",
+      "controls_sha256": "994af261fcee63cfe001e98bbf78c858b5ca462c14ef7788aa8290443b2bf56b",
+      "controls_version": "typescript-context-controls-v3",
+      "operation": "explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder required fields input output return type returned field named re-export original name route consumer spelling",
+        "max_output_bytes": 16384,
+        "max_evidence_bytes": 8192
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder, consumer\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"kind\":\"interface\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"16cac1334e9c04988782f752daad728bdd5b83cdf1619b38ae35213fb3e20b55\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5,6]}],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":76,\"end_byte\":159,\"start_line\":2,\"end_line\":4,\"content_hash\":\"16cac1334e9c04988782f752daad728bdd5b83cdf1619b38ae35213fb3e20b55\",\"content\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\"},{\"id\":2,\"file\":\"types.ts\",\"start_byte\":7,\"end_byte\":67,\"start_line\":1,\"end_line\":4,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\"},{\"id\":3,\"file\":\"consumer.ts\",\"start_byte\":69,\"end_byte\":132,\"start_line\":2,\"end_line\":2,\"content_hash\":\"16cac1334e9c04988782f752daad728bdd5b83cdf1619b38ae35213fb3e20b55\",\"content\":\"export function processOrder(value: ImportedPayload): string {\\n\"},{\"id\":4,\"file\":\"consumer.ts\",\"start_byte\":0,\"end_byte\":69,\"start_line\":1,\"end_line\":1,\"content_hash\":\"16cac1334e9c04988782f752daad728bdd5b83cdf1619b38ae35213fb3e20b55\",\"content\":\"import type { PublicPayload as ImportedPayload } from \\\"./barrel.js\\\";\\n\"},{\"id\":5,\"file\":\"barrel.ts\",\"start_byte\":0,\"end_byte\":60,\"start_line\":1,\"end_line\":1,\"content_hash\":\"841be26434600c9360eacf2d07a564d2670915c60b6ff071700be764167f07d7\",\"content\":\"export type { Payload as PublicPayload } from \\\"./types.js\\\";\\n\"},{\"id\":6,\"file\":\"types.ts\",\"start_byte\":0,\"end_byte\":27,\"start_line\":1,\"end_line\":1,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"export interface Payload {\\n\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":1}],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":286,\"output_bytes\":2875,\"estimated_tokens\":719,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"named_type_reexport_chain-r2-B-834c66fe-bd07-419c-8b85-3b154f01f0d1/attempt/1\",\"calls_remaining\":23}}",
+      "serialized_bytes": 2954,
+      "source_bytes": 362,
+      "elapsed_ms": 8.76520799647551,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 76,
+          "end_byte": 159,
+          "sha256": "10ff5e5d2a4918055984c04b730e5c8efc809afc556c79c0adf351c6d1b7d303",
+          "text": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 7,
+          "end_byte": 67,
+          "sha256": "1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d",
+          "text": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 69,
+          "end_byte": 132,
+          "sha256": "83c54e3329ae99d22dcf0d136cbc8798aca56ddbf71e72dd9da4ec3d8f133deb",
+          "text": "export function processOrder(value: ImportedPayload): string {\n"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 69,
+          "sha256": "8caed42a7fa1dc626850d65c5204722aab6ce846d6fb95dff3fa734a61081cfe",
+          "text": "import type { PublicPayload as ImportedPayload } from \"./barrel.js\";\n"
+        },
+        {
+          "file": "barrel.ts",
+          "start_byte": 0,
+          "end_byte": 60,
+          "sha256": "841be26434600c9360eacf2d07a564d2670915c60b6ff071700be764167f07d7",
+          "text": "export type { Payload as PublicPayload } from \"./types.js\";\n"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 0,
+          "end_byte": 27,
+          "sha256": "5ee6c66264e6f365acd3e9aa50e70879cd39daf5c763a64f43b3db4b09df5b24",
+          "text": "export interface Payload {\n"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "named_type_reexport_chain",
+    "session_id": "named_type_reexport_chain-r2-B-834c66fe-bd07-419c-8b85-3b154f01f0d1",
+    "arm": "B",
+    "repetition": 2,
+    "snapshot": "named_type_reexport_chain",
+    "corpus_sha256": "5d8f490a820f4e326aa522c2d963c8f0a56ea0c2d472f4d2b66caaeda9834b01",
+    "controls_sha256": "994af261fcee63cfe001e98bbf78c858b5ca462c14ef7788aa8290443b2bf56b",
+    "controls_version": "typescript-context-controls-v3",
+    "schema_version": 3,
+    "measurement_method": "observed_tool_calls",
+    "intent_collection": "not_collected",
+    "outcome": "completed",
+    "answer": {
+      "required_fields": {
+        "requestId": "string",
+        "amount": "number"
+      },
+      "return_type": "string",
+      "returned_field": "requestId",
+      "origin_file": "types.ts",
+      "name_route": [
+        "ImportedPayload",
+        "PublicPayload",
+        "Payload"
+      ]
+    },
+    "answer_correct": true,
+    "task_correct": true,
+    "read_count": 2,
+    "validated_read_count": 1,
+    "required_context_delivered": [
+      "entry",
+      "import",
+      "payload",
+      "reexport"
+    ],
+    "required_context_total": 4,
+    "context_recall": 1.0,
+    "serialized_tool_output_bytes": 3404,
+    "source_bytes": 362,
+    "estimated_source_tokens": 91,
+    "tool_elapsed_ms": 8.76520799647551,
+    "provider_usage": {
+      "input_tokens": 17583,
+      "cached_input_tokens": 13568,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 452,
+      "reasoning_output_tokens": 282
+    },
+    "usage_semantics": "Codex turn.completed gross input; cached input is a subset; output includes reasoning tokens.",
+    "token_status": "measured",
+    "measurement_complete": true
+  },
+  "baseline": {
+    "end_to_end_seconds": 18.430964125000173,
+    "actual_process_seconds": 18.430964125000173,
+    "exit_code": 0,
+    "provider_thread_id": "01a093e1-a21c-78a1-82fc-29021ed97c79",
+    "failures": [],
+    "tool_delivery_verified": true,
+    "output_accounting": {
+      "schema_version": 3,
+      "complete": true,
+      "tool_call_count": 2,
+      "recorded_payload_bytes": 3404,
+      "complete_payload_bytes": 3404,
+      "source_bytes": 362,
+      "calls": [
+        {
+          "item_id": "item_1",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "type_dependencies",
+            "query": "processOrder required fields input output return type returned field named re-export original name route consumer spelling",
+            "max_hops": null,
+            "max_output_bytes": null,
+            "max_evidence_bytes": null,
+            "seed_ids": null,
+            "resolutions": null
+          },
+          "status": "failed",
+          "attempt_id": null,
+          "trace_event_id": null,
+          "source_bytes": 0,
+          "serialized_bytes": 450,
+          "payload_texts": [
+            "Error executing tool loci_explore: 2 validation errors for loci_exploreArguments\nmax_output_bytes\n  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]\n    For further information visit https://errors.pydantic.dev/2.13/v/int_type\nmax_evidence_bytes\n  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]\n    For further information visit https://errors.pydantic.dev/2.13/v/int_type"
+          ],
+          "payload_format": "text_blocks"
+        },
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "type_dependencies",
+            "query": "processOrder required fields input output return type returned field named re-export original name route consumer spelling"
+          },
+          "status": "completed",
+          "attempt_id": "named_type_reexport_chain-r2-B-834c66fe-bd07-419c-8b85-3b154f01f0d1/attempt/1",
+          "trace_event_id": "named_type_reexport_chain-r2-B-834c66fe-bd07-419c-8b85-3b154f01f0d1:1",
+          "source_bytes": 362,
+          "serialized_bytes": 2954,
+          "payload_texts": [
+            "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder, consumer\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"kind\":\"interface\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"16cac1334e9c04988782f752daad728bdd5b83cdf1619b38ae35213fb3e20b55\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5,6]}],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":76,\"end_byte\":159,\"start_line\":2,\"end_line\":4,\"content_hash\":\"16cac1334e9c04988782f752daad728bdd5b83cdf1619b38ae35213fb3e20b55\",\"content\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\"},{\"id\":2,\"file\":\"types.ts\",\"start_byte\":7,\"end_byte\":67,\"start_line\":1,\"end_line\":4,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\"},{\"id\":3,\"file\":\"consumer.ts\",\"start_byte\":69,\"end_byte\":132,\"start_line\":2,\"end_line\":2,\"content_hash\":\"16cac1334e9c04988782f752daad728bdd5b83cdf1619b38ae35213fb3e20b55\",\"content\":\"export function processOrder(value: ImportedPayload): string {\\n\"},{\"id\":4,\"file\":\"consumer.ts\",\"start_byte\":0,\"end_byte\":69,\"start_line\":1,\"end_line\":1,\"content_hash\":\"16cac1334e9c04988782f752daad728bdd5b83cdf1619b38ae35213fb3e20b55\",\"content\":\"import type { PublicPayload as ImportedPayload } from \\\"./barrel.js\\\";\\n\"},{\"id\":5,\"file\":\"barrel.ts\",\"start_byte\":0,\"end_byte\":60,\"start_line\":1,\"end_line\":1,\"content_hash\":\"841be26434600c9360eacf2d07a564d2670915c60b6ff071700be764167f07d7\",\"content\":\"export type { Payload as PublicPayload } from \\\"./types.js\\\";\\n\"},{\"id\":6,\"file\":\"types.ts\",\"start_byte\":0,\"end_byte\":27,\"start_line\":1,\"end_line\":1,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"export interface Payload {\\n\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":1}],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":286,\"output_bytes\":2875,\"estimated_tokens\":719,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"named_type_reexport_chain-r2-B-834c66fe-bd07-419c-8b85-3b154f01f0d1/attempt/1\",\"calls_remaining\":23}}"
+          ],
+          "payload_format": "compact_json"
+        }
+      ],
+      "failures": []
+    },
+    "adapter_elapsed_ms": 8.898166997823864,
+    "recoverable_error_events": 1,
+    "relationships": {
+      "schema_version": 2,
+      "case_id": "named_type_reexport_chain",
+      "required_semantic_dependencies_total": 1,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "payload",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "generic_type_dependency",
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "consumer.ts::processOrder#function",
+              "to": "types.ts::Payload#interface",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "16cac1334e9c04988782f752daad728bdd5b83cdf1619b38ae35213fb3e20b55"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "consumer.ts::processOrder#function",
+              "to": "types.ts::Payload#interface",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "16cac1334e9c04988782f752daad728bdd5b83cdf1619b38ae35213fb3e20b55"
+              }
+            }
+          ]
+        }
+      ],
+      "available_dependency_links_total": 1,
+      "available_dependency_links": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "payload",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "generic_type_dependency",
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "consumer.ts::processOrder#function",
+              "to": "types.ts::Payload#interface",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "16cac1334e9c04988782f752daad728bdd5b83cdf1619b38ae35213fb3e20b55"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "consumer.ts::processOrder#function",
+              "to": "types.ts::Payload#interface",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "16cac1334e9c04988782f752daad728bdd5b83cdf1619b38ae35213fb3e20b55"
+              }
+            }
+          ]
+        }
+      ],
+      "delivered_dependency_links_total": 1,
+      "delivered_dependency_links": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "payload",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "generic_type_dependency",
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "consumer.ts::processOrder#function",
+              "to": "types.ts::Payload#interface",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "16cac1334e9c04988782f752daad728bdd5b83cdf1619b38ae35213fb3e20b55"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "consumer.ts::processOrder#function",
+              "to": "types.ts::Payload#interface",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "16cac1334e9c04988782f752daad728bdd5b83cdf1619b38ae35213fb3e20b55"
+              }
+            }
+          ]
+        }
+      ],
+      "dependency_link_recall": {
+        "label": "Exact endpoint dependency links; generic uses_type/references_type do not prove precise subtypes.",
+        "required": 1,
+        "available": 1,
+        "delivered": 1,
+        "available_ratio": 1.0,
+        "delivered_ratio": 1.0
+      },
+      "precise_kind_links_available_total": 0,
+      "precise_kind_links_delivered_total": 0,
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "delivery_integrity_violations": [],
+      "forbidden_scope": "Authored frozen negatives plus delivered edge/index consistency and complete exploration source proof; not exhaustive semantic truth."
+    },
+    "arm": "B",
+    "attempt_id": "named_type_reexport_chain-r2-B"
+  },
+  "routing": {
+    "schema_version": 1,
+    "observations_complete": false,
+    "first_repository_call": {
+      "item_id": "item_1",
+      "tool": "loci_explore",
+      "intent": "type_dependencies",
+      "status": "failed"
+    },
+    "initial_route_expected": "type_dependencies",
+    "initial_type_route": null,
+    "requested_anchor_received": null,
+    "maintained_exposure": null,
+    "explore_calls": [
+      {
+        "item_id": "item_1",
+        "intent": "type_dependencies",
+        "status": "failed",
+        "successful_delivery": false,
+        "anchor_ids": [],
+        "omissions": [],
+        "requested_anchor_received": false,
+        "anchor_complete": false
+      },
+      {
+        "item_id": "item_2",
+        "intent": "type_dependencies",
+        "status": "partial",
+        "successful_delivery": true,
+        "anchor_ids": [
+          "consumer.ts::processOrder#function"
+        ],
+        "omissions": [
+          {
+            "reason": "anchor_limit",
+            "count": 1
+          }
+        ],
+        "requested_anchor_received": true,
+        "anchor_complete": true
+      }
+    ],
+    "fallback_calls": [],
+    "helper_call_count": 0,
+    "failures": [
+      {
+        "category": "invalid_tool_status",
+        "item": "item_1"
+      }
+    ]
+  },
+  "attempt_id": "named_type_reexport_chain-r2-B",
+  "arm": "B",
+  "provenance": {
+    "attempt_id": "named_type_reexport_chain-r2-B",
+    "case_id": "named_type_reexport_chain",
+    "snapshot": "named_type_reexport_chain",
+    "repetition": 2,
+    "arm": "B",
+    "adapter_module": "benchmarks.typescript_context_routing_tools",
+    "model": "gpt-5.6-luna",
+    "reasoning_effort": "high",
+    "corpus_sha256": "5d8f490a820f4e326aa522c2d963c8f0a56ea0c2d472f4d2b66caaeda9834b01",
+    "controls_sha256": "994af261fcee63cfe001e98bbf78c858b5ca462c14ef7788aa8290443b2bf56b",
+    "catalog_sha256": "f1c45cceac1c3ee90fa1af1007c341713e220571390c3b1eb086c443d7781062",
+    "runner_sha256": "5756278252a74c9e86c68a898b284108288b74a864b9424f6445223b3a7ca6db",
+    "source": {
+      "engine": {
+        "commit": "36f5e2b1662c2d6bbe2449c3189430469e8c013f",
+        "source_tree": "75d01dfb4b76181400d42ae9e8ebbb552265639e",
+        "extractor_version": 25
+      },
+      "freeze_commit": "182accfca24e3401a2546e656f8758e6e4ae86ae",
+      "freeze_json_sha256": "20f8b2530dd91e7f9d06d7ba8498e0d6bfe44de304dc17feef801ca3ac5e91b7",
+      "source_scope": "same pinned engine and exploration-capable tools; candidate adds only explicit routing policy"
+    },
+    "config": {
+      "project_doc_max_bytes": 0,
+      "web_search": "disabled",
+      "skills.include_instructions": false,
+      "developer_instructions": "",
+      "model_reasoning_effort": "high",
+      "model_catalog_json": "/Users/brummerv/phluxxed/loci-exploration/benchmarks/results/typescript-context-routing-v1/model-catalog.json",
+      "include_collaboration_mode_instructions": false,
+      "tools.update_plan.enabled": false,
+      "tools.experimental_request_user_input.enabled": false,
+      "features.skip_host_skill_discovery": true,
+      "mcp_servers.evaluation.command": "/Users/brummerv/phluxxed/loci-exploration/.venv/bin/python",
+      "mcp_servers.evaluation.args": [
+        "-m",
+        "benchmarks.typescript_context_routing_tools",
+        "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-4nlvph81/run.json"
+      ],
+      "mcp_servers.evaluation.cwd": "/Users/brummerv/phluxxed/loci-exploration",
+      "mcp_servers.evaluation.env": {
+        "LOCI_BASE_DIR": "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-4nlvph81/store",
+        "LOCI_STORE_NAMESPACE": "typescript-context-preflight"
+      },
+      "mcp_servers.evaluation.required": true,
+      "mcp_servers.evaluation.default_tools_approval_mode": "auto",
+      "mcp_servers.evaluation.tool_timeout_sec": 12,
+      "tool_output_token_limit": 32768,
+      "features.shell_tool": false,
+      "features.multi_agent": false,
+      "features.apps": false,
+      "features.plugins": false,
+      "features.hooks": false,
+      "features.memories": false,
+      "features.skill_search": false,
+      "features.skill_mcp_dependency_install": false,
+      "features.view_image": false,
+      "features.image_generation": false,
+      "features.browser_use": false,
+      "features.computer_use": false,
+      "features.in_app_browser": false,
+      "features.code_mode": false,
+      "features.code_mode_host": false,
+      "features.sleep_tool": false,
+      "features.goals": false,
+      "features.context_management": false
+    },
+    "config_sha256": "c16e9cc7b92c8331fda2fa36de4343c532775b1242fbc0961f48bfae39526f0f",
+    "prompt_sha256": "3400830589e679d82b15e4bcec7a33ac04f32764c6b0e12ec2b20efdf84eb4aa",
+    "index_seconds": 0.016303916010656394,
+    "snapshot_files": {
+      "types.ts": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+      "barrel.ts": "841be26434600c9360eacf2d07a564d2670915c60b6ff071700be764167f07d7",
+      "consumer.ts": "16cac1334e9c04988782f752daad728bdd5b83cdf1619b38ae35213fb3e20b55"
+    },
+    "extractor_version": 25,
+    "canonical_tool_schemas_sha256": "f70174b36e4bb4ec3051e0df1ab2cb1449ad93c4f2dd5511823e1c7348999858",
+    "routing": {
+      "version": "typescript-context-routing-v1",
+      "condition": "B",
+      "policy_sha256": "cb940c97c00d1f5a2e3a5b2e266cf6ecfef47aea0e0283ad98f9644d157ffaed",
+      "base_prompt_sha256": "951c9ca3e19e290b9ebb5b1113a71ec1203834c8cd37d142098580671c902386",
+      "effective_prompt_sha256": "3400830589e679d82b15e4bcec7a33ac04f32764c6b0e12ec2b20efdf84eb4aa",
+      "candidate_prefix_utf8_bytes": 1155,
+      "capability_arm": "B"
+    }
+  }
+}

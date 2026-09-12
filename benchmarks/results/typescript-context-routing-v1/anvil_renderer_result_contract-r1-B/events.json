@@ -1,0 +1,710 @@
+[
+  {
+    "type": "thread.started",
+    "thread_id": "01a093ff-660c-7342-bfa7-75daf7ac6247"
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_0",
+      "type": "error",
+      "message": "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-8gz7q25y/agent-runtime/config.toml."
+    }
+  },
+  {
+    "type": "turn.started"
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_1",
+      "type": "agent_message",
+      "text": "I’m tracing the declaration’s typed contract and its related project-resolution types first, then I’ll verify the version-specific `matchedProject` behavior from exact source."
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "renderCompilerPromptEvidenceContext result fields projectResolution status matchedProject projectId page matchedBy v1 v3",
+        "seed_ids": null
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "renderCompilerPromptEvidenceContext result fields projectResolution status matchedProject projectId page matchedBy v1 v3",
+        "seed_ids": null
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "intent": "type_dependencies",
+          "status": "partial",
+          "selection": "inferred",
+          "scope": {
+            "source": "indexed_supported_source",
+            "coverage": "partial",
+            "relationships": "authored_types",
+            "exhaustive": false
+          },
+          "items": [
+            {
+              "id": "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function",
+              "name": "renderCompilerPromptEvidenceContext",
+              "kind": "function",
+              "file": "src/brain-context/render.ts",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Query matches rendercompilerpromptevidencecontext",
+              "source_id": 1,
+              "complete": true,
+              "path": []
+            },
+            {
+              "id": "test/codex-hook.test.ts::configureProjectAwareBrain.page#function",
+              "name": "page",
+              "kind": "function",
+              "file": "test/codex-hook.test.ts",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Query matches page",
+              "source_id": 2,
+              "complete": true,
+              "path": []
+            },
+            {
+              "id": "scripts/evaluate-brain-context.ts::PAGE_FAILURES#constant",
+              "name": "PAGE_FAILURES",
+              "kind": "constant",
+              "file": "scripts/evaluate-brain-context.ts",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Query matches page",
+              "source_id": 3,
+              "complete": true,
+              "path": []
+            },
+            {
+              "id": "src/brain-context/render.ts::PromptBrainContextRender#type",
+              "name": "PromptBrainContextRender",
+              "kind": "type",
+              "file": "src/brain-context/render.ts",
+              "role": "dependency",
+              "depth": 1,
+              "why": "Direct declared type",
+              "source_id": 4,
+              "complete": true,
+              "path": [
+                1
+              ]
+            },
+            {
+              "id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "name": "BrainRetrievalResult",
+              "kind": "type",
+              "file": "src/brain-context/retrieve.ts",
+              "role": "dependency",
+              "depth": 1,
+              "why": "Direct declared type",
+              "source_id": 7,
+              "complete": true,
+              "path": [
+                2
+              ]
+            },
+            {
+              "id": "src/brain-context/render.ts::BrainContextRender#type",
+              "name": "BrainContextRender",
+              "kind": "type",
+              "file": "src/brain-context/render.ts",
+              "role": "dependency",
+              "depth": 2,
+              "why": "Authored type or heritage continuation",
+              "source_id": 10,
+              "complete": true,
+              "path": [
+                1,
+                3
+              ]
+            },
+            {
+              "id": "src/brain-context/retrieve.ts::BrainProjectResolution#type",
+              "name": "BrainProjectResolution",
+              "kind": "type",
+              "file": "src/brain-context/retrieve.ts",
+              "role": "dependency",
+              "depth": 2,
+              "why": "Query matches project, resolution",
+              "source_id": 12,
+              "complete": true,
+              "path": [
+                2,
+                4
+              ]
+            }
+          ],
+          "relationships": [
+            {
+              "id": 1,
+              "edge": {
+                "from": "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function",
+                "to": "src/brain-context/render.ts::PromptBrainContextRender#type",
+                "type": "uses_type",
+                "directed": true,
+                "namespace": "loci",
+                "resolution": "exact",
+                "evidence": {
+                  "file": "src/brain-context/render.ts",
+                  "line": 96,
+                  "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd"
+                }
+              },
+              "traversed": "forward",
+              "source_ids": [
+                5,
+                6
+              ]
+            },
+            {
+              "id": 2,
+              "edge": {
+                "from": "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function",
+                "to": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+                "type": "uses_type",
+                "directed": true,
+                "namespace": "loci",
+                "resolution": "import-resolved",
+                "evidence": {
+                  "file": "src/brain-context/render.ts",
+                  "line": 96,
+                  "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd"
+                }
+              },
+              "traversed": "forward",
+              "source_ids": [
+                5,
+                8,
+                9
+              ]
+            },
+            {
+              "id": 3,
+              "edge": {
+                "from": "src/brain-context/render.ts::PromptBrainContextRender#type",
+                "to": "src/brain-context/render.ts::BrainContextRender#type",
+                "type": "uses_type",
+                "directed": true,
+                "namespace": "loci",
+                "resolution": "exact",
+                "evidence": {
+                  "file": "src/brain-context/render.ts",
+                  "line": 125,
+                  "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd"
+                }
+              },
+              "traversed": "forward",
+              "source_ids": [
+                6,
+                11
+              ]
+            },
+            {
+              "id": 4,
+              "edge": {
+                "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+                "to": "src/brain-context/retrieve.ts::BrainProjectResolution#type",
+                "type": "uses_type",
+                "directed": true,
+                "namespace": "loci",
+                "resolution": "exact",
+                "evidence": {
+                  "file": "src/brain-context/retrieve.ts",
+                  "line": 131,
+                  "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+                }
+              },
+              "traversed": "forward",
+              "source_ids": [
+                7,
+                9,
+                13
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "id": 1,
+              "file": "src/brain-context/render.ts",
+              "start_byte": 4860,
+              "end_byte": 5435,
+              "start_line": 96,
+              "end_line": 106,
+              "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+              "content": "function renderCompilerPromptEvidenceContext(retrieval: BrainRetrievalResult): PromptBrainContextRender {\n  const resolution = retrieval.contractVersion === \"3\" ? retrieval.query.projectResolution : undefined;\n  return renderPromptEvidenceContext({\n    matchedProject: resolution?.status === \"matched\" ? resolution.page : undefined,\n    includeRoute: true,\n    diagnostics: retrieval.contractVersion === \"3\" ? compilerContextDiagnostics(retrieval) : [],\n    temporal: retrieval.query.temporal,\n    evidence: retrieval.evidence,\n    hardBytes: Number.MAX_SAFE_INTEGER,\n  });\n}"
+            },
+            {
+              "id": 2,
+              "file": "test/codex-hook.test.ts",
+              "start_byte": 5446,
+              "end_byte": 5867,
+              "start_line": 143,
+              "end_line": 160,
+              "content_hash": "56d5b1056043ada8f62b0ecb75a687276f8e34d73b55a5b177556cecdab4b07c",
+              "content": "page = (title: string, type: string, extra: string, body: string) => [\n    \"---\",\n    `title: ${title}`,\n    \"category: Test\",\n    \"status: Active\",\n    \"owner: Codex\",\n    `type: ${type}`,\n    `description: ${title} fixture.`,\n    \"timestamp: 2026-08-28T00:00:00Z\",\n    \"tags: []\",\n    \"created: 2026-08-28\",\n    \"last_reviewed: 2026-08-28\",\n    extra,\n    \"---\",\n    \"\",\n    body,\n    \"\",\n  ].filter(Boolean).join(\"\\n\")"
+            },
+            {
+              "id": 3,
+              "file": "scripts/evaluate-brain-context.ts",
+              "start_byte": 578,
+              "end_byte": 709,
+              "start_line": 14,
+              "end_line": 16,
+              "content_hash": "3c8ebc08b040421bcae1ab45582592b1562c9321f58bde1561a3a0b8b8ca6375",
+              "content": "PAGE_FAILURES = new Map([\n  [\"patterns/rust.md\", [\"WP0-LANGUAGE-RELEVANCE\", \"Irrelevant Rust selection remains reproducible.\"]],\n])"
+            },
+            {
+              "id": 4,
+              "file": "src/brain-context/render.ts",
+              "start_byte": 5875,
+              "end_byte": 6040,
+              "start_line": 125,
+              "end_line": 130,
+              "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+              "content": "type PromptBrainContextRender = BrainContextRender & {\n  attemptedBytes: number;\n  guidanceBytes: number;\n  retrievedContextBytes: number;\n  framingBytes: number;\n};"
+            },
+            {
+              "id": 5,
+              "file": "src/brain-context/render.ts",
+              "start_byte": 4853,
+              "end_byte": 4966,
+              "start_line": 96,
+              "end_line": 96,
+              "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+              "content": "export function renderCompilerPromptEvidenceContext(retrieval: BrainRetrievalResult): PromptBrainContextRender {\n"
+            },
+            {
+              "id": 6,
+              "file": "src/brain-context/render.ts",
+              "start_byte": 5868,
+              "end_byte": 5930,
+              "start_line": 125,
+              "end_line": 125,
+              "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+              "content": "export type PromptBrainContextRender = BrainContextRender & {\n"
+            },
+            {
+              "id": 7,
+              "file": "src/brain-context/retrieve.ts",
+              "start_byte": 3020,
+              "end_byte": 3735,
+              "start_line": 119,
+              "end_line": 145,
+              "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+              "content": "type BrainRetrievalResult = {\n  contractVersion: \"1\" | \"3\";\n  wiki: {\n    alias: string;\n    schemaVersion: string;\n    runtimeContract: string;\n  };\n  query: {\n    question: string;\n    shapes: string[];\n    stateView: string;\n    resolvedSeeds: string[];\n    projectResolution?: BrainProjectResolution;\n    temporal?: TemporalQuery;\n  };\n  evidence: BrainCompiledEvidence[];\n  omissions: BrainCompilerOmission[];\n  coverage: BrainCompilerCoverage;\n  budget: BrainCompilerBudget;\n  stop: BrainCompilerStop;\n  continuation: Record<string, unknown> | null;\n  diagnostics: BrainCompilerDiagnostic[];\n  reporting: BrainCompilerReporting;\n  selectedPages: string[];\n  evidenceCount: number;\n  candidateCount: number;\n};"
+            },
+            {
+              "id": 8,
+              "file": "src/brain-context/render.ts",
+              "start_byte": 58,
+              "end_byte": 140,
+              "start_line": 2,
+              "end_line": 2,
+              "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+              "content": "import type { BrainCompiledEvidence, BrainRetrievalResult } from \"./retrieve.ts\";\n"
+            },
+            {
+              "id": 9,
+              "file": "src/brain-context/retrieve.ts",
+              "start_byte": 3013,
+              "end_byte": 3050,
+              "start_line": 119,
+              "end_line": 119,
+              "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+              "content": "export type BrainRetrievalResult = {\n"
+            },
+            {
+              "id": 10,
+              "file": "src/brain-context/render.ts",
+              "start_byte": 5769,
+              "end_byte": 5866,
+              "start_line": 119,
+              "end_line": 123,
+              "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+              "content": "type BrainContextRender = {\n  markdown: string;\n  renderedBytes: number;\n  truncated: boolean;\n};"
+            },
+            {
+              "id": 11,
+              "file": "src/brain-context/render.ts",
+              "start_byte": 5762,
+              "end_byte": 5797,
+              "start_line": 119,
+              "end_line": 119,
+              "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+              "content": "export type BrainContextRender = {\n"
+            },
+            {
+              "id": 12,
+              "file": "src/brain-context/retrieve.ts",
+              "start_byte": 1125,
+              "end_byte": 1500,
+              "start_line": 35,
+              "end_line": 49,
+              "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+              "content": "type BrainProjectResolution =\n  | { status: \"not_requested\" }\n  | { status: \"unknown\" }\n  | {\n      status: \"matched\";\n      projectId: string;\n      page: string;\n      matchedBy: \"remote\" | \"alias\";\n    }\n  | {\n      status: \"ambiguous\";\n      matchedBy: \"remote\" | \"alias\";\n      candidates: Array<{ projectId: string; page: string }>;\n      candidateCount: number;\n    };"
+            },
+            {
+              "id": 13,
+              "file": "src/brain-context/retrieve.ts",
+              "start_byte": 1118,
+              "end_byte": 1155,
+              "start_line": 35,
+              "end_line": 35,
+              "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+              "content": "export type BrainProjectResolution =\n"
+            }
+          ],
+          "omissions": [
+            {
+              "reason": "anchor_limit",
+              "count": 6
+            },
+            {
+              "reason": "not_selected",
+              "count": 8
+            },
+            {
+              "reason": "unresolved_relation",
+              "count": 2
+            }
+          ],
+          "limits": {
+            "max_hops": 3,
+            "max_nodes": 64,
+            "max_items": 12,
+            "max_neighbors": 32,
+            "max_output_bytes": 16384,
+            "max_evidence_bytes": 8192
+          },
+          "usage": {
+            "nodes_examined": 7,
+            "evidence_bytes": 2596,
+            "output_bytes": 9905,
+            "estimated_tokens": 2477,
+            "token_estimate_method": "utf8_bytes_div_4",
+            "output_encoding": "mcp_result_json_utf8"
+          },
+          "_evaluation": {
+            "attempt_id": "anvil_renderer_result_contract-r1-B-ecec1d3a-2563-4430-bf72-2c380d411489/attempt/1",
+            "calls_remaining": 23
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_3",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function",
+          "src/brain-context/render.ts::BrainContextRender#type",
+          "src/brain-context/render.ts::PromptBrainContextRender#type",
+          "src/brain-context/retrieve.ts::BrainProjectResolution#type",
+          "src/brain-context/retrieve.ts::BrainRetrievalResult#type"
+        ]
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_3",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function",
+          "src/brain-context/render.ts::BrainContextRender#type",
+          "src/brain-context/render.ts::PromptBrainContextRender#type",
+          "src/brain-context/retrieve.ts::BrainProjectResolution#type",
+          "src/brain-context/retrieve.ts::BrainRetrievalResult#type"
+        ]
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function",
+              "source": "function renderCompilerPromptEvidenceContext(retrieval: BrainRetrievalResult): PromptBrainContextRender {\n  const resolution = retrieval.contractVersion === \"3\" ? retrieval.query.projectResolution : undefined;\n  return renderPromptEvidenceContext({\n    matchedProject: resolution?.status === \"matched\" ? resolution.page : undefined,\n    includeRoute: true,\n    diagnostics: retrieval.contractVersion === \"3\" ? compilerContextDiagnostics(retrieval) : [],\n    temporal: retrieval.query.temporal,\n    evidence: retrieval.evidence,\n    hardBytes: Number.MAX_SAFE_INTEGER,\n  });\n}",
+              "byte_offset": 4860,
+              "byte_length": 575,
+              "line": 96,
+              "end_line": 106,
+              "signature": "function renderCompilerPromptEvidenceContext(retrieval: BrainRetrievalResult): PromptBrainContextRender {",
+              "kind": "function",
+              "language": "typescript"
+            },
+            {
+              "id": "src/brain-context/render.ts::BrainContextRender#type",
+              "source": "type BrainContextRender = {\n  markdown: string;\n  renderedBytes: number;\n  truncated: boolean;\n};",
+              "byte_offset": 5769,
+              "byte_length": 97,
+              "line": 119,
+              "end_line": 123,
+              "signature": "type BrainContextRender = {",
+              "kind": "type",
+              "language": "typescript"
+            },
+            {
+              "id": "src/brain-context/render.ts::PromptBrainContextRender#type",
+              "source": "type PromptBrainContextRender = BrainContextRender & {\n  attemptedBytes: number;\n  guidanceBytes: number;\n  retrievedContextBytes: number;\n  framingBytes: number;\n};",
+              "byte_offset": 5875,
+              "byte_length": 165,
+              "line": 125,
+              "end_line": 130,
+              "signature": "type PromptBrainContextRender = BrainContextRender & {",
+              "kind": "type",
+              "language": "typescript"
+            },
+            {
+              "id": "src/brain-context/retrieve.ts::BrainProjectResolution#type",
+              "source": "type BrainProjectResolution =\n  | { status: \"not_requested\" }\n  | { status: \"unknown\" }\n  | {\n      status: \"matched\";\n      projectId: string;\n      page: string;\n      matchedBy: \"remote\" | \"alias\";\n    }\n  | {\n      status: \"ambiguous\";\n      matchedBy: \"remote\" | \"alias\";\n      candidates: Array<{ projectId: string; page: string }>;\n      candidateCount: number;\n    };",
+              "byte_offset": 1125,
+              "byte_length": 375,
+              "line": 35,
+              "end_line": 49,
+              "signature": "type BrainProjectResolution =",
+              "kind": "type",
+              "language": "typescript"
+            },
+            {
+              "id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "source": "type BrainRetrievalResult = {\n  contractVersion: \"1\" | \"3\";\n  wiki: {\n    alias: string;\n    schemaVersion: string;\n    runtimeContract: string;\n  };\n  query: {\n    question: string;\n    shapes: string[];\n    stateView: string;\n    resolvedSeeds: string[];\n    projectResolution?: BrainProjectResolution;\n    temporal?: TemporalQuery;\n  };\n  evidence: BrainCompiledEvidence[];\n  omissions: BrainCompilerOmission[];\n  coverage: BrainCompilerCoverage;\n  budget: BrainCompilerBudget;\n  stop: BrainCompilerStop;\n  continuation: Record<string, unknown> | null;\n  diagnostics: BrainCompilerDiagnostic[];\n  reporting: BrainCompilerReporting;\n  selectedPages: string[];\n  evidenceCount: number;\n  candidateCount: number;\n};",
+              "byte_offset": 3020,
+              "byte_length": 715,
+              "line": 119,
+              "end_line": 145,
+              "signature": "type BrainRetrievalResult = {",
+              "kind": "type",
+              "language": "typescript"
+            }
+          ],
+          "_evaluation": {
+            "attempt_id": "anvil_renderer_result_contract-r1-B-ecec1d3a-2563-4430-bf72-2c380d411489/attempt/2",
+            "calls_remaining": 22
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_4",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "search",
+      "arguments": {
+        "query": "renderPromptEvidenceContext"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_4",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "search",
+      "arguments": {
+        "query": "renderPromptEvidenceContext"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "src/brain-context/render.ts::renderPromptEvidenceContext#function",
+              "name": "renderPromptEvidenceContext",
+              "qualified_name": "renderPromptEvidenceContext",
+              "kind": "function",
+              "language": "typescript",
+              "file_path": "src/brain-context/render.ts",
+              "byte_offset": 8421,
+              "byte_length": 3770,
+              "signature": "function renderPromptEvidenceContext(input: PromptEvidenceContextRenderInput): PromptBrainContextRender {",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "9197f835884bb6895e87fcf67c20166a01aae59aa52cc76c2bc20ae661fbcc87",
+              "decorators": [],
+              "keywords": [
+                "context",
+                "evidence",
+                "prompt",
+                "render"
+              ],
+              "metadata": {},
+              "line": 198,
+              "end_line": 295,
+              "score": 63.0
+            }
+          ],
+          "coverage": {
+            "schema_version": 1,
+            "state": "partial",
+            "scope": "repository",
+            "source_scope": "indexed_supported_source",
+            "indexed_files": 163,
+            "excluded_paths": 24,
+            "exclusions": [
+              {
+                "reason": "unsupported_file_type",
+                "paths": 24,
+                "samples": [
+                  "LICENSE",
+                  "package-lock.json",
+                  "package.json",
+                  "src/browser/assets/Dockerfile.corporate",
+                  "test/fixtures/brain-context/anvil-prompt-delivery-v1.json",
+                  "test/fixtures/brain-context/evaluation-baseline.json",
+                  "test/fixtures/brain-context/invalid-manifest/brain-bootstrap.json",
+                  "test/fixtures/brain-context/missing-core-page/brain-bootstrap.json",
+                  "test/fixtures/brain-context/oversized-retrieval/brain-bootstrap.json",
+                  "test/fixtures/brain-context/oversized-retrieval/compiled-context.json",
+                  "test/fixtures/brain-context/oversized-retrieval/fake-llm-wiki.json",
+                  "test/fixtures/brain-context/real-brain-bootstrap.json",
+                  "test/fixtures/brain-context/unknown-project/brain-bootstrap.json",
+                  "test/fixtures/brain-context/unknown-project/compiled-context.json",
+                  "test/fixtures/brain-context/unknown-project/fake-llm-wiki.json",
+                  "test/fixtures/brain-context/valid-known-project/brain-bootstrap.json",
+                  "test/fixtures/brain-context/valid-known-project/compiled-context.json",
+                  "test/fixtures/brain-context/valid-known-project/fake-llm-wiki.json",
+                  "test/fixtures/browser/test-root-ca.crt",
+                  "test/fixtures/manifest-brain-view.json"
+                ],
+                "omitted_samples": 4
+              }
+            ],
+            "unknown_reason": null,
+            "query_scope": "indexed_symbols"
+          },
+          "search_id": "d26a772e-4b4b-4b07-9c93-9da3ee3e2bc8",
+          "_evaluation": {
+            "attempt_id": "anvil_renderer_result_contract-r1-B-ecec1d3a-2563-4430-bf72-2c380d411489/attempt/3",
+            "calls_remaining": 21
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_5",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "selected_from_search_id": "d26a772e-4b4b-4b07-9c93-9da3ee3e2bc8",
+        "symbol_ids": [
+          "src/brain-context/render.ts::renderPromptEvidenceContext#function"
+        ]
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_5",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "selected_from_search_id": "d26a772e-4b4b-4b07-9c93-9da3ee3e2bc8",
+        "symbol_ids": [
+          "src/brain-context/render.ts::renderPromptEvidenceContext#function"
+        ]
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "src/brain-context/render.ts::renderPromptEvidenceContext#function",
+              "source": "function renderPromptEvidenceContext(input: PromptEvidenceContextRenderInput): PromptBrainContextRender {\n  const routeRequested =\n    input.includeRoute === true ||\n    input.evidence.length > 0;\n  const diagnosticSections = input.diagnostics ?? [];\n  if (input.evidence.length === 0 && !routeRequested && diagnosticSections.length === 0 &&\n      !input.retrievalLimits && !input.includeRoleDisclaimer) {\n    return {\n      markdown: \"\",\n      renderedBytes: 0,\n      truncated: false,\n      attemptedBytes: 0,\n      guidanceBytes: 0,\n      retrievedContextBytes: 0,\n      framingBytes: 0,\n    };\n  }\n\n  const relevant =\n    input.evidence.length > 0\n      ? section(\"Prompt Evidence\", input.evidence.map(evidenceBlock).join(\"\\n\\n\"))\n      : undefined;\n  const pages = [...new Set(input.evidence.flatMap((evidence) => (evidence.page ? [evidence.page] : [])))];\n  const routes = routeRequested\n    ? section(\n        \"Recall Route\",\n        [\n          `- current_project: ${input.matchedProject ? `\\`${input.matchedProject}\\`` : \"unknown_project\"}`,\n          \"- kernel_pages: none\",\n          `- evidence_pages: ${pages.length > 0 ? pages.map((page) => `\\`${page}\\``).join(\", \") : \"none\"}`,\n          ...(input.temporal ? [`- temporal_query: ${JSON.stringify({\n            view: input.temporal.view,\n            request_time: input.temporal.request_time,\n            ...(input.temporal.world_at !== undefined ? { world_at: input.temporal.world_at } : {}),\n            ...(input.temporal.known_at !== undefined ? { known_at: input.temporal.known_at } : {}),\n            ...(input.temporal.transition ? { transition: {\n              from: input.temporal.transition.from, to: input.temporal.transition.to,\n            } } : {}),\n          })}`] : []),\n        ].join(\"\\n\"),\n      )\n    : undefined;\n  const diagnostics = diagnosticSections.length > 0\n    ? section(\n        \"Diagnostics\",\n        diagnosticSections\n          .map((diagnostic) => [\n            `- code: ${diagnostic.code}`,\n            `- message: ${diagnostic.message.replace(/\\s+/g, \" \").trim()}`,\n            `- recovery: ${diagnostic.recovery.replace(/\\s+/g, \" \").trim()}`,\n          ].join(\"\\n\"))\n          .join(\"\\n\"),\n      )\n    : undefined;\n  const prefix = [\n    \"## Brain Context\",\n    ...(input.retrievalLimits ? [\"\", section(\"Retrieval limits\", input.retrievalLimits)] : []),\n    ...(input.includeRoleDisclaimer ? [\"\", EVIDENCE_ROLE_DISCLAIMER] : []),\n    ...(relevant ? [\"\", relevant] : []),\n    ...(diagnostics ? [\"\", diagnostics] : []),\n  ].join(\"\\n\");\n  const full = `${prefix}${routes ? `\\n\\n${routes}` : \"\"}\\n`;\n  const attemptedBytes = byteLength(full);\n  const guidanceBytes = 0;\n  const retrievedContextBytes = relevant === undefined ? 0 : byteLength(relevant);\n  const framingBytes = attemptedBytes - guidanceBytes - retrievedContextBytes;\n  if (attemptedBytes <= input.hardBytes) {\n    return {\n      markdown: full,\n      renderedBytes: attemptedBytes,\n      truncated: false,\n      attemptedBytes,\n      guidanceBytes,\n      retrievedContextBytes,\n      framingBytes,\n    };\n  }\n\n  const diagnostic = section(\n    \"Diagnostics\",\n    \"- code: BRAIN_CONTEXT_TRUNCATED\\n- recovery: Repair the compiler-to-envelope byte allowance before retrying.\",\n  );\n  const suffix = `${routes ? `\\n\\n${routes}` : \"\"}\\n\\n[truncated]\\n\\n${diagnostic}\\n`;\n  const available = input.hardBytes - byteLength(suffix);\n  const markdown =\n    available > 0\n      ? `${truncateUtf8(prefix, available)}${suffix}`\n      : truncateUtf8(\"## Brain Context\\n\\n### Diagnostics\\n\\n- code: BRAIN_CONTEXT_TRUNCATED\\n\", input.hardBytes);\n  return {\n    markdown,\n    renderedBytes: byteLength(markdown),\n    truncated: true,\n    attemptedBytes,\n    guidanceBytes,\n    retrievedContextBytes,\n    framingBytes,\n  };\n}",
+              "byte_offset": 8421,
+              "byte_length": 3770,
+              "line": 198,
+              "end_line": 295,
+              "signature": "function renderPromptEvidenceContext(input: PromptEvidenceContextRenderInput): PromptBrainContextRender {",
+              "kind": "function",
+              "language": "typescript"
+            }
+          ],
+          "_evaluation": {
+            "attempt_id": "anvil_renderer_result_contract-r1-B-ecec1d3a-2563-4430-bf72-2c380d411489/attempt/4",
+            "calls_remaining": 20
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_6",
+      "type": "agent_message",
+      "text": "{\"result_fields\":{\"markdown\":\"string\",\"renderedBytes\":\"number\",\"truncated\":\"boolean\",\"attemptedBytes\":\"number\",\"guidanceBytes\":\"number\",\"retrievedContextBytes\":\"number\",\"framingBytes\":\"number\"},\"project_statuses\":[\"ambiguous\",\"matched\",\"not_requested\",\"unknown\"],\"matchedProject_for_v1\":null,\"matchedProject_for_v3\":\"projects/anvil.md\"}"
+    }
+  },
+  {
+    "type": "turn.completed",
+    "usage": {
+      "input_tokens": 45633,
+      "cached_input_tokens": 30464,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 1041,
+      "reasoning_output_tokens": 678
+    }
+  }
+]

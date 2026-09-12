@@ -1,0 +1,588 @@
+{
+  "schema_version": 3,
+  "protocol": "typescript-context-routing-v1",
+  "identity": {
+    "task_id": "same_name_wrong_file",
+    "session_id": "same_name_wrong_file-r2-B-f6251817-dd9e-4c41-9563-63e8707ac9e7",
+    "arm": "B",
+    "repetition": 2,
+    "snapshot": "same_name_wrong_file",
+    "corpus_sha256": "5d8f490a820f4e326aa522c2d963c8f0a56ea0c2d472f4d2b66caaeda9834b01",
+    "controls_sha256": "994af261fcee63cfe001e98bbf78c858b5ca462c14ef7788aa8290443b2bf56b",
+    "controls_version": "typescript-context-controls-v3"
+  },
+  "events": [
+    {
+      "id": "same_name_wrong_file-r2-B-f6251817-dd9e-4c41-9563-63e8707ac9e7:1",
+      "task_id": "same_name_wrong_file",
+      "session_id": "same_name_wrong_file-r2-B-f6251817-dd9e-4c41-9563-63e8707ac9e7",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "same_name_wrong_file",
+      "corpus_sha256": "5d8f490a820f4e326aa522c2d963c8f0a56ea0c2d472f4d2b66caaeda9834b01",
+      "controls_sha256": "994af261fcee63cfe001e98bbf78c858b5ca462c14ef7788aa8290443b2bf56b",
+      "controls_version": "typescript-context-controls-v3",
+      "operation": "explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder required fields input output return type returned field declaration origin file order customer total status id",
+        "max_output_bytes": 16384,
+        "max_evidence_bytes": 8192
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder, order\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"kind\":\"interface\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5]}],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":69,\"end_byte\":152,\"start_line\":2,\"end_line\":4,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\"},{\"id\":2,\"file\":\"types.ts\",\"start_byte\":7,\"end_byte\":67,\"start_line\":1,\"end_line\":4,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\"},{\"id\":3,\"file\":\"consumer.ts\",\"start_byte\":62,\"end_byte\":125,\"start_line\":2,\"end_line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"export function processOrder(value: ImportedPayload): string {\\n\"},{\"id\":4,\"file\":\"consumer.ts\",\"start_byte\":0,\"end_byte\":62,\"start_line\":1,\"end_line\":1,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\\n\"},{\"id\":5,\"file\":\"types.ts\",\"start_byte\":0,\"end_byte\":27,\"start_line\":1,\"end_line\":1,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"export interface Payload {\\n\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":1}],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":219,\"output_bytes\":2620,\"estimated_tokens\":655,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"same_name_wrong_file-r2-B-f6251817-dd9e-4c41-9563-63e8707ac9e7/attempt/1\",\"calls_remaining\":23}}",
+      "serialized_bytes": 2694,
+      "source_bytes": 295,
+      "elapsed_ms": 11.949624997214414,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 69,
+          "end_byte": 152,
+          "sha256": "10ff5e5d2a4918055984c04b730e5c8efc809afc556c79c0adf351c6d1b7d303",
+          "text": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 7,
+          "end_byte": 67,
+          "sha256": "1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d",
+          "text": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 62,
+          "end_byte": 125,
+          "sha256": "83c54e3329ae99d22dcf0d136cbc8798aca56ddbf71e72dd9da4ec3d8f133deb",
+          "text": "export function processOrder(value: ImportedPayload): string {\n"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 62,
+          "sha256": "a3b3c969e5af4920d8688271be6b677639a17b9490c0047806abf59bd4debd3b",
+          "text": "import type { Payload as ImportedPayload } from \"./types.js\";\n"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 0,
+          "end_byte": 27,
+          "sha256": "5ee6c66264e6f365acd3e9aa50e70879cd39daf5c763a64f43b3db4b09df5b24",
+          "text": "export interface Payload {\n"
+        }
+      ]
+    },
+    {
+      "id": "same_name_wrong_file-r2-B-f6251817-dd9e-4c41-9563-63e8707ac9e7:2",
+      "task_id": "same_name_wrong_file",
+      "session_id": "same_name_wrong_file-r2-B-f6251817-dd9e-4c41-9563-63e8707ac9e7",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "same_name_wrong_file",
+      "corpus_sha256": "5d8f490a820f4e326aa522c2d963c8f0a56ea0c2d472f4d2b66caaeda9834b01",
+      "controls_sha256": "994af261fcee63cfe001e98bbf78c858b5ca462c14ef7788aa8290443b2bf56b",
+      "controls_version": "typescript-context-controls-v3",
+      "operation": "search",
+      "arguments": {
+        "query": "processOrder"
+      },
+      "search_id": "1cbea999-c3bc-47ff-a4fb-03187ff7b47c",
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"qualified_name\":\"processOrder\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":69,\"byte_length\":83,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"10ff5e5d2a4918055984c04b730e5c8efc809afc556c79c0adf351c6d1b7d303\",\"decorators\":[],\"keywords\":[\"order\",\"process\"],\"metadata\":{},\"line\":2,\"end_line\":4,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"1cbea999-c3bc-47ff-a4fb-03187ff7b47c\",\"_evaluation\":{\"attempt_id\":\"same_name_wrong_file-r2-B-f6251817-dd9e-4c41-9563-63e8707ac9e7/attempt/2\",\"calls_remaining\":22}}",
+      "serialized_bytes": 886,
+      "source_bytes": 55,
+      "elapsed_ms": 2.6246660127071664,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 69,
+          "end_byte": 124,
+          "sha256": "08653276f18caff75a7f70cd621f7b7e923bcbbbd2cb47ed8d3ac2b68ecaeec2",
+          "text": "function processOrder(value: ImportedPayload): string {"
+        }
+      ]
+    },
+    {
+      "id": "same_name_wrong_file-r2-B-f6251817-dd9e-4c41-9563-63e8707ac9e7:3",
+      "task_id": "same_name_wrong_file",
+      "session_id": "same_name_wrong_file-r2-B-f6251817-dd9e-4c41-9563-63e8707ac9e7",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "same_name_wrong_file",
+      "corpus_sha256": "5d8f490a820f4e326aa522c2d963c8f0a56ea0c2d472f4d2b66caaeda9834b01",
+      "controls_sha256": "994af261fcee63cfe001e98bbf78c858b5ca462c14ef7788aa8290443b2bf56b",
+      "controls_version": "typescript-context-controls-v3",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "consumer.ts::processOrder#function",
+          "types.ts::Payload#interface"
+        ],
+        "context": 2,
+        "selected_from_search_id": "1cbea999-c3bc-47ff-a4fb-03187ff7b47c"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"source\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\",\"byte_offset\":69,\"byte_length\":83,\"line\":2,\"end_line\":4,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\"],\"context_after\":[]},{\"id\":\"types.ts::Payload#interface\",\"source\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\",\"byte_offset\":7,\"byte_length\":60,\"line\":1,\"end_line\":4,\"signature\":\"interface Payload {\",\"kind\":\"interface\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"same_name_wrong_file-r2-B-f6251817-dd9e-4c41-9563-63e8707ac9e7/attempt/3\",\"calls_remaining\":21}}",
+      "serialized_bytes": 834,
+      "source_bytes": 278,
+      "elapsed_ms": 7.268041998031549,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 69,
+          "end_byte": 152,
+          "sha256": "10ff5e5d2a4918055984c04b730e5c8efc809afc556c79c0adf351c6d1b7d303",
+          "text": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 61,
+          "sha256": "0dbb3288339f9f31eeaf89b1c6e7fa1043c3756ea85c70b5e6a49cc5c32ec10b",
+          "text": "import type { Payload as ImportedPayload } from \"./types.js\";"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 7,
+          "end_byte": 67,
+          "sha256": "1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d",
+          "text": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 69,
+          "end_byte": 124,
+          "sha256": "08653276f18caff75a7f70cd621f7b7e923bcbbbd2cb47ed8d3ac2b68ecaeec2",
+          "text": "function processOrder(value: ImportedPayload): string {"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 7,
+          "end_byte": 26,
+          "sha256": "3c35bccaf71be1031a5c44b0fa3c7771b5743bb6ebedfda88fca7b184f983641",
+          "text": "interface Payload {"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "same_name_wrong_file",
+    "session_id": "same_name_wrong_file-r2-B-f6251817-dd9e-4c41-9563-63e8707ac9e7",
+    "arm": "B",
+    "repetition": 2,
+    "snapshot": "same_name_wrong_file",
+    "corpus_sha256": "5d8f490a820f4e326aa522c2d963c8f0a56ea0c2d472f4d2b66caaeda9834b01",
+    "controls_sha256": "994af261fcee63cfe001e98bbf78c858b5ca462c14ef7788aa8290443b2bf56b",
+    "controls_version": "typescript-context-controls-v3",
+    "schema_version": 3,
+    "measurement_method": "observed_tool_calls",
+    "intent_collection": "not_collected",
+    "outcome": "completed",
+    "answer": {
+      "required_fields": {
+        "amount": "number",
+        "requestId": "string"
+      },
+      "return_type": "string",
+      "returned_field": "requestId",
+      "origin_file": "types.ts"
+    },
+    "answer_correct": true,
+    "task_correct": true,
+    "read_count": 3,
+    "validated_read_count": 3,
+    "required_context_delivered": [
+      "entry",
+      "import",
+      "payload"
+    ],
+    "required_context_total": 3,
+    "context_recall": 1.0,
+    "serialized_tool_output_bytes": 4414,
+    "source_bytes": 628,
+    "estimated_source_tokens": 157,
+    "tool_elapsed_ms": 21.84233300795313,
+    "provider_usage": {
+      "input_tokens": 25472,
+      "cached_input_tokens": 16640,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 489,
+      "reasoning_output_tokens": 299
+    },
+    "usage_semantics": "Codex turn.completed gross input; cached input is a subset; output includes reasoning tokens.",
+    "token_status": "measured",
+    "measurement_complete": true
+  },
+  "baseline": {
+    "end_to_end_seconds": 17.322451375002856,
+    "actual_process_seconds": 17.322451375002856,
+    "exit_code": 0,
+    "provider_thread_id": "01a093e4-51aa-7283-9e12-081c66c15181",
+    "failures": [],
+    "tool_delivery_verified": true,
+    "output_accounting": {
+      "schema_version": 3,
+      "complete": true,
+      "tool_call_count": 3,
+      "recorded_payload_bytes": 4414,
+      "complete_payload_bytes": 4414,
+      "source_bytes": 628,
+      "calls": [
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "type_dependencies",
+            "max_hops": null,
+            "query": "processOrder required fields input output return type returned field declaration origin file order customer total status id",
+            "seed_ids": null
+          },
+          "status": "completed",
+          "attempt_id": "same_name_wrong_file-r2-B-f6251817-dd9e-4c41-9563-63e8707ac9e7/attempt/1",
+          "trace_event_id": "same_name_wrong_file-r2-B-f6251817-dd9e-4c41-9563-63e8707ac9e7:1",
+          "source_bytes": 295,
+          "serialized_bytes": 2694,
+          "payload_texts": [
+            "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder, order\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"kind\":\"interface\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5]}],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":69,\"end_byte\":152,\"start_line\":2,\"end_line\":4,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\"},{\"id\":2,\"file\":\"types.ts\",\"start_byte\":7,\"end_byte\":67,\"start_line\":1,\"end_line\":4,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\"},{\"id\":3,\"file\":\"consumer.ts\",\"start_byte\":62,\"end_byte\":125,\"start_line\":2,\"end_line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"export function processOrder(value: ImportedPayload): string {\\n\"},{\"id\":4,\"file\":\"consumer.ts\",\"start_byte\":0,\"end_byte\":62,\"start_line\":1,\"end_line\":1,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\\n\"},{\"id\":5,\"file\":\"types.ts\",\"start_byte\":0,\"end_byte\":27,\"start_line\":1,\"end_line\":1,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"export interface Payload {\\n\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":1}],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":219,\"output_bytes\":2620,\"estimated_tokens\":655,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"same_name_wrong_file-r2-B-f6251817-dd9e-4c41-9563-63e8707ac9e7/attempt/1\",\"calls_remaining\":23}}"
+          ],
+          "payload_format": "compact_json"
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "search",
+          "arguments": {
+            "query": "processOrder"
+          },
+          "status": "completed",
+          "attempt_id": "same_name_wrong_file-r2-B-f6251817-dd9e-4c41-9563-63e8707ac9e7/attempt/2",
+          "trace_event_id": "same_name_wrong_file-r2-B-f6251817-dd9e-4c41-9563-63e8707ac9e7:2",
+          "source_bytes": 55,
+          "serialized_bytes": 886,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"qualified_name\":\"processOrder\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":69,\"byte_length\":83,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"10ff5e5d2a4918055984c04b730e5c8efc809afc556c79c0adf351c6d1b7d303\",\"decorators\":[],\"keywords\":[\"order\",\"process\"],\"metadata\":{},\"line\":2,\"end_line\":4,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"1cbea999-c3bc-47ff-a4fb-03187ff7b47c\",\"_evaluation\":{\"attempt_id\":\"same_name_wrong_file-r2-B-f6251817-dd9e-4c41-9563-63e8707ac9e7/attempt/2\",\"calls_remaining\":22}}"
+          ],
+          "payload_format": "compact_json"
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "get",
+          "arguments": {
+            "context": 2,
+            "selected_from_search_id": "1cbea999-c3bc-47ff-a4fb-03187ff7b47c",
+            "symbol_ids": [
+              "consumer.ts::processOrder#function",
+              "types.ts::Payload#interface"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "same_name_wrong_file-r2-B-f6251817-dd9e-4c41-9563-63e8707ac9e7/attempt/3",
+          "trace_event_id": "same_name_wrong_file-r2-B-f6251817-dd9e-4c41-9563-63e8707ac9e7:3",
+          "source_bytes": 278,
+          "serialized_bytes": 834,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"source\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\",\"byte_offset\":69,\"byte_length\":83,\"line\":2,\"end_line\":4,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\"],\"context_after\":[]},{\"id\":\"types.ts::Payload#interface\",\"source\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\",\"byte_offset\":7,\"byte_length\":60,\"line\":1,\"end_line\":4,\"signature\":\"interface Payload {\",\"kind\":\"interface\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"same_name_wrong_file-r2-B-f6251817-dd9e-4c41-9563-63e8707ac9e7/attempt/3\",\"calls_remaining\":21}}"
+          ],
+          "payload_format": "compact_json"
+        }
+      ],
+      "failures": []
+    },
+    "adapter_elapsed_ms": 22.23633301036898,
+    "recoverable_error_events": 0,
+    "relationships": {
+      "schema_version": 2,
+      "case_id": "same_name_wrong_file",
+      "required_semantic_dependencies_total": 1,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "payload",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "generic_type_dependency",
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "consumer.ts::processOrder#function",
+              "to": "types.ts::Payload#interface",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "consumer.ts::processOrder#function",
+              "to": "types.ts::Payload#interface",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+              }
+            }
+          ]
+        }
+      ],
+      "available_dependency_links_total": 1,
+      "available_dependency_links": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "payload",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "generic_type_dependency",
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "consumer.ts::processOrder#function",
+              "to": "types.ts::Payload#interface",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "consumer.ts::processOrder#function",
+              "to": "types.ts::Payload#interface",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+              }
+            }
+          ]
+        }
+      ],
+      "delivered_dependency_links_total": 1,
+      "delivered_dependency_links": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "payload",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "generic_type_dependency",
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "consumer.ts::processOrder#function",
+              "to": "types.ts::Payload#interface",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "consumer.ts::processOrder#function",
+              "to": "types.ts::Payload#interface",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+              }
+            }
+          ]
+        }
+      ],
+      "dependency_link_recall": {
+        "label": "Exact endpoint dependency links; generic uses_type/references_type do not prove precise subtypes.",
+        "required": 1,
+        "available": 1,
+        "delivered": 1,
+        "available_ratio": 1.0,
+        "delivered_ratio": 1.0
+      },
+      "precise_kind_links_available_total": 0,
+      "precise_kind_links_delivered_total": 0,
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "delivery_integrity_violations": [],
+      "forbidden_scope": "Authored frozen negatives plus delivered edge/index consistency and complete exploration source proof; not exhaustive semantic truth."
+    },
+    "arm": "B",
+    "attempt_id": "same_name_wrong_file-r2-B"
+  },
+  "routing": {
+    "schema_version": 1,
+    "observations_complete": true,
+    "first_repository_call": {
+      "item_id": "item_2",
+      "tool": "loci_explore",
+      "intent": "type_dependencies",
+      "status": "completed"
+    },
+    "initial_route_expected": "type_dependencies",
+    "initial_type_route": true,
+    "requested_anchor_received": true,
+    "maintained_exposure": null,
+    "explore_calls": [
+      {
+        "item_id": "item_2",
+        "intent": "type_dependencies",
+        "status": "partial",
+        "successful_delivery": true,
+        "anchor_ids": [
+          "consumer.ts::processOrder#function"
+        ],
+        "omissions": [
+          {
+            "reason": "anchor_limit",
+            "count": 1
+          }
+        ],
+        "requested_anchor_received": true,
+        "anchor_complete": true
+      }
+    ],
+    "fallback_calls": [
+      {
+        "item_id": "item_3",
+        "tool": "search",
+        "status": "completed"
+      },
+      {
+        "item_id": "item_4",
+        "tool": "get",
+        "status": "completed"
+      }
+    ],
+    "helper_call_count": 0,
+    "failures": []
+  },
+  "attempt_id": "same_name_wrong_file-r2-B",
+  "arm": "B",
+  "provenance": {
+    "attempt_id": "same_name_wrong_file-r2-B",
+    "case_id": "same_name_wrong_file",
+    "snapshot": "same_name_wrong_file",
+    "repetition": 2,
+    "arm": "B",
+    "adapter_module": "benchmarks.typescript_context_routing_tools",
+    "model": "gpt-5.6-luna",
+    "reasoning_effort": "high",
+    "corpus_sha256": "5d8f490a820f4e326aa522c2d963c8f0a56ea0c2d472f4d2b66caaeda9834b01",
+    "controls_sha256": "994af261fcee63cfe001e98bbf78c858b5ca462c14ef7788aa8290443b2bf56b",
+    "catalog_sha256": "f1c45cceac1c3ee90fa1af1007c341713e220571390c3b1eb086c443d7781062",
+    "runner_sha256": "5756278252a74c9e86c68a898b284108288b74a864b9424f6445223b3a7ca6db",
+    "source": {
+      "engine": {
+        "commit": "36f5e2b1662c2d6bbe2449c3189430469e8c013f",
+        "source_tree": "75d01dfb4b76181400d42ae9e8ebbb552265639e",
+        "extractor_version": 25
+      },
+      "freeze_commit": "182accfca24e3401a2546e656f8758e6e4ae86ae",
+      "freeze_json_sha256": "20f8b2530dd91e7f9d06d7ba8498e0d6bfe44de304dc17feef801ca3ac5e91b7",
+      "source_scope": "same pinned engine and exploration-capable tools; candidate adds only explicit routing policy"
+    },
+    "config": {
+      "project_doc_max_bytes": 0,
+      "web_search": "disabled",
+      "skills.include_instructions": false,
+      "developer_instructions": "",
+      "model_reasoning_effort": "high",
+      "model_catalog_json": "/Users/brummerv/phluxxed/loci-exploration/benchmarks/results/typescript-context-routing-v1/model-catalog.json",
+      "include_collaboration_mode_instructions": false,
+      "tools.update_plan.enabled": false,
+      "tools.experimental_request_user_input.enabled": false,
+      "features.skip_host_skill_discovery": true,
+      "mcp_servers.evaluation.command": "/Users/brummerv/phluxxed/loci-exploration/.venv/bin/python",
+      "mcp_servers.evaluation.args": [
+        "-m",
+        "benchmarks.typescript_context_routing_tools",
+        "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-rc5eewuh/run.json"
+      ],
+      "mcp_servers.evaluation.cwd": "/Users/brummerv/phluxxed/loci-exploration",
+      "mcp_servers.evaluation.env": {
+        "LOCI_BASE_DIR": "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-rc5eewuh/store",
+        "LOCI_STORE_NAMESPACE": "typescript-context-preflight"
+      },
+      "mcp_servers.evaluation.required": true,
+      "mcp_servers.evaluation.default_tools_approval_mode": "auto",
+      "mcp_servers.evaluation.tool_timeout_sec": 12,
+      "tool_output_token_limit": 32768,
+      "features.shell_tool": false,
+      "features.multi_agent": false,
+      "features.apps": false,
+      "features.plugins": false,
+      "features.hooks": false,
+      "features.memories": false,
+      "features.skill_search": false,
+      "features.skill_mcp_dependency_install": false,
+      "features.view_image": false,
+      "features.image_generation": false,
+      "features.browser_use": false,
+      "features.computer_use": false,
+      "features.in_app_browser": false,
+      "features.code_mode": false,
+      "features.code_mode_host": false,
+      "features.sleep_tool": false,
+      "features.goals": false,
+      "features.context_management": false
+    },
+    "config_sha256": "0913c7a200149a8b0e3d47aade8ca11a10853b8846be67990eb857bd64ab12d0",
+    "prompt_sha256": "b71807b01c55db9b3994970b00aa01158d2e815a7e389621d016dc31faddac3a",
+    "index_seconds": 0.013280915998620912,
+    "snapshot_files": {
+      "types.ts": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+      "consumer.ts": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+      "wrong.ts": "52d553b2adf0f62e2467f70e810e3c5a86e54f8e47b11de6125fc31996003c59"
+    },
+    "extractor_version": 25,
+    "canonical_tool_schemas_sha256": "f70174b36e4bb4ec3051e0df1ab2cb1449ad93c4f2dd5511823e1c7348999858",
+    "routing": {
+      "version": "typescript-context-routing-v1",
+      "condition": "B",
+      "policy_sha256": "cb940c97c00d1f5a2e3a5b2e266cf6ecfef47aea0e0283ad98f9644d157ffaed",
+      "base_prompt_sha256": "9595c6b8672d8641c568e7452a39242067e0f55ec7f699814e3d8c7b2b864242",
+      "effective_prompt_sha256": "b71807b01c55db9b3994970b00aa01158d2e815a7e389621d016dc31faddac3a",
+      "candidate_prefix_utf8_bytes": 1155,
+      "capability_arm": "B"
+    }
+  }
+}
