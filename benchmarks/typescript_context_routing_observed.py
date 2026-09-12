@@ -394,6 +394,48 @@ def _source_for_anchor(
     return True, complete, [item.get("id")]
 
 
+def _has_matching_anchor_trace_span(
+    trace: ExploreObservedTrace | None,
+    trace_event_id: Any,
+    anchor: dict[str, Any] | None,
+) -> bool:
+    """Require this call's replayed source proof to begin at the requested anchor."""
+
+    if trace is None or not isinstance(trace_event_id, str) or anchor is None:
+        return False
+    file = anchor.get("file")
+    expected_start = anchor.get("start_byte")
+    expected_end = anchor.get("end_byte")
+    if (
+        not isinstance(file, str)
+        or type(expected_start) is not int
+        or type(expected_end) is not int
+        or expected_start < 0
+        or expected_end <= expected_start
+    ):
+        return False
+    event = next((event for event in trace.events if event.get("id") == trace_event_id), None)
+    if not isinstance(event, dict) or not isinstance(event.get("spans"), list):
+        return False
+    for span in event["spans"]:
+        if not isinstance(span, dict):
+            continue
+        start = span.get("start_byte")
+        end = span.get("end_byte")
+        text = span.get("text")
+        if (
+            span.get("file") == file
+            and type(start) is int
+            and type(end) is int
+            and start == expected_start
+            and start < end <= expected_end
+            and isinstance(text, str)
+            and bool(text)
+        ):
+            return True
+    return False
+
+
 def observe_routing(
     corpus: dict[str, Any],
     case: dict[str, Any],
@@ -405,6 +447,7 @@ def observe_routing(
     expected_route = "call_target" if case.get("id") in CALL_TARGET_CASES else "type_dependencies"
     terminal_calls, lifecycle_failures = _terminal_host_calls(events)
     failures: list[dict[str, Any]] = list(lifecycle_failures)
+    routing_integrity_failures: list[dict[str, Any]] = []
 
     trace = None
     trace_ok = False
@@ -479,6 +522,21 @@ def observe_routing(
             and trace_ok
         )
         requested, complete, _ = _source_for_anchor(payload if native_valid else None, anchor, native_id, files)
+        anchor_trace_proof = _has_matching_anchor_trace_span(
+            trace,
+            row.get("trace_event_id") if isinstance(row, dict) else None,
+            anchor,
+        )
+        if requested and not anchor_trace_proof:
+            failure = {
+                "category": "missing_requested_anchor_source",
+                "item": item_id,
+            }
+            failures.append(failure)
+            routing_integrity_failures.append(failure)
+        # A valid call for another anchor can still be delivered successfully.
+        # Requested-anchor exposure additionally needs this call's source proof.
+        successful_delivery = successful_delivery and (not requested or anchor_trace_proof)
         requested = bool(successful_delivery and requested)
         if not requested:
             complete = False
@@ -525,7 +583,13 @@ def observe_routing(
                 )
 
     helper_call_count = sum(1 for _item_id, call, _started in terminal_calls if call.get("tool") in HELPERS)
-    observations_complete = bool(trace_ok and accounting is not None and accounting.get("complete") and not lifecycle_failures)
+    observations_complete = bool(
+        trace_ok
+        and accounting is not None
+        and accounting.get("complete")
+        and not lifecycle_failures
+        and not routing_integrity_failures
+    )
 
     initial_type_route: bool | None
     requested_anchor_received: bool | None

@@ -270,6 +270,23 @@ def test_replay_attempt_rejects_policy_hash_tampering(tmp_path: Path) -> None:
         replay_attempt(folder, corpus, case, plan, freeze, index)
 
 
+@pytest.mark.parametrize('filename', ['run.json', 'provenance.json'])
+@pytest.mark.parametrize(('field', 'value'), [('case_id', 'local_alias'), ('arm', 'A'), ('repetition', 2)])
+def test_replay_attempt_rejects_descriptor_identity_tampering(tmp_path: Path, filename, field, value) -> None:
+    folder, corpus, case, plan, freeze, index = _retained_attempt(tmp_path)
+    path = folder / filename
+    descriptor = json.loads(path.read_text())
+    descriptor[field] = value
+    path.write_text(json.dumps(descriptor))
+    if filename == 'provenance.json':
+        result_path = folder / 'result.json'
+        result = json.loads(result_path.read_text())
+        result['provenance'] = descriptor
+        result_path.write_text(json.dumps(result))
+    with pytest.raises(ValueError, match='identities disagree'):
+        replay_attempt(folder, corpus, case, plan, freeze, index)
+
+
 def test_replay_attempt_rejects_prompt_digest_tampering(tmp_path: Path) -> None:
     folder, corpus, case, plan, freeze, index = _retained_attempt(tmp_path)
     path = folder / "request-audit.json"

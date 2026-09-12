@@ -277,6 +277,33 @@ def test_clipped_anchor_source_is_exposed_but_not_complete(tmp_path: Path) -> No
     assert observed["explore_calls"][0]["status"] == "partial"
 
 
+@pytest.mark.parametrize("span_variant", ["empty", "unrelated"])
+def test_missing_anchor_trace_proof_is_incomplete(
+    tmp_path: Path, span_variant: str
+) -> None:
+    corpus, case, _run, raw, payload, adapter = _fixture(tmp_path)
+    if span_variant == "empty":
+        spans: list[dict[str, Any]] = []
+    else:
+        # Keep positive, replay-valid source bytes while removing this call's
+        # requested consumer.ts anchor span.
+        spans = [copy.deepcopy(raw["events"][0]["spans"][1])]
+    rewritten = _rewrite_explore(raw, payload, spans=spans)
+    call = _call("explore-call", "loci_explore", adapter.deliveries[0]["arguments"], payload)
+    observed = observe_routing(corpus, _maintained(case), rewritten, _events([call]))
+
+    assert observed["observations_complete"] is False
+    assert observed["maintained_exposure"] is None
+    assert observed["requested_anchor_received"] is None
+    assert observed["explore_calls"][0]["successful_delivery"] is False
+    assert observed["explore_calls"][0]["requested_anchor_received"] is False
+    assert observed["explore_calls"][0]["anchor_complete"] is False
+    assert any(
+        failure["category"] == "missing_requested_anchor_source"
+        for failure in observed["failures"]
+    )
+
+
 def test_no_explore_keeps_exposure_false_and_call_target_route_distinct(tmp_path: Path) -> None:
     corpus, case, _run, raw, _payload, _adapter = _fixture(
         tmp_path, case_id="exported_arrow", intent="type_dependencies"

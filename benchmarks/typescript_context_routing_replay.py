@@ -141,6 +141,11 @@ def replay_attempt(folder, corpus, case, plan, freeze, index):
         raise ValueError('result differs from planned identity')
     if (raw['identity'] != identity or run['session_id'] != identity['session_id']
             or result['attempt_id'] != plan['attempt_id'] or run['attempt_id'] != plan['attempt_id']
+            or result['arm'] != plan['arm'] or provenance['snapshot'] != plan['snapshot']
+            or (run['case_id'], run['arm'], run['repetition']) != (
+                plan['case_id'], plan['arm'], plan['repetition'])
+            or (provenance['case_id'], provenance['arm'], provenance['repetition'], provenance['attempt_id']) != (
+                plan['case_id'], plan['arm'], plan['repetition'], plan['attempt_id'])
             or result['provenance'] != provenance):
         raise ValueError('trace, run, result and provenance identities disagree')
     controls = load_controls(corpus)
