@@ -213,7 +213,7 @@ names.
 | `loci_outline` | Return indexed symbols grouped by file |
 | `loci_search` | Search indexed symbols and return an opaque ID for explicit downstream selections |
 | `loci_get` | Return exact source, with optional bounded type context and deliberate search-selection lineage |
-| `loci_explore` | Select compact source for locating code, TypeScript/Python dependencies, or known static impact |
+| `loci_explore` | Select compact source for locating code, JavaScript dependencies, TypeScript/Python contracts, or known static impact |
 | `loci_file` | Return cached file content with optional line range |
 | `loci_grep` | Regex-search cached files |
 | `loci_graph_anchors` | Select a bounded, explained set of graph start nodes from a question or exact seeds |
@@ -237,6 +237,8 @@ Use `loci_explore` for source selected by an explicit purpose:
 loci_explore(repo="/path/to/repo", intent="locate", query="processOrder")
 loci_explore(repo="/path/to/repo", intent="type_dependencies",
              seed_ids=["src/order.ts::processOrder#function"], query="customer field")
+loci_explore(repo="/path/to/repo", intent="dependencies",
+             seed_ids=["src/app.js::run#function"])
 loci_explore(repo="/path/to/repo", intent="impact",
              seed_ids=["src/order.ts::processOrder#function"])
 ```
@@ -247,6 +249,14 @@ select deeper fields. Impact follows known static incoming relationships and
 reports non-exhaustive scope. Independent source and complete MCP-result byte
 limits keep output bounded; clipped anchors are marked incomplete. See the
 [intent and evidence contract](docs/design/2026-09-11-intent-evidence.md).
+
+For plain JavaScript, `dependencies` follows definite calls, declaration-owned
+imported value references and direct class bases. It returns the helper/value/base
+definitions with their import and re-export proof. For TypeScript and Python it
+uses the existing `type_dependencies` selection. JavaScript JSDoc, computed
+targets and runtime dispatch are outside this subset; `type_dependencies` remains
+explicitly unsupported for JavaScript. See the
+[JavaScript acceptance record](docs/reviews/2026-09-12-javascript-context.md).
 
 Pass `include_type_context: true` to `loci_get` to add complete definitions from
 proven TypeScript/Python dependencies and explicit heritage. The response keeps the requested
@@ -720,6 +730,12 @@ contains-only. Graph health includes type counts and resolution-reason summaries
 These relationships describe source declarations; they do not establish
 structural compatibility, inferred implementations or runtime dispatch.
 See the [contract and supported subset](docs/design/2026-09-11-type-observations.md).
+
+Plain JavaScript uses this family only for authored direct `class ... extends`
+syntax in the value namespace. It does not produce `uses_type` or `implements`
+records. Exact local classes and contained ESM import/re-export routes can prove
+the base; shadowed, computed, ambiguous and visibly mutated bindings stay
+unresolved. Prototype changes do not create inheritance or dispatch edges.
 
 Python uses the same type family and context interfaces for annotations,
 generic type arguments, explicit module `TypeAlias` assignments and direct

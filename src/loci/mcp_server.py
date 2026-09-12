@@ -213,7 +213,9 @@ def create_server() -> MCPServer:
 
         ``locate`` returns anchors only; ``type_dependencies`` follows outgoing
         proven TypeScript/TSX and Python type and direct-base edges; ``impact`` follows incoming known static
-        dependents. Query text is at most 4096 UTF-8 bytes; seeds are at most five
+        dependents. ``dependencies`` follows JavaScript calls, imported values and
+        direct class bases, or the same type dependencies for TypeScript/Python.
+        Query text is at most 4096 UTF-8 bytes; seeds are at most five
         unique IDs; hops are 0..4 (defaults: locate 0, type 3, impact 1), output
         is 2048..262144 bytes for the complete MCP result, and source evidence
         is 0..65536 bytes. Omitted or null byte limits use 16384 and 8192 bytes.

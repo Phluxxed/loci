@@ -20,9 +20,10 @@ from .storage.index_store import IndexStore
 from .type_context import _CachedSource
 
 
-INTENTS = ("locate", "type_dependencies", "impact")
+INTENTS = ("locate", "type_dependencies", "dependencies", "impact")
 TYPE_WEIGHTS = {"uses_type": .9, "extends": .95, "implements": .9}
 IMPACT_WEIGHTS = {**TYPE_WEIGHTS, "calls": .9, "references": .7, "references_type": .75}
+DEPENDENCY_WEIGHTS = {**TYPE_WEIGHTS, "calls": .9, "references": .7}
 _STRUCTURAL_CONTEXTS = frozenset({"alias", "type_query", "type_argument", "constraint"})
 _STOP_WORDS = frozenset("""
     a an and are as at be by can code context define definition dependency depend
@@ -66,7 +67,7 @@ def _limits(query, intent, seed_ids, max_hops, max_output_bytes, max_evidence_by
     if not query.strip() and not seed_ids:
         raise _invalid("Provide a query or explicit source symbol IDs", field="query")
     if max_hops is None:
-        max_hops = {"locate": 0, "type_dependencies": 3, "impact": 1}[intent]
+        max_hops = {"locate": 0, "type_dependencies": 3, "dependencies": 3, "impact": 1}[intent]
     for field, value, low, high in (
         ("max_hops", max_hops, 0, 4),
         ("max_output_bytes", max_output_bytes, 2048, 262144),
@@ -181,9 +182,11 @@ def _records(state: GraphIndexState) -> dict[tuple, _EdgeRecord]:
 
 
 def _priority(step, node, record, source, query_terms, intent, depth, degree, threshold):
-    weights = TYPE_WEIGHTS if intent == "type_dependencies" else IMPACT_WEIGHTS
+    weights = DEPENDENCY_WEIGHTS if intent == "dependencies" else TYPE_WEIGHTS if intent == "type_dependencies" else IMPACT_WEIGHTS
     matches = query_terms & _terms(node["name"])
-    if intent == "type_dependencies":
+    if intent == "dependencies" and record.record.raw.language == "javascript":
+        reason, relevance = "Authored JavaScript dependency", .85 + .03 * min(4, len(matches))
+    elif intent in {"type_dependencies", "dependencies"}:
         member_terms = source.member_terms(record.record)
         matches |= query_terms & member_terms
         if depth == 0:
@@ -230,7 +233,7 @@ def explore_context(
     base = {
         "schema_version": 1, "intent": intent, "selection": mode,
         "scope": {"source": "indexed_supported_source", "coverage": coverage,
-                  "relationships": {"locate": "none", "type_dependencies": "authored_types", "impact": "known_static_dependents"}[intent],
+                  "relationships": {"locate": "none", "type_dependencies": "authored_types", "dependencies": "authored_dependencies", "impact": "known_static_dependents"}[intent],
                   "exhaustive": False},
         "limits": limits, "usage": {"nodes_examined": 0},
     }
@@ -243,13 +246,21 @@ def explore_context(
     for anchor in anchors:
         focus = re.sub(r"(?<![\w$])" + re.escape(nodes[anchor.node_id]["name"]) + r"(?![\w$])", " ", focus, flags=re.I)
     query_terms = _terms(focus)
-    weights = TYPE_WEIGHTS if intent == "type_dependencies" else IMPACT_WEIGHTS
+    weights = DEPENDENCY_WEIGHTS if intent == "dependencies" else TYPE_WEIGHTS if intent == "type_dependencies" else IMPACT_WEIGHTS
     edges = filter_graph_edges(state.edges, namespaces=["loci"], edge_types=list(weights), resolutions=resolutions) if resolutions else ()
+    if intent == "dependencies":
+        edges = tuple(edge for edge in edges if edge.type in TYPE_WEIGHTS
+                      or nodes[edge.from_id].get("language") == "javascript")
     adjacency = graph_adjacency(edges, direction="incoming" if intent == "impact" else "outgoing")
     records = _records(state)
     degrees = Counter(endpoint for edge in edges for endpoint in (edge.from_id, edge.to_id))
     threshold = graph_hub_threshold(len(edges))
     unresolved = Counter(r.source_id for r in state.type_relations if r.status != "resolved")
+    if intent == "dependencies":
+        unresolved.update(r.source_id for r in state.symbol_references
+                          if r.raw.language == "javascript" and r.status != "resolved")
+        unresolved.update(r.caller_id for r in state.calls
+                          if r.raw.language == "javascript" and r.status != "resolved")
     bundles = []
     visited = set()
     queue = []
@@ -276,7 +287,7 @@ def explore_context(
                     raise ValueError("A projected relationship has no source record")
                 supports = tuple(source.support(item) for item in record.support)
                 relation_values.append(Relation(step.edge.to_dict(), step.traversed, supports))
-            role = "anchor" if not steps else "dependency" if intent == "type_dependencies" else "dependent"
+            role = "anchor" if not steps else "dependency" if intent in {"type_dependencies", "dependencies"} else "dependent"
             bundles.append(Bundle({"id": node_id, "name": node["name"], "kind": node["kind"],
                                    "file": node["file_path"], "role": role, "depth": len(steps), "why": why},
                                   (span,), tuple(relation_values)))
@@ -285,8 +296,9 @@ def explore_context(
             continue
         if intent == "locate":
             continue
-        if intent == "type_dependencies":
-            if node.get("language") not in {"typescript", "python"}:
+        if intent in {"type_dependencies", "dependencies"}:
+            supported = {"typescript", "python", "javascript"} if intent == "dependencies" else {"typescript", "python"}
+            if node.get("language") not in supported:
                 omissions["unsupported_language"] += 1
                 continue
             omissions["unresolved_relation"] += unresolved[node_id]

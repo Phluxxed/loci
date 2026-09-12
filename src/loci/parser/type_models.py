@@ -17,7 +17,7 @@ from loci.parser.reference_models import ImportBinding
 
 def valid_type_import_path(language: str, path: Sequence[str], binding: Any) -> bool:
     """Validate path shape; graph resolution must still prove its exact endpoint."""
-    if language == "typescript":
+    if language in {"typescript", "javascript"}:
         return ((binding.kind == "symbol" and len(path) == 1)
                 or (binding.kind == "namespace" and len(path) == 2))
     if language != "python":
@@ -329,8 +329,12 @@ class RawTypeObservation:
 
     def __post_init__(self) -> None:
         _relative_path(self.source_file, "source_file")
-        if self.language not in {"typescript", "python"}:
-            raise ValueError("language must be typescript or python")
+        if self.language not in {"typescript", "python", "javascript"}:
+            raise ValueError("language must be typescript, python or javascript")
+        if self.language == "javascript" and (
+            self.relation != "extends" or self.context != "heritage" or self.lookup_space != "value"
+        ):
+            raise ValueError("JavaScript observations require authored value-space class heritage")
         _integer(self.line, "line", minimum=1)
         _integer(self.column, "column", minimum=1)
         start, end = _range(self.start_byte, self.end_byte, "observation")

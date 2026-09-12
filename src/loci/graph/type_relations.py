@@ -63,7 +63,7 @@ def resolve_type_relations(
             declarations[(symbol.file_path, symbol.byte_offset,
                           symbol.byte_offset + symbol.byte_length)].append(symbol)
     for record in imports:
-        if record.raw.language not in {"typescript", "python"}:
+        if record.raw.language not in {"typescript", "python", "javascript"}:
             continue
         for binding in record.raw.bindings:
             if binding.local_name is not None:
@@ -184,7 +184,7 @@ def _resolve(raw: RawTypeObservation, index: _ResolutionIndex) -> TypeRelationRe
     if raw.binding_state != "imported" or len(raw.import_bindings) != 1:
         return finish("unsupported_reference")
     binding = raw.import_bindings[0]
-    if raw.language == "typescript" and not ((binding.kind == "symbol" and len(raw.path) == 1)
+    if raw.language in {"typescript", "javascript"} and not ((binding.kind == "symbol" and len(raw.path) == 1)
             or (binding.kind == "namespace" and len(raw.path) == 2)):
         return finish("unsupported_reference")
     matches = index.imports.get((raw.source_file, binding), ())

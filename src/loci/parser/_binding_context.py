@@ -47,6 +47,9 @@ class LexicalBinding:
     # where a language defers execution rather than hoisting the name, so
     # active_start_byte alone cannot express the visibility.
     deferred_visible: bool = False
+    # A const arrow shadows throughout its scope, but is callable only after
+    # its initializer (or from its own deferred body).
+    callable_start_byte: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -301,9 +304,16 @@ def _collect_executable_owners(
         definition_end = node.end_byte
         if language == "python":
             definition_start, definition_end = _python_definition_range(node)
+        named_arrow = (language in {"javascript", "typescript"}
+                       and node.type == "arrow_function" and node.parent is not None
+                       and node.parent.type == "variable_declarator"
+                       and node.parent.child_by_field_name("name") is not None
+                       and node.parent.child_by_field_name("name").type == "identifier")
+        if named_arrow:
+            definition_start, definition_end = node.parent.start_byte, node.parent.end_byte
         context.executable_owners.append(
             ExecutableOwner(
-                kind="callable" if node.type in callable_types else "unindexed",
+                kind="callable" if node.type in callable_types or named_arrow else "unindexed",
                 definition_start_byte=definition_start,
                 definition_end_byte=definition_end,
                 body_start_byte=body.start_byte,
@@ -495,6 +505,7 @@ def _add_local_binding(
     declaration_end_byte: int | None = None,
     callable_kind: CallableKind | None = None,
     deferred_visible: bool = False,
+    callable_start_byte: int | None = None,
 ) -> None:
     name = _node_text(name_node, source)
     if not name or (name == "_" and kind != "type_parameter"):
@@ -515,6 +526,7 @@ def _add_local_binding(
             active_start_byte=active_start_byte,
             callable_kind=callable_kind,
             deferred_visible=deferred_visible,
+            callable_start_byte=callable_start_byte,
         )
     )
 
@@ -840,6 +852,12 @@ def _collect_javascript_context(
                 )
         if node.type in _JAVASCRIPT_FUNCTION_NODES:
             parameters = node.child_by_field_name("parameters")
+            single_parameter = node.child_by_field_name("parameter")
+            if single_parameter is not None:
+                _exclude(context, single_parameter)
+                _add_local_binding(context, name_node=single_parameter, source=source,
+                                   scope=node, declaration_start_byte=node.start_byte,
+                                   active_start_byte=node.start_byte)
             if parameters is not None:
                 for parameter in parameters.named_children:
                     pattern = (
@@ -872,14 +890,22 @@ def _collect_javascript_context(
                 scope = _javascript_function_scope(node)
             else:
                 scope = _javascript_lexical_scope(node)
+            initializer = node.child_by_field_name("value")
+            named_arrow = (name.type == "identifier" and initializer is not None
+                           and initializer.type == "arrow_function"
+                           and _node_text(declaration, source).lstrip().startswith("const "))
             for identifier in _identifier_nodes(name):
                 _add_local_binding(
                     context,
                     name_node=identifier,
                     source=source,
                     scope=scope,
-                    declaration_start_byte=declaration.start_byte,
+                    declaration_start_byte=node.start_byte if named_arrow else declaration.start_byte,
+                    declaration_end_byte=node.end_byte if named_arrow else None,
                     active_start_byte=scope.start_byte,
+                    kind="callable" if named_arrow else "value",
+                    callable_kind="function" if named_arrow else None,
+                    callable_start_byte=node.end_byte if named_arrow else None,
                 )
             continue
         if node.type == "catch_clause":
