@@ -28,7 +28,7 @@ from loci.storage.repository_catalog import (
 from loci.storage.store_layout import repository_cache_key
 
 INDEX_SCHEMA_VERSION = 7
-EXTRACTOR_VERSION = 28
+EXTRACTOR_VERSION = 29
 MIN_SEARCH_SELECTIONS = 10
 MIN_ADVERSE_SEARCH_SELECTIONS = 3
 MIN_EXTRACTION_RETRIEVALS = 10
@@ -88,6 +88,7 @@ def _validate_graph_state(
             graph_state.type_relations, imports=graph_state.imports,
             exports=graph_state.exports, indexed_nodes=indexed_nodes,
             file_hashes=file_hashes, input_hashes=graph_state.input_hashes,
+            symbol_references=graph_state.symbol_references,
         )
     built_in_edges = [
         edge

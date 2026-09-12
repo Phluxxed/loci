@@ -25,6 +25,18 @@ class inheritance, an inferred method set, interface satisfaction or the target
 of a promoted-member call.
 _Avoid_: inheritance, inferred implementation, promoted dispatch
 
+**Authored trait contract**: A Rust declaration explicitly requires a trait,
+including a trait that names a supertrait. The requirement does not identify a
+trait-object call target, a monomorphized runtime target or every implementing
+type.
+_Avoid_: dynamic dispatch, implementation census
+
+**Implementation site**: A separate Rust declaration that names a self type
+and, for a trait implementation, the implemented trait. Its methods belong to
+that site; the declaration does not transfer ownership to the trait or self
+type.
+_Avoid_: inferred implementation, runtime target
+
 **Candidate universe**: The stated set of possible targets considered under a
 particular binding scope. Completeness within that universe does not establish
 completeness across the repository or language.

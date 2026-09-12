@@ -392,6 +392,7 @@ mod outer {
     for name, (visibility, scope) in expected.items():
         assert items[name].metadata == {
             "loci": {
+                "rust_type_configuration": "declared_possible",
                 "rust_item": {
                     "lexical_module_path": ["outer", "inner"],
                     "visibility": visibility,

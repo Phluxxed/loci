@@ -39,6 +39,7 @@ class Relation:
     edge: dict[str, Any]
     traversed: str
     sources: tuple[Span, ...]
+    resolution_configuration: str | None = None
 
 
 @dataclass(frozen=True)
@@ -265,10 +266,13 @@ def _append_bundle(state: _State, bundle: Bundle) -> _State:
         if relation_id is None:
             relation_id = len(candidate.relations) + 1
             candidate.relation_keys[key] = relation_id
-            candidate.relations.append({
+            value = {
                 "id": relation_id, "edge": copy.deepcopy(relation.edge),
                 "traversed": relation.traversed, "source_ids": source_ids,
-            })
+            }
+            if relation.resolution_configuration is not None:
+                value["resolution_configuration"] = relation.resolution_configuration
+            candidate.relations.append(value)
         else:
             current = candidate.relations[relation_id - 1]["source_ids"]
             candidate.relations[relation_id - 1]["source_ids"] = list(dict.fromkeys([*current, *source_ids]))
@@ -299,7 +303,11 @@ def _source_id(state: _State, span: Span) -> int:
 def _relation_key(relation: Relation) -> str:
     try:
         return json.dumps(
-            {"edge": relation.edge, "traversed": relation.traversed},
+            {
+                "edge": relation.edge,
+                "traversed": relation.traversed,
+                "resolution_configuration": relation.resolution_configuration,
+            },
             ensure_ascii=False, separators=(",", ":"), sort_keys=True,
         )
     except (TypeError, ValueError) as exc:

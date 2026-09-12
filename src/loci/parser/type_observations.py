@@ -86,6 +86,12 @@ def extract_type_observations(
         return extract_python_type_observations(
             path, source_file=source_file, source_hash=source_hash, symbols=symbols,
         )
+    if language == "rust":
+        from .rust_type_observations import extract_rust_type_observations
+
+        return extract_rust_type_observations(
+            path, source_file=source_file, source_hash=source_hash, symbols=symbols,
+        )
     if language == "go":
         from .go_type_observations import extract_go_type_observations
 

@@ -23,7 +23,15 @@ from .type_context import _CachedSource
 
 
 INTENTS = ("locate", "type_dependencies", "dependencies", "impact")
-TYPE_WEIGHTS = {"uses_type": .9, "extends": .95, "implements": .9, "embeds": .95}
+TYPE_WEIGHTS = {
+    "uses_type": .9,
+    "extends": .95,
+    "implements": .9,
+    "embeds": .95,
+    "supertrait": .95,
+    "impl_trait": .9,
+    "impl_self_type": .9,
+}
 IMPACT_WEIGHTS = {**TYPE_WEIGHTS, "calls": .9, "references": .7, "references_type": .75}
 DEPENDENCY_WEIGHTS = {**TYPE_WEIGHTS, "calls": .9, "references": .7}
 _STRUCTURAL_CONTEXTS = frozenset({"alias", "type_query", "type_argument", "constraint"})
@@ -102,7 +110,9 @@ class _Source:
         self.hashes = {n["file_path"]: n["content_hash"] for n in nodes.values() if n.get("kind") == "file"}
         self.languages = {n["file_path"]: n.get("language") for n in nodes.values() if n.get("kind") == "file"}
         self.definitions: dict[str, Span] = {}
-        self.go_import_declarations: dict[str, tuple[_GoImportDeclaration, ...]] = {}
+        self.go_import_declarations: dict[str, tuple[_Declaration, ...]] = {}
+        self.rust_declarations: dict[str, tuple[_Declaration, ...]] = {}
+        self.rust_configuration_attributes: dict[tuple[str, str, int, int], tuple[Span, ...]] = {}
 
     def definition(self, node: dict) -> Span:
         if node["id"] not in self.definitions:
@@ -126,8 +136,11 @@ class _Source:
             if node["content_hash"] != support.content_hash or node["file_path"] != support.file:
                 raise ValueError("Call definition support differs from its indexed endpoint")
             return self.definition(node)
-        if support.kind == "import_binding" and self.languages.get(support.file) == "go":
+        language = self.languages.get(support.file)
+        if support.kind == "import_binding" and language == "go":
             return self.go_import_declaration(support)
+        if support.kind in {"import_binding", "reexport", "module_declaration"} and language == "rust":
+            return self.rust_declaration(support)
         value = self.cache.support(support)
         return Span(value["file"], value["byte_offset"],
                     value["byte_offset"] + len(value["content"].encode("utf-8")),
@@ -145,39 +158,154 @@ class _Source:
         ]
         if len(matches) != 1:
             raise ValueError("Go import support has no unique enclosing declaration")
+        return _span_from_declaration(raw, support, matches[0])
+
+    def rust_declaration(self, support) -> Span:
+        raw, _ = self.cache.file(support.file, support.content_hash)
+        declarations = self.rust_declarations.get(support.file)
+        if declarations is None:
+            declarations = _rust_declarations(raw)
+            self.rust_declarations[support.file] = declarations
+        expected_kind = {
+            "import_binding": "use_declaration",
+            "reexport": "use_declaration",
+            "module_declaration": "mod_item",
+        }.get(support.kind)
+        matches = [
+            declaration for declaration in declarations
+            if declaration.kind == expected_kind
+            and declaration.statement_line == support.line
+        ]
+        if len(matches) != 1:
+            raise ValueError("Rust support has no unique enclosing declaration")
         declaration = matches[0]
-        try:
-            content = raw[declaration.start_byte:declaration.end_byte].decode("utf-8")
-        except UnicodeDecodeError as exc:
-            raise ValueError("Go import declaration is not UTF-8") from exc
-        return Span(
-            support.file, declaration.start_byte, declaration.end_byte,
-            declaration.start_line, declaration.end_line,
-            support.content_hash, content,
+        if declaration.kind != "use_declaration":
+            return _span_from_declaration(raw, support, declaration)
+        index = declarations.index(declaration)
+        start = end = index
+        while (
+            start
+            and declarations[start - 1].container == declaration.container
+            and not raw[declarations[start - 1].end_byte:declarations[start].start_byte].strip()
+        ):
+            start -= 1
+        while (
+            end + 1 < len(declarations)
+            and declarations[end + 1].container == declaration.container
+            and not raw[declarations[end].end_byte:declarations[end + 1].start_byte].strip()
+        ):
+            end += 1
+        block = _Declaration(
+            declaration.kind,
+            declarations[start].start_byte,
+            declarations[end].end_byte,
+            declarations[start].start_line,
+            declarations[end].end_line,
+            declarations[start].statement_line,
+            declaration.container,
         )
+        return _span_from_declaration(raw, support, block)
+
+    def rust_configuration_support(self, record) -> tuple[Span, ...]:
+        """Return exact cfg/other outer attributes for Rust record endpoints."""
+        if getattr(record.raw, "language", None) != "rust":
+            return ()
+        endpoint_ids = [
+            getattr(record, "source_id", getattr(record, "caller_id", None)),
+            getattr(record, "target_id", None),
+        ]
+        endpoint_ids.extend(
+            getattr(item, "endpoint_id", None) for item in getattr(record, "support", ())
+        )
+        spans = []
+        for endpoint_id in dict.fromkeys(endpoint_ids):
+            node = self.nodes.get(endpoint_id)
+            if not isinstance(node, Mapping) or node.get("language") != "rust":
+                continue
+            file = node.get("file_path")
+            offset = node.get("byte_offset")
+            length = node.get("byte_length")
+            if (
+                not isinstance(file, str) or not isinstance(self.hashes.get(file), str)
+                or type(offset) is not int or type(length) is not int or length <= 0
+            ):
+                continue
+            content_hash = self.hashes[file]
+            key = (file, content_hash, offset, offset + length)
+            attributes = self.rust_configuration_attributes.get(key)
+            if attributes is None:
+                attributes = self._rust_endpoint_attributes(
+                    file, content_hash, offset, offset + length,
+                )
+                self.rust_configuration_attributes[key] = attributes
+            spans.extend(attributes)
+        return tuple(dict.fromkeys(spans))
+
+    def _rust_endpoint_attributes(
+        self, file: str, content_hash: str, start_byte: int, end_byte: int,
+    ) -> tuple[Span, ...]:
+        raw, _ = self.cache.file(file, content_hash)
+        try:
+            from tree_sitter import Parser
+            from tree_sitter_language_pack import get_language
+
+            root = Parser(get_language("rust")).parse(raw).root_node
+        except Exception as exc:
+            raise ValueError("Rust configuration support source could not be parsed") from exc
+        if root.has_error:
+            raise ValueError("Rust configuration support source has parse errors")
+        matched = next(
+            (
+                node for node in _walk_tree_nodes(root)
+                if node.start_byte == start_byte and node.end_byte == end_byte
+            ),
+            None,
+        )
+        if matched is None:
+            raise ValueError("Rust endpoint has no exact declaration node")
+        attributes = []
+        node = matched
+        while node is not None:
+            sibling = node.prev_named_sibling
+            while sibling is not None:
+                if sibling.type == "attribute_item":
+                    attributes.append(sibling)
+                elif sibling.type not in {"block_comment", "line_comment"}:
+                    break
+                sibling = sibling.prev_named_sibling
+            node = node.parent
+        spans = []
+        for attribute in sorted(
+            { (item.start_byte, item.end_byte) for item in attributes },
+        ):
+            start, end = attribute
+            content = raw[start:end].decode("utf-8")
+            line = raw[:start].count(b"\n") + 1
+            spans.append(Span(file, start, end, line, line + content.count("\n"), content_hash, content))
+        return tuple(spans)
 
     def control(self, control) -> Span:
-        """Deliver complete, currently verified Go control bytes as evidence."""
+        """Deliver complete, currently verified repository controls as evidence."""
         file = control.file
-        if not _is_go_control_path(file):
-            raise ValueError("Go control evidence has an unsafe path")
+        if not _is_control_path(file):
+            raise ValueError("Control evidence has an unsafe path")
         try:
             data, relative = read_contained_file(
                 self.cache.repo,
                 Path(file),
-                record="Go control evidence",
+                record="Control evidence",
                 max_bytes=MAX_GO_CONTROL_BYTES,
             )
         except GraphContractError as exc:
-            raise ValueError("Go control evidence is unavailable") from exc
+            raise ValueError("Control evidence is unavailable") from exc
         if relative != file or hashlib.sha256(data).hexdigest() != control.content_hash:
-            raise ValueError("Go control evidence differs from indexed input")
+            raise ValueError("Control evidence differs from indexed input")
         if not data:
-            raise ValueError("Go control evidence is empty")
+            raise ValueError("Control evidence is empty")
         try:
             content = data.decode("utf-8")
         except UnicodeDecodeError as exc:
-            raise ValueError("Go control evidence is not UTF-8") from exc
+            raise ValueError("Control evidence is not UTF-8") from exc
         return Span(
             file, 0, len(data), 1, data[:-1].count(b"\n") + 1,
             control.content_hash, content,
@@ -196,14 +324,23 @@ class _Source:
 
 
 @dataclass(frozen=True)
-class _GoImportDeclaration:
+class _Declaration:
+    kind: str
     start_byte: int
     end_byte: int
     start_line: int
     end_line: int
+    statement_line: int
+    container: tuple[int, int]
 
 
-def _go_import_declarations(source: bytes) -> tuple[_GoImportDeclaration, ...]:
+def _walk_tree_nodes(node):
+    yield node
+    for child in node.named_children:
+        yield from _walk_tree_nodes(child)
+
+
+def _go_import_declarations(source: bytes) -> tuple[_Declaration, ...]:
     try:
         from tree_sitter import Parser
         from tree_sitter_language_pack import get_language
@@ -222,11 +359,61 @@ def _go_import_declarations(source: bytes) -> tuple[_GoImportDeclaration, ...]:
         if node.end_point.column == 0 and node.end_byte > node.start_byte:
             end_line -= 1
         declarations.append(
-            _GoImportDeclaration(
-                node.start_byte, node.end_byte, start_line, end_line,
+            _Declaration(
+                node.type, node.start_byte, node.end_byte, start_line, end_line,
+                node.start_point.row + 1, (node.parent.start_byte, node.parent.end_byte),
             )
         )
     return tuple(declarations)
+
+
+def _rust_declarations(source: bytes) -> tuple[_Declaration, ...]:
+    try:
+        from tree_sitter import Parser
+        from tree_sitter_language_pack import get_language
+
+        root = Parser(get_language("rust")).parse(source).root_node
+    except Exception as exc:
+        raise ValueError("Rust declaration source could not be parsed") from exc
+    if root.has_error:
+        raise ValueError("Rust declaration source has parse errors")
+    declarations = []
+    stack = [root]
+    while stack:
+        parent = stack.pop()
+        children = list(parent.named_children)
+        for index, node in enumerate(children):
+            if node.type not in {"use_declaration", "mod_item"}:
+                continue
+            start = node.start_byte
+            for preceding in reversed(children[:index]):
+                if preceding.type != "attribute_item":
+                    break
+                start = preceding.start_byte
+            start_line = source[:start].count(b"\n") + 1
+            end_line = node.end_point.row + 1
+            if node.end_point.column == 0 and node.end_byte > start:
+                end_line -= 1
+            declarations.append(
+                _Declaration(
+                    node.type, start, node.end_byte, start_line, end_line,
+                    node.start_point.row + 1, (node.parent.start_byte, node.parent.end_byte),
+                )
+            )
+        stack.extend(reversed(children))
+    return tuple(sorted(declarations, key=lambda item: (item.start_byte, item.end_byte)))
+
+
+def _span_from_declaration(raw: bytes, support, declaration: _Declaration) -> Span:
+    try:
+        content = raw[declaration.start_byte:declaration.end_byte].decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise ValueError("Declaration source is not UTF-8") from exc
+    return Span(
+        support.file, declaration.start_byte, declaration.end_byte,
+        declaration.start_line, declaration.end_line,
+        support.content_hash, content,
+    )
 
 
 @dataclass(frozen=True)
@@ -252,11 +439,20 @@ class _PackageClauseSupport:
     endpoint_id: str | None = None
 
 
+@dataclass(frozen=True)
+class _ModuleDeclarationSupport:
+    kind: str
+    file: str
+    line: int
+    content_hash: str
+    endpoint_id: str | None = None
+
+
 def _edge_key(edge: GraphEdge) -> tuple[str, str, str, int]:
     return edge.type, edge.from_id, edge.to_id, edge.evidence.line
 
 
-def _is_go_control_path(value: Any) -> bool:
+def _is_control_path(value: Any) -> bool:
     if not isinstance(value, str) or not value or "\\" in value:
         return False
     path = PurePosixPath(value)
@@ -264,8 +460,16 @@ def _is_go_control_path(value: Any) -> bool:
         not path.is_absolute()
         and ".." not in path.parts
         and path.as_posix() == value
-        and path.name in {"go.mod", "go.work"}
+        and path.name in {"go.mod", "go.work", "Cargo.toml"}
     )
+
+
+def _is_go_control_path(value: Any) -> bool:
+    return _is_control_path(value) and PurePosixPath(value).name in {"go.mod", "go.work"}
+
+
+def _is_rust_control_path(value: Any) -> bool:
+    return _is_control_path(value) and PurePosixPath(value).name == "Cargo.toml"
 
 
 def _go_controls(state: GraphIndexState) -> tuple[_ControlEvidence, ...]:
@@ -276,6 +480,18 @@ def _go_controls(state: GraphIndexState) -> tuple[_ControlEvidence, ...]:
         and isinstance(content_hash, str)
         and re.fullmatch(r"[0-9a-f]{64}", content_hash) is not None
     )
+
+
+def _rust_controls(state: GraphIndexState, files: tuple[str, ...]) -> tuple[_ControlEvidence, ...]:
+    controls = []
+    for file in sorted(set(files)):
+        content_hash = state.input_hashes.get(file)
+        if not _is_rust_control_path(file) or not isinstance(content_hash, str):
+            continue
+        if re.fullmatch(r"[0-9a-f]{64}", content_hash) is None:
+            continue
+        controls.append(_ControlEvidence(file, content_hash))
+    return tuple(controls)
 
 
 def _go_package_clause_support(record: Any, nodes: Mapping[str, dict]) -> tuple[_PackageClauseSupport, ...]:
@@ -312,6 +528,66 @@ def _go_package_clause_support(record: Any, nodes: Mapping[str, dict]) -> tuple[
     return (_PackageClauseSupport("package_clause", target_file, line, content_hash),)
 
 
+def _rust_module_declaration_support(
+    record: Any, state: GraphIndexState,
+) -> tuple[_ModuleDeclarationSupport, ...]:
+    raw = getattr(record, "raw", None)
+    if getattr(raw, "language", None) != "rust":
+        return ()
+    seed_files = {
+        value for value in (
+            getattr(raw, "source_file", None), getattr(record, "target_file", None),
+        ) if isinstance(value, str)
+    }
+    seed_files.update(
+        support.file for support in getattr(record, "support", ())
+        if isinstance(getattr(support, "file", None), str)
+    )
+    result = []
+    pending = sorted(seed_files)
+    seen_files = set()
+    # Each resolved external module record proves one parent hop.  Follow only
+    # those recorded hops from the involved files back to their crate roots.
+    while pending:
+        target_file = pending.pop(0)
+        if target_file in seen_files:
+            continue
+        seen_files.add(target_file)
+        parents = [
+            imported for imported in state.imports
+            if (
+                imported.status == "resolved"
+                and imported.raw.rust is not None
+                and imported.raw.rust.kind == "module"
+                and imported.target_file == target_file
+            )
+        ]
+        for imported in sorted(parents, key=lambda item: (
+            item.raw.source_file, item.raw.line, item.raw.specifier,
+        )):
+            result.append(_ModuleDeclarationSupport(
+                "module_declaration", imported.raw.source_file, imported.raw.line,
+                imported.raw.source_hash, imported.target_id,
+            ))
+            pending.append(imported.raw.source_file)
+    record_line = getattr(raw, "line", None)
+    for observation in state.rust_module_observations:
+        context = observation.rust
+        if (
+            context is not None
+            and context.kind == "module"
+            and context.inline
+            and observation.source_file in seen_files
+            and type(record_line) is int
+            and observation.line <= record_line <= observation.line + observation.text.count("\n")
+        ):
+            result.append(_ModuleDeclarationSupport(
+                "module_declaration", observation.source_file, observation.line,
+                observation.source_hash,
+            ))
+    return tuple(dict.fromkeys(result))
+
+
 def _records(state: GraphIndexState, nodes: Mapping[str, dict]) -> dict[tuple, _EdgeRecord]:
     result = {}
     go_controls = _go_controls(state)
@@ -322,8 +598,9 @@ def _records(state: GraphIndexState, nodes: Mapping[str, dict]) -> dict[tuple, _
     for record in sorted(state.type_relations, key=lambda r: type_site_key(r.raw)):
         if record.status == "resolved":
             key = record.raw.relation, record.source_id, record.target_id, record.raw.line
-            controls = tuple(getattr(record, "resolution_controls", ())) if record.raw.language == "go" else ()
-            result.setdefault(key, _EdgeRecord(record, record.raw.context, record.support, controls))
+            controls = tuple(getattr(record, "resolution_controls", ())) if record.raw.language in {"go", "rust"} else ()
+            support = (*record.support, *_rust_module_declaration_support(record, state))
+            result.setdefault(key, _EdgeRecord(record, record.raw.context, support, controls))
     for record in state.calls:
         if record.status == "resolved":
             key = "calls", record.caller_id, record.target_id, record.raw.line
@@ -338,9 +615,13 @@ def _records(state: GraphIndexState, nodes: Mapping[str, dict]) -> dict[tuple, _
                 support = (*support, *reference.support)
             if record.raw.language == "go":
                 support = (*support, *_go_package_clause_support(record, nodes))
+            if record.raw.language == "rust":
+                support = (*support, *_rust_module_declaration_support(record, state))
             result.setdefault(key, _EdgeRecord(
                 record, None, support,
-                go_controls if record.raw.language == "go" else (),
+                go_controls if record.raw.language == "go" else _rust_controls(
+                    state, record.resolution_control_files,
+                ) if record.raw.language == "rust" else (),
             ))
     for record in state.symbol_references:
         if record.status == "resolved":
@@ -349,9 +630,13 @@ def _records(state: GraphIndexState, nodes: Mapping[str, dict]) -> dict[tuple, _
             support = record.support
             if record.raw.language == "go":
                 support = (*support, *_go_package_clause_support(record, nodes))
+            if record.raw.language == "rust":
+                support = (*support, *_rust_module_declaration_support(record, state))
             result.setdefault(key, _EdgeRecord(
                 record, None, support,
-                go_controls if record.raw.language == "go" else (),
+                go_controls if record.raw.language == "go" else _rust_controls(
+                    state, record.resolution_control_files,
+                ) if record.raw.language == "rust" else (),
             ))
     return result
 
@@ -366,7 +651,9 @@ def _priority(step, node, record, source, query_terms, intent, depth, degree, th
         matches |= query_terms & member_terms
         if depth == 0:
             reason, relevance = "Direct declared type", 1.0
-        elif step.edge.type in {"extends", "implements", "embeds"} or (
+        elif step.edge.type in {
+            "extends", "implements", "embeds", "supertrait", "impl_trait", "impl_self_type",
+        } or (
             record.context in _STRUCTURAL_CONTEXTS and not member_terms
         ):
             reason, relevance = "Authored type or heritage continuation", .95
@@ -426,7 +713,25 @@ def explore_context(
     if intent == "dependencies":
         edges = tuple(edge for edge in edges if edge.type in TYPE_WEIGHTS
                       or nodes[edge.from_id].get("language") == "javascript")
-    adjacency = graph_adjacency(edges, direction="incoming" if intent == "impact" else "outgoing")
+    if intent == "impact":
+        adjacency = graph_adjacency(edges, direction="incoming")
+    else:
+        adjacency = graph_adjacency(edges, direction="outgoing")
+        if intent in {"type_dependencies", "dependencies"}:
+            reverse_impls = graph_adjacency(
+                [edge for edge in edges if edge.type == "impl_self_type"],
+                direction="incoming",
+            )
+            adjacency = {
+                node_id: tuple(sorted(
+                    (*adjacency.get(node_id, ()), *reverse_impls.get(node_id, ())),
+                    key=lambda step: (
+                        step.to_id, step.edge.type, step.edge.evidence.file,
+                        step.edge.evidence.line, step.traversed,
+                    ),
+                ))
+                for node_id in sorted(set(adjacency) | set(reverse_impls))
+            }
     records = _records(state, nodes)
     degrees = Counter(endpoint for edge in edges for endpoint in (edge.from_id, edge.to_id))
     threshold = graph_hub_threshold(len(edges))
@@ -463,8 +768,12 @@ def explore_context(
                 supports = (
                     *(source.support(item) for item in record.support),
                     *(source.control(item) for item in record.controls),
+                    *source.rust_configuration_support(record.record),
                 )
-                relation_values.append(Relation(step.edge.to_dict(), step.traversed, supports))
+                relation_values.append(Relation(
+                    step.edge.to_dict(), step.traversed, supports,
+                    getattr(record.record, "resolution_configuration", None),
+                ))
             role = "anchor" if not steps else "dependency" if intent in {"type_dependencies", "dependencies"} else "dependent"
             bundles.append(Bundle({"id": node_id, "name": node["name"], "kind": node["kind"],
                                    "file": node["file_path"], "role": role, "depth": len(steps), "why": why},
@@ -475,7 +784,7 @@ def explore_context(
         if intent == "locate":
             continue
         if intent in {"type_dependencies", "dependencies"}:
-            supported = {"typescript", "python", "javascript", "go"} if intent == "dependencies" else {"typescript", "python", "go"}
+            supported = {"typescript", "python", "javascript", "go", "rust"} if intent == "dependencies" else {"typescript", "python", "go", "rust"}
             if node.get("language") not in supported:
                 omissions["unsupported_language"] += 1
                 continue

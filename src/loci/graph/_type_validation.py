@@ -20,6 +20,7 @@ def validate_type_records(
     indexed_nodes: Mapping[str, Mapping[str, Any]],
     file_hashes: Mapping[str, str],
     input_hashes: Mapping[str, str],
+    symbol_references: Sequence = (),
 ) -> None:
     """Re-establish outcomes against current owner, binding and target evidence."""
     symbols = [Symbol.from_dict(dict(value)) for value in indexed_nodes.values()]
@@ -50,7 +51,7 @@ def validate_type_records(
                 raise _error("Type resolution control is stale", file=control.file)
         for binding in raw.local_bindings:
             expected_namespace = {
-                "class": "both", "enum": "both", "interface": "type", "type": "type",
+                "class": "both", "enum": "both", "interface": "type", "type": "type", "struct": "type", "trait": "type",
                 "type_parameter": "type", "function": "value", "constant": "value",
                 "parameter": "value", "namespace": "both", "unindexed": binding.namespace,
             }[binding.kind]
@@ -59,6 +60,7 @@ def validate_type_records(
     expected = resolve_type_relations(
         [record.raw for record in records], symbols=symbols, imports=imports,
         exports=exports, file_hashes=file_hashes, input_hashes=input_hashes,
+        symbol_references=symbol_references,
     )
     actual = sorted(records, key=lambda record: type_site_key(record.raw))
     if [record.to_dict() for record in actual] != [record.to_dict() for record in expected]:
@@ -75,7 +77,7 @@ def validate_type_projection(
 ) -> None:
     """Persisted type edges must be the complete deterministic record projection."""
     actual = [edge for edge in edges if edge.namespace == "loci"
-              and edge.type in {"uses_type", "extends", "implements", "embeds"}]
+              and edge.type in {"uses_type", "extends", "implements", "embeds", "supertrait", "impl_trait", "impl_self_type"}]
     key = lambda edge: (edge.type, edge.from_id, edge.to_id)
     if sorted(actual, key=key) != sorted(materialize_type_edges(records), key=key):
         raise _error("Persisted type edges do not match the complete record projection")

@@ -32,7 +32,7 @@ ResolutionTier: TypeAlias = Literal[
 ]
 
 GRAPH_SCHEMA_VERSION = 1  # Public contribution and retrieval envelopes.
-GRAPH_STATE_SCHEMA_VERSION = 13  # Persisted index.json.graph envelope only.
+GRAPH_STATE_SCHEMA_VERSION = 14  # Persisted index.json.graph envelope only.
 # Gates persisted graph reuse when resolver semantics change independently of
 # extraction.
 GRAPH_RESOLVER_VERSION = 1
@@ -400,7 +400,7 @@ def validate_graph_edges(
                 call_index=call_index,
             )
         elif edge_kind in {
-            ("loci", "uses_type"), ("loci", "extends"), ("loci", "implements"), ("loci", "embeds"),
+            ("loci", "uses_type"), ("loci", "extends"), ("loci", "implements"), ("loci", "embeds"), ("loci", "supertrait"), ("loci", "impl_trait"), ("loci", "impl_self_type"),
         }:
             from ._type_validation import validate_type_edge
 
