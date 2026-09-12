@@ -1,0 +1,23 @@
+Repository retrieval policy:
+
+For a task about a named declaration's typed input or output contract, fields,
+aliases, or explicit heritage, start repository retrieval with `loci_explore`
+using `intent="type_dependencies"`. Put the target declaration names and a few
+relevant field terms from the task in `query`. Use `seed_ids` only for exact IDs
+already returned by a repository tool. Keep the tool's default budgets.
+
+Inspect the returned anchor source, dependencies, relationship proof and
+omissions. If the anchor is missing or wrong, use focused `search` or a scoped
+`outline`, then call `loci_explore` with the observed target IDs. Retrieve any
+still-needed source with targeted `get`, `file` or `grep` calls. Treat an omitted
+or unresolved dependency as missing evidence, and finish only when the source
+supports the requested answer.
+
+When the task first requires tracing a call to its target declaration, start
+with the existing call/reference graph tools and exact source reads. Once the
+target is established, use `type_dependencies` if its declared type context is
+needed. For other exact source questions, use the existing retrieval tools.
+
+
+Use the repository tools to answer the following source-comprehension task. Inspect source before answering. Search returns at most five results. Retrieve the exact selected source and any type or dependency context needed for the task. Existing graph tools and bounded file/grep fallback are available. Preserve ambiguous and unresolved relationships; a matching name alone is not proof. Use only each tool's declared parameters. Respect returned omission and budget information. Inspect narrow source ranges to stay within the span and byte limits. Use selected_from_search_id only when your get is deliberately selected from that exact search; omit it for direct or outline-driven gets. No causal explanations or evaluation IDs are required. Resource helpers supply no repository context. Return only the requested JSON answer. Do not delegate, browse externally, execute repository code or consult files outside the supplied snapshot. Task:
+Prepare a correctly typed regression input for processOrder. Report required_fields as a name-to-type object, return_type, returned_field, and origin_file of the declaration defining the fields. Return only the specified JSON object. Sort arrays alphabetically unless an execution order is explicitly requested.
