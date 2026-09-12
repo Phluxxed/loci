@@ -2820,7 +2820,7 @@
           "id": "task_9a6c46f91458e3b44d5a46977af6fb97",
           "title": "Deliver Rust type, trait and implementation context",
           "outcome": "Rust exploration returns the authored type, trait-bound and explicit implementation context required by the frozen Rust tasks.",
-          "details": "Added to the existing Objective at Vik's direction on 12 September 2026, before further implementation. This Task is planned and unstarted.\n\nPreserve declared-possible versus configuration-convergent resolution boundaries. Do not run Cargo/rustc, macros or build scripts, or fetch crates during normal indexing.\n\nFrozen W4.1 cases: rust_authored_trait_contract, rust_contained_optional_reexport, rust_known_call_impact, rust_unproven_contracts. The input check demonstrates UserId type alias extraction is missing. Preserve separate impl-site ownership and trait/self-type links. Optional contained workspace dependency remains declared_possible; Cargo control mutation refreshes proof.\nContract and pinned inputs: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/docs/design/2026-09-12-multilingual-context-cases.md\nSource-only input check: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/benchmarks/corpora/multilingual-context-v1/input-check.json",
+          "details": "Completed 13 September 2026 at isolated exploration commit 5d9180ce00d7d315987d877063db8090082b922a. Rust type_dependencies/dependencies now deliver aliases, authored type/generic contracts, supertraits and separately owned implementation sites with exact source and complete Cargo/module/import/re-export/configuration proof. UserId extraction is repaired. Four frozen Rust cases pass. Bounded review fixed associated-type leakage, inherited external-module configuration/proof and unowned-file exact claims. Combined focused compatibility/stdio 749 and final Rust 23 checks pass (overlapping sets); graph state 14/extractor 29 invalidate prior caches. No provider study or runtime promotion. Next: W4.6 task_5463db0ee464fec8e1bc4db41ab17986, including TSX Badge.\n\nAcceptance: https://github.com/Phluxxed/loci/blob/5d9180ce00d7d315987d877063db8090082b922a/docs/reviews/2026-09-13-rust-context.md\nFrozen inputs remain unchanged at 82f045cc8bad324950ca0c2aa1f9125c089c4dc6.",
           "decompositionComplete": true,
           "completionCriteria": [
             "Resolve declared type uses/aliases, supported generic bounds, supertraits and explicit impl Trait for Type sites using exact ownership, visibility and repository-contained Cargo/module bindings. Declare the direction and meaning of every added relation.",
@@ -2834,7 +2834,58 @@
             "task_20015e6a552bcd64cff4d3a003b8ba4d"
           ],
           "externalBlocker": null,
-          "completion": null,
+          "completion": {
+            "evidence": [
+              {
+                "criterion": "Resolve declared type uses/aliases, supported generic bounds, supertraits and explicit impl Trait for Type sites using exact ownership, visibility and repository-contained Cargo/module bindings. Declare the direction and meaning of every added relation.",
+                "summary": "Authored aliases, signature/field/generic dependencies, supertraits and separate impl_trait/impl_self_type links resolve through exact lexical ownership or same-occurrence validated Rust references. Relation meanings and direction are documented; UserId extraction repaired.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/5d9180ce00d7d315987d877063db8090082b922a/docs/reviews/2026-09-13-rust-context.md",
+                  "https://github.com/Phluxxed/loci/blob/5d9180ce00d7d315987d877063db8090082b922a/tests/test_rust_context_delivery.py"
+                ]
+              },
+              {
+                "criterion": "An authored impl or trait bound does not identify a dynamic trait-object call, monomorphized runtime target or all implementing types. Macros/generated code, divergent cfg alternatives, external crates and ambiguous bindings remain explicit limits.",
+                "summary": "Explicit impl/bound source establishes no dynamic trait-object target, monomorphization or implementing set. Generic/Self shadow, associated projections, ambiguous namespaces, divergent cfg routes, external/inaccessible and unowned files remain unresolved. Conditional source/module/Cargo routes retain declared_possible.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/5d9180ce00d7d315987d877063db8090082b922a/docs/reviews/2026-09-13-rust-context.md",
+                  "https://github.com/Phluxxed/loci/blob/5d9180ce00d7d315987d877063db8090082b922a/tests/test_rust_context_delivery.py"
+                ]
+              },
+              {
+                "criterion": "Return the required definitions with exact declaration ownership, source spans/hashes and complete binding/import/re-export evidence through the shared exploration interface; preserve relationship direction and language-specific meaning.",
+                "summary": "Shared exploration delivers exact search/get definitions, complete imports/reexports/module declarations, configuration attributes and contained Cargo control bytes. Reversed impl_self_type selection and incoming impact preserve stored edge direction.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/5d9180ce00d7d315987d877063db8090082b922a/docs/reviews/2026-09-13-rust-context.md",
+                  "https://github.com/Phluxxed/loci/blob/5d9180ce00d7d315987d877063db8090082b922a/tests/test_rust_context_delivery.py"
+                ]
+              },
+              {
+                "criterion": "Required positive and same-name/wrong-origin, shadowed, ambiguous, external and unsupported negative cases pass. Unproven targets remain explicit diagnostics; no guessed exact relationship, repository/toolchain execution or network lookup is introduced.",
+                "summary": "All four immutable Rust cases and focused namespace/trait-kind, lexical/module scope, associated-type leakage, cfg, wrong-origin and ownership negatives pass. No Cargo/rustc, macro/build-script or network execution was introduced to indexing.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/5d9180ce00d7d315987d877063db8090082b922a/docs/reviews/2026-09-13-rust-context.md",
+                  "https://github.com/Phluxxed/loci/blob/5d9180ce00d7d315987d877063db8090082b922a/tests/test_rust_context_delivery.py"
+                ]
+              },
+              {
+                "criterion": "Source, target and applicable resolver-control changes invalidate stale relationships and delivered proof. Existing search/get, imports, references and calls retain their documented behavior.",
+                "summary": "Source, target, Cargo and external-module configuration changes refresh proof. Modified persisted type targets/configuration reject replay. Combined focused compatibility/stdio run passed 749 checks; final Rust slice 23 passed after last guard (overlapping sets). Graph state 14/extractor 29 invalidate stale data.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/5d9180ce00d7d315987d877063db8090082b922a/docs/reviews/2026-09-13-rust-context.md",
+                  "https://github.com/Phluxxed/loci/blob/5d9180ce00d7d315987d877063db8090082b922a/tests/test_rust_context_delivery.py"
+                ]
+              },
+              {
+                "criterion": "The frozen Rust tasks retain all required definitions within budgets, with trait/type same-name negatives, applicable Cargo/configuration refresh and supported incoming-impact controls.",
+                "summary": "All frozen Rust required positive definitions/proof fit 8192 evidence/16384 serialized MCP bytes. Optional workspace dependency refresh, incoming static caller controls, strict actual MCP schemas and full/reduced/zero budgets pass; corpus still 19 cases/16 snapshots unchanged.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/5d9180ce00d7d315987d877063db8090082b922a/docs/reviews/2026-09-13-rust-context.md",
+                  "https://github.com/Phluxxed/loci/blob/5d9180ce00d7d315987d877063db8090082b922a/tests/test_rust_context_delivery.py"
+                ]
+              }
+            ]
+          },
           "discontinued": null,
           "tasks": []
         },
