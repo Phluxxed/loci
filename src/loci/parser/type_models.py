@@ -20,6 +20,8 @@ def valid_type_import_path(language: str, path: Sequence[str], binding: Any) -> 
     if language in {"typescript", "javascript"}:
         return ((binding.kind == "symbol" and len(path) == 1)
                 or (binding.kind == "namespace" and len(path) == 2))
+    if language == "go":
+        return binding.kind == "namespace" and len(path) == 2 and binding.local_name in {None, path[0]}
     if language != "python":
         return False
     if binding.kind == "symbol":
@@ -57,7 +59,7 @@ TypeBindingKind: TypeAlias = Literal[
     "unindexed",
 ]
 TypeNamespace: TypeAlias = Literal["type", "value", "both"]
-TypeRelationKind: TypeAlias = Literal["uses_type", "extends", "implements"]
+TypeRelationKind: TypeAlias = Literal["uses_type", "extends", "implements", "embeds"]
 TypeObservationContext: TypeAlias = Literal[
     "annotation",
     "return",
@@ -67,11 +69,15 @@ TypeObservationContext: TypeAlias = Literal[
     "constraint",
     "type_query",
     "heritage",
+    "struct_embedding",
+    "interface_embedding",
 ]
 TypeLookupSpace: TypeAlias = Literal["type", "value"]
 TypeBindingState: TypeAlias = Literal[
     "local",
     "imported",
+    "package",
+    "deferred",
     "shadowed",
     "ambiguous",
     "unbound",
@@ -96,7 +102,7 @@ TYPE_BINDING_KINDS = frozenset(
     }
 )
 TYPE_NAMESPACES = frozenset({"type", "value", "both"})
-TYPE_RELATIONS = frozenset({"uses_type", "extends", "implements"})
+TYPE_RELATIONS = frozenset({"uses_type", "extends", "implements", "embeds"})
 TYPE_CONTEXTS = frozenset(
     {
         "annotation",
@@ -107,11 +113,13 @@ TYPE_CONTEXTS = frozenset(
         "constraint",
         "type_query",
         "heritage",
+        "struct_embedding",
+        "interface_embedding",
     }
 )
 TYPE_LOOKUP_SPACES = frozenset({"type", "value"})
 TYPE_BINDING_STATES = frozenset(
-    {"local", "imported", "shadowed", "ambiguous", "unbound", "unsupported"}
+    {"local", "imported", "package", "deferred", "shadowed", "ambiguous", "unbound", "unsupported"}
 )
 
 MAX_TYPE_BINDINGS_PER_OBSERVATION = 16
@@ -329,12 +337,22 @@ class RawTypeObservation:
 
     def __post_init__(self) -> None:
         _relative_path(self.source_file, "source_file")
-        if self.language not in {"typescript", "python", "javascript"}:
-            raise ValueError("language must be typescript, python or javascript")
+        if self.language not in {"typescript", "python", "javascript", "go"}:
+            raise ValueError("language must be typescript, python, javascript or go")
         if self.language == "javascript" and (
             self.relation != "extends" or self.context != "heritage" or self.lookup_space != "value"
         ):
             raise ValueError("JavaScript observations require authored value-space class heritage")
+        if self.relation == "embeds" and (self.language != "go" or self.context not in {"struct_embedding", "interface_embedding"}):
+            raise ValueError("embedding requires an authored Go embedding context")
+        if self.context in {"struct_embedding", "interface_embedding"} and self.relation != "embeds":
+            raise ValueError("embedding context requires an embeds relation")
+        if self.language == "go" and (self.relation not in {"uses_type", "embeds"} or self.lookup_space != "type"):
+            raise ValueError("Go observations require authored types or embedding")
+        if self.binding_state == "package" and (self.language != "go" or len(self.path) != 1 or self.local_bindings or self.import_bindings):
+            raise ValueError("package lookup requires a bare Go name without lexical bindings")
+        if self.binding_state == "deferred" and (self.language != "go" or len(self.path) != 2 or self.local_bindings or not self.import_bindings or any(b.kind != "namespace" or b.local_name is not None for b in self.import_bindings)):
+            raise ValueError("deferred Go lookup requires implicit package imports")
         _integer(self.line, "line", minimum=1)
         _integer(self.column, "column", minimum=1)
         start, end = _range(self.start_byte, self.end_byte, "observation")

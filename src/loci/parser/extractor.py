@@ -25,6 +25,16 @@ FRONTMATTER_SCALAR_FIELDS = (
 )
 FRONTMATTER_LIST_FIELDS = ("tags",)
 
+GOOS_SUFFIXES = frozenset({
+    "aix", "android", "darwin", "dragonfly", "freebsd", "hurd", "illumos", "ios",
+    "js", "linux", "netbsd", "openbsd", "plan9", "solaris", "wasip1", "windows", "zos",
+})
+GOARCH_SUFFIXES = frozenset({
+    "386", "amd64", "amd64p32", "arm", "arm64", "arm64be", "armbe", "loong64", "mips",
+    "mips64", "mips64le", "mips64p32", "mips64p32le", "mipsle", "ppc", "ppc64", "ppc64le",
+    "riscv", "riscv64", "s390", "s390x", "sparc", "sparc64", "wasm",
+})
+
 
 def parse_file(
     path: Path,
@@ -593,7 +603,9 @@ def _walk(
                 )
         return
 
-    if node_type in spec.symbol_node_types:
+    if node_type in spec.symbol_node_types or (
+        language == "go" and node_type == "type_alias"
+    ):
         _extract_symbol(
             node,
             source,
@@ -630,6 +642,8 @@ def _walk(
 
 
 def _symbol_kind(node, spec: LanguageSpec, language: str, source: bytes) -> str | None:
+    if language == "go" and node.type == "type_alias":
+        return "type"
     if language == "python" and is_python_type_alias(node, source):
         return "type"
     if language in {"javascript", "typescript", "tsx"} and node.type == "variable_declarator":
@@ -752,6 +766,15 @@ def _extract_symbol(
 
     sym_id = make_symbol_id(file_path, qualified_name, kind)
 
+    metadata = _rust_item_metadata(node, source) if language == "rust" else {}
+    if language == "go":
+        metadata = {
+            "loci": {
+                "go_package_level": _go_package_level(node),
+                "go_type_configuration": _go_type_configuration(node, source, file_path),
+            }
+        }
+
     out.append(Symbol(
         id=sym_id,
         name=name,
@@ -766,10 +789,65 @@ def _extract_symbol(
         content_hash=content_hash,
         decorators=decorators,
         keywords=sorted(keywords),
-        metadata=_rust_item_metadata(node, source) if language == "rust" else {},
+        metadata=metadata,
         line=line,
         end_line=end_line,
     ))
+
+
+def _go_package_level(node) -> bool:
+    """Whether a Go declaration appears outside a callable body."""
+    if node.type == "method_declaration":
+        return False
+    current = node.parent
+    while current is not None:
+        if current.type == "source_file":
+            return True
+        if current.type in {"function_declaration", "method_declaration", "func_literal"}:
+            return False
+        current = current.parent
+    return False
+
+
+def _go_type_configuration(node, source: bytes, file_path: str) -> str:
+    """Classify source requiring an unevaluated Go build configuration."""
+    root = node
+    while root.parent is not None:
+        root = root.parent
+
+    if _go_filename_has_platform_suffix(file_path):
+        return "unsupported"
+    for item in _go_nodes(root):
+        if item.type == "comment":
+            text = source[item.start_byte:item.end_byte].decode("utf-8", errors="replace")
+            if re.match(r"//(?:go:build|\s+\+build)(?:\s|$)", text):
+                return "unsupported"
+        if item.type == "import_spec":
+            path = item.child_by_field_name("path")
+            if path is not None and source[path.start_byte:path.end_byte] in {b'"C"', b"`C`"}:
+                return "unsupported"
+    return "unconditional"
+
+
+def _go_filename_has_platform_suffix(file_path: str) -> bool:
+    stem = Path(file_path).stem
+    parts = stem.split("_")
+    if len(parts) < 2:
+        return False
+    return parts[-1] in GOOS_SUFFIXES | GOARCH_SUFFIXES or (
+        len(parts) >= 3
+        and parts[-2] in GOOS_SUFFIXES
+        and parts[-1] in GOARCH_SUFFIXES
+    )
+
+
+def _go_nodes(node):
+    """Yield a Go syntax subtree without interpreting its declarations."""
+    stack = [node]
+    while stack:
+        current = stack.pop()
+        yield current
+        stack.extend(reversed(current.children))
 
 
 def _extract_name(node, spec: LanguageSpec, source: bytes) -> Optional[str]:

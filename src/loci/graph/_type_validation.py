@@ -75,7 +75,7 @@ def validate_type_projection(
 ) -> None:
     """Persisted type edges must be the complete deterministic record projection."""
     actual = [edge for edge in edges if edge.namespace == "loci"
-              and edge.type in {"uses_type", "extends", "implements"}]
+              and edge.type in {"uses_type", "extends", "implements", "embeds"}]
     key = lambda edge: (edge.type, edge.from_id, edge.to_id)
     if sorted(actual, key=key) != sorted(materialize_type_edges(records), key=key):
         raise _error("Persisted type edges do not match the complete record projection")

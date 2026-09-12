@@ -18,16 +18,19 @@ TypeSupportKind: TypeAlias = Literal[
     "import_binding",
     "local_export",
     "reexport",
+    "package_clause",
 ]
 TypeRelationStatus: TypeAlias = Literal["resolved", "unresolved"]
 TypeResolutionBasis: TypeAlias = Literal[
     "lexical_binding",
+    "package_binding",
     "direct_binding",
     "qualified_member",
     "reexport_chain",
 ]
 TypeCandidateUniverse: TypeAlias = Literal[
     "lexical_scope",
+    "package_scope",
     "import_surface",
     "unavailable",
 ]
@@ -36,6 +39,8 @@ TypeUnresolvedReason: TypeAlias = Literal[
     "unsupported_owner",
     "ambiguous_owner",
     "type_parameter",
+    "binding_shadowed",
+    "unsupported_configuration",
     "binding_not_found",
     "binding_ambiguous",
     "binding_unindexed",
@@ -50,14 +55,14 @@ TypeUnresolvedReason: TypeAlias = Literal[
 ]
 
 TYPE_SUPPORT_KINDS = frozenset(
-    {"type_site", "owner", "definition", "import_binding", "local_export", "reexport"}
+    {"type_site", "owner", "definition", "import_binding", "local_export", "reexport", "package_clause"}
 )
 TYPE_RELATION_STATUSES = frozenset({"resolved", "unresolved"})
 TYPE_RESOLUTION_BASES = frozenset(
-    {"lexical_binding", "direct_binding", "qualified_member", "reexport_chain"}
+    {"lexical_binding", "package_binding", "direct_binding", "qualified_member", "reexport_chain"}
 )
 TYPE_CANDIDATE_UNIVERSES = frozenset(
-    {"lexical_scope", "import_surface", "unavailable"}
+    {"lexical_scope", "package_scope", "import_surface", "unavailable"}
 )
 TYPE_UNRESOLVED_REASONS = frozenset(
     {
@@ -65,6 +70,8 @@ TYPE_UNRESOLVED_REASONS = frozenset(
         "unsupported_owner",
         "ambiguous_owner",
         "type_parameter",
+        "binding_shadowed",
+        "unsupported_configuration",
         "binding_not_found",
         "binding_ambiguous",
         "binding_unindexed",
@@ -296,15 +303,18 @@ class TypeRelationRecord:
                     or len(self.raw.path) != 1
                 ):
                     raise ValueError("lexical resolutions require local lexical evidence")
-            elif (
-                self.candidate_universe != "import_surface"
-                or self.raw.binding_state != "imported"
-                or len(self.raw.import_bindings) != 1
-            ):
-                raise ValueError("import resolutions require imported binding evidence")
+            elif self.resolution_basis == "package_binding":
+                if self.raw.language != "go" or self.raw.binding_state != "package" or self.candidate_universe != "package_scope" or "package_clause" not in support_kinds:
+                    raise ValueError("package resolutions require Go package evidence")
             else:
-                import_binding = self.raw.import_bindings[0]
-                if not valid_type_import_path(self.raw.language, self.raw.path, import_binding):
+                if self.candidate_universe != "import_surface":
+                    raise ValueError("import resolutions require an import surface")
+                if self.raw.language == "go" and self.raw.binding_state == "deferred":
+                    if self.resolution_basis != "qualified_member" or "package_clause" not in support_kinds:
+                        raise ValueError("deferred package lookup requires qualified package evidence")
+                elif self.raw.binding_state != "imported" or len(self.raw.import_bindings) != 1:
+                    raise ValueError("import resolutions require imported binding evidence")
+                if not all(valid_type_import_path(self.raw.language, self.raw.path, binding) for binding in self.raw.import_bindings):
                     raise ValueError("resolved import paths must match their binding kind")
             if "owner" not in support_kinds or "definition" not in support_kinds:
                 raise ValueError(
@@ -324,7 +334,7 @@ class TypeRelationRecord:
 
         if self.status != "resolved":
             return None
-        if self.resolution_basis == "lexical_binding":
+        if self.resolution_basis in {"lexical_binding", "package_binding"}:
             return "exact"
         return "import-resolved"
 

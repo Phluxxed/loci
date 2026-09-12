@@ -391,7 +391,7 @@ def _extract_go_exports(
     source_hash: str,
 ) -> None:
     for node in _walk_nodes(root):
-        if node.type not in {"function_declaration", "type_spec", "const_spec"}:
+        if node.type not in {"function_declaration", "type_spec", "type_alias", "const_spec"}:
             continue
         if not _go_package_level(node):
             continue

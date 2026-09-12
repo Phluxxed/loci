@@ -155,7 +155,7 @@ def test_loci_explore_bad_inputs_are_structured_service_errors(tmp_path: Path) -
             assert invalid_intent.is_error
             assert invalid_intent.structured_content["error"]["code"] == "INVALID_INPUT"
             assert invalid_intent.structured_content["error"]["details"] == {
-                "supported_intents": ["locate", "type_dependencies", "impact"],
+                "supported_intents": ["locate", "type_dependencies", "dependencies", "impact"],
                 "fallback_intent": "locate",
             }
 

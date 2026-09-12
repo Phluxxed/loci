@@ -202,7 +202,7 @@ def expand_type_context(
         records.sort(key=lambda record: (record.raw.start_byte, record.raw.end_byte, record.target_id or ""))
     edges = {(edge.type, edge.from_id, edge.to_id): edge for edge in graph_state.edges
              if edge.namespace == "loci"
-             and edge.type in {"references_type", "uses_type", "extends", "implements"}
+             and edge.type in {"references_type", "uses_type", "extends", "implements", "embeds"}
              and edge.resolution in {"exact", "import-resolved"} and edge.directed}
     source = _CachedSource(repo_path, store)
     evidence_keys: set[tuple[str, int]] = set()
