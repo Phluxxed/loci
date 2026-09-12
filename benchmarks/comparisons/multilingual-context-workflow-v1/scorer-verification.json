@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "comparison": "multilingual-context-workflow-v1",
+  "provider_calls": 0,
+  "implementation": "fresh fixture indexes and direct current service.explore packets",
+  "mapping_coverage": {
+    "validated": true,
+    "mapped_kinds": [
+      "go:alias_target",
+      "go:calls",
+      "go:generic_constraint",
+      "go:interface_embedding",
+      "go:parameter_type",
+      "go:return_type",
+      "go:struct_embedding",
+      "go:type_argument",
+      "javascript:calls",
+      "javascript:direct_class_extends",
+      "python:alias_target",
+      "python:calls",
+      "python:direct_class_base",
+      "python:field_annotation",
+      "python:literal_forward_annotation",
+      "python:parameter_annotation",
+      "python:type_argument",
+      "rust:calls",
+      "rust:field_type",
+      "rust:generic_bound",
+      "rust:impl_self_type",
+      "rust:impl_trait",
+      "rust:parameter_type",
+      "rust:return_type",
+      "rust:supertrait",
+      "typescript:parameter_type"
+    ],
+    "count": 26
+  },
+  "unknown_kind_rejection": {
+    "rejected": true,
+    "error": "unsupported multilingual relationship mappings: [('python', 'unknown_preflight_kind')]"
+  },
+  "checks": [
+    {
+      "family": "python",
+      "case_id": "python_alias_annotation",
+      "intent": "type_dependencies",
+      "seed_ids": [
+        "consumer.py::decode#function",
+        "consumer.py::Alias#type"
+      ],
+      "positive": true,
+      "zero_budget": true,
+      "missing_proof": true,
+      "wrong_origin": true,
+      "wrong_origin_not_applicable": false,
+      "relationships_not_applicable": false
+    },
+    {
+      "family": "javascript",
+      "case_id": "javascript_value_dependencies",
+      "intent": "dependencies",
+      "seed_ids": [
+        "app.js::run#function",
+        "helper.js::make#function"
+      ],
+      "positive": true,
+      "zero_budget": true,
+      "missing_proof": true,
+      "wrong_origin": true,
+      "wrong_origin_not_applicable": false,
+      "relationships_not_applicable": false
+    },
+    {
+      "family": "go",
+      "case_id": "go_alias_generic_contract",
+      "intent": "type_dependencies",
+      "seed_ids": [
+        "app/main.go::Build#function",
+        "model/model.go::AliasID#type"
+      ],
+      "positive": true,
+      "zero_budget": true,
+      "missing_proof": true,
+      "wrong_origin": true,
+      "wrong_origin_not_applicable": false,
+      "relationships_not_applicable": false
+    },
+    {
+      "family": "rust",
+      "case_id": "rust_authored_trait_contract",
+      "intent": "type_dependencies",
+      "seed_ids": [
+        "src/lib.rs::build#function",
+        "src/lib.rs::Receipt#struct",
+        "src/lib.rs::Envelope#struct",
+        "src/lib.rs::Receipt#impl",
+        "src/lib.rs::Receipt#impl~1"
+      ],
+      "positive": true,
+      "zero_budget": true,
+      "missing_proof": true,
+      "wrong_origin": true,
+      "wrong_origin_not_applicable": false,
+      "relationships_not_applicable": false
+    },
+    {
+      "family": "tsx",
+      "case_id": "tsx_props_control",
+      "intent": "type_dependencies",
+      "seed_ids": [
+        "badge.tsx::Badge#function"
+      ],
+      "positive": true,
+      "zero_budget": true,
+      "missing_proof": true,
+      "wrong_origin": true,
+      "wrong_origin_not_applicable": false,
+      "relationships_not_applicable": false
+    },
+    {
+      "family": "markdown",
+      "case_id": "markdown_section_control",
+      "intent": "locate",
+      "seed_ids": [
+        "guide.md::Context guide > Limits#section"
+      ],
+      "positive": true,
+      "zero_budget": true,
+      "missing_proof": true,
+      "wrong_origin": true,
+      "wrong_origin_not_applicable": true,
+      "relationships_not_applicable": true
+    }
+  ],
+  "failures": [],
+  "passed": true
+}
