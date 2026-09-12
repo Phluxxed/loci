@@ -210,7 +210,9 @@ def _extract_python_exports(
             target = declaration.child_by_field_name("left")
             if target is not None and target.type == "identifier":
                 value = _node_text(target, source)
-                if _python_constant_name(value):
+                from ._python_type_syntax import is_python_type_alias
+
+                if _python_constant_name(value) or is_python_type_alias(declaration, source):
                     _append_export(
                         exports,
                         evidence_node=child,

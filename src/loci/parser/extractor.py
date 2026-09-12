@@ -8,6 +8,7 @@ import textwrap
 import yaml
 
 from .symbols import Symbol, make_symbol_id
+from ._python_type_syntax import is_python_type_alias
 from .languages import get_language_spec, EXTENSION_MAP, MARKDOWN_SUFFIXES, LanguageSpec
 
 
@@ -628,7 +629,9 @@ def _walk(
         )
 
 
-def _symbol_kind(node, spec: LanguageSpec, language: str) -> str | None:
+def _symbol_kind(node, spec: LanguageSpec, language: str, source: bytes) -> str | None:
+    if language == "python" and is_python_type_alias(node, source):
+        return "type"
     if language in {"javascript", "typescript", "tsx"} and node.type == "variable_declarator":
         name = node.child_by_field_name("name")
         value = node.child_by_field_name("value")
@@ -653,7 +656,7 @@ def _recurse_body(
 ) -> None:
     """Find named declarations nested inside a type or callable body."""
     node_type = node.type
-    symbol_kind = _symbol_kind(node, spec, language)
+    symbol_kind = _symbol_kind(node, spec, language, source)
     is_container = node_type in spec.container_node_types
     if not is_container and symbol_kind not in {"function", "method"}:
         return
@@ -710,7 +713,7 @@ def _extract_symbol(
     if not name:
         return
 
-    kind = _symbol_kind(node, spec, language) or "function"
+    kind = _symbol_kind(node, spec, language, source) or "function"
     # Functions inside a class container become methods
     if parent_is_container and kind == "function":
         kind = "method"

@@ -128,6 +128,10 @@ class _Source:
 
     def member_terms(self, record) -> set[str]:
         raw = record.raw
+        if raw.language == "python" and raw.context == "alias":
+            # Python's explicit alias marker contains a colon but does not
+            # introduce a property branch requiring a field-name query.
+            return set()
         data, _ = self.cache.file(raw.source_file, raw.source_hash)
         prefix = data[max(raw.owner.start_byte, raw.start_byte - 4096):raw.start_byte].decode("utf-8", errors="ignore")
         match = _MEMBER.search(prefix)
@@ -282,7 +286,7 @@ def explore_context(
         if intent == "locate":
             continue
         if intent == "type_dependencies":
-            if node.get("language") != "typescript":
+            if node.get("language") not in {"typescript", "python"}:
                 omissions["unsupported_language"] += 1
                 continue
             omissions["unresolved_relation"] += unresolved[node_id]

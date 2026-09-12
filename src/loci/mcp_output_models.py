@@ -4,6 +4,7 @@ from pathlib import PurePosixPath
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, RootModel, model_validator
+from loci.parser.type_models import valid_type_import_path
 
 
 JSONValue = JsonValue
@@ -503,7 +504,7 @@ class LocalTypeBinding(StrictOutputModel):
 
 class RawTypeObservation(StrictOutputModel):
     source_file: str = Field(min_length=1)
-    language: Literal["typescript"]
+    language: Literal["typescript", "python"]
     line: int = Field(ge=1)
     column: int = Field(ge=1)
     start_byte: int = Field(ge=0)
@@ -1267,14 +1268,10 @@ class TypeRelationItem(StrictOutputModel):
                     self.candidate_universe == "import_surface"
                     and self.raw.binding_state == "imported"
                     and len(self.raw.import_bindings) == 1
-                    and len(self.raw.path) in {1, 2}
                 ):
                     raise ValueError("import resolutions require imported evidence")
                 binding = self.raw.import_bindings[0]
-                if (
-                    (binding.kind == "symbol" and len(self.raw.path) != 1)
-                    or (binding.kind == "namespace" and len(self.raw.path) != 2)
-                ):
+                if not valid_type_import_path(self.raw.language, self.raw.path, binding):
                     raise ValueError("resolved import paths must match their binding kind")
             if not {"owner", "definition"} <= support_kinds:
                 raise ValueError("resolved relations require owner and definition support")

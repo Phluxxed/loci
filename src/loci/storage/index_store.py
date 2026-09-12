@@ -28,7 +28,7 @@ from loci.storage.repository_catalog import (
 from loci.storage.store_layout import repository_cache_key
 
 INDEX_SCHEMA_VERSION = 7
-EXTRACTOR_VERSION = 25
+EXTRACTOR_VERSION = 26
 MIN_SEARCH_SELECTIONS = 10
 MIN_ADVERSE_SEARCH_SELECTIONS = 3
 MIN_EXTRACTION_RETRIEVALS = 10

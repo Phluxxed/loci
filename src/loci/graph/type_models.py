@@ -1,4 +1,4 @@
-"""Immutable graph records for resolved TypeScript type observations."""
+"""Immutable graph records for resolved authored type observations."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from pathlib import PurePosixPath
 from typing import Any, Literal, TypeAlias
 
 from loci.parser.reference_models import _sha256
-from loci.parser.type_models import RawTypeObservation
+from loci.parser.type_models import RawTypeObservation, valid_type_import_path
 
 
 TypeSupportKind: TypeAlias = Literal[
@@ -300,15 +300,11 @@ class TypeRelationRecord:
                 self.candidate_universe != "import_surface"
                 or self.raw.binding_state != "imported"
                 or len(self.raw.import_bindings) != 1
-                or len(self.raw.path) not in {1, 2}
             ):
                 raise ValueError("import resolutions require imported binding evidence")
             else:
                 import_binding = self.raw.import_bindings[0]
-                if (
-                    (import_binding.kind == "symbol" and len(self.raw.path) != 1)
-                    or (import_binding.kind == "namespace" and len(self.raw.path) != 2)
-                ):
+                if not valid_type_import_path(self.raw.language, self.raw.path, import_binding):
                     raise ValueError("resolved import paths must match their binding kind")
             if "owner" not in support_kinds or "definition" not in support_kinds:
                 raise ValueError(

@@ -1,4 +1,4 @@
-"""Bounded TypeScript type-site extraction.
+"""Bounded authored type-site extraction, with language-specific adapters.
 
 This module deliberately only records authored syntax.  Resolving a record to
 an indexed declaration belongs to the graph layer; extraction must never make
@@ -74,12 +74,18 @@ def extract_type_observations(
     source_hash: str,
     symbols: Sequence[Symbol],
 ) -> tuple[RawTypeObservation, ...]:
-    """Return exact TypeScript type-site observations for one source file.
+    """Return exact supported type-site observations for one source file.
 
     A separate parse is intentional.  Import/reference extraction shares a
     batch today, while this family needs declaration ownership rather than an
     executable owner and must leave that established payload untouched.
     """
+    if language == "python":
+        from .python_type_observations import extract_python_type_observations
+
+        return extract_python_type_observations(
+            path, source_file=source_file, source_hash=source_hash, symbols=symbols,
+        )
     if language != "typescript":
         return ()
     try:
