@@ -1,0 +1,317 @@
+[
+  {
+    "type": "thread.started",
+    "thread_id": "01a092fd-9a90-7680-99a5-38b0c58a1500"
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_0",
+      "type": "error",
+      "message": "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-p18jec57/agent-runtime/config.toml."
+    }
+  },
+  {
+    "type": "turn.started"
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_1",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "outline",
+      "arguments": {
+        "file": null
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_1",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "outline",
+      "arguments": {
+        "file": null
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "files": [
+            {
+              "file": "consumer.ts",
+              "symbols": [
+                {
+                  "id": "consumer.ts::processOrder#function",
+                  "name": "processOrder",
+                  "kind": "function",
+                  "line": 2,
+                  "end_line": 4,
+                  "signature": "function processOrder(value: ImportedPayload): string {",
+                  "summary": ""
+                },
+                {
+                  "id": "consumer.ts::__file__#file",
+                  "name": "consumer.ts",
+                  "kind": "file",
+                  "line": 1,
+                  "end_line": 1,
+                  "signature": "consumer.ts",
+                  "summary": ""
+                }
+              ]
+            },
+            {
+              "file": "types.ts",
+              "symbols": [
+                {
+                  "id": "types.ts::Payload#interface",
+                  "name": "Payload",
+                  "kind": "interface",
+                  "line": 1,
+                  "end_line": 4,
+                  "signature": "interface Payload {",
+                  "summary": ""
+                },
+                {
+                  "id": "types.ts::__file__#file",
+                  "name": "types.ts",
+                  "kind": "file",
+                  "line": 1,
+                  "end_line": 1,
+                  "signature": "types.ts",
+                  "summary": ""
+                }
+              ]
+            },
+            {
+              "file": "wrong.ts",
+              "symbols": [
+                {
+                  "id": "wrong.ts::Payload#interface",
+                  "name": "Payload",
+                  "kind": "interface",
+                  "line": 1,
+                  "end_line": 1,
+                  "signature": "interface Payload { unrelated: boolean; }",
+                  "summary": ""
+                },
+                {
+                  "id": "wrong.ts::__file__#file",
+                  "name": "wrong.ts",
+                  "kind": "file",
+                  "line": 1,
+                  "end_line": 1,
+                  "signature": "wrong.ts",
+                  "summary": ""
+                }
+              ]
+            }
+          ],
+          "_evaluation": {
+            "attempt_id": "same_name_wrong_file-r2-A-74439026-8409-4df2-90c5-6cf03d4cb7dd/attempt/1",
+            "calls_remaining": 23
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "consumer.ts::processOrder#function",
+          "types.ts::Payload#interface",
+          "wrong.ts::Payload#interface"
+        ]
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "consumer.ts::processOrder#function",
+          "types.ts::Payload#interface",
+          "wrong.ts::Payload#interface"
+        ]
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "consumer.ts::processOrder#function",
+              "source": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}",
+              "byte_offset": 69,
+              "byte_length": 83,
+              "line": 2,
+              "end_line": 4,
+              "signature": "function processOrder(value: ImportedPayload): string {",
+              "kind": "function",
+              "language": "typescript"
+            },
+            {
+              "id": "types.ts::Payload#interface",
+              "source": "interface Payload {\n  requestId: string;\n  amount: number;\n}",
+              "byte_offset": 7,
+              "byte_length": 60,
+              "line": 1,
+              "end_line": 4,
+              "signature": "interface Payload {",
+              "kind": "interface",
+              "language": "typescript"
+            },
+            {
+              "id": "wrong.ts::Payload#interface",
+              "source": "interface Payload { unrelated: boolean; }",
+              "byte_offset": 7,
+              "byte_length": 41,
+              "line": 1,
+              "end_line": 1,
+              "signature": "interface Payload { unrelated: boolean; }",
+              "kind": "interface",
+              "language": "typescript"
+            }
+          ],
+          "_evaluation": {
+            "attempt_id": "same_name_wrong_file-r2-A-74439026-8409-4df2-90c5-6cf03d4cb7dd/attempt/2",
+            "calls_remaining": 22
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_3",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_imports",
+      "arguments": {
+        "file": "consumer.ts",
+        "status": "all"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_3",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_imports",
+      "arguments": {
+        "file": "consumer.ts",
+        "status": "all"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "repo": "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-p18jec57/snapshot",
+          "file": "consumer.ts",
+          "status": "all",
+          "items": [
+            {
+              "raw": {
+                "source_file": "consumer.ts",
+                "language": "typescript",
+                "line": 1,
+                "text": "import type { Payload as ImportedPayload } from \"./types.js\";",
+                "specifier": "./types.js",
+                "imported_name": null,
+                "type_only": true,
+                "is_reexport": false,
+                "source_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "rust": null
+              },
+              "source_file": "consumer.ts",
+              "source_id": "consumer.ts::__file__#file",
+              "target_file": "types.ts",
+              "target_package": null,
+              "target_crate": null,
+              "target_module": null,
+              "target_kind": "file",
+              "target_id": "types.ts::__file__#file",
+              "specifier": "./types.js",
+              "imported_name": null,
+              "language": "typescript",
+              "line": 1,
+              "text": "import type { Payload as ImportedPayload } from \"./types.js\";",
+              "type_only": true,
+              "is_reexport": false,
+              "status": "resolved",
+              "resolution": "import-resolved",
+              "unresolved_reason": null,
+              "resolution_basis": "relative_path",
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            }
+          ],
+          "counts": {
+            "total": 1,
+            "resolved": 1,
+            "unresolved": 0,
+            "returned": 1
+          },
+          "pagination": {
+            "offset": 0,
+            "limit": 20,
+            "next_offset": null
+          },
+          "_evaluation": {
+            "attempt_id": "same_name_wrong_file-r2-A-74439026-8409-4df2-90c5-6cf03d4cb7dd/attempt/3",
+            "calls_remaining": 21
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_4",
+      "type": "agent_message",
+      "text": "{\"required_fields\":{\"amount\":\"number\",\"requestId\":\"string\"},\"return_type\":\"string\",\"returned_field\":\"requestId\",\"origin_file\":\"types.ts\"}"
+    }
+  },
+  {
+    "type": "turn.completed",
+    "usage": {
+      "input_tokens": 21758,
+      "cached_input_tokens": 17408,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 263,
+      "reasoning_output_tokens": 133
+    }
+  }
+]
