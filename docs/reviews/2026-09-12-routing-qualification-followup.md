@@ -1,5 +1,12 @@
 # Routing qualification follow-up decision
 
+> **Withdrawn — 12 September 2026.** Vik cancelled this diagnostic because it
+> extends into model-reliability research without a demonstrated Loci defect.
+> No diagnostic runs occurred. Return to the North Star's useful repository
+> context, evidence guarantees and language delivery. The proposal below is
+> retained as history; it is not active work. Existing benchmark verdicts remain
+> unchanged. Current work belongs in the canonical Manifest Objective.
+
 The repaired routing-v2 qualification remains **rejected**. The next useful
 work is a bounded answer-reliability diagnostic with source delivery held fixed.
 There is no demonstrated retrieval defect to repair from the remaining failure.
