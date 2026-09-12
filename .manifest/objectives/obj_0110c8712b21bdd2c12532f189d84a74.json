@@ -2537,7 +2537,7 @@
           "id": "task_20015e6a552bcd64cff4d3a003b8ba4d",
           "title": "Define useful context cases for each language",
           "outcome": "Each language has a small concrete context-delivery contract and budget that directly guides its implementation.",
-          "details": "Next implementation preparation after the completed TypeScript product review. Keep this focused on what useful code and dependency/contract context Python, JavaScript, Go and Rust should return, representative tasks, expected source and supported/unsupported cases. It does not build a new benchmark platform or run providers. Preserve the source/provenance/ambiguity/budget guarantees. Exact final measurement controls and scorer/output verification are prepared in W4.7 once the language implementations exist.",
+          "details": "Completed 12 September 2026 at exploration commit 82f045cc8bad324950ca0c2aa1f9125c089c4dc6. Nineteen small source/context cases and a language capability contract now guide implementation. Exact input checks pass; new language semantics and four missing declaration forms are explicitly unimplemented. No provider runs or final measurement freeze. Contract: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/docs/design/2026-09-12-multilingual-context-cases.md\nCorpus: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/benchmarks/corpora/multilingual-context-v1/README.md",
           "decompositionComplete": true,
           "completionCriteria": [
             "Publish a language-by-capability matrix separating existing search/import/reference/call support, new delivered context, and explicit unsupported semantics. Define useful locate, dependency/contract and known-impact questions per language without forcing TypeScript relationship names or type semantics onto other languages.",
@@ -2547,7 +2547,42 @@
           ],
           "dependencies": [],
           "externalBlocker": null,
-          "completion": null,
+          "completion": {
+            "evidence": [
+              {
+                "criterion": "Publish a language-by-capability matrix separating existing search/import/reference/call support, new delivered context, and explicit unsupported semantics. Define useful locate, dependency/contract and known-impact questions per language without forcing TypeScript relationship names or type semantics onto other languages.",
+                "summary": "Published the current-versus-required language matrix, locate/dependency/known-impact behavior and precise Python, plain JavaScript, Go and Rust authored syntax/unsupported boundaries. TypeScript/TSX and ordinary Markdown remain controls.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/docs/design/2026-09-12-multilingual-context-cases.md"
+                ]
+              },
+              {
+                "criterion": "Define small positive and adversarial context cases plus representative repository-work questions for each language, with expected source, relationships, unsupported outcomes and explicit evidence/output budgets before implementation. Preserve TypeScript/TSX regression controls and ordinary Markdown navigation; expected answers remain evaluator-only.",
+                "summary": "Published 19 cases in 16 snapshots (60 source/control files): four per new language, TSX/Markdown controls and one complete maintained Loci Python module task. Independent expected facts and exact source/relationship gold remain evaluator-only. Shared exploration budgets are 8,192 evidence and 16,384 output bytes; largest required source set is 2,033 bytes. Static review corrected Go symbol metadata and ordered-pair instructions.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/benchmarks/corpora/multilingual-context-v1/corpus.json",
+                  "https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/benchmarks/corpora/multilingual-context-v1/README.md"
+                ]
+              },
+              {
+                "criterion": "Record the pinned case/source inputs and a concrete way to compare required-context delivery, task success and total retrieval cost per language. Reuse existing measurement infrastructure; final implementation/tool-schema/model/provider/scorer freezing is part of W4.7 before measured runs, not a prerequisite for writing the language slice.",
+                "summary": "Corpus SHA-256 0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0; archive SHA-256 94cf067dc5e30c3139bdc75e1b4e9dfecf19db1c0b62f0e1404fb85e3254d4f5. Existing corpus loader/materializer/answer checking reused without new runner code. Integrity, exact source spans/endpoints, byte fit and retained 17-case TypeScript identity verified. W4.7 retains final implementation/schema/model/provider/scorer freezing and per-language comparison.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/benchmarks/corpora/multilingual-context-v1/corpus.json",
+                  "https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/benchmarks/corpora/multilingual-context-v1/input-check.json",
+                  "https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/docs/design/2026-09-12-multilingual-context-cases.md"
+                ]
+              },
+              {
+                "criterion": "Use the completed W2.5 product review as the starting boundary: preserve rejected comparisons, repair demonstrated retrieval defects, and do not launch model-reliability studies or repeat finished batches merely to obtain a pass.",
+                "summary": "Preserved the completed W2.5 product-review boundary and every rejected comparison. No providers, reliability study, repeated completed batch, runtime integration or promotion. Source-only parsing identifies missing Python/Go/Rust aliases and a JSX-bearing TSX function; these demonstrated retrieval targets are recorded in existing W4.2/W4.4/W4.5/W4.6 tasks.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/docs/design/2026-09-12-multilingual-context-cases.md",
+                  "https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/benchmarks/corpora/multilingual-context-v1/input-check.json"
+                ]
+              }
+            ]
+          },
           "discontinued": null,
           "tasks": []
         },
@@ -2555,7 +2590,7 @@
           "id": "task_118c2cfa255b8d3fca0a4846bd0bec96",
           "title": "Deliver Python contract and dependency context",
           "outcome": "Python exploration returns the authored annotation, alias and class-base definitions needed by the frozen Python tasks.",
-          "details": "Added to the existing Objective at Vik's direction on 12 September 2026, before further implementation. This Task is planned and unstarted.\n\nImplement only the authored forms established by the shared language contract. Do not evaluate Python annotations, import modules or infer arbitrary runtime types.",
+          "details": "Added to the existing Objective at Vik's direction on 12 September 2026, before further implementation. This Task is planned and unstarted.\n\nImplement only the authored forms established by the shared language contract. Do not evaluate Python annotations, import modules or infer arbitrary runtime types.\n\nFrozen W4.1 cases: python_alias_annotation, python_base_and_literal_forward, python_known_call_impact, python_unproven_contracts, plus python_loci_bundle_contract. The input check demonstrates that mixed-case Alias: TypeAlias = P is not yet indexed; include authored alias declaration extraction. Bare/dotted literal forward names only; no compound-string evaluation or incorrect parameter shadowing in definition-time annotations.\nContract and pinned inputs: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/docs/design/2026-09-12-multilingual-context-cases.md\nSource-only input check: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/benchmarks/corpora/multilingual-context-v1/input-check.json",
           "decompositionComplete": true,
           "completionCriteria": [
             "Extract and resolve the frozen Python annotation/type-expression, alias and direct class-base cases using lexical ownership and contained import/re-export bindings. State precisely which forward references and generic forms are supported.",
@@ -2577,7 +2612,7 @@
           "id": "task_b280004a5bac7e5e92970ea053b51bf8",
           "title": "Deliver JavaScript dependency and class context",
           "outcome": "Ordinary JavaScript receives useful related source for dependency questions and known static impact without invented TypeScript typing.",
-          "details": "Added to the existing Objective at Vik's direction on 12 September 2026, before further implementation. This Task is planned and unstarted.\n\nUse language-appropriate dependency evidence. Do not claim structural types or implements relationships merely because the shared machinery already exposes TypeScript type edges.",
+          "details": "Added to the existing Objective at Vik's direction on 12 September 2026, before further implementation. This Task is planned and unstarted.\n\nUse language-appropriate dependency evidence. Do not claim structural types or implements relationships merely because the shared machinery already exposes TypeScript type edges.\n\nFrozen W4.1 cases: javascript_value_dependencies, javascript_direct_class_base, javascript_known_call_impact, javascript_unproven_dependencies. All JavaScript fixtures are plain .js. Supply actual value/call dependencies, arrow/default-identifier and re-export proof, plus direct class extends; TypeScript-only empty context does not pass.\nContract and pinned inputs: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/docs/design/2026-09-12-multilingual-context-cases.md\nSource-only input check: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/benchmarks/corpora/multilingual-context-v1/input-check.json",
           "decompositionComplete": true,
           "completionCriteria": [
             "Use proven JavaScript import/re-export, reference and definite-call bindings to supply required dependency definitions; add source-proven direct class-extends context where the frozen tasks require it.",
@@ -2600,7 +2635,7 @@
           "id": "task_5eb1f78e6e2a876259dd9bf3b170288d",
           "title": "Deliver Go type and embedding context",
           "outcome": "Go exploration returns the type definitions and explicitly embedded declarations needed by the frozen Go tasks.",
-          "details": "Added to the existing Objective at Vik's direction on 12 September 2026, before further implementation. This Task is planned and unstarted.\n\nReuse existing Go import/package identity and controls; no ambient module cache, dependency download or Go execution during normal indexing.",
+          "details": "Added to the existing Objective at Vik's direction on 12 September 2026, before further implementation. This Task is planned and unstarted.\n\nReuse existing Go import/package identity and controls; no ambient module cache, dependency download or Go execution during normal indexing.\n\nFrozen W4.1 cases: go_alias_generic_contract, go_explicit_embedding, go_known_api_impact, go_unproven_package_uses. The input check demonstrates that AliasID = UserID is not yet indexed; include alias extraction. Existing Go declaration kind is type, retaining exact type-spec source and alias equals sign. Preserve struct/interface embedding meaning, package identity and go.mod mutation proof.\nContract and pinned inputs: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/docs/design/2026-09-12-multilingual-context-cases.md\nSource-only input check: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/benchmarks/corpora/multilingual-context-v1/input-check.json",
           "decompositionComplete": true,
           "completionCriteria": [
             "Resolve declared type uses, aliases versus defined types, generic argument/constraint uses and explicit struct/interface embedding within the frozen supported syntax and existing repository-contained package/module/workspace boundaries.",
@@ -2622,7 +2657,7 @@
           "id": "task_9a6c46f91458e3b44d5a46977af6fb97",
           "title": "Deliver Rust type, trait and implementation context",
           "outcome": "Rust exploration returns the authored type, trait-bound and explicit implementation context required by the frozen Rust tasks.",
-          "details": "Added to the existing Objective at Vik's direction on 12 September 2026, before further implementation. This Task is planned and unstarted.\n\nPreserve declared-possible versus configuration-convergent resolution boundaries. Do not run Cargo/rustc, macros or build scripts, or fetch crates during normal indexing.",
+          "details": "Added to the existing Objective at Vik's direction on 12 September 2026, before further implementation. This Task is planned and unstarted.\n\nPreserve declared-possible versus configuration-convergent resolution boundaries. Do not run Cargo/rustc, macros or build scripts, or fetch crates during normal indexing.\n\nFrozen W4.1 cases: rust_authored_trait_contract, rust_contained_optional_reexport, rust_known_call_impact, rust_unproven_contracts. The input check demonstrates UserId type alias extraction is missing. Preserve separate impl-site ownership and trait/self-type links. Optional contained workspace dependency remains declared_possible; Cargo control mutation refreshes proof.\nContract and pinned inputs: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/docs/design/2026-09-12-multilingual-context-cases.md\nSource-only input check: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/benchmarks/corpora/multilingual-context-v1/input-check.json",
           "decompositionComplete": true,
           "completionCriteria": [
             "Resolve declared type uses/aliases, supported generic bounds, supertraits and explicit impl Trait for Type sites using exact ownership, visibility and repository-contained Cargo/module bindings. Declare the direction and meaning of every added relation.",
@@ -2644,7 +2679,7 @@
           "id": "task_5463db0ee464fec8e1bc4db41ab17986",
           "title": "Verify the shared exploration interface across languages",
           "outcome": "All five programming-language families use the same dependable source/evidence interface with truthful capability reporting.",
-          "details": "Added to the existing Objective at Vik's direction on 12 September 2026, before further implementation. This Task is planned and unstarted.\n\nStop after the smallest checks directly covering these integration boundaries; do not add an unrelated broad acceptance campaign.",
+          "details": "Added to the existing Objective at Vik's direction on 12 September 2026, before further implementation. This Task is planned and unstarted.\n\nStop after the smallest checks directly covering these integration boundaries; do not add an unrelated broad acceptance campaign.\n\nAdditional W4.1 controls are tsx_props_control and markdown_section_control, with the old 17-case TypeScript corpus retained unchanged. The input check demonstrates that the JSX-bearing Badge function produces no indexed declaration: .tsx currently selects the TypeScript grammar. Repair this actual extraction/anchor defect and verify it through the normal host interface. This is within preserving TypeScript/TSX navigation acceptance; it does not reopen historical provider comparisons.\nContract and pinned inputs: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/docs/design/2026-09-12-multilingual-context-cases.md\nSource-only input check: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/benchmarks/corpora/multilingual-context-v1/input-check.json",
           "decompositionComplete": true,
           "completionCriteria": [
             "Exercise real normal MCP calls for Python, JavaScript, TypeScript/TSX, Go and Rust through the intended host, checking required definitions, complete proof paths, coverage, errors and omissions rather than tool discovery alone.",
