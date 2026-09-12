@@ -59,6 +59,12 @@ def extract_call_sites(
         raise ValueError("context must be a SyntaxContext")
 
     observations: list[RawCallSite] = []
+    if language == "javascript":
+        from ._javascript_mutations import mutated_roots
+
+        mutations = mutated_roots(root_node, source)
+    else:
+        mutations = frozenset()
     for node in _walk_nodes(root_node):
         if node.type not in _CALL_NODE_TYPES[language]:
             continue
@@ -71,6 +77,8 @@ def extract_call_sites(
             callee_form, callee_path = "dynamic", ()
         else:
             callee_form, callee_path = _classify_callee(callee, source, language)
+        if callee_path and callee_path[0] in mutations:
+            callee_form, callee_path = "dynamic", ()
         owner = nearest_executable_owner(context, node)
         local_candidates, local_binding_state = _local_call_binding(
             callee,
@@ -324,6 +332,12 @@ def _local_call_binding(
         binding.kind != "callable" or binding.callable_kind is None
         for binding in nearest
     ):
+        return (), "shadowed"
+    if any(binding.callable_start_byte is not None
+           and callee.start_byte < binding.callable_start_byte
+           and (owner.definition_start_byte, owner.definition_end_byte)
+               != (binding.declaration_start_byte, binding.declaration_end_byte)
+           for binding in nearest):
         return (), "shadowed"
 
     candidates_by_identity: dict[tuple[Any, ...], LocalCallableBinding] = {}

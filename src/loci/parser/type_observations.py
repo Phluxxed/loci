@@ -86,7 +86,7 @@ def extract_type_observations(
         return extract_python_type_observations(
             path, source_file=source_file, source_hash=source_hash, symbols=symbols,
         )
-    if language != "typescript":
+    if language not in {"typescript", "javascript"}:
         return ()
     try:
         source = path.read_bytes()
@@ -104,20 +104,28 @@ def extract_type_observations(
         from tree_sitter import Parser
         from tree_sitter_language_pack import get_language
 
-        grammar = "tsx" if path.suffix.lower() == ".tsx" else "typescript"
+        grammar = "tsx" if path.suffix.lower() == ".tsx" else language
         root = Parser(get_language(grammar)).parse(source).root_node
     except Exception as exc:
         raise TypeExtractionError(
-            "TYPE_PARSE_FAILED", f"could not parse {source_file} for TypeScript types", "parse_failed"
+            "TYPE_PARSE_FAILED", f"could not parse {source_file} for {language} declarations", "parse_failed"
         ) from exc
     if root.has_error:
         raise TypeExtractionError(
-            "TYPE_PARSE_FAILED", f"{source_file} could not be parsed for TypeScript types", "parse_error"
+            "TYPE_PARSE_FAILED", f"{source_file} could not be parsed for {language} declarations", "parse_error"
         )
 
     file_symbols = tuple(symbol for symbol in symbols if symbol.file_path == source_file)
     owners = _owners(root, source, file_symbols)
-    local_bindings = _local_bindings(root, source, file_symbols)
+    if language == "javascript":
+        from .javascript_heritage import heritage_bindings
+        from ._javascript_mutations import mutated_roots
+
+        local_bindings = heritage_bindings(root, source, file_symbols)
+        mutations = mutated_roots(root, source)
+    else:
+        local_bindings = _local_bindings(root, source, file_symbols)
+        mutations = frozenset()
     imports = _import_bindings(root, source)
     observations: list[RawTypeObservation] = []
     consumed: set[tuple[int, int, str]] = set()
@@ -131,6 +139,10 @@ def extract_type_observations(
         lookup_space: Literal["type", "value"] = "type",
         unsupported_reason: str | None = None,
     ) -> None:
+        if language == "javascript":
+            lookup_space = "value"
+            if path_value and path_value[0] in mutations:
+                unsupported_reason = unsupported_reason or "mutated_heritage_binding"
         if len(observations) >= MAX_TYPE_OBSERVATIONS_PER_FILE:
             raise TypeExtractionError(
                 "TYPE_OBSERVATION_LIMIT", f"{source_file} exceeds the type-site limit", "site_limit"
@@ -177,7 +189,7 @@ def extract_type_observations(
         observations.append(
             RawTypeObservation(
                 source_file=source_file,
-                language="typescript",
+                language=language,
                 source_hash=source_hash,
                 line=_line(source, node.start_byte),
                 column=_column(source, node.start_byte),
@@ -199,6 +211,13 @@ def extract_type_observations(
         )
 
     def visit(node: Any) -> None:
+        if language == "javascript":
+            if node.type == "class_heritage":
+                _heritage(node, source, add)
+                return
+            for child in node.named_children:
+                visit(child)
+            return
         unsupported = _unsupported_container(node)
         if unsupported is node:
             add(node, (), context=_context(node), unsupported_reason=f"unsupported_{node.type}")
@@ -541,12 +560,12 @@ def _same_scope(left: LocalTypeBinding, right: LocalTypeBinding) -> bool:
 
 
 def _heritage(node: Any, source: bytes, add: Any) -> None:
-    relation = "extends" if node.type in {"extends_clause", "extends_type_clause"} else "implements"
+    relation = "extends" if node.type in {"extends_clause", "extends_type_clause", "class_heritage"} else "implements"
     for child in node.named_children:
         head = child
         if child.type == "generic_type":
             head = child.named_children[0] if child.named_children else child
-        lookup_space = "value" if node.type == "extends_clause" else "type"
+        lookup_space = "value" if node.type in {"extends_clause", "class_heritage"} else "type"
         if head.type == "type_identifier":
             add(
                 head,

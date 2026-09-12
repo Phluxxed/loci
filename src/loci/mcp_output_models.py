@@ -504,7 +504,7 @@ class LocalTypeBinding(StrictOutputModel):
 
 class RawTypeObservation(StrictOutputModel):
     source_file: str = Field(min_length=1)
-    language: Literal["typescript", "python"]
+    language: Literal["typescript", "python", "javascript"]
     line: int = Field(ge=1)
     column: int = Field(ge=1)
     start_byte: int = Field(ge=0)
@@ -531,6 +531,10 @@ class RawTypeObservation(StrictOutputModel):
     @model_validator(mode="after")
     def _valid_observation(self) -> RawTypeObservation:
         _require_relative_path(self.source_file, "source_file")
+        if self.language == "javascript" and (
+            self.relation != "extends" or self.context != "heritage" or self.lookup_space != "value"
+        ):
+            raise ValueError("JavaScript observations require authored value-space class heritage")
         if self.start_byte >= self.end_byte:
             raise ValueError("observation span must be non-empty and ordered")
         if len(self.text.encode("utf-8")) != self.end_byte - self.start_byte:
@@ -1431,7 +1435,7 @@ class LociGraphCallsOutput(RootModel[LociGraphCallsSuccess | LociErrorOutput]):
     model_config = ConfigDict(json_schema_extra={"type": "object"})
 
 
-ExplorationIntent = Literal["locate", "type_dependencies", "impact"]
+ExplorationIntent = Literal["locate", "type_dependencies", "dependencies", "impact"]
 ExplorationStatus = Literal["ok", "partial", "empty"]
 ExplorationSelection = Literal["explicit", "inferred"]
 
@@ -1439,7 +1443,7 @@ ExplorationSelection = Literal["explicit", "inferred"]
 class ExplorationScope(StrictOutputModel):
     source: Literal["indexed_supported_source"]
     coverage: Literal["complete", "partial", "unknown"]
-    relationships: Literal["none", "authored_types", "known_static_dependents"]
+    relationships: Literal["none", "authored_types", "authored_dependencies", "known_static_dependents"]
     exhaustive: Literal[False]
 
 

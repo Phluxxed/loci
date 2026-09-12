@@ -153,7 +153,7 @@ def _base(base: Mapping[str, Any]) -> tuple[dict[str, Any], dict[str, int], int,
         raise ValueError("base is missing required exploration fields")
     if base["schema_version"] != 1:
         raise ValueError("schema_version must be 1")
-    if base["intent"] not in {"locate", "type_dependencies", "impact"}:
+    if base["intent"] not in {"locate", "type_dependencies", "dependencies", "impact"}:
         raise ValueError("intent is unsupported")
     if base["selection"] not in {"explicit", "inferred"}:
         raise ValueError("selection is unsupported")
