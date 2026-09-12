@@ -2590,7 +2590,7 @@
           "id": "task_118c2cfa255b8d3fca0a4846bd0bec96",
           "title": "Deliver Python contract and dependency context",
           "outcome": "Python exploration returns the authored annotation, alias and class-base definitions needed by the frozen Python tasks.",
-          "details": "Added to the existing Objective at Vik's direction on 12 September 2026, before further implementation. This Task is planned and unstarted.\n\nImplement only the authored forms established by the shared language contract. Do not evaluate Python annotations, import modules or infer arbitrary runtime types.\n\nFrozen W4.1 cases: python_alias_annotation, python_base_and_literal_forward, python_known_call_impact, python_unproven_contracts, plus python_loci_bundle_contract. The input check demonstrates that mixed-case Alias: TypeAlias = P is not yet indexed; include authored alias declaration extraction. Bare/dotted literal forward names only; no compound-string evaluation or incorrect parameter shadowing in definition-time annotations.\nContract and pinned inputs: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/docs/design/2026-09-12-multilingual-context-cases.md\nSource-only input check: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/benchmarks/corpora/multilingual-context-v1/input-check.json",
+          "details": "Completed 12 September 2026 at isolated exploration commit c170d91971e77ef68d0d3007a6de571781268ef5. Python contract extraction, exact local/import/reexport resolution, bounded source delivery and incoming impact now cover the five frozen W4.1 cases. The directly relevant acceptance set passes 204 checks, including 24 new Python checks and an actual stdio MCP call. Corpus integrity remains 19 cases / 16 snapshots with unchanged inputs and hashes. Canonical runtime and shared installations are not promoted.\n\nAcceptance and supported boundaries: https://github.com/Phluxxed/loci/blob/c170d91971e77ef68d0d3007a6de571781268ef5/docs/reviews/2026-09-12-python-context.md\nFrozen contract: https://github.com/Phluxxed/loci/blob/82f045cc8bad324950ca0c2aa1f9125c089c4dc6/docs/design/2026-09-12-multilingual-context-cases.md\n\nNext: W4.3 JavaScript, task_b280004a5bac7e5e92970ea053b51bf8.",
           "decompositionComplete": true,
           "completionCriteria": [
             "Extract and resolve the frozen Python annotation/type-expression, alias and direct class-base cases using lexical ownership and contained import/re-export bindings. State precisely which forward references and generic forms are supported.",
@@ -2604,7 +2604,60 @@
             "task_20015e6a552bcd64cff4d3a003b8ba4d"
           ],
           "externalBlocker": null,
-          "completion": null,
+          "completion": {
+            "evidence": [
+              {
+                "criterion": "Extract and resolve the frozen Python annotation/type-expression, alias and direct class-base cases using lexical ownership and contained import/re-export bindings. State precisely which forward references and generic forms are supported.",
+                "summary": "Python adapter resolves the five frozen cases through declaration-owned annotations, generic arguments, unions, explicit module TypeAlias assignments and direct class bases. Literal forwards accept only unescaped bare/dotted names; alias-marker and generic boundaries are documented.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/c170d91971e77ef68d0d3007a6de571781268ef5/docs/reviews/2026-09-12-python-context.md",
+                  "https://github.com/Phluxxed/loci/blob/c170d91971e77ef68d0d3007a6de571781268ef5/src/loci/parser/python_type_observations.py"
+                ]
+              },
+              {
+                "criterion": "Authored class bases do not imply computed MRO, structural Protocol/ABC satisfaction or runtime dispatch. Dynamic rebinding, metaclass/computed bases and unproven forward references remain unresolved.",
+                "summary": "Direct extends edges preserve authored base syntax. Computed expressions, metaclass/class keywords, generic binders and uncertain rebinding remain unresolved; no MRO, Protocol/ABC or runtime inference is performed.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/c170d91971e77ef68d0d3007a6de571781268ef5/docs/reviews/2026-09-12-python-context.md",
+                  "https://github.com/Phluxxed/loci/blob/c170d91971e77ef68d0d3007a6de571781268ef5/tests/parser/test_python_type_observations.py"
+                ]
+              },
+              {
+                "criterion": "Return the required definitions with exact declaration ownership, source spans/hashes and complete binding/import/re-export evidence through the shared exploration interface; preserve relationship direction and language-specific meaning.",
+                "summary": "Exact definitions and original ownership/spans/hashes, lexical/import/reexport support, direction and candidate completeness flow through exploration, optional get type context and type diagnostics. Actual stdio MCP acceptance passes.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/c170d91971e77ef68d0d3007a6de571781268ef5/docs/reviews/2026-09-12-python-context.md",
+                  "https://github.com/Phluxxed/loci/blob/c170d91971e77ef68d0d3007a6de571781268ef5/tests/test_python_context_mcp.py",
+                  "https://github.com/Phluxxed/loci/blob/c170d91971e77ef68d0d3007a6de571781268ef5/tests/test_python_type_relation_bindings.py"
+                ]
+              },
+              {
+                "criterion": "Required positive and same-name/wrong-origin, shadowed, ambiguous, external and unsupported negative cases pass. Unproven targets remain explicit diagnostics; no guessed exact relationship, repository/toolchain execution or network lookup is introduced.",
+                "summary": "Positive and wrong-origin/shadowed/wildcard/external/computed/unsupported cases pass. Extra checks reject qualified attribute suffixes, spoofed TypeAlias markers, match captures and Literal/Annotated value arguments without executing source or consulting a network.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/c170d91971e77ef68d0d3007a6de571781268ef5/docs/reviews/2026-09-12-python-context.md",
+                  "https://github.com/Phluxxed/loci/blob/c170d91971e77ef68d0d3007a6de571781268ef5/tests/test_python_context_delivery.py",
+                  "https://github.com/Phluxxed/loci/blob/c170d91971e77ef68d0d3007a6de571781268ef5/tests/parser/test_python_type_observations.py"
+                ]
+              },
+              {
+                "criterion": "Source, target and applicable resolver-control changes invalidate stale relationships and delivered proof. Existing search/get, imports, references and calls retain their documented behavior.",
+                "summary": "Source, target and barrel edits refresh the index and invalidate stale proof; extractor version 26 forces earlier caches to rebuild. Existing extraction, import/reference/call use, context and public schemas pass directly relevant checks.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/c170d91971e77ef68d0d3007a6de571781268ef5/docs/reviews/2026-09-12-python-context.md",
+                  "https://github.com/Phluxxed/loci/blob/c170d91971e77ef68d0d3007a6de571781268ef5/tests/test_python_context_delivery.py"
+                ]
+              },
+              {
+                "criterion": "The frozen Python source-delivery tasks retain every required definition within their output/evidence budgets, including focused selection and explicit omissions; supported locate and incoming-impact controls pass.",
+                "summary": "All five frozen Python cases deliver required source within unchanged 8192-byte evidence and 16384-byte output budgets. Focused Bundle selection uses the frozen question; alternative paths, unresolved relations and reduced/zero evidence are explicit. Locate and incoming calls/type impact pass.",
+                "references": [
+                  "https://github.com/Phluxxed/loci/blob/c170d91971e77ef68d0d3007a6de571781268ef5/docs/reviews/2026-09-12-python-context.md",
+                  "https://github.com/Phluxxed/loci/blob/c170d91971e77ef68d0d3007a6de571781268ef5/tests/test_python_context_delivery.py"
+                ]
+              }
+            ]
+          },
           "discontinued": null,
           "tasks": []
         },
