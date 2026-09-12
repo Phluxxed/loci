@@ -1,0 +1,4376 @@
+{
+  "version": "typescript-context-routing-v2",
+  "purpose": "byte-limit repair acceptance",
+  "provider_calls": 0,
+  "model_adoption_measured": false,
+  "modes": [
+    {
+      "mode": "omitted",
+      "arm": "B",
+      "case_id": "imported_interface",
+      "request_count": 2,
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.6683848750108154,
+      "model": "gpt-5.6-luna",
+      "reasoning": {
+        "effort": "high",
+        "context": "all_turns"
+      },
+      "tool_set": [
+        [
+          "functions",
+          "list_mcp_resources"
+        ],
+        [
+          "functions",
+          "list_mcp_resource_templates"
+        ],
+        [
+          "functions",
+          "read_mcp_resource"
+        ],
+        [
+          "mcp__evaluation",
+          "file"
+        ],
+        [
+          "mcp__evaluation",
+          "get"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_anchors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_calls"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_imports"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_paths"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_references"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_retrieve"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_traverse_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "grep"
+        ],
+        [
+          "mcp__evaluation",
+          "loci_explore"
+        ],
+        [
+          "mcp__evaluation",
+          "outline"
+        ],
+        [
+          "mcp__evaluation",
+          "search"
+        ]
+      ],
+      "tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "canonical_tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "call_event": {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "type_dependencies",
+            "query": "processOrder"
+          },
+          "result": {
+            "content": [],
+            "structured_content": {
+              "schema_version": 1,
+              "intent": "type_dependencies",
+              "status": "ok",
+              "selection": "inferred",
+              "scope": {
+                "source": "indexed_supported_source",
+                "coverage": "complete",
+                "relationships": "authored_types",
+                "exhaustive": false
+              },
+              "items": [
+                {
+                  "id": "consumer.ts::processOrder#function",
+                  "name": "processOrder",
+                  "kind": "function",
+                  "file": "consumer.ts",
+                  "role": "anchor",
+                  "depth": 0,
+                  "why": "Query matches processorder",
+                  "source_id": 1,
+                  "complete": true,
+                  "path": []
+                },
+                {
+                  "id": "types.ts::Payload#interface",
+                  "name": "Payload",
+                  "kind": "interface",
+                  "file": "types.ts",
+                  "role": "dependency",
+                  "depth": 1,
+                  "why": "Direct declared type",
+                  "source_id": 2,
+                  "complete": true,
+                  "path": [
+                    1
+                  ]
+                }
+              ],
+              "relationships": [
+                {
+                  "id": 1,
+                  "edge": {
+                    "from": "consumer.ts::processOrder#function",
+                    "to": "types.ts::Payload#interface",
+                    "type": "uses_type",
+                    "directed": true,
+                    "namespace": "loci",
+                    "resolution": "import-resolved",
+                    "evidence": {
+                      "file": "consumer.ts",
+                      "line": 2,
+                      "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                    }
+                  },
+                  "traversed": "forward",
+                  "source_ids": [
+                    3,
+                    4,
+                    5
+                  ]
+                }
+              ],
+              "sources": [
+                {
+                  "id": 1,
+                  "file": "consumer.ts",
+                  "start_byte": 69,
+                  "end_byte": 152,
+                  "start_line": 2,
+                  "end_line": 4,
+                  "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                  "content": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+                },
+                {
+                  "id": 2,
+                  "file": "types.ts",
+                  "start_byte": 7,
+                  "end_byte": 67,
+                  "start_line": 1,
+                  "end_line": 4,
+                  "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                  "content": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+                },
+                {
+                  "id": 3,
+                  "file": "consumer.ts",
+                  "start_byte": 62,
+                  "end_byte": 125,
+                  "start_line": 2,
+                  "end_line": 2,
+                  "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                  "content": "export function processOrder(value: ImportedPayload): string {\n"
+                },
+                {
+                  "id": 4,
+                  "file": "consumer.ts",
+                  "start_byte": 0,
+                  "end_byte": 62,
+                  "start_line": 1,
+                  "end_line": 1,
+                  "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                  "content": "import type { Payload as ImportedPayload } from \"./types.js\";\n"
+                },
+                {
+                  "id": 5,
+                  "file": "types.ts",
+                  "start_byte": 0,
+                  "end_byte": 27,
+                  "start_line": 1,
+                  "end_line": 1,
+                  "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                  "content": "export interface Payload {\n"
+                }
+              ],
+              "omissions": [],
+              "limits": {
+                "max_hops": 3,
+                "max_nodes": 64,
+                "max_items": 12,
+                "max_neighbors": 32,
+                "max_output_bytes": 16384,
+                "max_evidence_bytes": 8192
+              },
+              "usage": {
+                "nodes_examined": 2,
+                "evidence_bytes": 219,
+                "output_bytes": 2573,
+                "estimated_tokens": 644,
+                "token_estimate_method": "utf8_bytes_div_4",
+                "output_encoding": "mcp_result_json_utf8"
+              },
+              "_evaluation": {
+                "attempt_id": "43d95317-fd96-4ac6-8b86-bbd7fc09c398/attempt/1",
+                "calls_remaining": 23
+              }
+            }
+          },
+          "error": null,
+          "status": "completed"
+        }
+      },
+      "call_item": {
+        "id": "item_1",
+        "type": "mcp_tool_call",
+        "server": "evaluation",
+        "tool": "loci_explore",
+        "arguments": {
+          "intent": "type_dependencies",
+          "query": "processOrder"
+        },
+        "result": {
+          "content": [],
+          "structured_content": {
+            "schema_version": 1,
+            "intent": "type_dependencies",
+            "status": "ok",
+            "selection": "inferred",
+            "scope": {
+              "source": "indexed_supported_source",
+              "coverage": "complete",
+              "relationships": "authored_types",
+              "exhaustive": false
+            },
+            "items": [
+              {
+                "id": "consumer.ts::processOrder#function",
+                "name": "processOrder",
+                "kind": "function",
+                "file": "consumer.ts",
+                "role": "anchor",
+                "depth": 0,
+                "why": "Query matches processorder",
+                "source_id": 1,
+                "complete": true,
+                "path": []
+              },
+              {
+                "id": "types.ts::Payload#interface",
+                "name": "Payload",
+                "kind": "interface",
+                "file": "types.ts",
+                "role": "dependency",
+                "depth": 1,
+                "why": "Direct declared type",
+                "source_id": 2,
+                "complete": true,
+                "path": [
+                  1
+                ]
+              }
+            ],
+            "relationships": [
+              {
+                "id": 1,
+                "edge": {
+                  "from": "consumer.ts::processOrder#function",
+                  "to": "types.ts::Payload#interface",
+                  "type": "uses_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "consumer.ts",
+                    "line": 2,
+                    "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                  }
+                },
+                "traversed": "forward",
+                "source_ids": [
+                  3,
+                  4,
+                  5
+                ]
+              }
+            ],
+            "sources": [
+              {
+                "id": 1,
+                "file": "consumer.ts",
+                "start_byte": 69,
+                "end_byte": 152,
+                "start_line": 2,
+                "end_line": 4,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+              },
+              {
+                "id": 2,
+                "file": "types.ts",
+                "start_byte": 7,
+                "end_byte": 67,
+                "start_line": 1,
+                "end_line": 4,
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                "content": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+              },
+              {
+                "id": 3,
+                "file": "consumer.ts",
+                "start_byte": 62,
+                "end_byte": 125,
+                "start_line": 2,
+                "end_line": 2,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "export function processOrder(value: ImportedPayload): string {\n"
+              },
+              {
+                "id": 4,
+                "file": "consumer.ts",
+                "start_byte": 0,
+                "end_byte": 62,
+                "start_line": 1,
+                "end_line": 1,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "import type { Payload as ImportedPayload } from \"./types.js\";\n"
+              },
+              {
+                "id": 5,
+                "file": "types.ts",
+                "start_byte": 0,
+                "end_byte": 27,
+                "start_line": 1,
+                "end_line": 1,
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                "content": "export interface Payload {\n"
+              }
+            ],
+            "omissions": [],
+            "limits": {
+              "max_hops": 3,
+              "max_nodes": 64,
+              "max_items": 12,
+              "max_neighbors": 32,
+              "max_output_bytes": 16384,
+              "max_evidence_bytes": 8192
+            },
+            "usage": {
+              "nodes_examined": 2,
+              "evidence_bytes": 219,
+              "output_bytes": 2573,
+              "estimated_tokens": 644,
+              "token_estimate_method": "utf8_bytes_div_4",
+              "output_encoding": "mcp_result_json_utf8"
+            },
+            "_evaluation": {
+              "attempt_id": "43d95317-fd96-4ac6-8b86-bbd7fc09c398/attempt/1",
+              "calls_remaining": 23
+            }
+          }
+        },
+        "error": null,
+        "status": "completed"
+      },
+      "model_tool_outputs": [
+        {
+          "type": "function_call_output",
+          "id": "fco_01a0945e-e810-74a3-8e6a-c0ca98113008",
+          "call_id": "call_probe",
+          "output": "Wall time: 0.0069 seconds\nOutput:\n{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"ok\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"kind\":\"interface\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5]}],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":69,\"end_byte\":152,\"start_line\":2,\"end_line\":4,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\"},{\"id\":2,\"file\":\"types.ts\",\"start_byte\":7,\"end_byte\":67,\"start_line\":1,\"end_line\":4,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\"},{\"id\":3,\"file\":\"consumer.ts\",\"start_byte\":62,\"end_byte\":125,\"start_line\":2,\"end_line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"export function processOrder(value: ImportedPayload): string {\\n\"},{\"id\":4,\"file\":\"consumer.ts\",\"start_byte\":0,\"end_byte\":62,\"start_line\":1,\"end_line\":1,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\\n\"},{\"id\":5,\"file\":\"types.ts\",\"start_byte\":0,\"end_byte\":27,\"start_line\":1,\"end_line\":1,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"export interface Payload {\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":219,\"output_bytes\":2573,\"estimated_tokens\":644,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"43d95317-fd96-4ac6-8b86-bbd7fc09c398/attempt/1\",\"calls_remaining\":23}}"
+        }
+      ],
+      "payload_kind": "compact_json",
+      "payload_texts": [
+        "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"ok\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"kind\":\"interface\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5]}],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":69,\"end_byte\":152,\"start_line\":2,\"end_line\":4,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\"},{\"id\":2,\"file\":\"types.ts\",\"start_byte\":7,\"end_byte\":67,\"start_line\":1,\"end_line\":4,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\"},{\"id\":3,\"file\":\"consumer.ts\",\"start_byte\":62,\"end_byte\":125,\"start_line\":2,\"end_line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"export function processOrder(value: ImportedPayload): string {\\n\"},{\"id\":4,\"file\":\"consumer.ts\",\"start_byte\":0,\"end_byte\":62,\"start_line\":1,\"end_line\":1,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\\n\"},{\"id\":5,\"file\":\"types.ts\",\"start_byte\":0,\"end_byte\":27,\"start_line\":1,\"end_line\":1,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"export interface Payload {\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":219,\"output_bytes\":2573,\"estimated_tokens\":644,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"43d95317-fd96-4ac6-8b86-bbd7fc09c398/attempt/1\",\"calls_remaining\":23}}"
+      ],
+      "observed_accounting": {
+        "schema_version": 3,
+        "complete": true,
+        "tool_call_count": 1,
+        "recorded_payload_bytes": 2621,
+        "complete_payload_bytes": 2621,
+        "source_bytes": 295,
+        "calls": [
+          {
+            "item_id": "item_1",
+            "server": "evaluation",
+            "tool": "loci_explore",
+            "arguments": {
+              "intent": "type_dependencies",
+              "query": "processOrder"
+            },
+            "status": "completed",
+            "attempt_id": "43d95317-fd96-4ac6-8b86-bbd7fc09c398/attempt/1",
+            "trace_event_id": "43d95317-fd96-4ac6-8b86-bbd7fc09c398:1",
+            "source_bytes": 295,
+            "serialized_bytes": 2621,
+            "payload_texts": [
+              "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"ok\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"kind\":\"interface\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5]}],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":69,\"end_byte\":152,\"start_line\":2,\"end_line\":4,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\"},{\"id\":2,\"file\":\"types.ts\",\"start_byte\":7,\"end_byte\":67,\"start_line\":1,\"end_line\":4,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\"},{\"id\":3,\"file\":\"consumer.ts\",\"start_byte\":62,\"end_byte\":125,\"start_line\":2,\"end_line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"export function processOrder(value: ImportedPayload): string {\\n\"},{\"id\":4,\"file\":\"consumer.ts\",\"start_byte\":0,\"end_byte\":62,\"start_line\":1,\"end_line\":1,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\\n\"},{\"id\":5,\"file\":\"types.ts\",\"start_byte\":0,\"end_byte\":27,\"start_line\":1,\"end_line\":1,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"export interface Payload {\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":219,\"output_bytes\":2573,\"estimated_tokens\":644,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"43d95317-fd96-4ac6-8b86-bbd7fc09c398/attempt/1\",\"calls_remaining\":23}}"
+            ],
+            "payload_format": "compact_json"
+          }
+        ],
+        "failures": [],
+        "validated_results": [
+          {
+            "schema_version": 1,
+            "intent": "type_dependencies",
+            "status": "ok",
+            "selection": "inferred",
+            "scope": {
+              "source": "indexed_supported_source",
+              "coverage": "complete",
+              "relationships": "authored_types",
+              "exhaustive": false
+            },
+            "items": [
+              {
+                "id": "consumer.ts::processOrder#function",
+                "name": "processOrder",
+                "kind": "function",
+                "file": "consumer.ts",
+                "role": "anchor",
+                "depth": 0,
+                "why": "Query matches processorder",
+                "source_id": 1,
+                "complete": true,
+                "path": []
+              },
+              {
+                "id": "types.ts::Payload#interface",
+                "name": "Payload",
+                "kind": "interface",
+                "file": "types.ts",
+                "role": "dependency",
+                "depth": 1,
+                "why": "Direct declared type",
+                "source_id": 2,
+                "complete": true,
+                "path": [
+                  1
+                ]
+              }
+            ],
+            "relationships": [
+              {
+                "id": 1,
+                "edge": {
+                  "from": "consumer.ts::processOrder#function",
+                  "to": "types.ts::Payload#interface",
+                  "type": "uses_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "consumer.ts",
+                    "line": 2,
+                    "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                  }
+                },
+                "traversed": "forward",
+                "source_ids": [
+                  3,
+                  4,
+                  5
+                ]
+              }
+            ],
+            "sources": [
+              {
+                "id": 1,
+                "file": "consumer.ts",
+                "start_byte": 69,
+                "end_byte": 152,
+                "start_line": 2,
+                "end_line": 4,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+              },
+              {
+                "id": 2,
+                "file": "types.ts",
+                "start_byte": 7,
+                "end_byte": 67,
+                "start_line": 1,
+                "end_line": 4,
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                "content": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+              },
+              {
+                "id": 3,
+                "file": "consumer.ts",
+                "start_byte": 62,
+                "end_byte": 125,
+                "start_line": 2,
+                "end_line": 2,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "export function processOrder(value: ImportedPayload): string {\n"
+              },
+              {
+                "id": 4,
+                "file": "consumer.ts",
+                "start_byte": 0,
+                "end_byte": 62,
+                "start_line": 1,
+                "end_line": 1,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "import type { Payload as ImportedPayload } from \"./types.js\";\n"
+              },
+              {
+                "id": 5,
+                "file": "types.ts",
+                "start_byte": 0,
+                "end_byte": 27,
+                "start_line": 1,
+                "end_line": 1,
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                "content": "export interface Payload {\n"
+              }
+            ],
+            "omissions": [],
+            "limits": {
+              "max_hops": 3,
+              "max_nodes": 64,
+              "max_items": 12,
+              "max_neighbors": 32,
+              "max_output_bytes": 16384,
+              "max_evidence_bytes": 8192
+            },
+            "usage": {
+              "nodes_examined": 2,
+              "evidence_bytes": 219,
+              "output_bytes": 2573,
+              "estimated_tokens": 644,
+              "token_estimate_method": "utf8_bytes_div_4",
+              "output_encoding": "mcp_result_json_utf8"
+            },
+            "_evaluation": {
+              "attempt_id": "43d95317-fd96-4ac6-8b86-bbd7fc09c398/attempt/1",
+              "calls_remaining": 23
+            }
+          }
+        ]
+      },
+      "trace_schema_version": 3,
+      "expected_mode": "recorded",
+      "adapter_attempts": 1,
+      "adapter_deliveries": 1,
+      "evidence_dir": "byte-limit-transport-evidence/omitted",
+      "output_verified": true,
+      "effective_arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder",
+        "max_output_bytes": 16384,
+        "max_evidence_bytes": 8192
+      },
+      "product_envelope_bytes": 2573,
+      "snapshot_source_verified": true,
+      "routing": {
+        "schema_version": 1,
+        "observations_complete": true,
+        "first_repository_call": {
+          "item_id": "item_1",
+          "tool": "loci_explore",
+          "intent": "type_dependencies",
+          "status": "completed"
+        },
+        "initial_route_expected": "type_dependencies",
+        "initial_type_route": true,
+        "requested_anchor_received": true,
+        "maintained_exposure": true,
+        "explore_calls": [
+          {
+            "item_id": "item_1",
+            "intent": "type_dependencies",
+            "status": "ok",
+            "successful_delivery": true,
+            "anchor_ids": [
+              "consumer.ts::processOrder#function"
+            ],
+            "omissions": [],
+            "requested_anchor_received": true,
+            "anchor_complete": true
+          }
+        ],
+        "fallback_calls": [],
+        "helper_call_count": 0,
+        "failures": []
+      }
+    },
+    {
+      "mode": "null",
+      "arm": "B",
+      "case_id": "imported_interface",
+      "request_count": 2,
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.5782607910077786,
+      "model": "gpt-5.6-luna",
+      "reasoning": {
+        "effort": "high",
+        "context": "all_turns"
+      },
+      "tool_set": [
+        [
+          "functions",
+          "list_mcp_resources"
+        ],
+        [
+          "functions",
+          "list_mcp_resource_templates"
+        ],
+        [
+          "functions",
+          "read_mcp_resource"
+        ],
+        [
+          "mcp__evaluation",
+          "file"
+        ],
+        [
+          "mcp__evaluation",
+          "get"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_anchors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_calls"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_imports"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_paths"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_references"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_retrieve"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_traverse_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "grep"
+        ],
+        [
+          "mcp__evaluation",
+          "loci_explore"
+        ],
+        [
+          "mcp__evaluation",
+          "outline"
+        ],
+        [
+          "mcp__evaluation",
+          "search"
+        ]
+      ],
+      "tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "canonical_tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "call_event": {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "type_dependencies",
+            "query": "processOrder",
+            "max_output_bytes": null,
+            "max_evidence_bytes": null
+          },
+          "result": {
+            "content": [],
+            "structured_content": {
+              "schema_version": 1,
+              "intent": "type_dependencies",
+              "status": "ok",
+              "selection": "inferred",
+              "scope": {
+                "source": "indexed_supported_source",
+                "coverage": "complete",
+                "relationships": "authored_types",
+                "exhaustive": false
+              },
+              "items": [
+                {
+                  "id": "consumer.ts::processOrder#function",
+                  "name": "processOrder",
+                  "kind": "function",
+                  "file": "consumer.ts",
+                  "role": "anchor",
+                  "depth": 0,
+                  "why": "Query matches processorder",
+                  "source_id": 1,
+                  "complete": true,
+                  "path": []
+                },
+                {
+                  "id": "types.ts::Payload#interface",
+                  "name": "Payload",
+                  "kind": "interface",
+                  "file": "types.ts",
+                  "role": "dependency",
+                  "depth": 1,
+                  "why": "Direct declared type",
+                  "source_id": 2,
+                  "complete": true,
+                  "path": [
+                    1
+                  ]
+                }
+              ],
+              "relationships": [
+                {
+                  "id": 1,
+                  "edge": {
+                    "from": "consumer.ts::processOrder#function",
+                    "to": "types.ts::Payload#interface",
+                    "type": "uses_type",
+                    "directed": true,
+                    "namespace": "loci",
+                    "resolution": "import-resolved",
+                    "evidence": {
+                      "file": "consumer.ts",
+                      "line": 2,
+                      "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                    }
+                  },
+                  "traversed": "forward",
+                  "source_ids": [
+                    3,
+                    4,
+                    5
+                  ]
+                }
+              ],
+              "sources": [
+                {
+                  "id": 1,
+                  "file": "consumer.ts",
+                  "start_byte": 69,
+                  "end_byte": 152,
+                  "start_line": 2,
+                  "end_line": 4,
+                  "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                  "content": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+                },
+                {
+                  "id": 2,
+                  "file": "types.ts",
+                  "start_byte": 7,
+                  "end_byte": 67,
+                  "start_line": 1,
+                  "end_line": 4,
+                  "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                  "content": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+                },
+                {
+                  "id": 3,
+                  "file": "consumer.ts",
+                  "start_byte": 62,
+                  "end_byte": 125,
+                  "start_line": 2,
+                  "end_line": 2,
+                  "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                  "content": "export function processOrder(value: ImportedPayload): string {\n"
+                },
+                {
+                  "id": 4,
+                  "file": "consumer.ts",
+                  "start_byte": 0,
+                  "end_byte": 62,
+                  "start_line": 1,
+                  "end_line": 1,
+                  "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                  "content": "import type { Payload as ImportedPayload } from \"./types.js\";\n"
+                },
+                {
+                  "id": 5,
+                  "file": "types.ts",
+                  "start_byte": 0,
+                  "end_byte": 27,
+                  "start_line": 1,
+                  "end_line": 1,
+                  "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                  "content": "export interface Payload {\n"
+                }
+              ],
+              "omissions": [],
+              "limits": {
+                "max_hops": 3,
+                "max_nodes": 64,
+                "max_items": 12,
+                "max_neighbors": 32,
+                "max_output_bytes": 16384,
+                "max_evidence_bytes": 8192
+              },
+              "usage": {
+                "nodes_examined": 2,
+                "evidence_bytes": 219,
+                "output_bytes": 2573,
+                "estimated_tokens": 644,
+                "token_estimate_method": "utf8_bytes_div_4",
+                "output_encoding": "mcp_result_json_utf8"
+              },
+              "_evaluation": {
+                "attempt_id": "7247c7ea-7f86-46d7-abce-a200aa0e31b5/attempt/1",
+                "calls_remaining": 23
+              }
+            }
+          },
+          "error": null,
+          "status": "completed"
+        }
+      },
+      "call_item": {
+        "id": "item_1",
+        "type": "mcp_tool_call",
+        "server": "evaluation",
+        "tool": "loci_explore",
+        "arguments": {
+          "intent": "type_dependencies",
+          "query": "processOrder",
+          "max_output_bytes": null,
+          "max_evidence_bytes": null
+        },
+        "result": {
+          "content": [],
+          "structured_content": {
+            "schema_version": 1,
+            "intent": "type_dependencies",
+            "status": "ok",
+            "selection": "inferred",
+            "scope": {
+              "source": "indexed_supported_source",
+              "coverage": "complete",
+              "relationships": "authored_types",
+              "exhaustive": false
+            },
+            "items": [
+              {
+                "id": "consumer.ts::processOrder#function",
+                "name": "processOrder",
+                "kind": "function",
+                "file": "consumer.ts",
+                "role": "anchor",
+                "depth": 0,
+                "why": "Query matches processorder",
+                "source_id": 1,
+                "complete": true,
+                "path": []
+              },
+              {
+                "id": "types.ts::Payload#interface",
+                "name": "Payload",
+                "kind": "interface",
+                "file": "types.ts",
+                "role": "dependency",
+                "depth": 1,
+                "why": "Direct declared type",
+                "source_id": 2,
+                "complete": true,
+                "path": [
+                  1
+                ]
+              }
+            ],
+            "relationships": [
+              {
+                "id": 1,
+                "edge": {
+                  "from": "consumer.ts::processOrder#function",
+                  "to": "types.ts::Payload#interface",
+                  "type": "uses_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "consumer.ts",
+                    "line": 2,
+                    "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                  }
+                },
+                "traversed": "forward",
+                "source_ids": [
+                  3,
+                  4,
+                  5
+                ]
+              }
+            ],
+            "sources": [
+              {
+                "id": 1,
+                "file": "consumer.ts",
+                "start_byte": 69,
+                "end_byte": 152,
+                "start_line": 2,
+                "end_line": 4,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+              },
+              {
+                "id": 2,
+                "file": "types.ts",
+                "start_byte": 7,
+                "end_byte": 67,
+                "start_line": 1,
+                "end_line": 4,
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                "content": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+              },
+              {
+                "id": 3,
+                "file": "consumer.ts",
+                "start_byte": 62,
+                "end_byte": 125,
+                "start_line": 2,
+                "end_line": 2,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "export function processOrder(value: ImportedPayload): string {\n"
+              },
+              {
+                "id": 4,
+                "file": "consumer.ts",
+                "start_byte": 0,
+                "end_byte": 62,
+                "start_line": 1,
+                "end_line": 1,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "import type { Payload as ImportedPayload } from \"./types.js\";\n"
+              },
+              {
+                "id": 5,
+                "file": "types.ts",
+                "start_byte": 0,
+                "end_byte": 27,
+                "start_line": 1,
+                "end_line": 1,
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                "content": "export interface Payload {\n"
+              }
+            ],
+            "omissions": [],
+            "limits": {
+              "max_hops": 3,
+              "max_nodes": 64,
+              "max_items": 12,
+              "max_neighbors": 32,
+              "max_output_bytes": 16384,
+              "max_evidence_bytes": 8192
+            },
+            "usage": {
+              "nodes_examined": 2,
+              "evidence_bytes": 219,
+              "output_bytes": 2573,
+              "estimated_tokens": 644,
+              "token_estimate_method": "utf8_bytes_div_4",
+              "output_encoding": "mcp_result_json_utf8"
+            },
+            "_evaluation": {
+              "attempt_id": "7247c7ea-7f86-46d7-abce-a200aa0e31b5/attempt/1",
+              "calls_remaining": 23
+            }
+          }
+        },
+        "error": null,
+        "status": "completed"
+      },
+      "model_tool_outputs": [
+        {
+          "type": "function_call_output",
+          "id": "fco_01a0945e-ec95-7ae1-8c68-d51eb1a0c1f6",
+          "call_id": "call_probe",
+          "output": "Wall time: 0.0075 seconds\nOutput:\n{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"ok\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"kind\":\"interface\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5]}],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":69,\"end_byte\":152,\"start_line\":2,\"end_line\":4,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\"},{\"id\":2,\"file\":\"types.ts\",\"start_byte\":7,\"end_byte\":67,\"start_line\":1,\"end_line\":4,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\"},{\"id\":3,\"file\":\"consumer.ts\",\"start_byte\":62,\"end_byte\":125,\"start_line\":2,\"end_line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"export function processOrder(value: ImportedPayload): string {\\n\"},{\"id\":4,\"file\":\"consumer.ts\",\"start_byte\":0,\"end_byte\":62,\"start_line\":1,\"end_line\":1,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\\n\"},{\"id\":5,\"file\":\"types.ts\",\"start_byte\":0,\"end_byte\":27,\"start_line\":1,\"end_line\":1,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"export interface Payload {\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":219,\"output_bytes\":2573,\"estimated_tokens\":644,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"7247c7ea-7f86-46d7-abce-a200aa0e31b5/attempt/1\",\"calls_remaining\":23}}"
+        }
+      ],
+      "payload_kind": "compact_json",
+      "payload_texts": [
+        "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"ok\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"kind\":\"interface\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5]}],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":69,\"end_byte\":152,\"start_line\":2,\"end_line\":4,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\"},{\"id\":2,\"file\":\"types.ts\",\"start_byte\":7,\"end_byte\":67,\"start_line\":1,\"end_line\":4,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\"},{\"id\":3,\"file\":\"consumer.ts\",\"start_byte\":62,\"end_byte\":125,\"start_line\":2,\"end_line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"export function processOrder(value: ImportedPayload): string {\\n\"},{\"id\":4,\"file\":\"consumer.ts\",\"start_byte\":0,\"end_byte\":62,\"start_line\":1,\"end_line\":1,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\\n\"},{\"id\":5,\"file\":\"types.ts\",\"start_byte\":0,\"end_byte\":27,\"start_line\":1,\"end_line\":1,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"export interface Payload {\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":219,\"output_bytes\":2573,\"estimated_tokens\":644,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"7247c7ea-7f86-46d7-abce-a200aa0e31b5/attempt/1\",\"calls_remaining\":23}}"
+      ],
+      "observed_accounting": {
+        "schema_version": 3,
+        "complete": true,
+        "tool_call_count": 1,
+        "recorded_payload_bytes": 2621,
+        "complete_payload_bytes": 2621,
+        "source_bytes": 295,
+        "calls": [
+          {
+            "item_id": "item_1",
+            "server": "evaluation",
+            "tool": "loci_explore",
+            "arguments": {
+              "intent": "type_dependencies",
+              "query": "processOrder",
+              "max_output_bytes": null,
+              "max_evidence_bytes": null
+            },
+            "status": "completed",
+            "attempt_id": "7247c7ea-7f86-46d7-abce-a200aa0e31b5/attempt/1",
+            "trace_event_id": "7247c7ea-7f86-46d7-abce-a200aa0e31b5:1",
+            "source_bytes": 295,
+            "serialized_bytes": 2621,
+            "payload_texts": [
+              "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"ok\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"kind\":\"interface\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5]}],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":69,\"end_byte\":152,\"start_line\":2,\"end_line\":4,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\"},{\"id\":2,\"file\":\"types.ts\",\"start_byte\":7,\"end_byte\":67,\"start_line\":1,\"end_line\":4,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\"},{\"id\":3,\"file\":\"consumer.ts\",\"start_byte\":62,\"end_byte\":125,\"start_line\":2,\"end_line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"export function processOrder(value: ImportedPayload): string {\\n\"},{\"id\":4,\"file\":\"consumer.ts\",\"start_byte\":0,\"end_byte\":62,\"start_line\":1,\"end_line\":1,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\\n\"},{\"id\":5,\"file\":\"types.ts\",\"start_byte\":0,\"end_byte\":27,\"start_line\":1,\"end_line\":1,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"export interface Payload {\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":219,\"output_bytes\":2573,\"estimated_tokens\":644,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"7247c7ea-7f86-46d7-abce-a200aa0e31b5/attempt/1\",\"calls_remaining\":23}}"
+            ],
+            "payload_format": "compact_json"
+          }
+        ],
+        "failures": [],
+        "validated_results": [
+          {
+            "schema_version": 1,
+            "intent": "type_dependencies",
+            "status": "ok",
+            "selection": "inferred",
+            "scope": {
+              "source": "indexed_supported_source",
+              "coverage": "complete",
+              "relationships": "authored_types",
+              "exhaustive": false
+            },
+            "items": [
+              {
+                "id": "consumer.ts::processOrder#function",
+                "name": "processOrder",
+                "kind": "function",
+                "file": "consumer.ts",
+                "role": "anchor",
+                "depth": 0,
+                "why": "Query matches processorder",
+                "source_id": 1,
+                "complete": true,
+                "path": []
+              },
+              {
+                "id": "types.ts::Payload#interface",
+                "name": "Payload",
+                "kind": "interface",
+                "file": "types.ts",
+                "role": "dependency",
+                "depth": 1,
+                "why": "Direct declared type",
+                "source_id": 2,
+                "complete": true,
+                "path": [
+                  1
+                ]
+              }
+            ],
+            "relationships": [
+              {
+                "id": 1,
+                "edge": {
+                  "from": "consumer.ts::processOrder#function",
+                  "to": "types.ts::Payload#interface",
+                  "type": "uses_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "consumer.ts",
+                    "line": 2,
+                    "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                  }
+                },
+                "traversed": "forward",
+                "source_ids": [
+                  3,
+                  4,
+                  5
+                ]
+              }
+            ],
+            "sources": [
+              {
+                "id": 1,
+                "file": "consumer.ts",
+                "start_byte": 69,
+                "end_byte": 152,
+                "start_line": 2,
+                "end_line": 4,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+              },
+              {
+                "id": 2,
+                "file": "types.ts",
+                "start_byte": 7,
+                "end_byte": 67,
+                "start_line": 1,
+                "end_line": 4,
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                "content": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+              },
+              {
+                "id": 3,
+                "file": "consumer.ts",
+                "start_byte": 62,
+                "end_byte": 125,
+                "start_line": 2,
+                "end_line": 2,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "export function processOrder(value: ImportedPayload): string {\n"
+              },
+              {
+                "id": 4,
+                "file": "consumer.ts",
+                "start_byte": 0,
+                "end_byte": 62,
+                "start_line": 1,
+                "end_line": 1,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "import type { Payload as ImportedPayload } from \"./types.js\";\n"
+              },
+              {
+                "id": 5,
+                "file": "types.ts",
+                "start_byte": 0,
+                "end_byte": 27,
+                "start_line": 1,
+                "end_line": 1,
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                "content": "export interface Payload {\n"
+              }
+            ],
+            "omissions": [],
+            "limits": {
+              "max_hops": 3,
+              "max_nodes": 64,
+              "max_items": 12,
+              "max_neighbors": 32,
+              "max_output_bytes": 16384,
+              "max_evidence_bytes": 8192
+            },
+            "usage": {
+              "nodes_examined": 2,
+              "evidence_bytes": 219,
+              "output_bytes": 2573,
+              "estimated_tokens": 644,
+              "token_estimate_method": "utf8_bytes_div_4",
+              "output_encoding": "mcp_result_json_utf8"
+            },
+            "_evaluation": {
+              "attempt_id": "7247c7ea-7f86-46d7-abce-a200aa0e31b5/attempt/1",
+              "calls_remaining": 23
+            }
+          }
+        ]
+      },
+      "trace_schema_version": 3,
+      "expected_mode": "recorded",
+      "adapter_attempts": 1,
+      "adapter_deliveries": 1,
+      "evidence_dir": "byte-limit-transport-evidence/null",
+      "output_verified": true,
+      "effective_arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder",
+        "max_output_bytes": 16384,
+        "max_evidence_bytes": 8192
+      },
+      "product_envelope_bytes": 2573,
+      "snapshot_source_verified": true,
+      "routing": {
+        "schema_version": 1,
+        "observations_complete": true,
+        "first_repository_call": {
+          "item_id": "item_1",
+          "tool": "loci_explore",
+          "intent": "type_dependencies",
+          "status": "completed"
+        },
+        "initial_route_expected": "type_dependencies",
+        "initial_type_route": true,
+        "requested_anchor_received": true,
+        "maintained_exposure": true,
+        "explore_calls": [
+          {
+            "item_id": "item_1",
+            "intent": "type_dependencies",
+            "status": "ok",
+            "successful_delivery": true,
+            "anchor_ids": [
+              "consumer.ts::processOrder#function"
+            ],
+            "omissions": [],
+            "requested_anchor_received": true,
+            "anchor_complete": true
+          }
+        ],
+        "fallback_calls": [],
+        "helper_call_count": 0,
+        "failures": []
+      }
+    },
+    {
+      "mode": "explicit",
+      "arm": "B",
+      "case_id": "imported_interface",
+      "request_count": 2,
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.6121605829976033,
+      "model": "gpt-5.6-luna",
+      "reasoning": {
+        "effort": "high",
+        "context": "all_turns"
+      },
+      "tool_set": [
+        [
+          "functions",
+          "list_mcp_resources"
+        ],
+        [
+          "functions",
+          "list_mcp_resource_templates"
+        ],
+        [
+          "functions",
+          "read_mcp_resource"
+        ],
+        [
+          "mcp__evaluation",
+          "file"
+        ],
+        [
+          "mcp__evaluation",
+          "get"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_anchors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_calls"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_imports"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_paths"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_references"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_retrieve"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_traverse_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "grep"
+        ],
+        [
+          "mcp__evaluation",
+          "loci_explore"
+        ],
+        [
+          "mcp__evaluation",
+          "outline"
+        ],
+        [
+          "mcp__evaluation",
+          "search"
+        ]
+      ],
+      "tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "canonical_tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "call_event": {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "type_dependencies",
+            "query": "processOrder",
+            "max_output_bytes": 8192,
+            "max_evidence_bytes": 512
+          },
+          "result": {
+            "content": [],
+            "structured_content": {
+              "schema_version": 1,
+              "intent": "type_dependencies",
+              "status": "ok",
+              "selection": "inferred",
+              "scope": {
+                "source": "indexed_supported_source",
+                "coverage": "complete",
+                "relationships": "authored_types",
+                "exhaustive": false
+              },
+              "items": [
+                {
+                  "id": "consumer.ts::processOrder#function",
+                  "name": "processOrder",
+                  "kind": "function",
+                  "file": "consumer.ts",
+                  "role": "anchor",
+                  "depth": 0,
+                  "why": "Query matches processorder",
+                  "source_id": 1,
+                  "complete": true,
+                  "path": []
+                },
+                {
+                  "id": "types.ts::Payload#interface",
+                  "name": "Payload",
+                  "kind": "interface",
+                  "file": "types.ts",
+                  "role": "dependency",
+                  "depth": 1,
+                  "why": "Direct declared type",
+                  "source_id": 2,
+                  "complete": true,
+                  "path": [
+                    1
+                  ]
+                }
+              ],
+              "relationships": [
+                {
+                  "id": 1,
+                  "edge": {
+                    "from": "consumer.ts::processOrder#function",
+                    "to": "types.ts::Payload#interface",
+                    "type": "uses_type",
+                    "directed": true,
+                    "namespace": "loci",
+                    "resolution": "import-resolved",
+                    "evidence": {
+                      "file": "consumer.ts",
+                      "line": 2,
+                      "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                    }
+                  },
+                  "traversed": "forward",
+                  "source_ids": [
+                    3,
+                    4,
+                    5
+                  ]
+                }
+              ],
+              "sources": [
+                {
+                  "id": 1,
+                  "file": "consumer.ts",
+                  "start_byte": 69,
+                  "end_byte": 152,
+                  "start_line": 2,
+                  "end_line": 4,
+                  "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                  "content": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+                },
+                {
+                  "id": 2,
+                  "file": "types.ts",
+                  "start_byte": 7,
+                  "end_byte": 67,
+                  "start_line": 1,
+                  "end_line": 4,
+                  "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                  "content": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+                },
+                {
+                  "id": 3,
+                  "file": "consumer.ts",
+                  "start_byte": 62,
+                  "end_byte": 125,
+                  "start_line": 2,
+                  "end_line": 2,
+                  "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                  "content": "export function processOrder(value: ImportedPayload): string {\n"
+                },
+                {
+                  "id": 4,
+                  "file": "consumer.ts",
+                  "start_byte": 0,
+                  "end_byte": 62,
+                  "start_line": 1,
+                  "end_line": 1,
+                  "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                  "content": "import type { Payload as ImportedPayload } from \"./types.js\";\n"
+                },
+                {
+                  "id": 5,
+                  "file": "types.ts",
+                  "start_byte": 0,
+                  "end_byte": 27,
+                  "start_line": 1,
+                  "end_line": 1,
+                  "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                  "content": "export interface Payload {\n"
+                }
+              ],
+              "omissions": [],
+              "limits": {
+                "max_hops": 3,
+                "max_nodes": 64,
+                "max_items": 12,
+                "max_neighbors": 32,
+                "max_output_bytes": 8192,
+                "max_evidence_bytes": 512
+              },
+              "usage": {
+                "nodes_examined": 2,
+                "evidence_bytes": 219,
+                "output_bytes": 2571,
+                "estimated_tokens": 643,
+                "token_estimate_method": "utf8_bytes_div_4",
+                "output_encoding": "mcp_result_json_utf8"
+              },
+              "_evaluation": {
+                "attempt_id": "df4a9214-315d-4cc5-86f9-003dd50bef38/attempt/1",
+                "calls_remaining": 23
+              }
+            }
+          },
+          "error": null,
+          "status": "completed"
+        }
+      },
+      "call_item": {
+        "id": "item_1",
+        "type": "mcp_tool_call",
+        "server": "evaluation",
+        "tool": "loci_explore",
+        "arguments": {
+          "intent": "type_dependencies",
+          "query": "processOrder",
+          "max_output_bytes": 8192,
+          "max_evidence_bytes": 512
+        },
+        "result": {
+          "content": [],
+          "structured_content": {
+            "schema_version": 1,
+            "intent": "type_dependencies",
+            "status": "ok",
+            "selection": "inferred",
+            "scope": {
+              "source": "indexed_supported_source",
+              "coverage": "complete",
+              "relationships": "authored_types",
+              "exhaustive": false
+            },
+            "items": [
+              {
+                "id": "consumer.ts::processOrder#function",
+                "name": "processOrder",
+                "kind": "function",
+                "file": "consumer.ts",
+                "role": "anchor",
+                "depth": 0,
+                "why": "Query matches processorder",
+                "source_id": 1,
+                "complete": true,
+                "path": []
+              },
+              {
+                "id": "types.ts::Payload#interface",
+                "name": "Payload",
+                "kind": "interface",
+                "file": "types.ts",
+                "role": "dependency",
+                "depth": 1,
+                "why": "Direct declared type",
+                "source_id": 2,
+                "complete": true,
+                "path": [
+                  1
+                ]
+              }
+            ],
+            "relationships": [
+              {
+                "id": 1,
+                "edge": {
+                  "from": "consumer.ts::processOrder#function",
+                  "to": "types.ts::Payload#interface",
+                  "type": "uses_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "consumer.ts",
+                    "line": 2,
+                    "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                  }
+                },
+                "traversed": "forward",
+                "source_ids": [
+                  3,
+                  4,
+                  5
+                ]
+              }
+            ],
+            "sources": [
+              {
+                "id": 1,
+                "file": "consumer.ts",
+                "start_byte": 69,
+                "end_byte": 152,
+                "start_line": 2,
+                "end_line": 4,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+              },
+              {
+                "id": 2,
+                "file": "types.ts",
+                "start_byte": 7,
+                "end_byte": 67,
+                "start_line": 1,
+                "end_line": 4,
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                "content": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+              },
+              {
+                "id": 3,
+                "file": "consumer.ts",
+                "start_byte": 62,
+                "end_byte": 125,
+                "start_line": 2,
+                "end_line": 2,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "export function processOrder(value: ImportedPayload): string {\n"
+              },
+              {
+                "id": 4,
+                "file": "consumer.ts",
+                "start_byte": 0,
+                "end_byte": 62,
+                "start_line": 1,
+                "end_line": 1,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "import type { Payload as ImportedPayload } from \"./types.js\";\n"
+              },
+              {
+                "id": 5,
+                "file": "types.ts",
+                "start_byte": 0,
+                "end_byte": 27,
+                "start_line": 1,
+                "end_line": 1,
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                "content": "export interface Payload {\n"
+              }
+            ],
+            "omissions": [],
+            "limits": {
+              "max_hops": 3,
+              "max_nodes": 64,
+              "max_items": 12,
+              "max_neighbors": 32,
+              "max_output_bytes": 8192,
+              "max_evidence_bytes": 512
+            },
+            "usage": {
+              "nodes_examined": 2,
+              "evidence_bytes": 219,
+              "output_bytes": 2571,
+              "estimated_tokens": 643,
+              "token_estimate_method": "utf8_bytes_div_4",
+              "output_encoding": "mcp_result_json_utf8"
+            },
+            "_evaluation": {
+              "attempt_id": "df4a9214-315d-4cc5-86f9-003dd50bef38/attempt/1",
+              "calls_remaining": 23
+            }
+          }
+        },
+        "error": null,
+        "status": "completed"
+      },
+      "model_tool_outputs": [
+        {
+          "type": "function_call_output",
+          "id": "fco_01a0945e-f13f-7b21-a24f-a4808f8a7bee",
+          "call_id": "call_probe",
+          "output": "Wall time: 0.0064 seconds\nOutput:\n{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"ok\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"kind\":\"interface\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5]}],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":69,\"end_byte\":152,\"start_line\":2,\"end_line\":4,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\"},{\"id\":2,\"file\":\"types.ts\",\"start_byte\":7,\"end_byte\":67,\"start_line\":1,\"end_line\":4,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\"},{\"id\":3,\"file\":\"consumer.ts\",\"start_byte\":62,\"end_byte\":125,\"start_line\":2,\"end_line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"export function processOrder(value: ImportedPayload): string {\\n\"},{\"id\":4,\"file\":\"consumer.ts\",\"start_byte\":0,\"end_byte\":62,\"start_line\":1,\"end_line\":1,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\\n\"},{\"id\":5,\"file\":\"types.ts\",\"start_byte\":0,\"end_byte\":27,\"start_line\":1,\"end_line\":1,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"export interface Payload {\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":8192,\"max_evidence_bytes\":512},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":219,\"output_bytes\":2571,\"estimated_tokens\":643,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"df4a9214-315d-4cc5-86f9-003dd50bef38/attempt/1\",\"calls_remaining\":23}}"
+        }
+      ],
+      "payload_kind": "compact_json",
+      "payload_texts": [
+        "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"ok\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"kind\":\"interface\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5]}],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":69,\"end_byte\":152,\"start_line\":2,\"end_line\":4,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\"},{\"id\":2,\"file\":\"types.ts\",\"start_byte\":7,\"end_byte\":67,\"start_line\":1,\"end_line\":4,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\"},{\"id\":3,\"file\":\"consumer.ts\",\"start_byte\":62,\"end_byte\":125,\"start_line\":2,\"end_line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"export function processOrder(value: ImportedPayload): string {\\n\"},{\"id\":4,\"file\":\"consumer.ts\",\"start_byte\":0,\"end_byte\":62,\"start_line\":1,\"end_line\":1,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\\n\"},{\"id\":5,\"file\":\"types.ts\",\"start_byte\":0,\"end_byte\":27,\"start_line\":1,\"end_line\":1,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"export interface Payload {\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":8192,\"max_evidence_bytes\":512},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":219,\"output_bytes\":2571,\"estimated_tokens\":643,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"df4a9214-315d-4cc5-86f9-003dd50bef38/attempt/1\",\"calls_remaining\":23}}"
+      ],
+      "observed_accounting": {
+        "schema_version": 3,
+        "complete": true,
+        "tool_call_count": 1,
+        "recorded_payload_bytes": 2619,
+        "complete_payload_bytes": 2619,
+        "source_bytes": 295,
+        "calls": [
+          {
+            "item_id": "item_1",
+            "server": "evaluation",
+            "tool": "loci_explore",
+            "arguments": {
+              "intent": "type_dependencies",
+              "query": "processOrder",
+              "max_output_bytes": 8192,
+              "max_evidence_bytes": 512
+            },
+            "status": "completed",
+            "attempt_id": "df4a9214-315d-4cc5-86f9-003dd50bef38/attempt/1",
+            "trace_event_id": "df4a9214-315d-4cc5-86f9-003dd50bef38:1",
+            "source_bytes": 295,
+            "serialized_bytes": 2619,
+            "payload_texts": [
+              "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"ok\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"kind\":\"interface\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5]}],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":69,\"end_byte\":152,\"start_line\":2,\"end_line\":4,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\"},{\"id\":2,\"file\":\"types.ts\",\"start_byte\":7,\"end_byte\":67,\"start_line\":1,\"end_line\":4,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\"},{\"id\":3,\"file\":\"consumer.ts\",\"start_byte\":62,\"end_byte\":125,\"start_line\":2,\"end_line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"export function processOrder(value: ImportedPayload): string {\\n\"},{\"id\":4,\"file\":\"consumer.ts\",\"start_byte\":0,\"end_byte\":62,\"start_line\":1,\"end_line\":1,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\\n\"},{\"id\":5,\"file\":\"types.ts\",\"start_byte\":0,\"end_byte\":27,\"start_line\":1,\"end_line\":1,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"export interface Payload {\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":8192,\"max_evidence_bytes\":512},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":219,\"output_bytes\":2571,\"estimated_tokens\":643,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"df4a9214-315d-4cc5-86f9-003dd50bef38/attempt/1\",\"calls_remaining\":23}}"
+            ],
+            "payload_format": "compact_json"
+          }
+        ],
+        "failures": [],
+        "validated_results": [
+          {
+            "schema_version": 1,
+            "intent": "type_dependencies",
+            "status": "ok",
+            "selection": "inferred",
+            "scope": {
+              "source": "indexed_supported_source",
+              "coverage": "complete",
+              "relationships": "authored_types",
+              "exhaustive": false
+            },
+            "items": [
+              {
+                "id": "consumer.ts::processOrder#function",
+                "name": "processOrder",
+                "kind": "function",
+                "file": "consumer.ts",
+                "role": "anchor",
+                "depth": 0,
+                "why": "Query matches processorder",
+                "source_id": 1,
+                "complete": true,
+                "path": []
+              },
+              {
+                "id": "types.ts::Payload#interface",
+                "name": "Payload",
+                "kind": "interface",
+                "file": "types.ts",
+                "role": "dependency",
+                "depth": 1,
+                "why": "Direct declared type",
+                "source_id": 2,
+                "complete": true,
+                "path": [
+                  1
+                ]
+              }
+            ],
+            "relationships": [
+              {
+                "id": 1,
+                "edge": {
+                  "from": "consumer.ts::processOrder#function",
+                  "to": "types.ts::Payload#interface",
+                  "type": "uses_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "consumer.ts",
+                    "line": 2,
+                    "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                  }
+                },
+                "traversed": "forward",
+                "source_ids": [
+                  3,
+                  4,
+                  5
+                ]
+              }
+            ],
+            "sources": [
+              {
+                "id": 1,
+                "file": "consumer.ts",
+                "start_byte": 69,
+                "end_byte": 152,
+                "start_line": 2,
+                "end_line": 4,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+              },
+              {
+                "id": 2,
+                "file": "types.ts",
+                "start_byte": 7,
+                "end_byte": 67,
+                "start_line": 1,
+                "end_line": 4,
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                "content": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+              },
+              {
+                "id": 3,
+                "file": "consumer.ts",
+                "start_byte": 62,
+                "end_byte": 125,
+                "start_line": 2,
+                "end_line": 2,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "export function processOrder(value: ImportedPayload): string {\n"
+              },
+              {
+                "id": 4,
+                "file": "consumer.ts",
+                "start_byte": 0,
+                "end_byte": 62,
+                "start_line": 1,
+                "end_line": 1,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "import type { Payload as ImportedPayload } from \"./types.js\";\n"
+              },
+              {
+                "id": 5,
+                "file": "types.ts",
+                "start_byte": 0,
+                "end_byte": 27,
+                "start_line": 1,
+                "end_line": 1,
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                "content": "export interface Payload {\n"
+              }
+            ],
+            "omissions": [],
+            "limits": {
+              "max_hops": 3,
+              "max_nodes": 64,
+              "max_items": 12,
+              "max_neighbors": 32,
+              "max_output_bytes": 8192,
+              "max_evidence_bytes": 512
+            },
+            "usage": {
+              "nodes_examined": 2,
+              "evidence_bytes": 219,
+              "output_bytes": 2571,
+              "estimated_tokens": 643,
+              "token_estimate_method": "utf8_bytes_div_4",
+              "output_encoding": "mcp_result_json_utf8"
+            },
+            "_evaluation": {
+              "attempt_id": "df4a9214-315d-4cc5-86f9-003dd50bef38/attempt/1",
+              "calls_remaining": 23
+            }
+          }
+        ]
+      },
+      "trace_schema_version": 3,
+      "expected_mode": "recorded",
+      "adapter_attempts": 1,
+      "adapter_deliveries": 1,
+      "evidence_dir": "byte-limit-transport-evidence/explicit",
+      "output_verified": true,
+      "effective_arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder",
+        "max_output_bytes": 8192,
+        "max_evidence_bytes": 512
+      },
+      "product_envelope_bytes": 2571,
+      "snapshot_source_verified": true,
+      "routing": {
+        "schema_version": 1,
+        "observations_complete": true,
+        "first_repository_call": {
+          "item_id": "item_1",
+          "tool": "loci_explore",
+          "intent": "type_dependencies",
+          "status": "completed"
+        },
+        "initial_route_expected": "type_dependencies",
+        "initial_type_route": true,
+        "requested_anchor_received": true,
+        "maintained_exposure": true,
+        "explore_calls": [
+          {
+            "item_id": "item_1",
+            "intent": "type_dependencies",
+            "status": "ok",
+            "successful_delivery": true,
+            "anchor_ids": [
+              "consumer.ts::processOrder#function"
+            ],
+            "omissions": [],
+            "requested_anchor_received": true,
+            "anchor_complete": true
+          }
+        ],
+        "fallback_calls": [],
+        "helper_call_count": 0,
+        "failures": []
+      }
+    },
+    {
+      "mode": "zero_evidence",
+      "arm": "B",
+      "case_id": "imported_interface",
+      "request_count": 2,
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.6025619159918278,
+      "model": "gpt-5.6-luna",
+      "reasoning": {
+        "effort": "high",
+        "context": "all_turns"
+      },
+      "tool_set": [
+        [
+          "functions",
+          "list_mcp_resources"
+        ],
+        [
+          "functions",
+          "list_mcp_resource_templates"
+        ],
+        [
+          "functions",
+          "read_mcp_resource"
+        ],
+        [
+          "mcp__evaluation",
+          "file"
+        ],
+        [
+          "mcp__evaluation",
+          "get"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_anchors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_calls"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_imports"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_paths"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_references"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_retrieve"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_traverse_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "grep"
+        ],
+        [
+          "mcp__evaluation",
+          "loci_explore"
+        ],
+        [
+          "mcp__evaluation",
+          "outline"
+        ],
+        [
+          "mcp__evaluation",
+          "search"
+        ]
+      ],
+      "tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "canonical_tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "call_event": {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "type_dependencies",
+            "query": "processOrder",
+            "max_output_bytes": null,
+            "max_evidence_bytes": 0
+          },
+          "result": {
+            "content": [],
+            "structured_content": {
+              "schema_version": 1,
+              "intent": "type_dependencies",
+              "status": "empty",
+              "selection": "inferred",
+              "scope": {
+                "source": "indexed_supported_source",
+                "coverage": "complete",
+                "relationships": "authored_types",
+                "exhaustive": false
+              },
+              "items": [],
+              "relationships": [],
+              "sources": [],
+              "omissions": [
+                {
+                  "reason": "ancestor_unavailable",
+                  "count": 1
+                },
+                {
+                  "reason": "evidence_budget",
+                  "count": 1
+                }
+              ],
+              "limits": {
+                "max_hops": 3,
+                "max_nodes": 64,
+                "max_items": 12,
+                "max_neighbors": 32,
+                "max_output_bytes": 16384,
+                "max_evidence_bytes": 0
+              },
+              "usage": {
+                "nodes_examined": 2,
+                "evidence_bytes": 0,
+                "output_bytes": 695,
+                "estimated_tokens": 174,
+                "token_estimate_method": "utf8_bytes_div_4",
+                "output_encoding": "mcp_result_json_utf8"
+              },
+              "_evaluation": {
+                "attempt_id": "afa708d4-1d21-4546-bd32-edd33aa7f868/attempt/1",
+                "calls_remaining": 23
+              }
+            }
+          },
+          "error": null,
+          "status": "completed"
+        }
+      },
+      "call_item": {
+        "id": "item_1",
+        "type": "mcp_tool_call",
+        "server": "evaluation",
+        "tool": "loci_explore",
+        "arguments": {
+          "intent": "type_dependencies",
+          "query": "processOrder",
+          "max_output_bytes": null,
+          "max_evidence_bytes": 0
+        },
+        "result": {
+          "content": [],
+          "structured_content": {
+            "schema_version": 1,
+            "intent": "type_dependencies",
+            "status": "empty",
+            "selection": "inferred",
+            "scope": {
+              "source": "indexed_supported_source",
+              "coverage": "complete",
+              "relationships": "authored_types",
+              "exhaustive": false
+            },
+            "items": [],
+            "relationships": [],
+            "sources": [],
+            "omissions": [
+              {
+                "reason": "ancestor_unavailable",
+                "count": 1
+              },
+              {
+                "reason": "evidence_budget",
+                "count": 1
+              }
+            ],
+            "limits": {
+              "max_hops": 3,
+              "max_nodes": 64,
+              "max_items": 12,
+              "max_neighbors": 32,
+              "max_output_bytes": 16384,
+              "max_evidence_bytes": 0
+            },
+            "usage": {
+              "nodes_examined": 2,
+              "evidence_bytes": 0,
+              "output_bytes": 695,
+              "estimated_tokens": 174,
+              "token_estimate_method": "utf8_bytes_div_4",
+              "output_encoding": "mcp_result_json_utf8"
+            },
+            "_evaluation": {
+              "attempt_id": "afa708d4-1d21-4546-bd32-edd33aa7f868/attempt/1",
+              "calls_remaining": 23
+            }
+          }
+        },
+        "error": null,
+        "status": "completed"
+      },
+      "model_tool_outputs": [
+        {
+          "type": "function_call_output",
+          "id": "fco_01a0945e-f5de-7ea0-a896-d027cde23fa7",
+          "call_id": "call_probe",
+          "output": "Wall time: 0.0080 seconds\nOutput:\n{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"empty\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[],\"relationships\":[],\"sources\":[],\"omissions\":[{\"reason\":\"ancestor_unavailable\",\"count\":1},{\"reason\":\"evidence_budget\",\"count\":1}],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":0},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":0,\"output_bytes\":695,\"estimated_tokens\":174,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"afa708d4-1d21-4546-bd32-edd33aa7f868/attempt/1\",\"calls_remaining\":23}}"
+        }
+      ],
+      "payload_kind": "compact_json",
+      "payload_texts": [
+        "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"empty\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[],\"relationships\":[],\"sources\":[],\"omissions\":[{\"reason\":\"ancestor_unavailable\",\"count\":1},{\"reason\":\"evidence_budget\",\"count\":1}],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":0},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":0,\"output_bytes\":695,\"estimated_tokens\":174,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"afa708d4-1d21-4546-bd32-edd33aa7f868/attempt/1\",\"calls_remaining\":23}}"
+      ],
+      "observed_accounting": {
+        "schema_version": 3,
+        "complete": true,
+        "tool_call_count": 1,
+        "recorded_payload_bytes": 743,
+        "complete_payload_bytes": 743,
+        "source_bytes": 0,
+        "calls": [
+          {
+            "item_id": "item_1",
+            "server": "evaluation",
+            "tool": "loci_explore",
+            "arguments": {
+              "intent": "type_dependencies",
+              "query": "processOrder",
+              "max_output_bytes": null,
+              "max_evidence_bytes": 0
+            },
+            "status": "completed",
+            "attempt_id": "afa708d4-1d21-4546-bd32-edd33aa7f868/attempt/1",
+            "trace_event_id": "afa708d4-1d21-4546-bd32-edd33aa7f868:1",
+            "source_bytes": 0,
+            "serialized_bytes": 743,
+            "payload_texts": [
+              "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"empty\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[],\"relationships\":[],\"sources\":[],\"omissions\":[{\"reason\":\"ancestor_unavailable\",\"count\":1},{\"reason\":\"evidence_budget\",\"count\":1}],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":0},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":0,\"output_bytes\":695,\"estimated_tokens\":174,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"afa708d4-1d21-4546-bd32-edd33aa7f868/attempt/1\",\"calls_remaining\":23}}"
+            ],
+            "payload_format": "compact_json"
+          }
+        ],
+        "failures": [],
+        "validated_results": [
+          {
+            "schema_version": 1,
+            "intent": "type_dependencies",
+            "status": "empty",
+            "selection": "inferred",
+            "scope": {
+              "source": "indexed_supported_source",
+              "coverage": "complete",
+              "relationships": "authored_types",
+              "exhaustive": false
+            },
+            "items": [],
+            "relationships": [],
+            "sources": [],
+            "omissions": [
+              {
+                "reason": "ancestor_unavailable",
+                "count": 1
+              },
+              {
+                "reason": "evidence_budget",
+                "count": 1
+              }
+            ],
+            "limits": {
+              "max_hops": 3,
+              "max_nodes": 64,
+              "max_items": 12,
+              "max_neighbors": 32,
+              "max_output_bytes": 16384,
+              "max_evidence_bytes": 0
+            },
+            "usage": {
+              "nodes_examined": 2,
+              "evidence_bytes": 0,
+              "output_bytes": 695,
+              "estimated_tokens": 174,
+              "token_estimate_method": "utf8_bytes_div_4",
+              "output_encoding": "mcp_result_json_utf8"
+            },
+            "_evaluation": {
+              "attempt_id": "afa708d4-1d21-4546-bd32-edd33aa7f868/attempt/1",
+              "calls_remaining": 23
+            }
+          }
+        ]
+      },
+      "trace_schema_version": 3,
+      "expected_mode": "recorded",
+      "adapter_attempts": 1,
+      "adapter_deliveries": 1,
+      "evidence_dir": "byte-limit-transport-evidence/zero_evidence",
+      "output_verified": true,
+      "effective_arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder",
+        "max_output_bytes": 16384,
+        "max_evidence_bytes": 0
+      },
+      "product_envelope_bytes": 695,
+      "snapshot_source_verified": true,
+      "routing": {
+        "schema_version": 1,
+        "observations_complete": true,
+        "first_repository_call": {
+          "item_id": "item_1",
+          "tool": "loci_explore",
+          "intent": "type_dependencies",
+          "status": "completed"
+        },
+        "initial_route_expected": "type_dependencies",
+        "initial_type_route": true,
+        "requested_anchor_received": false,
+        "maintained_exposure": false,
+        "explore_calls": [
+          {
+            "item_id": "item_1",
+            "intent": "type_dependencies",
+            "status": "empty",
+            "successful_delivery": true,
+            "anchor_ids": [],
+            "omissions": [
+              {
+                "reason": "ancestor_unavailable",
+                "count": 1
+              },
+              {
+                "reason": "evidence_budget",
+                "count": 1
+              }
+            ],
+            "requested_anchor_received": false,
+            "anchor_complete": false
+          }
+        ],
+        "fallback_calls": [],
+        "helper_call_count": 0,
+        "failures": []
+      }
+    },
+    {
+      "mode": "minimum_output",
+      "arm": "B",
+      "case_id": "imported_interface",
+      "request_count": 2,
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.6353454999916721,
+      "model": "gpt-5.6-luna",
+      "reasoning": {
+        "effort": "high",
+        "context": "all_turns"
+      },
+      "tool_set": [
+        [
+          "functions",
+          "list_mcp_resources"
+        ],
+        [
+          "functions",
+          "list_mcp_resource_templates"
+        ],
+        [
+          "functions",
+          "read_mcp_resource"
+        ],
+        [
+          "mcp__evaluation",
+          "file"
+        ],
+        [
+          "mcp__evaluation",
+          "get"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_anchors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_calls"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_imports"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_paths"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_references"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_retrieve"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_traverse_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "grep"
+        ],
+        [
+          "mcp__evaluation",
+          "loci_explore"
+        ],
+        [
+          "mcp__evaluation",
+          "outline"
+        ],
+        [
+          "mcp__evaluation",
+          "search"
+        ]
+      ],
+      "tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "canonical_tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "call_event": {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "type_dependencies",
+            "query": "processOrder",
+            "max_output_bytes": 2048,
+            "max_evidence_bytes": null
+          },
+          "result": {
+            "content": [],
+            "structured_content": {
+              "schema_version": 1,
+              "intent": "type_dependencies",
+              "status": "partial",
+              "selection": "inferred",
+              "scope": {
+                "source": "indexed_supported_source",
+                "coverage": "complete",
+                "relationships": "authored_types",
+                "exhaustive": false
+              },
+              "items": [
+                {
+                  "id": "consumer.ts::processOrder#function",
+                  "name": "processOrder",
+                  "kind": "function",
+                  "file": "consumer.ts",
+                  "role": "anchor",
+                  "depth": 0,
+                  "why": "Query matches processorder",
+                  "source_id": 1,
+                  "complete": true,
+                  "path": []
+                }
+              ],
+              "relationships": [],
+              "sources": [
+                {
+                  "id": 1,
+                  "file": "consumer.ts",
+                  "start_byte": 69,
+                  "end_byte": 152,
+                  "start_line": 2,
+                  "end_line": 4,
+                  "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                  "content": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+                }
+              ],
+              "omissions": [
+                {
+                  "reason": "output_budget",
+                  "count": 1
+                }
+              ],
+              "limits": {
+                "max_hops": 3,
+                "max_nodes": 64,
+                "max_items": 12,
+                "max_neighbors": 32,
+                "max_output_bytes": 2048,
+                "max_evidence_bytes": 8192
+              },
+              "usage": {
+                "nodes_examined": 2,
+                "evidence_bytes": 83,
+                "output_bytes": 1128,
+                "estimated_tokens": 282,
+                "token_estimate_method": "utf8_bytes_div_4",
+                "output_encoding": "mcp_result_json_utf8"
+              },
+              "_evaluation": {
+                "attempt_id": "75df3326-663d-42d3-91fa-59cc5f8d01ae/attempt/1",
+                "calls_remaining": 23
+              }
+            }
+          },
+          "error": null,
+          "status": "completed"
+        }
+      },
+      "call_item": {
+        "id": "item_1",
+        "type": "mcp_tool_call",
+        "server": "evaluation",
+        "tool": "loci_explore",
+        "arguments": {
+          "intent": "type_dependencies",
+          "query": "processOrder",
+          "max_output_bytes": 2048,
+          "max_evidence_bytes": null
+        },
+        "result": {
+          "content": [],
+          "structured_content": {
+            "schema_version": 1,
+            "intent": "type_dependencies",
+            "status": "partial",
+            "selection": "inferred",
+            "scope": {
+              "source": "indexed_supported_source",
+              "coverage": "complete",
+              "relationships": "authored_types",
+              "exhaustive": false
+            },
+            "items": [
+              {
+                "id": "consumer.ts::processOrder#function",
+                "name": "processOrder",
+                "kind": "function",
+                "file": "consumer.ts",
+                "role": "anchor",
+                "depth": 0,
+                "why": "Query matches processorder",
+                "source_id": 1,
+                "complete": true,
+                "path": []
+              }
+            ],
+            "relationships": [],
+            "sources": [
+              {
+                "id": 1,
+                "file": "consumer.ts",
+                "start_byte": 69,
+                "end_byte": 152,
+                "start_line": 2,
+                "end_line": 4,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+              }
+            ],
+            "omissions": [
+              {
+                "reason": "output_budget",
+                "count": 1
+              }
+            ],
+            "limits": {
+              "max_hops": 3,
+              "max_nodes": 64,
+              "max_items": 12,
+              "max_neighbors": 32,
+              "max_output_bytes": 2048,
+              "max_evidence_bytes": 8192
+            },
+            "usage": {
+              "nodes_examined": 2,
+              "evidence_bytes": 83,
+              "output_bytes": 1128,
+              "estimated_tokens": 282,
+              "token_estimate_method": "utf8_bytes_div_4",
+              "output_encoding": "mcp_result_json_utf8"
+            },
+            "_evaluation": {
+              "attempt_id": "75df3326-663d-42d3-91fa-59cc5f8d01ae/attempt/1",
+              "calls_remaining": 23
+            }
+          }
+        },
+        "error": null,
+        "status": "completed"
+      },
+      "model_tool_outputs": [
+        {
+          "type": "function_call_output",
+          "id": "fco_01a0945e-fadb-7f70-8d01-6c694b22fe8a",
+          "call_id": "call_probe",
+          "output": "Wall time: 0.0093 seconds\nOutput:\n{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder\",\"source_id\":1,\"complete\":true,\"path\":[]}],\"relationships\":[],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":69,\"end_byte\":152,\"start_line\":2,\"end_line\":4,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\"}],\"omissions\":[{\"reason\":\"output_budget\",\"count\":1}],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":2048,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":83,\"output_bytes\":1128,\"estimated_tokens\":282,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"75df3326-663d-42d3-91fa-59cc5f8d01ae/attempt/1\",\"calls_remaining\":23}}"
+        }
+      ],
+      "payload_kind": "compact_json",
+      "payload_texts": [
+        "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder\",\"source_id\":1,\"complete\":true,\"path\":[]}],\"relationships\":[],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":69,\"end_byte\":152,\"start_line\":2,\"end_line\":4,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\"}],\"omissions\":[{\"reason\":\"output_budget\",\"count\":1}],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":2048,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":83,\"output_bytes\":1128,\"estimated_tokens\":282,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"75df3326-663d-42d3-91fa-59cc5f8d01ae/attempt/1\",\"calls_remaining\":23}}"
+      ],
+      "observed_accounting": {
+        "schema_version": 3,
+        "complete": true,
+        "tool_call_count": 1,
+        "recorded_payload_bytes": 1176,
+        "complete_payload_bytes": 1176,
+        "source_bytes": 83,
+        "calls": [
+          {
+            "item_id": "item_1",
+            "server": "evaluation",
+            "tool": "loci_explore",
+            "arguments": {
+              "intent": "type_dependencies",
+              "query": "processOrder",
+              "max_output_bytes": 2048,
+              "max_evidence_bytes": null
+            },
+            "status": "completed",
+            "attempt_id": "75df3326-663d-42d3-91fa-59cc5f8d01ae/attempt/1",
+            "trace_event_id": "75df3326-663d-42d3-91fa-59cc5f8d01ae:1",
+            "source_bytes": 83,
+            "serialized_bytes": 1176,
+            "payload_texts": [
+              "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder\",\"source_id\":1,\"complete\":true,\"path\":[]}],\"relationships\":[],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":69,\"end_byte\":152,\"start_line\":2,\"end_line\":4,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\"}],\"omissions\":[{\"reason\":\"output_budget\",\"count\":1}],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":2048,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":83,\"output_bytes\":1128,\"estimated_tokens\":282,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"75df3326-663d-42d3-91fa-59cc5f8d01ae/attempt/1\",\"calls_remaining\":23}}"
+            ],
+            "payload_format": "compact_json"
+          }
+        ],
+        "failures": [],
+        "validated_results": [
+          {
+            "schema_version": 1,
+            "intent": "type_dependencies",
+            "status": "partial",
+            "selection": "inferred",
+            "scope": {
+              "source": "indexed_supported_source",
+              "coverage": "complete",
+              "relationships": "authored_types",
+              "exhaustive": false
+            },
+            "items": [
+              {
+                "id": "consumer.ts::processOrder#function",
+                "name": "processOrder",
+                "kind": "function",
+                "file": "consumer.ts",
+                "role": "anchor",
+                "depth": 0,
+                "why": "Query matches processorder",
+                "source_id": 1,
+                "complete": true,
+                "path": []
+              }
+            ],
+            "relationships": [],
+            "sources": [
+              {
+                "id": 1,
+                "file": "consumer.ts",
+                "start_byte": 69,
+                "end_byte": 152,
+                "start_line": 2,
+                "end_line": 4,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+              }
+            ],
+            "omissions": [
+              {
+                "reason": "output_budget",
+                "count": 1
+              }
+            ],
+            "limits": {
+              "max_hops": 3,
+              "max_nodes": 64,
+              "max_items": 12,
+              "max_neighbors": 32,
+              "max_output_bytes": 2048,
+              "max_evidence_bytes": 8192
+            },
+            "usage": {
+              "nodes_examined": 2,
+              "evidence_bytes": 83,
+              "output_bytes": 1128,
+              "estimated_tokens": 282,
+              "token_estimate_method": "utf8_bytes_div_4",
+              "output_encoding": "mcp_result_json_utf8"
+            },
+            "_evaluation": {
+              "attempt_id": "75df3326-663d-42d3-91fa-59cc5f8d01ae/attempt/1",
+              "calls_remaining": 23
+            }
+          }
+        ]
+      },
+      "trace_schema_version": 3,
+      "expected_mode": "recorded",
+      "adapter_attempts": 1,
+      "adapter_deliveries": 1,
+      "evidence_dir": "byte-limit-transport-evidence/minimum_output",
+      "output_verified": true,
+      "effective_arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder",
+        "max_output_bytes": 2048,
+        "max_evidence_bytes": 8192
+      },
+      "product_envelope_bytes": 1128,
+      "snapshot_source_verified": true,
+      "routing": {
+        "schema_version": 1,
+        "observations_complete": true,
+        "first_repository_call": {
+          "item_id": "item_1",
+          "tool": "loci_explore",
+          "intent": "type_dependencies",
+          "status": "completed"
+        },
+        "initial_route_expected": "type_dependencies",
+        "initial_type_route": true,
+        "requested_anchor_received": true,
+        "maintained_exposure": true,
+        "explore_calls": [
+          {
+            "item_id": "item_1",
+            "intent": "type_dependencies",
+            "status": "partial",
+            "successful_delivery": true,
+            "anchor_ids": [
+              "consumer.ts::processOrder#function"
+            ],
+            "omissions": [
+              {
+                "reason": "output_budget",
+                "count": 1
+              }
+            ],
+            "requested_anchor_received": true,
+            "anchor_complete": true
+          }
+        ],
+        "fallback_calls": [],
+        "helper_call_count": 0,
+        "failures": []
+      }
+    },
+    {
+      "mode": "maximum",
+      "arm": "B",
+      "case_id": "imported_interface",
+      "request_count": 2,
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.6416615420021117,
+      "model": "gpt-5.6-luna",
+      "reasoning": {
+        "effort": "high",
+        "context": "all_turns"
+      },
+      "tool_set": [
+        [
+          "functions",
+          "list_mcp_resources"
+        ],
+        [
+          "functions",
+          "list_mcp_resource_templates"
+        ],
+        [
+          "functions",
+          "read_mcp_resource"
+        ],
+        [
+          "mcp__evaluation",
+          "file"
+        ],
+        [
+          "mcp__evaluation",
+          "get"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_anchors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_calls"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_imports"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_paths"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_references"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_retrieve"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_traverse_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "grep"
+        ],
+        [
+          "mcp__evaluation",
+          "loci_explore"
+        ],
+        [
+          "mcp__evaluation",
+          "outline"
+        ],
+        [
+          "mcp__evaluation",
+          "search"
+        ]
+      ],
+      "tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "canonical_tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "call_event": {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "type_dependencies",
+            "query": "processOrder",
+            "max_output_bytes": 32768,
+            "max_evidence_bytes": 16384
+          },
+          "result": {
+            "content": [],
+            "structured_content": {
+              "schema_version": 1,
+              "intent": "type_dependencies",
+              "status": "ok",
+              "selection": "inferred",
+              "scope": {
+                "source": "indexed_supported_source",
+                "coverage": "complete",
+                "relationships": "authored_types",
+                "exhaustive": false
+              },
+              "items": [
+                {
+                  "id": "consumer.ts::processOrder#function",
+                  "name": "processOrder",
+                  "kind": "function",
+                  "file": "consumer.ts",
+                  "role": "anchor",
+                  "depth": 0,
+                  "why": "Query matches processorder",
+                  "source_id": 1,
+                  "complete": true,
+                  "path": []
+                },
+                {
+                  "id": "types.ts::Payload#interface",
+                  "name": "Payload",
+                  "kind": "interface",
+                  "file": "types.ts",
+                  "role": "dependency",
+                  "depth": 1,
+                  "why": "Direct declared type",
+                  "source_id": 2,
+                  "complete": true,
+                  "path": [
+                    1
+                  ]
+                }
+              ],
+              "relationships": [
+                {
+                  "id": 1,
+                  "edge": {
+                    "from": "consumer.ts::processOrder#function",
+                    "to": "types.ts::Payload#interface",
+                    "type": "uses_type",
+                    "directed": true,
+                    "namespace": "loci",
+                    "resolution": "import-resolved",
+                    "evidence": {
+                      "file": "consumer.ts",
+                      "line": 2,
+                      "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                    }
+                  },
+                  "traversed": "forward",
+                  "source_ids": [
+                    3,
+                    4,
+                    5
+                  ]
+                }
+              ],
+              "sources": [
+                {
+                  "id": 1,
+                  "file": "consumer.ts",
+                  "start_byte": 69,
+                  "end_byte": 152,
+                  "start_line": 2,
+                  "end_line": 4,
+                  "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                  "content": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+                },
+                {
+                  "id": 2,
+                  "file": "types.ts",
+                  "start_byte": 7,
+                  "end_byte": 67,
+                  "start_line": 1,
+                  "end_line": 4,
+                  "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                  "content": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+                },
+                {
+                  "id": 3,
+                  "file": "consumer.ts",
+                  "start_byte": 62,
+                  "end_byte": 125,
+                  "start_line": 2,
+                  "end_line": 2,
+                  "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                  "content": "export function processOrder(value: ImportedPayload): string {\n"
+                },
+                {
+                  "id": 4,
+                  "file": "consumer.ts",
+                  "start_byte": 0,
+                  "end_byte": 62,
+                  "start_line": 1,
+                  "end_line": 1,
+                  "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                  "content": "import type { Payload as ImportedPayload } from \"./types.js\";\n"
+                },
+                {
+                  "id": 5,
+                  "file": "types.ts",
+                  "start_byte": 0,
+                  "end_byte": 27,
+                  "start_line": 1,
+                  "end_line": 1,
+                  "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                  "content": "export interface Payload {\n"
+                }
+              ],
+              "omissions": [],
+              "limits": {
+                "max_hops": 3,
+                "max_nodes": 64,
+                "max_items": 12,
+                "max_neighbors": 32,
+                "max_output_bytes": 32768,
+                "max_evidence_bytes": 16384
+              },
+              "usage": {
+                "nodes_examined": 2,
+                "evidence_bytes": 219,
+                "output_bytes": 2574,
+                "estimated_tokens": 644,
+                "token_estimate_method": "utf8_bytes_div_4",
+                "output_encoding": "mcp_result_json_utf8"
+              },
+              "_evaluation": {
+                "attempt_id": "9fa0f714-0010-4542-af96-4614ab40abd2/attempt/1",
+                "calls_remaining": 23
+              }
+            }
+          },
+          "error": null,
+          "status": "completed"
+        }
+      },
+      "call_item": {
+        "id": "item_1",
+        "type": "mcp_tool_call",
+        "server": "evaluation",
+        "tool": "loci_explore",
+        "arguments": {
+          "intent": "type_dependencies",
+          "query": "processOrder",
+          "max_output_bytes": 32768,
+          "max_evidence_bytes": 16384
+        },
+        "result": {
+          "content": [],
+          "structured_content": {
+            "schema_version": 1,
+            "intent": "type_dependencies",
+            "status": "ok",
+            "selection": "inferred",
+            "scope": {
+              "source": "indexed_supported_source",
+              "coverage": "complete",
+              "relationships": "authored_types",
+              "exhaustive": false
+            },
+            "items": [
+              {
+                "id": "consumer.ts::processOrder#function",
+                "name": "processOrder",
+                "kind": "function",
+                "file": "consumer.ts",
+                "role": "anchor",
+                "depth": 0,
+                "why": "Query matches processorder",
+                "source_id": 1,
+                "complete": true,
+                "path": []
+              },
+              {
+                "id": "types.ts::Payload#interface",
+                "name": "Payload",
+                "kind": "interface",
+                "file": "types.ts",
+                "role": "dependency",
+                "depth": 1,
+                "why": "Direct declared type",
+                "source_id": 2,
+                "complete": true,
+                "path": [
+                  1
+                ]
+              }
+            ],
+            "relationships": [
+              {
+                "id": 1,
+                "edge": {
+                  "from": "consumer.ts::processOrder#function",
+                  "to": "types.ts::Payload#interface",
+                  "type": "uses_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "consumer.ts",
+                    "line": 2,
+                    "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                  }
+                },
+                "traversed": "forward",
+                "source_ids": [
+                  3,
+                  4,
+                  5
+                ]
+              }
+            ],
+            "sources": [
+              {
+                "id": 1,
+                "file": "consumer.ts",
+                "start_byte": 69,
+                "end_byte": 152,
+                "start_line": 2,
+                "end_line": 4,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+              },
+              {
+                "id": 2,
+                "file": "types.ts",
+                "start_byte": 7,
+                "end_byte": 67,
+                "start_line": 1,
+                "end_line": 4,
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                "content": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+              },
+              {
+                "id": 3,
+                "file": "consumer.ts",
+                "start_byte": 62,
+                "end_byte": 125,
+                "start_line": 2,
+                "end_line": 2,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "export function processOrder(value: ImportedPayload): string {\n"
+              },
+              {
+                "id": 4,
+                "file": "consumer.ts",
+                "start_byte": 0,
+                "end_byte": 62,
+                "start_line": 1,
+                "end_line": 1,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "import type { Payload as ImportedPayload } from \"./types.js\";\n"
+              },
+              {
+                "id": 5,
+                "file": "types.ts",
+                "start_byte": 0,
+                "end_byte": 27,
+                "start_line": 1,
+                "end_line": 1,
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                "content": "export interface Payload {\n"
+              }
+            ],
+            "omissions": [],
+            "limits": {
+              "max_hops": 3,
+              "max_nodes": 64,
+              "max_items": 12,
+              "max_neighbors": 32,
+              "max_output_bytes": 32768,
+              "max_evidence_bytes": 16384
+            },
+            "usage": {
+              "nodes_examined": 2,
+              "evidence_bytes": 219,
+              "output_bytes": 2574,
+              "estimated_tokens": 644,
+              "token_estimate_method": "utf8_bytes_div_4",
+              "output_encoding": "mcp_result_json_utf8"
+            },
+            "_evaluation": {
+              "attempt_id": "9fa0f714-0010-4542-af96-4614ab40abd2/attempt/1",
+              "calls_remaining": 23
+            }
+          }
+        },
+        "error": null,
+        "status": "completed"
+      },
+      "model_tool_outputs": [
+        {
+          "type": "function_call_output",
+          "id": "fco_01a0945e-ffc0-7133-b648-75ab846a05d6",
+          "call_id": "call_probe",
+          "output": "Wall time: 0.0068 seconds\nOutput:\n{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"ok\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"kind\":\"interface\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5]}],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":69,\"end_byte\":152,\"start_line\":2,\"end_line\":4,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\"},{\"id\":2,\"file\":\"types.ts\",\"start_byte\":7,\"end_byte\":67,\"start_line\":1,\"end_line\":4,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\"},{\"id\":3,\"file\":\"consumer.ts\",\"start_byte\":62,\"end_byte\":125,\"start_line\":2,\"end_line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"export function processOrder(value: ImportedPayload): string {\\n\"},{\"id\":4,\"file\":\"consumer.ts\",\"start_byte\":0,\"end_byte\":62,\"start_line\":1,\"end_line\":1,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\\n\"},{\"id\":5,\"file\":\"types.ts\",\"start_byte\":0,\"end_byte\":27,\"start_line\":1,\"end_line\":1,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"export interface Payload {\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":32768,\"max_evidence_bytes\":16384},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":219,\"output_bytes\":2574,\"estimated_tokens\":644,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"9fa0f714-0010-4542-af96-4614ab40abd2/attempt/1\",\"calls_remaining\":23}}"
+        }
+      ],
+      "payload_kind": "compact_json",
+      "payload_texts": [
+        "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"ok\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"kind\":\"interface\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5]}],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":69,\"end_byte\":152,\"start_line\":2,\"end_line\":4,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\"},{\"id\":2,\"file\":\"types.ts\",\"start_byte\":7,\"end_byte\":67,\"start_line\":1,\"end_line\":4,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\"},{\"id\":3,\"file\":\"consumer.ts\",\"start_byte\":62,\"end_byte\":125,\"start_line\":2,\"end_line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"export function processOrder(value: ImportedPayload): string {\\n\"},{\"id\":4,\"file\":\"consumer.ts\",\"start_byte\":0,\"end_byte\":62,\"start_line\":1,\"end_line\":1,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\\n\"},{\"id\":5,\"file\":\"types.ts\",\"start_byte\":0,\"end_byte\":27,\"start_line\":1,\"end_line\":1,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"export interface Payload {\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":32768,\"max_evidence_bytes\":16384},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":219,\"output_bytes\":2574,\"estimated_tokens\":644,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"9fa0f714-0010-4542-af96-4614ab40abd2/attempt/1\",\"calls_remaining\":23}}"
+      ],
+      "observed_accounting": {
+        "schema_version": 3,
+        "complete": true,
+        "tool_call_count": 1,
+        "recorded_payload_bytes": 2622,
+        "complete_payload_bytes": 2622,
+        "source_bytes": 295,
+        "calls": [
+          {
+            "item_id": "item_1",
+            "server": "evaluation",
+            "tool": "loci_explore",
+            "arguments": {
+              "intent": "type_dependencies",
+              "query": "processOrder",
+              "max_output_bytes": 32768,
+              "max_evidence_bytes": 16384
+            },
+            "status": "completed",
+            "attempt_id": "9fa0f714-0010-4542-af96-4614ab40abd2/attempt/1",
+            "trace_event_id": "9fa0f714-0010-4542-af96-4614ab40abd2:1",
+            "source_bytes": 295,
+            "serialized_bytes": 2622,
+            "payload_texts": [
+              "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"ok\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"kind\":\"interface\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5]}],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":69,\"end_byte\":152,\"start_line\":2,\"end_line\":4,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\"},{\"id\":2,\"file\":\"types.ts\",\"start_byte\":7,\"end_byte\":67,\"start_line\":1,\"end_line\":4,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\"},{\"id\":3,\"file\":\"consumer.ts\",\"start_byte\":62,\"end_byte\":125,\"start_line\":2,\"end_line\":2,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"export function processOrder(value: ImportedPayload): string {\\n\"},{\"id\":4,\"file\":\"consumer.ts\",\"start_byte\":0,\"end_byte\":62,\"start_line\":1,\"end_line\":1,\"content_hash\":\"a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b\",\"content\":\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\\n\"},{\"id\":5,\"file\":\"types.ts\",\"start_byte\":0,\"end_byte\":27,\"start_line\":1,\"end_line\":1,\"content_hash\":\"29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d\",\"content\":\"export interface Payload {\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":32768,\"max_evidence_bytes\":16384},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":219,\"output_bytes\":2574,\"estimated_tokens\":644,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"9fa0f714-0010-4542-af96-4614ab40abd2/attempt/1\",\"calls_remaining\":23}}"
+            ],
+            "payload_format": "compact_json"
+          }
+        ],
+        "failures": [],
+        "validated_results": [
+          {
+            "schema_version": 1,
+            "intent": "type_dependencies",
+            "status": "ok",
+            "selection": "inferred",
+            "scope": {
+              "source": "indexed_supported_source",
+              "coverage": "complete",
+              "relationships": "authored_types",
+              "exhaustive": false
+            },
+            "items": [
+              {
+                "id": "consumer.ts::processOrder#function",
+                "name": "processOrder",
+                "kind": "function",
+                "file": "consumer.ts",
+                "role": "anchor",
+                "depth": 0,
+                "why": "Query matches processorder",
+                "source_id": 1,
+                "complete": true,
+                "path": []
+              },
+              {
+                "id": "types.ts::Payload#interface",
+                "name": "Payload",
+                "kind": "interface",
+                "file": "types.ts",
+                "role": "dependency",
+                "depth": 1,
+                "why": "Direct declared type",
+                "source_id": 2,
+                "complete": true,
+                "path": [
+                  1
+                ]
+              }
+            ],
+            "relationships": [
+              {
+                "id": 1,
+                "edge": {
+                  "from": "consumer.ts::processOrder#function",
+                  "to": "types.ts::Payload#interface",
+                  "type": "uses_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "consumer.ts",
+                    "line": 2,
+                    "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                  }
+                },
+                "traversed": "forward",
+                "source_ids": [
+                  3,
+                  4,
+                  5
+                ]
+              }
+            ],
+            "sources": [
+              {
+                "id": 1,
+                "file": "consumer.ts",
+                "start_byte": 69,
+                "end_byte": 152,
+                "start_line": 2,
+                "end_line": 4,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+              },
+              {
+                "id": 2,
+                "file": "types.ts",
+                "start_byte": 7,
+                "end_byte": 67,
+                "start_line": 1,
+                "end_line": 4,
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                "content": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+              },
+              {
+                "id": 3,
+                "file": "consumer.ts",
+                "start_byte": 62,
+                "end_byte": 125,
+                "start_line": 2,
+                "end_line": 2,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "export function processOrder(value: ImportedPayload): string {\n"
+              },
+              {
+                "id": 4,
+                "file": "consumer.ts",
+                "start_byte": 0,
+                "end_byte": 62,
+                "start_line": 1,
+                "end_line": 1,
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                "content": "import type { Payload as ImportedPayload } from \"./types.js\";\n"
+              },
+              {
+                "id": 5,
+                "file": "types.ts",
+                "start_byte": 0,
+                "end_byte": 27,
+                "start_line": 1,
+                "end_line": 1,
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                "content": "export interface Payload {\n"
+              }
+            ],
+            "omissions": [],
+            "limits": {
+              "max_hops": 3,
+              "max_nodes": 64,
+              "max_items": 12,
+              "max_neighbors": 32,
+              "max_output_bytes": 32768,
+              "max_evidence_bytes": 16384
+            },
+            "usage": {
+              "nodes_examined": 2,
+              "evidence_bytes": 219,
+              "output_bytes": 2574,
+              "estimated_tokens": 644,
+              "token_estimate_method": "utf8_bytes_div_4",
+              "output_encoding": "mcp_result_json_utf8"
+            },
+            "_evaluation": {
+              "attempt_id": "9fa0f714-0010-4542-af96-4614ab40abd2/attempt/1",
+              "calls_remaining": 23
+            }
+          }
+        ]
+      },
+      "trace_schema_version": 3,
+      "expected_mode": "recorded",
+      "adapter_attempts": 1,
+      "adapter_deliveries": 1,
+      "evidence_dir": "byte-limit-transport-evidence/maximum",
+      "output_verified": true,
+      "effective_arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder",
+        "max_output_bytes": 32768,
+        "max_evidence_bytes": 16384
+      },
+      "product_envelope_bytes": 2574,
+      "snapshot_source_verified": true,
+      "routing": {
+        "schema_version": 1,
+        "observations_complete": true,
+        "first_repository_call": {
+          "item_id": "item_1",
+          "tool": "loci_explore",
+          "intent": "type_dependencies",
+          "status": "completed"
+        },
+        "initial_route_expected": "type_dependencies",
+        "initial_type_route": true,
+        "requested_anchor_received": true,
+        "maintained_exposure": true,
+        "explore_calls": [
+          {
+            "item_id": "item_1",
+            "intent": "type_dependencies",
+            "status": "ok",
+            "successful_delivery": true,
+            "anchor_ids": [
+              "consumer.ts::processOrder#function"
+            ],
+            "omissions": [],
+            "requested_anchor_received": true,
+            "anchor_complete": true
+          }
+        ],
+        "fallback_calls": [],
+        "helper_call_count": 0,
+        "failures": []
+      }
+    },
+    {
+      "mode": "output_over_cap",
+      "arm": "B",
+      "case_id": "imported_interface",
+      "request_count": 2,
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.6761403340060497,
+      "model": "gpt-5.6-luna",
+      "reasoning": {
+        "effort": "high",
+        "context": "all_turns"
+      },
+      "tool_set": [
+        [
+          "functions",
+          "list_mcp_resources"
+        ],
+        [
+          "functions",
+          "list_mcp_resource_templates"
+        ],
+        [
+          "functions",
+          "read_mcp_resource"
+        ],
+        [
+          "mcp__evaluation",
+          "file"
+        ],
+        [
+          "mcp__evaluation",
+          "get"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_anchors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_calls"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_imports"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_paths"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_references"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_retrieve"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_traverse_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "grep"
+        ],
+        [
+          "mcp__evaluation",
+          "loci_explore"
+        ],
+        [
+          "mcp__evaluation",
+          "outline"
+        ],
+        [
+          "mcp__evaluation",
+          "search"
+        ]
+      ],
+      "tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "canonical_tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "call_event": {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "type_dependencies",
+            "query": "processOrder",
+            "max_output_bytes": 32769
+          },
+          "result": {
+            "content": [
+              {
+                "type": "text",
+                "text": "Error executing tool loci_explore: loci_explore.max_output_bytes must be between 2048 and 32768"
+              }
+            ],
+            "structured_content": null
+          },
+          "error": null,
+          "status": "failed"
+        }
+      },
+      "call_item": {
+        "id": "item_1",
+        "type": "mcp_tool_call",
+        "server": "evaluation",
+        "tool": "loci_explore",
+        "arguments": {
+          "intent": "type_dependencies",
+          "query": "processOrder",
+          "max_output_bytes": 32769
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Error executing tool loci_explore: loci_explore.max_output_bytes must be between 2048 and 32768"
+            }
+          ],
+          "structured_content": null
+        },
+        "error": null,
+        "status": "failed"
+      },
+      "model_tool_outputs": [
+        {
+          "type": "function_call_output",
+          "id": "fco_01a0945f-04d8-7c63-9be6-81d0cc3509f3",
+          "call_id": "call_probe",
+          "output": [
+            {
+              "type": "input_text",
+              "text": "Wall time: 0.0008 seconds\nOutput:"
+            },
+            {
+              "type": "input_text",
+              "text": "Error executing tool loci_explore: loci_explore.max_output_bytes must be between 2048 and 32768"
+            }
+          ]
+        }
+      ],
+      "payload_kind": "text_blocks",
+      "payload_texts": [
+        "Error executing tool loci_explore: loci_explore.max_output_bytes must be between 2048 and 32768"
+      ],
+      "observed_accounting": {
+        "schema_version": 3,
+        "complete": true,
+        "tool_call_count": 1,
+        "recorded_payload_bytes": 95,
+        "complete_payload_bytes": 95,
+        "source_bytes": 0,
+        "calls": [
+          {
+            "item_id": "item_1",
+            "server": "evaluation",
+            "tool": "loci_explore",
+            "arguments": {
+              "intent": "type_dependencies",
+              "query": "processOrder",
+              "max_output_bytes": 32769
+            },
+            "status": "failed",
+            "attempt_id": null,
+            "trace_event_id": null,
+            "source_bytes": 0,
+            "serialized_bytes": 95,
+            "payload_texts": [
+              "Error executing tool loci_explore: loci_explore.max_output_bytes must be between 2048 and 32768"
+            ],
+            "payload_format": "text_blocks"
+          }
+        ],
+        "failures": [],
+        "validated_results": []
+      },
+      "trace_schema_version": 3,
+      "expected_mode": "schema_error",
+      "adapter_attempts": 0,
+      "adapter_deliveries": 0,
+      "evidence_dir": "byte-limit-transport-evidence/output_over_cap",
+      "output_verified": true,
+      "routing": {
+        "schema_version": 1,
+        "observations_complete": true,
+        "first_repository_call": {
+          "item_id": "item_1",
+          "tool": "loci_explore",
+          "intent": "type_dependencies",
+          "status": "failed"
+        },
+        "initial_route_expected": "type_dependencies",
+        "initial_type_route": true,
+        "requested_anchor_received": false,
+        "maintained_exposure": false,
+        "explore_calls": [
+          {
+            "item_id": "item_1",
+            "intent": "type_dependencies",
+            "status": "failed",
+            "successful_delivery": false,
+            "anchor_ids": [],
+            "omissions": [],
+            "requested_anchor_received": false,
+            "anchor_complete": false
+          }
+        ],
+        "fallback_calls": [],
+        "helper_call_count": 0,
+        "failures": []
+      }
+    },
+    {
+      "mode": "evidence_over_cap",
+      "arm": "B",
+      "case_id": "imported_interface",
+      "request_count": 2,
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.7305715419934131,
+      "model": "gpt-5.6-luna",
+      "reasoning": {
+        "effort": "high",
+        "context": "all_turns"
+      },
+      "tool_set": [
+        [
+          "functions",
+          "list_mcp_resources"
+        ],
+        [
+          "functions",
+          "list_mcp_resource_templates"
+        ],
+        [
+          "functions",
+          "read_mcp_resource"
+        ],
+        [
+          "mcp__evaluation",
+          "file"
+        ],
+        [
+          "mcp__evaluation",
+          "get"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_anchors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_calls"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_imports"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_paths"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_references"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_retrieve"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_traverse_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "grep"
+        ],
+        [
+          "mcp__evaluation",
+          "loci_explore"
+        ],
+        [
+          "mcp__evaluation",
+          "outline"
+        ],
+        [
+          "mcp__evaluation",
+          "search"
+        ]
+      ],
+      "tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "canonical_tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "call_event": {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "type_dependencies",
+            "query": "processOrder",
+            "max_evidence_bytes": 16385
+          },
+          "result": {
+            "content": [
+              {
+                "type": "text",
+                "text": "Error executing tool loci_explore: loci_explore.max_evidence_bytes must be between 0 and 16384"
+              }
+            ],
+            "structured_content": null
+          },
+          "error": null,
+          "status": "failed"
+        }
+      },
+      "call_item": {
+        "id": "item_1",
+        "type": "mcp_tool_call",
+        "server": "evaluation",
+        "tool": "loci_explore",
+        "arguments": {
+          "intent": "type_dependencies",
+          "query": "processOrder",
+          "max_evidence_bytes": 16385
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Error executing tool loci_explore: loci_explore.max_evidence_bytes must be between 0 and 16384"
+            }
+          ],
+          "structured_content": null
+        },
+        "error": null,
+        "status": "failed"
+      },
+      "model_tool_outputs": [
+        {
+          "type": "function_call_output",
+          "id": "fco_01a0945f-0a2d-7281-ac98-7f5d4d5c3a72",
+          "call_id": "call_probe",
+          "output": [
+            {
+              "type": "input_text",
+              "text": "Wall time: 0.0009 seconds\nOutput:"
+            },
+            {
+              "type": "input_text",
+              "text": "Error executing tool loci_explore: loci_explore.max_evidence_bytes must be between 0 and 16384"
+            }
+          ]
+        }
+      ],
+      "payload_kind": "text_blocks",
+      "payload_texts": [
+        "Error executing tool loci_explore: loci_explore.max_evidence_bytes must be between 0 and 16384"
+      ],
+      "observed_accounting": {
+        "schema_version": 3,
+        "complete": true,
+        "tool_call_count": 1,
+        "recorded_payload_bytes": 94,
+        "complete_payload_bytes": 94,
+        "source_bytes": 0,
+        "calls": [
+          {
+            "item_id": "item_1",
+            "server": "evaluation",
+            "tool": "loci_explore",
+            "arguments": {
+              "intent": "type_dependencies",
+              "query": "processOrder",
+              "max_evidence_bytes": 16385
+            },
+            "status": "failed",
+            "attempt_id": null,
+            "trace_event_id": null,
+            "source_bytes": 0,
+            "serialized_bytes": 94,
+            "payload_texts": [
+              "Error executing tool loci_explore: loci_explore.max_evidence_bytes must be between 0 and 16384"
+            ],
+            "payload_format": "text_blocks"
+          }
+        ],
+        "failures": [],
+        "validated_results": []
+      },
+      "trace_schema_version": 3,
+      "expected_mode": "schema_error",
+      "adapter_attempts": 0,
+      "adapter_deliveries": 0,
+      "evidence_dir": "byte-limit-transport-evidence/evidence_over_cap",
+      "output_verified": true,
+      "routing": {
+        "schema_version": 1,
+        "observations_complete": true,
+        "first_repository_call": {
+          "item_id": "item_1",
+          "tool": "loci_explore",
+          "intent": "type_dependencies",
+          "status": "failed"
+        },
+        "initial_route_expected": "type_dependencies",
+        "initial_type_route": true,
+        "requested_anchor_received": false,
+        "maintained_exposure": false,
+        "explore_calls": [
+          {
+            "item_id": "item_1",
+            "intent": "type_dependencies",
+            "status": "failed",
+            "successful_delivery": false,
+            "anchor_ids": [],
+            "omissions": [],
+            "requested_anchor_received": false,
+            "anchor_complete": false
+          }
+        ],
+        "fallback_calls": [],
+        "helper_call_count": 0,
+        "failures": []
+      }
+    },
+    {
+      "mode": "output_below_minimum",
+      "arm": "B",
+      "case_id": "imported_interface",
+      "request_count": 2,
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.6781554159970256,
+      "model": "gpt-5.6-luna",
+      "reasoning": {
+        "effort": "high",
+        "context": "all_turns"
+      },
+      "tool_set": [
+        [
+          "functions",
+          "list_mcp_resources"
+        ],
+        [
+          "functions",
+          "list_mcp_resource_templates"
+        ],
+        [
+          "functions",
+          "read_mcp_resource"
+        ],
+        [
+          "mcp__evaluation",
+          "file"
+        ],
+        [
+          "mcp__evaluation",
+          "get"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_anchors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_calls"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_imports"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_paths"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_references"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_retrieve"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_traverse_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "grep"
+        ],
+        [
+          "mcp__evaluation",
+          "loci_explore"
+        ],
+        [
+          "mcp__evaluation",
+          "outline"
+        ],
+        [
+          "mcp__evaluation",
+          "search"
+        ]
+      ],
+      "tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "canonical_tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "call_event": {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "type_dependencies",
+            "query": "processOrder",
+            "max_output_bytes": 2047
+          },
+          "result": {
+            "content": [
+              {
+                "type": "text",
+                "text": "Error executing tool loci_explore: loci_explore.max_output_bytes must be between 2048 and 32768"
+              }
+            ],
+            "structured_content": null
+          },
+          "error": null,
+          "status": "failed"
+        }
+      },
+      "call_item": {
+        "id": "item_1",
+        "type": "mcp_tool_call",
+        "server": "evaluation",
+        "tool": "loci_explore",
+        "arguments": {
+          "intent": "type_dependencies",
+          "query": "processOrder",
+          "max_output_bytes": 2047
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Error executing tool loci_explore: loci_explore.max_output_bytes must be between 2048 and 32768"
+            }
+          ],
+          "structured_content": null
+        },
+        "error": null,
+        "status": "failed"
+      },
+      "model_tool_outputs": [
+        {
+          "type": "function_call_output",
+          "id": "fco_01a0945f-0f4b-7b01-88a8-5f78bacc5b71",
+          "call_id": "call_probe",
+          "output": [
+            {
+              "type": "input_text",
+              "text": "Wall time: 0.0008 seconds\nOutput:"
+            },
+            {
+              "type": "input_text",
+              "text": "Error executing tool loci_explore: loci_explore.max_output_bytes must be between 2048 and 32768"
+            }
+          ]
+        }
+      ],
+      "payload_kind": "text_blocks",
+      "payload_texts": [
+        "Error executing tool loci_explore: loci_explore.max_output_bytes must be between 2048 and 32768"
+      ],
+      "observed_accounting": {
+        "schema_version": 3,
+        "complete": true,
+        "tool_call_count": 1,
+        "recorded_payload_bytes": 95,
+        "complete_payload_bytes": 95,
+        "source_bytes": 0,
+        "calls": [
+          {
+            "item_id": "item_1",
+            "server": "evaluation",
+            "tool": "loci_explore",
+            "arguments": {
+              "intent": "type_dependencies",
+              "query": "processOrder",
+              "max_output_bytes": 2047
+            },
+            "status": "failed",
+            "attempt_id": null,
+            "trace_event_id": null,
+            "source_bytes": 0,
+            "serialized_bytes": 95,
+            "payload_texts": [
+              "Error executing tool loci_explore: loci_explore.max_output_bytes must be between 2048 and 32768"
+            ],
+            "payload_format": "text_blocks"
+          }
+        ],
+        "failures": [],
+        "validated_results": []
+      },
+      "trace_schema_version": 3,
+      "expected_mode": "schema_error",
+      "adapter_attempts": 0,
+      "adapter_deliveries": 0,
+      "evidence_dir": "byte-limit-transport-evidence/output_below_minimum",
+      "output_verified": true,
+      "routing": {
+        "schema_version": 1,
+        "observations_complete": true,
+        "first_repository_call": {
+          "item_id": "item_1",
+          "tool": "loci_explore",
+          "intent": "type_dependencies",
+          "status": "failed"
+        },
+        "initial_route_expected": "type_dependencies",
+        "initial_type_route": true,
+        "requested_anchor_received": false,
+        "maintained_exposure": false,
+        "explore_calls": [
+          {
+            "item_id": "item_1",
+            "intent": "type_dependencies",
+            "status": "failed",
+            "successful_delivery": false,
+            "anchor_ids": [],
+            "omissions": [],
+            "requested_anchor_received": false,
+            "anchor_complete": false
+          }
+        ],
+        "fallback_calls": [],
+        "helper_call_count": 0,
+        "failures": []
+      }
+    },
+    {
+      "mode": "negative_evidence",
+      "arm": "B",
+      "case_id": "imported_interface",
+      "request_count": 2,
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.5665171250002459,
+      "model": "gpt-5.6-luna",
+      "reasoning": {
+        "effort": "high",
+        "context": "all_turns"
+      },
+      "tool_set": [
+        [
+          "functions",
+          "list_mcp_resources"
+        ],
+        [
+          "functions",
+          "list_mcp_resource_templates"
+        ],
+        [
+          "functions",
+          "read_mcp_resource"
+        ],
+        [
+          "mcp__evaluation",
+          "file"
+        ],
+        [
+          "mcp__evaluation",
+          "get"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_anchors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_calls"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_imports"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_paths"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_references"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_retrieve"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_traverse_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "grep"
+        ],
+        [
+          "mcp__evaluation",
+          "loci_explore"
+        ],
+        [
+          "mcp__evaluation",
+          "outline"
+        ],
+        [
+          "mcp__evaluation",
+          "search"
+        ]
+      ],
+      "tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "canonical_tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "call_event": {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "type_dependencies",
+            "query": "processOrder",
+            "max_evidence_bytes": -1
+          },
+          "result": {
+            "content": [
+              {
+                "type": "text",
+                "text": "Error executing tool loci_explore: loci_explore.max_evidence_bytes must be between 0 and 16384"
+              }
+            ],
+            "structured_content": null
+          },
+          "error": null,
+          "status": "failed"
+        }
+      },
+      "call_item": {
+        "id": "item_1",
+        "type": "mcp_tool_call",
+        "server": "evaluation",
+        "tool": "loci_explore",
+        "arguments": {
+          "intent": "type_dependencies",
+          "query": "processOrder",
+          "max_evidence_bytes": -1
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Error executing tool loci_explore: loci_explore.max_evidence_bytes must be between 0 and 16384"
+            }
+          ],
+          "structured_content": null
+        },
+        "error": null,
+        "status": "failed"
+      },
+      "model_tool_outputs": [
+        {
+          "type": "function_call_output",
+          "id": "fco_01a0945f-13bb-7aa0-84ef-947d22c7b810",
+          "call_id": "call_probe",
+          "output": [
+            {
+              "type": "input_text",
+              "text": "Wall time: 0.0008 seconds\nOutput:"
+            },
+            {
+              "type": "input_text",
+              "text": "Error executing tool loci_explore: loci_explore.max_evidence_bytes must be between 0 and 16384"
+            }
+          ]
+        }
+      ],
+      "payload_kind": "text_blocks",
+      "payload_texts": [
+        "Error executing tool loci_explore: loci_explore.max_evidence_bytes must be between 0 and 16384"
+      ],
+      "observed_accounting": {
+        "schema_version": 3,
+        "complete": true,
+        "tool_call_count": 1,
+        "recorded_payload_bytes": 94,
+        "complete_payload_bytes": 94,
+        "source_bytes": 0,
+        "calls": [
+          {
+            "item_id": "item_1",
+            "server": "evaluation",
+            "tool": "loci_explore",
+            "arguments": {
+              "intent": "type_dependencies",
+              "query": "processOrder",
+              "max_evidence_bytes": -1
+            },
+            "status": "failed",
+            "attempt_id": null,
+            "trace_event_id": null,
+            "source_bytes": 0,
+            "serialized_bytes": 94,
+            "payload_texts": [
+              "Error executing tool loci_explore: loci_explore.max_evidence_bytes must be between 0 and 16384"
+            ],
+            "payload_format": "text_blocks"
+          }
+        ],
+        "failures": [],
+        "validated_results": []
+      },
+      "trace_schema_version": 3,
+      "expected_mode": "schema_error",
+      "adapter_attempts": 0,
+      "adapter_deliveries": 0,
+      "evidence_dir": "byte-limit-transport-evidence/negative_evidence",
+      "output_verified": true,
+      "routing": {
+        "schema_version": 1,
+        "observations_complete": true,
+        "first_repository_call": {
+          "item_id": "item_1",
+          "tool": "loci_explore",
+          "intent": "type_dependencies",
+          "status": "failed"
+        },
+        "initial_route_expected": "type_dependencies",
+        "initial_type_route": true,
+        "requested_anchor_received": false,
+        "maintained_exposure": false,
+        "explore_calls": [
+          {
+            "item_id": "item_1",
+            "intent": "type_dependencies",
+            "status": "failed",
+            "successful_delivery": false,
+            "anchor_ids": [],
+            "omissions": [],
+            "requested_anchor_received": false,
+            "anchor_complete": false
+          }
+        ],
+        "fallback_calls": [],
+        "helper_call_count": 0,
+        "failures": []
+      }
+    },
+    {
+      "mode": "coercible_string",
+      "arm": "B",
+      "case_id": "imported_interface",
+      "request_count": 2,
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.6479390839958796,
+      "model": "gpt-5.6-luna",
+      "reasoning": {
+        "effort": "high",
+        "context": "all_turns"
+      },
+      "tool_set": [
+        [
+          "functions",
+          "list_mcp_resources"
+        ],
+        [
+          "functions",
+          "list_mcp_resource_templates"
+        ],
+        [
+          "functions",
+          "read_mcp_resource"
+        ],
+        [
+          "mcp__evaluation",
+          "file"
+        ],
+        [
+          "mcp__evaluation",
+          "get"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_anchors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_calls"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_imports"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_paths"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_references"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_retrieve"
+        ],
+        [
+          "mcp__evaluation",
+          "graph_traverse_neighbors"
+        ],
+        [
+          "mcp__evaluation",
+          "grep"
+        ],
+        [
+          "mcp__evaluation",
+          "loci_explore"
+        ],
+        [
+          "mcp__evaluation",
+          "outline"
+        ],
+        [
+          "mcp__evaluation",
+          "search"
+        ]
+      ],
+      "tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "canonical_tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+      "call_event": {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "type_dependencies",
+            "query": "processOrder",
+            "max_output_bytes": "8192"
+          },
+          "result": {
+            "content": [
+              {
+                "type": "text",
+                "text": "Error executing tool loci_explore: 1 validation error for loci_exploreArguments\nmax_output_bytes\n  Input should be a valid integer [type=int_type, input_value='8192', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/int_type"
+              }
+            ],
+            "structured_content": null
+          },
+          "error": null,
+          "status": "failed"
+        }
+      },
+      "call_item": {
+        "id": "item_1",
+        "type": "mcp_tool_call",
+        "server": "evaluation",
+        "tool": "loci_explore",
+        "arguments": {
+          "intent": "type_dependencies",
+          "query": "processOrder",
+          "max_output_bytes": "8192"
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Error executing tool loci_explore: 1 validation error for loci_exploreArguments\nmax_output_bytes\n  Input should be a valid integer [type=int_type, input_value='8192', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/int_type"
+            }
+          ],
+          "structured_content": null
+        },
+        "error": null,
+        "status": "failed"
+      },
+      "model_tool_outputs": [
+        {
+          "type": "function_call_output",
+          "id": "fco_01a0945f-18a6-7513-a221-5b0618714ef4",
+          "call_id": "call_probe",
+          "output": [
+            {
+              "type": "input_text",
+              "text": "Wall time: 0.0007 seconds\nOutput:"
+            },
+            {
+              "type": "input_text",
+              "text": "Error executing tool loci_explore: 1 validation error for loci_exploreArguments\nmax_output_bytes\n  Input should be a valid integer [type=int_type, input_value='8192', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/int_type"
+            }
+          ]
+        }
+      ],
+      "payload_kind": "text_blocks",
+      "payload_texts": [
+        "Error executing tool loci_explore: 1 validation error for loci_exploreArguments\nmax_output_bytes\n  Input should be a valid integer [type=int_type, input_value='8192', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/int_type"
+      ],
+      "observed_accounting": {
+        "schema_version": 3,
+        "complete": true,
+        "tool_call_count": 1,
+        "recorded_payload_bytes": 260,
+        "complete_payload_bytes": 260,
+        "source_bytes": 0,
+        "calls": [
+          {
+            "item_id": "item_1",
+            "server": "evaluation",
+            "tool": "loci_explore",
+            "arguments": {
+              "intent": "type_dependencies",
+              "query": "processOrder",
+              "max_output_bytes": "8192"
+            },
+            "status": "failed",
+            "attempt_id": null,
+            "trace_event_id": null,
+            "source_bytes": 0,
+            "serialized_bytes": 260,
+            "payload_texts": [
+              "Error executing tool loci_explore: 1 validation error for loci_exploreArguments\nmax_output_bytes\n  Input should be a valid integer [type=int_type, input_value='8192', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/int_type"
+            ],
+            "payload_format": "text_blocks"
+          }
+        ],
+        "failures": [],
+        "validated_results": []
+      },
+      "trace_schema_version": 3,
+      "expected_mode": "schema_error",
+      "adapter_attempts": 0,
+      "adapter_deliveries": 0,
+      "evidence_dir": "byte-limit-transport-evidence/coercible_string",
+      "output_verified": true,
+      "routing": {
+        "schema_version": 1,
+        "observations_complete": true,
+        "first_repository_call": {
+          "item_id": "item_1",
+          "tool": "loci_explore",
+          "intent": "type_dependencies",
+          "status": "failed"
+        },
+        "initial_route_expected": "type_dependencies",
+        "initial_type_route": true,
+        "requested_anchor_received": false,
+        "maintained_exposure": false,
+        "explore_calls": [
+          {
+            "item_id": "item_1",
+            "intent": "type_dependencies",
+            "status": "failed",
+            "successful_delivery": false,
+            "anchor_ids": [],
+            "omissions": [],
+            "requested_anchor_received": false,
+            "anchor_complete": false
+          }
+        ],
+        "fallback_calls": [],
+        "helper_call_count": 0,
+        "failures": []
+      }
+    }
+  ],
+  "source_sha256": {
+    "benchmarks/typescript_context_routing_v2_transport.py": "5a305d4586a34ca8d6eaebdf3bac0b7f977768ff15cd54e97e618d8ae53212fc",
+    "benchmarks/typescript_context_routing_v2_tools.py": "9d1d3900219f9e6067f25eefb580bfa1c9c7a7d4267d5e44bddca2f1f24f0553",
+    "benchmarks/typescript_context_routing_v2_observed.py": "e85e5ea1b295b30df3cb7a1b6e1ac01d84b1e21819bb79652bc319b0b92f92be",
+    "src/loci/mcp_server.py": "c5d4116e5a1ac97eaf48e6ecf020db539a6eb0a3eb8d6da4993996f424e1af52"
+  },
+  "catalog_sha256": "f1c45cceac1c3ee90fa1af1007c341713e220571390c3b1eb086c443d7781062",
+  "meaning": "Real Codex/MCP; scripted loopback Responses endpoint; no provider outcomes.",
+  "canonical_tool_schemas_sha256": "51d384d6a43cca66f05d96f5bc717710ea25558e1c3acca04cfb50128a72982b",
+  "product_budget_scope": "Native product MCP envelope; evaluator metadata is separately costed."
+}

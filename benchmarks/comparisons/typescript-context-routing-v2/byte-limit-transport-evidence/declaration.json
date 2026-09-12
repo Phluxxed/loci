@@ -1,0 +1,151 @@
+{
+  "version": "typescript-context-routing-v2",
+  "purpose": "byte-limit repair acceptance",
+  "provider_calls": 0,
+  "model_adoption_measured": false,
+  "modes": [
+    {
+      "id": "omitted",
+      "arm": "B",
+      "namespace": "mcp__evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder"
+      },
+      "expected": "recorded"
+    },
+    {
+      "id": "null",
+      "arm": "B",
+      "namespace": "mcp__evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder",
+        "max_output_bytes": null,
+        "max_evidence_bytes": null
+      },
+      "expected": "recorded"
+    },
+    {
+      "id": "explicit",
+      "arm": "B",
+      "namespace": "mcp__evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder",
+        "max_output_bytes": 8192,
+        "max_evidence_bytes": 512
+      },
+      "expected": "recorded"
+    },
+    {
+      "id": "zero_evidence",
+      "arm": "B",
+      "namespace": "mcp__evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder",
+        "max_output_bytes": null,
+        "max_evidence_bytes": 0
+      },
+      "expected": "recorded"
+    },
+    {
+      "id": "minimum_output",
+      "arm": "B",
+      "namespace": "mcp__evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder",
+        "max_output_bytes": 2048,
+        "max_evidence_bytes": null
+      },
+      "expected": "recorded"
+    },
+    {
+      "id": "maximum",
+      "arm": "B",
+      "namespace": "mcp__evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder",
+        "max_output_bytes": 32768,
+        "max_evidence_bytes": 16384
+      },
+      "expected": "recorded"
+    },
+    {
+      "id": "output_over_cap",
+      "arm": "B",
+      "namespace": "mcp__evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder",
+        "max_output_bytes": 32769
+      },
+      "expected": "schema_error"
+    },
+    {
+      "id": "evidence_over_cap",
+      "arm": "B",
+      "namespace": "mcp__evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder",
+        "max_evidence_bytes": 16385
+      },
+      "expected": "schema_error"
+    },
+    {
+      "id": "output_below_minimum",
+      "arm": "B",
+      "namespace": "mcp__evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder",
+        "max_output_bytes": 2047
+      },
+      "expected": "schema_error"
+    },
+    {
+      "id": "negative_evidence",
+      "arm": "B",
+      "namespace": "mcp__evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder",
+        "max_evidence_bytes": -1
+      },
+      "expected": "schema_error"
+    },
+    {
+      "id": "coercible_string",
+      "arm": "B",
+      "namespace": "mcp__evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder",
+        "max_output_bytes": "8192"
+      },
+      "expected": "schema_error"
+    }
+  ],
+  "source_sha256": {
+    "benchmarks/typescript_context_routing_v2_transport.py": "5a305d4586a34ca8d6eaebdf3bac0b7f977768ff15cd54e97e618d8ae53212fc",
+    "benchmarks/typescript_context_routing_v2_tools.py": "9d1d3900219f9e6067f25eefb580bfa1c9c7a7d4267d5e44bddca2f1f24f0553",
+    "benchmarks/typescript_context_routing_v2_observed.py": "e85e5ea1b295b30df3cb7a1b6e1ac01d84b1e21819bb79652bc319b0b92f92be",
+    "src/loci/mcp_server.py": "c5d4116e5a1ac97eaf48e6ecf020db539a6eb0a3eb8d6da4993996f424e1af52"
+  },
+  "catalog_sha256": "f1c45cceac1c3ee90fa1af1007c341713e220571390c3b1eb086c443d7781062"
+}
