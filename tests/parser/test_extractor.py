@@ -208,6 +208,54 @@ def test_parse_typescript_no_duplicate_ids(sample_ts: Path):
     assert len(ids) == len(set(ids))
 
 
+def test_parse_tsx_extracts_jsx_bearing_function_with_typescript_identity(tmp_path: Path):
+    source = (
+        'import type { Props } from "./props";\n'
+        "export function Badge(props: Props) { return <span>{props.label}</span>; }\n"
+    )
+    path = tmp_path / "badge.tsx"
+    path.write_text(source, encoding="utf-8")
+
+    badge = next(symbol for symbol in parse_file(path) if symbol.name == "Badge")
+
+    assert badge.kind == "function"
+    assert badge.language == "typescript"
+    assert source[badge.byte_offset:badge.byte_offset + badge.byte_length] == (
+        "function Badge(props: Props) { return <span>{props.label}</span>; }"
+    )
+
+
+def test_parse_tsx_process_fallback_uses_tsx_grammar(tmp_path: Path, monkeypatch):
+    import tree_sitter_language_pack
+
+    source = (
+        'import type { Props } from "./props";\n'
+        "export function Badge(props: Props) { return <span>{props.label}</span>; }\n"
+    )
+    path = tmp_path / "badge.tsx"
+    path.write_text(source, encoding="utf-8")
+    process = tree_sitter_language_pack.process
+    processed_languages = []
+
+    def fail_get_parser(_language):
+        raise RuntimeError("force process fallback")
+
+    def record_process(text, config):
+        processed_languages.append(config.language)
+        return process(text, config)
+
+    monkeypatch.setattr(tree_sitter_language_pack, "get_parser", fail_get_parser)
+    monkeypatch.setattr(tree_sitter_language_pack, "process", record_process)
+
+    badge = next(symbol for symbol in parse_file(path) if symbol.name == "Badge")
+
+    assert processed_languages == ["tsx"]
+    assert (badge.kind, badge.language) == ("function", "typescript")
+    assert source[badge.byte_offset:badge.byte_offset + badge.byte_length] == (
+        "function Badge(props: Props) { return <span>{props.label}</span>; }"
+    )
+
+
 @pytest.mark.parametrize(
     ("suffix", "language"),
     [

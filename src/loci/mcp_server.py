@@ -168,7 +168,7 @@ def create_server() -> MCPServer:
         selected_from_search_id: str | None = None,
         include_type_context: bool = False,
     ) -> Annotated[CallToolResult, LociGetOutput]:
-        """Return exact source; opt in to bounded existing imported-type definitions. Set lineage only for deliberate search selections, not direct or hydration gets."""
+        """Return exact source; opt in to bounded outgoing type definitions and supporting lines. Use loci_explore for complete import/re-export statements and Go/Rust control source. Set lineage only for deliberate search selections, not direct or hydration gets."""
         return _handle_loci_error(
             lambda service: service.get_symbols_result(
                 repo,
@@ -211,12 +211,17 @@ def create_server() -> MCPServer:
     ) -> Annotated[CallToolResult, LociExploreOutput]:
         """Select bounded source for one explicit retrieval intent.
 
-        ``locate`` returns anchors only; ``type_dependencies`` follows outgoing
-        proven TypeScript/TSX and Python type and direct-base edges; ``impact`` follows incoming known static
-        dependents. ``dependencies`` follows JavaScript calls, imported values and
-        direct class bases, or the same type dependencies for TypeScript/Python.
+        ``locate`` returns anchors only. ``type_dependencies`` selects authored
+        TypeScript/TSX and Python types/bases, Go types/embeddings, or Rust
+        types/bounds/traits/impl sites. ``dependencies`` uses that selection and
+        also supports JavaScript definite calls, imported values and direct bases.
+        Rust self types can select explicit impl sites by reverse traversal;
+        stored relationship direction and possible configuration remain explicit.
+        ``impact`` follows incoming known static dependents, without runtime
+        dispatch or exhaustive impact claims. Parsing support is broader than
+        these semantic subsets; inspect unsupported-language and unresolved omissions.
         Query text is at most 4096 UTF-8 bytes; seeds are at most five
-        unique IDs; hops are 0..4 (defaults: locate 0, type 3, impact 1), output
+        unique IDs; hops are 0..4 (defaults: locate 0, dependencies 3, impact 1), output
         is 2048..262144 bytes for the complete MCP result, and source evidence
         is 0..65536 bytes. Omitted or null byte limits use 16384 and 8192 bytes.
         Use query terms to focus deeper type fields; inspect

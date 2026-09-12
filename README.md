@@ -248,7 +248,10 @@ prioritizes immediate contracts, aliases and heritage, and uses the query to
 select deeper fields. Impact follows known static incoming relationships and
 reports non-exhaustive scope. Independent source and complete MCP-result byte
 limits keep output bounded; clipped anchors are marked incomplete. See the
-[intent and evidence contract](docs/design/2026-09-11-intent-evidence.md).
+[intent and evidence contract](docs/design/2026-09-11-intent-evidence.md) and the
+[implemented language-by-capability matrix](skills/loci/references/language-resolution.md#exploration-capabilities).
+The matrix describes the development branch's delivered semantic subsets;
+shared parsing and response schemas do not imply semantic parity.
 
 For plain JavaScript, `dependencies` follows definite calls, declaration-owned
 imported value references and direct class bases. It returns the helper/value/base
@@ -276,11 +279,17 @@ complete contained Cargo controls. Rust relationships retain `unconditional`
 or `declared_possible` configuration; active features are never assumed.
 See the [Rust acceptance record](docs/reviews/2026-09-13-rust-context.md).
 
-Pass `include_type_context: true` to `loci_get` to add complete definitions from
-proven TypeScript/Python dependencies and explicit heritage. The response keeps the requested
+Pass `include_type_context: true` to `loci_get` to add bounded definitions from
+stored authored type relationships and explicit heritage. The response keeps the requested
 `symbols` and adds `type_context` with definitions, original graph edges,
 declaration ownership, supporting source and omissions. The default remains
 exact retrieval. Search-selection lineage applies only to the requested symbols.
+This compatibility expansion follows outgoing records and supplies supporting
+lines. Use `loci_explore` for complete selected import/re-export statements,
+Go/Rust control source, Rust configuration and reverse selection of explicit
+implementation sites. JS/TS resolver controls affect validation and refresh;
+their paths/hashes are diagnostic metadata and their full source requires a
+separate read.
 
 Expansion follows at most three hops from five requested declarations, within
 fixed node, source and output limits. It excludes references owned by nested
