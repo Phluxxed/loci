@@ -32,6 +32,7 @@ from loci.mcp_server import create_server
 
 EXPECTED_LOCI_TOOLS = {
     "loci_analyze",
+    "loci_explore",
     "loci_file",
     "loci_get",
     "loci_graph_anchors",
@@ -383,7 +384,7 @@ def test_graph_structured_error_uses_the_declared_union(tmp_path: Path) -> None:
 def test_every_loci_tool_advertises_an_object_root_success_or_error_schema() -> None:
     tools = asyncio.run(create_server().list_tools())
 
-    assert len(tools) == 20
+    assert len(tools) == len(EXPECTED_LOCI_TOOLS)
     assert {tool.name for tool in tools} == EXPECTED_LOCI_TOOLS
     assert not [tool.name for tool in tools if tool.output_schema is None]
     for tool in tools:

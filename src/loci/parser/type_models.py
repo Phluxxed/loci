@@ -1,4 +1,4 @@
-"""Immutable records emitted by the TypeScript type observation extractor.
+"""Immutable records emitted by authored type observation extractors.
 
 The parser records deliberately contain only authored source evidence.  Graph
 resolution is kept in :mod:`loci.graph.type_models` so raw observations can be
@@ -7,12 +7,32 @@ cached and replayed without carrying inferred endpoints.
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import PurePosixPath
 from typing import Any, Literal, TypeAlias
 
 from loci.parser.reference_models import ImportBinding
+
+
+def valid_type_import_path(language: str, path: Sequence[str], binding: Any) -> bool:
+    """Validate path shape; graph resolution must still prove its exact endpoint."""
+    if language == "typescript":
+        return ((binding.kind == "symbol" and len(path) == 1)
+                or (binding.kind == "namespace" and len(path) == 2))
+    if language != "python":
+        return False
+    if binding.kind == "symbol":
+        # Two segments are valid only when the imported endpoint proves a
+        # submodule, which the Python graph resolver checks independently.
+        return len(path) in {1, 2} and path[0] == binding.local_name
+    if binding.kind != "module" or binding.local_name is None:
+        return False
+    module = tuple(part for part in binding.import_specifier.split(".") if part)
+    if not module:
+        return False
+    prefix = module if binding.local_name == module[0] else (binding.local_name,)
+    return len(path) == len(prefix) + 1 and tuple(path[:-1]) == prefix
 
 
 TypeDeclarationOwnerKind: TypeAlias = Literal[
@@ -309,8 +329,8 @@ class RawTypeObservation:
 
     def __post_init__(self) -> None:
         _relative_path(self.source_file, "source_file")
-        if self.language != "typescript":
-            raise ValueError("language must be typescript")
+        if self.language not in {"typescript", "python"}:
+            raise ValueError("language must be typescript or python")
         _integer(self.line, "line", minimum=1)
         _integer(self.column, "column", minimum=1)
         start, end = _range(self.start_byte, self.end_byte, "observation")

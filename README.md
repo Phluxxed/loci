@@ -213,7 +213,7 @@ names.
 | `loci_outline` | Return indexed symbols grouped by file |
 | `loci_search` | Search indexed symbols and return an opaque ID for explicit downstream selections |
 | `loci_get` | Return exact source, with optional bounded type context and deliberate search-selection lineage |
-| `loci_explore` | Select compact source for locating code, TypeScript dependencies, or known static impact |
+| `loci_explore` | Select compact source for locating code, TypeScript/Python dependencies, or known static impact |
 | `loci_file` | Return cached file content with optional line range |
 | `loci_grep` | Regex-search cached files |
 | `loci_graph_anchors` | Select a bounded, explained set of graph start nodes from a question or exact seeds |
@@ -249,7 +249,7 @@ limits keep output bounded; clipped anchors are marked incomplete. See the
 [intent and evidence contract](docs/design/2026-09-11-intent-evidence.md).
 
 Pass `include_type_context: true` to `loci_get` to add complete definitions from
-proven TypeScript dependencies and explicit heritage. The response keeps the requested
+proven TypeScript/Python dependencies and explicit heritage. The response keeps the requested
 `symbols` and adds `type_context` with definitions, original graph edges,
 declaration ownership, supporting source and omissions. The default remains
 exact retrieval. Search-selection lineage applies only to the requested symbols.
@@ -720,6 +720,21 @@ contains-only. Graph health includes type counts and resolution-reason summaries
 These relationships describe source declarations; they do not establish
 structural compatibility, inferred implementations or runtime dispatch.
 See the [contract and supported subset](docs/design/2026-09-11-type-observations.md).
+
+Python uses the same type family and context interfaces for annotations,
+generic type arguments, explicit module `TypeAlias` assignments and direct
+class bases. Exact local bindings and contained named import/reexport routes
+retain source spans, hashes and origin proof. Unescaped string literals
+containing one bare or dotted name can act as forward references.
+
+Python `extends` records the authored base expression. It does not establish
+MROs, protocol/ABC compatibility or runtime dispatch. Computed annotations,
+compound string forwards, wildcard or shadowed bindings and type-parameter
+names remain unresolved. The initial alias subset requires an unambiguous
+canonical `TypeAlias` marker imported from `typing` or `typing_extensions`;
+nested aliases and renamed markers are outside it. `Literal` value arguments
+and `Annotated` metadata are also outside this type-expression subset.
+See the [Python acceptance record](docs/reviews/2026-09-12-python-context.md).
 
 ## Analytics
 

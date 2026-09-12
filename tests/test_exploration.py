@@ -177,13 +177,18 @@ def test_unicode_clipping_and_zero_evidence_are_explicit(tmp_path, monkeypatch):
 
 
 def test_missing_inferred_and_unsupported_explicit_anchors(tmp_path, monkeypatch):
-    repo, _ = _setup(tmp_path, monkeypatch, {'a.py': 'def specialize_payload():\n    return 1\n'})
+    repo, _ = _setup(tmp_path, monkeypatch, {
+        'a.py': 'def specialize_payload():\n    return 1\n',
+        'a.js': 'function plain() { return 1; }\n',
+    })
     inferred = service.explore(repo, 'specialize_payload', intent='locate')
     assert _names(inferred) == ['specialize_payload'] and inferred['selection'] == 'inferred'
     assert service.explore(repo, 'zxqvnonexistent', intent='locate')['status'] == 'empty'
     unsupported = service.explore(repo, intent='locate', seed_ids=['a.py::__file__#file'])
     assert unsupported['status'] == 'empty' and _reasons(unsupported)['unsupported_anchor'] == 1
-    typed = service.explore(repo, intent='type_dependencies', seed_ids=['a.py::specialize_payload#function'])
+    python = service.explore(repo, intent='type_dependencies', seed_ids=['a.py::specialize_payload#function'])
+    assert 'unsupported_language' not in _reasons(python)
+    typed = service.explore(repo, intent='type_dependencies', seed_ids=['a.js::plain#function'])
     assert _reasons(typed)['unsupported_language'] == 1
 
 

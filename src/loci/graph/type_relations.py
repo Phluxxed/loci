@@ -1,7 +1,7 @@
-"""Pure resolution and projection of authored TypeScript type relationships.
+"""Pure resolution and projection of authored type relationships.
 
 This family owns declaration contracts, independently of executable references.
-The imported branch reuses the contained JavaScript export resolver; it never
+The imported branch reuses contained language export resolvers; it never
 inserts synthetic observations into the existing reference family.
 """
 from __future__ import annotations
@@ -13,12 +13,16 @@ from typing import Mapping, Sequence
 from loci.parser._binding_context import ExecutableOwner
 from loci.parser.reference_models import ImportBinding, RawLocalExport, RawSymbolReference
 from loci.parser.symbols import Symbol
-from loci.parser.type_models import RawTypeObservation
+from loci.parser.type_models import RawTypeObservation, valid_type_import_path
 
 from ._javascript_references import (
     JavaScriptReferenceIndex,
     build_javascript_reference_index,
     resolve_javascript_reference,
+)
+from ._python_references import (
+    PythonReferenceIndex, _is_imported_submodule, build_python_reference_index,
+    resolve_python_reference,
 )
 from .contracts import GraphContractError, GraphEdge, GraphEvidence
 from .imports import ImportRecord
@@ -35,6 +39,7 @@ class _ResolutionIndex:
     declarations: Mapping[tuple[str, int, int], tuple[Symbol, ...]]
     imports: Mapping[tuple[str, ImportBinding], tuple[ImportRecord, ...]]
     javascript: JavaScriptReferenceIndex
+    python: PythonReferenceIndex
     file_hashes: Mapping[str, str]
     input_hashes: Mapping[str, str]
     all_imports: Sequence[ImportRecord]
@@ -58,7 +63,7 @@ def resolve_type_relations(
             declarations[(symbol.file_path, symbol.byte_offset,
                           symbol.byte_offset + symbol.byte_length)].append(symbol)
     for record in imports:
-        if record.raw.language != "typescript":
+        if record.raw.language not in {"typescript", "python"}:
             continue
         for binding in record.raw.bindings:
             if binding.local_name is not None:
@@ -70,6 +75,10 @@ def resolve_type_relations(
             symbols, imports, exports,
             file_nodes={symbol.file_path: symbol for symbol in symbols
                         if symbol.kind == "file"},
+        ),
+        python=build_python_reference_index(
+            symbols, imports, exports,
+            file_nodes={symbol.file_path: symbol for symbol in symbols if symbol.kind == "file"},
         ),
         file_hashes=file_hashes,
         input_hashes=input_hashes,
@@ -175,7 +184,7 @@ def _resolve(raw: RawTypeObservation, index: _ResolutionIndex) -> TypeRelationRe
     if raw.binding_state != "imported" or len(raw.import_bindings) != 1:
         return finish("unsupported_reference")
     binding = raw.import_bindings[0]
-    if not ((binding.kind == "symbol" and len(raw.path) == 1)
+    if raw.language == "typescript" and not ((binding.kind == "symbol" and len(raw.path) == 1)
             or (binding.kind == "namespace" and len(raw.path) == 2)):
         return finish("unsupported_reference")
     matches = index.imports.get((raw.source_file, binding), ())
@@ -196,8 +205,16 @@ def _resolve(raw: RawTypeObservation, index: _ResolutionIndex) -> TypeRelationRe
         binding_state="definite", source_hash=raw.source_hash,
         owner=ExecutableOwner("file", None, None, None, None),
     )
-    outcome = resolve_javascript_reference(reference, binding=binding,
-                                            import_record=imported, index=index.javascript)
+    if raw.language == "python":
+        if not _exact_python_type_path(reference, binding, imported):
+            return finish("unsupported_reference", extra_support=(import_support,), controls=controls)
+        outcome = resolve_python_reference(reference, binding=binding,
+                                           import_record=imported, index=index.python)
+        surfaces = index.python.surfaces
+    else:
+        outcome = resolve_javascript_reference(reference, binding=binding,
+                                               import_record=imported, index=index.javascript)
+        surfaces = index.javascript.surfaces
     controls = _controls(tuple(sorted(set((*imported.resolution_control_files,
                                           *outcome.resolution_control_files)))), index)
     extra = (import_support, *(TypeSupport(item.kind, item.file, item.line,
@@ -206,8 +223,8 @@ def _resolve(raw: RawTypeObservation, index: _ResolutionIndex) -> TypeRelationRe
     if outcome.target is None:
         # Export surfaces can omit alternatives after their own limits or lose
         # candidates to unresolved routes. Never label that list exhaustive.
-        name = binding.imported_name if binding.kind == "symbol" else raw.path[1]
-        visible = tuple(sorted({item.symbol.id for item in index.javascript.surfaces.get(
+        name = binding.imported_name if binding.kind == "symbol" and len(raw.path) == 1 else raw.path[-1]
+        visible = tuple(sorted({item.symbol.id for item in surfaces.get(
             (imported.target_file, name), ())}))
         return finish(outcome.reason or "target_not_indexed", extra_support=extra,
                       controls=controls, candidate_ids=visible[:MAX_TYPE_CANDIDATES],
@@ -220,13 +237,24 @@ def _resolve(raw: RawTypeObservation, index: _ResolutionIndex) -> TypeRelationRe
                 candidates_complete=True, candidates_truncated=0)
     if not _target_compatible(raw, target):
         return finish("unsupported_target", **args)
-    if raw.relation == "extends" and owner.kind == "class" and (
+    if raw.language == "typescript" and raw.relation == "extends" and owner.kind == "class" and (
         binding.type_only or _type_only_value_route(outcome.support, index)
     ):
         return finish("type_only_value", **args)
     if raw.relation != "uses_type" and owner.id == target.id:
         return finish("self_heritage", **args)
     return finish(None, target=target, basis=outcome.basis, **args)
+
+
+def _exact_python_type_path(
+    raw: RawSymbolReference, binding: ImportBinding, imported: ImportRecord,
+) -> bool:
+    """The value resolver permits attribute suffixes; a type needs the exact name."""
+    if not valid_type_import_path("python", raw.path, binding):
+        return False
+    if binding.kind == "symbol":
+        return len(raw.path) == (2 if _is_imported_submodule(raw, binding, imported) else 1)
+    return True
 
 
 def _local_candidates(raw: RawTypeObservation, index: _ResolutionIndex) -> tuple[str, ...]:
