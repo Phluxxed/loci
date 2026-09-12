@@ -358,12 +358,13 @@ def materialize_graph(
     type_records = tuple(resolve_type_relations(
         raw_type_observations, symbols=symbols, imports=import_records,
         exports=raw_exports, file_hashes=file_hashes, input_hashes=input_hashes or {},
+        symbol_references=reference_records,
     )) if raw_type_observations else ()
     if type_records:
         validate_type_records(
             type_records, imports=import_records, exports=raw_exports,
             indexed_nodes=serialized_nodes, file_hashes=file_hashes,
-            input_hashes=input_hashes or {},
+            input_hashes=input_hashes or {}, symbol_references=reference_records,
         )
     type_edges = materialize_type_edges(type_records)
     validate_graph_edges(

@@ -213,7 +213,7 @@ names.
 | `loci_outline` | Return indexed symbols grouped by file |
 | `loci_search` | Search indexed symbols and return an opaque ID for explicit downstream selections |
 | `loci_get` | Return exact source, with optional bounded type context and deliberate search-selection lineage |
-| `loci_explore` | Select compact source for locating code, JavaScript dependencies, TypeScript/Python contracts, or known static impact |
+| `loci_explore` | Select compact source for locating code, JavaScript dependencies, TypeScript/Python/Go/Rust contracts, or known static impact |
 | `loci_file` | Return cached file content with optional line range |
 | `loci_grep` | Regex-search cached files |
 | `loci_graph_anchors` | Select a bounded, explained set of graph start nodes from a question or exact seeds |
@@ -264,6 +264,17 @@ The `embeds` relationship retains Go meaning without inferring method sets or
 promoted calls. Definitions carry exact package/import proof and complete
 contained module/workspace controls. See the
 [Go acceptance record](docs/reviews/2026-09-12-go-context.md).
+
+For Rust, `type_dependencies` and `dependencies` return authored aliases,
+field/signature types, generic bounds, supertraits and separate implementation
+sites. `supertrait` points from the trait to its required trait; `impl_trait`
+and `impl_self_type` point from the implementation site to its trait and self
+type. Selecting a self type may follow the latter in reverse to include its
+explicit implementation sites. This never proves dynamic dispatch or all
+implementations. Exact definitions carry import/re-export/module source and
+complete contained Cargo controls. Rust relationships retain `unconditional`
+or `declared_possible` configuration; active features are never assumed.
+See the [Rust acceptance record](docs/reviews/2026-09-13-rust-context.md).
 
 Pass `include_type_context: true` to `loci_get` to add complete definitions from
 proven TypeScript/Python dependencies and explicit heritage. The response keeps the requested

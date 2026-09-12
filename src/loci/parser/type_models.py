@@ -22,6 +22,8 @@ def valid_type_import_path(language: str, path: Sequence[str], binding: Any) -> 
                 or (binding.kind == "namespace" and len(path) == 2))
     if language == "go":
         return binding.kind == "namespace" and len(path) == 2 and binding.local_name in {None, path[0]}
+    if language == "rust":
+        return binding.local_name == path[0] and binding.kind in {"symbol", "module"}
     if language != "python":
         return False
     if binding.kind == "symbol":
@@ -44,9 +46,11 @@ TypeDeclarationOwnerKind: TypeAlias = Literal[
     "interface",
     "type",
     "constant",
+    "struct", "enum", "trait", "impl",
     "unindexed",
 ]
 TypeBindingKind: TypeAlias = Literal[
+    "struct", "trait",
     "class",
     "interface",
     "type",
@@ -59,7 +63,7 @@ TypeBindingKind: TypeAlias = Literal[
     "unindexed",
 ]
 TypeNamespace: TypeAlias = Literal["type", "value", "both"]
-TypeRelationKind: TypeAlias = Literal["uses_type", "extends", "implements", "embeds"]
+TypeRelationKind: TypeAlias = Literal["uses_type", "extends", "implements", "embeds", "supertrait", "impl_trait", "impl_self_type"]
 TypeObservationContext: TypeAlias = Literal[
     "annotation",
     "return",
@@ -71,6 +75,7 @@ TypeObservationContext: TypeAlias = Literal[
     "heritage",
     "struct_embedding",
     "interface_embedding",
+    "supertrait", "impl_trait", "impl_self_type",
 ]
 TypeLookupSpace: TypeAlias = Literal["type", "value"]
 TypeBindingState: TypeAlias = Literal[
@@ -85,10 +90,11 @@ TypeBindingState: TypeAlias = Literal[
 ]
 
 TYPE_DECLARATION_OWNER_KINDS = frozenset(
-    {"function", "method", "class", "interface", "type", "constant", "unindexed"}
+    {"function", "method", "class", "interface", "type", "constant", "struct", "enum", "trait", "impl", "unindexed"}
 )
 TYPE_BINDING_KINDS = frozenset(
     {
+        "struct", "trait",
         "class",
         "interface",
         "type",
@@ -102,7 +108,7 @@ TYPE_BINDING_KINDS = frozenset(
     }
 )
 TYPE_NAMESPACES = frozenset({"type", "value", "both"})
-TYPE_RELATIONS = frozenset({"uses_type", "extends", "implements", "embeds"})
+TYPE_RELATIONS = frozenset({"uses_type", "extends", "implements", "embeds", "supertrait", "impl_trait", "impl_self_type"})
 TYPE_CONTEXTS = frozenset(
     {
         "annotation",
@@ -115,6 +121,7 @@ TYPE_CONTEXTS = frozenset(
         "heritage",
         "struct_embedding",
         "interface_embedding",
+        "supertrait", "impl_trait", "impl_self_type",
     }
 )
 TYPE_LOOKUP_SPACES = frozenset({"type", "value"})
@@ -263,6 +270,7 @@ class LocalTypeBinding:
             raise ValueError("declaration span must be contained by the binding scope")
         expected_namespaces = {
             "interface": {"type"},
+            "struct": {"type"}, "trait": {"type"},
             "type": {"type"},
             "type_parameter": {"type"},
             "function": {"value"},
@@ -337,8 +345,8 @@ class RawTypeObservation:
 
     def __post_init__(self) -> None:
         _relative_path(self.source_file, "source_file")
-        if self.language not in {"typescript", "python", "javascript", "go"}:
-            raise ValueError("language must be typescript, python, javascript or go")
+        if self.language not in {"typescript", "python", "javascript", "go", "rust"}:
+            raise ValueError("language must be typescript, python, javascript, go or rust")
         if self.language == "javascript" and (
             self.relation != "extends" or self.context != "heritage" or self.lookup_space != "value"
         ):
@@ -349,6 +357,17 @@ class RawTypeObservation:
             raise ValueError("embedding context requires an embeds relation")
         if self.language == "go" and (self.relation not in {"uses_type", "embeds"} or self.lookup_space != "type"):
             raise ValueError("Go observations require authored types or embedding")
+        rust_relations = {"supertrait", "impl_trait", "impl_self_type"}
+        if self.relation in rust_relations and (self.language != "rust" or self.context != self.relation):
+            raise ValueError("Rust relation requires its authored Rust context")
+        if self.context in rust_relations and self.relation != self.context:
+            raise ValueError("Rust context requires its matching relation")
+        if self.language == "rust" and (self.relation not in {"uses_type", *rust_relations} or self.lookup_space != "type"):
+            raise ValueError("Rust observations require authored type relations")
+        if self.relation == "supertrait" and self.owner.kind not in {"trait", "unindexed"}:
+            raise ValueError("supertrait requires a trait owner")
+        if self.relation in {"impl_trait", "impl_self_type"} and self.owner.kind not in {"impl", "unindexed"}:
+            raise ValueError("implementation links require a separate impl owner")
         if self.binding_state == "package" and (self.language != "go" or len(self.path) != 1 or self.local_bindings or self.import_bindings):
             raise ValueError("package lookup requires a bare Go name without lexical bindings")
         if self.binding_state == "deferred" and (self.language != "go" or len(self.path) != 2 or self.local_bindings or not self.import_bindings or any(b.kind != "namespace" or b.local_name is not None for b in self.import_bindings)):

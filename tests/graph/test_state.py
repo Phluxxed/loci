@@ -790,8 +790,8 @@ def test_empty_graph_state_has_complete_envelope():
     }
 
 
-def test_graph_state_uses_schema_version_thirteen():
-    assert GRAPH_STATE_SCHEMA_VERSION == 13
+def test_graph_state_uses_schema_version_fourteen():
+    assert GRAPH_STATE_SCHEMA_VERSION == 14
 
 
 def test_graph_state_rejects_schema_version_two_as_stale():

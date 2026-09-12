@@ -448,7 +448,7 @@ class GraphEdge(StrictOutputModel):
 
 class TypeDeclarationOwner(StrictOutputModel):
     kind: Literal[
-        "function", "method", "class", "interface", "type", "constant", "unindexed"
+        "function", "method", "class", "interface", "type", "constant", "struct", "enum", "trait", "impl", "unindexed"
     ]
     start_byte: int = Field(ge=0)
     end_byte: int = Field(ge=1)
@@ -463,7 +463,7 @@ class TypeDeclarationOwner(StrictOutputModel):
 class LocalTypeBinding(StrictOutputModel):
     name: str = Field(min_length=1)
     kind: Literal[
-        "class", "interface", "type", "enum", "function", "constant",
+        "class", "interface", "type", "enum", "struct", "trait", "function", "constant",
         "type_parameter", "parameter", "namespace", "unindexed",
     ]
     namespace: Literal["type", "value", "both"]
@@ -485,6 +485,7 @@ class LocalTypeBinding(StrictOutputModel):
             raise ValueError("declaration span must be contained by the binding scope")
         namespaces = {
             "interface": {"type"},
+            "struct": {"type"}, "trait": {"type"},
             "type": {"type"},
             "type_parameter": {"type"},
             "function": {"value"},
@@ -504,17 +505,18 @@ class LocalTypeBinding(StrictOutputModel):
 
 class RawTypeObservation(StrictOutputModel):
     source_file: str = Field(min_length=1)
-    language: Literal["typescript", "python", "javascript", "go"]
+    language: Literal["typescript", "python", "javascript", "go", "rust"]
     line: int = Field(ge=1)
     column: int = Field(ge=1)
     start_byte: int = Field(ge=0)
     end_byte: int = Field(ge=1)
     text: str = Field(min_length=1)
     path: list[str] = Field(max_length=16)
-    relation: Literal["uses_type", "extends", "implements", "embeds"]
+    relation: Literal["uses_type", "extends", "implements", "embeds", "supertrait", "impl_trait", "impl_self_type"]
     context: Literal[
         "annotation", "return", "property", "alias", "type_argument",
         "constraint", "type_query", "heritage", "struct_embedding", "interface_embedding",
+        "supertrait", "impl_trait", "impl_self_type",
     ]
     lookup_space: Literal["type", "value"]
     owner: TypeDeclarationOwner
@@ -541,6 +543,17 @@ class RawTypeObservation(StrictOutputModel):
             raise ValueError("embedding context requires an embeds relation")
         if self.language == "go" and (self.relation not in {"uses_type", "embeds"} or self.lookup_space != "type"):
             raise ValueError("Go observations require authored types or embedding")
+        rust_relations = {"supertrait", "impl_trait", "impl_self_type"}
+        if self.relation in rust_relations and (self.language != "rust" or self.context != self.relation):
+            raise ValueError("Rust relation requires its authored Rust context")
+        if self.context in rust_relations and self.relation != self.context:
+            raise ValueError("Rust context requires its matching relation")
+        if self.language == "rust" and (self.relation not in {"uses_type", *rust_relations} or self.lookup_space != "type"):
+            raise ValueError("Rust observations require authored type relations")
+        if self.relation == "supertrait" and self.owner.kind not in {"trait", "unindexed"}:
+            raise ValueError("supertrait requires a trait owner")
+        if self.relation in {"impl_trait", "impl_self_type"} and self.owner.kind not in {"impl", "unindexed"}:
+            raise ValueError("implementation links require a separate impl owner")
         if self.binding_state == "package" and (self.language != "go" or len(self.path) != 1 or self.local_bindings or self.import_bindings):
             raise ValueError("package lookup requires a bare Go name without lexical bindings")
         if self.binding_state == "deferred" and (self.language != "go" or len(self.path) != 2 or self.local_bindings or not self.import_bindings or any(b.kind != "namespace" or b.local_name is not None for b in self.import_bindings)):
@@ -609,7 +622,7 @@ class RawTypeObservation(StrictOutputModel):
 
 class TypeSupport(StrictOutputModel):
     kind: Literal[
-        "type_site", "owner", "definition", "import_binding", "local_export", "reexport", "package_clause"
+        "type_site", "owner", "definition", "import_binding", "local_export", "reexport", "package_clause", "module_declaration"
     ]
     file: str = Field(min_length=1)
     line: int = Field(ge=1)
@@ -1195,7 +1208,7 @@ class TypeRelationItem(StrictOutputModel):
         "unsupported_syntax", "unsupported_owner", "ambiguous_owner", "type_parameter",
         "binding_not_found", "binding_ambiguous", "binding_unindexed", "target_not_indexed",
         "ambiguous_target", "unsupported_target", "unsupported_reference", "import_unresolved",
-        "binding_limit", "self_heritage", "type_only_value", "binding_shadowed", "unsupported_configuration",
+        "binding_limit", "self_heritage", "type_only_value", "binding_shadowed", "unsupported_configuration", "target_inaccessible",
     ] | None
     resolution_basis: Literal[
         "lexical_binding", "package_binding", "direct_binding", "qualified_member", "reexport_chain"
@@ -1207,6 +1220,7 @@ class TypeRelationItem(StrictOutputModel):
     candidate_ids: list[str] = Field(max_length=16)
     candidates_complete: bool
     candidates_truncated: int = Field(ge=0)
+    resolution_configuration: Literal["unconditional", "declared_possible"] | None
     source_file: str = Field(min_length=1)
     resolution: Literal["exact", "import-resolved"] | None
 
@@ -1256,6 +1270,13 @@ class TypeRelationItem(StrictOutputModel):
         support_kinds = {support.kind for support in self.support}
         if "type_site" not in support_kinds:
             raise ValueError("type relation support must include the type site")
+        if self.resolution_configuration not in {None, "unconditional", "declared_possible"}:
+            raise ValueError("resolution_configuration is not supported")
+        if self.raw.language == "rust" and self.status == "resolved":
+            if self.resolution_configuration is None:
+                raise ValueError("Rust relations require declared configuration proof")
+        elif self.resolution_configuration is not None:
+            raise ValueError("configuration is only carried by resolved Rust relations")
         if self.status == "resolved":
             if self.source_id is None or self.target_id is None:
                 raise ValueError("resolved relations require source and target endpoints")
@@ -1478,6 +1499,8 @@ class ExplorationRelationship(StrictOutputModel):
     edge: GraphEdge
     traversed: Literal["forward", "reverse"]
     source_ids: list[int] = Field(min_length=1)
+
+    resolution_configuration: Literal["unconditional", "declared_possible"] | None = _OMITTED
 
 
 class ExplorationSource(StrictOutputModel):

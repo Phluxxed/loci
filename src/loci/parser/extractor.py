@@ -466,8 +466,10 @@ def _rust_item_metadata(node, source: bytes) -> dict[str, Any]:
         _rust_cfg_dependent(item, source)
         for item in (node, *_rust_inline_module_ancestors(node))
     ) else "unconditional"
+    type_configuration = _rust_type_configuration(node, source)
     return {
         "loci": {
+            "rust_type_configuration": type_configuration,
             "rust_item": {
                 "lexical_module_path": list(lexical_path),
                 "visibility": visibility,
@@ -488,6 +490,29 @@ def _rust_inline_module_ancestors(node) -> list[Any]:
             modules.append(ancestor)
         ancestor = ancestor.parent
     return modules
+
+
+def _rust_type_configuration(node, source: bytes) -> str:
+    """Return the declared configuration of a Rust type declaration owner."""
+    declaration_nodes = {
+        "const_item",
+        "enum_item",
+        "foreign_mod_item",
+        "function_item",
+        "impl_item",
+        "mod_item",
+        "static_item",
+        "struct_item",
+        "trait_item",
+        "type_item",
+        "union_item",
+    }
+    current = node
+    while current is not None:
+        if current.type in declaration_nodes and _rust_cfg_dependent(current, source):
+            return "declared_possible"
+        current = current.parent
+    return "unconditional"
 
 
 def _rust_item_visibility(node, source: bytes) -> str:
@@ -605,7 +630,7 @@ def _walk(
 
     if node_type in spec.symbol_node_types or (
         language == "go" and node_type == "type_alias"
-    ):
+    ) or (language == "rust" and node_type == "type_item"):
         _extract_symbol(
             node,
             source,
@@ -643,6 +668,8 @@ def _walk(
 
 def _symbol_kind(node, spec: LanguageSpec, language: str, source: bytes) -> str | None:
     if language == "go" and node.type == "type_alias":
+        return "type"
+    if language == "rust" and node.type == "type_item":
         return "type"
     if language == "python" and is_python_type_alias(node, source):
         return "type"

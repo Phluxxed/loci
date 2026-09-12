@@ -19,6 +19,7 @@ TypeSupportKind: TypeAlias = Literal[
     "local_export",
     "reexport",
     "package_clause",
+    "module_declaration",
 ]
 TypeRelationStatus: TypeAlias = Literal["resolved", "unresolved"]
 TypeResolutionBasis: TypeAlias = Literal[
@@ -52,10 +53,11 @@ TypeUnresolvedReason: TypeAlias = Literal[
     "binding_limit",
     "self_heritage",
     "type_only_value",
+    "target_inaccessible",
 ]
 
 TYPE_SUPPORT_KINDS = frozenset(
-    {"type_site", "owner", "definition", "import_binding", "local_export", "reexport", "package_clause"}
+    {"type_site", "owner", "definition", "import_binding", "local_export", "reexport", "package_clause", "module_declaration"}
 )
 TYPE_RELATION_STATUSES = frozenset({"resolved", "unresolved"})
 TYPE_RESOLUTION_BASES = frozenset(
@@ -83,6 +85,7 @@ TYPE_UNRESOLVED_REASONS = frozenset(
         "binding_limit",
         "self_heritage",
         "type_only_value",
+        "target_inaccessible",
     }
 )
 MAX_TYPE_CANDIDATES = 16
@@ -220,6 +223,7 @@ class TypeRelationRecord:
     candidate_ids: tuple[str, ...]
     candidates_complete: bool
     candidates_truncated: int
+    resolution_configuration: Literal["unconditional", "declared_possible"] | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.raw, RawTypeObservation):
@@ -277,6 +281,13 @@ class TypeRelationRecord:
         if "type_site" not in support_kinds:
             raise ValueError("type relation support must include the source type site")
 
+        if self.resolution_configuration not in {None, "unconditional", "declared_possible"}:
+            raise ValueError("resolution_configuration is not supported")
+        if self.raw.language == "rust" and self.status == "resolved":
+            if self.resolution_configuration is None:
+                raise ValueError("Rust relations require declared configuration proof")
+        elif self.resolution_configuration is not None:
+            raise ValueError("configuration is only carried by resolved Rust relations")
         if self.status == "resolved":
             if self.source_id is None or self.source_kind is None:
                 raise ValueError("resolved relations require a source endpoint")
@@ -356,6 +367,7 @@ class TypeRelationRecord:
             "candidate_ids": list(self.candidate_ids),
             "candidates_complete": self.candidates_complete,
             "candidates_truncated": self.candidates_truncated,
+            "resolution_configuration": self.resolution_configuration,
         }
 
     @classmethod
@@ -379,6 +391,7 @@ class TypeRelationRecord:
                 "candidate_ids",
                 "candidates_complete",
                 "candidates_truncated",
+                "resolution_configuration",
             },
             "type relation record",
         )
@@ -406,6 +419,7 @@ class TypeRelationRecord:
             candidate_ids=tuple(candidate_ids),
             candidates_complete=value["candidates_complete"],
             candidates_truncated=value["candidates_truncated"],
+            resolution_configuration=value["resolution_configuration"],
         )
 
 
