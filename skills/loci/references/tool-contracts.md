@@ -69,6 +69,10 @@ Each item's `source_id` points to its definition or a containing source span;
 `source_ids` point to complete authored and import/re-export proof source.
 Source entries retain UTF-8 byte intervals, line bounds, full-file hashes and
 exact text. Read `complete` on each item to detect clipped anchors.
+Rust relationships can also carry `resolution_configuration`; preserve
+`declared_possible` when explaining conditional source. For intent selection
+and language-specific meaning, use the
+[capability matrix](language-resolution.md#exploration-capabilities).
 
 `status="ok"` describes successful delivery of the selected packet;
 `partial` reports uncertainty, missing source or a work/delivery bound;

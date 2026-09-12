@@ -83,8 +83,8 @@ use a targeted normal read.
 5. Use `context` on focused retrieval when nearby lines are required, then
    inspect the returned source, line bounds, and signatures before reasoning.
 
-For compact source discovery, type dependencies, or known static dependents,
-use `loci_explore` with `locate`, `type_dependencies`, or `impact`. Put the
+For compact source discovery, dependencies, or known static dependents,
+use `loci_explore` with `locate`, `dependencies`, `type_dependencies`, or `impact`. Put the
 specific field or contract of interest in `query`; pass exact `seed_ids` when
 known. Inspect returned source, proof paths and omissions before deciding that
 the context is sufficient. If the host lacks this tool, use search/get and the
@@ -94,7 +94,7 @@ For intent selection, budgets, and graph-shaped questions, follow the rules in
 [graph-navigation.md](references/graph-navigation.md). For exact response
 schemas, pagination, coverage, and store-health semantics, read
 [tool-contracts.md](references/tool-contracts.md). For language-specific
-resolver guarantees and limits, read
+exploration capabilities, resolver guarantees and limits, read
 [language-resolution.md](references/language-resolution.md).
 
 ## Safety and evidence boundaries

@@ -63,16 +63,27 @@ def parse_file(
         return []
 
     rel_path = str(path)
+    tree_sitter_language = (
+        "tsx"
+        if language == "typescript" and suffix == ".tsx"
+        else spec.ts_language
+    )
 
     try:
         from tree_sitter_language_pack import get_parser
-        parser = get_parser(spec.ts_language)
+        parser = get_parser(tree_sitter_language)
         parse = getattr(parser, "parse", None)
         if parse is None:
             raise AttributeError("tree-sitter parser has no parse() method")
         tree = parse(source_bytes)
     except Exception:
-        return _parse_file_with_process(source_bytes, spec, language, rel_path)
+        return _parse_file_with_process(
+            source_bytes,
+            spec,
+            language,
+            rel_path,
+            tree_sitter_language,
+        )
 
     symbols: list[Symbol] = []
     _walk(tree.root_node, source_bytes, spec, language, rel_path, symbols, parent_name=None)
@@ -80,7 +91,13 @@ def parse_file(
     return symbols
 
 
-def _parse_file_with_process(source: bytes, spec: LanguageSpec, language: str, file_path: str) -> list[Symbol]:
+def _parse_file_with_process(
+    source: bytes,
+    spec: LanguageSpec,
+    language: str,
+    file_path: str,
+    tree_sitter_language: str,
+) -> list[Symbol]:
     """Parse using tree-sitter-language-pack's newer high-level process() API."""
     try:
         from tree_sitter_language_pack import ProcessConfig, process
@@ -89,7 +106,7 @@ def _parse_file_with_process(source: bytes, spec: LanguageSpec, language: str, f
         result = process(
             text,
             ProcessConfig(
-                language=spec.ts_language,
+                language=tree_sitter_language,
                 structure=True,
                 symbols=True,
                 comments=True,
