@@ -1,0 +1,112 @@
+[
+  {
+    "type": "thread.started",
+    "thread_id": "01a092ee-efe1-78e2-b9b5-2edec94e3adf"
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_0",
+      "type": "error",
+      "message": "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-transport-2l3satwb/runtime/config.toml."
+    }
+  },
+  {
+    "type": "turn.started"
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_1",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ],
+        "max_evidence_bytes": 0
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_1",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ],
+        "max_evidence_bytes": 0
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "intent": "type_dependencies",
+          "status": "empty",
+          "selection": "explicit",
+          "scope": {
+            "source": "indexed_supported_source",
+            "coverage": "complete",
+            "relationships": "authored_types",
+            "exhaustive": false
+          },
+          "items": [],
+          "relationships": [],
+          "sources": [],
+          "omissions": [
+            {
+              "reason": "ancestor_unavailable",
+              "count": 1
+            },
+            {
+              "reason": "evidence_budget",
+              "count": 1
+            }
+          ],
+          "limits": {
+            "max_hops": 3,
+            "max_nodes": 64,
+            "max_items": 12,
+            "max_neighbors": 32,
+            "max_output_bytes": 16384,
+            "max_evidence_bytes": 0
+          },
+          "usage": {
+            "nodes_examined": 2,
+            "evidence_bytes": 0,
+            "output_bytes": 695,
+            "estimated_tokens": 174,
+            "token_estimate_method": "utf8_bytes_div_4",
+            "output_encoding": "mcp_result_json_utf8"
+          },
+          "_evaluation": {
+            "attempt_id": "941ec237-bd02-4317-a223-17fa417a62ab/attempt/1",
+            "calls_remaining": 23
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "error",
+    "message": "{\"error\":{\"message\":\"offline transport probe complete\",\"type\":\"invalid_request_error\"}}"
+  },
+  {
+    "type": "turn.failed",
+    "error": {
+      "message": "{\"error\":{\"message\":\"offline transport probe complete\",\"type\":\"invalid_request_error\"}}"
+    }
+  }
+]
