@@ -241,4 +241,3 @@ def test_replay_attempt_rejects_missing_relationship_score(tmp_path: Path) -> No
 
     with pytest.raises(ValueError, match="relationship score is unavailable"):
         replay_attempt(folder, corpus, case, plan, freeze, index)
-
