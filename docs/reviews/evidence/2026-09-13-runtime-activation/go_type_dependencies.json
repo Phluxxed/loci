@@ -1,0 +1,345 @@
+{
+  "content": [],
+  "structuredContent": {
+    "schema_version": 1,
+    "intent": "type_dependencies",
+    "status": "partial",
+    "selection": "explicit",
+    "scope": {
+      "source": "indexed_supported_source",
+      "coverage": "partial",
+      "relationships": "authored_types",
+      "exhaustive": false
+    },
+    "items": [
+      {
+        "id": "go/app/main.go::Build#function",
+        "name": "Build",
+        "kind": "function",
+        "file": "go/app/main.go",
+        "role": "anchor",
+        "depth": 0,
+        "why": "Explicitly requested",
+        "source_id": 1,
+        "complete": true,
+        "path": []
+      },
+      {
+        "id": "go/model/model.go::AliasID#type",
+        "name": "AliasID",
+        "kind": "type",
+        "file": "go/model/model.go",
+        "role": "dependency",
+        "depth": 1,
+        "why": "Direct declared type",
+        "source_id": 2,
+        "complete": true,
+        "path": [
+          1
+        ]
+      },
+      {
+        "id": "go/model/model.go::Page#type",
+        "name": "Page",
+        "kind": "type",
+        "file": "go/model/model.go",
+        "role": "dependency",
+        "depth": 1,
+        "why": "Direct declared type",
+        "source_id": 8,
+        "complete": true,
+        "path": [
+          2
+        ]
+      },
+      {
+        "id": "go/model/model.go::UserID#type",
+        "name": "UserID",
+        "kind": "type",
+        "file": "go/model/model.go",
+        "role": "dependency",
+        "depth": 1,
+        "why": "Direct declared type",
+        "source_id": 10,
+        "complete": true,
+        "path": [
+          3
+        ]
+      },
+      {
+        "id": "go/model/model.go::Number#type",
+        "name": "Number",
+        "kind": "type",
+        "file": "go/model/model.go",
+        "role": "dependency",
+        "depth": 2,
+        "why": "Authored type or heritage continuation",
+        "source_id": 12,
+        "complete": true,
+        "path": [
+          2,
+          4
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": 1,
+        "edge": {
+          "from": "go/app/main.go::Build#function",
+          "to": "go/model/model.go::AliasID#type",
+          "type": "uses_type",
+          "directed": true,
+          "namespace": "loci",
+          "resolution": "import-resolved",
+          "evidence": {
+            "file": "go/app/main.go",
+            "line": 5,
+            "content_hash": "42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3"
+          }
+        },
+        "traversed": "forward",
+        "source_ids": [
+          1,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      {
+        "id": 2,
+        "edge": {
+          "from": "go/app/main.go::Build#function",
+          "to": "go/model/model.go::Page#type",
+          "type": "uses_type",
+          "directed": true,
+          "namespace": "loci",
+          "resolution": "import-resolved",
+          "evidence": {
+            "file": "go/app/main.go",
+            "line": 5,
+            "content_hash": "42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3"
+          }
+        },
+        "traversed": "forward",
+        "source_ids": [
+          1,
+          3,
+          4,
+          5,
+          9,
+          7
+        ]
+      },
+      {
+        "id": 3,
+        "edge": {
+          "from": "go/app/main.go::Build#function",
+          "to": "go/model/model.go::UserID#type",
+          "type": "uses_type",
+          "directed": true,
+          "namespace": "loci",
+          "resolution": "import-resolved",
+          "evidence": {
+            "file": "go/app/main.go",
+            "line": 5,
+            "content_hash": "42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3"
+          }
+        },
+        "traversed": "forward",
+        "source_ids": [
+          1,
+          3,
+          4,
+          5,
+          11,
+          7
+        ]
+      },
+      {
+        "id": 4,
+        "edge": {
+          "from": "go/model/model.go::Page#type",
+          "to": "go/model/model.go::Number#type",
+          "type": "uses_type",
+          "directed": true,
+          "namespace": "loci",
+          "resolution": "exact",
+          "evidence": {
+            "file": "go/model/model.go",
+            "line": 8,
+            "content_hash": "a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5"
+          }
+        },
+        "traversed": "forward",
+        "source_ids": [
+          9,
+          5,
+          13,
+          7
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "id": 1,
+        "file": "go/app/main.go",
+        "start_byte": 47,
+        "end_byte": 151,
+        "start_line": 5,
+        "end_line": 7,
+        "content_hash": "42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3",
+        "content": "func Build(id model.AliasID) model.Page[model.UserID] {\n    return model.Page[model.UserID]{Value: id}\n}"
+      },
+      {
+        "id": 2,
+        "file": "go/model/model.go",
+        "start_byte": 38,
+        "end_byte": 54,
+        "start_line": 4,
+        "end_line": 4,
+        "content_hash": "a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5",
+        "content": "AliasID = UserID"
+      },
+      {
+        "id": 3,
+        "file": "go/app/main.go",
+        "start_byte": 0,
+        "end_byte": 13,
+        "start_line": 1,
+        "end_line": 1,
+        "content_hash": "42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3",
+        "content": "package main\n"
+      },
+      {
+        "id": 4,
+        "file": "go/app/main.go",
+        "start_byte": 14,
+        "end_byte": 45,
+        "start_line": 3,
+        "end_line": 3,
+        "content_hash": "42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3",
+        "content": "import \"example.com/acme/model\""
+      },
+      {
+        "id": 5,
+        "file": "go/model/model.go",
+        "start_byte": 0,
+        "end_byte": 14,
+        "start_line": 1,
+        "end_line": 1,
+        "content_hash": "a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5",
+        "content": "package model\n"
+      },
+      {
+        "id": 6,
+        "file": "go/model/model.go",
+        "start_byte": 33,
+        "end_byte": 55,
+        "start_line": 4,
+        "end_line": 4,
+        "content_hash": "a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5",
+        "content": "type AliasID = UserID\n"
+      },
+      {
+        "id": 7,
+        "file": "go/go.mod",
+        "start_byte": 0,
+        "end_byte": 33,
+        "start_line": 1,
+        "end_line": 3,
+        "content_hash": "01cc905450c59f6d3133f5fd339444536aa4d2b32468f197ea50d39884391d4d",
+        "content": "module example.com/acme\n\ngo 1.23\n"
+      },
+      {
+        "id": 8,
+        "file": "go/model/model.go",
+        "start_byte": 102,
+        "end_byte": 135,
+        "start_line": 8,
+        "end_line": 8,
+        "content_hash": "a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5",
+        "content": "Page[T Number] struct { Value T }"
+      },
+      {
+        "id": 9,
+        "file": "go/model/model.go",
+        "start_byte": 97,
+        "end_byte": 136,
+        "start_line": 8,
+        "end_line": 8,
+        "content_hash": "a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5",
+        "content": "type Page[T Number] struct { Value T }\n"
+      },
+      {
+        "id": 10,
+        "file": "go/model/model.go",
+        "start_byte": 20,
+        "end_byte": 32,
+        "start_line": 3,
+        "end_line": 3,
+        "content_hash": "a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5",
+        "content": "UserID int64"
+      },
+      {
+        "id": 11,
+        "file": "go/model/model.go",
+        "start_byte": 15,
+        "end_byte": 33,
+        "start_line": 3,
+        "end_line": 3,
+        "content_hash": "a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5",
+        "content": "type UserID int64\n"
+      },
+      {
+        "id": 12,
+        "file": "go/model/model.go",
+        "start_byte": 61,
+        "end_byte": 95,
+        "start_line": 6,
+        "end_line": 6,
+        "content_hash": "a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5",
+        "content": "Number interface { ~int | ~int64 }"
+      },
+      {
+        "id": 13,
+        "file": "go/model/model.go",
+        "start_byte": 56,
+        "end_byte": 96,
+        "start_line": 6,
+        "end_line": 6,
+        "content_hash": "a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5",
+        "content": "type Number interface { ~int | ~int64 }\n"
+      }
+    ],
+    "omissions": [
+      {
+        "reason": "alternative_path",
+        "count": 1
+      },
+      {
+        "reason": "unresolved_relation",
+        "count": 2
+      }
+    ],
+    "limits": {
+      "max_hops": 3,
+      "max_nodes": 64,
+      "max_items": 12,
+      "max_neighbors": 32,
+      "max_output_bytes": 16384,
+      "max_evidence_bytes": 8192
+    },
+    "usage": {
+      "nodes_examined": 5,
+      "evidence_bytes": 314,
+      "output_bytes": 5987,
+      "estimated_tokens": 1497,
+      "token_estimate_method": "utf8_bytes_div_4",
+      "output_encoding": "mcp_result_json_utf8"
+    }
+  },
+  "isError": false
+}

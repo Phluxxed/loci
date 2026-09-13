@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "repo": "/tmp/loci-w55-runtime-root",
+  "instructions": "Call each public host tool exactly once and save its complete raw CallToolResult JSON to evidence_file.",
+  "requests": [
+    {
+      "name": "python_types",
+      "tool": "loci_explore",
+      "arguments": {
+        "repo": "/tmp/loci-w55-runtime-root",
+        "intent": "type_dependencies",
+        "seed_ids": [
+          "python/consumer.py::decode#function"
+        ],
+        "max_hops": 3,
+        "max_evidence_bytes": 8192,
+        "max_output_bytes": 16384
+      },
+      "evidence_file": "/tmp/loci-w55-evidence/python_types.json",
+      "expected": {
+        "ids": [
+          "python/consumer.py::decode#function",
+          "python/schema.py::Payload#class"
+        ],
+        "relationships": "authored_types"
+      }
+    },
+    {
+      "name": "javascript_dependencies",
+      "tool": "loci_explore",
+      "arguments": {
+        "repo": "/tmp/loci-w55-runtime-root",
+        "intent": "dependencies",
+        "seed_ids": [
+          "javascript/app.js::run#function"
+        ],
+        "max_hops": 3,
+        "max_evidence_bytes": 8192,
+        "max_output_bytes": 16384
+      },
+      "evidence_file": "/tmp/loci-w55-evidence/javascript_dependencies.json",
+      "expected": {
+        "ids": [
+          "javascript/app.js::run#function"
+        ],
+        "relationships": "authored_dependencies"
+      }
+    },
+    {
+      "name": "go_type_dependencies",
+      "tool": "loci_explore",
+      "arguments": {
+        "repo": "/tmp/loci-w55-runtime-root",
+        "intent": "type_dependencies",
+        "seed_ids": [
+          "go/app/main.go::Build#function"
+        ],
+        "max_hops": 3,
+        "max_evidence_bytes": 8192,
+        "max_output_bytes": 16384
+      },
+      "evidence_file": "/tmp/loci-w55-evidence/go_type_dependencies.json",
+      "expected": {
+        "ids": [
+          "go/app/main.go::Build#function",
+          "go/model/model.go::AliasID#type",
+          "go/model/model.go::UserID#type",
+          "go/model/model.go::Page#type",
+          "go/model/model.go::Number#type"
+        ],
+        "relationships": "authored_types",
+        "source_files": [
+          "go/go.mod"
+        ]
+      }
+    },
+    {
+      "name": "rust_type_dependencies",
+      "tool": "loci_explore",
+      "arguments": {
+        "repo": "/tmp/loci-w55-runtime-root",
+        "intent": "type_dependencies",
+        "seed_ids": [
+          "rust/src/lib.rs::build#function"
+        ],
+        "max_hops": 3,
+        "max_evidence_bytes": 8192,
+        "max_output_bytes": 16384
+      },
+      "evidence_file": "/tmp/loci-w55-evidence/rust_type_dependencies.json",
+      "expected": {
+        "ids": [
+          "rust/src/lib.rs::build#function",
+          "rust/src/lib.rs::UserId#type",
+          "rust/src/lib.rs::Format#trait",
+          "rust/src/lib.rs::Render#trait"
+        ],
+        "relationships": "authored_types",
+        "source_files": [
+          "rust/Cargo.toml"
+        ],
+        "resolution_configuration": "unconditional"
+      }
+    },
+    {
+      "name": "tsx_type_dependencies",
+      "tool": "loci_explore",
+      "arguments": {
+        "repo": "/tmp/loci-w55-runtime-root",
+        "intent": "type_dependencies",
+        "seed_ids": [
+          "tsx/badge.tsx::Badge#function"
+        ],
+        "max_hops": 3,
+        "max_evidence_bytes": 8192,
+        "max_output_bytes": 16384
+      },
+      "evidence_file": "/tmp/loci-w55-evidence/tsx_type_dependencies.json",
+      "expected": {
+        "ids": [
+          "tsx/badge.tsx::Badge#function",
+          "tsx/props.ts::Props#interface"
+        ],
+        "relationships": "authored_types"
+      }
+    },
+    {
+      "name": "go_module_control",
+      "tool": "loci_file",
+      "arguments": {
+        "repo": "/tmp/loci-w55-runtime-root",
+        "file_path": "go/go.mod"
+      },
+      "evidence_file": "/tmp/loci-w55-evidence/go_module_control.json",
+      "expected": {
+        "content_contains": "module ",
+        "file": "go/go.mod"
+      }
+    },
+    {
+      "name": "cargo_control",
+      "tool": "loci_file",
+      "arguments": {
+        "repo": "/tmp/loci-w55-runtime-root",
+        "file_path": "rust/Cargo.toml"
+      },
+      "evidence_file": "/tmp/loci-w55-evidence/cargo_control.json",
+      "expected": {
+        "content_contains": "[package]",
+        "file": "rust/Cargo.toml"
+      }
+    },
+    {
+      "name": "zero_evidence_bound",
+      "tool": "loci_explore",
+      "arguments": {
+        "repo": "/tmp/loci-w55-runtime-root",
+        "intent": "type_dependencies",
+        "seed_ids": [
+          "python/consumer.py::decode#function"
+        ],
+        "max_evidence_bytes": 0,
+        "max_output_bytes": 2048
+      },
+      "evidence_file": "/tmp/loci-w55-evidence/zero_evidence_bound.json",
+      "expected": {
+        "empty": true,
+        "relationships": "authored_types"
+      }
+    },
+    {
+      "name": "rust_workspace_declared_possible",
+      "tool": "loci_explore",
+      "arguments": {
+        "repo": "/tmp/loci-w55-runtime-root",
+        "intent": "type_dependencies",
+        "seed_ids": [
+          "rust_workspace/app/src/lib.rs::use_it#function"
+        ],
+        "max_hops": 3,
+        "max_evidence_bytes": 8192,
+        "max_output_bytes": 16384
+      },
+      "evidence_file": "/tmp/loci-w55-evidence/rust_workspace_declared_possible.json",
+      "expected": {
+        "ids": [
+          "rust_workspace/app/src/lib.rs::use_it#function"
+        ],
+        "relationships": "authored_types",
+        "resolution_configuration": "declared_possible",
+        "source_files": [
+          "rust_workspace/Cargo.toml",
+          "rust_workspace/app/Cargo.toml",
+          "rust_workspace/core/Cargo.toml"
+        ]
+      }
+    }
+  ]
+}

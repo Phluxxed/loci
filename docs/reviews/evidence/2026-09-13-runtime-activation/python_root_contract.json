@@ -1,0 +1,138 @@
+{
+  "content": [],
+  "structuredContent": {
+    "schema_version": 1,
+    "intent": "type_dependencies",
+    "status": "ok",
+    "selection": "explicit",
+    "scope": {
+      "source": "indexed_supported_source",
+      "coverage": "complete",
+      "relationships": "authored_types",
+      "exhaustive": false
+    },
+    "items": [
+      {
+        "id": "consumer.py::Alias#type",
+        "name": "Alias",
+        "kind": "type",
+        "file": "consumer.py",
+        "role": "anchor",
+        "depth": 0,
+        "why": "Explicitly requested",
+        "source_id": 1,
+        "complete": true,
+        "path": []
+      },
+      {
+        "id": "schema.py::Payload#class",
+        "name": "Payload",
+        "kind": "class",
+        "file": "schema.py",
+        "role": "dependency",
+        "depth": 1,
+        "why": "Direct declared type",
+        "source_id": 2,
+        "complete": true,
+        "path": [
+          1
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": 1,
+        "edge": {
+          "from": "consumer.py::Alias#type",
+          "to": "schema.py::Payload#class",
+          "type": "uses_type",
+          "directed": true,
+          "namespace": "loci",
+          "resolution": "import-resolved",
+          "evidence": {
+            "file": "consumer.py",
+            "line": 5,
+            "content_hash": "38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462"
+          }
+        },
+        "traversed": "forward",
+        "source_ids": [
+          3,
+          4,
+          5,
+          2
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "id": 1,
+        "file": "consumer.py",
+        "start_byte": 87,
+        "end_byte": 107,
+        "start_line": 5,
+        "end_line": 5,
+        "content_hash": "38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462",
+        "content": "Alias: TypeAlias = P"
+      },
+      {
+        "id": 2,
+        "file": "schema.py",
+        "start_byte": 0,
+        "end_byte": 34,
+        "start_line": 1,
+        "end_line": 2,
+        "content_hash": "e15994eefb294c55da32540a16759f095f67ae73ce7ecd7f5e9634c25c6f4ecd",
+        "content": "class Payload:\n    request_id: str"
+      },
+      {
+        "id": 3,
+        "file": "consumer.py",
+        "start_byte": 87,
+        "end_byte": 108,
+        "start_line": 5,
+        "end_line": 5,
+        "content_hash": "38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462",
+        "content": "Alias: TypeAlias = P\n"
+      },
+      {
+        "id": 4,
+        "file": "consumer.py",
+        "start_byte": 29,
+        "end_byte": 62,
+        "start_line": 2,
+        "end_line": 2,
+        "content_hash": "38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462",
+        "content": "from barrel import Exported as P\n"
+      },
+      {
+        "id": 5,
+        "file": "barrel.py",
+        "start_byte": 0,
+        "end_byte": 39,
+        "start_line": 1,
+        "end_line": 1,
+        "content_hash": "ea3012e0017f334a3c46f223013d209cbe35aa479aaaf93b239dd3364f6b303a",
+        "content": "from schema import Payload as Exported\n"
+      }
+    ],
+    "omissions": [],
+    "limits": {
+      "max_hops": 1,
+      "max_nodes": 64,
+      "max_items": 12,
+      "max_neighbors": 32,
+      "max_output_bytes": 16384,
+      "max_evidence_bytes": 8192
+    },
+    "usage": {
+      "nodes_examined": 2,
+      "evidence_bytes": 127,
+      "output_bytes": 2376,
+      "estimated_tokens": 594,
+      "token_estimate_method": "utf8_bytes_div_4",
+      "output_encoding": "mcp_result_json_utf8"
+    }
+  },
+  "isError": false
+}
