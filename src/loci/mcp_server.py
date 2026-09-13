@@ -474,7 +474,7 @@ def create_server() -> MCPServer:
         start_line: int | None = None,
         end_line: int | None = None,
     ) -> Annotated[CallToolResult, LociFileOutput]:
-        """Return cached file content by relative path and optional line range."""
+        """Read indexed source or tracked Go/Cargo controls by relative path and line range."""
         return _handle_loci_error(
             lambda service: service.get_cached_file(
                 repo,

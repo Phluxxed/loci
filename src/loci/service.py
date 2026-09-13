@@ -20,6 +20,7 @@ from loci.graph.contracts import (
     validate_graph_edges,
 )
 from loci.graph.go_modules import (
+    MAX_GO_CONTROL_BYTES,
     GoModuleProblem,
     build_go_package_index,
     load_go_module_context,
@@ -30,6 +31,7 @@ from loci.graph.javascript_modules import (
     load_javascript_module_context,
 )
 from loci.graph.rust_crates import (
+    MAX_CARGO_CONTROL_BYTES,
     RustCrateProblem,
     build_rust_crate_index,
     load_cargo_context,
@@ -41,7 +43,7 @@ from loci.graph.swift_modules import (
     build_swift_module_index,
     load_swift_module_context,
 )
-from loci.graph.profiles import required_frontmatter_fields
+from loci.graph.profiles import read_contained_file, required_frontmatter_fields
 from loci.graph.state import GraphDiagnostic, GraphIndexState
 from loci.graph.retrieval import (
     _graph_node_ref,
@@ -803,18 +805,38 @@ def get_cached_file(
     store = get_store()
     if ensure_fresh:
         ensure_fresh_index(repo_path)
-    _load_required_index(store, repo_path)
+    index = _load_required_index(store, repo_path)
 
-    result = store.get_file_content(
-        repo_path,
-        file_path,
-        start_line=start_line,
-        end_line=end_line,
+    control_path = PurePosixPath(file_path)
+    is_control = (
+        bool(file_path)
+        and "\\" not in file_path
+        and not control_path.is_absolute()
+        and ".." not in control_path.parts
+        and control_path.as_posix() == file_path
+        and control_path.name in {"go.mod", "go.work", "Cargo.toml"}
     )
+    if is_control:
+        try:
+            state = store.validate_graph_state(index)
+        except GraphContractError as exc:
+            raise LociError(exc.code, exc.message, exc.details) from exc
+        result = _get_resolver_control_content(
+            repo_path, file_path, state.input_hashes.get(file_path),
+            start_line=start_line, end_line=end_line,
+        )
+    else:
+        result = store.get_file_content(
+            repo_path,
+            file_path,
+            start_line=start_line,
+            end_line=end_line,
+        )
     if result is None:
         raise LociError(
             "FILE_NOT_FOUND",
-            "File not found in cache",
+            "Resolver control is not tracked by the current index"
+            if is_control else "File not found in cache",
             {"repo": str(repo_path), "file": file_path},
         )
 
@@ -829,6 +851,57 @@ def get_cached_file(
         language=language,
     )
     return result
+
+
+def _get_resolver_control_content(
+    repo_path: Path,
+    file_path: str,
+    expected_hash: str | None,
+    *,
+    start_line: int | None,
+    end_line: int | None,
+) -> dict[str, Any] | None:
+    """Read bounded control bytes only when they match indexed resolver input."""
+    if expected_hash is None:
+        return None
+    limit = MAX_CARGO_CONTROL_BYTES if Path(file_path).name == "Cargo.toml" else MAX_GO_CONTROL_BYTES
+    details: dict[str, Any] = {"repo": str(repo_path), "file": file_path}
+    try:
+        raw, relative = read_contained_file(
+            repo_path, Path(file_path), record="resolver control", max_bytes=limit,
+        )
+    except GraphContractError as exc:
+        raise LociError(
+            "CONTROL_SOURCE_UNAVAILABLE",
+            "Indexed resolver control cannot be read safely within its byte limit",
+            {**details, "reason": "read_failed", "limit_bytes": limit, "cause": exc.message},
+        ) from exc
+    if relative != file_path or hashlib.sha256(raw).hexdigest() != expected_hash:
+        raise LociError(
+            "CONTROL_SOURCE_UNAVAILABLE",
+            "Resolver control differs from indexed input; refresh the index",
+            {**details, "reason": "indexed_hash_mismatch"},
+        )
+    try:
+        content = raw.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise LociError(
+            "CONTROL_SOURCE_UNAVAILABLE",
+            "Indexed resolver control is not UTF-8",
+            {**details, "reason": "invalid_utf8"},
+        ) from exc
+    lines = content.splitlines(keepends=True)
+    total_lines = len(lines)
+    start = max(0, min(start_line - 1 if start_line is not None else 0, total_lines))
+    end = max(start, min(end_line if end_line is not None else total_lines, total_lines))
+    return {
+        "file": file_path,
+        "content": "".join(lines[start:end]),
+        "total_lines": total_lines,
+        "start_line": start + 1,
+        "end_line": end,
+        "file_bytes": len(raw),
+    }
 
 
 def grep_repo(
