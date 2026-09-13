@@ -294,6 +294,10 @@ control; programming-language workflow efficiency remains unproven or withheld.
 The review separates evaluator accounting defects, exact control-file access,
 disclosed relationship omissions and answer-contract limits from implemented
 source-proven semantics.
+The [future evaluator contract repair](docs/reviews/2026-09-13-evaluator-contract-repair.md)
+provides versioned graph accounting, explicit tool bounds and answer formats.
+It preserves those historical results; any new provider comparison needs its
+own pre-outcome freeze of the repaired components.
 
 For plain JavaScript, `dependencies` follows definite calls, declaration-owned
 imported value references and direct class bases. It returns the helper/value/base
