@@ -88,6 +88,12 @@ Direct `python -m loci.mcp_server` registration is useful for diagnostics, but
 it should not be the permanent local config because it bypasses the tracked
 wrapper.
 
+After updating an editable installation, restart the MCP host/session so it
+loads the current tools and source. If an expected new tool is absent, stop and
+flag the required restart before continuing activation checks. After restart,
+verify the tool through that host. The [runtime activation record](docs/reviews/2026-09-13-shared-runtime-activation.md)
+identifies the verified source revision, language checks and remaining limits.
+
 Custom cache location:
 
 ```bash

@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "repo": "/tmp/loci-w55-runtime-root",
+  "changed_files": {
+    "tsx/badge.tsx": {
+      "before_sha256": "5b4483e65def4b4d5ddde658ece6a92969f51ca305c96f256bc8468afaefa50e",
+      "after_sha256": "de9131f8728cce1a3dc7185b2e3827c24de36bc1d3ab5e3e2fa45acfdb17c128",
+      "marker": "W55_FRESH"
+    },
+    "go/go.mod": {
+      "before_sha256": "01cc905450c59f6d3133f5fd339444536aa4d2b32468f197ea50d39884391d4d",
+      "after_sha256": "13b30b02971aa219598da5ab85741d48963fc1fa05aebf0601269b5808ad88d2",
+      "marker": "example.com/w55fresh"
+    }
+  },
+  "requests": [
+    {
+      "name": "fresh_tsx_file",
+      "tool": "loci_file",
+      "arguments": {
+        "repo": "/tmp/loci-w55-runtime-root",
+        "file_path": "tsx/badge.tsx"
+      },
+      "evidence_file": "/tmp/loci-w55-evidence/fresh_tsx_file.json",
+      "expected": {
+        "content_contains": "W55_FRESH",
+        "file": "tsx/badge.tsx"
+      }
+    },
+    {
+      "name": "fresh_tsx_explore",
+      "tool": "loci_explore",
+      "arguments": {
+        "repo": "/tmp/loci-w55-runtime-root",
+        "intent": "locate",
+        "seed_ids": [
+          "tsx/badge.tsx::Badge#function"
+        ],
+        "max_evidence_bytes": 8192,
+        "max_output_bytes": 16384
+      },
+      "evidence_file": "/tmp/loci-w55-evidence/fresh_tsx_explore.json",
+      "expected": {
+        "ids": [
+          "tsx/badge.tsx::Badge#function"
+        ],
+        "marker": "W55_FRESH",
+        "relationships": "none"
+      }
+    },
+    {
+      "name": "fresh_go_module_control",
+      "tool": "loci_file",
+      "arguments": {
+        "repo": "/tmp/loci-w55-runtime-root",
+        "file_path": "go/go.mod"
+      },
+      "evidence_file": "/tmp/loci-w55-evidence/fresh_go_module_control.json",
+      "expected": {
+        "content_contains": "example.com/w55fresh",
+        "file": "go/go.mod"
+      }
+    }
+  ]
+}

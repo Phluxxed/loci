@@ -1,0 +1,113 @@
+{
+  "content": [],
+  "structuredContent": {
+    "schema_version": 1,
+    "intent": "locate",
+    "status": "partial",
+    "selection": "inferred",
+    "scope": {
+      "source": "indexed_supported_source",
+      "coverage": "partial",
+      "relationships": "none",
+      "exhaustive": false
+    },
+    "items": [
+      {
+        "id": "benchmarks/multilingual_context_preflight.py::_explore#function",
+        "name": "_explore",
+        "kind": "function",
+        "file": "benchmarks/multilingual_context_preflight.py",
+        "role": "anchor",
+        "depth": 0,
+        "why": "Query matches explore",
+        "source_id": 1,
+        "complete": true,
+        "path": []
+      },
+      {
+        "id": "src/loci/service.py::explore#function",
+        "name": "explore",
+        "kind": "function",
+        "file": "src/loci/service.py",
+        "role": "anchor",
+        "depth": 0,
+        "why": "Query matches explore",
+        "source_id": 2,
+        "complete": true,
+        "path": []
+      },
+      {
+        "id": "tests/test_go_context_delivery.py::_explore#function",
+        "name": "_explore",
+        "kind": "function",
+        "file": "tests/test_go_context_delivery.py",
+        "role": "anchor",
+        "depth": 0,
+        "why": "Query matches explore",
+        "source_id": 3,
+        "complete": false,
+        "path": []
+      }
+    ],
+    "relationships": [],
+    "sources": [
+      {
+        "id": 1,
+        "file": "benchmarks/multilingual_context_preflight.py",
+        "start_byte": 2730,
+        "end_byte": 3047,
+        "start_line": 71,
+        "end_line": 80,
+        "content_hash": "2e5c916f0b99f6a7f7447c0c899b2cb3644724c2ac5f41b1b66dd3f552289ab4",
+        "content": "def _explore(repo: Path, intent: str, seed_ids: list[str], *, evidence: int = 8192) -> dict[str, Any]:\n    return service.explore(\n        repo,\n        intent=intent,\n        seed_ids=seed_ids,\n        max_hops=3,\n        max_evidence_bytes=evidence,\n        max_output_bytes=16_384,\n        ensure_fresh=True,\n    )"
+      },
+      {
+        "id": 2,
+        "file": "src/loci/service.py",
+        "start_byte": 40432,
+        "end_byte": 41488,
+        "start_line": 1181,
+        "end_line": 1205,
+        "content_hash": "edce3b1c90c5a2e7974910f23be25b4ae4b47366045bf80f722cfae59bb57f60",
+        "content": "def explore(\n    repo: str | Path,\n    query: str = \"\",\n    *,\n    intent: str = \"locate\",\n    seed_ids: list[str] | None = None,\n    max_hops: int | None = None,\n    max_output_bytes: int = 16384,\n    max_evidence_bytes: int = 8192,\n    resolutions: list[str] | None = None,\n    ensure_fresh: bool = False,\n) -> dict[str, Any]:\n    \"\"\"Return compact source selected for an explicit static retrieval intent.\"\"\"\n    repo_path = Path(repo).resolve()\n    store, nodes, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)\n    coverage = query_coverage_from_index(_load_required_index(store, repo_path), \"indexed_symbols\")\n    try:\n        return explore_context(\n            repo_path, store, nodes, state, query, intent=intent, seed_ids=seed_ids,\n            max_hops=max_hops, max_output_bytes=max_output_bytes,\n            max_evidence_bytes=max_evidence_bytes, resolutions=resolutions,\n            coverage=coverage[\"state\"],\n        )\n    except GraphContractError as exc:\n        raise LociError(exc.code, exc.message, exc.details) from exc"
+      },
+      {
+        "id": 3,
+        "file": "tests/test_go_context_delivery.py",
+        "start_byte": 586,
+        "end_byte": 704,
+        "start_line": 32,
+        "end_line": 34,
+        "content_hash": "14dc6303a9e7d86d00368f1c6d37735dfa814663f626ce45076eb0c023eca518",
+        "content": "def _explore(repo: Path, *, intent: str, seed_id: str, **kwargs) -> dict:\n    result = service.explore(\n        repo,\n"
+      }
+    ],
+    "omissions": [
+      {
+        "reason": "anchor_limit",
+        "count": 278
+      },
+      {
+        "reason": "source_clipped",
+        "count": 1
+      }
+    ],
+    "limits": {
+      "max_hops": 0,
+      "max_nodes": 64,
+      "max_items": 12,
+      "max_neighbors": 32,
+      "max_output_bytes": 5000,
+      "max_evidence_bytes": 1500
+    },
+    "usage": {
+      "nodes_examined": 3,
+      "evidence_bytes": 1491,
+      "output_bytes": 3551,
+      "estimated_tokens": 888,
+      "token_estimate_method": "utf8_bytes_div_4",
+      "output_encoding": "mcp_result_json_utf8"
+    }
+  },
+  "isError": false
+}

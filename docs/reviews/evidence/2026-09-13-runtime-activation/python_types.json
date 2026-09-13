@@ -1,0 +1,121 @@
+{
+  "content": [],
+  "structuredContent": {
+    "schema_version": 1,
+    "intent": "type_dependencies",
+    "status": "partial",
+    "selection": "explicit",
+    "scope": {
+      "source": "indexed_supported_source",
+      "coverage": "partial",
+      "relationships": "authored_types",
+      "exhaustive": false
+    },
+    "items": [
+      {
+        "id": "python/consumer.py::decode#function",
+        "name": "decode",
+        "kind": "function",
+        "file": "python/consumer.py",
+        "role": "anchor",
+        "depth": 0,
+        "why": "Explicitly requested",
+        "source_id": 1,
+        "complete": true,
+        "path": []
+      },
+      {
+        "id": "python/consumer.py::Alias#type",
+        "name": "Alias",
+        "kind": "type",
+        "file": "python/consumer.py",
+        "role": "dependency",
+        "depth": 1,
+        "why": "Direct declared type",
+        "source_id": 2,
+        "complete": true,
+        "path": [
+          1
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": 1,
+        "edge": {
+          "from": "python/consumer.py::decode#function",
+          "to": "python/consumer.py::Alias#type",
+          "type": "uses_type",
+          "directed": true,
+          "namespace": "loci",
+          "resolution": "exact",
+          "evidence": {
+            "file": "python/consumer.py",
+            "line": 7,
+            "content_hash": "38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462"
+          }
+        },
+        "traversed": "forward",
+        "source_ids": [
+          1,
+          3
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "id": 1,
+        "file": "python/consumer.py",
+        "start_byte": 109,
+        "end_byte": 164,
+        "start_line": 7,
+        "end_line": 8,
+        "content_hash": "38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462",
+        "content": "def decode(value: Alias) -> list[P]:\n    return [value]"
+      },
+      {
+        "id": 2,
+        "file": "python/consumer.py",
+        "start_byte": 87,
+        "end_byte": 107,
+        "start_line": 5,
+        "end_line": 5,
+        "content_hash": "38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462",
+        "content": "Alias: TypeAlias = P"
+      },
+      {
+        "id": 3,
+        "file": "python/consumer.py",
+        "start_byte": 87,
+        "end_byte": 108,
+        "start_line": 5,
+        "end_line": 5,
+        "content_hash": "38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462",
+        "content": "Alias: TypeAlias = P\n"
+      }
+    ],
+    "omissions": [
+      {
+        "reason": "unresolved_relation",
+        "count": 2
+      }
+    ],
+    "limits": {
+      "max_hops": 3,
+      "max_nodes": 64,
+      "max_items": 12,
+      "max_neighbors": 32,
+      "max_output_bytes": 16384,
+      "max_evidence_bytes": 8192
+    },
+    "usage": {
+      "nodes_examined": 2,
+      "evidence_bytes": 76,
+      "output_bytes": 2078,
+      "estimated_tokens": 520,
+      "token_estimate_method": "utf8_bytes_div_4",
+      "output_encoding": "mcp_result_json_utf8"
+    }
+  },
+  "isError": false
+}
