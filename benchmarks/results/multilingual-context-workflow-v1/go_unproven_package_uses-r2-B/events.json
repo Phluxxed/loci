@@ -1,0 +1,1381 @@
+[
+  {
+    "type": "thread.started",
+    "thread_id": "01a09831-7f73-7741-80b0-a5361dd4a523"
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_0",
+      "type": "error",
+      "message": "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-3xuk4k75/agent-runtime/config.toml."
+    }
+  },
+  {
+    "type": "turn.started"
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_1",
+      "type": "agent_message",
+      "text": "I’m locating `Keep`, `Probe`, and `Missing`, then I’ll trace their declared types and callees while preserving unresolved or ambiguous edges."
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "dependencies",
+        "max_hops": 3,
+        "max_output_bytes": 12000,
+        "max_evidence_bytes": 8000,
+        "query": "Locate declarations Keep Probe Missing; report Keep type origin and Probe/Missing callees, including shadowed, ambiguous, external, and unresolved endpoints."
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "dependencies",
+        "max_hops": 3,
+        "max_output_bytes": 12000,
+        "max_evidence_bytes": 8000,
+        "query": "Locate declarations Keep Probe Missing; report Keep type origin and Probe/Missing callees, including shadowed, ambiguous, external, and unresolved endpoints."
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "intent": "dependencies",
+          "status": "partial",
+          "selection": "inferred",
+          "scope": {
+            "source": "indexed_supported_source",
+            "coverage": "partial",
+            "relationships": "authored_dependencies",
+            "exhaustive": false
+          },
+          "items": [
+            {
+              "id": "cmd/main.go::Keep#function",
+              "name": "Keep",
+              "kind": "function",
+              "file": "cmd/main.go",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Query matches keep",
+              "source_id": 1,
+              "complete": true,
+              "path": []
+            },
+            {
+              "id": "model/model.go::Request#type",
+              "name": "Request",
+              "kind": "type",
+              "file": "model/model.go",
+              "role": "dependency",
+              "depth": 1,
+              "why": "Direct declared type",
+              "source_id": 2,
+              "complete": true,
+              "path": [
+                1
+              ]
+            }
+          ],
+          "relationships": [
+            {
+              "id": 1,
+              "edge": {
+                "from": "cmd/main.go::Keep#function",
+                "to": "model/model.go::Request#type",
+                "type": "uses_type",
+                "directed": true,
+                "namespace": "loci",
+                "resolution": "import-resolved",
+                "evidence": {
+                  "file": "cmd/main.go",
+                  "line": 10,
+                  "content_hash": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15"
+                }
+              },
+              "traversed": "forward",
+              "source_ids": [
+                3,
+                4,
+                5,
+                6,
+                7,
+                8
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "id": 1,
+              "file": "cmd/main.go",
+              "start_byte": 123,
+              "end_byte": 152,
+              "start_line": 10,
+              "end_line": 10,
+              "content_hash": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15",
+              "content": "func Keep(req api.Request) {}"
+            },
+            {
+              "id": 2,
+              "file": "model/model.go",
+              "start_byte": 20,
+              "end_byte": 36,
+              "start_line": 3,
+              "end_line": 3,
+              "content_hash": "6d478b1b050450fc228dc1a04d79f699dbf67a6c2604e6e3a37c8b283f58a0cc",
+              "content": "Request struct{}"
+            },
+            {
+              "id": 3,
+              "file": "cmd/main.go",
+              "start_byte": 123,
+              "end_byte": 153,
+              "start_line": 10,
+              "end_line": 10,
+              "content_hash": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15",
+              "content": "func Keep(req api.Request) {}\n"
+            },
+            {
+              "id": 4,
+              "file": "cmd/main.go",
+              "start_byte": 0,
+              "end_byte": 13,
+              "start_line": 1,
+              "end_line": 1,
+              "content_hash": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15",
+              "content": "package main\n"
+            },
+            {
+              "id": 5,
+              "file": "cmd/main.go",
+              "start_byte": 14,
+              "end_byte": 121,
+              "start_line": 3,
+              "end_line": 8,
+              "content_hash": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15",
+              "content": "import (\n    api \"example.com/acme/model\"\n    \"example.com/acme/one\"\n    \"example.com/acme/two\"\n    \"fmt\"\n)"
+            },
+            {
+              "id": 6,
+              "file": "model/model.go",
+              "start_byte": 0,
+              "end_byte": 14,
+              "start_line": 1,
+              "end_line": 1,
+              "content_hash": "6d478b1b050450fc228dc1a04d79f699dbf67a6c2604e6e3a37c8b283f58a0cc",
+              "content": "package model\n"
+            },
+            {
+              "id": 7,
+              "file": "model/model.go",
+              "start_byte": 15,
+              "end_byte": 37,
+              "start_line": 3,
+              "end_line": 3,
+              "content_hash": "6d478b1b050450fc228dc1a04d79f699dbf67a6c2604e6e3a37c8b283f58a0cc",
+              "content": "type Request struct{}\n"
+            },
+            {
+              "id": 8,
+              "file": "go.mod",
+              "start_byte": 0,
+              "end_byte": 33,
+              "start_line": 1,
+              "end_line": 3,
+              "content_hash": "01cc905450c59f6d3133f5fd339444536aa4d2b32468f197ea50d39884391d4d",
+              "content": "module example.com/acme\n\ngo 1.23\n"
+            }
+          ],
+          "omissions": [
+            {
+              "reason": "anchor_limit",
+              "count": 2
+            }
+          ],
+          "limits": {
+            "max_hops": 3,
+            "max_nodes": 64,
+            "max_items": 12,
+            "max_neighbors": 32,
+            "max_output_bytes": 12000,
+            "max_evidence_bytes": 8000
+          },
+          "usage": {
+            "nodes_examined": 2,
+            "evidence_bytes": 219,
+            "output_bytes": 3137,
+            "estimated_tokens": 785,
+            "token_estimate_method": "utf8_bytes_div_4",
+            "output_encoding": "mcp_result_json_utf8"
+          },
+          "_evaluation": {
+            "attempt_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1/attempt/1",
+            "calls_remaining": 23,
+            "event_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1:1"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_3",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "search",
+      "arguments": {
+        "query": "Probe Missing"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_3",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "search",
+      "arguments": {
+        "query": "Probe Missing"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "cmd/main.go::Probe#function",
+              "name": "Probe",
+              "qualified_name": "Probe",
+              "kind": "function",
+              "language": "go",
+              "file_path": "cmd/main.go",
+              "byte_offset": 154,
+              "byte_length": 79,
+              "signature": "func Probe(api int) {",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "8f417d777639cc7cd28e30aaeb50d9ae6de4bdec133969ef6011ef8cf26ae970",
+              "decorators": [],
+              "keywords": [
+                "probe"
+              ],
+              "metadata": {
+                "loci": {
+                  "go_package_level": true,
+                  "go_type_configuration": "unconditional"
+                }
+              },
+              "line": 12,
+              "end_line": 16,
+              "score": 20.0
+            },
+            {
+              "id": "cmd/main.go::Missing#function",
+              "name": "Missing",
+              "qualified_name": "Missing",
+              "kind": "function",
+              "language": "go",
+              "file_path": "cmd/main.go",
+              "byte_offset": 235,
+              "byte_length": 31,
+              "signature": "func Missing() { api.Absent() }",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "f13e4733cff5722acf920ae34920f4cda4e5271df9e6be53331e1fc758b6ca42",
+              "decorators": [],
+              "keywords": [
+                "missing"
+              ],
+              "metadata": {
+                "loci": {
+                  "go_package_level": true,
+                  "go_type_configuration": "unconditional"
+                }
+              },
+              "line": 18,
+              "end_line": 18,
+              "score": 20.0
+            }
+          ],
+          "coverage": {
+            "schema_version": 1,
+            "state": "partial",
+            "scope": "repository",
+            "source_scope": "indexed_supported_source",
+            "indexed_files": 5,
+            "excluded_paths": 1,
+            "exclusions": [
+              {
+                "reason": "unsupported_file_type",
+                "paths": 1,
+                "samples": [
+                  "go.mod"
+                ],
+                "omitted_samples": 0
+              }
+            ],
+            "unknown_reason": null,
+            "query_scope": "indexed_symbols"
+          },
+          "search_id": "60e39f0d-8a7b-4731-b16c-fa14a44873d4",
+          "_evaluation": {
+            "attempt_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1/attempt/2",
+            "calls_remaining": 22,
+            "event_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1:2"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_4",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "cmd/main.go::Probe#function",
+          "cmd/main.go::Missing#function"
+        ],
+        "selected_from_search_id": "60e39f0d-8a7b-4731-b16c-fa14a44873d4",
+        "context": 4
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_4",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "cmd/main.go::Probe#function",
+          "cmd/main.go::Missing#function"
+        ],
+        "selected_from_search_id": "60e39f0d-8a7b-4731-b16c-fa14a44873d4",
+        "context": 4
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "cmd/main.go::Probe#function",
+              "source": "func Probe(api int) {\n    api.Handle()\n    shared.Open()\n    fmt.Println(api)\n}",
+              "byte_offset": 154,
+              "byte_length": 79,
+              "line": 12,
+              "end_line": 16,
+              "signature": "func Probe(api int) {",
+              "kind": "function",
+              "language": "go",
+              "context_before": [
+                ")",
+                "",
+                "func Keep(req api.Request) {}",
+                ""
+              ],
+              "context_after": [
+                "",
+                "func Missing() { api.Absent() }"
+              ]
+            },
+            {
+              "id": "cmd/main.go::Missing#function",
+              "source": "func Missing() { api.Absent() }",
+              "byte_offset": 235,
+              "byte_length": 31,
+              "line": 18,
+              "end_line": 18,
+              "signature": "func Missing() { api.Absent() }",
+              "kind": "function",
+              "language": "go",
+              "context_before": [
+                "    shared.Open()",
+                "    fmt.Println(api)",
+                "}",
+                ""
+              ],
+              "context_after": []
+            }
+          ],
+          "_evaluation": {
+            "attempt_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1/attempt/3",
+            "calls_remaining": 21,
+            "event_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1:3"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_5",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "dependencies",
+        "seed_ids": [
+          "cmd/main.go::Probe#function",
+          "cmd/main.go::Missing#function"
+        ],
+        "max_hops": 1,
+        "max_output_bytes": 14000,
+        "max_evidence_bytes": 8000,
+        "query": "Resolve direct callees of Probe and Missing, preserving shadowed, ambiguous, external, and missing endpoints."
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_5",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "dependencies",
+        "seed_ids": [
+          "cmd/main.go::Probe#function",
+          "cmd/main.go::Missing#function"
+        ],
+        "max_hops": 1,
+        "max_output_bytes": 14000,
+        "max_evidence_bytes": 8000,
+        "query": "Resolve direct callees of Probe and Missing, preserving shadowed, ambiguous, external, and missing endpoints."
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "intent": "dependencies",
+          "status": "partial",
+          "selection": "explicit",
+          "scope": {
+            "source": "indexed_supported_source",
+            "coverage": "partial",
+            "relationships": "authored_dependencies",
+            "exhaustive": false
+          },
+          "items": [
+            {
+              "id": "cmd/main.go::Probe#function",
+              "name": "Probe",
+              "kind": "function",
+              "file": "cmd/main.go",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Explicitly requested",
+              "source_id": 1,
+              "complete": true,
+              "path": []
+            },
+            {
+              "id": "cmd/main.go::Missing#function",
+              "name": "Missing",
+              "kind": "function",
+              "file": "cmd/main.go",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Explicitly requested",
+              "source_id": 2,
+              "complete": true,
+              "path": []
+            }
+          ],
+          "relationships": [],
+          "sources": [
+            {
+              "id": 1,
+              "file": "cmd/main.go",
+              "start_byte": 154,
+              "end_byte": 233,
+              "start_line": 12,
+              "end_line": 16,
+              "content_hash": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15",
+              "content": "func Probe(api int) {\n    api.Handle()\n    shared.Open()\n    fmt.Println(api)\n}"
+            },
+            {
+              "id": 2,
+              "file": "cmd/main.go",
+              "start_byte": 235,
+              "end_byte": 266,
+              "start_line": 18,
+              "end_line": 18,
+              "content_hash": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15",
+              "content": "func Missing() { api.Absent() }"
+            }
+          ],
+          "omissions": [
+            {
+              "reason": "unresolved_relation",
+              "count": 8
+            }
+          ],
+          "limits": {
+            "max_hops": 1,
+            "max_nodes": 64,
+            "max_items": 12,
+            "max_neighbors": 32,
+            "max_output_bytes": 14000,
+            "max_evidence_bytes": 8000
+          },
+          "usage": {
+            "nodes_examined": 2,
+            "evidence_bytes": 110,
+            "output_bytes": 1526,
+            "estimated_tokens": 382,
+            "token_estimate_method": "utf8_bytes_div_4",
+            "output_encoding": "mcp_result_json_utf8"
+          },
+          "_evaluation": {
+            "attempt_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1/attempt/4",
+            "calls_remaining": 20,
+            "event_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1:4"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_6",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_calls",
+      "arguments": {
+        "file": "cmd/main.go",
+        "status": "all",
+        "limit": 100,
+        "offset": 0
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_6",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_calls",
+      "arguments": {
+        "file": "cmd/main.go",
+        "status": "all",
+        "limit": 100,
+        "offset": 0
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "error": {
+            "code": "ValueError",
+            "message": "invalid record pagination"
+          },
+          "_evaluation": {
+            "attempt_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1/attempt/5",
+            "calls_remaining": 19,
+            "event_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1:5"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_7",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_calls",
+      "arguments": {
+        "status": "all",
+        "limit": 50,
+        "offset": 0
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_7",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_calls",
+      "arguments": {
+        "status": "all",
+        "limit": 50,
+        "offset": 0
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "error": {
+            "code": "ValueError",
+            "message": "invalid record pagination"
+          },
+          "_evaluation": {
+            "attempt_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1/attempt/6",
+            "calls_remaining": 18,
+            "event_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1:6"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_8",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_calls",
+      "arguments": {
+        "limit": 10
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_8",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_calls",
+      "arguments": {
+        "limit": 10
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "repo": "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-3xuk4k75/snapshot",
+          "file": null,
+          "status": "all",
+          "items": [
+            {
+              "raw": {
+                "source_file": "cmd/main.go",
+                "language": "go",
+                "line": 13,
+                "column": 5,
+                "start_byte": 180,
+                "end_byte": 192,
+                "callee_start_byte": 180,
+                "callee_end_byte": 190,
+                "callee_text": "api.Handle",
+                "callee_path": [
+                  "api",
+                  "Handle"
+                ],
+                "callee_form": "static_path",
+                "local_candidates": [],
+                "local_binding_state": "absent",
+                "member_candidates": [],
+                "member_binding_state": "absent",
+                "owner": {
+                  "kind": "callable",
+                  "definition_start_byte": 154,
+                  "definition_end_byte": 233,
+                  "body_start_byte": 174,
+                  "body_end_byte": 233
+                },
+                "source_hash": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15"
+              },
+              "caller_id": "cmd/main.go::Probe#function",
+              "caller_kind": "function",
+              "target_file": null,
+              "target_id": null,
+              "target_kind": null,
+              "status": "unresolved",
+              "resolution": null,
+              "unresolved_reason": "reference_unresolved",
+              "reference_unresolved_reason": "binding_shadowed",
+              "resolution_basis": null,
+              "support": [],
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            },
+            {
+              "raw": {
+                "source_file": "cmd/main.go",
+                "language": "go",
+                "line": 14,
+                "column": 5,
+                "start_byte": 197,
+                "end_byte": 210,
+                "callee_start_byte": 197,
+                "callee_end_byte": 208,
+                "callee_text": "shared.Open",
+                "callee_path": [
+                  "shared",
+                  "Open"
+                ],
+                "callee_form": "static_path",
+                "local_candidates": [],
+                "local_binding_state": "absent",
+                "member_candidates": [],
+                "member_binding_state": "absent",
+                "owner": {
+                  "kind": "callable",
+                  "definition_start_byte": 154,
+                  "definition_end_byte": 233,
+                  "body_start_byte": 174,
+                  "body_end_byte": 233
+                },
+                "source_hash": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15"
+              },
+              "caller_id": "cmd/main.go::Probe#function",
+              "caller_kind": "function",
+              "target_file": null,
+              "target_id": null,
+              "target_kind": null,
+              "status": "unresolved",
+              "resolution": null,
+              "unresolved_reason": "reference_unresolved",
+              "reference_unresolved_reason": "ambiguous_binding",
+              "resolution_basis": null,
+              "support": [],
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            },
+            {
+              "raw": {
+                "source_file": "cmd/main.go",
+                "language": "go",
+                "line": 15,
+                "column": 5,
+                "start_byte": 215,
+                "end_byte": 231,
+                "callee_start_byte": 215,
+                "callee_end_byte": 226,
+                "callee_text": "fmt.Println",
+                "callee_path": [
+                  "fmt",
+                  "Println"
+                ],
+                "callee_form": "static_path",
+                "local_candidates": [],
+                "local_binding_state": "absent",
+                "member_candidates": [],
+                "member_binding_state": "absent",
+                "owner": {
+                  "kind": "callable",
+                  "definition_start_byte": 154,
+                  "definition_end_byte": 233,
+                  "body_start_byte": 174,
+                  "body_end_byte": 233
+                },
+                "source_hash": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15"
+              },
+              "caller_id": "cmd/main.go::Probe#function",
+              "caller_kind": "function",
+              "target_file": null,
+              "target_id": null,
+              "target_kind": null,
+              "status": "unresolved",
+              "resolution": null,
+              "unresolved_reason": "reference_unresolved",
+              "reference_unresolved_reason": "import_unresolved",
+              "resolution_basis": null,
+              "support": [],
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            },
+            {
+              "raw": {
+                "source_file": "cmd/main.go",
+                "language": "go",
+                "line": 18,
+                "column": 18,
+                "start_byte": 252,
+                "end_byte": 264,
+                "callee_start_byte": 252,
+                "callee_end_byte": 262,
+                "callee_text": "api.Absent",
+                "callee_path": [
+                  "api",
+                  "Absent"
+                ],
+                "callee_form": "static_path",
+                "local_candidates": [],
+                "local_binding_state": "absent",
+                "member_candidates": [],
+                "member_binding_state": "absent",
+                "owner": {
+                  "kind": "callable",
+                  "definition_start_byte": 235,
+                  "definition_end_byte": 266,
+                  "body_start_byte": 250,
+                  "body_end_byte": 266
+                },
+                "source_hash": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15"
+              },
+              "caller_id": "cmd/main.go::Missing#function",
+              "caller_kind": "function",
+              "target_file": null,
+              "target_id": null,
+              "target_kind": null,
+              "status": "unresolved",
+              "resolution": null,
+              "unresolved_reason": "reference_unresolved",
+              "reference_unresolved_reason": "target_not_indexed",
+              "resolution_basis": null,
+              "support": [],
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            }
+          ],
+          "counts": {
+            "total": 4,
+            "resolved": 0,
+            "unresolved": 4,
+            "returned": 4
+          },
+          "pagination": {
+            "offset": 0,
+            "limit": 10,
+            "next_offset": null
+          },
+          "_evaluation": {
+            "attempt_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1/attempt/7",
+            "calls_remaining": 17,
+            "event_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1:7"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_9",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "cmd/main.go",
+        "start_line": 1,
+        "end_line": 18
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_9",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "cmd/main.go",
+        "start_line": 1,
+        "end_line": 18
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "file": "cmd/main.go",
+          "content": "package main\n\nimport (\n    api \"example.com/acme/model\"\n    \"example.com/acme/one\"\n    \"example.com/acme/two\"\n    \"fmt\"\n)\n\nfunc Keep(req api.Request) {}\n\nfunc Probe(api int) {\n    api.Handle()\n    shared.Open()\n    fmt.Println(api)\n}\n\nfunc Missing() { api.Absent() }\n",
+          "total_lines": 18,
+          "start_line": 1,
+          "end_line": 18,
+          "_evaluation": {
+            "attempt_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1/attempt/8",
+            "calls_remaining": 16,
+            "event_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1:8"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_10",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "model/model.go",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_10",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "model/model.go",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "file": "model/model.go",
+          "content": "package model\n\ntype Request struct{}\nfunc Handle() {}\n",
+          "total_lines": 4,
+          "start_line": 1,
+          "end_line": 4,
+          "_evaluation": {
+            "attempt_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1/attempt/9",
+            "calls_remaining": 15,
+            "event_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1:9"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_11",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "one/one.go",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_11",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "one/one.go",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "file": "one/one.go",
+          "content": "package shared\n\nfunc Open() {}\n",
+          "total_lines": 3,
+          "start_line": 1,
+          "end_line": 3,
+          "_evaluation": {
+            "attempt_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1/attempt/10",
+            "calls_remaining": 14,
+            "event_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1:10"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_12",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "two/two.go",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_12",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "two/two.go",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "file": "two/two.go",
+          "content": "package shared\n\nfunc Open() {}\n",
+          "total_lines": 3,
+          "start_line": 1,
+          "end_line": 3,
+          "_evaluation": {
+            "attempt_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1/attempt/11",
+            "calls_remaining": 13,
+            "event_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1:11"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_13",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "go.mod",
+        "start_line": 1,
+        "end_line": 5
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_13",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "go.mod",
+        "start_line": 1,
+        "end_line": 5
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "error": {
+            "code": "LociError",
+            "message": "File not found in cache"
+          },
+          "_evaluation": {
+            "attempt_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1/attempt/12",
+            "calls_remaining": 12,
+            "event_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1:12"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_14",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "seed_ids": [
+          "cmd/main.go::Keep#function"
+        ],
+        "max_hops": 2,
+        "max_output_bytes": 10000,
+        "max_evidence_bytes": 7000,
+        "query": "Determine the exact declared type origin of Keep's parameter, including import and module path provenance."
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_14",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "seed_ids": [
+          "cmd/main.go::Keep#function"
+        ],
+        "max_hops": 2,
+        "max_output_bytes": 10000,
+        "max_evidence_bytes": 7000,
+        "query": "Determine the exact declared type origin of Keep's parameter, including import and module path provenance."
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "intent": "type_dependencies",
+          "status": "ok",
+          "selection": "explicit",
+          "scope": {
+            "source": "indexed_supported_source",
+            "coverage": "partial",
+            "relationships": "authored_types",
+            "exhaustive": false
+          },
+          "items": [
+            {
+              "id": "cmd/main.go::Keep#function",
+              "name": "Keep",
+              "kind": "function",
+              "file": "cmd/main.go",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Explicitly requested",
+              "source_id": 1,
+              "complete": true,
+              "path": []
+            },
+            {
+              "id": "model/model.go::Request#type",
+              "name": "Request",
+              "kind": "type",
+              "file": "model/model.go",
+              "role": "dependency",
+              "depth": 1,
+              "why": "Direct declared type",
+              "source_id": 2,
+              "complete": true,
+              "path": [
+                1
+              ]
+            }
+          ],
+          "relationships": [
+            {
+              "id": 1,
+              "edge": {
+                "from": "cmd/main.go::Keep#function",
+                "to": "model/model.go::Request#type",
+                "type": "uses_type",
+                "directed": true,
+                "namespace": "loci",
+                "resolution": "import-resolved",
+                "evidence": {
+                  "file": "cmd/main.go",
+                  "line": 10,
+                  "content_hash": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15"
+                }
+              },
+              "traversed": "forward",
+              "source_ids": [
+                3,
+                4,
+                5,
+                6,
+                7,
+                8
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "id": 1,
+              "file": "cmd/main.go",
+              "start_byte": 123,
+              "end_byte": 152,
+              "start_line": 10,
+              "end_line": 10,
+              "content_hash": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15",
+              "content": "func Keep(req api.Request) {}"
+            },
+            {
+              "id": 2,
+              "file": "model/model.go",
+              "start_byte": 20,
+              "end_byte": 36,
+              "start_line": 3,
+              "end_line": 3,
+              "content_hash": "6d478b1b050450fc228dc1a04d79f699dbf67a6c2604e6e3a37c8b283f58a0cc",
+              "content": "Request struct{}"
+            },
+            {
+              "id": 3,
+              "file": "cmd/main.go",
+              "start_byte": 123,
+              "end_byte": 153,
+              "start_line": 10,
+              "end_line": 10,
+              "content_hash": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15",
+              "content": "func Keep(req api.Request) {}\n"
+            },
+            {
+              "id": 4,
+              "file": "cmd/main.go",
+              "start_byte": 0,
+              "end_byte": 13,
+              "start_line": 1,
+              "end_line": 1,
+              "content_hash": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15",
+              "content": "package main\n"
+            },
+            {
+              "id": 5,
+              "file": "cmd/main.go",
+              "start_byte": 14,
+              "end_byte": 121,
+              "start_line": 3,
+              "end_line": 8,
+              "content_hash": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15",
+              "content": "import (\n    api \"example.com/acme/model\"\n    \"example.com/acme/one\"\n    \"example.com/acme/two\"\n    \"fmt\"\n)"
+            },
+            {
+              "id": 6,
+              "file": "model/model.go",
+              "start_byte": 0,
+              "end_byte": 14,
+              "start_line": 1,
+              "end_line": 1,
+              "content_hash": "6d478b1b050450fc228dc1a04d79f699dbf67a6c2604e6e3a37c8b283f58a0cc",
+              "content": "package model\n"
+            },
+            {
+              "id": 7,
+              "file": "model/model.go",
+              "start_byte": 15,
+              "end_byte": 37,
+              "start_line": 3,
+              "end_line": 3,
+              "content_hash": "6d478b1b050450fc228dc1a04d79f699dbf67a6c2604e6e3a37c8b283f58a0cc",
+              "content": "type Request struct{}\n"
+            },
+            {
+              "id": 8,
+              "file": "go.mod",
+              "start_byte": 0,
+              "end_byte": 33,
+              "start_line": 1,
+              "end_line": 3,
+              "content_hash": "01cc905450c59f6d3133f5fd339444536aa4d2b32468f197ea50d39884391d4d",
+              "content": "module example.com/acme\n\ngo 1.23\n"
+            }
+          ],
+          "omissions": [],
+          "limits": {
+            "max_hops": 2,
+            "max_nodes": 64,
+            "max_items": 12,
+            "max_neighbors": 32,
+            "max_output_bytes": 10000,
+            "max_evidence_bytes": 7000
+          },
+          "usage": {
+            "nodes_examined": 2,
+            "evidence_bytes": 219,
+            "output_bytes": 3097,
+            "estimated_tokens": 775,
+            "token_estimate_method": "utf8_bytes_div_4",
+            "output_encoding": "mcp_result_json_utf8"
+          },
+          "_evaluation": {
+            "attempt_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1/attempt/13",
+            "calls_remaining": 11,
+            "event_id": "session-fe0f2c89-182d-48f7-8b62-8c16b2f2dbd1:13"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_15",
+      "type": "agent_message",
+      "text": "{\"keep_type_origin\":\"model/model.go::Request#type\",\"exact_probe_or_missing_callees\":[{\"caller\":\"Missing\",\"callee\":\"api.Absent\",\"status\":\"missing\",\"reason\":\"target_not_indexed\"},{\"caller\":\"Probe\",\"callee\":\"api.Handle\",\"status\":\"shadowed\",\"reason\":\"binding_shadowed\"},{\"caller\":\"Probe\",\"callee\":\"fmt.Println\",\"status\":\"external\",\"reason\":\"import_unresolved\"},{\"caller\":\"Probe\",\"callee\":\"shared.Open\",\"status\":\"ambiguous\",\"reason\":\"ambiguous_binding\"}],\"old_proof_survives_module_change\":false}"
+    }
+  },
+  {
+    "type": "turn.completed",
+    "usage": {
+      "input_tokens": 126697,
+      "cached_input_tokens": 97280,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 2178,
+      "reasoning_output_tokens": 1428
+    }
+  }
+]

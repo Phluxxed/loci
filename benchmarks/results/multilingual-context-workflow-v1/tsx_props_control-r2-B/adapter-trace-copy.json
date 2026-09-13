@@ -1,0 +1,362 @@
+{
+  "schema_version": 3,
+  "protocol": "multilingual-context-workflow-v1",
+  "identity": {
+    "task_id": "tsx_props_control",
+    "session_id": "session-63d1dbe2-c745-41cf-857a-115fdb9be634",
+    "arm": "B",
+    "repetition": 2,
+    "snapshot": "tsx_props",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1"
+  },
+  "events": [
+    {
+      "id": "session-63d1dbe2-c745-41cf-857a-115fdb9be634:1",
+      "task_id": "tsx_props_control",
+      "session_id": "session-63d1dbe2-c745-41cf-857a-115fdb9be634",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "tsx_props",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "Badge"
+      },
+      "search_id": "5e5a7258-d52c-49db-b40e-112b12dca1e3",
+      "response_json": "{\"symbols\":[{\"id\":\"badge.tsx::Badge#function\",\"name\":\"Badge\",\"qualified_name\":\"Badge\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"badge.tsx\",\"byte_offset\":45,\"byte_length\":67,\"signature\":\"function Badge(props: Props) { return <span>{props.label}</span>; }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"ebcb683005bc41a15d37cfa4bb595d6eb4fc6b85e5d55e4ef9a49d2de2c5d156\",\"decorators\":[],\"keywords\":[\"badge\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":71.0},{\"id\":\"badge.tsx::__file__#file\",\"name\":\"badge.tsx\",\"qualified_name\":\"__file__\",\"kind\":\"file\",\"language\":\"typescript\",\"file_path\":\"badge.tsx\",\"byte_offset\":0,\"byte_length\":0,\"signature\":\"badge.tsx\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"5b4483e65def4b4d5ddde658ece6a92969f51ca305c96f256bc8468afaefa50e\",\"decorators\":[],\"keywords\":[\"badge\"],\"metadata\":{\"loci\":{\"file_node\":true}},\"line\":1,\"end_line\":1,\"score\":21.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"5e5a7258-d52c-49db-b40e-112b12dca1e3\",\"_evaluation\":{\"attempt_id\":\"session-63d1dbe2-c745-41cf-857a-115fdb9be634/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-63d1dbe2-c745-41cf-857a-115fdb9be634:1\"}}",
+      "serialized_bytes": 1325,
+      "source_bytes": 67,
+      "elapsed_ms": 2.4834579962771386,
+      "spans": [
+        {
+          "file": "badge.tsx",
+          "start_byte": 45,
+          "end_byte": 112,
+          "sha256": "ebcb683005bc41a15d37cfa4bb595d6eb4fc6b85e5d55e4ef9a49d2de2c5d156",
+          "text": "function Badge(props: Props) { return <span>{props.label}</span>; }"
+        }
+      ]
+    },
+    {
+      "id": "session-63d1dbe2-c745-41cf-857a-115fdb9be634:2",
+      "task_id": "tsx_props_control",
+      "session_id": "session-63d1dbe2-c745-41cf-857a-115fdb9be634",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "tsx_props",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "",
+        "max_output_bytes": 12000,
+        "max_evidence_bytes": 8000,
+        "seed_ids": [
+          "badge.tsx::Badge#function"
+        ],
+        "max_hops": 2
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"ok\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"badge.tsx::Badge#function\",\"name\":\"Badge\",\"kind\":\"function\",\"file\":\"badge.tsx\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"props.ts::Props#interface\",\"name\":\"Props\",\"kind\":\"interface\",\"file\":\"props.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"badge.tsx::Badge#function\",\"to\":\"props.ts::Props#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"badge.tsx\",\"line\":2,\"content_hash\":\"5b4483e65def4b4d5ddde658ece6a92969f51ca305c96f256bc8468afaefa50e\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5]}],\"sources\":[{\"id\":1,\"file\":\"badge.tsx\",\"start_byte\":45,\"end_byte\":112,\"start_line\":2,\"end_line\":2,\"content_hash\":\"5b4483e65def4b4d5ddde658ece6a92969f51ca305c96f256bc8468afaefa50e\",\"content\":\"function Badge(props: Props) { return <span>{props.label}</span>; }\"},{\"id\":2,\"file\":\"props.ts\",\"start_byte\":7,\"end_byte\":64,\"start_line\":1,\"end_line\":1,\"content_hash\":\"4d0e8c294bd005227b1313e53ec747e068fd8c39d370ab738a91c2618529e392\",\"content\":\"interface Props { label: string; tone: \\\"quiet\\\" | \\\"loud\\\" }\"},{\"id\":3,\"file\":\"badge.tsx\",\"start_byte\":38,\"end_byte\":113,\"start_line\":2,\"end_line\":2,\"content_hash\":\"5b4483e65def4b4d5ddde658ece6a92969f51ca305c96f256bc8468afaefa50e\",\"content\":\"export function Badge(props: Props) { return <span>{props.label}</span>; }\\n\"},{\"id\":4,\"file\":\"badge.tsx\",\"start_byte\":0,\"end_byte\":38,\"start_line\":1,\"end_line\":1,\"content_hash\":\"5b4483e65def4b4d5ddde658ece6a92969f51ca305c96f256bc8468afaefa50e\",\"content\":\"import type { Props } from \\\"./props\\\";\\n\"},{\"id\":5,\"file\":\"props.ts\",\"start_byte\":0,\"end_byte\":65,\"start_line\":1,\"end_line\":1,\"content_hash\":\"4d0e8c294bd005227b1313e53ec747e068fd8c39d370ab738a91c2618529e392\",\"content\":\"export interface Props { label: string; tone: \\\"quiet\\\" | \\\"loud\\\" }\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":12000,\"max_evidence_bytes\":8000},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":178,\"output_bytes\":2536,\"estimated_tokens\":634,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-63d1dbe2-c745-41cf-857a-115fdb9be634/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-63d1dbe2-c745-41cf-857a-115fdb9be634:2\"}}",
+      "serialized_bytes": 2652,
+      "source_bytes": 302,
+      "elapsed_ms": 6.06329197762534,
+      "spans": [
+        {
+          "file": "badge.tsx",
+          "start_byte": 45,
+          "end_byte": 112,
+          "sha256": "ebcb683005bc41a15d37cfa4bb595d6eb4fc6b85e5d55e4ef9a49d2de2c5d156",
+          "text": "function Badge(props: Props) { return <span>{props.label}</span>; }"
+        },
+        {
+          "file": "props.ts",
+          "start_byte": 7,
+          "end_byte": 64,
+          "sha256": "26a2217f5238a20e7f8240af37e4ff823b294efabf106fa5da664cfb415ee4c5",
+          "text": "interface Props { label: string; tone: \"quiet\" | \"loud\" }"
+        },
+        {
+          "file": "badge.tsx",
+          "start_byte": 38,
+          "end_byte": 113,
+          "sha256": "e407b1df0cbd1f053aeb06fb1a0342754218a61be83eb3969b7c57302913d550",
+          "text": "export function Badge(props: Props) { return <span>{props.label}</span>; }\n"
+        },
+        {
+          "file": "badge.tsx",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "79fae5d0e4a3855ab3b825faf7e5fde2628f832ad326dd17fffa19f916562fe1",
+          "text": "import type { Props } from \"./props\";\n"
+        },
+        {
+          "file": "props.ts",
+          "start_byte": 0,
+          "end_byte": 65,
+          "sha256": "4d0e8c294bd005227b1313e53ec747e068fd8c39d370ab738a91c2618529e392",
+          "text": "export interface Props { label: string; tone: \"quiet\" | \"loud\" }\n"
+        }
+      ]
+    },
+    {
+      "id": "session-63d1dbe2-c745-41cf-857a-115fdb9be634:3",
+      "task_id": "tsx_props_control",
+      "session_id": "session-63d1dbe2-c745-41cf-857a-115fdb9be634",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "tsx_props",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "badge.tsx::Badge#function"
+        ],
+        "context": 2,
+        "selected_from_search_id": "5e5a7258-d52c-49db-b40e-112b12dca1e3"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"badge.tsx::Badge#function\",\"source\":\"function Badge(props: Props) { return <span>{props.label}</span>; }\",\"byte_offset\":45,\"byte_length\":67,\"line\":2,\"end_line\":2,\"signature\":\"function Badge(props: Props) { return <span>{props.label}</span>; }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import type { Props } from \\\"./props\\\";\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-63d1dbe2-c745-41cf-857a-115fdb9be634/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-63d1dbe2-c745-41cf-857a-115fdb9be634:3\"}}",
+      "serialized_bytes": 554,
+      "source_bytes": 171,
+      "elapsed_ms": 10.209625004790723,
+      "spans": [
+        {
+          "file": "badge.tsx",
+          "start_byte": 45,
+          "end_byte": 112,
+          "sha256": "ebcb683005bc41a15d37cfa4bb595d6eb4fc6b85e5d55e4ef9a49d2de2c5d156",
+          "text": "function Badge(props: Props) { return <span>{props.label}</span>; }"
+        },
+        {
+          "file": "badge.tsx",
+          "start_byte": 0,
+          "end_byte": 37,
+          "sha256": "365a8acb0b80d313001bdb127c140358ab263e34fd14d2894e0a6c08a2bf2f28",
+          "text": "import type { Props } from \"./props\";"
+        },
+        {
+          "file": "badge.tsx",
+          "start_byte": 45,
+          "end_byte": 112,
+          "sha256": "ebcb683005bc41a15d37cfa4bb595d6eb4fc6b85e5d55e4ef9a49d2de2c5d156",
+          "text": "function Badge(props: Props) { return <span>{props.label}</span>; }"
+        }
+      ]
+    },
+    {
+      "id": "session-63d1dbe2-c745-41cf-857a-115fdb9be634:4",
+      "task_id": "tsx_props_control",
+      "session_id": "session-63d1dbe2-c745-41cf-857a-115fdb9be634",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "tsx_props",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "props.ts::Props#interface"
+        ],
+        "context": 1
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"props.ts::Props#interface\",\"source\":\"interface Props { label: string; tone: \\\"quiet\\\" | \\\"loud\\\" }\",\"byte_offset\":7,\"byte_length\":57,\"line\":1,\"end_line\":1,\"signature\":\"interface Props { label: string; tone: \\\"quiet\\\" | \\\"loud\\\" }\",\"kind\":\"interface\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-63d1dbe2-c745-41cf-857a-115fdb9be634/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-63d1dbe2-c745-41cf-857a-115fdb9be634:4\"}}",
+      "serialized_bytes": 501,
+      "source_bytes": 114,
+      "elapsed_ms": 3.3464579901192337,
+      "spans": [
+        {
+          "file": "props.ts",
+          "start_byte": 7,
+          "end_byte": 64,
+          "sha256": "26a2217f5238a20e7f8240af37e4ff823b294efabf106fa5da664cfb415ee4c5",
+          "text": "interface Props { label: string; tone: \"quiet\" | \"loud\" }"
+        },
+        {
+          "file": "props.ts",
+          "start_byte": 7,
+          "end_byte": 64,
+          "sha256": "26a2217f5238a20e7f8240af37e4ff823b294efabf106fa5da664cfb415ee4c5",
+          "text": "interface Props { label: string; tone: \"quiet\" | \"loud\" }"
+        }
+      ]
+    }
+  ],
+  "failures": [],
+  "attempts": 4,
+  "deliveries": [
+    {
+      "attempt_id": "session-63d1dbe2-c745-41cf-857a-115fdb9be634/attempt/1",
+      "operation": "search",
+      "arguments": {
+        "query": "Badge"
+      },
+      "reason": "task_context",
+      "detail": "Observed search request.",
+      "because": null,
+      "response_json": "{\"symbols\":[{\"id\":\"badge.tsx::Badge#function\",\"name\":\"Badge\",\"qualified_name\":\"Badge\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"badge.tsx\",\"byte_offset\":45,\"byte_length\":67,\"signature\":\"function Badge(props: Props) { return <span>{props.label}</span>; }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"ebcb683005bc41a15d37cfa4bb595d6eb4fc6b85e5d55e4ef9a49d2de2c5d156\",\"decorators\":[],\"keywords\":[\"badge\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":71.0},{\"id\":\"badge.tsx::__file__#file\",\"name\":\"badge.tsx\",\"qualified_name\":\"__file__\",\"kind\":\"file\",\"language\":\"typescript\",\"file_path\":\"badge.tsx\",\"byte_offset\":0,\"byte_length\":0,\"signature\":\"badge.tsx\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"5b4483e65def4b4d5ddde658ece6a92969f51ca305c96f256bc8468afaefa50e\",\"decorators\":[],\"keywords\":[\"badge\"],\"metadata\":{\"loci\":{\"file_node\":true}},\"line\":1,\"end_line\":1,\"score\":21.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"5e5a7258-d52c-49db-b40e-112b12dca1e3\",\"_evaluation\":{\"attempt_id\":\"session-63d1dbe2-c745-41cf-857a-115fdb9be634/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-63d1dbe2-c745-41cf-857a-115fdb9be634:1\"}}",
+      "serialized_bytes": 1325,
+      "source_bytes": 67,
+      "elapsed_ms": 2.5697499804664403,
+      "trace_event_id": "session-63d1dbe2-c745-41cf-857a-115fdb9be634:1",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "badge.tsx",
+          "start_byte": 45,
+          "end_byte": 112,
+          "sha256": "ebcb683005bc41a15d37cfa4bb595d6eb4fc6b85e5d55e4ef9a49d2de2c5d156",
+          "text": "function Badge(props: Props) { return <span>{props.label}</span>; }"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-63d1dbe2-c745-41cf-857a-115fdb9be634/attempt/2",
+      "operation": "explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "",
+        "max_output_bytes": 12000,
+        "max_evidence_bytes": 8000,
+        "seed_ids": [
+          "badge.tsx::Badge#function"
+        ],
+        "max_hops": 2
+      },
+      "reason": "task_context",
+      "detail": "Observed loci_explore request.",
+      "because": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"ok\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"badge.tsx::Badge#function\",\"name\":\"Badge\",\"kind\":\"function\",\"file\":\"badge.tsx\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"props.ts::Props#interface\",\"name\":\"Props\",\"kind\":\"interface\",\"file\":\"props.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"badge.tsx::Badge#function\",\"to\":\"props.ts::Props#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"badge.tsx\",\"line\":2,\"content_hash\":\"5b4483e65def4b4d5ddde658ece6a92969f51ca305c96f256bc8468afaefa50e\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5]}],\"sources\":[{\"id\":1,\"file\":\"badge.tsx\",\"start_byte\":45,\"end_byte\":112,\"start_line\":2,\"end_line\":2,\"content_hash\":\"5b4483e65def4b4d5ddde658ece6a92969f51ca305c96f256bc8468afaefa50e\",\"content\":\"function Badge(props: Props) { return <span>{props.label}</span>; }\"},{\"id\":2,\"file\":\"props.ts\",\"start_byte\":7,\"end_byte\":64,\"start_line\":1,\"end_line\":1,\"content_hash\":\"4d0e8c294bd005227b1313e53ec747e068fd8c39d370ab738a91c2618529e392\",\"content\":\"interface Props { label: string; tone: \\\"quiet\\\" | \\\"loud\\\" }\"},{\"id\":3,\"file\":\"badge.tsx\",\"start_byte\":38,\"end_byte\":113,\"start_line\":2,\"end_line\":2,\"content_hash\":\"5b4483e65def4b4d5ddde658ece6a92969f51ca305c96f256bc8468afaefa50e\",\"content\":\"export function Badge(props: Props) { return <span>{props.label}</span>; }\\n\"},{\"id\":4,\"file\":\"badge.tsx\",\"start_byte\":0,\"end_byte\":38,\"start_line\":1,\"end_line\":1,\"content_hash\":\"5b4483e65def4b4d5ddde658ece6a92969f51ca305c96f256bc8468afaefa50e\",\"content\":\"import type { Props } from \\\"./props\\\";\\n\"},{\"id\":5,\"file\":\"props.ts\",\"start_byte\":0,\"end_byte\":65,\"start_line\":1,\"end_line\":1,\"content_hash\":\"4d0e8c294bd005227b1313e53ec747e068fd8c39d370ab738a91c2618529e392\",\"content\":\"export interface Props { label: string; tone: \\\"quiet\\\" | \\\"loud\\\" }\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":12000,\"max_evidence_bytes\":8000},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":178,\"output_bytes\":2536,\"estimated_tokens\":634,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-63d1dbe2-c745-41cf-857a-115fdb9be634/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-63d1dbe2-c745-41cf-857a-115fdb9be634:2\"}}",
+      "serialized_bytes": 2652,
+      "source_bytes": 302,
+      "elapsed_ms": 6.180666998261586,
+      "trace_event_id": "session-63d1dbe2-c745-41cf-857a-115fdb9be634:2",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "badge.tsx",
+          "start_byte": 45,
+          "end_byte": 112,
+          "sha256": "ebcb683005bc41a15d37cfa4bb595d6eb4fc6b85e5d55e4ef9a49d2de2c5d156",
+          "text": "function Badge(props: Props) { return <span>{props.label}</span>; }"
+        },
+        {
+          "file": "props.ts",
+          "start_byte": 7,
+          "end_byte": 64,
+          "sha256": "26a2217f5238a20e7f8240af37e4ff823b294efabf106fa5da664cfb415ee4c5",
+          "text": "interface Props { label: string; tone: \"quiet\" | \"loud\" }"
+        },
+        {
+          "file": "badge.tsx",
+          "start_byte": 38,
+          "end_byte": 113,
+          "sha256": "e407b1df0cbd1f053aeb06fb1a0342754218a61be83eb3969b7c57302913d550",
+          "text": "export function Badge(props: Props) { return <span>{props.label}</span>; }\n"
+        },
+        {
+          "file": "badge.tsx",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "79fae5d0e4a3855ab3b825faf7e5fde2628f832ad326dd17fffa19f916562fe1",
+          "text": "import type { Props } from \"./props\";\n"
+        },
+        {
+          "file": "props.ts",
+          "start_byte": 0,
+          "end_byte": 65,
+          "sha256": "4d0e8c294bd005227b1313e53ec747e068fd8c39d370ab738a91c2618529e392",
+          "text": "export interface Props { label: string; tone: \"quiet\" | \"loud\" }\n"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-63d1dbe2-c745-41cf-857a-115fdb9be634/attempt/3",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "badge.tsx::Badge#function"
+        ],
+        "context": 2,
+        "selected_from_search_id": "5e5a7258-d52c-49db-b40e-112b12dca1e3"
+      },
+      "reason": "task_context",
+      "detail": "Observed get request.",
+      "because": null,
+      "response_json": "{\"symbols\":[{\"id\":\"badge.tsx::Badge#function\",\"source\":\"function Badge(props: Props) { return <span>{props.label}</span>; }\",\"byte_offset\":45,\"byte_length\":67,\"line\":2,\"end_line\":2,\"signature\":\"function Badge(props: Props) { return <span>{props.label}</span>; }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import type { Props } from \\\"./props\\\";\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-63d1dbe2-c745-41cf-857a-115fdb9be634/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-63d1dbe2-c745-41cf-857a-115fdb9be634:3\"}}",
+      "serialized_bytes": 554,
+      "source_bytes": 171,
+      "elapsed_ms": 10.299624991603196,
+      "trace_event_id": "session-63d1dbe2-c745-41cf-857a-115fdb9be634:3",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "badge.tsx",
+          "start_byte": 45,
+          "end_byte": 112,
+          "sha256": "ebcb683005bc41a15d37cfa4bb595d6eb4fc6b85e5d55e4ef9a49d2de2c5d156",
+          "text": "function Badge(props: Props) { return <span>{props.label}</span>; }"
+        },
+        {
+          "file": "badge.tsx",
+          "start_byte": 0,
+          "end_byte": 37,
+          "sha256": "365a8acb0b80d313001bdb127c140358ab263e34fd14d2894e0a6c08a2bf2f28",
+          "text": "import type { Props } from \"./props\";"
+        },
+        {
+          "file": "badge.tsx",
+          "start_byte": 45,
+          "end_byte": 112,
+          "sha256": "ebcb683005bc41a15d37cfa4bb595d6eb4fc6b85e5d55e4ef9a49d2de2c5d156",
+          "text": "function Badge(props: Props) { return <span>{props.label}</span>; }"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-63d1dbe2-c745-41cf-857a-115fdb9be634/attempt/4",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "props.ts::Props#interface"
+        ],
+        "context": 1
+      },
+      "reason": "task_context",
+      "detail": "Observed get request.",
+      "because": null,
+      "response_json": "{\"symbols\":[{\"id\":\"props.ts::Props#interface\",\"source\":\"interface Props { label: string; tone: \\\"quiet\\\" | \\\"loud\\\" }\",\"byte_offset\":7,\"byte_length\":57,\"line\":1,\"end_line\":1,\"signature\":\"interface Props { label: string; tone: \\\"quiet\\\" | \\\"loud\\\" }\",\"kind\":\"interface\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-63d1dbe2-c745-41cf-857a-115fdb9be634/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-63d1dbe2-c745-41cf-857a-115fdb9be634:4\"}}",
+      "serialized_bytes": 501,
+      "source_bytes": 114,
+      "elapsed_ms": 3.4527499810792506,
+      "trace_event_id": "session-63d1dbe2-c745-41cf-857a-115fdb9be634:4",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "props.ts",
+          "start_byte": 7,
+          "end_byte": 64,
+          "sha256": "26a2217f5238a20e7f8240af37e4ff823b294efabf106fa5da664cfb415ee4c5",
+          "text": "interface Props { label: string; tone: \"quiet\" | \"loud\" }"
+        },
+        {
+          "file": "props.ts",
+          "start_byte": 7,
+          "end_byte": 64,
+          "sha256": "26a2217f5238a20e7f8240af37e4ff823b294efabf106fa5da664cfb415ee4c5",
+          "text": "interface Props { label: string; tone: \"quiet\" | \"loud\" }"
+        }
+      ]
+    }
+  ]
+}

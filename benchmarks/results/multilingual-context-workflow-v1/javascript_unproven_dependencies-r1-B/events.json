@@ -1,0 +1,1924 @@
+[
+  {
+    "type": "thread.started",
+    "thread_id": "01a09819-3eba-71f2-af52-861c4c3a82a4"
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_0",
+      "type": "error",
+      "message": "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-mtntvvnw/agent-runtime/config.toml."
+    }
+  },
+  {
+    "type": "turn.started"
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_1",
+      "type": "agent_message",
+      "text": ""
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "dependencies",
+        "max_hops": 2,
+        "query": "Inspect bad.js declarations and identify proven dependency targets for unproven, default_forwarded_by_star, computed_call_exact, shadowed_Thing_is_import, commonjs_member_proven, dynamic_import_proven, computed_base_proven, and jsdoc_type_supported. Preserve unresolved and unsupported relationships."
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "dependencies",
+        "max_hops": 2,
+        "query": "Inspect bad.js declarations and identify proven dependency targets for unproven, default_forwarded_by_star, computed_call_exact, shadowed_Thing_is_import, commonjs_member_proven, dynamic_import_proven, computed_base_proven, and jsdoc_type_supported. Preserve unresolved and unsupported relationships."
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "intent": "dependencies",
+          "status": "partial",
+          "selection": "inferred",
+          "scope": {
+            "source": "indexed_supported_source",
+            "coverage": "complete",
+            "relationships": "authored_dependencies",
+            "exhaustive": false
+          },
+          "items": [
+            {
+              "id": "bad.js::shadowed#function",
+              "name": "shadowed",
+              "kind": "function",
+              "file": "bad.js",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Query matches bad, js, shadowed, thing",
+              "source_id": 1,
+              "complete": true,
+              "path": []
+            }
+          ],
+          "relationships": [],
+          "sources": [
+            {
+              "id": 1,
+              "file": "bad.js",
+              "start_byte": 204,
+              "end_byte": 248,
+              "start_line": 6,
+              "end_line": 6,
+              "content_hash": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+              "content": "function shadowed(Thing) { return Thing(); }"
+            }
+          ],
+          "omissions": [
+            {
+              "reason": "anchor_limit",
+              "count": 8
+            },
+            {
+              "reason": "unresolved_relation",
+              "count": 2
+            }
+          ],
+          "limits": {
+            "max_hops": 2,
+            "max_nodes": 64,
+            "max_items": 12,
+            "max_neighbors": 32,
+            "max_output_bytes": 16384,
+            "max_evidence_bytes": 8192
+          },
+          "usage": {
+            "nodes_examined": 1,
+            "evidence_bytes": 44,
+            "output_bytes": 1122,
+            "estimated_tokens": 281,
+            "token_estimate_method": "utf8_bytes_div_4",
+            "output_encoding": "mcp_result_json_utf8"
+          },
+          "_evaluation": {
+            "attempt_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761/attempt/1",
+            "calls_remaining": 23,
+            "event_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761:1"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_3",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "search",
+      "arguments": {
+        "query": "unproven default_forwarded_by_star computed_call_exact shadowed_Thing_is_import commonjs_member_proven dynamic_import_proven computed_base_proven jsdoc_type_supported"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_3",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "search",
+      "arguments": {
+        "query": "unproven default_forwarded_by_star computed_call_exact shadowed_Thing_is_import commonjs_member_proven dynamic_import_proven computed_base_proven jsdoc_type_supported"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "bad.js::unproven#function",
+              "name": "unproven",
+              "qualified_name": "unproven",
+              "kind": "function",
+              "language": "javascript",
+              "file_path": "bad.js",
+              "byte_offset": 138,
+              "byte_length": 58,
+              "signature": "function unproven() { return [Thing, Factory, External]; }",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "6522ac544fc6e9dca38c175edc521c5470035abbdeb32b6a3aad7b1ad03c6450",
+              "decorators": [],
+              "keywords": [
+                "unproven"
+              ],
+              "metadata": {},
+              "line": 5,
+              "end_line": 5,
+              "score": 24.0
+            },
+            {
+              "id": "bad.js::shadowed#function",
+              "name": "shadowed",
+              "qualified_name": "shadowed",
+              "kind": "function",
+              "language": "javascript",
+              "file_path": "bad.js",
+              "byte_offset": 204,
+              "byte_length": 44,
+              "signature": "function shadowed(Thing) { return Thing(); }",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "2c2941ecb270d8c5f2fd8eb5c8c133a0b3b2d5d5e79922fabfe4e060c8b05343",
+              "decorators": [],
+              "keywords": [
+                "shadowed"
+              ],
+              "metadata": {},
+              "line": 6,
+              "end_line": 6,
+              "score": 22.0
+            },
+            {
+              "id": "bad.js::dynamic#function",
+              "name": "dynamic",
+              "qualified_name": "dynamic",
+              "kind": "function",
+              "language": "javascript",
+              "file_path": "bad.js",
+              "byte_offset": 398,
+              "byte_length": 47,
+              "signature": "function dynamic(path) { return import(path); }",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "d079757c6cb4cbacb0f4ffd111e2c4b0490ebd0f902ed37d01ef3ac8c607cace",
+              "decorators": [],
+              "keywords": [
+                "dynamic"
+              ],
+              "metadata": {},
+              "line": 9,
+              "end_line": 9,
+              "score": 22.0
+            },
+            {
+              "id": "bad.js::computed#function",
+              "name": "computed",
+              "qualified_name": "computed",
+              "kind": "function",
+              "language": "javascript",
+              "file_path": "bad.js",
+              "byte_offset": 256,
+              "byte_length": 47,
+              "signature": "function computed(key) { return model[key](); }",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "a3655a9a9c72e59c1c4af1d6a00fce7de36149a6011d7f5d17a9af79ba4d9708",
+              "decorators": [],
+              "keywords": [
+                "computed"
+              ],
+              "metadata": {},
+              "line": 7,
+              "end_line": 7,
+              "score": 20.0
+            },
+            {
+              "id": "bad.js::Dynamic#class",
+              "name": "Dynamic",
+              "qualified_name": "Dynamic",
+              "kind": "class",
+              "language": "javascript",
+              "file_path": "bad.js",
+              "byte_offset": 453,
+              "byte_length": 37,
+              "signature": "class Dynamic extends chooseBase() {}",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "6c30aa9b97acc481eb4b5014e63bf8510bc43d2274ac357763d176c093c67176",
+              "decorators": [],
+              "keywords": [
+                "dynamic"
+              ],
+              "metadata": {},
+              "line": 10,
+              "end_line": 10,
+              "score": 18.0
+            }
+          ],
+          "coverage": {
+            "schema_version": 1,
+            "state": "complete",
+            "scope": "repository",
+            "source_scope": "indexed_supported_source",
+            "indexed_files": 4,
+            "excluded_paths": 0,
+            "exclusions": [],
+            "unknown_reason": null,
+            "query_scope": "indexed_symbols"
+          },
+          "search_id": "8719f412-779b-4431-b7ed-6adffad4d036",
+          "_evaluation": {
+            "attempt_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761/attempt/2",
+            "calls_remaining": 22,
+            "event_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761:2"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_4",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "bad.js",
+        "start_line": 1,
+        "end_line": 40
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_4",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "bad.js",
+        "start_line": 1,
+        "end_line": 40
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "file": "bad.js",
+          "content": "import Factory, { Thing } from \"./barrel.js\";\nimport * as model from \"./left.js\";\nimport { External } from \"uninstalled-package\";\n\nexport function unproven() { return [Thing, Factory, External]; }\nexport function shadowed(Thing) { return Thing(); }\nexport function computed(key) { return model[key](); }\nexport function legacy() { const loaded = require(\"./left.js\"); return loaded.Thing; }\nexport function dynamic(path) { return import(path); }\nexport class Dynamic extends chooseBase() {}\n/** @param {Thing} value */\nexport function documented(value) { return value; }\n",
+          "total_lines": 12,
+          "start_line": 1,
+          "end_line": 12,
+          "_evaluation": {
+            "attempt_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761/attempt/3",
+            "calls_remaining": 21,
+            "event_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761:3"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_5",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "outline",
+      "arguments": {
+        "file": null
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_5",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "outline",
+      "arguments": {
+        "file": null
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "files": [
+            {
+              "file": "bad.js",
+              "symbols": [
+                {
+                  "id": "bad.js::unproven#function",
+                  "name": "unproven",
+                  "kind": "function",
+                  "line": 5,
+                  "end_line": 5,
+                  "signature": "function unproven() { return [Thing, Factory, External]; }",
+                  "summary": ""
+                },
+                {
+                  "id": "bad.js::shadowed#function",
+                  "name": "shadowed",
+                  "kind": "function",
+                  "line": 6,
+                  "end_line": 6,
+                  "signature": "function shadowed(Thing) { return Thing(); }",
+                  "summary": ""
+                },
+                {
+                  "id": "bad.js::computed#function",
+                  "name": "computed",
+                  "kind": "function",
+                  "line": 7,
+                  "end_line": 7,
+                  "signature": "function computed(key) { return model[key](); }",
+                  "summary": ""
+                },
+                {
+                  "id": "bad.js::legacy#function",
+                  "name": "legacy",
+                  "kind": "function",
+                  "line": 8,
+                  "end_line": 8,
+                  "signature": "function legacy() { const loaded = require(\"./left.js\"); return loaded.Thing; }",
+                  "summary": ""
+                },
+                {
+                  "id": "bad.js::dynamic#function",
+                  "name": "dynamic",
+                  "kind": "function",
+                  "line": 9,
+                  "end_line": 9,
+                  "signature": "function dynamic(path) { return import(path); }",
+                  "summary": ""
+                },
+                {
+                  "id": "bad.js::Dynamic#class",
+                  "name": "Dynamic",
+                  "kind": "class",
+                  "line": 10,
+                  "end_line": 10,
+                  "signature": "class Dynamic extends chooseBase() {}",
+                  "summary": ""
+                },
+                {
+                  "id": "bad.js::documented#function",
+                  "name": "documented",
+                  "kind": "function",
+                  "line": 12,
+                  "end_line": 12,
+                  "signature": "function documented(value) { return value; }",
+                  "summary": ""
+                },
+                {
+                  "id": "bad.js::__file__#file",
+                  "name": "bad.js",
+                  "kind": "file",
+                  "line": 1,
+                  "end_line": 1,
+                  "signature": "bad.js",
+                  "summary": ""
+                }
+              ]
+            },
+            {
+              "file": "barrel.js",
+              "symbols": [
+                {
+                  "id": "barrel.js::__file__#file",
+                  "name": "barrel.js",
+                  "kind": "file",
+                  "line": 1,
+                  "end_line": 1,
+                  "signature": "barrel.js",
+                  "summary": ""
+                }
+              ]
+            },
+            {
+              "file": "left.js",
+              "symbols": [
+                {
+                  "id": "left.js::Thing#class",
+                  "name": "Thing",
+                  "kind": "class",
+                  "line": 1,
+                  "end_line": 1,
+                  "signature": "class Thing {}",
+                  "summary": ""
+                },
+                {
+                  "id": "left.js::Factory#function",
+                  "name": "Factory",
+                  "kind": "function",
+                  "line": 2,
+                  "end_line": 2,
+                  "signature": "function Factory() {}",
+                  "summary": ""
+                },
+                {
+                  "id": "left.js::__file__#file",
+                  "name": "left.js",
+                  "kind": "file",
+                  "line": 1,
+                  "end_line": 1,
+                  "signature": "left.js",
+                  "summary": ""
+                }
+              ]
+            },
+            {
+              "file": "right.js",
+              "symbols": [
+                {
+                  "id": "right.js::Thing#class",
+                  "name": "Thing",
+                  "kind": "class",
+                  "line": 1,
+                  "end_line": 1,
+                  "signature": "class Thing {}",
+                  "summary": ""
+                },
+                {
+                  "id": "right.js::__file__#file",
+                  "name": "right.js",
+                  "kind": "file",
+                  "line": 1,
+                  "end_line": 1,
+                  "signature": "right.js",
+                  "summary": ""
+                }
+              ]
+            }
+          ],
+          "_evaluation": {
+            "attempt_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761/attempt/4",
+            "calls_remaining": 20,
+            "event_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761:4"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_6",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "barrel.js",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_6",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "barrel.js",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "file": "barrel.js",
+          "content": "export * from \"./left.js\";\nexport * from \"./right.js\";\n",
+          "total_lines": 2,
+          "start_line": 1,
+          "end_line": 2,
+          "_evaluation": {
+            "attempt_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761/attempt/5",
+            "calls_remaining": 19,
+            "event_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761:5"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_7",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "left.js",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_7",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "left.js",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "file": "left.js",
+          "content": "export class Thing {}\nexport default function Factory() {}\n",
+          "total_lines": 2,
+          "start_line": 1,
+          "end_line": 2,
+          "_evaluation": {
+            "attempt_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761/attempt/6",
+            "calls_remaining": 18,
+            "event_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761:6"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_8",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "right.js",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_8",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "right.js",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "file": "right.js",
+          "content": "export class Thing {}\n",
+          "total_lines": 1,
+          "start_line": 1,
+          "end_line": 1,
+          "_evaluation": {
+            "attempt_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761/attempt/7",
+            "calls_remaining": 17,
+            "event_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761:7"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_9",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "grep",
+      "arguments": {
+        "pattern": "default_forwarded_by_star|computed_call_exact|commonjs_member_proven|dynamic_import_proven|computed_base_proven|jsdoc_type_supported"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_9",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "grep",
+      "arguments": {
+        "pattern": "default_forwarded_by_star|computed_call_exact|commonjs_member_proven|dynamic_import_proven|computed_base_proven|jsdoc_type_supported"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "matches": [],
+          "coverage": {
+            "schema_version": 1,
+            "state": "complete",
+            "scope": "repository",
+            "source_scope": "indexed_supported_source",
+            "indexed_files": 4,
+            "excluded_paths": 0,
+            "exclusions": [],
+            "unknown_reason": null,
+            "query_scope": "indexed_source_text"
+          },
+          "_evaluation": {
+            "attempt_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761/attempt/8",
+            "calls_remaining": 16,
+            "event_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761:8"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_10",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_imports",
+      "arguments": {
+        "file": "bad.js",
+        "limit": 100,
+        "offset": 0,
+        "status": "all"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_10",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_imports",
+      "arguments": {
+        "file": "bad.js",
+        "limit": 100,
+        "offset": 0,
+        "status": "all"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "error": {
+            "code": "ValueError",
+            "message": "invalid record pagination"
+          },
+          "_evaluation": {
+            "attempt_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761/attempt/9",
+            "calls_remaining": 15,
+            "event_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761:9"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_11",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_imports",
+      "arguments": {
+        "file": "bad.js",
+        "limit": 20,
+        "offset": 0,
+        "status": "resolved"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_11",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_imports",
+      "arguments": {
+        "file": "bad.js",
+        "limit": 20,
+        "offset": 0,
+        "status": "resolved"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "repo": "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-mtntvvnw/snapshot",
+          "file": "bad.js",
+          "status": "resolved",
+          "items": [
+            {
+              "raw": {
+                "source_file": "bad.js",
+                "language": "javascript",
+                "line": 1,
+                "text": "import Factory, { Thing } from \"./barrel.js\";",
+                "specifier": "./barrel.js",
+                "imported_name": null,
+                "type_only": false,
+                "is_reexport": false,
+                "source_hash": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+                "rust": null
+              },
+              "source_file": "bad.js",
+              "source_id": "bad.js::__file__#file",
+              "target_file": "barrel.js",
+              "target_package": null,
+              "target_crate": null,
+              "target_module": null,
+              "target_kind": "file",
+              "target_id": "barrel.js::__file__#file",
+              "specifier": "./barrel.js",
+              "imported_name": null,
+              "language": "javascript",
+              "line": 1,
+              "text": "import Factory, { Thing } from \"./barrel.js\";",
+              "type_only": false,
+              "is_reexport": false,
+              "status": "resolved",
+              "resolution": "import-resolved",
+              "unresolved_reason": null,
+              "resolution_basis": "relative_path",
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            },
+            {
+              "raw": {
+                "source_file": "bad.js",
+                "language": "javascript",
+                "line": 2,
+                "text": "import * as model from \"./left.js\";",
+                "specifier": "./left.js",
+                "imported_name": null,
+                "type_only": false,
+                "is_reexport": false,
+                "source_hash": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+                "rust": null
+              },
+              "source_file": "bad.js",
+              "source_id": "bad.js::__file__#file",
+              "target_file": "left.js",
+              "target_package": null,
+              "target_crate": null,
+              "target_module": null,
+              "target_kind": "file",
+              "target_id": "left.js::__file__#file",
+              "specifier": "./left.js",
+              "imported_name": null,
+              "language": "javascript",
+              "line": 2,
+              "text": "import * as model from \"./left.js\";",
+              "type_only": false,
+              "is_reexport": false,
+              "status": "resolved",
+              "resolution": "import-resolved",
+              "unresolved_reason": null,
+              "resolution_basis": "relative_path",
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            }
+          ],
+          "counts": {
+            "total": 3,
+            "resolved": 2,
+            "unresolved": 1,
+            "returned": 2
+          },
+          "pagination": {
+            "offset": 0,
+            "limit": 20,
+            "next_offset": null
+          },
+          "_evaluation": {
+            "attempt_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761/attempt/10",
+            "calls_remaining": 14,
+            "event_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761:10"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_12",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_references",
+      "arguments": {
+        "file": "bad.js",
+        "limit": 20,
+        "offset": 0,
+        "status": "all"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_12",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_references",
+      "arguments": {
+        "file": "bad.js",
+        "limit": 20,
+        "offset": 0,
+        "status": "all"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "repo": "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-mtntvvnw/snapshot",
+          "file": "bad.js",
+          "status": "all",
+          "items": [
+            {
+              "raw": {
+                "source_file": "bad.js",
+                "language": "javascript",
+                "line": 5,
+                "column": 38,
+                "start_byte": 168,
+                "end_byte": 173,
+                "text": "Thing",
+                "path": [
+                  "Thing"
+                ],
+                "candidate_bindings": [
+                  {
+                    "local_name": "Thing",
+                    "imported_name": "Thing",
+                    "exported_name": null,
+                    "kind": "symbol",
+                    "type_only": false,
+                    "module_level": true,
+                    "declaration_start_byte": 0,
+                    "scope_start_byte": 0,
+                    "scope_end_byte": 571,
+                    "import_line": 1,
+                    "import_text": "import Factory, { Thing } from \"./barrel.js\";",
+                    "import_specifier": "./barrel.js"
+                  }
+                ],
+                "binding_state": "definite",
+                "source_hash": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+                "owner": {
+                  "kind": "callable",
+                  "definition_start_byte": 138,
+                  "definition_end_byte": 196,
+                  "body_start_byte": 158,
+                  "body_end_byte": 196
+                }
+              },
+              "binding": {
+                "local_name": "Thing",
+                "imported_name": "Thing",
+                "exported_name": null,
+                "kind": "symbol",
+                "type_only": false,
+                "module_level": true,
+                "declaration_start_byte": 0,
+                "scope_start_byte": 0,
+                "scope_end_byte": 571,
+                "import_line": 1,
+                "import_text": "import Factory, { Thing } from \"./barrel.js\";",
+                "import_specifier": "./barrel.js"
+              },
+              "source_file": "bad.js",
+              "source_id": "bad.js::unproven#function",
+              "source_kind": "function",
+              "import_source_id": "bad.js::__file__#file",
+              "import_target_id": "barrel.js::__file__#file",
+              "target_file": null,
+              "target_id": null,
+              "target_kind": null,
+              "status": "unresolved",
+              "resolution": null,
+              "unresolved_reason": "ambiguous_target",
+              "import_unresolved_reason": null,
+              "resolution_basis": null,
+              "support": [
+                {
+                  "kind": "import_binding",
+                  "file": "bad.js",
+                  "line": 1,
+                  "content_hash": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+                  "endpoint_id": "barrel.js::__file__#file"
+                }
+              ],
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            },
+            {
+              "raw": {
+                "source_file": "bad.js",
+                "language": "javascript",
+                "line": 5,
+                "column": 45,
+                "start_byte": 175,
+                "end_byte": 182,
+                "text": "Factory",
+                "path": [
+                  "Factory"
+                ],
+                "candidate_bindings": [
+                  {
+                    "local_name": "Factory",
+                    "imported_name": "default",
+                    "exported_name": null,
+                    "kind": "symbol",
+                    "type_only": false,
+                    "module_level": true,
+                    "declaration_start_byte": 0,
+                    "scope_start_byte": 0,
+                    "scope_end_byte": 571,
+                    "import_line": 1,
+                    "import_text": "import Factory, { Thing } from \"./barrel.js\";",
+                    "import_specifier": "./barrel.js"
+                  }
+                ],
+                "binding_state": "definite",
+                "source_hash": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+                "owner": {
+                  "kind": "callable",
+                  "definition_start_byte": 138,
+                  "definition_end_byte": 196,
+                  "body_start_byte": 158,
+                  "body_end_byte": 196
+                }
+              },
+              "binding": {
+                "local_name": "Factory",
+                "imported_name": "default",
+                "exported_name": null,
+                "kind": "symbol",
+                "type_only": false,
+                "module_level": true,
+                "declaration_start_byte": 0,
+                "scope_start_byte": 0,
+                "scope_end_byte": 571,
+                "import_line": 1,
+                "import_text": "import Factory, { Thing } from \"./barrel.js\";",
+                "import_specifier": "./barrel.js"
+              },
+              "source_file": "bad.js",
+              "source_id": "bad.js::unproven#function",
+              "source_kind": "function",
+              "import_source_id": "bad.js::__file__#file",
+              "import_target_id": "barrel.js::__file__#file",
+              "target_file": null,
+              "target_id": null,
+              "target_kind": null,
+              "status": "unresolved",
+              "resolution": null,
+              "unresolved_reason": "target_not_indexed",
+              "import_unresolved_reason": null,
+              "resolution_basis": null,
+              "support": [
+                {
+                  "kind": "import_binding",
+                  "file": "bad.js",
+                  "line": 1,
+                  "content_hash": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+                  "endpoint_id": "barrel.js::__file__#file"
+                }
+              ],
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            },
+            {
+              "raw": {
+                "source_file": "bad.js",
+                "language": "javascript",
+                "line": 5,
+                "column": 54,
+                "start_byte": 184,
+                "end_byte": 192,
+                "text": "External",
+                "path": [
+                  "External"
+                ],
+                "candidate_bindings": [
+                  {
+                    "local_name": "External",
+                    "imported_name": "External",
+                    "exported_name": null,
+                    "kind": "symbol",
+                    "type_only": false,
+                    "module_level": true,
+                    "declaration_start_byte": 82,
+                    "scope_start_byte": 0,
+                    "scope_end_byte": 571,
+                    "import_line": 3,
+                    "import_text": "import { External } from \"uninstalled-package\";",
+                    "import_specifier": "uninstalled-package"
+                  }
+                ],
+                "binding_state": "definite",
+                "source_hash": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+                "owner": {
+                  "kind": "callable",
+                  "definition_start_byte": 138,
+                  "definition_end_byte": 196,
+                  "body_start_byte": 158,
+                  "body_end_byte": 196
+                }
+              },
+              "binding": {
+                "local_name": "External",
+                "imported_name": "External",
+                "exported_name": null,
+                "kind": "symbol",
+                "type_only": false,
+                "module_level": true,
+                "declaration_start_byte": 82,
+                "scope_start_byte": 0,
+                "scope_end_byte": 571,
+                "import_line": 3,
+                "import_text": "import { External } from \"uninstalled-package\";",
+                "import_specifier": "uninstalled-package"
+              },
+              "source_file": "bad.js",
+              "source_id": "bad.js::unproven#function",
+              "source_kind": "function",
+              "import_source_id": "bad.js::__file__#file",
+              "import_target_id": null,
+              "target_file": null,
+              "target_id": null,
+              "target_kind": null,
+              "status": "unresolved",
+              "resolution": null,
+              "unresolved_reason": "import_unresolved",
+              "import_unresolved_reason": "external",
+              "resolution_basis": null,
+              "support": [],
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            },
+            {
+              "raw": {
+                "source_file": "bad.js",
+                "language": "javascript",
+                "line": 6,
+                "column": 42,
+                "start_byte": 238,
+                "end_byte": 243,
+                "text": "Thing",
+                "path": [
+                  "Thing"
+                ],
+                "candidate_bindings": [
+                  {
+                    "local_name": "Thing",
+                    "imported_name": "Thing",
+                    "exported_name": null,
+                    "kind": "symbol",
+                    "type_only": false,
+                    "module_level": true,
+                    "declaration_start_byte": 0,
+                    "scope_start_byte": 0,
+                    "scope_end_byte": 571,
+                    "import_line": 1,
+                    "import_text": "import Factory, { Thing } from \"./barrel.js\";",
+                    "import_specifier": "./barrel.js"
+                  }
+                ],
+                "binding_state": "shadowed",
+                "source_hash": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+                "owner": {
+                  "kind": "callable",
+                  "definition_start_byte": 204,
+                  "definition_end_byte": 248,
+                  "body_start_byte": 229,
+                  "body_end_byte": 248
+                }
+              },
+              "binding": {
+                "local_name": "Thing",
+                "imported_name": "Thing",
+                "exported_name": null,
+                "kind": "symbol",
+                "type_only": false,
+                "module_level": true,
+                "declaration_start_byte": 0,
+                "scope_start_byte": 0,
+                "scope_end_byte": 571,
+                "import_line": 1,
+                "import_text": "import Factory, { Thing } from \"./barrel.js\";",
+                "import_specifier": "./barrel.js"
+              },
+              "source_file": "bad.js",
+              "source_id": "bad.js::shadowed#function",
+              "source_kind": "function",
+              "import_source_id": "bad.js::__file__#file",
+              "import_target_id": "barrel.js::__file__#file",
+              "target_file": null,
+              "target_id": null,
+              "target_kind": null,
+              "status": "unresolved",
+              "resolution": null,
+              "unresolved_reason": "binding_shadowed",
+              "import_unresolved_reason": null,
+              "resolution_basis": null,
+              "support": [],
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            },
+            {
+              "raw": {
+                "source_file": "bad.js",
+                "language": "javascript",
+                "line": 7,
+                "column": 40,
+                "start_byte": 288,
+                "end_byte": 298,
+                "text": "model[key]",
+                "path": [
+                  "model"
+                ],
+                "candidate_bindings": [
+                  {
+                    "local_name": "model",
+                    "imported_name": null,
+                    "exported_name": null,
+                    "kind": "namespace",
+                    "type_only": false,
+                    "module_level": true,
+                    "declaration_start_byte": 46,
+                    "scope_start_byte": 0,
+                    "scope_end_byte": 571,
+                    "import_line": 2,
+                    "import_text": "import * as model from \"./left.js\";",
+                    "import_specifier": "./left.js"
+                  }
+                ],
+                "binding_state": "unsupported",
+                "source_hash": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+                "owner": {
+                  "kind": "callable",
+                  "definition_start_byte": 256,
+                  "definition_end_byte": 303,
+                  "body_start_byte": 279,
+                  "body_end_byte": 303
+                }
+              },
+              "binding": {
+                "local_name": "model",
+                "imported_name": null,
+                "exported_name": null,
+                "kind": "namespace",
+                "type_only": false,
+                "module_level": true,
+                "declaration_start_byte": 46,
+                "scope_start_byte": 0,
+                "scope_end_byte": 571,
+                "import_line": 2,
+                "import_text": "import * as model from \"./left.js\";",
+                "import_specifier": "./left.js"
+              },
+              "source_file": "bad.js",
+              "source_id": "bad.js::computed#function",
+              "source_kind": "function",
+              "import_source_id": "bad.js::__file__#file",
+              "import_target_id": "left.js::__file__#file",
+              "target_file": null,
+              "target_id": null,
+              "target_kind": null,
+              "status": "unresolved",
+              "resolution": null,
+              "unresolved_reason": "unsupported_reference",
+              "import_unresolved_reason": null,
+              "resolution_basis": null,
+              "support": [],
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            }
+          ],
+          "counts": {
+            "total": 5,
+            "resolved": 0,
+            "unresolved": 5,
+            "returned": 5
+          },
+          "pagination": {
+            "offset": 0,
+            "limit": 20,
+            "next_offset": null
+          },
+          "_evaluation": {
+            "attempt_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761/attempt/11",
+            "calls_remaining": 13,
+            "event_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761:11"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_13",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_calls",
+      "arguments": {
+        "file": "bad.js",
+        "limit": 50,
+        "offset": 0,
+        "status": "all"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_13",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_calls",
+      "arguments": {
+        "file": "bad.js",
+        "limit": 50,
+        "offset": 0,
+        "status": "all"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "error": {
+            "code": "ValueError",
+            "message": "invalid record pagination"
+          },
+          "_evaluation": {
+            "attempt_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761/attempt/12",
+            "calls_remaining": 12,
+            "event_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761:12"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_14",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_calls",
+      "arguments": {
+        "file": "bad.js",
+        "limit": 20,
+        "offset": 0,
+        "status": "resolved"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_14",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_calls",
+      "arguments": {
+        "file": "bad.js",
+        "limit": 20,
+        "offset": 0,
+        "status": "resolved"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "repo": "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-mtntvvnw/snapshot",
+          "file": "bad.js",
+          "status": "resolved",
+          "items": [],
+          "counts": {
+            "total": 5,
+            "resolved": 0,
+            "unresolved": 5,
+            "returned": 0
+          },
+          "pagination": {
+            "offset": 0,
+            "limit": 20,
+            "next_offset": null
+          },
+          "_evaluation": {
+            "attempt_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761/attempt/13",
+            "calls_remaining": 11,
+            "event_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761:13"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_15",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "dependencies",
+        "max_hops": 1,
+        "seed_ids": [
+          "bad.js::unproven#function",
+          "bad.js::computed#function",
+          "bad.js::shadowed#function",
+          "bad.js::dynamic#function",
+          "bad.js::Dynamic#class"
+        ],
+        "query": "Resolve authored dependency targets for these bad.js declarations; include only proven relationships and preserve unresolved/unsupported status."
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_15",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "dependencies",
+        "max_hops": 1,
+        "seed_ids": [
+          "bad.js::unproven#function",
+          "bad.js::computed#function",
+          "bad.js::shadowed#function",
+          "bad.js::dynamic#function",
+          "bad.js::Dynamic#class"
+        ],
+        "query": "Resolve authored dependency targets for these bad.js declarations; include only proven relationships and preserve unresolved/unsupported status."
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "intent": "dependencies",
+          "status": "partial",
+          "selection": "explicit",
+          "scope": {
+            "source": "indexed_supported_source",
+            "coverage": "complete",
+            "relationships": "authored_dependencies",
+            "exhaustive": false
+          },
+          "items": [
+            {
+              "id": "bad.js::unproven#function",
+              "name": "unproven",
+              "kind": "function",
+              "file": "bad.js",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Explicitly requested",
+              "source_id": 1,
+              "complete": true,
+              "path": []
+            },
+            {
+              "id": "bad.js::computed#function",
+              "name": "computed",
+              "kind": "function",
+              "file": "bad.js",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Explicitly requested",
+              "source_id": 2,
+              "complete": true,
+              "path": []
+            },
+            {
+              "id": "bad.js::shadowed#function",
+              "name": "shadowed",
+              "kind": "function",
+              "file": "bad.js",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Explicitly requested",
+              "source_id": 3,
+              "complete": true,
+              "path": []
+            },
+            {
+              "id": "bad.js::dynamic#function",
+              "name": "dynamic",
+              "kind": "function",
+              "file": "bad.js",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Explicitly requested",
+              "source_id": 4,
+              "complete": true,
+              "path": []
+            },
+            {
+              "id": "bad.js::Dynamic#class",
+              "name": "Dynamic",
+              "kind": "class",
+              "file": "bad.js",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Explicitly requested",
+              "source_id": 5,
+              "complete": true,
+              "path": []
+            }
+          ],
+          "relationships": [],
+          "sources": [
+            {
+              "id": 1,
+              "file": "bad.js",
+              "start_byte": 138,
+              "end_byte": 196,
+              "start_line": 5,
+              "end_line": 5,
+              "content_hash": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+              "content": "function unproven() { return [Thing, Factory, External]; }"
+            },
+            {
+              "id": 2,
+              "file": "bad.js",
+              "start_byte": 256,
+              "end_byte": 303,
+              "start_line": 7,
+              "end_line": 7,
+              "content_hash": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+              "content": "function computed(key) { return model[key](); }"
+            },
+            {
+              "id": 3,
+              "file": "bad.js",
+              "start_byte": 204,
+              "end_byte": 248,
+              "start_line": 6,
+              "end_line": 6,
+              "content_hash": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+              "content": "function shadowed(Thing) { return Thing(); }"
+            },
+            {
+              "id": 4,
+              "file": "bad.js",
+              "start_byte": 398,
+              "end_byte": 445,
+              "start_line": 9,
+              "end_line": 9,
+              "content_hash": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+              "content": "function dynamic(path) { return import(path); }"
+            },
+            {
+              "id": 5,
+              "file": "bad.js",
+              "start_byte": 453,
+              "end_byte": 490,
+              "start_line": 10,
+              "end_line": 10,
+              "content_hash": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+              "content": "class Dynamic extends chooseBase() {}"
+            }
+          ],
+          "omissions": [
+            {
+              "reason": "unresolved_relation",
+              "count": 7
+            }
+          ],
+          "limits": {
+            "max_hops": 1,
+            "max_nodes": 64,
+            "max_items": 12,
+            "max_neighbors": 32,
+            "max_output_bytes": 16384,
+            "max_evidence_bytes": 8192
+          },
+          "usage": {
+            "nodes_examined": 5,
+            "evidence_bytes": 233,
+            "output_bytes": 2698,
+            "estimated_tokens": 675,
+            "token_estimate_method": "utf8_bytes_div_4",
+            "output_encoding": "mcp_result_json_utf8"
+          },
+          "_evaluation": {
+            "attempt_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761/attempt/14",
+            "calls_remaining": 10,
+            "event_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761:14"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_16",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "dependencies",
+        "max_hops": 1,
+        "seed_ids": [
+          "bad.js::legacy#function",
+          "bad.js::documented#function"
+        ],
+        "query": "Resolve authored dependency targets for legacy and documented in bad.js; include proven relationships only, with unsupported and unresolved preserved."
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_16",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "dependencies",
+        "max_hops": 1,
+        "seed_ids": [
+          "bad.js::legacy#function",
+          "bad.js::documented#function"
+        ],
+        "query": "Resolve authored dependency targets for legacy and documented in bad.js; include proven relationships only, with unsupported and unresolved preserved."
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "intent": "dependencies",
+          "status": "partial",
+          "selection": "explicit",
+          "scope": {
+            "source": "indexed_supported_source",
+            "coverage": "complete",
+            "relationships": "authored_dependencies",
+            "exhaustive": false
+          },
+          "items": [
+            {
+              "id": "bad.js::legacy#function",
+              "name": "legacy",
+              "kind": "function",
+              "file": "bad.js",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Explicitly requested",
+              "source_id": 1,
+              "complete": true,
+              "path": []
+            },
+            {
+              "id": "bad.js::documented#function",
+              "name": "documented",
+              "kind": "function",
+              "file": "bad.js",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Explicitly requested",
+              "source_id": 2,
+              "complete": true,
+              "path": []
+            }
+          ],
+          "relationships": [],
+          "sources": [
+            {
+              "id": 1,
+              "file": "bad.js",
+              "start_byte": 311,
+              "end_byte": 390,
+              "start_line": 8,
+              "end_line": 8,
+              "content_hash": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+              "content": "function legacy() { const loaded = require(\"./left.js\"); return loaded.Thing; }"
+            },
+            {
+              "id": 2,
+              "file": "bad.js",
+              "start_byte": 526,
+              "end_byte": 570,
+              "start_line": 12,
+              "end_line": 12,
+              "content_hash": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+              "content": "function documented(value) { return value; }"
+            }
+          ],
+          "omissions": [
+            {
+              "reason": "unresolved_relation",
+              "count": 1
+            }
+          ],
+          "limits": {
+            "max_hops": 1,
+            "max_nodes": 64,
+            "max_items": 12,
+            "max_neighbors": 32,
+            "max_output_bytes": 16384,
+            "max_evidence_bytes": 8192
+          },
+          "usage": {
+            "nodes_examined": 2,
+            "evidence_bytes": 123,
+            "output_bytes": 1514,
+            "estimated_tokens": 379,
+            "token_estimate_method": "utf8_bytes_div_4",
+            "output_encoding": "mcp_result_json_utf8"
+          },
+          "_evaluation": {
+            "attempt_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761/attempt/15",
+            "calls_remaining": 9,
+            "event_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761:15"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_17",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_imports",
+      "arguments": {
+        "file": "barrel.js",
+        "limit": 20,
+        "offset": 0,
+        "status": "resolved"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_17",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_imports",
+      "arguments": {
+        "file": "barrel.js",
+        "limit": 20,
+        "offset": 0,
+        "status": "resolved"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "repo": "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-mtntvvnw/snapshot",
+          "file": "barrel.js",
+          "status": "resolved",
+          "items": [
+            {
+              "raw": {
+                "source_file": "barrel.js",
+                "language": "javascript",
+                "line": 1,
+                "text": "export * from \"./left.js\";",
+                "specifier": "./left.js",
+                "imported_name": null,
+                "type_only": false,
+                "is_reexport": true,
+                "source_hash": "c63a9e4e681e57529e38d14442b791fc8d8a58a7066fc8328a8db6116c8a19c7",
+                "rust": null
+              },
+              "source_file": "barrel.js",
+              "source_id": "barrel.js::__file__#file",
+              "target_file": "left.js",
+              "target_package": null,
+              "target_crate": null,
+              "target_module": null,
+              "target_kind": "file",
+              "target_id": "left.js::__file__#file",
+              "specifier": "./left.js",
+              "imported_name": null,
+              "language": "javascript",
+              "line": 1,
+              "text": "export * from \"./left.js\";",
+              "type_only": false,
+              "is_reexport": true,
+              "status": "resolved",
+              "resolution": "import-resolved",
+              "unresolved_reason": null,
+              "resolution_basis": "relative_path",
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            },
+            {
+              "raw": {
+                "source_file": "barrel.js",
+                "language": "javascript",
+                "line": 2,
+                "text": "export * from \"./right.js\";",
+                "specifier": "./right.js",
+                "imported_name": null,
+                "type_only": false,
+                "is_reexport": true,
+                "source_hash": "c63a9e4e681e57529e38d14442b791fc8d8a58a7066fc8328a8db6116c8a19c7",
+                "rust": null
+              },
+              "source_file": "barrel.js",
+              "source_id": "barrel.js::__file__#file",
+              "target_file": "right.js",
+              "target_package": null,
+              "target_crate": null,
+              "target_module": null,
+              "target_kind": "file",
+              "target_id": "right.js::__file__#file",
+              "specifier": "./right.js",
+              "imported_name": null,
+              "language": "javascript",
+              "line": 2,
+              "text": "export * from \"./right.js\";",
+              "type_only": false,
+              "is_reexport": true,
+              "status": "resolved",
+              "resolution": "import-resolved",
+              "unresolved_reason": null,
+              "resolution_basis": "relative_path",
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            }
+          ],
+          "counts": {
+            "total": 2,
+            "resolved": 2,
+            "unresolved": 0,
+            "returned": 2
+          },
+          "pagination": {
+            "offset": 0,
+            "limit": 20,
+            "next_offset": null
+          },
+          "_evaluation": {
+            "attempt_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761/attempt/16",
+            "calls_remaining": 8,
+            "event_id": "session-5134cd8a-3f23-40ab-b7e2-9d9ea9074761:16"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_18",
+      "type": "agent_message",
+      "text": "{\"proven_targets\":{\"unproven\":[],\"default_forwarded_by_star\":[],\"computed_call_exact\":[],\"shadowed_Thing_is_import\":[],\"commonjs_member_proven\":[],\"dynamic_import_proven\":[],\"computed_base_proven\":[],\"jsdoc_type_supported\":[]}}"
+    }
+  },
+  {
+    "type": "turn.completed",
+    "usage": {
+      "input_tokens": 170387,
+      "cached_input_tokens": 137472,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 3256,
+      "reasoning_output_tokens": 2454
+    }
+  }
+]

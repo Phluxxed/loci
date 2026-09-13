@@ -1,0 +1,809 @@
+{
+  "schema_version": 4,
+  "protocol": "multilingual-context-workflow-v1",
+  "identity": {
+    "task_id": "rust_known_call_impact",
+    "session_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d",
+    "arm": "B",
+    "repetition": 3,
+    "snapshot": "rust_impact",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1"
+  },
+  "events": [
+    {
+      "id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:1",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "dependencies",
+        "query": "Locate the authored declaration parse, its direct caller via authored module/import and definite static call, and Config with configuration field and field type.",
+        "max_output_bytes": 12000,
+        "max_evidence_bytes": 7000,
+        "max_hops": 2
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"dependencies\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"authored_dependencies\",\"exhaustive\":false},\"items\":[{\"id\":\"src/lib.rs::caller#function\",\"name\":\"caller\",\"kind\":\"function\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches parse, caller, config\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"src/api.rs::Config#struct\",\"name\":\"Config\",\"kind\":\"struct\",\"file\":\"src/api.rs\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"src/lib.rs::caller#function\",\"to\":\"src/api.rs::Config#struct\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"src/lib.rs\",\"line\":4,\"content_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5,6],\"resolution_configuration\":\"unconditional\"}],\"sources\":[{\"id\":1,\"file\":\"src/lib.rs\",\"start_byte\":47,\"end_byte\":102,\"start_line\":4,\"end_line\":4,\"content_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\",\"content\":\"pub fn caller(config: Config) -> bool { parse(config) }\"},{\"id\":2,\"file\":\"src/api.rs\",\"start_byte\":0,\"end_byte\":38,\"start_line\":1,\"end_line\":1,\"content_hash\":\"8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272\",\"content\":\"pub struct Config { pub strict: bool }\"},{\"id\":3,\"file\":\"src/lib.rs\",\"start_byte\":47,\"end_byte\":103,\"start_line\":4,\"end_line\":4,\"content_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\",\"content\":\"pub fn caller(config: Config) -> bool { parse(config) }\\n\"},{\"id\":4,\"file\":\"src/lib.rs\",\"start_byte\":0,\"end_byte\":45,\"start_line\":1,\"end_line\":2,\"content_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\",\"content\":\"pub mod api;\\nuse crate::api::{parse, Config};\"},{\"id\":5,\"file\":\"src/api.rs\",\"start_byte\":0,\"end_byte\":39,\"start_line\":1,\"end_line\":1,\"content_hash\":\"8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272\",\"content\":\"pub struct Config { pub strict: bool }\\n\"},{\"id\":6,\"file\":\"Cargo.toml\",\"start_byte\":0,\"end_byte\":61,\"start_line\":1,\"end_line\":4,\"content_hash\":\"734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9\",\"content\":\"[package]\\nname = \\\"ledger\\\"\\nversion = \\\"0.1.0\\\"\\nedition = \\\"2021\\\"\\n\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":2}],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":12000,\"max_evidence_bytes\":7000},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":201,\"output_bytes\":2824,\"estimated_tokens\":706,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:1\"}}",
+      "serialized_bytes": 2940,
+      "source_bytes": 294,
+      "elapsed_ms": 26.83704101946205,
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5",
+          "text": "pub struct Config { pub strict: bool }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 103,
+          "sha256": "26e55cc5dd6670d98f6717f1a49ec030300205da3bd1a39f253111b283b77a1a",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }\n"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 45,
+          "sha256": "20e70783ecf0725329e6a60873a8283abea80906880ffe315f3f19bcc54292a2",
+          "text": "pub mod api;\nuse crate::api::{parse, Config};"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 39,
+          "sha256": "d1dc24305b92199868846f17a8d65d9c46e104da4aac7b13bff86a46d03c923d",
+          "text": "pub struct Config { pub strict: bool }\n"
+        },
+        {
+          "file": "Cargo.toml",
+          "start_byte": 0,
+          "end_byte": 61,
+          "sha256": "734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9",
+          "text": "[package]\nname = \"ledger\"\nversion = \"0.1.0\"\nedition = \"2021\"\n"
+        }
+      ]
+    },
+    {
+      "id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:2",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "parse"
+      },
+      "search_id": "7f4d5531-d7c7-4508-8d16-00e48fb80065",
+      "response_json": "{\"symbols\":[{\"id\":\"src/api.rs::parse#function\",\"name\":\"parse\",\"qualified_name\":\"parse\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/api.rs\",\"byte_offset\":40,\"byte_length\":54,\"signature\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60\",\"decorators\":[],\"keywords\":[\"parse\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":3,\"end_line\":3,\"score\":71.0},{\"id\":\"src/lib.rs::caller#function\",\"name\":\"caller\",\"qualified_name\":\"caller\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":47,\"byte_length\":55,\"signature\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304\",\"decorators\":[],\"keywords\":[\"caller\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":4,\"end_line\":4,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"7f4d5531-d7c7-4508-8d16-00e48fb80065\",\"_evaluation\":{\"attempt_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:2\"}}",
+      "serialized_bytes": 1745,
+      "source_bytes": 109,
+      "elapsed_ms": 4.044166998937726,
+      "spans": [
+        {
+          "file": "src/api.rs",
+          "start_byte": 40,
+          "end_byte": 94,
+          "sha256": "91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60",
+          "text": "pub fn parse(config: Config) -> bool { config.strict }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }"
+        }
+      ]
+    },
+    {
+      "id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:3",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "src/api.rs::parse#function",
+          "src/lib.rs::caller#function"
+        ],
+        "context": 0,
+        "selected_from_search_id": "7f4d5531-d7c7-4508-8d16-00e48fb80065"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"src/api.rs::parse#function\",\"source\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"byte_offset\":40,\"byte_length\":54,\"line\":3,\"end_line\":3,\"signature\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"kind\":\"function\",\"language\":\"rust\"},{\"id\":\"src/lib.rs::caller#function\",\"source\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"byte_offset\":47,\"byte_length\":55,\"line\":4,\"end_line\":4,\"signature\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"kind\":\"function\",\"language\":\"rust\"}],\"_evaluation\":{\"attempt_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:3\"}}",
+      "serialized_bytes": 709,
+      "source_bytes": 218,
+      "elapsed_ms": 4.909750015940517,
+      "spans": [
+        {
+          "file": "src/api.rs",
+          "start_byte": 40,
+          "end_byte": 94,
+          "sha256": "91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60",
+          "text": "pub fn parse(config: Config) -> bool { config.strict }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 40,
+          "end_byte": 94,
+          "sha256": "91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60",
+          "text": "pub fn parse(config: Config) -> bool { config.strict }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }"
+        }
+      ]
+    },
+    {
+      "id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:4",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "Config"
+      },
+      "search_id": "1e10932c-503e-4b9a-860c-db52bb2f60bf",
+      "response_json": "{\"symbols\":[{\"id\":\"src/api.rs::Config#struct\",\"name\":\"Config\",\"qualified_name\":\"Config\",\"kind\":\"struct\",\"language\":\"rust\",\"file_path\":\"src/api.rs\",\"byte_offset\":0,\"byte_length\":38,\"signature\":\"pub struct Config { pub strict: bool }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5\",\"decorators\":[],\"keywords\":[\"config\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":1,\"end_line\":1,\"score\":61.0},{\"id\":\"src/api.rs::parse#function\",\"name\":\"parse\",\"qualified_name\":\"parse\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/api.rs\",\"byte_offset\":40,\"byte_length\":54,\"signature\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60\",\"decorators\":[],\"keywords\":[\"parse\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":3,\"end_line\":3,\"score\":18.0},{\"id\":\"src/lib.rs::caller#function\",\"name\":\"caller\",\"qualified_name\":\"caller\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":47,\"byte_length\":55,\"signature\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304\",\"decorators\":[],\"keywords\":[\"caller\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":4,\"end_line\":4,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"1e10932c-503e-4b9a-860c-db52bb2f60bf\",\"_evaluation\":{\"attempt_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:4\"}}",
+      "serialized_bytes": 2328,
+      "source_bytes": 147,
+      "elapsed_ms": 1.5555419959127903,
+      "spans": [
+        {
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5",
+          "text": "pub struct Config { pub strict: bool }"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 40,
+          "end_byte": 94,
+          "sha256": "91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60",
+          "text": "pub fn parse(config: Config) -> bool { config.strict }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }"
+        }
+      ]
+    },
+    {
+      "id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:5",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "src/api.rs::Config#struct"
+        ],
+        "context": 0,
+        "selected_from_search_id": "1e10932c-503e-4b9a-860c-db52bb2f60bf"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"src/api.rs::Config#struct\",\"source\":\"pub struct Config { pub strict: bool }\",\"byte_offset\":0,\"byte_length\":38,\"line\":1,\"end_line\":1,\"signature\":\"pub struct Config { pub strict: bool }\",\"kind\":\"struct\",\"language\":\"rust\"}],\"_evaluation\":{\"attempt_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:5\"}}",
+      "serialized_bytes": 407,
+      "source_bytes": 76,
+      "elapsed_ms": 3.3646670053713024,
+      "spans": [
+        {
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5",
+          "text": "pub struct Config { pub strict: bool }"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5",
+          "text": "pub struct Config { pub strict: bool }"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "rust_known_call_impact",
+    "session_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d",
+    "arm": "B",
+    "repetition": 3,
+    "snapshot": "rust_impact",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1",
+    "schema_version": 3,
+    "measurement_method": "observed_tool_calls",
+    "intent_collection": "not_collected",
+    "outcome": "completed",
+    "answer": {
+      "parse_file": "src/api.rs",
+      "direct_caller": "src/lib.rs::caller",
+      "config_field": "strict",
+      "field_type": "bool",
+      "configuration": "unconditional"
+    },
+    "answer_correct": true,
+    "task_correct": true,
+    "read_count": 5,
+    "validated_read_count": 5,
+    "required_context_delivered": [
+      "caller",
+      "cargo",
+      "config",
+      "entry",
+      "import",
+      "module"
+    ],
+    "required_context_total": 6,
+    "context_recall": 1.0,
+    "serialized_tool_output_bytes": 8129,
+    "source_bytes": 844,
+    "estimated_source_tokens": 211,
+    "tool_elapsed_ms": 40.711167035624385,
+    "provider_usage": {
+      "input_tokens": 42626,
+      "cached_input_tokens": 30464,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 557,
+      "reasoning_output_tokens": 278
+    },
+    "usage_semantics": "One Codex turn.completed event; gross input includes cached input subset; output includes reasoning tokens.",
+    "token_status": "measured",
+    "measurement_complete": true,
+    "full_pass": false
+  },
+  "baseline": {
+    "end_to_end_seconds": 22.58112566600903,
+    "actual_process_seconds": 22.58112566600903,
+    "exit_code": 0,
+    "provider_thread_id": "01a09842-c77b-7a92-af08-5bdbaafe0687",
+    "failures": [],
+    "tool_delivery_verified": true,
+    "output_accounting": {
+      "schema_version": 4,
+      "complete": true,
+      "tool_call_count": 5,
+      "recorded_payload_bytes": 8129,
+      "complete_payload_bytes": 8129,
+      "source_bytes": 844,
+      "calls": [
+        {
+          "item_id": "item_1",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "dependencies",
+            "max_hops": 2,
+            "max_output_bytes": 12000,
+            "max_evidence_bytes": 7000,
+            "query": "Locate the authored declaration parse, its direct caller via authored module/import and definite static call, and Config with configuration field and field type."
+          },
+          "status": "completed",
+          "attempt_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/1",
+          "trace_event_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:1",
+          "source_bytes": 294,
+          "serialized_bytes": 2940,
+          "elapsed_ms": 26.99062501778826,
+          "payload_texts": [
+            "{\"schema_version\":1,\"intent\":\"dependencies\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"authored_dependencies\",\"exhaustive\":false},\"items\":[{\"id\":\"src/lib.rs::caller#function\",\"name\":\"caller\",\"kind\":\"function\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches parse, caller, config\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"src/api.rs::Config#struct\",\"name\":\"Config\",\"kind\":\"struct\",\"file\":\"src/api.rs\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"src/lib.rs::caller#function\",\"to\":\"src/api.rs::Config#struct\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"src/lib.rs\",\"line\":4,\"content_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5,6],\"resolution_configuration\":\"unconditional\"}],\"sources\":[{\"id\":1,\"file\":\"src/lib.rs\",\"start_byte\":47,\"end_byte\":102,\"start_line\":4,\"end_line\":4,\"content_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\",\"content\":\"pub fn caller(config: Config) -> bool { parse(config) }\"},{\"id\":2,\"file\":\"src/api.rs\",\"start_byte\":0,\"end_byte\":38,\"start_line\":1,\"end_line\":1,\"content_hash\":\"8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272\",\"content\":\"pub struct Config { pub strict: bool }\"},{\"id\":3,\"file\":\"src/lib.rs\",\"start_byte\":47,\"end_byte\":103,\"start_line\":4,\"end_line\":4,\"content_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\",\"content\":\"pub fn caller(config: Config) -> bool { parse(config) }\\n\"},{\"id\":4,\"file\":\"src/lib.rs\",\"start_byte\":0,\"end_byte\":45,\"start_line\":1,\"end_line\":2,\"content_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\",\"content\":\"pub mod api;\\nuse crate::api::{parse, Config};\"},{\"id\":5,\"file\":\"src/api.rs\",\"start_byte\":0,\"end_byte\":39,\"start_line\":1,\"end_line\":1,\"content_hash\":\"8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272\",\"content\":\"pub struct Config { pub strict: bool }\\n\"},{\"id\":6,\"file\":\"Cargo.toml\",\"start_byte\":0,\"end_byte\":61,\"start_line\":1,\"end_line\":4,\"content_hash\":\"734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9\",\"content\":\"[package]\\nname = \\\"ledger\\\"\\nversion = \\\"0.1.0\\\"\\nedition = \\\"2021\\\"\\n\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":2}],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":12000,\"max_evidence_bytes\":7000},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":201,\"output_bytes\":2824,\"estimated_tokens\":706,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:1\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": {
+            "nodes_examined": 2,
+            "evidence_bytes": 201,
+            "output_bytes": 2824,
+            "selected_items": 2,
+            "max_nodes": 64,
+            "max_neighbors": 32
+          }
+        },
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "search",
+          "arguments": {
+            "query": "parse"
+          },
+          "status": "completed",
+          "attempt_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/2",
+          "trace_event_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:2",
+          "source_bytes": 109,
+          "serialized_bytes": 1745,
+          "elapsed_ms": 4.3127500102855265,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"src/api.rs::parse#function\",\"name\":\"parse\",\"qualified_name\":\"parse\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/api.rs\",\"byte_offset\":40,\"byte_length\":54,\"signature\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60\",\"decorators\":[],\"keywords\":[\"parse\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":3,\"end_line\":3,\"score\":71.0},{\"id\":\"src/lib.rs::caller#function\",\"name\":\"caller\",\"qualified_name\":\"caller\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":47,\"byte_length\":55,\"signature\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304\",\"decorators\":[],\"keywords\":[\"caller\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":4,\"end_line\":4,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"7f4d5531-d7c7-4508-8d16-00e48fb80065\",\"_evaluation\":{\"attempt_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:2\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "get",
+          "arguments": {
+            "selected_from_search_id": "7f4d5531-d7c7-4508-8d16-00e48fb80065",
+            "symbol_ids": [
+              "src/api.rs::parse#function",
+              "src/lib.rs::caller#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/3",
+          "trace_event_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:3",
+          "source_bytes": 218,
+          "serialized_bytes": 709,
+          "elapsed_ms": 4.988334025256336,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"src/api.rs::parse#function\",\"source\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"byte_offset\":40,\"byte_length\":54,\"line\":3,\"end_line\":3,\"signature\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"kind\":\"function\",\"language\":\"rust\"},{\"id\":\"src/lib.rs::caller#function\",\"source\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"byte_offset\":47,\"byte_length\":55,\"line\":4,\"end_line\":4,\"signature\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"kind\":\"function\",\"language\":\"rust\"}],\"_evaluation\":{\"attempt_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:3\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "search",
+          "arguments": {
+            "query": "Config"
+          },
+          "status": "completed",
+          "attempt_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/4",
+          "trace_event_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:4",
+          "source_bytes": 147,
+          "serialized_bytes": 2328,
+          "elapsed_ms": 1.6584170225542039,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"src/api.rs::Config#struct\",\"name\":\"Config\",\"qualified_name\":\"Config\",\"kind\":\"struct\",\"language\":\"rust\",\"file_path\":\"src/api.rs\",\"byte_offset\":0,\"byte_length\":38,\"signature\":\"pub struct Config { pub strict: bool }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5\",\"decorators\":[],\"keywords\":[\"config\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":1,\"end_line\":1,\"score\":61.0},{\"id\":\"src/api.rs::parse#function\",\"name\":\"parse\",\"qualified_name\":\"parse\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/api.rs\",\"byte_offset\":40,\"byte_length\":54,\"signature\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60\",\"decorators\":[],\"keywords\":[\"parse\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":3,\"end_line\":3,\"score\":18.0},{\"id\":\"src/lib.rs::caller#function\",\"name\":\"caller\",\"qualified_name\":\"caller\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":47,\"byte_length\":55,\"signature\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304\",\"decorators\":[],\"keywords\":[\"caller\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":4,\"end_line\":4,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"1e10932c-503e-4b9a-860c-db52bb2f60bf\",\"_evaluation\":{\"attempt_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:4\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_5",
+          "server": "evaluation",
+          "tool": "get",
+          "arguments": {
+            "selected_from_search_id": "1e10932c-503e-4b9a-860c-db52bb2f60bf",
+            "symbol_ids": [
+              "src/api.rs::Config#struct"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/5",
+          "trace_event_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:5",
+          "source_bytes": 76,
+          "serialized_bytes": 407,
+          "elapsed_ms": 3.4349590132478625,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"src/api.rs::Config#struct\",\"source\":\"pub struct Config { pub strict: bool }\",\"byte_offset\":0,\"byte_length\":38,\"line\":1,\"end_line\":1,\"signature\":\"pub struct Config { pub strict: bool }\",\"kind\":\"struct\",\"language\":\"rust\"}],\"_evaluation\":{\"attempt_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:5\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        }
+      ],
+      "failures": []
+    },
+    "adapter_elapsed_ms": 41.38508508913219,
+    "recoverable_error_events": 0,
+    "relationships": {
+      "schema_version": 3,
+      "case_id": "rust_known_call_impact",
+      "language": "rust",
+      "required_semantic_dependencies_total": 3,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "caller",
+          "kind": "calls",
+          "to": "entry",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "calls",
+          "record_contexts": [],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "src/lib.rs::caller#function",
+              "to": "src/api.rs::parse#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "src/lib.rs",
+                "line": 4,
+                "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 1,
+          "from": "caller",
+          "kind": "parameter_type",
+          "to": "config",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "src/lib.rs::caller#function",
+              "to": "src/api.rs::Config#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "src/lib.rs",
+                "line": 4,
+                "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "src/lib.rs::caller#function",
+              "to": "src/api.rs::Config#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "src/lib.rs",
+                "line": 4,
+                "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710"
+              }
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "config",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "src/api.rs::parse#function",
+              "to": "src/api.rs::Config#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "src/api.rs",
+                "line": 3,
+                "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "available_dependency_links_total": 3,
+      "available_dependency_links": [
+        {
+          "index": 0,
+          "from": "caller",
+          "kind": "calls",
+          "to": "entry",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "calls",
+          "record_contexts": [],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "src/lib.rs::caller#function",
+              "to": "src/api.rs::parse#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "src/lib.rs",
+                "line": 4,
+                "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 1,
+          "from": "caller",
+          "kind": "parameter_type",
+          "to": "config",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "src/lib.rs::caller#function",
+              "to": "src/api.rs::Config#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "src/lib.rs",
+                "line": 4,
+                "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "src/lib.rs::caller#function",
+              "to": "src/api.rs::Config#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "src/lib.rs",
+                "line": 4,
+                "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710"
+              }
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "config",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "src/api.rs::parse#function",
+              "to": "src/api.rs::Config#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "src/api.rs",
+                "line": 3,
+                "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "delivered_dependency_links_total": 1,
+      "delivered_dependency_links": [
+        {
+          "index": 1,
+          "from": "caller",
+          "kind": "parameter_type",
+          "to": "config",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "src/lib.rs::caller#function",
+              "to": "src/api.rs::Config#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "src/lib.rs",
+                "line": 4,
+                "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "src/lib.rs::caller#function",
+              "to": "src/api.rs::Config#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "src/lib.rs",
+                "line": 4,
+                "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710"
+              }
+            }
+          ]
+        }
+      ],
+      "dependency_link_recall": {
+        "label": "Exact frozen meaning joined to persisted semantic record and delivered source proof.",
+        "required": 3,
+        "available": 3,
+        "delivered": 1,
+        "available_ratio": 1.0,
+        "delivered_ratio": 0.3333333333333333
+      },
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_available_relationships": 0,
+      "forbidden_delivered_relationships": 0,
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_delivered_relationship_edges": [],
+      "delivery_integrity_violations": [],
+      "forbidden_scope": "Frozen multilingual negatives plus delivered edge/index and complete exploration-proof consistency."
+    },
+    "arm": "B",
+    "attempt_id": "rust_known_call_impact-r3-B"
+  },
+  "attempt_id": "rust_known_call_impact-r3-B",
+  "arm": "B",
+  "provenance": {
+    "attempt_id": "rust_known_call_impact-r3-B",
+    "case_id": "rust_known_call_impact",
+    "snapshot": "rust_impact",
+    "repetition": 3,
+    "arm": "B",
+    "adapter_module": "benchmarks.multilingual_context_tools",
+    "model": "gpt-5.6-luna",
+    "reasoning_effort": "high",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "catalog_sha256": "f1c45cceac1c3ee90fa1af1007c341713e220571390c3b1eb086c443d7781062",
+    "runner_sha256": "5756278252a74c9e86c68a898b284108288b74a864b9424f6445223b3a7ca6db",
+    "source": {
+      "freeze_commit": "c910c5ac252a7c982f784d87d61bc4c50fc0c0ec",
+      "freeze_json_sha256": "254f38dd6247215928f4cce3fae379cf9dbf3acb74e51bd2d1ac91c12f290848",
+      "source_scope": "W4 evaluator snapshot; A exact retrieval/graph, B adds current loci_explore plus frozen guide"
+    },
+    "config": {
+      "project_doc_max_bytes": 0,
+      "web_search": "disabled",
+      "skills.include_instructions": false,
+      "developer_instructions": "",
+      "model_reasoning_effort": "high",
+      "model_catalog_json": "/Users/brummerv/phluxxed/loci-exploration/benchmarks/results/multilingual-context-workflow-v1/model-catalog.json",
+      "include_collaboration_mode_instructions": false,
+      "tools.update_plan.enabled": false,
+      "tools.experimental_request_user_input.enabled": false,
+      "features.skip_host_skill_discovery": true,
+      "mcp_servers.evaluation.command": "/Users/brummerv/phluxxed/loci-exploration/.venv/bin/python",
+      "mcp_servers.evaluation.args": [
+        "-m",
+        "benchmarks.multilingual_context_tools",
+        "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-tl_j1i76/run.json"
+      ],
+      "mcp_servers.evaluation.cwd": "/Users/brummerv/phluxxed/loci-exploration",
+      "mcp_servers.evaluation.env": {
+        "LOCI_BASE_DIR": "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-tl_j1i76/store",
+        "LOCI_STORE_NAMESPACE": "typescript-context-preflight"
+      },
+      "mcp_servers.evaluation.required": true,
+      "mcp_servers.evaluation.default_tools_approval_mode": "auto",
+      "mcp_servers.evaluation.tool_timeout_sec": 12,
+      "tool_output_token_limit": 32768,
+      "features.shell_tool": false,
+      "features.multi_agent": false,
+      "features.apps": false,
+      "features.plugins": false,
+      "features.hooks": false,
+      "features.memories": false,
+      "features.skill_search": false,
+      "features.skill_mcp_dependency_install": false,
+      "features.view_image": false,
+      "features.image_generation": false,
+      "features.browser_use": false,
+      "features.computer_use": false,
+      "features.in_app_browser": false,
+      "features.code_mode": false,
+      "features.code_mode_host": false,
+      "features.sleep_tool": false,
+      "features.goals": false,
+      "features.context_management": false,
+      "service_tier": "default"
+    },
+    "config_sha256": "1108157a633150ed2f3a6a3b21b2c58a51ff5e3c26d45b7c9ec7fd17adfeb4c8",
+    "prompt_sha256": "380733ca0a33a8023d227f773f23b911325494a64d289989f5ba8cb378062dea",
+    "index_seconds": 0.014252209017286077,
+    "snapshot_files": {
+      "Cargo.toml": "734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9",
+      "src/api.rs": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+      "src/lib.rs": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710"
+    },
+    "extractor_version": 30,
+    "canonical_tool_schemas_sha256": "492ec2cf0a57ac05d4cb601c1ab44d0604406245f7dcdd865d7f8cbed7e8c90f"
+  }
+}

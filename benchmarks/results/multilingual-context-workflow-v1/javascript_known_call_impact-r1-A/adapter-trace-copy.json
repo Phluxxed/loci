@@ -1,0 +1,384 @@
+{
+  "schema_version": 3,
+  "protocol": "multilingual-context-workflow-v1",
+  "identity": {
+    "task_id": "javascript_known_call_impact",
+    "session_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2",
+    "arm": "A",
+    "repetition": 1,
+    "snapshot": "javascript_dependencies",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1"
+  },
+  "events": [
+    {
+      "id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2:1",
+      "task_id": "javascript_known_call_impact",
+      "session_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "add"
+      },
+      "search_id": "38536662-0a09-4b87-b59e-3144de43b331",
+      "response_json": "{\"symbols\":[{\"id\":\"helper.js::add#function\",\"name\":\"add\",\"qualified_name\":\"add\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"helper.js\",\"byte_offset\":13,\"byte_length\":26,\"signature\":\"add = (value) => value + 1\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f\",\"decorators\":[],\"keywords\":[\"add\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":71.0},{\"id\":\"wrong.js::add#function\",\"name\":\"add\",\"qualified_name\":\"add\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"wrong.js\",\"byte_offset\":13,\"byte_length\":26,\"signature\":\"add = (value) => value - 1\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"c220ba4411800a47ed5011a262c6c728fef9acf997eddd63f87cac46446c9e75\",\"decorators\":[],\"keywords\":[\"add\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":71.0},{\"id\":\"app.js::run#function\",\"name\":\"run\",\"qualified_name\":\"run\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"app.js\",\"byte_offset\":56,\"byte_length\":42,\"signature\":\"function run() { return make() + add(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"decorators\":[],\"keywords\":[\"run\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":18.0},{\"id\":\"app.js::Worker.work#method\",\"name\":\"work\",\"qualified_name\":\"Worker.work\",\"kind\":\"method\",\"language\":\"javascript\",\"file_path\":\"app.js\",\"byte_offset\":136,\"byte_length\":25,\"signature\":\"work() { return add(2); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"fc5691268bb3ee147c5ce653cb740088ca42491be3a2d5ea3a26b85b2c08d953\",\"decorators\":[],\"keywords\":[\"work\"],\"metadata\":{},\"line\":3,\"end_line\":3,\"score\":18.0},{\"id\":\"helper.js::make#function\",\"name\":\"make\",\"qualified_name\":\"make\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"helper.js\",\"byte_offset\":41,\"byte_length\":34,\"signature\":\"function make() { return add(0); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df\",\"decorators\":[],\"keywords\":[\"make\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":5,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"38536662-0a09-4b87-b59e-3144de43b331\",\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:1\"}}",
+      "serialized_bytes": 2500,
+      "source_bytes": 153,
+      "elapsed_ms": 2.2685830190312117,
+      "spans": [
+        {
+          "file": "helper.js",
+          "start_byte": 13,
+          "end_byte": 39,
+          "sha256": "4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f",
+          "text": "add = (value) => value + 1"
+        },
+        {
+          "file": "wrong.js",
+          "start_byte": 13,
+          "end_byte": 39,
+          "sha256": "c220ba4411800a47ed5011a262c6c728fef9acf997eddd63f87cac46446c9e75",
+          "text": "add = (value) => value - 1"
+        },
+        {
+          "file": "app.js",
+          "start_byte": 56,
+          "end_byte": 98,
+          "sha256": "32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18",
+          "text": "function run() { return make() + add(1); }"
+        },
+        {
+          "file": "app.js",
+          "start_byte": 136,
+          "end_byte": 161,
+          "sha256": "fc5691268bb3ee147c5ce653cb740088ca42491be3a2d5ea3a26b85b2c08d953",
+          "text": "work() { return add(2); }"
+        },
+        {
+          "file": "helper.js",
+          "start_byte": 41,
+          "end_byte": 75,
+          "sha256": "2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df",
+          "text": "function make() { return add(0); }"
+        }
+      ]
+    },
+    {
+      "id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2:2",
+      "task_id": "javascript_known_call_impact",
+      "session_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "helper.js::add#function"
+        ],
+        "context": 0,
+        "selected_from_search_id": "38536662-0a09-4b87-b59e-3144de43b331"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"helper.js::add#function\",\"source\":\"add = (value) => value + 1\",\"byte_offset\":13,\"byte_length\":26,\"line\":1,\"end_line\":1,\"signature\":\"add = (value) => value + 1\",\"kind\":\"function\",\"language\":\"javascript\"}],\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:2\"}}",
+      "serialized_bytes": 390,
+      "source_bytes": 52,
+      "elapsed_ms": 4.17333299992606,
+      "spans": [
+        {
+          "file": "helper.js",
+          "start_byte": 13,
+          "end_byte": 39,
+          "sha256": "4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f",
+          "text": "add = (value) => value + 1"
+        },
+        {
+          "file": "helper.js",
+          "start_byte": 13,
+          "end_byte": 39,
+          "sha256": "4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f",
+          "text": "add = (value) => value + 1"
+        }
+      ]
+    },
+    {
+      "id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2:3",
+      "task_id": "javascript_known_call_impact",
+      "session_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "question": "What are the known direct callers of helper.js::add#function, including same-file and imported calls? Preserve unresolved relationships and do not infer runtime callers.",
+        "seed_ids": [
+          "helper.js::add#function"
+        ]
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-l0haecg4/snapshot\",\"question\":\"What are the known direct callers of helper.js::add#function, including same-file and imported calls? Preserve unresolved relationships and do not infer runtime callers.\",\"selection\":\"explicit\",\"question_terms\":[],\"anchors\":[{\"node\":{\"id\":\"helper.js::add#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"helper.js\",\"line\":1,\"end_line\":1}},\"matched_symbol_id\":\"helper.js::add#function\",\"name\":\"add\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}}],\"routing\":{\"kind\":\"relationship\",\"reason\":\"relationship_intent\"},\"filters\":{\"namespaces\":null,\"edge_types\":null,\"resolutions\":[\"exact\",\"declared\",\"import-resolved\"],\"direction\":\"outgoing\"},\"hub_threshold\":4,\"paths\":[],\"rejected_paths\":[],\"counts\":{\"filtered_edges\":12,\"examined_nodes\":10,\"examined_paths\":1,\"returned_paths\":0,\"rejected_paths\":0,\"duplicate_paths\":0,\"omitted_rejected_paths\":0,\"omitted_nodes\":0,\"omitted_paths\":0},\"budget\":{\"max_hops\":3,\"max_nodes\":64,\"max_paths\":16,\"path_offset\":0,\"evidence_bytes\":0,\"estimated_tokens\":0,\"max_evidence_bytes\":16384,\"max_estimated_tokens\":4096,\"hop_limit_reached\":false,\"node_limit_reached\":false,\"next_path_offset\":null},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:3\"}}",
+      "serialized_bytes": 1514,
+      "source_bytes": 0,
+      "elapsed_ms": 12.333416991168633,
+      "spans": []
+    },
+    {
+      "id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2:4",
+      "task_id": "javascript_known_call_impact",
+      "session_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "question": "Find symbols that directly call add in helper.js, including same-file and imported calls.",
+        "seed_ids": [
+          "helper.js::add#function"
+        ]
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-l0haecg4/snapshot\",\"question\":\"Find symbols that directly call add in helper.js, including same-file and imported calls.\",\"selection\":\"explicit\",\"question_terms\":[],\"anchors\":[{\"node\":{\"id\":\"helper.js::add#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"helper.js\",\"line\":1,\"end_line\":1}},\"matched_symbol_id\":\"helper.js::add#function\",\"name\":\"add\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}}],\"counts\":{\"indexed_nodes\":13,\"eligible_units\":13,\"qualified_candidates\":1,\"collapsed_symbols\":0,\"returned_anchors\":1,\"omitted_candidates\":0},\"budget\":{\"requested_max_anchors\":5,\"effective_max_anchors\":5},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:4\"}}",
+      "serialized_bytes": 967,
+      "source_bytes": 0,
+      "elapsed_ms": 2.0176249963697046,
+      "spans": []
+    },
+    {
+      "id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2:5",
+      "task_id": "javascript_known_call_impact",
+      "session_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 50
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"invalid record pagination\"},\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:5\"}}",
+      "serialized_bytes": 236,
+      "source_bytes": 0,
+      "elapsed_ms": 0.11266701039858162,
+      "spans": []
+    },
+    {
+      "id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2:6",
+      "task_id": "javascript_known_call_impact",
+      "session_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 10
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-l0haecg4/snapshot\",\"file\":null,\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"app.js\",\"language\":\"javascript\",\"line\":2,\"column\":32,\"start_byte\":80,\"end_byte\":86,\"callee_start_byte\":80,\"callee_end_byte\":84,\"callee_text\":\"make\",\"callee_path\":[\"make\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":56,\"definition_end_byte\":98,\"body_start_byte\":71,\"body_end_byte\":98},\"source_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\"},\"caller_id\":\"app.js::run#function\",\"caller_kind\":\"function\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::make#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"caller_definition\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"symbol_reference\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"helper.js::make#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"app.js\",\"language\":\"javascript\",\"line\":2,\"column\":41,\"start_byte\":89,\"end_byte\":95,\"callee_start_byte\":89,\"callee_end_byte\":92,\"callee_text\":\"add\",\"callee_path\":[\"add\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":56,\"definition_end_byte\":98,\"body_start_byte\":71,\"body_end_byte\":98},\"source_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\"},\"caller_id\":\"app.js::run#function\",\"caller_kind\":\"function\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::add#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"caller_definition\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"symbol_reference\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"helper.js::add#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"app.js\",\"language\":\"javascript\",\"line\":3,\"column\":54,\"start_byte\":152,\"end_byte\":158,\"callee_start_byte\":152,\"callee_end_byte\":155,\"callee_text\":\"add\",\"callee_path\":[\"add\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":136,\"definition_end_byte\":161,\"body_start_byte\":143,\"body_end_byte\":161},\"source_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\"},\"caller_id\":\"app.js::Worker.work#method\",\"caller_kind\":\"method\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::add#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"app.js\",\"line\":3,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"app.js::Worker.work#method\"},{\"kind\":\"caller_definition\",\"file\":\"app.js\",\"line\":3,\"content_hash\":\"fc5691268bb3ee147c5ce653cb740088ca42491be3a2d5ea3a26b85b2c08d953\",\"endpoint_id\":\"app.js::Worker.work#method\"},{\"kind\":\"symbol_reference\",\"file\":\"app.js\",\"line\":3,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"helper.js::add#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"helper.js\",\"language\":\"javascript\",\"line\":2,\"column\":26,\"start_byte\":66,\"end_byte\":72,\"callee_start_byte\":66,\"callee_end_byte\":69,\"callee_text\":\"add\",\"callee_path\":[\"add\"],\"callee_form\":\"identifier\",\"local_candidates\":[{\"name\":\"add\",\"callable_kind\":\"function\",\"definition_start_byte\":13,\"definition_end_byte\":39,\"definition_line\":1,\"scope_start_byte\":0,\"scope_end_byte\":97}],\"local_binding_state\":\"definite\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":41,\"definition_end_byte\":75,\"body_start_byte\":57,\"body_end_byte\":75},\"source_hash\":\"6a1835c96fc597b7c7a8ba7cd2717fbd1aef2ea8be4b0bf82e8fd00d0fa5911e\"},\"caller_id\":\"helper.js::make#function\",\"caller_kind\":\"function\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::add#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"exact\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"local_callable\",\"support\":[{\"kind\":\"call_site\",\"file\":\"helper.js\",\"line\":2,\"content_hash\":\"6a1835c96fc597b7c7a8ba7cd2717fbd1aef2ea8be4b0bf82e8fd00d0fa5911e\",\"endpoint_id\":\"helper.js::make#function\"},{\"kind\":\"caller_definition\",\"file\":\"helper.js\",\"line\":2,\"content_hash\":\"2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df\",\"endpoint_id\":\"helper.js::make#function\"},{\"kind\":\"local_definition\",\"file\":\"helper.js\",\"line\":1,\"content_hash\":\"4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f\",\"endpoint_id\":\"helper.js::add#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":4,\"resolved\":4,\"unresolved\":0,\"returned\":4},\"pagination\":{\"offset\":0,\"limit\":10,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:6\"}}",
+      "serialized_bytes": 6304,
+      "source_bytes": 0,
+      "elapsed_ms": 4.025958012789488,
+      "spans": []
+    }
+  ],
+  "failures": [
+    {
+      "attempt_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/5",
+      "category": "tool_error",
+      "message": "invalid record pagination"
+    }
+  ],
+  "attempts": 6,
+  "deliveries": [
+    {
+      "attempt_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/1",
+      "operation": "search",
+      "arguments": {
+        "query": "add"
+      },
+      "reason": "task_context",
+      "detail": "Observed search request.",
+      "because": null,
+      "response_json": "{\"symbols\":[{\"id\":\"helper.js::add#function\",\"name\":\"add\",\"qualified_name\":\"add\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"helper.js\",\"byte_offset\":13,\"byte_length\":26,\"signature\":\"add = (value) => value + 1\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f\",\"decorators\":[],\"keywords\":[\"add\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":71.0},{\"id\":\"wrong.js::add#function\",\"name\":\"add\",\"qualified_name\":\"add\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"wrong.js\",\"byte_offset\":13,\"byte_length\":26,\"signature\":\"add = (value) => value - 1\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"c220ba4411800a47ed5011a262c6c728fef9acf997eddd63f87cac46446c9e75\",\"decorators\":[],\"keywords\":[\"add\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":71.0},{\"id\":\"app.js::run#function\",\"name\":\"run\",\"qualified_name\":\"run\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"app.js\",\"byte_offset\":56,\"byte_length\":42,\"signature\":\"function run() { return make() + add(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"decorators\":[],\"keywords\":[\"run\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":18.0},{\"id\":\"app.js::Worker.work#method\",\"name\":\"work\",\"qualified_name\":\"Worker.work\",\"kind\":\"method\",\"language\":\"javascript\",\"file_path\":\"app.js\",\"byte_offset\":136,\"byte_length\":25,\"signature\":\"work() { return add(2); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"fc5691268bb3ee147c5ce653cb740088ca42491be3a2d5ea3a26b85b2c08d953\",\"decorators\":[],\"keywords\":[\"work\"],\"metadata\":{},\"line\":3,\"end_line\":3,\"score\":18.0},{\"id\":\"helper.js::make#function\",\"name\":\"make\",\"qualified_name\":\"make\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"helper.js\",\"byte_offset\":41,\"byte_length\":34,\"signature\":\"function make() { return add(0); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df\",\"decorators\":[],\"keywords\":[\"make\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":5,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"38536662-0a09-4b87-b59e-3144de43b331\",\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:1\"}}",
+      "serialized_bytes": 2500,
+      "source_bytes": 153,
+      "elapsed_ms": 2.3938750091474503,
+      "trace_event_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2:1",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "helper.js",
+          "start_byte": 13,
+          "end_byte": 39,
+          "sha256": "4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f",
+          "text": "add = (value) => value + 1"
+        },
+        {
+          "file": "wrong.js",
+          "start_byte": 13,
+          "end_byte": 39,
+          "sha256": "c220ba4411800a47ed5011a262c6c728fef9acf997eddd63f87cac46446c9e75",
+          "text": "add = (value) => value - 1"
+        },
+        {
+          "file": "app.js",
+          "start_byte": 56,
+          "end_byte": 98,
+          "sha256": "32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18",
+          "text": "function run() { return make() + add(1); }"
+        },
+        {
+          "file": "app.js",
+          "start_byte": 136,
+          "end_byte": 161,
+          "sha256": "fc5691268bb3ee147c5ce653cb740088ca42491be3a2d5ea3a26b85b2c08d953",
+          "text": "work() { return add(2); }"
+        },
+        {
+          "file": "helper.js",
+          "start_byte": 41,
+          "end_byte": 75,
+          "sha256": "2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df",
+          "text": "function make() { return add(0); }"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/2",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "helper.js::add#function"
+        ],
+        "context": 0,
+        "selected_from_search_id": "38536662-0a09-4b87-b59e-3144de43b331"
+      },
+      "reason": "task_context",
+      "detail": "Observed get request.",
+      "because": null,
+      "response_json": "{\"symbols\":[{\"id\":\"helper.js::add#function\",\"source\":\"add = (value) => value + 1\",\"byte_offset\":13,\"byte_length\":26,\"line\":1,\"end_line\":1,\"signature\":\"add = (value) => value + 1\",\"kind\":\"function\",\"language\":\"javascript\"}],\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:2\"}}",
+      "serialized_bytes": 390,
+      "source_bytes": 52,
+      "elapsed_ms": 4.241042013745755,
+      "trace_event_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2:2",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "helper.js",
+          "start_byte": 13,
+          "end_byte": 39,
+          "sha256": "4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f",
+          "text": "add = (value) => value + 1"
+        },
+        {
+          "file": "helper.js",
+          "start_byte": 13,
+          "end_byte": 39,
+          "sha256": "4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f",
+          "text": "add = (value) => value + 1"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/3",
+      "operation": "graph_retrieve",
+      "arguments": {
+        "question": "What are the known direct callers of helper.js::add#function, including same-file and imported calls? Preserve unresolved relationships and do not infer runtime callers.",
+        "seed_ids": [
+          "helper.js::add#function"
+        ]
+      },
+      "reason": "task_context",
+      "detail": "Observed graph_retrieve request.",
+      "because": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-l0haecg4/snapshot\",\"question\":\"What are the known direct callers of helper.js::add#function, including same-file and imported calls? Preserve unresolved relationships and do not infer runtime callers.\",\"selection\":\"explicit\",\"question_terms\":[],\"anchors\":[{\"node\":{\"id\":\"helper.js::add#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"helper.js\",\"line\":1,\"end_line\":1}},\"matched_symbol_id\":\"helper.js::add#function\",\"name\":\"add\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}}],\"routing\":{\"kind\":\"relationship\",\"reason\":\"relationship_intent\"},\"filters\":{\"namespaces\":null,\"edge_types\":null,\"resolutions\":[\"exact\",\"declared\",\"import-resolved\"],\"direction\":\"outgoing\"},\"hub_threshold\":4,\"paths\":[],\"rejected_paths\":[],\"counts\":{\"filtered_edges\":12,\"examined_nodes\":10,\"examined_paths\":1,\"returned_paths\":0,\"rejected_paths\":0,\"duplicate_paths\":0,\"omitted_rejected_paths\":0,\"omitted_nodes\":0,\"omitted_paths\":0},\"budget\":{\"max_hops\":3,\"max_nodes\":64,\"max_paths\":16,\"path_offset\":0,\"evidence_bytes\":0,\"estimated_tokens\":0,\"max_evidence_bytes\":16384,\"max_estimated_tokens\":4096,\"hop_limit_reached\":false,\"node_limit_reached\":false,\"next_path_offset\":null},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:3\"}}",
+      "serialized_bytes": 1514,
+      "source_bytes": 0,
+      "elapsed_ms": 12.47575000161305,
+      "trace_event_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2:3",
+      "status": "recorded",
+      "spans": []
+    },
+    {
+      "attempt_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/4",
+      "operation": "graph_anchors",
+      "arguments": {
+        "question": "Find symbols that directly call add in helper.js, including same-file and imported calls.",
+        "seed_ids": [
+          "helper.js::add#function"
+        ]
+      },
+      "reason": "task_context",
+      "detail": "Observed graph_anchors request.",
+      "because": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-l0haecg4/snapshot\",\"question\":\"Find symbols that directly call add in helper.js, including same-file and imported calls.\",\"selection\":\"explicit\",\"question_terms\":[],\"anchors\":[{\"node\":{\"id\":\"helper.js::add#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"helper.js\",\"line\":1,\"end_line\":1}},\"matched_symbol_id\":\"helper.js::add#function\",\"name\":\"add\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}}],\"counts\":{\"indexed_nodes\":13,\"eligible_units\":13,\"qualified_candidates\":1,\"collapsed_symbols\":0,\"returned_anchors\":1,\"omitted_candidates\":0},\"budget\":{\"requested_max_anchors\":5,\"effective_max_anchors\":5},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:4\"}}",
+      "serialized_bytes": 967,
+      "source_bytes": 0,
+      "elapsed_ms": 2.069749985821545,
+      "trace_event_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2:4",
+      "status": "recorded",
+      "spans": []
+    },
+    {
+      "attempt_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/5",
+      "operation": "graph_calls",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 50
+      },
+      "reason": "task_context",
+      "detail": "Observed graph_calls request.",
+      "because": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"invalid record pagination\"},\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:5\"}}",
+      "serialized_bytes": 236,
+      "source_bytes": 0,
+      "elapsed_ms": 0.23187501938082278,
+      "trace_event_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2:5",
+      "status": "recorded",
+      "spans": []
+    },
+    {
+      "attempt_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/6",
+      "operation": "graph_calls",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 10
+      },
+      "reason": "task_context",
+      "detail": "Observed graph_calls request.",
+      "because": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-l0haecg4/snapshot\",\"file\":null,\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"app.js\",\"language\":\"javascript\",\"line\":2,\"column\":32,\"start_byte\":80,\"end_byte\":86,\"callee_start_byte\":80,\"callee_end_byte\":84,\"callee_text\":\"make\",\"callee_path\":[\"make\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":56,\"definition_end_byte\":98,\"body_start_byte\":71,\"body_end_byte\":98},\"source_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\"},\"caller_id\":\"app.js::run#function\",\"caller_kind\":\"function\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::make#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"caller_definition\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"symbol_reference\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"helper.js::make#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"app.js\",\"language\":\"javascript\",\"line\":2,\"column\":41,\"start_byte\":89,\"end_byte\":95,\"callee_start_byte\":89,\"callee_end_byte\":92,\"callee_text\":\"add\",\"callee_path\":[\"add\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":56,\"definition_end_byte\":98,\"body_start_byte\":71,\"body_end_byte\":98},\"source_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\"},\"caller_id\":\"app.js::run#function\",\"caller_kind\":\"function\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::add#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"caller_definition\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"symbol_reference\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"helper.js::add#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"app.js\",\"language\":\"javascript\",\"line\":3,\"column\":54,\"start_byte\":152,\"end_byte\":158,\"callee_start_byte\":152,\"callee_end_byte\":155,\"callee_text\":\"add\",\"callee_path\":[\"add\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":136,\"definition_end_byte\":161,\"body_start_byte\":143,\"body_end_byte\":161},\"source_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\"},\"caller_id\":\"app.js::Worker.work#method\",\"caller_kind\":\"method\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::add#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"app.js\",\"line\":3,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"app.js::Worker.work#method\"},{\"kind\":\"caller_definition\",\"file\":\"app.js\",\"line\":3,\"content_hash\":\"fc5691268bb3ee147c5ce653cb740088ca42491be3a2d5ea3a26b85b2c08d953\",\"endpoint_id\":\"app.js::Worker.work#method\"},{\"kind\":\"symbol_reference\",\"file\":\"app.js\",\"line\":3,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"helper.js::add#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"helper.js\",\"language\":\"javascript\",\"line\":2,\"column\":26,\"start_byte\":66,\"end_byte\":72,\"callee_start_byte\":66,\"callee_end_byte\":69,\"callee_text\":\"add\",\"callee_path\":[\"add\"],\"callee_form\":\"identifier\",\"local_candidates\":[{\"name\":\"add\",\"callable_kind\":\"function\",\"definition_start_byte\":13,\"definition_end_byte\":39,\"definition_line\":1,\"scope_start_byte\":0,\"scope_end_byte\":97}],\"local_binding_state\":\"definite\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":41,\"definition_end_byte\":75,\"body_start_byte\":57,\"body_end_byte\":75},\"source_hash\":\"6a1835c96fc597b7c7a8ba7cd2717fbd1aef2ea8be4b0bf82e8fd00d0fa5911e\"},\"caller_id\":\"helper.js::make#function\",\"caller_kind\":\"function\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::add#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"exact\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"local_callable\",\"support\":[{\"kind\":\"call_site\",\"file\":\"helper.js\",\"line\":2,\"content_hash\":\"6a1835c96fc597b7c7a8ba7cd2717fbd1aef2ea8be4b0bf82e8fd00d0fa5911e\",\"endpoint_id\":\"helper.js::make#function\"},{\"kind\":\"caller_definition\",\"file\":\"helper.js\",\"line\":2,\"content_hash\":\"2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df\",\"endpoint_id\":\"helper.js::make#function\"},{\"kind\":\"local_definition\",\"file\":\"helper.js\",\"line\":1,\"content_hash\":\"4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f\",\"endpoint_id\":\"helper.js::add#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":4,\"resolved\":4,\"unresolved\":0,\"returned\":4},\"pagination\":{\"offset\":0,\"limit\":10,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:6\"}}",
+      "serialized_bytes": 6304,
+      "source_bytes": 0,
+      "elapsed_ms": 4.241250018822029,
+      "trace_event_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2:6",
+      "status": "recorded",
+      "spans": []
+    }
+  ]
+}

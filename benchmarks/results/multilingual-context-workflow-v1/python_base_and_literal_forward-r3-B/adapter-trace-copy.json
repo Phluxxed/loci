@@ -1,0 +1,684 @@
+{
+  "schema_version": 3,
+  "protocol": "multilingual-context-workflow-v1",
+  "identity": {
+    "task_id": "python_base_and_literal_forward",
+    "session_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56",
+    "arm": "B",
+    "repetition": 3,
+    "snapshot": "python_contracts",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1"
+  },
+  "events": [
+    {
+      "id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56:1",
+      "task_id": "python_base_and_literal_forward",
+      "session_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "python_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "Locate the authored declaration of Child and the function or declaration named later. Report Child's direct base, base origin, base fields, any annotation exactly equal to P, and whether the source proves a computed MRO.",
+        "max_output_bytes": 12000,
+        "max_evidence_bytes": 8000,
+        "max_hops": 2
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.py::Child#class\",\"name\":\"Child\",\"kind\":\"class\",\"file\":\"consumer.py\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches child, base\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"schema.py::Base#class\",\"name\":\"Base\",\"kind\":\"class\",\"file\":\"schema.py\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.py::Child#class\",\"to\":\"schema.py::Base#class\",\"type\":\"extends\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.py\",\"line\":10,\"content_hash\":\"38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462\"}},\"traversed\":\"forward\",\"source_ids\":[1,3,2]}],\"sources\":[{\"id\":1,\"file\":\"consumer.py\",\"start_byte\":166,\"end_byte\":193,\"start_line\":10,\"end_line\":11,\"content_hash\":\"38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462\",\"content\":\"class Child(Base):\\n    pass\"},{\"id\":2,\"file\":\"schema.py\",\"start_byte\":36,\"end_byte\":65,\"start_line\":4,\"end_line\":5,\"content_hash\":\"e15994eefb294c55da32540a16759f095f67ae73ce7ecd7f5e9634c25c6f4ecd\",\"content\":\"class Base:\\n    enabled: bool\"},{\"id\":3,\"file\":\"consumer.py\",\"start_byte\":62,\"end_byte\":86,\"start_line\":3,\"end_line\":3,\"content_hash\":\"38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462\",\"content\":\"from schema import Base\\n\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":2}],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":12000,\"max_evidence_bytes\":8000},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":80,\"output_bytes\":1983,\"estimated_tokens\":496,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56:1\"}}",
+      "serialized_bytes": 2099,
+      "source_bytes": 80,
+      "elapsed_ms": 8.40779099962674,
+      "spans": [
+        {
+          "file": "consumer.py",
+          "start_byte": 166,
+          "end_byte": 193,
+          "sha256": "874268998ed249a6307588123b97e3c6cf844cc84d1981253a9d6961816608c4",
+          "text": "class Child(Base):\n    pass"
+        },
+        {
+          "file": "schema.py",
+          "start_byte": 36,
+          "end_byte": 65,
+          "sha256": "530520bae1f5f9992db2ca9e14661ff643cb91cc6240f9878ce58e8a42c00b7c",
+          "text": "class Base:\n    enabled: bool"
+        },
+        {
+          "file": "consumer.py",
+          "start_byte": 62,
+          "end_byte": 86,
+          "sha256": "43ca8c7afd5d5c042f8969edac731b95b9bf1bf12ab9d96eab9838075666c8b0",
+          "text": "from schema import Base\n"
+        }
+      ]
+    },
+    {
+      "id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56:2",
+      "task_id": "python_base_and_literal_forward",
+      "session_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "python_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "later"
+      },
+      "search_id": "52cb4aba-c013-4dc6-84aa-6b18015ddb27",
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.py::later#function\",\"name\":\"later\",\"qualified_name\":\"later\",\"kind\":\"function\",\"language\":\"python\",\"file_path\":\"consumer.py\",\"byte_offset\":195,\"byte_length\":46,\"signature\":\"def later(value: \\\"P\\\") -> \\\"P\\\"\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"e3e93c34015caf7ad773941f594df519bfbd027483a89f93320fb8c6d8237ba2\",\"decorators\":[],\"keywords\":[\"later\"],\"metadata\":{},\"line\":13,\"end_line\":14,\"score\":71.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"52cb4aba-c013-4dc6-84aa-6b18015ddb27\",\"_evaluation\":{\"attempt_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56:2\"}}",
+      "serialized_bytes": 873,
+      "source_bytes": 28,
+      "elapsed_ms": 4.556458996376023,
+      "spans": [
+        {
+          "file": "consumer.py",
+          "start_byte": 195,
+          "end_byte": 223,
+          "sha256": "c8fd58a4f6651a77a5518f75ef1f7f5b6315631170156935551f146304cd99fd",
+          "text": "def later(value: \"P\") -> \"P\""
+        }
+      ]
+    },
+    {
+      "id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56:3",
+      "task_id": "python_base_and_literal_forward",
+      "session_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "python_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "consumer.py::Child#class",
+          "consumer.py::later#function",
+          "schema.py::Base#class"
+        ],
+        "context": 2,
+        "selected_from_search_id": "52cb4aba-c013-4dc6-84aa-6b18015ddb27"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.py::Child#class\",\"source\":\"class Child(Base):\\n    pass\",\"byte_offset\":166,\"byte_length\":27,\"line\":10,\"end_line\":11,\"signature\":\"class Child(Base)\",\"kind\":\"class\",\"language\":\"python\",\"context_before\":[\"    return [value]\",\"\"],\"context_after\":[\"\",\"def later(value: \\\"P\\\") -> \\\"P\\\":\"]},{\"id\":\"consumer.py::later#function\",\"source\":\"def later(value: \\\"P\\\") -> \\\"P\\\":\\n    return value\",\"byte_offset\":195,\"byte_length\":46,\"line\":13,\"end_line\":14,\"signature\":\"def later(value: \\\"P\\\") -> \\\"P\\\"\",\"kind\":\"function\",\"language\":\"python\",\"context_before\":[\"    pass\",\"\"],\"context_after\":[]},{\"id\":\"schema.py::Base#class\",\"source\":\"class Base:\\n    enabled: bool\",\"byte_offset\":36,\"byte_length\":29,\"line\":4,\"end_line\":5,\"signature\":\"class Base\",\"kind\":\"class\",\"language\":\"python\",\"context_before\":[\"    request_id: str\",\"\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56:3\"}}",
+      "serialized_bytes": 1028,
+      "source_bytes": 231,
+      "elapsed_ms": 13.957541988929734,
+      "spans": [
+        {
+          "file": "consumer.py",
+          "start_byte": 166,
+          "end_byte": 193,
+          "sha256": "874268998ed249a6307588123b97e3c6cf844cc84d1981253a9d6961816608c4",
+          "text": "class Child(Base):\n    pass"
+        },
+        {
+          "file": "consumer.py",
+          "start_byte": 146,
+          "end_byte": 164,
+          "sha256": "85c8e9ec3c814fdc842c525ea862e8dbcf15b5475fb71a122d644e0bd22f68d5",
+          "text": "    return [value]"
+        },
+        {
+          "file": "consumer.py",
+          "start_byte": 195,
+          "end_byte": 224,
+          "sha256": "72ca9507ee92acd81d295edf31746a4933b7ab183c35547ecad599e77c0214c3",
+          "text": "def later(value: \"P\") -> \"P\":"
+        },
+        {
+          "file": "consumer.py",
+          "start_byte": 195,
+          "end_byte": 241,
+          "sha256": "e3e93c34015caf7ad773941f594df519bfbd027483a89f93320fb8c6d8237ba2",
+          "text": "def later(value: \"P\") -> \"P\":\n    return value"
+        },
+        {
+          "file": "consumer.py",
+          "start_byte": 185,
+          "end_byte": 193,
+          "sha256": "e225b388d251d09902488254da501605f76393535a8838121ecc2372c568af31",
+          "text": "    pass"
+        },
+        {
+          "file": "schema.py",
+          "start_byte": 36,
+          "end_byte": 65,
+          "sha256": "530520bae1f5f9992db2ca9e14661ff643cb91cc6240f9878ce58e8a42c00b7c",
+          "text": "class Base:\n    enabled: bool"
+        },
+        {
+          "file": "schema.py",
+          "start_byte": 15,
+          "end_byte": 34,
+          "sha256": "dca0ae6d9032ab2abee78fa4a7829cf9b958db23fd5493e008577d7c93329ccb",
+          "text": "    request_id: str"
+        },
+        {
+          "file": "consumer.py",
+          "start_byte": 166,
+          "end_byte": 183,
+          "sha256": "908d84e7f1cc35b81de9475678d4472e2dba64d1de6cf513a80b1073af8a8a05",
+          "text": "class Child(Base)"
+        },
+        {
+          "file": "consumer.py",
+          "start_byte": 195,
+          "end_byte": 223,
+          "sha256": "c8fd58a4f6651a77a5518f75ef1f7f5b6315631170156935551f146304cd99fd",
+          "text": "def later(value: \"P\") -> \"P\""
+        },
+        {
+          "file": "schema.py",
+          "start_byte": 36,
+          "end_byte": 46,
+          "sha256": "78984207cb4146f26ca0b1edec47b270d92afee09e01152f043447bcb281aede",
+          "text": "class Base"
+        }
+      ]
+    },
+    {
+      "id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56:4",
+      "task_id": "python_base_and_literal_forward",
+      "session_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "python_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "consumer.py",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"consumer.py\",\"content\":\"from typing import TypeAlias\\nfrom barrel import Exported as P\\nfrom schema import Base\\n\\nAlias: TypeAlias = P\\n\\ndef decode(value: Alias) -> list[P]:\\n    return [value]\\n\\nclass Child(Base):\\n    pass\\n\\ndef later(value: \\\"P\\\") -> \\\"P\\\":\\n    return value\\n\",\"total_lines\":14,\"start_line\":1,\"end_line\":14,\"_evaluation\":{\"attempt_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56:4\"}}",
+      "serialized_bytes": 508,
+      "source_bytes": 242,
+      "elapsed_ms": 2.3886249982751906,
+      "spans": [
+        {
+          "file": "consumer.py",
+          "start_byte": 0,
+          "end_byte": 242,
+          "sha256": "38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462",
+          "text": "from typing import TypeAlias\nfrom barrel import Exported as P\nfrom schema import Base\n\nAlias: TypeAlias = P\n\ndef decode(value: Alias) -> list[P]:\n    return [value]\n\nclass Child(Base):\n    pass\n\ndef later(value: \"P\") -> \"P\":\n    return value\n"
+        }
+      ]
+    },
+    {
+      "id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56:5",
+      "task_id": "python_base_and_literal_forward",
+      "session_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "python_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "schema.py",
+        "start_line": 1,
+        "end_line": 12
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"schema.py\",\"content\":\"class Payload:\\n    request_id: str\\n\\nclass Base:\\n    enabled: bool\\n\",\"total_lines\":5,\"start_line\":1,\"end_line\":5,\"_evaluation\":{\"attempt_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56:5\"}}",
+      "serialized_bytes": 315,
+      "source_bytes": 66,
+      "elapsed_ms": 1.8179579928983003,
+      "spans": [
+        {
+          "file": "schema.py",
+          "start_byte": 0,
+          "end_byte": 66,
+          "sha256": "e15994eefb294c55da32540a16759f095f67ae73ce7ecd7f5e9634c25c6f4ecd",
+          "text": "class Payload:\n    request_id: str\n\nclass Base:\n    enabled: bool\n"
+        }
+      ]
+    },
+    {
+      "id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56:6",
+      "task_id": "python_base_and_literal_forward",
+      "session_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "python_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "barrel.py",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"barrel.py\",\"content\":\"from schema import Payload as Exported\\n\",\"total_lines\":1,\"start_line\":1,\"end_line\":1,\"_evaluation\":{\"attempt_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56:6\"}}",
+      "serialized_bytes": 284,
+      "source_bytes": 39,
+      "elapsed_ms": 2.8308329929132015,
+      "spans": [
+        {
+          "file": "barrel.py",
+          "start_byte": 0,
+          "end_byte": 39,
+          "sha256": "ea3012e0017f334a3c46f223013d209cbe35aa479aaaf93b239dd3364f6b303a",
+          "text": "from schema import Payload as Exported\n"
+        }
+      ]
+    },
+    {
+      "id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56:7",
+      "task_id": "python_base_and_literal_forward",
+      "session_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "python_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "dependencies",
+        "query": "Trace the annotation references in later, especially the literal string annotation P, through authored imports and aliases to its resolved declaration.",
+        "max_output_bytes": 12000,
+        "max_evidence_bytes": 8000,
+        "seed_ids": [
+          "consumer.py::later#function"
+        ],
+        "max_hops": 3
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"dependencies\",\"status\":\"ok\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_dependencies\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.py::later#function\",\"name\":\"later\",\"kind\":\"function\",\"file\":\"consumer.py\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"schema.py::Payload#class\",\"name\":\"Payload\",\"kind\":\"class\",\"file\":\"schema.py\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.py::later#function\",\"to\":\"schema.py::Payload#class\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.py\",\"line\":13,\"content_hash\":\"38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462\"}},\"traversed\":\"forward\",\"source_ids\":[1,3,4,2]}],\"sources\":[{\"id\":1,\"file\":\"consumer.py\",\"start_byte\":195,\"end_byte\":241,\"start_line\":13,\"end_line\":14,\"content_hash\":\"38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462\",\"content\":\"def later(value: \\\"P\\\") -> \\\"P\\\":\\n    return value\"},{\"id\":2,\"file\":\"schema.py\",\"start_byte\":0,\"end_byte\":34,\"start_line\":1,\"end_line\":2,\"content_hash\":\"e15994eefb294c55da32540a16759f095f67ae73ce7ecd7f5e9634c25c6f4ecd\",\"content\":\"class Payload:\\n    request_id: str\"},{\"id\":3,\"file\":\"consumer.py\",\"start_byte\":29,\"end_byte\":62,\"start_line\":2,\"end_line\":2,\"content_hash\":\"38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462\",\"content\":\"from barrel import Exported as P\\n\"},{\"id\":4,\"file\":\"barrel.py\",\"start_byte\":0,\"end_byte\":39,\"start_line\":1,\"end_line\":1,\"content_hash\":\"ea3012e0017f334a3c46f223013d209cbe35aa479aaaf93b239dd3364f6b303a\",\"content\":\"from schema import Payload as Exported\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":12000,\"max_evidence_bytes\":8000},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":152,\"output_bytes\":2219,\"estimated_tokens\":555,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56:7\"}}",
+      "serialized_bytes": 2335,
+      "source_bytes": 152,
+      "elapsed_ms": 8.502582990331575,
+      "spans": [
+        {
+          "file": "consumer.py",
+          "start_byte": 195,
+          "end_byte": 241,
+          "sha256": "e3e93c34015caf7ad773941f594df519bfbd027483a89f93320fb8c6d8237ba2",
+          "text": "def later(value: \"P\") -> \"P\":\n    return value"
+        },
+        {
+          "file": "schema.py",
+          "start_byte": 0,
+          "end_byte": 34,
+          "sha256": "fbc060734857298af0bc95adb581cebcda4f3d12b7371b9a5b84e9eeae95724d",
+          "text": "class Payload:\n    request_id: str"
+        },
+        {
+          "file": "consumer.py",
+          "start_byte": 29,
+          "end_byte": 62,
+          "sha256": "b524e492766a813b38bd348d1ee1023bd78f29b32cd3877e296936e861550114",
+          "text": "from barrel import Exported as P\n"
+        },
+        {
+          "file": "barrel.py",
+          "start_byte": 0,
+          "end_byte": 39,
+          "sha256": "ea3012e0017f334a3c46f223013d209cbe35aa479aaaf93b239dd3364f6b303a",
+          "text": "from schema import Payload as Exported\n"
+        }
+      ]
+    },
+    {
+      "id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56:8",
+      "task_id": "python_base_and_literal_forward",
+      "session_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "python_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 20,
+        "file": "consumer.py"
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-y92f0om6/snapshot\",\"file\":\"consumer.py\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"consumer.py\",\"language\":\"python\",\"line\":1,\"text\":\"from typing import TypeAlias\",\"specifier\":\"typing\",\"imported_name\":\"TypeAlias\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462\",\"rust\":null},\"source_file\":\"consumer.py\",\"source_id\":\"consumer.py::__file__#file\",\"target_file\":null,\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":null,\"target_id\":null,\"specifier\":\"typing\",\"imported_name\":\"TypeAlias\",\"language\":\"python\",\"line\":1,\"text\":\"from typing import TypeAlias\",\"type_only\":false,\"is_reexport\":false,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"not_indexed\",\"resolution_basis\":null,\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"consumer.py\",\"language\":\"python\",\"line\":2,\"text\":\"from barrel import Exported as P\",\"specifier\":\"barrel\",\"imported_name\":\"Exported\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462\",\"rust\":null},\"source_file\":\"consumer.py\",\"source_id\":\"consumer.py::__file__#file\",\"target_file\":\"barrel.py\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"barrel.py::__file__#file\",\"specifier\":\"barrel\",\"imported_name\":\"Exported\",\"language\":\"python\",\"line\":2,\"text\":\"from barrel import Exported as P\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":null,\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"consumer.py\",\"language\":\"python\",\"line\":3,\"text\":\"from schema import Base\",\"specifier\":\"schema\",\"imported_name\":\"Base\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462\",\"rust\":null},\"source_file\":\"consumer.py\",\"source_id\":\"consumer.py::__file__#file\",\"target_file\":\"schema.py\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"schema.py::__file__#file\",\"specifier\":\"schema\",\"imported_name\":\"Base\",\"language\":\"python\",\"line\":3,\"text\":\"from schema import Base\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":null,\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":3,\"resolved\":2,\"unresolved\":1,\"returned\":3},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/8\",\"calls_remaining\":16,\"event_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56:8\"}}",
+      "serialized_bytes": 2861,
+      "source_bytes": 0,
+      "elapsed_ms": 2.675750001799315,
+      "spans": []
+    }
+  ],
+  "failures": [],
+  "attempts": 8,
+  "deliveries": [
+    {
+      "attempt_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "Locate the authored declaration of Child and the function or declaration named later. Report Child's direct base, base origin, base fields, any annotation exactly equal to P, and whether the source proves a computed MRO.",
+        "max_output_bytes": 12000,
+        "max_evidence_bytes": 8000,
+        "max_hops": 2
+      },
+      "reason": "task_context",
+      "detail": "Observed loci_explore request.",
+      "because": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.py::Child#class\",\"name\":\"Child\",\"kind\":\"class\",\"file\":\"consumer.py\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches child, base\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"schema.py::Base#class\",\"name\":\"Base\",\"kind\":\"class\",\"file\":\"schema.py\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.py::Child#class\",\"to\":\"schema.py::Base#class\",\"type\":\"extends\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.py\",\"line\":10,\"content_hash\":\"38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462\"}},\"traversed\":\"forward\",\"source_ids\":[1,3,2]}],\"sources\":[{\"id\":1,\"file\":\"consumer.py\",\"start_byte\":166,\"end_byte\":193,\"start_line\":10,\"end_line\":11,\"content_hash\":\"38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462\",\"content\":\"class Child(Base):\\n    pass\"},{\"id\":2,\"file\":\"schema.py\",\"start_byte\":36,\"end_byte\":65,\"start_line\":4,\"end_line\":5,\"content_hash\":\"e15994eefb294c55da32540a16759f095f67ae73ce7ecd7f5e9634c25c6f4ecd\",\"content\":\"class Base:\\n    enabled: bool\"},{\"id\":3,\"file\":\"consumer.py\",\"start_byte\":62,\"end_byte\":86,\"start_line\":3,\"end_line\":3,\"content_hash\":\"38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462\",\"content\":\"from schema import Base\\n\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":2}],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":12000,\"max_evidence_bytes\":8000},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":80,\"output_bytes\":1983,\"estimated_tokens\":496,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56:1\"}}",
+      "serialized_bytes": 2099,
+      "source_bytes": 80,
+      "elapsed_ms": 8.501541014993563,
+      "trace_event_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56:1",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "consumer.py",
+          "start_byte": 166,
+          "end_byte": 193,
+          "sha256": "874268998ed249a6307588123b97e3c6cf844cc84d1981253a9d6961816608c4",
+          "text": "class Child(Base):\n    pass"
+        },
+        {
+          "file": "schema.py",
+          "start_byte": 36,
+          "end_byte": 65,
+          "sha256": "530520bae1f5f9992db2ca9e14661ff643cb91cc6240f9878ce58e8a42c00b7c",
+          "text": "class Base:\n    enabled: bool"
+        },
+        {
+          "file": "consumer.py",
+          "start_byte": 62,
+          "end_byte": 86,
+          "sha256": "43ca8c7afd5d5c042f8969edac731b95b9bf1bf12ab9d96eab9838075666c8b0",
+          "text": "from schema import Base\n"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/2",
+      "operation": "search",
+      "arguments": {
+        "query": "later"
+      },
+      "reason": "task_context",
+      "detail": "Observed search request.",
+      "because": null,
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.py::later#function\",\"name\":\"later\",\"qualified_name\":\"later\",\"kind\":\"function\",\"language\":\"python\",\"file_path\":\"consumer.py\",\"byte_offset\":195,\"byte_length\":46,\"signature\":\"def later(value: \\\"P\\\") -> \\\"P\\\"\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"e3e93c34015caf7ad773941f594df519bfbd027483a89f93320fb8c6d8237ba2\",\"decorators\":[],\"keywords\":[\"later\"],\"metadata\":{},\"line\":13,\"end_line\":14,\"score\":71.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"52cb4aba-c013-4dc6-84aa-6b18015ddb27\",\"_evaluation\":{\"attempt_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56:2\"}}",
+      "serialized_bytes": 873,
+      "source_bytes": 28,
+      "elapsed_ms": 4.737333976663649,
+      "trace_event_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56:2",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "consumer.py",
+          "start_byte": 195,
+          "end_byte": 223,
+          "sha256": "c8fd58a4f6651a77a5518f75ef1f7f5b6315631170156935551f146304cd99fd",
+          "text": "def later(value: \"P\") -> \"P\""
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/3",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "consumer.py::Child#class",
+          "consumer.py::later#function",
+          "schema.py::Base#class"
+        ],
+        "context": 2,
+        "selected_from_search_id": "52cb4aba-c013-4dc6-84aa-6b18015ddb27"
+      },
+      "reason": "task_context",
+      "detail": "Observed get request.",
+      "because": null,
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.py::Child#class\",\"source\":\"class Child(Base):\\n    pass\",\"byte_offset\":166,\"byte_length\":27,\"line\":10,\"end_line\":11,\"signature\":\"class Child(Base)\",\"kind\":\"class\",\"language\":\"python\",\"context_before\":[\"    return [value]\",\"\"],\"context_after\":[\"\",\"def later(value: \\\"P\\\") -> \\\"P\\\":\"]},{\"id\":\"consumer.py::later#function\",\"source\":\"def later(value: \\\"P\\\") -> \\\"P\\\":\\n    return value\",\"byte_offset\":195,\"byte_length\":46,\"line\":13,\"end_line\":14,\"signature\":\"def later(value: \\\"P\\\") -> \\\"P\\\"\",\"kind\":\"function\",\"language\":\"python\",\"context_before\":[\"    pass\",\"\"],\"context_after\":[]},{\"id\":\"schema.py::Base#class\",\"source\":\"class Base:\\n    enabled: bool\",\"byte_offset\":36,\"byte_length\":29,\"line\":4,\"end_line\":5,\"signature\":\"class Base\",\"kind\":\"class\",\"language\":\"python\",\"context_before\":[\"    request_id: str\",\"\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56:3\"}}",
+      "serialized_bytes": 1028,
+      "source_bytes": 231,
+      "elapsed_ms": 14.175958989653736,
+      "trace_event_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56:3",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "consumer.py",
+          "start_byte": 166,
+          "end_byte": 193,
+          "sha256": "874268998ed249a6307588123b97e3c6cf844cc84d1981253a9d6961816608c4",
+          "text": "class Child(Base):\n    pass"
+        },
+        {
+          "file": "consumer.py",
+          "start_byte": 146,
+          "end_byte": 164,
+          "sha256": "85c8e9ec3c814fdc842c525ea862e8dbcf15b5475fb71a122d644e0bd22f68d5",
+          "text": "    return [value]"
+        },
+        {
+          "file": "consumer.py",
+          "start_byte": 195,
+          "end_byte": 224,
+          "sha256": "72ca9507ee92acd81d295edf31746a4933b7ab183c35547ecad599e77c0214c3",
+          "text": "def later(value: \"P\") -> \"P\":"
+        },
+        {
+          "file": "consumer.py",
+          "start_byte": 195,
+          "end_byte": 241,
+          "sha256": "e3e93c34015caf7ad773941f594df519bfbd027483a89f93320fb8c6d8237ba2",
+          "text": "def later(value: \"P\") -> \"P\":\n    return value"
+        },
+        {
+          "file": "consumer.py",
+          "start_byte": 185,
+          "end_byte": 193,
+          "sha256": "e225b388d251d09902488254da501605f76393535a8838121ecc2372c568af31",
+          "text": "    pass"
+        },
+        {
+          "file": "schema.py",
+          "start_byte": 36,
+          "end_byte": 65,
+          "sha256": "530520bae1f5f9992db2ca9e14661ff643cb91cc6240f9878ce58e8a42c00b7c",
+          "text": "class Base:\n    enabled: bool"
+        },
+        {
+          "file": "schema.py",
+          "start_byte": 15,
+          "end_byte": 34,
+          "sha256": "dca0ae6d9032ab2abee78fa4a7829cf9b958db23fd5493e008577d7c93329ccb",
+          "text": "    request_id: str"
+        },
+        {
+          "file": "consumer.py",
+          "start_byte": 166,
+          "end_byte": 183,
+          "sha256": "908d84e7f1cc35b81de9475678d4472e2dba64d1de6cf513a80b1073af8a8a05",
+          "text": "class Child(Base)"
+        },
+        {
+          "file": "consumer.py",
+          "start_byte": 195,
+          "end_byte": 223,
+          "sha256": "c8fd58a4f6651a77a5518f75ef1f7f5b6315631170156935551f146304cd99fd",
+          "text": "def later(value: \"P\") -> \"P\""
+        },
+        {
+          "file": "schema.py",
+          "start_byte": 36,
+          "end_byte": 46,
+          "sha256": "78984207cb4146f26ca0b1edec47b270d92afee09e01152f043447bcb281aede",
+          "text": "class Base"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/4",
+      "operation": "file",
+      "arguments": {
+        "file_path": "consumer.py",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "reason": "task_context",
+      "detail": "Observed file request.",
+      "because": null,
+      "response_json": "{\"file\":\"consumer.py\",\"content\":\"from typing import TypeAlias\\nfrom barrel import Exported as P\\nfrom schema import Base\\n\\nAlias: TypeAlias = P\\n\\ndef decode(value: Alias) -> list[P]:\\n    return [value]\\n\\nclass Child(Base):\\n    pass\\n\\ndef later(value: \\\"P\\\") -> \\\"P\\\":\\n    return value\\n\",\"total_lines\":14,\"start_line\":1,\"end_line\":14,\"_evaluation\":{\"attempt_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56:4\"}}",
+      "serialized_bytes": 508,
+      "source_bytes": 242,
+      "elapsed_ms": 2.457833004882559,
+      "trace_event_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56:4",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "consumer.py",
+          "start_byte": 0,
+          "end_byte": 242,
+          "sha256": "38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462",
+          "text": "from typing import TypeAlias\nfrom barrel import Exported as P\nfrom schema import Base\n\nAlias: TypeAlias = P\n\ndef decode(value: Alias) -> list[P]:\n    return [value]\n\nclass Child(Base):\n    pass\n\ndef later(value: \"P\") -> \"P\":\n    return value\n"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/5",
+      "operation": "file",
+      "arguments": {
+        "file_path": "schema.py",
+        "start_line": 1,
+        "end_line": 12
+      },
+      "reason": "task_context",
+      "detail": "Observed file request.",
+      "because": null,
+      "response_json": "{\"file\":\"schema.py\",\"content\":\"class Payload:\\n    request_id: str\\n\\nclass Base:\\n    enabled: bool\\n\",\"total_lines\":5,\"start_line\":1,\"end_line\":5,\"_evaluation\":{\"attempt_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56:5\"}}",
+      "serialized_bytes": 315,
+      "source_bytes": 66,
+      "elapsed_ms": 1.8818749813362956,
+      "trace_event_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56:5",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "schema.py",
+          "start_byte": 0,
+          "end_byte": 66,
+          "sha256": "e15994eefb294c55da32540a16759f095f67ae73ce7ecd7f5e9634c25c6f4ecd",
+          "text": "class Payload:\n    request_id: str\n\nclass Base:\n    enabled: bool\n"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/6",
+      "operation": "file",
+      "arguments": {
+        "file_path": "barrel.py",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "reason": "task_context",
+      "detail": "Observed file request.",
+      "because": null,
+      "response_json": "{\"file\":\"barrel.py\",\"content\":\"from schema import Payload as Exported\\n\",\"total_lines\":1,\"start_line\":1,\"end_line\":1,\"_evaluation\":{\"attempt_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56:6\"}}",
+      "serialized_bytes": 284,
+      "source_bytes": 39,
+      "elapsed_ms": 2.9037909989710897,
+      "trace_event_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56:6",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "barrel.py",
+          "start_byte": 0,
+          "end_byte": 39,
+          "sha256": "ea3012e0017f334a3c46f223013d209cbe35aa479aaaf93b239dd3364f6b303a",
+          "text": "from schema import Payload as Exported\n"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/7",
+      "operation": "explore",
+      "arguments": {
+        "intent": "dependencies",
+        "query": "Trace the annotation references in later, especially the literal string annotation P, through authored imports and aliases to its resolved declaration.",
+        "max_output_bytes": 12000,
+        "max_evidence_bytes": 8000,
+        "seed_ids": [
+          "consumer.py::later#function"
+        ],
+        "max_hops": 3
+      },
+      "reason": "task_context",
+      "detail": "Observed loci_explore request.",
+      "because": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"dependencies\",\"status\":\"ok\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_dependencies\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.py::later#function\",\"name\":\"later\",\"kind\":\"function\",\"file\":\"consumer.py\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"schema.py::Payload#class\",\"name\":\"Payload\",\"kind\":\"class\",\"file\":\"schema.py\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.py::later#function\",\"to\":\"schema.py::Payload#class\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.py\",\"line\":13,\"content_hash\":\"38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462\"}},\"traversed\":\"forward\",\"source_ids\":[1,3,4,2]}],\"sources\":[{\"id\":1,\"file\":\"consumer.py\",\"start_byte\":195,\"end_byte\":241,\"start_line\":13,\"end_line\":14,\"content_hash\":\"38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462\",\"content\":\"def later(value: \\\"P\\\") -> \\\"P\\\":\\n    return value\"},{\"id\":2,\"file\":\"schema.py\",\"start_byte\":0,\"end_byte\":34,\"start_line\":1,\"end_line\":2,\"content_hash\":\"e15994eefb294c55da32540a16759f095f67ae73ce7ecd7f5e9634c25c6f4ecd\",\"content\":\"class Payload:\\n    request_id: str\"},{\"id\":3,\"file\":\"consumer.py\",\"start_byte\":29,\"end_byte\":62,\"start_line\":2,\"end_line\":2,\"content_hash\":\"38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462\",\"content\":\"from barrel import Exported as P\\n\"},{\"id\":4,\"file\":\"barrel.py\",\"start_byte\":0,\"end_byte\":39,\"start_line\":1,\"end_line\":1,\"content_hash\":\"ea3012e0017f334a3c46f223013d209cbe35aa479aaaf93b239dd3364f6b303a\",\"content\":\"from schema import Payload as Exported\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":12000,\"max_evidence_bytes\":8000},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":152,\"output_bytes\":2219,\"estimated_tokens\":555,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56:7\"}}",
+      "serialized_bytes": 2335,
+      "source_bytes": 152,
+      "elapsed_ms": 8.608457981608808,
+      "trace_event_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56:7",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "consumer.py",
+          "start_byte": 195,
+          "end_byte": 241,
+          "sha256": "e3e93c34015caf7ad773941f594df519bfbd027483a89f93320fb8c6d8237ba2",
+          "text": "def later(value: \"P\") -> \"P\":\n    return value"
+        },
+        {
+          "file": "schema.py",
+          "start_byte": 0,
+          "end_byte": 34,
+          "sha256": "fbc060734857298af0bc95adb581cebcda4f3d12b7371b9a5b84e9eeae95724d",
+          "text": "class Payload:\n    request_id: str"
+        },
+        {
+          "file": "consumer.py",
+          "start_byte": 29,
+          "end_byte": 62,
+          "sha256": "b524e492766a813b38bd348d1ee1023bd78f29b32cd3877e296936e861550114",
+          "text": "from barrel import Exported as P\n"
+        },
+        {
+          "file": "barrel.py",
+          "start_byte": 0,
+          "end_byte": 39,
+          "sha256": "ea3012e0017f334a3c46f223013d209cbe35aa479aaaf93b239dd3364f6b303a",
+          "text": "from schema import Payload as Exported\n"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/8",
+      "operation": "graph_imports",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 20,
+        "file": "consumer.py"
+      },
+      "reason": "task_context",
+      "detail": "Observed graph_imports request.",
+      "because": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-y92f0om6/snapshot\",\"file\":\"consumer.py\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"consumer.py\",\"language\":\"python\",\"line\":1,\"text\":\"from typing import TypeAlias\",\"specifier\":\"typing\",\"imported_name\":\"TypeAlias\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462\",\"rust\":null},\"source_file\":\"consumer.py\",\"source_id\":\"consumer.py::__file__#file\",\"target_file\":null,\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":null,\"target_id\":null,\"specifier\":\"typing\",\"imported_name\":\"TypeAlias\",\"language\":\"python\",\"line\":1,\"text\":\"from typing import TypeAlias\",\"type_only\":false,\"is_reexport\":false,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"not_indexed\",\"resolution_basis\":null,\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"consumer.py\",\"language\":\"python\",\"line\":2,\"text\":\"from barrel import Exported as P\",\"specifier\":\"barrel\",\"imported_name\":\"Exported\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462\",\"rust\":null},\"source_file\":\"consumer.py\",\"source_id\":\"consumer.py::__file__#file\",\"target_file\":\"barrel.py\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"barrel.py::__file__#file\",\"specifier\":\"barrel\",\"imported_name\":\"Exported\",\"language\":\"python\",\"line\":2,\"text\":\"from barrel import Exported as P\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":null,\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"consumer.py\",\"language\":\"python\",\"line\":3,\"text\":\"from schema import Base\",\"specifier\":\"schema\",\"imported_name\":\"Base\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462\",\"rust\":null},\"source_file\":\"consumer.py\",\"source_id\":\"consumer.py::__file__#file\",\"target_file\":\"schema.py\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"schema.py::__file__#file\",\"specifier\":\"schema\",\"imported_name\":\"Base\",\"language\":\"python\",\"line\":3,\"text\":\"from schema import Base\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":null,\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":3,\"resolved\":2,\"unresolved\":1,\"returned\":3},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56/attempt/8\",\"calls_remaining\":16,\"event_id\":\"session-421367bc-bbe3-4a4f-80ea-14f61caebe56:8\"}}",
+      "serialized_bytes": 2861,
+      "source_bytes": 0,
+      "elapsed_ms": 2.7609170065261424,
+      "trace_event_id": "session-421367bc-bbe3-4a4f-80ea-14f61caebe56:8",
+      "status": "recorded",
+      "spans": []
+    }
+  ]
+}

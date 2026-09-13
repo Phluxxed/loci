@@ -1,0 +1,574 @@
+{
+  "schema_version": 4,
+  "protocol": "multilingual-context-workflow-v1",
+  "identity": {
+    "task_id": "javascript_direct_class_base",
+    "session_id": "session-1644662c-7d4f-4f6a-9833-948ede480e63",
+    "arm": "B",
+    "repetition": 1,
+    "snapshot": "javascript_dependencies",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1"
+  },
+  "events": [
+    {
+      "id": "session-1644662c-7d4f-4f6a-9833-948ede480e63:1",
+      "task_id": "javascript_direct_class_base",
+      "session_id": "session-1644662c-7d4f-4f6a-9833-948ede480e63",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "locate",
+        "query": "Locate the authored class declaration named Worker and inspect its direct class base extends clause, including file and source.",
+        "max_output_bytes": 16384,
+        "max_evidence_bytes": 8192,
+        "max_hops": 1
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"locate\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"none\",\"exhaustive\":false},\"items\":[{\"id\":\"app.js::Worker#class\",\"name\":\"Worker\",\"kind\":\"class\",\"file\":\"app.js\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches class, worker, extend\",\"source_id\":1,\"complete\":true,\"path\":[]}],\"relationships\":[],\"sources\":[{\"id\":1,\"file\":\"app.js\",\"start_byte\":106,\"end_byte\":163,\"start_line\":3,\"end_line\":3,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"content\":\"class Worker extends Parent { work() { return add(2); } }\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":3}],\"limits\":{\"max_hops\":0,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":1,\"evidence_bytes\":57,\"output_bytes\":1056,\"estimated_tokens\":264,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-1644662c-7d4f-4f6a-9833-948ede480e63/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-1644662c-7d4f-4f6a-9833-948ede480e63:1\"}}",
+      "serialized_bytes": 1172,
+      "source_bytes": 57,
+      "elapsed_ms": 9.499792009592056,
+      "spans": [
+        {
+          "file": "app.js",
+          "start_byte": 106,
+          "end_byte": 163,
+          "sha256": "bc5db1762411251ec1c2aaf40c7d9ad35605067cb12ead39defcc3a11742fecd",
+          "text": "class Worker extends Parent { work() { return add(2); } }"
+        }
+      ]
+    },
+    {
+      "id": "session-1644662c-7d4f-4f6a-9833-948ede480e63:2",
+      "task_id": "javascript_direct_class_base",
+      "session_id": "session-1644662c-7d4f-4f6a-9833-948ede480e63",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "app.js::Worker#class"
+        ],
+        "context": 2
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"app.js::Worker#class\",\"source\":\"class Worker extends Parent { work() { return add(2); } }\",\"byte_offset\":106,\"byte_length\":57,\"line\":3,\"end_line\":3,\"signature\":\"class Worker extends Parent { work() { return add(2); } }\",\"kind\":\"class\",\"language\":\"javascript\",\"context_before\":[\"import { make, add, Parent } from \\\"./barrel.js\\\";\",\"export function run() { return make() + add(1); }\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-1644662c-7d4f-4f6a-9833-948ede480e63/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-1644662c-7d4f-4f6a-9833-948ede480e63:2\"}}",
+      "serialized_bytes": 590,
+      "source_bytes": 211,
+      "elapsed_ms": 4.807999997865409,
+      "spans": [
+        {
+          "file": "app.js",
+          "start_byte": 106,
+          "end_byte": 163,
+          "sha256": "bc5db1762411251ec1c2aaf40c7d9ad35605067cb12ead39defcc3a11742fecd",
+          "text": "class Worker extends Parent { work() { return add(2); } }"
+        },
+        {
+          "file": "app.js",
+          "start_byte": 0,
+          "end_byte": 48,
+          "sha256": "5bfc3c4c47940fb978e1cd4c03b7aaa9dc1b42cb9aa5c4fa3ef62f98113dac30",
+          "text": "import { make, add, Parent } from \"./barrel.js\";"
+        },
+        {
+          "file": "app.js",
+          "start_byte": 49,
+          "end_byte": 98,
+          "sha256": "363b52b218eabdd280610da3a7fab53669d38f626ec1e74a763afe967df3edae",
+          "text": "export function run() { return make() + add(1); }"
+        },
+        {
+          "file": "app.js",
+          "start_byte": 106,
+          "end_byte": 163,
+          "sha256": "bc5db1762411251ec1c2aaf40c7d9ad35605067cb12ead39defcc3a11742fecd",
+          "text": "class Worker extends Parent { work() { return add(2); } }"
+        }
+      ]
+    },
+    {
+      "id": "session-1644662c-7d4f-4f6a-9833-948ede480e63:3",
+      "task_id": "javascript_direct_class_base",
+      "session_id": "session-1644662c-7d4f-4f6a-9833-948ede480e63",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "dependencies",
+        "query": "Resolve Worker authored direct class base Parent, its origin, and any base method relevant to the extends clause. Preserve unresolved ambiguity.",
+        "max_output_bytes": 16384,
+        "max_evidence_bytes": 8192,
+        "seed_ids": [
+          "app.js::Worker#class"
+        ],
+        "max_hops": 2
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"dependencies\",\"status\":\"ok\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_dependencies\",\"exhaustive\":false},\"items\":[{\"id\":\"app.js::Worker#class\",\"name\":\"Worker\",\"kind\":\"class\",\"file\":\"app.js\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"contracts.js::Base#class\",\"name\":\"Base\",\"kind\":\"class\",\"file\":\"contracts.js\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Authored JavaScript dependency\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"app.js::Worker#class\",\"to\":\"contracts.js::Base#class\",\"type\":\"extends\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"app.js\",\"line\":3,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5,6]}],\"sources\":[{\"id\":1,\"file\":\"app.js\",\"start_byte\":106,\"end_byte\":163,\"start_line\":3,\"end_line\":3,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"content\":\"class Worker extends Parent { work() { return add(2); } }\"},{\"id\":2,\"file\":\"contracts.js\",\"start_byte\":7,\"end_byte\":48,\"start_line\":1,\"end_line\":1,\"content_hash\":\"ab2c02fa56cd54099a9831ed7ed31bebef78597b48c1f29571d2eee5f4447822\",\"content\":\"class Base { enabled() { return true; } }\"},{\"id\":3,\"file\":\"app.js\",\"start_byte\":99,\"end_byte\":164,\"start_line\":3,\"end_line\":3,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"content\":\"export class Worker extends Parent { work() { return add(2); } }\\n\"},{\"id\":4,\"file\":\"app.js\",\"start_byte\":0,\"end_byte\":49,\"start_line\":1,\"end_line\":1,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"content\":\"import { make, add, Parent } from \\\"./barrel.js\\\";\\n\"},{\"id\":5,\"file\":\"barrel.js\",\"start_byte\":52,\"end_byte\":101,\"start_line\":2,\"end_line\":2,\"content_hash\":\"b2b45765fdfa71f94888a5459919ab00ab243a0e5edad925de34a122ba346e04\",\"content\":\"export { Base as Parent } from \\\"./contracts.js\\\";\\n\"},{\"id\":6,\"file\":\"contracts.js\",\"start_byte\":0,\"end_byte\":49,\"start_line\":1,\"end_line\":1,\"content_hash\":\"ab2c02fa56cd54099a9831ed7ed31bebef78597b48c1f29571d2eee5f4447822\",\"content\":\"export class Base { enabled() { return true; } }\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":212,\"output_bytes\":2712,\"estimated_tokens\":678,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-1644662c-7d4f-4f6a-9833-948ede480e63/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-1644662c-7d4f-4f6a-9833-948ede480e63:3\"}}",
+      "serialized_bytes": 2828,
+      "source_bytes": 310,
+      "elapsed_ms": 8.026208990486339,
+      "spans": [
+        {
+          "file": "app.js",
+          "start_byte": 106,
+          "end_byte": 163,
+          "sha256": "bc5db1762411251ec1c2aaf40c7d9ad35605067cb12ead39defcc3a11742fecd",
+          "text": "class Worker extends Parent { work() { return add(2); } }"
+        },
+        {
+          "file": "contracts.js",
+          "start_byte": 7,
+          "end_byte": 48,
+          "sha256": "d008204f7f136fa616ff53854973369408209b1bab7d09e54c4062f34810af16",
+          "text": "class Base { enabled() { return true; } }"
+        },
+        {
+          "file": "app.js",
+          "start_byte": 99,
+          "end_byte": 164,
+          "sha256": "ed986b5d46e816f76f10479392529e176ace270fccfd4d8e69624270b780b464",
+          "text": "export class Worker extends Parent { work() { return add(2); } }\n"
+        },
+        {
+          "file": "app.js",
+          "start_byte": 0,
+          "end_byte": 49,
+          "sha256": "06ae59c6920cf5132cdfee94cfcba11ecf73953888e09fa6939a9d60cadb9017",
+          "text": "import { make, add, Parent } from \"./barrel.js\";\n"
+        },
+        {
+          "file": "barrel.js",
+          "start_byte": 52,
+          "end_byte": 101,
+          "sha256": "092fa6e421bb3c162c0489fef62a4c84a45b1c55b455e8c6a360774058749786",
+          "text": "export { Base as Parent } from \"./contracts.js\";\n"
+        },
+        {
+          "file": "contracts.js",
+          "start_byte": 0,
+          "end_byte": 49,
+          "sha256": "ab2c02fa56cd54099a9831ed7ed31bebef78597b48c1f29571d2eee5f4447822",
+          "text": "export class Base { enabled() { return true; } }\n"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "javascript_direct_class_base",
+    "session_id": "session-1644662c-7d4f-4f6a-9833-948ede480e63",
+    "arm": "B",
+    "repetition": 1,
+    "snapshot": "javascript_dependencies",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1",
+    "schema_version": 3,
+    "measurement_method": "observed_tool_calls",
+    "intent_collection": "not_collected",
+    "outcome": "completed",
+    "answer": {
+      "class_file": "app.js",
+      "local_base_name": "Parent",
+      "base_name": "Base",
+      "base_origin": "contracts.js",
+      "base_method": "enabled",
+      "proves_runtime_dispatch": false
+    },
+    "answer_correct": true,
+    "task_correct": true,
+    "read_count": 3,
+    "validated_read_count": 3,
+    "required_context_delivered": [
+      "base",
+      "base_export",
+      "entry",
+      "import"
+    ],
+    "required_context_total": 4,
+    "context_recall": 1.0,
+    "serialized_tool_output_bytes": 4590,
+    "source_bytes": 578,
+    "estimated_source_tokens": 145,
+    "tool_elapsed_ms": 22.334000997943804,
+    "provider_usage": {
+      "input_tokens": 24394,
+      "cached_input_tokens": 13568,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 448,
+      "reasoning_output_tokens": 243
+    },
+    "usage_semantics": "One Codex turn.completed event; gross input includes cached input subset; output includes reasoning tokens.",
+    "token_status": "measured",
+    "measurement_complete": true,
+    "full_pass": true
+  },
+  "baseline": {
+    "end_to_end_seconds": 17.647736582992366,
+    "actual_process_seconds": 17.647736582992366,
+    "exit_code": 0,
+    "provider_thread_id": "01a09813-0f06-74f3-adcd-d9958868775f",
+    "failures": [],
+    "tool_delivery_verified": true,
+    "output_accounting": {
+      "schema_version": 4,
+      "complete": true,
+      "tool_call_count": 3,
+      "recorded_payload_bytes": 4590,
+      "complete_payload_bytes": 4590,
+      "source_bytes": 578,
+      "calls": [
+        {
+          "item_id": "item_1",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "locate",
+            "max_hops": 1,
+            "query": "Locate the authored class declaration named Worker and inspect its direct class base extends clause, including file and source."
+          },
+          "status": "completed",
+          "attempt_id": "session-1644662c-7d4f-4f6a-9833-948ede480e63/attempt/1",
+          "trace_event_id": "session-1644662c-7d4f-4f6a-9833-948ede480e63:1",
+          "source_bytes": 57,
+          "serialized_bytes": 1172,
+          "elapsed_ms": 9.581374994013458,
+          "payload_texts": [
+            "{\"schema_version\":1,\"intent\":\"locate\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"none\",\"exhaustive\":false},\"items\":[{\"id\":\"app.js::Worker#class\",\"name\":\"Worker\",\"kind\":\"class\",\"file\":\"app.js\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches class, worker, extend\",\"source_id\":1,\"complete\":true,\"path\":[]}],\"relationships\":[],\"sources\":[{\"id\":1,\"file\":\"app.js\",\"start_byte\":106,\"end_byte\":163,\"start_line\":3,\"end_line\":3,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"content\":\"class Worker extends Parent { work() { return add(2); } }\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":3}],\"limits\":{\"max_hops\":0,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":1,\"evidence_bytes\":57,\"output_bytes\":1056,\"estimated_tokens\":264,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-1644662c-7d4f-4f6a-9833-948ede480e63/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-1644662c-7d4f-4f6a-9833-948ede480e63:1\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": {
+            "nodes_examined": 1,
+            "evidence_bytes": 57,
+            "output_bytes": 1056,
+            "selected_items": 1,
+            "max_nodes": 64,
+            "max_neighbors": 32
+          }
+        },
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "get",
+          "arguments": {
+            "context": 2,
+            "symbol_ids": [
+              "app.js::Worker#class"
+            ],
+            "selected_from_search_id": null
+          },
+          "status": "completed",
+          "attempt_id": "session-1644662c-7d4f-4f6a-9833-948ede480e63/attempt/2",
+          "trace_event_id": "session-1644662c-7d4f-4f6a-9833-948ede480e63:2",
+          "source_bytes": 211,
+          "serialized_bytes": 590,
+          "elapsed_ms": 4.8910839832387865,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"app.js::Worker#class\",\"source\":\"class Worker extends Parent { work() { return add(2); } }\",\"byte_offset\":106,\"byte_length\":57,\"line\":3,\"end_line\":3,\"signature\":\"class Worker extends Parent { work() { return add(2); } }\",\"kind\":\"class\",\"language\":\"javascript\",\"context_before\":[\"import { make, add, Parent } from \\\"./barrel.js\\\";\",\"export function run() { return make() + add(1); }\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-1644662c-7d4f-4f6a-9833-948ede480e63/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-1644662c-7d4f-4f6a-9833-948ede480e63:2\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "dependencies",
+            "max_hops": 2,
+            "seed_ids": [
+              "app.js::Worker#class"
+            ],
+            "query": "Resolve Worker authored direct class base Parent, its origin, and any base method relevant to the extends clause. Preserve unresolved ambiguity."
+          },
+          "status": "completed",
+          "attempt_id": "session-1644662c-7d4f-4f6a-9833-948ede480e63/attempt/3",
+          "trace_event_id": "session-1644662c-7d4f-4f6a-9833-948ede480e63:3",
+          "source_bytes": 310,
+          "serialized_bytes": 2828,
+          "elapsed_ms": 8.172083995305002,
+          "payload_texts": [
+            "{\"schema_version\":1,\"intent\":\"dependencies\",\"status\":\"ok\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_dependencies\",\"exhaustive\":false},\"items\":[{\"id\":\"app.js::Worker#class\",\"name\":\"Worker\",\"kind\":\"class\",\"file\":\"app.js\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"contracts.js::Base#class\",\"name\":\"Base\",\"kind\":\"class\",\"file\":\"contracts.js\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Authored JavaScript dependency\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"app.js::Worker#class\",\"to\":\"contracts.js::Base#class\",\"type\":\"extends\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"app.js\",\"line\":3,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5,6]}],\"sources\":[{\"id\":1,\"file\":\"app.js\",\"start_byte\":106,\"end_byte\":163,\"start_line\":3,\"end_line\":3,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"content\":\"class Worker extends Parent { work() { return add(2); } }\"},{\"id\":2,\"file\":\"contracts.js\",\"start_byte\":7,\"end_byte\":48,\"start_line\":1,\"end_line\":1,\"content_hash\":\"ab2c02fa56cd54099a9831ed7ed31bebef78597b48c1f29571d2eee5f4447822\",\"content\":\"class Base { enabled() { return true; } }\"},{\"id\":3,\"file\":\"app.js\",\"start_byte\":99,\"end_byte\":164,\"start_line\":3,\"end_line\":3,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"content\":\"export class Worker extends Parent { work() { return add(2); } }\\n\"},{\"id\":4,\"file\":\"app.js\",\"start_byte\":0,\"end_byte\":49,\"start_line\":1,\"end_line\":1,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"content\":\"import { make, add, Parent } from \\\"./barrel.js\\\";\\n\"},{\"id\":5,\"file\":\"barrel.js\",\"start_byte\":52,\"end_byte\":101,\"start_line\":2,\"end_line\":2,\"content_hash\":\"b2b45765fdfa71f94888a5459919ab00ab243a0e5edad925de34a122ba346e04\",\"content\":\"export { Base as Parent } from \\\"./contracts.js\\\";\\n\"},{\"id\":6,\"file\":\"contracts.js\",\"start_byte\":0,\"end_byte\":49,\"start_line\":1,\"end_line\":1,\"content_hash\":\"ab2c02fa56cd54099a9831ed7ed31bebef78597b48c1f29571d2eee5f4447822\",\"content\":\"export class Base { enabled() { return true; } }\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":212,\"output_bytes\":2712,\"estimated_tokens\":678,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-1644662c-7d4f-4f6a-9833-948ede480e63/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-1644662c-7d4f-4f6a-9833-948ede480e63:3\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": {
+            "nodes_examined": 2,
+            "evidence_bytes": 212,
+            "output_bytes": 2712,
+            "selected_items": 2,
+            "max_nodes": 64,
+            "max_neighbors": 32
+          }
+        }
+      ],
+      "failures": []
+    },
+    "adapter_elapsed_ms": 22.644542972557247,
+    "recoverable_error_events": 0,
+    "relationships": {
+      "schema_version": 3,
+      "case_id": "javascript_direct_class_base",
+      "language": "javascript",
+      "required_semantic_dependencies_total": 1,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "direct_class_extends",
+          "to": "base",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "extends",
+          "record_contexts": [
+            "heritage"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "app.js::Worker#class",
+              "to": "contracts.js::Base#class",
+              "type": "extends",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app.js",
+                "line": 3,
+                "content_hash": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "app.js::Worker#class",
+              "to": "contracts.js::Base#class",
+              "type": "extends",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app.js",
+                "line": 3,
+                "content_hash": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c"
+              }
+            }
+          ]
+        }
+      ],
+      "available_dependency_links_total": 1,
+      "available_dependency_links": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "direct_class_extends",
+          "to": "base",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "extends",
+          "record_contexts": [
+            "heritage"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "app.js::Worker#class",
+              "to": "contracts.js::Base#class",
+              "type": "extends",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app.js",
+                "line": 3,
+                "content_hash": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "app.js::Worker#class",
+              "to": "contracts.js::Base#class",
+              "type": "extends",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app.js",
+                "line": 3,
+                "content_hash": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c"
+              }
+            }
+          ]
+        }
+      ],
+      "delivered_dependency_links_total": 1,
+      "delivered_dependency_links": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "direct_class_extends",
+          "to": "base",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "extends",
+          "record_contexts": [
+            "heritage"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "app.js::Worker#class",
+              "to": "contracts.js::Base#class",
+              "type": "extends",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app.js",
+                "line": 3,
+                "content_hash": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "app.js::Worker#class",
+              "to": "contracts.js::Base#class",
+              "type": "extends",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app.js",
+                "line": 3,
+                "content_hash": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c"
+              }
+            }
+          ]
+        }
+      ],
+      "dependency_link_recall": {
+        "label": "Exact frozen meaning joined to persisted semantic record and delivered source proof.",
+        "required": 1,
+        "available": 1,
+        "delivered": 1,
+        "available_ratio": 1.0,
+        "delivered_ratio": 1.0
+      },
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_available_relationships": 0,
+      "forbidden_delivered_relationships": 0,
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_delivered_relationship_edges": [],
+      "delivery_integrity_violations": [],
+      "forbidden_scope": "Frozen multilingual negatives plus delivered edge/index and complete exploration-proof consistency."
+    },
+    "arm": "B",
+    "attempt_id": "javascript_direct_class_base-r1-B"
+  },
+  "attempt_id": "javascript_direct_class_base-r1-B",
+  "arm": "B",
+  "provenance": {
+    "attempt_id": "javascript_direct_class_base-r1-B",
+    "case_id": "javascript_direct_class_base",
+    "snapshot": "javascript_dependencies",
+    "repetition": 1,
+    "arm": "B",
+    "adapter_module": "benchmarks.multilingual_context_tools",
+    "model": "gpt-5.6-luna",
+    "reasoning_effort": "high",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "catalog_sha256": "f1c45cceac1c3ee90fa1af1007c341713e220571390c3b1eb086c443d7781062",
+    "runner_sha256": "5756278252a74c9e86c68a898b284108288b74a864b9424f6445223b3a7ca6db",
+    "source": {
+      "freeze_commit": "c910c5ac252a7c982f784d87d61bc4c50fc0c0ec",
+      "freeze_json_sha256": "254f38dd6247215928f4cce3fae379cf9dbf3acb74e51bd2d1ac91c12f290848",
+      "source_scope": "W4 evaluator snapshot; A exact retrieval/graph, B adds current loci_explore plus frozen guide"
+    },
+    "config": {
+      "project_doc_max_bytes": 0,
+      "web_search": "disabled",
+      "skills.include_instructions": false,
+      "developer_instructions": "",
+      "model_reasoning_effort": "high",
+      "model_catalog_json": "/Users/brummerv/phluxxed/loci-exploration/benchmarks/results/multilingual-context-workflow-v1/model-catalog.json",
+      "include_collaboration_mode_instructions": false,
+      "tools.update_plan.enabled": false,
+      "tools.experimental_request_user_input.enabled": false,
+      "features.skip_host_skill_discovery": true,
+      "mcp_servers.evaluation.command": "/Users/brummerv/phluxxed/loci-exploration/.venv/bin/python",
+      "mcp_servers.evaluation.args": [
+        "-m",
+        "benchmarks.multilingual_context_tools",
+        "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-rrc3ch9c/run.json"
+      ],
+      "mcp_servers.evaluation.cwd": "/Users/brummerv/phluxxed/loci-exploration",
+      "mcp_servers.evaluation.env": {
+        "LOCI_BASE_DIR": "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-rrc3ch9c/store",
+        "LOCI_STORE_NAMESPACE": "typescript-context-preflight"
+      },
+      "mcp_servers.evaluation.required": true,
+      "mcp_servers.evaluation.default_tools_approval_mode": "auto",
+      "mcp_servers.evaluation.tool_timeout_sec": 12,
+      "tool_output_token_limit": 32768,
+      "features.shell_tool": false,
+      "features.multi_agent": false,
+      "features.apps": false,
+      "features.plugins": false,
+      "features.hooks": false,
+      "features.memories": false,
+      "features.skill_search": false,
+      "features.skill_mcp_dependency_install": false,
+      "features.view_image": false,
+      "features.image_generation": false,
+      "features.browser_use": false,
+      "features.computer_use": false,
+      "features.in_app_browser": false,
+      "features.code_mode": false,
+      "features.code_mode_host": false,
+      "features.sleep_tool": false,
+      "features.goals": false,
+      "features.context_management": false,
+      "service_tier": "default"
+    },
+    "config_sha256": "33819e53301357bdc1c38c7b5f4f54c51c31a2e8fa15a77f4190f95de7dac1d1",
+    "prompt_sha256": "a26dfe08f4adf0953b9b2f611b6943067b24c9bf1aa206a79ff783751ba56265",
+    "index_seconds": 0.024176665989216417,
+    "snapshot_files": {
+      "app.js": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c",
+      "barrel.js": "b2b45765fdfa71f94888a5459919ab00ab243a0e5edad925de34a122ba346e04",
+      "contracts.js": "ab2c02fa56cd54099a9831ed7ed31bebef78597b48c1f29571d2eee5f4447822",
+      "helper.js": "6a1835c96fc597b7c7a8ba7cd2717fbd1aef2ea8be4b0bf82e8fd00d0fa5911e",
+      "wrong.js": "aa24a74d347a81052b1fda29ee57a221daf97ae7dc047205758af7a442582bf9"
+    },
+    "extractor_version": 30,
+    "canonical_tool_schemas_sha256": "492ec2cf0a57ac05d4cb601c1ab44d0604406245f7dcdd865d7f8cbed7e8c90f"
+  }
+}

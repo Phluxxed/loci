@@ -1,0 +1,1044 @@
+{
+  "schema_version": 4,
+  "protocol": "multilingual-context-workflow-v1",
+  "identity": {
+    "task_id": "rust_known_call_impact",
+    "session_id": "session-b5295521-1bc6-4787-9262-206149973281",
+    "arm": "A",
+    "repetition": 1,
+    "snapshot": "rust_impact",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1"
+  },
+  "events": [
+    {
+      "id": "session-b5295521-1bc6-4787-9262-206149973281:1",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-b5295521-1bc6-4787-9262-206149973281",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "question": "Locate the authored parse function and Config type/class. Report parse_file, its direct caller as file::name, config_field, field_type, and configuration. Follow only authored module/import relationships and definite static calls."
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-jyev4yek/snapshot\",\"question\":\"Locate the authored parse function and Config type/class. Report parse_file, its direct caller as file::name, config_field, field_type, and configuration. Follow only authored module/import relationships and definite static calls.\",\"selection\":\"inferred\",\"question_terms\":[\"locate\",\"authored\",\"parse\",\"function\",\"config\",\"type\",\"class\",\"report\",\"file\",\"direct\",\"caller\",\"name\",\"field\",\"configuration\",\"follow\",\"only\",\"module\",\"import\",\"relationship\",\"definite\",\"static\",\"call\"],\"anchors\":[{\"node\":{\"id\":\"src/lib.rs::caller#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/lib.rs\",\"line\":4,\"end_line\":4}},\"matched_symbol_id\":\"src/lib.rs::caller#function\",\"name\":\"caller\",\"score\":21.724,\"reason\":{\"kind\":\"inferred\",\"matched_terms\":[\"parse\",\"config\",\"caller\"],\"match_scope\":[\"symbol_name\",\"qualified_name\",\"signature\",\"keywords\"]}}],\"counts\":{\"indexed_nodes\":6,\"eligible_units\":6,\"qualified_candidates\":5,\"collapsed_symbols\":0,\"returned_anchors\":1,\"omitted_candidates\":4},\"budget\":{\"requested_max_anchors\":5,\"effective_max_anchors\":1},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:1\"}}",
+      "serialized_bytes": 1390,
+      "source_bytes": 0,
+      "elapsed_ms": 5.78012497862801,
+      "spans": []
+    },
+    {
+      "id": "session-b5295521-1bc6-4787-9262-206149973281:2",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-b5295521-1bc6-4787-9262-206149973281",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "outline",
+      "arguments": {},
+      "search_id": null,
+      "response_json": "{\"files\":[{\"file\":\"src/api.rs\",\"symbols\":[{\"id\":\"src/api.rs::Config#struct\",\"name\":\"Config\",\"kind\":\"struct\",\"line\":1,\"end_line\":1,\"signature\":\"pub struct Config { pub strict: bool }\",\"summary\":\"\"},{\"id\":\"src/api.rs::parse#function\",\"name\":\"parse\",\"kind\":\"function\",\"line\":3,\"end_line\":3,\"signature\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"summary\":\"\"},{\"id\":\"src/api.rs::__file__#file\",\"name\":\"api.rs\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"src/api.rs\",\"summary\":\"\"}]},{\"file\":\"src/lib.rs\",\"symbols\":[{\"id\":\"src/lib.rs::caller#function\",\"name\":\"caller\",\"kind\":\"function\",\"line\":4,\"end_line\":4,\"signature\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"summary\":\"\"},{\"id\":\"src/lib.rs::__file__#file\",\"name\":\"lib.rs\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"src/lib.rs\",\"summary\":\"\"},{\"id\":\"Cargo.toml::lib:ledger#crate\",\"name\":\"ledger\",\"kind\":\"crate\",\"line\":1,\"end_line\":1,\"signature\":\"Cargo.toml::lib:ledger\",\"summary\":\"\"}]}],\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:2\"}}",
+      "serialized_bytes": 1141,
+      "source_bytes": 147,
+      "elapsed_ms": 1.6629160090815276,
+      "spans": [
+        {
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5",
+          "text": "pub struct Config { pub strict: bool }"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 40,
+          "end_byte": 94,
+          "sha256": "91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60",
+          "text": "pub fn parse(config: Config) -> bool { config.strict }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }"
+        }
+      ]
+    },
+    {
+      "id": "session-b5295521-1bc6-4787-9262-206149973281:3",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-b5295521-1bc6-4787-9262-206149973281",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "src/api.rs::Config#struct",
+          "src/api.rs::parse#function",
+          "src/lib.rs::caller#function"
+        ],
+        "context": 2
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"src/api.rs::Config#struct\",\"source\":\"pub struct Config { pub strict: bool }\",\"byte_offset\":0,\"byte_length\":38,\"line\":1,\"end_line\":1,\"signature\":\"pub struct Config { pub strict: bool }\",\"kind\":\"struct\",\"language\":\"rust\",\"context_before\":[],\"context_after\":[\"\",\"pub fn parse(config: Config) -> bool { config.strict }\"]},{\"id\":\"src/api.rs::parse#function\",\"source\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"byte_offset\":40,\"byte_length\":54,\"line\":3,\"end_line\":3,\"signature\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"kind\":\"function\",\"language\":\"rust\",\"context_before\":[\"pub struct Config { pub strict: bool }\",\"\"],\"context_after\":[]},{\"id\":\"src/lib.rs::caller#function\",\"source\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"byte_offset\":47,\"byte_length\":55,\"line\":4,\"end_line\":4,\"signature\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"kind\":\"function\",\"language\":\"rust\",\"context_before\":[\"use crate::api::{parse, Config};\",\"\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:3\"}}",
+      "serialized_bytes": 1192,
+      "source_bytes": 418,
+      "elapsed_ms": 10.94508299138397,
+      "spans": [
+        {
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5",
+          "text": "pub struct Config { pub strict: bool }"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 40,
+          "end_byte": 94,
+          "sha256": "91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60",
+          "text": "pub fn parse(config: Config) -> bool { config.strict }"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 40,
+          "end_byte": 94,
+          "sha256": "91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60",
+          "text": "pub fn parse(config: Config) -> bool { config.strict }"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5",
+          "text": "pub struct Config { pub strict: bool }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 13,
+          "end_byte": 45,
+          "sha256": "d61d24f1f269f2ac66936a50c72489bf0ca89eb3df48e5cc6f44a21764459f26",
+          "text": "use crate::api::{parse, Config};"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5",
+          "text": "pub struct Config { pub strict: bool }"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 40,
+          "end_byte": 94,
+          "sha256": "91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60",
+          "text": "pub fn parse(config: Config) -> bool { config.strict }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }"
+        }
+      ]
+    },
+    {
+      "id": "session-b5295521-1bc6-4787-9262-206149973281:4",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-b5295521-1bc6-4787-9262-206149973281",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "src/lib.rs",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"src/lib.rs\",\"content\":\"pub mod api;\\nuse crate::api::{parse, Config};\\n\\npub fn caller(config: Config) -> bool { parse(config) }\\n\",\"total_lines\":4,\"start_line\":1,\"end_line\":4,\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:4\"}}",
+      "serialized_bytes": 352,
+      "source_bytes": 103,
+      "elapsed_ms": 1.8349159799981862,
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 103,
+          "sha256": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "text": "pub mod api;\nuse crate::api::{parse, Config};\n\npub fn caller(config: Config) -> bool { parse(config) }\n"
+        }
+      ]
+    },
+    {
+      "id": "session-b5295521-1bc6-4787-9262-206149973281:5",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-b5295521-1bc6-4787-9262-206149973281",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "src/api.rs",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"src/api.rs\",\"content\":\"pub struct Config { pub strict: bool }\\n\\npub fn parse(config: Config) -> bool { config.strict }\\n\",\"total_lines\":3,\"start_line\":1,\"end_line\":3,\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:5\"}}",
+      "serialized_bytes": 343,
+      "source_bytes": 95,
+      "elapsed_ms": 2.931541996076703,
+      "spans": [
+        {
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 95,
+          "sha256": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "text": "pub struct Config { pub strict: bool }\n\npub fn parse(config: Config) -> bool { config.strict }\n"
+        }
+      ]
+    },
+    {
+      "id": "session-b5295521-1bc6-4787-9262-206149973281:6",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-b5295521-1bc6-4787-9262-206149973281",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "Cargo.toml",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"LociError\",\"message\":\"File not found in cache\"},\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:6\"}}",
+      "serialized_bytes": 233,
+      "source_bytes": 0,
+      "elapsed_ms": 0.986708007985726,
+      "spans": []
+    },
+    {
+      "id": "session-b5295521-1bc6-4787-9262-206149973281:7",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-b5295521-1bc6-4787-9262-206149973281",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "question": "What are the parse function's file, its direct static caller in file::name form, Config's field and field type, and the relevant crate configuration? Return factual authored-source relationships only.",
+        "seed_ids": [
+          "src/api.rs::parse#function",
+          "src/api.rs::Config#struct",
+          "src/lib.rs::caller#function"
+        ]
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-jyev4yek/snapshot\",\"question\":\"What are the parse function's file, its direct static caller in file::name form, Config's field and field type, and the relevant crate configuration? Return factual authored-source relationships only.\",\"selection\":\"explicit\",\"question_terms\":[],\"anchors\":[{\"node\":{\"id\":\"src/api.rs::parse#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/api.rs\",\"line\":3,\"end_line\":3}},\"matched_symbol_id\":\"src/api.rs::parse#function\",\"name\":\"parse\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}},{\"node\":{\"id\":\"src/api.rs::Config#struct\",\"namespace\":\"loci\",\"kind\":\"struct\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/api.rs\",\"line\":1,\"end_line\":1}},\"matched_symbol_id\":\"src/api.rs::Config#struct\",\"name\":\"Config\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}},{\"node\":{\"id\":\"src/lib.rs::caller#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/lib.rs\",\"line\":4,\"end_line\":4}},\"matched_symbol_id\":\"src/lib.rs::caller#function\",\"name\":\"caller\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}}],\"routing\":{\"kind\":\"relationship\",\"reason\":\"relationship_intent\"},\"filters\":{\"namespaces\":null,\"edge_types\":null,\"resolutions\":[\"exact\",\"declared\",\"import-resolved\"],\"direction\":\"outgoing\"},\"hub_threshold\":4,\"paths\":[{\"nodes\":[{\"id\":\"src/api.rs::parse#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/api.rs\",\"line\":3,\"end_line\":3}},{\"id\":\"src/api.rs::Config#struct\",\"namespace\":\"loci\",\"kind\":\"struct\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/api.rs\",\"line\":1,\"end_line\":1}}],\"steps\":[{\"traversed\":\"forward\",\"edge\":{\"from\":\"src/api.rs::parse#function\",\"to\":\"src/api.rs::Config#struct\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"src/api.rs\",\"line\":3,\"content_hash\":\"8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272\"}},\"evidence_span\":{\"file\":\"src/api.rs\",\"start_line\":3,\"end_line\":3,\"content\":\"pub fn parse(config: Config) -> bool { config.strict }\\n\"}}],\"support_kind\":\"direct_authored_edge\",\"semantic_bridge\":{\"required\":false,\"required_terms\":[\"function\",\"file\",\"direct\",\"static\",\"caller\",\"name\",\"form\",\"field\",\"type\",\"relevant\",\"crate\",\"configuration\",\"return\",\"factual\",\"author\",\"source\",\"relationship\",\"only\"],\"matched_terms\":[\"type\"]},\"retrieval_score\":2.1,\"score_components\":{\"anchor\":0.0,\"endpoint\":0.5,\"evidence\":0.1,\"hop\":1.0,\"direct\":0.5,\"hub_penalty\":0}}],\"rejected_paths\":[],\"counts\":{\"filtered_edges\":6,\"examined_nodes\":3,\"examined_paths\":2,\"returned_paths\":1,\"rejected_paths\":0,\"duplicate_paths\":1,\"omitted_rejected_paths\":0,\"omitted_nodes\":0,\"omitted_paths\":0},\"budget\":{\"max_hops\":3,\"max_nodes\":64,\"max_paths\":16,\"path_offset\":0,\"evidence_bytes\":55,\"estimated_tokens\":14,\"max_evidence_bytes\":16384,\"max_estimated_tokens\":4096,\"hop_limit_reached\":false,\"node_limit_reached\":false,\"next_path_offset\":null},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:7\"}}",
+      "serialized_bytes": 3318,
+      "source_bytes": 55,
+      "elapsed_ms": 6.549791025463492,
+      "spans": [
+        {
+          "file": "src/api.rs",
+          "start_byte": 40,
+          "end_byte": 95,
+          "sha256": "6a73b00143c5dc41c7cb0aa76219297320a9159be67070bfb7b499521618c2ea",
+          "text": "pub fn parse(config: Config) -> bool { config.strict }\n"
+        }
+      ]
+    },
+    {
+      "id": "session-b5295521-1bc6-4787-9262-206149973281:8",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-b5295521-1bc6-4787-9262-206149973281",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "seed_ids": [
+          "src/lib.rs::caller#function",
+          "src/api.rs::Config#struct",
+          "src/api.rs::parse#function",
+          "Cargo.toml::lib:ledger#crate"
+        ]
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-jyev4yek/snapshot\",\"results\":[{\"seed\":{\"id\":\"src/lib.rs::caller#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/lib.rs\",\"line\":4,\"end_line\":4}},\"neighbors\":[]},{\"seed\":{\"id\":\"src/api.rs::Config#struct\",\"namespace\":\"loci\",\"kind\":\"struct\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/api.rs\",\"line\":1,\"end_line\":1}},\"neighbors\":[]},{\"seed\":{\"id\":\"src/api.rs::parse#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/api.rs\",\"line\":3,\"end_line\":3}},\"neighbors\":[]},{\"seed\":{\"id\":\"Cargo.toml::lib:ledger#crate\",\"namespace\":\"loci\",\"kind\":\"crate\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/lib.rs\",\"line\":1,\"end_line\":1,\"manifest\":\"Cargo.toml\",\"package_name\":\"ledger\",\"package_root\":\".\",\"target_kind\":\"lib\",\"target_name\":\"ledger\",\"crate_name\":\"ledger\",\"crate_root\":\"src/lib.rs\",\"edition\":\"2021\",\"required_features\":[]}},\"neighbors\":[]}],\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/8\",\"calls_remaining\":16,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:8\"}}",
+      "serialized_bytes": 1199,
+      "source_bytes": 0,
+      "elapsed_ms": 2.656666998518631,
+      "spans": []
+    },
+    {
+      "id": "session-b5295521-1bc6-4787-9262-206149973281:9",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-b5295521-1bc6-4787-9262-206149973281",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "configuration"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":null,\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/9\",\"calls_remaining\":15,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:9\"}}",
+      "serialized_bytes": 507,
+      "source_bytes": 0,
+      "elapsed_ms": 1.8418330000713468,
+      "spans": []
+    },
+    {
+      "id": "session-b5295521-1bc6-4787-9262-206149973281:10",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-b5295521-1bc6-4787-9262-206149973281",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 20,
+        "file": "src/api.rs"
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-jyev4yek/snapshot\",\"file\":\"src/api.rs\",\"status\":\"all\",\"items\":[],\"counts\":{\"total\":0,\"resolved\":0,\"unresolved\":0,\"returned\":0},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/10\",\"calls_remaining\":14,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:10\"}}",
+      "serialized_bytes": 453,
+      "source_bytes": 0,
+      "elapsed_ms": 2.2377080167643726,
+      "spans": []
+    },
+    {
+      "id": "session-b5295521-1bc6-4787-9262-206149973281:11",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-b5295521-1bc6-4787-9262-206149973281",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 20,
+        "file": "src/lib.rs"
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-jyev4yek/snapshot\",\"file\":\"src/lib.rs\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":4,\"column\":41,\"start_byte\":87,\"end_byte\":100,\"callee_start_byte\":87,\"callee_end_byte\":92,\"callee_text\":\"parse\",\"callee_path\":[\"parse\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":47,\"definition_end_byte\":102,\"body_start_byte\":85,\"body_end_byte\":102},\"source_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\"},\"caller_id\":\"src/lib.rs::caller#function\",\"caller_kind\":\"function\",\"target_file\":\"src/api.rs\",\"target_id\":\"src/api.rs::parse#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"src/lib.rs\",\"line\":4,\"content_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\",\"endpoint_id\":\"src/lib.rs::caller#function\"},{\"kind\":\"caller_definition\",\"file\":\"src/lib.rs\",\"line\":4,\"content_hash\":\"8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304\",\"endpoint_id\":\"src/lib.rs::caller#function\"},{\"kind\":\"symbol_reference\",\"file\":\"src/lib.rs\",\"line\":4,\"content_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\",\"endpoint_id\":\"src/api.rs::parse#function\"}],\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"}],\"counts\":{\"total\":1,\"resolved\":1,\"unresolved\":0,\"returned\":1},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/11\",\"calls_remaining\":13,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:11\"}}",
+      "serialized_bytes": 1937,
+      "source_bytes": 0,
+      "elapsed_ms": 1.8914589891210198,
+      "spans": []
+    }
+  ],
+  "measurement": {
+    "task_id": "rust_known_call_impact",
+    "session_id": "session-b5295521-1bc6-4787-9262-206149973281",
+    "arm": "A",
+    "repetition": 1,
+    "snapshot": "rust_impact",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1",
+    "schema_version": 3,
+    "measurement_method": "observed_tool_calls",
+    "intent_collection": "not_collected",
+    "outcome": "tool_failure",
+    "answer": {
+      "parse_file": "src/api.rs",
+      "direct_caller": "src/lib.rs::caller",
+      "config_field": "strict",
+      "field_type": "bool",
+      "configuration": "unconditional"
+    },
+    "answer_correct": true,
+    "task_correct": false,
+    "read_count": 11,
+    "validated_read_count": 11,
+    "required_context_delivered": [
+      "caller",
+      "config",
+      "entry",
+      "import",
+      "module"
+    ],
+    "required_context_total": 6,
+    "context_recall": 0.8333333333333334,
+    "serialized_tool_output_bytes": null,
+    "source_bytes": null,
+    "estimated_source_tokens": null,
+    "tool_elapsed_ms": 39.318747993092984,
+    "provider_usage": {
+      "input_tokens": 86270,
+      "cached_input_tokens": 60672,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 1328,
+      "reasoning_output_tokens": 822
+    },
+    "usage_semantics": "One Codex turn.completed event; gross input includes cached input subset; output includes reasoning tokens.",
+    "token_status": "measured",
+    "measurement_complete": false,
+    "full_pass": false
+  },
+  "baseline": {
+    "end_to_end_seconds": 47.335715041990625,
+    "actual_process_seconds": 47.335715041990625,
+    "exit_code": 0,
+    "provider_thread_id": "01a09840-88a0-79f2-8194-9138d3e61af6",
+    "failures": [
+      {
+        "attempt_id": "session-b5295521-1bc6-4787-9262-206149973281/attempt/6",
+        "category": "tool_error",
+        "message": "File not found in cache"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_1",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_7",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_8",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_10",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_11",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "unmatched_recorded_delivery"
+      }
+    ],
+    "tool_delivery_verified": false,
+    "output_accounting": {
+      "schema_version": 4,
+      "complete": false,
+      "tool_call_count": 11,
+      "recorded_payload_bytes": 12065,
+      "complete_payload_bytes": null,
+      "source_bytes": null,
+      "calls": [
+        {
+          "item_id": "item_1",
+          "server": "evaluation",
+          "tool": "graph_anchors",
+          "arguments": {
+            "question": "Locate the authored parse function and Config type/class. Report parse_file, its direct caller as file::name, config_field, field_type, and configuration. Follow only authored module/import relationships and definite static calls."
+          },
+          "status": "completed",
+          "attempt_id": "session-b5295521-1bc6-4787-9262-206149973281/attempt/1",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 1390,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-jyev4yek/snapshot\",\"question\":\"Locate the authored parse function and Config type/class. Report parse_file, its direct caller as file::name, config_field, field_type, and configuration. Follow only authored module/import relationships and definite static calls.\",\"selection\":\"inferred\",\"question_terms\":[\"locate\",\"authored\",\"parse\",\"function\",\"config\",\"type\",\"class\",\"report\",\"file\",\"direct\",\"caller\",\"name\",\"field\",\"configuration\",\"follow\",\"only\",\"module\",\"import\",\"relationship\",\"definite\",\"static\",\"call\"],\"anchors\":[{\"node\":{\"id\":\"src/lib.rs::caller#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/lib.rs\",\"line\":4,\"end_line\":4}},\"matched_symbol_id\":\"src/lib.rs::caller#function\",\"name\":\"caller\",\"score\":21.724,\"reason\":{\"kind\":\"inferred\",\"matched_terms\":[\"parse\",\"config\",\"caller\"],\"match_scope\":[\"symbol_name\",\"qualified_name\",\"signature\",\"keywords\"]}}],\"counts\":{\"indexed_nodes\":6,\"eligible_units\":6,\"qualified_candidates\":5,\"collapsed_symbols\":0,\"returned_anchors\":1,\"omitted_candidates\":4},\"budget\":{\"requested_max_anchors\":5,\"effective_max_anchors\":1},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:1\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "outline",
+          "arguments": {
+            "file": null
+          },
+          "status": "completed",
+          "attempt_id": "session-b5295521-1bc6-4787-9262-206149973281/attempt/2",
+          "trace_event_id": "session-b5295521-1bc6-4787-9262-206149973281:2",
+          "source_bytes": 147,
+          "serialized_bytes": 1141,
+          "elapsed_ms": 1.7603330197744071,
+          "payload_texts": [
+            "{\"files\":[{\"file\":\"src/api.rs\",\"symbols\":[{\"id\":\"src/api.rs::Config#struct\",\"name\":\"Config\",\"kind\":\"struct\",\"line\":1,\"end_line\":1,\"signature\":\"pub struct Config { pub strict: bool }\",\"summary\":\"\"},{\"id\":\"src/api.rs::parse#function\",\"name\":\"parse\",\"kind\":\"function\",\"line\":3,\"end_line\":3,\"signature\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"summary\":\"\"},{\"id\":\"src/api.rs::__file__#file\",\"name\":\"api.rs\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"src/api.rs\",\"summary\":\"\"}]},{\"file\":\"src/lib.rs\",\"symbols\":[{\"id\":\"src/lib.rs::caller#function\",\"name\":\"caller\",\"kind\":\"function\",\"line\":4,\"end_line\":4,\"signature\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"summary\":\"\"},{\"id\":\"src/lib.rs::__file__#file\",\"name\":\"lib.rs\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"src/lib.rs\",\"summary\":\"\"},{\"id\":\"Cargo.toml::lib:ledger#crate\",\"name\":\"ledger\",\"kind\":\"crate\",\"line\":1,\"end_line\":1,\"signature\":\"Cargo.toml::lib:ledger\",\"summary\":\"\"}]}],\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:2\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "get",
+          "arguments": {
+            "context": 2,
+            "symbol_ids": [
+              "src/api.rs::Config#struct",
+              "src/api.rs::parse#function",
+              "src/lib.rs::caller#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-b5295521-1bc6-4787-9262-206149973281/attempt/3",
+          "trace_event_id": "session-b5295521-1bc6-4787-9262-206149973281:3",
+          "source_bytes": 418,
+          "serialized_bytes": 1192,
+          "elapsed_ms": 11.095957976067439,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"src/api.rs::Config#struct\",\"source\":\"pub struct Config { pub strict: bool }\",\"byte_offset\":0,\"byte_length\":38,\"line\":1,\"end_line\":1,\"signature\":\"pub struct Config { pub strict: bool }\",\"kind\":\"struct\",\"language\":\"rust\",\"context_before\":[],\"context_after\":[\"\",\"pub fn parse(config: Config) -> bool { config.strict }\"]},{\"id\":\"src/api.rs::parse#function\",\"source\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"byte_offset\":40,\"byte_length\":54,\"line\":3,\"end_line\":3,\"signature\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"kind\":\"function\",\"language\":\"rust\",\"context_before\":[\"pub struct Config { pub strict: bool }\",\"\"],\"context_after\":[]},{\"id\":\"src/lib.rs::caller#function\",\"source\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"byte_offset\":47,\"byte_length\":55,\"line\":4,\"end_line\":4,\"signature\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"kind\":\"function\",\"language\":\"rust\",\"context_before\":[\"use crate::api::{parse, Config};\",\"\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:3\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "src/lib.rs",
+            "start_line": 1,
+            "end_line": 10
+          },
+          "status": "completed",
+          "attempt_id": "session-b5295521-1bc6-4787-9262-206149973281/attempt/4",
+          "trace_event_id": "session-b5295521-1bc6-4787-9262-206149973281:4",
+          "source_bytes": 103,
+          "serialized_bytes": 352,
+          "elapsed_ms": 1.8861659918911755,
+          "payload_texts": [
+            "{\"file\":\"src/lib.rs\",\"content\":\"pub mod api;\\nuse crate::api::{parse, Config};\\n\\npub fn caller(config: Config) -> bool { parse(config) }\\n\",\"total_lines\":4,\"start_line\":1,\"end_line\":4,\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:4\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_5",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "src/api.rs",
+            "start_line": 1,
+            "end_line": 10
+          },
+          "status": "completed",
+          "attempt_id": "session-b5295521-1bc6-4787-9262-206149973281/attempt/5",
+          "trace_event_id": "session-b5295521-1bc6-4787-9262-206149973281:5",
+          "source_bytes": 95,
+          "serialized_bytes": 343,
+          "elapsed_ms": 3.0085420003160834,
+          "payload_texts": [
+            "{\"file\":\"src/api.rs\",\"content\":\"pub struct Config { pub strict: bool }\\n\\npub fn parse(config: Config) -> bool { config.strict }\\n\",\"total_lines\":3,\"start_line\":1,\"end_line\":3,\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:5\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_6",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "Cargo.toml",
+            "start_line": 1,
+            "end_line": 20
+          },
+          "status": "completed",
+          "attempt_id": "session-b5295521-1bc6-4787-9262-206149973281/attempt/6",
+          "trace_event_id": "session-b5295521-1bc6-4787-9262-206149973281:6",
+          "source_bytes": 0,
+          "serialized_bytes": 233,
+          "elapsed_ms": 1.0292080114595592,
+          "payload_texts": [
+            "{\"error\":{\"code\":\"LociError\",\"message\":\"File not found in cache\"},\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:6\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_7",
+          "server": "evaluation",
+          "tool": "graph_retrieve",
+          "arguments": {
+            "question": "What are the parse function's file, its direct static caller in file::name form, Config's field and field type, and the relevant crate configuration? Return factual authored-source relationships only.",
+            "seed_ids": [
+              "src/api.rs::parse#function",
+              "src/api.rs::Config#struct",
+              "src/lib.rs::caller#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-b5295521-1bc6-4787-9262-206149973281/attempt/7",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 3318,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-jyev4yek/snapshot\",\"question\":\"What are the parse function's file, its direct static caller in file::name form, Config's field and field type, and the relevant crate configuration? Return factual authored-source relationships only.\",\"selection\":\"explicit\",\"question_terms\":[],\"anchors\":[{\"node\":{\"id\":\"src/api.rs::parse#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/api.rs\",\"line\":3,\"end_line\":3}},\"matched_symbol_id\":\"src/api.rs::parse#function\",\"name\":\"parse\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}},{\"node\":{\"id\":\"src/api.rs::Config#struct\",\"namespace\":\"loci\",\"kind\":\"struct\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/api.rs\",\"line\":1,\"end_line\":1}},\"matched_symbol_id\":\"src/api.rs::Config#struct\",\"name\":\"Config\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}},{\"node\":{\"id\":\"src/lib.rs::caller#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/lib.rs\",\"line\":4,\"end_line\":4}},\"matched_symbol_id\":\"src/lib.rs::caller#function\",\"name\":\"caller\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}}],\"routing\":{\"kind\":\"relationship\",\"reason\":\"relationship_intent\"},\"filters\":{\"namespaces\":null,\"edge_types\":null,\"resolutions\":[\"exact\",\"declared\",\"import-resolved\"],\"direction\":\"outgoing\"},\"hub_threshold\":4,\"paths\":[{\"nodes\":[{\"id\":\"src/api.rs::parse#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/api.rs\",\"line\":3,\"end_line\":3}},{\"id\":\"src/api.rs::Config#struct\",\"namespace\":\"loci\",\"kind\":\"struct\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/api.rs\",\"line\":1,\"end_line\":1}}],\"steps\":[{\"traversed\":\"forward\",\"edge\":{\"from\":\"src/api.rs::parse#function\",\"to\":\"src/api.rs::Config#struct\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"src/api.rs\",\"line\":3,\"content_hash\":\"8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272\"}},\"evidence_span\":{\"file\":\"src/api.rs\",\"start_line\":3,\"end_line\":3,\"content\":\"pub fn parse(config: Config) -> bool { config.strict }\\n\"}}],\"support_kind\":\"direct_authored_edge\",\"semantic_bridge\":{\"required\":false,\"required_terms\":[\"function\",\"file\",\"direct\",\"static\",\"caller\",\"name\",\"form\",\"field\",\"type\",\"relevant\",\"crate\",\"configuration\",\"return\",\"factual\",\"author\",\"source\",\"relationship\",\"only\"],\"matched_terms\":[\"type\"]},\"retrieval_score\":2.1,\"score_components\":{\"anchor\":0.0,\"endpoint\":0.5,\"evidence\":0.1,\"hop\":1.0,\"direct\":0.5,\"hub_penalty\":0}}],\"rejected_paths\":[],\"counts\":{\"filtered_edges\":6,\"examined_nodes\":3,\"examined_paths\":2,\"returned_paths\":1,\"rejected_paths\":0,\"duplicate_paths\":1,\"omitted_rejected_paths\":0,\"omitted_nodes\":0,\"omitted_paths\":0},\"budget\":{\"max_hops\":3,\"max_nodes\":64,\"max_paths\":16,\"path_offset\":0,\"evidence_bytes\":55,\"estimated_tokens\":14,\"max_evidence_bytes\":16384,\"max_estimated_tokens\":4096,\"hop_limit_reached\":false,\"node_limit_reached\":false,\"next_path_offset\":null},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:7\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_8",
+          "server": "evaluation",
+          "tool": "graph_neighbors",
+          "arguments": {
+            "seed_ids": [
+              "src/lib.rs::caller#function",
+              "src/api.rs::Config#struct",
+              "src/api.rs::parse#function",
+              "Cargo.toml::lib:ledger#crate"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-b5295521-1bc6-4787-9262-206149973281/attempt/8",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 1199,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-jyev4yek/snapshot\",\"results\":[{\"seed\":{\"id\":\"src/lib.rs::caller#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/lib.rs\",\"line\":4,\"end_line\":4}},\"neighbors\":[]},{\"seed\":{\"id\":\"src/api.rs::Config#struct\",\"namespace\":\"loci\",\"kind\":\"struct\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/api.rs\",\"line\":1,\"end_line\":1}},\"neighbors\":[]},{\"seed\":{\"id\":\"src/api.rs::parse#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/api.rs\",\"line\":3,\"end_line\":3}},\"neighbors\":[]},{\"seed\":{\"id\":\"Cargo.toml::lib:ledger#crate\",\"namespace\":\"loci\",\"kind\":\"crate\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/lib.rs\",\"line\":1,\"end_line\":1,\"manifest\":\"Cargo.toml\",\"package_name\":\"ledger\",\"package_root\":\".\",\"target_kind\":\"lib\",\"target_name\":\"ledger\",\"crate_name\":\"ledger\",\"crate_root\":\"src/lib.rs\",\"edition\":\"2021\",\"required_features\":[]}},\"neighbors\":[]}],\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/8\",\"calls_remaining\":16,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:8\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_9",
+          "server": "evaluation",
+          "tool": "search",
+          "arguments": {
+            "query": "configuration"
+          },
+          "status": "completed",
+          "attempt_id": "session-b5295521-1bc6-4787-9262-206149973281/attempt/9",
+          "trace_event_id": "session-b5295521-1bc6-4787-9262-206149973281:9",
+          "source_bytes": 0,
+          "serialized_bytes": 507,
+          "elapsed_ms": 1.8909999926108867,
+          "payload_texts": [
+            "{\"symbols\":[],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":null,\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/9\",\"calls_remaining\":15,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:9\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_10",
+          "server": "evaluation",
+          "tool": "graph_calls",
+          "arguments": {
+            "file": "src/api.rs",
+            "limit": 20,
+            "offset": 0,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-b5295521-1bc6-4787-9262-206149973281/attempt/10",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 453,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-jyev4yek/snapshot\",\"file\":\"src/api.rs\",\"status\":\"all\",\"items\":[],\"counts\":{\"total\":0,\"resolved\":0,\"unresolved\":0,\"returned\":0},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/10\",\"calls_remaining\":14,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:10\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_11",
+          "server": "evaluation",
+          "tool": "graph_calls",
+          "arguments": {
+            "file": "src/lib.rs",
+            "limit": 20,
+            "offset": 0,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-b5295521-1bc6-4787-9262-206149973281/attempt/11",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 1937,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-jyev4yek/snapshot\",\"file\":\"src/lib.rs\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":4,\"column\":41,\"start_byte\":87,\"end_byte\":100,\"callee_start_byte\":87,\"callee_end_byte\":92,\"callee_text\":\"parse\",\"callee_path\":[\"parse\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":47,\"definition_end_byte\":102,\"body_start_byte\":85,\"body_end_byte\":102},\"source_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\"},\"caller_id\":\"src/lib.rs::caller#function\",\"caller_kind\":\"function\",\"target_file\":\"src/api.rs\",\"target_id\":\"src/api.rs::parse#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"src/lib.rs\",\"line\":4,\"content_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\",\"endpoint_id\":\"src/lib.rs::caller#function\"},{\"kind\":\"caller_definition\",\"file\":\"src/lib.rs\",\"line\":4,\"content_hash\":\"8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304\",\"endpoint_id\":\"src/lib.rs::caller#function\"},{\"kind\":\"symbol_reference\",\"file\":\"src/lib.rs\",\"line\":4,\"content_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\",\"endpoint_id\":\"src/api.rs::parse#function\"}],\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"}],\"counts\":{\"total\":1,\"resolved\":1,\"unresolved\":0,\"returned\":1},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-b5295521-1bc6-4787-9262-206149973281/attempt/11\",\"calls_remaining\":13,\"event_id\":\"session-b5295521-1bc6-4787-9262-206149973281:11\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        }
+      ],
+      "failures": [
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_1",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_7",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_8",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_10",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_11",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "unmatched_recorded_delivery"
+        }
+      ]
+    },
+    "adapter_elapsed_ms": 40.505122975446284,
+    "recoverable_error_events": 1,
+    "relationships": {
+      "schema_version": 3,
+      "case_id": "rust_known_call_impact",
+      "language": "rust",
+      "required_semantic_dependencies_total": 3,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "caller",
+          "kind": "calls",
+          "to": "entry",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "calls",
+          "record_contexts": [],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "src/lib.rs::caller#function",
+              "to": "src/api.rs::parse#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "src/lib.rs",
+                "line": 4,
+                "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 1,
+          "from": "caller",
+          "kind": "parameter_type",
+          "to": "config",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "src/lib.rs::caller#function",
+              "to": "src/api.rs::Config#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "src/lib.rs",
+                "line": 4,
+                "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 2,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "config",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "src/api.rs::parse#function",
+              "to": "src/api.rs::Config#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "src/api.rs",
+                "line": 3,
+                "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "available_dependency_links_total": 3,
+      "available_dependency_links": [
+        {
+          "index": 0,
+          "from": "caller",
+          "kind": "calls",
+          "to": "entry",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "calls",
+          "record_contexts": [],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "src/lib.rs::caller#function",
+              "to": "src/api.rs::parse#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "src/lib.rs",
+                "line": 4,
+                "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 1,
+          "from": "caller",
+          "kind": "parameter_type",
+          "to": "config",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "src/lib.rs::caller#function",
+              "to": "src/api.rs::Config#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "src/lib.rs",
+                "line": 4,
+                "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 2,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "config",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "src/api.rs::parse#function",
+              "to": "src/api.rs::Config#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "src/api.rs",
+                "line": 3,
+                "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "Exact frozen meaning joined to persisted semantic record and delivered source proof.",
+        "required": 3,
+        "available": 3,
+        "delivered": 0,
+        "available_ratio": 1.0,
+        "delivered_ratio": 0.0
+      },
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_available_relationships": 0,
+      "forbidden_delivered_relationships": 0,
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_delivered_relationship_edges": [],
+      "delivery_integrity_violations": [],
+      "forbidden_scope": "Frozen multilingual negatives plus delivered edge/index and complete exploration-proof consistency."
+    },
+    "arm": "A",
+    "attempt_id": "rust_known_call_impact-r1-A"
+  },
+  "attempt_id": "rust_known_call_impact-r1-A",
+  "arm": "A",
+  "provenance": {
+    "attempt_id": "rust_known_call_impact-r1-A",
+    "case_id": "rust_known_call_impact",
+    "snapshot": "rust_impact",
+    "repetition": 1,
+    "arm": "A",
+    "adapter_module": "benchmarks.multilingual_context_tools",
+    "model": "gpt-5.6-luna",
+    "reasoning_effort": "high",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "catalog_sha256": "f1c45cceac1c3ee90fa1af1007c341713e220571390c3b1eb086c443d7781062",
+    "runner_sha256": "5756278252a74c9e86c68a898b284108288b74a864b9424f6445223b3a7ca6db",
+    "source": {
+      "freeze_commit": "c910c5ac252a7c982f784d87d61bc4c50fc0c0ec",
+      "freeze_json_sha256": "254f38dd6247215928f4cce3fae379cf9dbf3acb74e51bd2d1ac91c12f290848",
+      "source_scope": "W4 evaluator snapshot; A exact retrieval/graph, B adds current loci_explore plus frozen guide"
+    },
+    "config": {
+      "project_doc_max_bytes": 0,
+      "web_search": "disabled",
+      "skills.include_instructions": false,
+      "developer_instructions": "",
+      "model_reasoning_effort": "high",
+      "model_catalog_json": "/Users/brummerv/phluxxed/loci-exploration/benchmarks/results/multilingual-context-workflow-v1/model-catalog.json",
+      "include_collaboration_mode_instructions": false,
+      "tools.update_plan.enabled": false,
+      "tools.experimental_request_user_input.enabled": false,
+      "features.skip_host_skill_discovery": true,
+      "mcp_servers.evaluation.command": "/Users/brummerv/phluxxed/loci-exploration/.venv/bin/python",
+      "mcp_servers.evaluation.args": [
+        "-m",
+        "benchmarks.multilingual_context_tools",
+        "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-jyev4yek/run.json"
+      ],
+      "mcp_servers.evaluation.cwd": "/Users/brummerv/phluxxed/loci-exploration",
+      "mcp_servers.evaluation.env": {
+        "LOCI_BASE_DIR": "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-jyev4yek/store",
+        "LOCI_STORE_NAMESPACE": "typescript-context-preflight"
+      },
+      "mcp_servers.evaluation.required": true,
+      "mcp_servers.evaluation.default_tools_approval_mode": "auto",
+      "mcp_servers.evaluation.tool_timeout_sec": 12,
+      "tool_output_token_limit": 32768,
+      "features.shell_tool": false,
+      "features.multi_agent": false,
+      "features.apps": false,
+      "features.plugins": false,
+      "features.hooks": false,
+      "features.memories": false,
+      "features.skill_search": false,
+      "features.skill_mcp_dependency_install": false,
+      "features.view_image": false,
+      "features.image_generation": false,
+      "features.browser_use": false,
+      "features.computer_use": false,
+      "features.in_app_browser": false,
+      "features.code_mode": false,
+      "features.code_mode_host": false,
+      "features.sleep_tool": false,
+      "features.goals": false,
+      "features.context_management": false,
+      "service_tier": "default"
+    },
+    "config_sha256": "8092dc76c9d64bec0876534f5ec26ddf5e507c4e4300514d784afd8bc615968e",
+    "prompt_sha256": "83e58871fd152e6c932b8c83fd6ca302075292a2834520522d2de3c6a03408e0",
+    "index_seconds": 0.015306416986277327,
+    "snapshot_files": {
+      "Cargo.toml": "734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9",
+      "src/api.rs": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+      "src/lib.rs": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710"
+    },
+    "extractor_version": 30,
+    "canonical_tool_schemas_sha256": "9119a51db6fc5ac2ab9834897a0a83bfef979c9dcb94fff08ab4ef3b71522753"
+  }
+}
