@@ -1,0 +1,2749 @@
+[
+  {
+    "type": "thread.started",
+    "thread_id": "01a09809-3ed9-7f01-ad79-9d0b5204faa9"
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_0",
+      "type": "error",
+      "message": "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-1bhq57oz/agent-runtime/config.toml."
+    }
+  },
+  {
+    "type": "turn.started"
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_1",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "outline",
+      "arguments": {
+        "file": "negative.py"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_1",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "outline",
+      "arguments": {
+        "file": "negative.py"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "files": [
+            {
+              "file": "negative.py",
+              "symbols": [
+                {
+                  "id": "negative.py::unknown#function",
+                  "name": "unknown",
+                  "kind": "function",
+                  "line": 7,
+                  "end_line": 8,
+                  "signature": "def unknown(value: Missing, other: External, choice: Choice)",
+                  "summary": ""
+                },
+                {
+                  "id": "negative.py::shadowed#function",
+                  "name": "shadowed",
+                  "kind": "function",
+                  "line": 10,
+                  "end_line": 14,
+                  "signature": "def shadowed()",
+                  "summary": ""
+                },
+                {
+                  "id": "negative.py::shadowed.P#constant",
+                  "name": "P",
+                  "kind": "constant",
+                  "line": 11,
+                  "end_line": 11,
+                  "signature": "P = object()",
+                  "summary": ""
+                },
+                {
+                  "id": "negative.py::shadowed.nested#function",
+                  "name": "nested",
+                  "kind": "function",
+                  "line": 12,
+                  "end_line": 13,
+                  "signature": "def nested(value: P)",
+                  "summary": ""
+                },
+                {
+                  "id": "negative.py::generic#function",
+                  "name": "generic",
+                  "kind": "function",
+                  "line": 16,
+                  "end_line": 17,
+                  "signature": "def generic[P](value: P) -> P",
+                  "summary": ""
+                },
+                {
+                  "id": "negative.py::computed#function",
+                  "name": "computed",
+                  "kind": "function",
+                  "line": 19,
+                  "end_line": 20,
+                  "signature": "def computed(value: make_type()) -> \"list[P]\"",
+                  "summary": ""
+                },
+                {
+                  "id": "negative.py::Dynamic#class",
+                  "name": "Dynamic",
+                  "kind": "class",
+                  "line": 22,
+                  "end_line": 23,
+                  "signature": "class Dynamic(make_base())",
+                  "summary": ""
+                },
+                {
+                  "id": "negative.py::__file__#file",
+                  "name": "negative.py",
+                  "kind": "file",
+                  "line": 1,
+                  "end_line": 1,
+                  "signature": "negative.py",
+                  "summary": ""
+                }
+              ]
+            }
+          ],
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/1",
+            "calls_remaining": 23,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:1"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "negative.py",
+        "start_line": 1,
+        "end_line": 30
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "negative.py",
+        "start_line": 1,
+        "end_line": 30
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "file": "negative.py",
+          "content": "from model import Missing\nfrom absent import External\nfrom left import *\nfrom right import *\nfrom model import Payload as P\n\ndef unknown(value: Missing, other: External, choice: Choice):\n    return value\n\ndef shadowed():\n    P = object()\n    def nested(value: P):\n        return value\n    return nested\n\ndef generic[P](value: P) -> P:\n    return value\n\ndef computed(value: make_type()) -> \"list[P]\":\n    return value\n\nclass Dynamic(make_base()):\n    pass\n",
+          "total_lines": 23,
+          "start_line": 1,
+          "end_line": 23,
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/2",
+            "calls_remaining": 22,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:2"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_3",
+      "type": "agent_message",
+      "text": ""
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_4",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "Review annotation and base uses in negative.py: Missing, External, Choice, nested P, generic P, make_type(), make_base(), and string forward reference list[P]. Determine proven repository targets and static-boundary handling.",
+        "max_hops": 2,
+        "max_output_bytes": 12000,
+        "max_evidence_bytes": 8000
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_4",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "Review annotation and base uses in negative.py: Missing, External, Choice, nested P, generic P, make_type(), make_base(), and string forward reference list[P]. Determine proven repository targets and static-boundary handling.",
+        "max_hops": 2,
+        "max_output_bytes": 12000,
+        "max_evidence_bytes": 8000
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "intent": "type_dependencies",
+          "status": "partial",
+          "selection": "inferred",
+          "scope": {
+            "source": "indexed_supported_source",
+            "coverage": "complete",
+            "relationships": "authored_types",
+            "exhaustive": false
+          },
+          "items": [
+            {
+              "id": "negative.py::generic#function",
+              "name": "generic",
+              "kind": "function",
+              "file": "negative.py",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Query matches negative, py, generic",
+              "source_id": 1,
+              "complete": true,
+              "path": []
+            }
+          ],
+          "relationships": [],
+          "sources": [
+            {
+              "id": 1,
+              "file": "negative.py",
+              "start_byte": 304,
+              "end_byte": 351,
+              "start_line": 16,
+              "end_line": 17,
+              "content_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+              "content": "def generic[P](value: P) -> P:\n    return value"
+            }
+          ],
+          "omissions": [
+            {
+              "reason": "anchor_limit",
+              "count": 9
+            },
+            {
+              "reason": "unresolved_relation",
+              "count": 2
+            }
+          ],
+          "limits": {
+            "max_hops": 2,
+            "max_nodes": 64,
+            "max_items": 12,
+            "max_neighbors": 32,
+            "max_output_bytes": 12000,
+            "max_evidence_bytes": 8000
+          },
+          "usage": {
+            "nodes_examined": 1,
+            "evidence_bytes": 47,
+            "output_bytes": 1136,
+            "estimated_tokens": 284,
+            "token_estimate_method": "utf8_bytes_div_4",
+            "output_encoding": "mcp_result_json_utf8"
+          },
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/3",
+            "calls_remaining": 21,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:3"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_5",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "search",
+      "arguments": {
+        "query": "Missing"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_5",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "search",
+      "arguments": {
+        "query": "Missing"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "wrong.py::Missing#class",
+              "name": "Missing",
+              "qualified_name": "Missing",
+              "kind": "class",
+              "language": "python",
+              "file_path": "wrong.py",
+              "byte_offset": 0,
+              "byte_length": 23,
+              "signature": "class Missing",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "6c236cfe4c28b4a9a72a6b1bfb83d93fdfac1b778fbefe4ad4dd1e41de5fd795",
+              "decorators": [],
+              "keywords": [
+                "missing"
+              ],
+              "metadata": {},
+              "line": 1,
+              "end_line": 2,
+              "score": 64.0
+            },
+            {
+              "id": "negative.py::unknown#function",
+              "name": "unknown",
+              "qualified_name": "unknown",
+              "kind": "function",
+              "language": "python",
+              "file_path": "negative.py",
+              "byte_offset": 125,
+              "byte_length": 78,
+              "signature": "def unknown(value: Missing, other: External, choice: Choice)",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "278150947da530e8b17bc521a95d18db22854f0538000d8f0edfccaffe927ba9",
+              "decorators": [],
+              "keywords": [
+                "unknown"
+              ],
+              "metadata": {},
+              "line": 7,
+              "end_line": 8,
+              "score": 18.0
+            }
+          ],
+          "coverage": {
+            "schema_version": 1,
+            "state": "complete",
+            "scope": "repository",
+            "source_scope": "indexed_supported_source",
+            "indexed_files": 5,
+            "excluded_paths": 0,
+            "exclusions": [],
+            "unknown_reason": null,
+            "query_scope": "indexed_symbols"
+          },
+          "search_id": "96f2aaa5-cb96-4510-80d0-02935caaeba8",
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/4",
+            "calls_remaining": 20,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:4"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_6",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "outline",
+      "arguments": {
+        "file": null
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_6",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "outline",
+      "arguments": {
+        "file": null
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "files": [
+            {
+              "file": "left.py",
+              "symbols": [
+                {
+                  "id": "left.py::Choice#class",
+                  "name": "Choice",
+                  "kind": "class",
+                  "line": 1,
+                  "end_line": 2,
+                  "signature": "class Choice",
+                  "summary": ""
+                },
+                {
+                  "id": "left.py::__file__#file",
+                  "name": "left.py",
+                  "kind": "file",
+                  "line": 1,
+                  "end_line": 1,
+                  "signature": "left.py",
+                  "summary": ""
+                }
+              ]
+            },
+            {
+              "file": "model.py",
+              "symbols": [
+                {
+                  "id": "model.py::Payload#class",
+                  "name": "Payload",
+                  "kind": "class",
+                  "line": 1,
+                  "end_line": 2,
+                  "signature": "class Payload",
+                  "summary": ""
+                },
+                {
+                  "id": "model.py::__file__#file",
+                  "name": "model.py",
+                  "kind": "file",
+                  "line": 1,
+                  "end_line": 1,
+                  "signature": "model.py",
+                  "summary": ""
+                }
+              ]
+            },
+            {
+              "file": "negative.py",
+              "symbols": [
+                {
+                  "id": "negative.py::unknown#function",
+                  "name": "unknown",
+                  "kind": "function",
+                  "line": 7,
+                  "end_line": 8,
+                  "signature": "def unknown(value: Missing, other: External, choice: Choice)",
+                  "summary": ""
+                },
+                {
+                  "id": "negative.py::shadowed#function",
+                  "name": "shadowed",
+                  "kind": "function",
+                  "line": 10,
+                  "end_line": 14,
+                  "signature": "def shadowed()",
+                  "summary": ""
+                },
+                {
+                  "id": "negative.py::shadowed.P#constant",
+                  "name": "P",
+                  "kind": "constant",
+                  "line": 11,
+                  "end_line": 11,
+                  "signature": "P = object()",
+                  "summary": ""
+                },
+                {
+                  "id": "negative.py::shadowed.nested#function",
+                  "name": "nested",
+                  "kind": "function",
+                  "line": 12,
+                  "end_line": 13,
+                  "signature": "def nested(value: P)",
+                  "summary": ""
+                },
+                {
+                  "id": "negative.py::generic#function",
+                  "name": "generic",
+                  "kind": "function",
+                  "line": 16,
+                  "end_line": 17,
+                  "signature": "def generic[P](value: P) -> P",
+                  "summary": ""
+                },
+                {
+                  "id": "negative.py::computed#function",
+                  "name": "computed",
+                  "kind": "function",
+                  "line": 19,
+                  "end_line": 20,
+                  "signature": "def computed(value: make_type()) -> \"list[P]\"",
+                  "summary": ""
+                },
+                {
+                  "id": "negative.py::Dynamic#class",
+                  "name": "Dynamic",
+                  "kind": "class",
+                  "line": 22,
+                  "end_line": 23,
+                  "signature": "class Dynamic(make_base())",
+                  "summary": ""
+                },
+                {
+                  "id": "negative.py::__file__#file",
+                  "name": "negative.py",
+                  "kind": "file",
+                  "line": 1,
+                  "end_line": 1,
+                  "signature": "negative.py",
+                  "summary": ""
+                }
+              ]
+            },
+            {
+              "file": "right.py",
+              "symbols": [
+                {
+                  "id": "right.py::Choice#class",
+                  "name": "Choice",
+                  "kind": "class",
+                  "line": 1,
+                  "end_line": 2,
+                  "signature": "class Choice",
+                  "summary": ""
+                },
+                {
+                  "id": "right.py::__file__#file",
+                  "name": "right.py",
+                  "kind": "file",
+                  "line": 1,
+                  "end_line": 1,
+                  "signature": "right.py",
+                  "summary": ""
+                }
+              ]
+            },
+            {
+              "file": "wrong.py",
+              "symbols": [
+                {
+                  "id": "wrong.py::Missing#class",
+                  "name": "Missing",
+                  "kind": "class",
+                  "line": 1,
+                  "end_line": 2,
+                  "signature": "class Missing",
+                  "summary": ""
+                },
+                {
+                  "id": "wrong.py::__file__#file",
+                  "name": "wrong.py",
+                  "kind": "file",
+                  "line": 1,
+                  "end_line": 1,
+                  "signature": "wrong.py",
+                  "summary": ""
+                }
+              ]
+            }
+          ],
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/5",
+            "calls_remaining": 19,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:5"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_7",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "model.py",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_7",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "model.py",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "file": "model.py",
+          "content": "class Payload:\n    pass\n",
+          "total_lines": 2,
+          "start_line": 1,
+          "end_line": 2,
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/6",
+            "calls_remaining": 18,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:6"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_8",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "left.py",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_8",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "left.py",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "file": "left.py",
+          "content": "class Choice:\n    pass\n",
+          "total_lines": 2,
+          "start_line": 1,
+          "end_line": 2,
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/7",
+            "calls_remaining": 17,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:7"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_9",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "right.py",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_9",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "right.py",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "file": "right.py",
+          "content": "class Choice:\n    pass\n",
+          "total_lines": 2,
+          "start_line": 1,
+          "end_line": 2,
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/8",
+            "calls_remaining": 16,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:8"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_10",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "wrong.py",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_10",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "wrong.py",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "file": "wrong.py",
+          "content": "class Missing:\n    pass\n",
+          "total_lines": 2,
+          "start_line": 1,
+          "end_line": 2,
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/9",
+            "calls_remaining": 15,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:9"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_11",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "seed_ids": [
+          "negative.py::shadowed.nested#function"
+        ],
+        "max_hops": 2,
+        "max_output_bytes": 10000,
+        "max_evidence_bytes": 7000
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_11",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "seed_ids": [
+          "negative.py::shadowed.nested#function"
+        ],
+        "max_hops": 2,
+        "max_output_bytes": 10000,
+        "max_evidence_bytes": 7000
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "intent": "type_dependencies",
+          "status": "partial",
+          "selection": "explicit",
+          "scope": {
+            "source": "indexed_supported_source",
+            "coverage": "complete",
+            "relationships": "authored_types",
+            "exhaustive": false
+          },
+          "items": [
+            {
+              "id": "negative.py::shadowed.nested#function",
+              "name": "nested",
+              "kind": "function",
+              "file": "negative.py",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Explicitly requested",
+              "source_id": 1,
+              "complete": true,
+              "path": []
+            }
+          ],
+          "relationships": [],
+          "sources": [
+            {
+              "id": 1,
+              "file": "negative.py",
+              "start_byte": 242,
+              "end_byte": 284,
+              "start_line": 12,
+              "end_line": 13,
+              "content_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+              "content": "def nested(value: P):\n        return value"
+            }
+          ],
+          "omissions": [
+            {
+              "reason": "unresolved_relation",
+              "count": 1
+            }
+          ],
+          "limits": {
+            "max_hops": 2,
+            "max_nodes": 64,
+            "max_items": 12,
+            "max_neighbors": 32,
+            "max_output_bytes": 10000,
+            "max_evidence_bytes": 7000
+          },
+          "usage": {
+            "nodes_examined": 1,
+            "evidence_bytes": 42,
+            "output_bytes": 1087,
+            "estimated_tokens": 272,
+            "token_estimate_method": "utf8_bytes_div_4",
+            "output_encoding": "mcp_result_json_utf8"
+          },
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/10",
+            "calls_remaining": 14,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:10"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_12",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_imports",
+      "arguments": {
+        "file": "negative.py",
+        "limit": 20,
+        "offset": 0,
+        "status": "all"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_12",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_imports",
+      "arguments": {
+        "file": "negative.py",
+        "limit": 20,
+        "offset": 0,
+        "status": "all"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "repo": "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-1bhq57oz/snapshot",
+          "file": "negative.py",
+          "status": "all",
+          "items": [
+            {
+              "raw": {
+                "source_file": "negative.py",
+                "language": "python",
+                "line": 1,
+                "text": "from model import Missing",
+                "specifier": "model",
+                "imported_name": "Missing",
+                "type_only": false,
+                "is_reexport": false,
+                "source_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+                "rust": null
+              },
+              "source_file": "negative.py",
+              "source_id": "negative.py::__file__#file",
+              "target_file": "model.py",
+              "target_package": null,
+              "target_crate": null,
+              "target_module": null,
+              "target_kind": "file",
+              "target_id": "model.py::__file__#file",
+              "specifier": "model",
+              "imported_name": "Missing",
+              "language": "python",
+              "line": 1,
+              "text": "from model import Missing",
+              "type_only": false,
+              "is_reexport": false,
+              "status": "resolved",
+              "resolution": "import-resolved",
+              "unresolved_reason": null,
+              "resolution_basis": null,
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            },
+            {
+              "raw": {
+                "source_file": "negative.py",
+                "language": "python",
+                "line": 2,
+                "text": "from absent import External",
+                "specifier": "absent",
+                "imported_name": "External",
+                "type_only": false,
+                "is_reexport": false,
+                "source_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+                "rust": null
+              },
+              "source_file": "negative.py",
+              "source_id": "negative.py::__file__#file",
+              "target_file": null,
+              "target_package": null,
+              "target_crate": null,
+              "target_module": null,
+              "target_kind": null,
+              "target_id": null,
+              "specifier": "absent",
+              "imported_name": "External",
+              "language": "python",
+              "line": 2,
+              "text": "from absent import External",
+              "type_only": false,
+              "is_reexport": false,
+              "status": "unresolved",
+              "resolution": null,
+              "unresolved_reason": "not_indexed",
+              "resolution_basis": null,
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            },
+            {
+              "raw": {
+                "source_file": "negative.py",
+                "language": "python",
+                "line": 3,
+                "text": "from left import *",
+                "specifier": "left",
+                "imported_name": null,
+                "type_only": false,
+                "is_reexport": false,
+                "source_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+                "rust": null
+              },
+              "source_file": "negative.py",
+              "source_id": "negative.py::__file__#file",
+              "target_file": "left.py",
+              "target_package": null,
+              "target_crate": null,
+              "target_module": null,
+              "target_kind": "file",
+              "target_id": "left.py::__file__#file",
+              "specifier": "left",
+              "imported_name": null,
+              "language": "python",
+              "line": 3,
+              "text": "from left import *",
+              "type_only": false,
+              "is_reexport": false,
+              "status": "resolved",
+              "resolution": "import-resolved",
+              "unresolved_reason": null,
+              "resolution_basis": null,
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            },
+            {
+              "raw": {
+                "source_file": "negative.py",
+                "language": "python",
+                "line": 4,
+                "text": "from right import *",
+                "specifier": "right",
+                "imported_name": null,
+                "type_only": false,
+                "is_reexport": false,
+                "source_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+                "rust": null
+              },
+              "source_file": "negative.py",
+              "source_id": "negative.py::__file__#file",
+              "target_file": "right.py",
+              "target_package": null,
+              "target_crate": null,
+              "target_module": null,
+              "target_kind": "file",
+              "target_id": "right.py::__file__#file",
+              "specifier": "right",
+              "imported_name": null,
+              "language": "python",
+              "line": 4,
+              "text": "from right import *",
+              "type_only": false,
+              "is_reexport": false,
+              "status": "resolved",
+              "resolution": "import-resolved",
+              "unresolved_reason": null,
+              "resolution_basis": null,
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            },
+            {
+              "raw": {
+                "source_file": "negative.py",
+                "language": "python",
+                "line": 5,
+                "text": "from model import Payload as P",
+                "specifier": "model",
+                "imported_name": "Payload",
+                "type_only": false,
+                "is_reexport": false,
+                "source_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+                "rust": null
+              },
+              "source_file": "negative.py",
+              "source_id": "negative.py::__file__#file",
+              "target_file": "model.py",
+              "target_package": null,
+              "target_crate": null,
+              "target_module": null,
+              "target_kind": "file",
+              "target_id": "model.py::__file__#file",
+              "specifier": "model",
+              "imported_name": "Payload",
+              "language": "python",
+              "line": 5,
+              "text": "from model import Payload as P",
+              "type_only": false,
+              "is_reexport": false,
+              "status": "resolved",
+              "resolution": "import-resolved",
+              "unresolved_reason": null,
+              "resolution_basis": null,
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            }
+          ],
+          "counts": {
+            "total": 5,
+            "resolved": 4,
+            "unresolved": 1,
+            "returned": 5
+          },
+          "pagination": {
+            "offset": 0,
+            "limit": 20,
+            "next_offset": null
+          },
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/11",
+            "calls_remaining": 13,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:11"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_13",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "model.py::Payload#class",
+          "left.py::Choice#class",
+          "right.py::Choice#class",
+          "wrong.py::Missing#class"
+        ],
+        "context": 20
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_13",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "model.py::Payload#class",
+          "left.py::Choice#class",
+          "right.py::Choice#class",
+          "wrong.py::Missing#class"
+        ],
+        "context": 20
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "model.py::Payload#class",
+              "source": "class Payload:\n    pass",
+              "byte_offset": 0,
+              "byte_length": 23,
+              "line": 1,
+              "end_line": 2,
+              "signature": "class Payload",
+              "kind": "class",
+              "language": "python",
+              "context_before": [],
+              "context_after": []
+            },
+            {
+              "id": "left.py::Choice#class",
+              "source": "class Choice:\n    pass",
+              "byte_offset": 0,
+              "byte_length": 22,
+              "line": 1,
+              "end_line": 2,
+              "signature": "class Choice",
+              "kind": "class",
+              "language": "python",
+              "context_before": [],
+              "context_after": []
+            },
+            {
+              "id": "right.py::Choice#class",
+              "source": "class Choice:\n    pass",
+              "byte_offset": 0,
+              "byte_length": 22,
+              "line": 1,
+              "end_line": 2,
+              "signature": "class Choice",
+              "kind": "class",
+              "language": "python",
+              "context_before": [],
+              "context_after": []
+            },
+            {
+              "id": "wrong.py::Missing#class",
+              "source": "class Missing:\n    pass",
+              "byte_offset": 0,
+              "byte_length": 23,
+              "line": 1,
+              "end_line": 2,
+              "signature": "class Missing",
+              "kind": "class",
+              "language": "python",
+              "context_before": [],
+              "context_after": []
+            }
+          ],
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/12",
+            "calls_remaining": 12,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:12"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_14",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "seed_ids": [
+          "negative.py::unknown#function",
+          "negative.py::computed#function",
+          "negative.py::Dynamic#class"
+        ],
+        "max_hops": 1,
+        "max_output_bytes": 14000,
+        "max_evidence_bytes": 8000
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_14",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "seed_ids": [
+          "negative.py::unknown#function",
+          "negative.py::computed#function",
+          "negative.py::Dynamic#class"
+        ],
+        "max_hops": 1,
+        "max_output_bytes": 14000,
+        "max_evidence_bytes": 8000
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "intent": "type_dependencies",
+          "status": "partial",
+          "selection": "explicit",
+          "scope": {
+            "source": "indexed_supported_source",
+            "coverage": "complete",
+            "relationships": "authored_types",
+            "exhaustive": false
+          },
+          "items": [
+            {
+              "id": "negative.py::unknown#function",
+              "name": "unknown",
+              "kind": "function",
+              "file": "negative.py",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Explicitly requested",
+              "source_id": 1,
+              "complete": true,
+              "path": []
+            },
+            {
+              "id": "negative.py::computed#function",
+              "name": "computed",
+              "kind": "function",
+              "file": "negative.py",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Explicitly requested",
+              "source_id": 2,
+              "complete": true,
+              "path": []
+            },
+            {
+              "id": "negative.py::Dynamic#class",
+              "name": "Dynamic",
+              "kind": "class",
+              "file": "negative.py",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Explicitly requested",
+              "source_id": 3,
+              "complete": true,
+              "path": []
+            }
+          ],
+          "relationships": [],
+          "sources": [
+            {
+              "id": 1,
+              "file": "negative.py",
+              "start_byte": 125,
+              "end_byte": 203,
+              "start_line": 7,
+              "end_line": 8,
+              "content_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+              "content": "def unknown(value: Missing, other: External, choice: Choice):\n    return value"
+            },
+            {
+              "id": 2,
+              "file": "negative.py",
+              "start_byte": 353,
+              "end_byte": 416,
+              "start_line": 19,
+              "end_line": 20,
+              "content_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+              "content": "def computed(value: make_type()) -> \"list[P]\":\n    return value"
+            },
+            {
+              "id": 3,
+              "file": "negative.py",
+              "start_byte": 418,
+              "end_byte": 454,
+              "start_line": 22,
+              "end_line": 23,
+              "content_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+              "content": "class Dynamic(make_base()):\n    pass"
+            }
+          ],
+          "omissions": [
+            {
+              "reason": "unresolved_relation",
+              "count": 6
+            }
+          ],
+          "limits": {
+            "max_hops": 1,
+            "max_nodes": 64,
+            "max_items": 12,
+            "max_neighbors": 32,
+            "max_output_bytes": 14000,
+            "max_evidence_bytes": 8000
+          },
+          "usage": {
+            "nodes_examined": 3,
+            "evidence_bytes": 177,
+            "output_bytes": 1968,
+            "estimated_tokens": 492,
+            "token_estimate_method": "utf8_bytes_div_4",
+            "output_encoding": "mcp_result_json_utf8"
+          },
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/13",
+            "calls_remaining": 11,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:13"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_15",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_references",
+      "arguments": {
+        "file": "negative.py",
+        "limit": 50,
+        "offset": 0,
+        "status": "all"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_15",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_references",
+      "arguments": {
+        "file": "negative.py",
+        "limit": 50,
+        "offset": 0,
+        "status": "all"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "error": {
+            "code": "ValueError",
+            "message": "invalid record pagination"
+          },
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/14",
+            "calls_remaining": 10,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:14"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_16",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_references",
+      "arguments": {
+        "file": "negative.py",
+        "limit": 20,
+        "status": "all"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_16",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_references",
+      "arguments": {
+        "file": "negative.py",
+        "limit": 20,
+        "status": "all"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "repo": "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-1bhq57oz/snapshot",
+          "file": "negative.py",
+          "status": "all",
+          "items": [
+            {
+              "raw": {
+                "source_file": "negative.py",
+                "language": "python",
+                "line": 7,
+                "column": 20,
+                "start_byte": 144,
+                "end_byte": 151,
+                "text": "Missing",
+                "path": [
+                  "Missing"
+                ],
+                "candidate_bindings": [
+                  {
+                    "local_name": "Missing",
+                    "imported_name": "Missing",
+                    "exported_name": null,
+                    "kind": "symbol",
+                    "type_only": false,
+                    "module_level": true,
+                    "declaration_start_byte": 0,
+                    "scope_start_byte": 0,
+                    "scope_end_byte": 455,
+                    "import_line": 1,
+                    "import_text": "from model import Missing",
+                    "import_specifier": "model"
+                  }
+                ],
+                "binding_state": "definite",
+                "source_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+                "owner": {
+                  "kind": "file",
+                  "definition_start_byte": null,
+                  "definition_end_byte": null,
+                  "body_start_byte": null,
+                  "body_end_byte": null
+                }
+              },
+              "binding": {
+                "local_name": "Missing",
+                "imported_name": "Missing",
+                "exported_name": null,
+                "kind": "symbol",
+                "type_only": false,
+                "module_level": true,
+                "declaration_start_byte": 0,
+                "scope_start_byte": 0,
+                "scope_end_byte": 455,
+                "import_line": 1,
+                "import_text": "from model import Missing",
+                "import_specifier": "model"
+              },
+              "source_file": "negative.py",
+              "source_id": "negative.py::__file__#file",
+              "source_kind": "file",
+              "import_source_id": "negative.py::__file__#file",
+              "import_target_id": "model.py::__file__#file",
+              "target_file": null,
+              "target_id": null,
+              "target_kind": null,
+              "status": "unresolved",
+              "resolution": null,
+              "unresolved_reason": "target_not_indexed",
+              "import_unresolved_reason": null,
+              "resolution_basis": null,
+              "support": [
+                {
+                  "kind": "import_binding",
+                  "file": "negative.py",
+                  "line": 1,
+                  "content_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+                  "endpoint_id": "model.py::__file__#file"
+                }
+              ],
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            },
+            {
+              "raw": {
+                "source_file": "negative.py",
+                "language": "python",
+                "line": 7,
+                "column": 36,
+                "start_byte": 160,
+                "end_byte": 168,
+                "text": "External",
+                "path": [
+                  "External"
+                ],
+                "candidate_bindings": [
+                  {
+                    "local_name": "External",
+                    "imported_name": "External",
+                    "exported_name": null,
+                    "kind": "symbol",
+                    "type_only": false,
+                    "module_level": true,
+                    "declaration_start_byte": 26,
+                    "scope_start_byte": 0,
+                    "scope_end_byte": 455,
+                    "import_line": 2,
+                    "import_text": "from absent import External",
+                    "import_specifier": "absent"
+                  }
+                ],
+                "binding_state": "definite",
+                "source_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+                "owner": {
+                  "kind": "file",
+                  "definition_start_byte": null,
+                  "definition_end_byte": null,
+                  "body_start_byte": null,
+                  "body_end_byte": null
+                }
+              },
+              "binding": {
+                "local_name": "External",
+                "imported_name": "External",
+                "exported_name": null,
+                "kind": "symbol",
+                "type_only": false,
+                "module_level": true,
+                "declaration_start_byte": 26,
+                "scope_start_byte": 0,
+                "scope_end_byte": 455,
+                "import_line": 2,
+                "import_text": "from absent import External",
+                "import_specifier": "absent"
+              },
+              "source_file": "negative.py",
+              "source_id": "negative.py::__file__#file",
+              "source_kind": "file",
+              "import_source_id": "negative.py::__file__#file",
+              "import_target_id": null,
+              "target_file": null,
+              "target_id": null,
+              "target_kind": null,
+              "status": "unresolved",
+              "resolution": null,
+              "unresolved_reason": "import_unresolved",
+              "import_unresolved_reason": "not_indexed",
+              "resolution_basis": null,
+              "support": [],
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            },
+            {
+              "raw": {
+                "source_file": "negative.py",
+                "language": "python",
+                "line": 12,
+                "column": 23,
+                "start_byte": 260,
+                "end_byte": 261,
+                "text": "P",
+                "path": [
+                  "P"
+                ],
+                "candidate_bindings": [
+                  {
+                    "local_name": "P",
+                    "imported_name": "Payload",
+                    "exported_name": null,
+                    "kind": "symbol",
+                    "type_only": false,
+                    "module_level": true,
+                    "declaration_start_byte": 93,
+                    "scope_start_byte": 0,
+                    "scope_end_byte": 455,
+                    "import_line": 5,
+                    "import_text": "from model import Payload as P",
+                    "import_specifier": "model"
+                  }
+                ],
+                "binding_state": "shadowed",
+                "source_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+                "owner": {
+                  "kind": "callable",
+                  "definition_start_byte": 205,
+                  "definition_end_byte": 302,
+                  "body_start_byte": 225,
+                  "body_end_byte": 302
+                }
+              },
+              "binding": {
+                "local_name": "P",
+                "imported_name": "Payload",
+                "exported_name": null,
+                "kind": "symbol",
+                "type_only": false,
+                "module_level": true,
+                "declaration_start_byte": 93,
+                "scope_start_byte": 0,
+                "scope_end_byte": 455,
+                "import_line": 5,
+                "import_text": "from model import Payload as P",
+                "import_specifier": "model"
+              },
+              "source_file": "negative.py",
+              "source_id": "negative.py::shadowed#function",
+              "source_kind": "function",
+              "import_source_id": "negative.py::__file__#file",
+              "import_target_id": "model.py::__file__#file",
+              "target_file": null,
+              "target_id": null,
+              "target_kind": null,
+              "status": "unresolved",
+              "resolution": null,
+              "unresolved_reason": "binding_shadowed",
+              "import_unresolved_reason": null,
+              "resolution_basis": null,
+              "support": [],
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            },
+            {
+              "raw": {
+                "source_file": "negative.py",
+                "language": "python",
+                "line": 16,
+                "column": 13,
+                "start_byte": 316,
+                "end_byte": 317,
+                "text": "P",
+                "path": [
+                  "P"
+                ],
+                "candidate_bindings": [
+                  {
+                    "local_name": "P",
+                    "imported_name": "Payload",
+                    "exported_name": null,
+                    "kind": "symbol",
+                    "type_only": false,
+                    "module_level": true,
+                    "declaration_start_byte": 93,
+                    "scope_start_byte": 0,
+                    "scope_end_byte": 455,
+                    "import_line": 5,
+                    "import_text": "from model import Payload as P",
+                    "import_specifier": "model"
+                  }
+                ],
+                "binding_state": "definite",
+                "source_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+                "owner": {
+                  "kind": "file",
+                  "definition_start_byte": null,
+                  "definition_end_byte": null,
+                  "body_start_byte": null,
+                  "body_end_byte": null
+                }
+              },
+              "binding": {
+                "local_name": "P",
+                "imported_name": "Payload",
+                "exported_name": null,
+                "kind": "symbol",
+                "type_only": false,
+                "module_level": true,
+                "declaration_start_byte": 93,
+                "scope_start_byte": 0,
+                "scope_end_byte": 455,
+                "import_line": 5,
+                "import_text": "from model import Payload as P",
+                "import_specifier": "model"
+              },
+              "source_file": "negative.py",
+              "source_id": "negative.py::__file__#file",
+              "source_kind": "file",
+              "import_source_id": "negative.py::__file__#file",
+              "import_target_id": "model.py::__file__#file",
+              "target_file": "model.py",
+              "target_id": "model.py::Payload#class",
+              "target_kind": "class",
+              "status": "resolved",
+              "resolution": "import-resolved",
+              "unresolved_reason": null,
+              "import_unresolved_reason": null,
+              "resolution_basis": "direct_binding",
+              "support": [
+                {
+                  "kind": "import_binding",
+                  "file": "negative.py",
+                  "line": 5,
+                  "content_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+                  "endpoint_id": "model.py::__file__#file"
+                },
+                {
+                  "kind": "definition",
+                  "file": "model.py",
+                  "line": 1,
+                  "content_hash": "a28cc7764f351e2f05320829281b10b51decf2bba78d2b6757da301542bd7196",
+                  "endpoint_id": "model.py::Payload#class"
+                }
+              ],
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            },
+            {
+              "raw": {
+                "source_file": "negative.py",
+                "language": "python",
+                "line": 16,
+                "column": 23,
+                "start_byte": 326,
+                "end_byte": 327,
+                "text": "P",
+                "path": [
+                  "P"
+                ],
+                "candidate_bindings": [
+                  {
+                    "local_name": "P",
+                    "imported_name": "Payload",
+                    "exported_name": null,
+                    "kind": "symbol",
+                    "type_only": false,
+                    "module_level": true,
+                    "declaration_start_byte": 93,
+                    "scope_start_byte": 0,
+                    "scope_end_byte": 455,
+                    "import_line": 5,
+                    "import_text": "from model import Payload as P",
+                    "import_specifier": "model"
+                  }
+                ],
+                "binding_state": "definite",
+                "source_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+                "owner": {
+                  "kind": "file",
+                  "definition_start_byte": null,
+                  "definition_end_byte": null,
+                  "body_start_byte": null,
+                  "body_end_byte": null
+                }
+              },
+              "binding": {
+                "local_name": "P",
+                "imported_name": "Payload",
+                "exported_name": null,
+                "kind": "symbol",
+                "type_only": false,
+                "module_level": true,
+                "declaration_start_byte": 93,
+                "scope_start_byte": 0,
+                "scope_end_byte": 455,
+                "import_line": 5,
+                "import_text": "from model import Payload as P",
+                "import_specifier": "model"
+              },
+              "source_file": "negative.py",
+              "source_id": "negative.py::__file__#file",
+              "source_kind": "file",
+              "import_source_id": "negative.py::__file__#file",
+              "import_target_id": "model.py::__file__#file",
+              "target_file": "model.py",
+              "target_id": "model.py::Payload#class",
+              "target_kind": "class",
+              "status": "resolved",
+              "resolution": "import-resolved",
+              "unresolved_reason": null,
+              "import_unresolved_reason": null,
+              "resolution_basis": "direct_binding",
+              "support": [
+                {
+                  "kind": "import_binding",
+                  "file": "negative.py",
+                  "line": 5,
+                  "content_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+                  "endpoint_id": "model.py::__file__#file"
+                },
+                {
+                  "kind": "definition",
+                  "file": "model.py",
+                  "line": 1,
+                  "content_hash": "a28cc7764f351e2f05320829281b10b51decf2bba78d2b6757da301542bd7196",
+                  "endpoint_id": "model.py::Payload#class"
+                }
+              ],
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            },
+            {
+              "raw": {
+                "source_file": "negative.py",
+                "language": "python",
+                "line": 16,
+                "column": 29,
+                "start_byte": 332,
+                "end_byte": 333,
+                "text": "P",
+                "path": [
+                  "P"
+                ],
+                "candidate_bindings": [
+                  {
+                    "local_name": "P",
+                    "imported_name": "Payload",
+                    "exported_name": null,
+                    "kind": "symbol",
+                    "type_only": false,
+                    "module_level": true,
+                    "declaration_start_byte": 93,
+                    "scope_start_byte": 0,
+                    "scope_end_byte": 455,
+                    "import_line": 5,
+                    "import_text": "from model import Payload as P",
+                    "import_specifier": "model"
+                  }
+                ],
+                "binding_state": "definite",
+                "source_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+                "owner": {
+                  "kind": "file",
+                  "definition_start_byte": null,
+                  "definition_end_byte": null,
+                  "body_start_byte": null,
+                  "body_end_byte": null
+                }
+              },
+              "binding": {
+                "local_name": "P",
+                "imported_name": "Payload",
+                "exported_name": null,
+                "kind": "symbol",
+                "type_only": false,
+                "module_level": true,
+                "declaration_start_byte": 93,
+                "scope_start_byte": 0,
+                "scope_end_byte": 455,
+                "import_line": 5,
+                "import_text": "from model import Payload as P",
+                "import_specifier": "model"
+              },
+              "source_file": "negative.py",
+              "source_id": "negative.py::__file__#file",
+              "source_kind": "file",
+              "import_source_id": "negative.py::__file__#file",
+              "import_target_id": "model.py::__file__#file",
+              "target_file": "model.py",
+              "target_id": "model.py::Payload#class",
+              "target_kind": "class",
+              "status": "resolved",
+              "resolution": "import-resolved",
+              "unresolved_reason": null,
+              "import_unresolved_reason": null,
+              "resolution_basis": "direct_binding",
+              "support": [
+                {
+                  "kind": "import_binding",
+                  "file": "negative.py",
+                  "line": 5,
+                  "content_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+                  "endpoint_id": "model.py::__file__#file"
+                },
+                {
+                  "kind": "definition",
+                  "file": "model.py",
+                  "line": 1,
+                  "content_hash": "a28cc7764f351e2f05320829281b10b51decf2bba78d2b6757da301542bd7196",
+                  "endpoint_id": "model.py::Payload#class"
+                }
+              ],
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            }
+          ],
+          "counts": {
+            "total": 6,
+            "resolved": 3,
+            "unresolved": 3,
+            "returned": 6
+          },
+          "pagination": {
+            "offset": 0,
+            "limit": 20,
+            "next_offset": null
+          },
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/15",
+            "calls_remaining": 9,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:15"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_17",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_references",
+      "arguments": {
+        "limit": 50,
+        "status": "all"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_17",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_references",
+      "arguments": {
+        "limit": 50,
+        "status": "all"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "error": {
+            "code": "ValueError",
+            "message": "invalid record pagination"
+          },
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/16",
+            "calls_remaining": 8,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:16"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_18",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "negative.py::generic#function",
+          "negative.py::shadowed.nested#function",
+          "negative.py::computed#function",
+          "negative.py::Dynamic#class",
+          "negative.py::shadowed.P#constant"
+        ],
+        "context": 12
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_18",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "negative.py::generic#function",
+          "negative.py::shadowed.nested#function",
+          "negative.py::computed#function",
+          "negative.py::Dynamic#class",
+          "negative.py::shadowed.P#constant"
+        ],
+        "context": 12
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "error": {
+            "code": "BUDGET_EXHAUSTED",
+            "limits": [
+              "max_evidence_spans"
+            ],
+            "message": "Result withheld before source delivery; run budget failure retained."
+          },
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/17",
+            "calls_remaining": 7,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:17"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_19",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_calls",
+      "arguments": {
+        "file": "negative.py",
+        "limit": 20,
+        "status": "all"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_19",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_calls",
+      "arguments": {
+        "file": "negative.py",
+        "limit": 20,
+        "status": "all"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "repo": "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-1bhq57oz/snapshot",
+          "file": "negative.py",
+          "status": "all",
+          "items": [
+            {
+              "raw": {
+                "source_file": "negative.py",
+                "language": "python",
+                "line": 11,
+                "column": 9,
+                "start_byte": 229,
+                "end_byte": 237,
+                "callee_start_byte": 229,
+                "callee_end_byte": 235,
+                "callee_text": "object",
+                "callee_path": [
+                  "object"
+                ],
+                "callee_form": "identifier",
+                "local_candidates": [],
+                "local_binding_state": "absent",
+                "member_candidates": [],
+                "member_binding_state": "absent",
+                "owner": {
+                  "kind": "callable",
+                  "definition_start_byte": 205,
+                  "definition_end_byte": 302,
+                  "body_start_byte": 225,
+                  "body_end_byte": 302
+                },
+                "source_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8"
+              },
+              "caller_id": "negative.py::shadowed#function",
+              "caller_kind": "function",
+              "target_file": null,
+              "target_id": null,
+              "target_kind": null,
+              "status": "unresolved",
+              "resolution": null,
+              "unresolved_reason": "callee_not_proven",
+              "reference_unresolved_reason": null,
+              "resolution_basis": null,
+              "support": [],
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            },
+            {
+              "raw": {
+                "source_file": "negative.py",
+                "language": "python",
+                "line": 19,
+                "column": 21,
+                "start_byte": 373,
+                "end_byte": 384,
+                "callee_start_byte": 373,
+                "callee_end_byte": 382,
+                "callee_text": "make_type",
+                "callee_path": [
+                  "make_type"
+                ],
+                "callee_form": "identifier",
+                "local_candidates": [],
+                "local_binding_state": "absent",
+                "member_candidates": [],
+                "member_binding_state": "absent",
+                "owner": {
+                  "kind": "file",
+                  "definition_start_byte": null,
+                  "definition_end_byte": null,
+                  "body_start_byte": null,
+                  "body_end_byte": null
+                },
+                "source_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8"
+              },
+              "caller_id": "negative.py::__file__#file",
+              "caller_kind": "file",
+              "target_file": null,
+              "target_id": null,
+              "target_kind": null,
+              "status": "unresolved",
+              "resolution": null,
+              "unresolved_reason": "callee_not_proven",
+              "reference_unresolved_reason": null,
+              "resolution_basis": null,
+              "support": [],
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            },
+            {
+              "raw": {
+                "source_file": "negative.py",
+                "language": "python",
+                "line": 22,
+                "column": 15,
+                "start_byte": 432,
+                "end_byte": 443,
+                "callee_start_byte": 432,
+                "callee_end_byte": 441,
+                "callee_text": "make_base",
+                "callee_path": [
+                  "make_base"
+                ],
+                "callee_form": "identifier",
+                "local_candidates": [],
+                "local_binding_state": "absent",
+                "member_candidates": [],
+                "member_binding_state": "absent",
+                "owner": {
+                  "kind": "file",
+                  "definition_start_byte": null,
+                  "definition_end_byte": null,
+                  "body_start_byte": null,
+                  "body_end_byte": null
+                },
+                "source_hash": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8"
+              },
+              "caller_id": "negative.py::__file__#file",
+              "caller_kind": "file",
+              "target_file": null,
+              "target_id": null,
+              "target_kind": null,
+              "status": "unresolved",
+              "resolution": null,
+              "unresolved_reason": "callee_not_proven",
+              "reference_unresolved_reason": null,
+              "resolution_basis": null,
+              "support": [],
+              "resolution_control_files": [],
+              "resolution_configuration": null
+            }
+          ],
+          "counts": {
+            "total": 3,
+            "resolved": 0,
+            "unresolved": 3,
+            "returned": 3
+          },
+          "pagination": {
+            "offset": 0,
+            "limit": 20,
+            "next_offset": null
+          },
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/18",
+            "calls_remaining": 6,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:18"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_20",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_retrieve",
+      "arguments": {
+        "question": "What exact repository targets are proven for the annotation names Missing, External, Choice, nested P, and generic P in negative.py, including ambiguity and shadowing?",
+        "seed_ids": [
+          "negative.py::unknown#function",
+          "negative.py::shadowed.nested#function",
+          "negative.py::generic#function"
+        ],
+        "edge_types": [
+          "reference",
+          "imports",
+          "type"
+        ]
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_20",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_retrieve",
+      "arguments": {
+        "question": "What exact repository targets are proven for the annotation names Missing, External, Choice, nested P, and generic P in negative.py, including ambiguity and shadowing?",
+        "seed_ids": [
+          "negative.py::unknown#function",
+          "negative.py::shadowed.nested#function",
+          "negative.py::generic#function"
+        ],
+        "edge_types": [
+          "reference",
+          "imports",
+          "type"
+        ]
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "repo": "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-1bhq57oz/snapshot",
+          "question": "What exact repository targets are proven for the annotation names Missing, External, Choice, nested P, and generic P in negative.py, including ambiguity and shadowing?",
+          "selection": "explicit",
+          "question_terms": [],
+          "anchors": [
+            {
+              "node": {
+                "id": "negative.py::unknown#function",
+                "namespace": "loci",
+                "kind": "function",
+                "attributes": {
+                  "language": "python",
+                  "file": "negative.py",
+                  "line": 7,
+                  "end_line": 8
+                }
+              },
+              "matched_symbol_id": "negative.py::unknown#function",
+              "name": "unknown",
+              "score": null,
+              "reason": {
+                "kind": "explicit_seed",
+                "matched_terms": [],
+                "match_scope": []
+              }
+            },
+            {
+              "node": {
+                "id": "negative.py::shadowed.nested#function",
+                "namespace": "loci",
+                "kind": "function",
+                "attributes": {
+                  "language": "python",
+                  "file": "negative.py",
+                  "line": 12,
+                  "end_line": 13
+                }
+              },
+              "matched_symbol_id": "negative.py::shadowed.nested#function",
+              "name": "nested",
+              "score": null,
+              "reason": {
+                "kind": "explicit_seed",
+                "matched_terms": [],
+                "match_scope": []
+              }
+            },
+            {
+              "node": {
+                "id": "negative.py::generic#function",
+                "namespace": "loci",
+                "kind": "function",
+                "attributes": {
+                  "language": "python",
+                  "file": "negative.py",
+                  "line": 16,
+                  "end_line": 17
+                }
+              },
+              "matched_symbol_id": "negative.py::generic#function",
+              "name": "generic",
+              "score": null,
+              "reason": {
+                "kind": "explicit_seed",
+                "matched_terms": [],
+                "match_scope": []
+              }
+            }
+          ],
+          "routing": {
+            "kind": "relationship",
+            "reason": "relationship_intent"
+          },
+          "filters": {
+            "namespaces": null,
+            "edge_types": [
+              "reference",
+              "imports",
+              "type"
+            ],
+            "resolutions": [
+              "exact",
+              "declared",
+              "import-resolved"
+            ],
+            "direction": "outgoing"
+          },
+          "hub_threshold": 4,
+          "paths": [],
+          "rejected_paths": [],
+          "counts": {
+            "filtered_edges": 3,
+            "examined_nodes": 3,
+            "examined_paths": 1,
+            "returned_paths": 0,
+            "rejected_paths": 0,
+            "duplicate_paths": 0,
+            "omitted_rejected_paths": 0,
+            "omitted_nodes": 0,
+            "omitted_paths": 0
+          },
+          "budget": {
+            "max_hops": 3,
+            "max_nodes": 64,
+            "max_paths": 16,
+            "path_offset": 0,
+            "evidence_bytes": 0,
+            "estimated_tokens": 0,
+            "max_evidence_bytes": 16384,
+            "max_estimated_tokens": 4096,
+            "hop_limit_reached": false,
+            "node_limit_reached": false,
+            "next_path_offset": null
+          },
+          "diagnostics": [],
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/19",
+            "calls_remaining": 5,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:19"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_21",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "search",
+      "arguments": {
+        "query": "P"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_21",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "search",
+      "arguments": {
+        "query": "P"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "negative.py::computed#function",
+              "name": "computed",
+              "qualified_name": "computed",
+              "kind": "function",
+              "language": "python",
+              "file_path": "negative.py",
+              "byte_offset": 353,
+              "byte_length": 63,
+              "signature": "def computed(value: make_type()) -> \"list[P]\"",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "d728401688af558bb083343caab0104c2b188ddd5a52a084297d6afb29b7322d",
+              "decorators": [],
+              "keywords": [
+                "computed"
+              ],
+              "metadata": {},
+              "line": 19,
+              "end_line": 20,
+              "score": 40.0
+            },
+            {
+              "id": "negative.py::shadowed.P#constant",
+              "name": "P",
+              "qualified_name": "shadowed.P",
+              "kind": "constant",
+              "language": "python",
+              "file_path": "negative.py",
+              "byte_offset": 225,
+              "byte_length": 12,
+              "signature": "P = object()",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "1697af5f6f2ca699afcdb44380ef41235ae11c8b7d3cbddda576934aa864338d",
+              "decorators": [],
+              "keywords": [],
+              "metadata": {},
+              "line": 11,
+              "end_line": 11,
+              "score": 35.0
+            },
+            {
+              "id": "model.py::Payload#class",
+              "name": "Payload",
+              "qualified_name": "Payload",
+              "kind": "class",
+              "language": "python",
+              "file_path": "model.py",
+              "byte_offset": 0,
+              "byte_length": 23,
+              "signature": "class Payload",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "c4234f6e751babaf600ba7b0b205351fb84d45e0ca4f955eed8c0f1b54116e27",
+              "decorators": [],
+              "keywords": [
+                "payload"
+              ],
+              "metadata": {},
+              "line": 1,
+              "end_line": 2,
+              "score": 33.0
+            },
+            {
+              "id": "left.py::__file__#file",
+              "name": "left.py",
+              "qualified_name": "__file__",
+              "kind": "file",
+              "language": "python",
+              "file_path": "left.py",
+              "byte_offset": 0,
+              "byte_length": 0,
+              "signature": "left.py",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "4b924a8edab261765af15873e2a0a40a8b72c4fbd3296e7f9508184a80b55838",
+              "decorators": [],
+              "keywords": [
+                "left"
+              ],
+              "metadata": {
+                "loci": {
+                  "file_node": true
+                }
+              },
+              "line": 1,
+              "end_line": 1,
+              "score": 18.0
+            },
+            {
+              "id": "model.py::__file__#file",
+              "name": "model.py",
+              "qualified_name": "__file__",
+              "kind": "file",
+              "language": "python",
+              "file_path": "model.py",
+              "byte_offset": 0,
+              "byte_length": 0,
+              "signature": "model.py",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "a28cc7764f351e2f05320829281b10b51decf2bba78d2b6757da301542bd7196",
+              "decorators": [],
+              "keywords": [
+                "model"
+              ],
+              "metadata": {
+                "loci": {
+                  "file_node": true
+                }
+              },
+              "line": 1,
+              "end_line": 1,
+              "score": 18.0
+            }
+          ],
+          "coverage": {
+            "schema_version": 1,
+            "state": "complete",
+            "scope": "repository",
+            "source_scope": "indexed_supported_source",
+            "indexed_files": 5,
+            "excluded_paths": 0,
+            "exclusions": [],
+            "unknown_reason": null,
+            "query_scope": "indexed_symbols"
+          },
+          "search_id": "0716b70b-6db3-4759-89f5-727fcb179eb1",
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/20",
+            "calls_remaining": 4,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:20"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_22",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_neighbors",
+      "arguments": {
+        "seed_ids": [
+          "negative.py::generic#function",
+          "negative.py::shadowed.P#constant",
+          "left.py::Choice#class",
+          "right.py::Choice#class"
+        ]
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_22",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "graph_neighbors",
+      "arguments": {
+        "seed_ids": [
+          "negative.py::generic#function",
+          "negative.py::shadowed.P#constant",
+          "left.py::Choice#class",
+          "right.py::Choice#class"
+        ]
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "schema_version": 1,
+          "repo": "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-1bhq57oz/snapshot",
+          "results": [
+            {
+              "seed": {
+                "id": "negative.py::generic#function",
+                "namespace": "loci",
+                "kind": "function",
+                "attributes": {
+                  "language": "python",
+                  "file": "negative.py",
+                  "line": 16,
+                  "end_line": 17
+                }
+              },
+              "neighbors": []
+            },
+            {
+              "seed": {
+                "id": "negative.py::shadowed.P#constant",
+                "namespace": "loci",
+                "kind": "constant",
+                "attributes": {
+                  "language": "python",
+                  "file": "negative.py",
+                  "line": 11,
+                  "end_line": 11
+                }
+              },
+              "neighbors": []
+            },
+            {
+              "seed": {
+                "id": "left.py::Choice#class",
+                "namespace": "loci",
+                "kind": "class",
+                "attributes": {
+                  "language": "python",
+                  "file": "left.py",
+                  "line": 1,
+                  "end_line": 2
+                }
+              },
+              "neighbors": []
+            },
+            {
+              "seed": {
+                "id": "right.py::Choice#class",
+                "namespace": "loci",
+                "kind": "class",
+                "attributes": {
+                  "language": "python",
+                  "file": "right.py",
+                  "line": 1,
+                  "end_line": 2
+                }
+              },
+              "neighbors": []
+            }
+          ],
+          "diagnostics": [],
+          "_evaluation": {
+            "attempt_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731/attempt/21",
+            "calls_remaining": 3,
+            "event_id": "session-c240273a-7aa1-4fe6-b4a2-7748b799d731:21"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_23",
+      "type": "agent_message",
+      "text": "{\"exact_repository_targets\":{\"Missing\":[],\"External\":[],\"Choice\":[\"left.py::Choice#class\",\"right.py::Choice#class\"],\"nested P\":[\"negative.py::shadowed.P#constant\"],\"generic P\":[],\"make_type()\":[],\"make_base()\":[]},\"generic_P_is_imported_payload\":false,\"compound_string_supported\":false,\"runtime_evaluation_allowed\":false}"
+    }
+  },
+  {
+    "type": "turn.completed",
+    "usage": {
+      "input_tokens": 253364,
+      "cached_input_tokens": 202752,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 5748,
+      "reasoning_output_tokens": 4764
+    }
+  }
+]

@@ -3,6 +3,7 @@
 ## Contents
 
 - Exploration capabilities
+- Measured workflow scope
 - JavaScript and TypeScript
 - Go
 - Rust
@@ -59,6 +60,30 @@ over outgoing type records with supporting lines. It does not provide the full
 Go/Rust control-source, configuration or reverse impl-selection contract above. Use
 `loci_explore` when the question requires those proofs, and ordinary exact get
 when editing a complete declaration.
+
+## Measured workflow scope
+
+The [W4.7 review](../../../docs/reviews/2026-09-13-multilingual-workflow-measurement.md)
+retains 114 attempts and exact independent replay. Python, JavaScript, Go and
+Rust comparison claims are withheld because of incomplete evaluator accounting;
+the maintained Python and TSX controls record measured coverage/quality and cost
+limits. Only the single Markdown section-navigation control passes every
+workflow gate. Use the capability matrix for implemented authored semantics;
+this measurement establishes no programming-language efficiency recommendation.
+
+Check required relationships as well as source coverage. Compact selection can
+deliver correct definitions while omitting available alternate paths, or stop
+at declared anchor/hop/selection bounds. Follow up on the specific missing
+source or proof; a correct answer or a packet with valid selected proofs does
+not establish complete contract coverage.
+
+Exact `loci_file` and grep read mirrored indexed source. A present `go.mod` or
+`Cargo.toml` can
+therefore return a cache miss through those tools even while exploration can
+hydrate its complete control source. Treat that as a retrieval-surface limit,
+not evidence that the file is absent. Inspect the returned control proof or use
+an authorized targeted filesystem read when full control contents are required.
+Keep authored relationships distinct from model assertions of runtime certainty.
 
 ## JavaScript and TypeScript
 

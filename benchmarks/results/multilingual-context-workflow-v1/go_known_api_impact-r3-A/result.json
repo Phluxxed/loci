@@ -1,0 +1,1058 @@
+{
+  "schema_version": 4,
+  "protocol": "multilingual-context-workflow-v1",
+  "identity": {
+    "task_id": "go_known_api_impact",
+    "session_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b",
+    "arm": "A",
+    "repetition": 3,
+    "snapshot": "go_impact",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1"
+  },
+  "events": [
+    {
+      "id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:1",
+      "task_id": "go_known_api_impact",
+      "session_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "go_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "Handle"
+      },
+      "search_id": "62359cd7-75fb-431a-af8d-6bc582e90739",
+      "response_json": "{\"symbols\":[{\"id\":\"api/api.go::Handle#function\",\"name\":\"Handle\",\"qualified_name\":\"Handle\",\"kind\":\"function\",\"language\":\"go\",\"file_path\":\"api/api.go\",\"byte_offset\":47,\"byte_length\":27,\"signature\":\"func Handle(req Request) {}\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"9cc68888af0f803728ab812ae6f49147f3a7f6e93037167e605d723ac3340822\",\"decorators\":[],\"keywords\":[\"handle\"],\"metadata\":{\"loci\":{\"go_package_level\":true,\"go_type_configuration\":\"unconditional\"}},\"line\":5,\"end_line\":5,\"score\":71.0},{\"id\":\"cmd/server/main.go::Serve#function\",\"name\":\"Serve\",\"qualified_name\":\"Serve\",\"kind\":\"function\",\"language\":\"go\",\"file_path\":\"cmd/server/main.go\",\"byte_offset\":45,\"byte_length\":47,\"signature\":\"func Serve(req api.Request) { api.Handle(req) }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"ce2d0feab9ecb91e9a7653020117aff4c6da66b222273ee4388494e38d09e9b2\",\"decorators\":[],\"keywords\":[\"serve\"],\"metadata\":{\"loci\":{\"go_package_level\":true,\"go_type_configuration\":\"unconditional\"}},\"line\":5,\"end_line\":5,\"score\":18.0},{\"id\":\"cmd/worker/main.go::Work#function\",\"name\":\"Work\",\"qualified_name\":\"Work\",\"kind\":\"function\",\"language\":\"go\",\"file_path\":\"cmd/worker/main.go\",\"byte_offset\":53,\"byte_length\":54,\"signature\":\"func Work(req service.Request) { service.Handle(req) }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"8782c2a12952b30c1f8a0ec7cca634b8cfda6fcd2eb673eab7229d29a765c505\",\"decorators\":[],\"keywords\":[\"work\"],\"metadata\":{\"loci\":{\"go_package_level\":true,\"go_type_configuration\":\"unconditional\"}},\"line\":5,\"end_line\":5,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"go.mod\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"62359cd7-75fb-431a-af8d-6bc582e90739\",\"_evaluation\":{\"attempt_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:1\"}}",
+      "serialized_bytes": 2052,
+      "source_bytes": 128,
+      "elapsed_ms": 2.112041984219104,
+      "spans": [
+        {
+          "file": "api/api.go",
+          "start_byte": 47,
+          "end_byte": 74,
+          "sha256": "9cc68888af0f803728ab812ae6f49147f3a7f6e93037167e605d723ac3340822",
+          "text": "func Handle(req Request) {}"
+        },
+        {
+          "file": "cmd/server/main.go",
+          "start_byte": 45,
+          "end_byte": 92,
+          "sha256": "ce2d0feab9ecb91e9a7653020117aff4c6da66b222273ee4388494e38d09e9b2",
+          "text": "func Serve(req api.Request) { api.Handle(req) }"
+        },
+        {
+          "file": "cmd/worker/main.go",
+          "start_byte": 53,
+          "end_byte": 107,
+          "sha256": "8782c2a12952b30c1f8a0ec7cca634b8cfda6fcd2eb673eab7229d29a765c505",
+          "text": "func Work(req service.Request) { service.Handle(req) }"
+        }
+      ]
+    },
+    {
+      "id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:2",
+      "task_id": "go_known_api_impact",
+      "session_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "go_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "Request"
+      },
+      "search_id": "f9b6eda5-5894-41be-9c1e-1c6de50f46f9",
+      "response_json": "{\"symbols\":[{\"id\":\"api/api.go::Request#type\",\"name\":\"Request\",\"qualified_name\":\"Request\",\"kind\":\"type\",\"language\":\"go\",\"file_path\":\"api/api.go\",\"byte_offset\":18,\"byte_length\":27,\"signature\":\"Request struct { ID int64 }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"c6a7e151be8d2ddcaca203b5445f3e9748ed11853af5396a18f61920494e6925\",\"decorators\":[],\"keywords\":[\"request\"],\"metadata\":{\"loci\":{\"go_package_level\":true,\"go_type_configuration\":\"unconditional\"}},\"line\":3,\"end_line\":3,\"score\":69.0},{\"id\":\"api/api.go::Handle#function\",\"name\":\"Handle\",\"qualified_name\":\"Handle\",\"kind\":\"function\",\"language\":\"go\",\"file_path\":\"api/api.go\",\"byte_offset\":47,\"byte_length\":27,\"signature\":\"func Handle(req Request) {}\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"9cc68888af0f803728ab812ae6f49147f3a7f6e93037167e605d723ac3340822\",\"decorators\":[],\"keywords\":[\"handle\"],\"metadata\":{\"loci\":{\"go_package_level\":true,\"go_type_configuration\":\"unconditional\"}},\"line\":5,\"end_line\":5,\"score\":18.0},{\"id\":\"cmd/server/main.go::Serve#function\",\"name\":\"Serve\",\"qualified_name\":\"Serve\",\"kind\":\"function\",\"language\":\"go\",\"file_path\":\"cmd/server/main.go\",\"byte_offset\":45,\"byte_length\":47,\"signature\":\"func Serve(req api.Request) { api.Handle(req) }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"ce2d0feab9ecb91e9a7653020117aff4c6da66b222273ee4388494e38d09e9b2\",\"decorators\":[],\"keywords\":[\"serve\"],\"metadata\":{\"loci\":{\"go_package_level\":true,\"go_type_configuration\":\"unconditional\"}},\"line\":5,\"end_line\":5,\"score\":18.0},{\"id\":\"cmd/worker/main.go::Work#function\",\"name\":\"Work\",\"qualified_name\":\"Work\",\"kind\":\"function\",\"language\":\"go\",\"file_path\":\"cmd/worker/main.go\",\"byte_offset\":53,\"byte_length\":54,\"signature\":\"func Work(req service.Request) { service.Handle(req) }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"8782c2a12952b30c1f8a0ec7cca634b8cfda6fcd2eb673eab7229d29a765c505\",\"decorators\":[],\"keywords\":[\"work\"],\"metadata\":{\"loci\":{\"go_package_level\":true,\"go_type_configuration\":\"unconditional\"}},\"line\":5,\"end_line\":5,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"go.mod\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"f9b6eda5-5894-41be-9c1e-1c6de50f46f9\",\"_evaluation\":{\"attempt_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:2\"}}",
+      "serialized_bytes": 2531,
+      "source_bytes": 155,
+      "elapsed_ms": 2.4252079892903566,
+      "spans": [
+        {
+          "file": "api/api.go",
+          "start_byte": 18,
+          "end_byte": 45,
+          "sha256": "c6a7e151be8d2ddcaca203b5445f3e9748ed11853af5396a18f61920494e6925",
+          "text": "Request struct { ID int64 }"
+        },
+        {
+          "file": "api/api.go",
+          "start_byte": 47,
+          "end_byte": 74,
+          "sha256": "9cc68888af0f803728ab812ae6f49147f3a7f6e93037167e605d723ac3340822",
+          "text": "func Handle(req Request) {}"
+        },
+        {
+          "file": "cmd/server/main.go",
+          "start_byte": 45,
+          "end_byte": 92,
+          "sha256": "ce2d0feab9ecb91e9a7653020117aff4c6da66b222273ee4388494e38d09e9b2",
+          "text": "func Serve(req api.Request) { api.Handle(req) }"
+        },
+        {
+          "file": "cmd/worker/main.go",
+          "start_byte": 53,
+          "end_byte": 107,
+          "sha256": "8782c2a12952b30c1f8a0ec7cca634b8cfda6fcd2eb673eab7229d29a765c505",
+          "text": "func Work(req service.Request) { service.Handle(req) }"
+        }
+      ]
+    },
+    {
+      "id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:3",
+      "task_id": "go_known_api_impact",
+      "session_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "go_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "api/api.go::Request#type",
+          "api/api.go::Handle#function"
+        ],
+        "context": 3,
+        "selected_from_search_id": "f9b6eda5-5894-41be-9c1e-1c6de50f46f9"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"api/api.go::Request#type\",\"source\":\"Request struct { ID int64 }\",\"byte_offset\":18,\"byte_length\":27,\"line\":3,\"end_line\":3,\"signature\":\"Request struct { ID int64 }\",\"kind\":\"type\",\"language\":\"go\",\"context_before\":[\"package api\",\"\"],\"context_after\":[\"\",\"func Handle(req Request) {}\"]},{\"id\":\"api/api.go::Handle#function\",\"source\":\"func Handle(req Request) {}\",\"byte_offset\":47,\"byte_length\":27,\"line\":5,\"end_line\":5,\"signature\":\"func Handle(req Request) {}\",\"kind\":\"function\",\"language\":\"go\",\"context_before\":[\"\",\"type Request struct { ID int64 }\",\"\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:3\"}}",
+      "serialized_bytes": 755,
+      "source_bytes": 178,
+      "elapsed_ms": 9.074040979612619,
+      "spans": [
+        {
+          "file": "api/api.go",
+          "start_byte": 18,
+          "end_byte": 45,
+          "sha256": "c6a7e151be8d2ddcaca203b5445f3e9748ed11853af5396a18f61920494e6925",
+          "text": "Request struct { ID int64 }"
+        },
+        {
+          "file": "api/api.go",
+          "start_byte": 0,
+          "end_byte": 11,
+          "sha256": "fc707199563c7558fa3681ba59f16924986e0042969408254885e93812b2a288",
+          "text": "package api"
+        },
+        {
+          "file": "api/api.go",
+          "start_byte": 47,
+          "end_byte": 74,
+          "sha256": "9cc68888af0f803728ab812ae6f49147f3a7f6e93037167e605d723ac3340822",
+          "text": "func Handle(req Request) {}"
+        },
+        {
+          "file": "api/api.go",
+          "start_byte": 47,
+          "end_byte": 74,
+          "sha256": "9cc68888af0f803728ab812ae6f49147f3a7f6e93037167e605d723ac3340822",
+          "text": "func Handle(req Request) {}"
+        },
+        {
+          "file": "api/api.go",
+          "start_byte": 13,
+          "end_byte": 45,
+          "sha256": "0a8949d9f7200fc24397ce28eb2924023ff1525e7a15789b1ffba0e4ea259202",
+          "text": "type Request struct { ID int64 }"
+        },
+        {
+          "file": "api/api.go",
+          "start_byte": 18,
+          "end_byte": 45,
+          "sha256": "c6a7e151be8d2ddcaca203b5445f3e9748ed11853af5396a18f61920494e6925",
+          "text": "Request struct { ID int64 }"
+        },
+        {
+          "file": "api/api.go",
+          "start_byte": 47,
+          "end_byte": 74,
+          "sha256": "9cc68888af0f803728ab812ae6f49147f3a7f6e93037167e605d723ac3340822",
+          "text": "func Handle(req Request) {}"
+        }
+      ]
+    },
+    {
+      "id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:4",
+      "task_id": "go_known_api_impact",
+      "session_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "go_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "api/api.go",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"api/api.go\",\"content\":\"package api\\n\\ntype Request struct { ID int64 }\\n\\nfunc Handle(req Request) {}\\n\",\"total_lines\":5,\"start_line\":1,\"end_line\":5,\"_evaluation\":{\"attempt_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:4\"}}",
+      "serialized_bytes": 325,
+      "source_bytes": 75,
+      "elapsed_ms": 1.7552500066813082,
+      "spans": [
+        {
+          "file": "api/api.go",
+          "start_byte": 0,
+          "end_byte": 75,
+          "sha256": "a7f10af67423f7dfb8cac758f519ce135834ee686b3ba6328b0575e26e010046",
+          "text": "package api\n\ntype Request struct { ID int64 }\n\nfunc Handle(req Request) {}\n"
+        }
+      ]
+    },
+    {
+      "id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:5",
+      "task_id": "go_known_api_impact",
+      "session_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "go_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "cmd/server/main.go",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"cmd/server/main.go\",\"content\":\"package main\\n\\nimport \\\"example.com/acme/api\\\"\\n\\nfunc Serve(req api.Request) { api.Handle(req) }\\n\",\"total_lines\":5,\"start_line\":1,\"end_line\":5,\"_evaluation\":{\"attempt_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:5\"}}",
+      "serialized_bytes": 353,
+      "source_bytes": 93,
+      "elapsed_ms": 3.0194579740054905,
+      "spans": [
+        {
+          "file": "cmd/server/main.go",
+          "start_byte": 0,
+          "end_byte": 93,
+          "sha256": "9a71af30fcac65e6443378eab3562c1dc659c28a86df882a3e12f13e5598c5b3",
+          "text": "package main\n\nimport \"example.com/acme/api\"\n\nfunc Serve(req api.Request) { api.Handle(req) }\n"
+        }
+      ]
+    },
+    {
+      "id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:6",
+      "task_id": "go_known_api_impact",
+      "session_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "go_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "cmd/worker/main.go",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"cmd/worker/main.go\",\"content\":\"package main\\n\\nimport service \\\"example.com/acme/api\\\"\\n\\nfunc Work(req service.Request) { service.Handle(req) }\\n\",\"total_lines\":5,\"start_line\":1,\"end_line\":5,\"_evaluation\":{\"attempt_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:6\"}}",
+      "serialized_bytes": 368,
+      "source_bytes": 108,
+      "elapsed_ms": 2.4039580021053553,
+      "spans": [
+        {
+          "file": "cmd/worker/main.go",
+          "start_byte": 0,
+          "end_byte": 108,
+          "sha256": "fc98aa964d34d18b7781e7c711f4cdc39fbfc22c8700b7eca5fd6732678ec5d6",
+          "text": "package main\n\nimport service \"example.com/acme/api\"\n\nfunc Work(req service.Request) { service.Handle(req) }\n"
+        }
+      ]
+    },
+    {
+      "id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:7",
+      "task_id": "go_known_api_impact",
+      "session_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "go_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "go.mod",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"LociError\",\"message\":\"File not found in cache\"},\"_evaluation\":{\"attempt_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:7\"}}",
+      "serialized_bytes": 233,
+      "source_bytes": 0,
+      "elapsed_ms": 1.474166987463832,
+      "spans": []
+    },
+    {
+      "id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:8",
+      "task_id": "go_known_api_impact",
+      "session_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "go_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 20,
+        "file": "api/api.go"
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-ktry0zx9/snapshot\",\"file\":\"api/api.go\",\"status\":\"all\",\"items\":[],\"counts\":{\"total\":0,\"resolved\":0,\"unresolved\":0,\"returned\":0},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/8\",\"calls_remaining\":16,\"event_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:8\"}}",
+      "serialized_bytes": 451,
+      "source_bytes": 0,
+      "elapsed_ms": 8.913792000385001,
+      "spans": []
+    },
+    {
+      "id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:9",
+      "task_id": "go_known_api_impact",
+      "session_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "go_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "seed_ids": [
+          "api/api.go::Handle#function"
+        ]
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-ktry0zx9/snapshot\",\"results\":[{\"seed\":{\"id\":\"api/api.go::Handle#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"go\",\"file\":\"api/api.go\",\"line\":5,\"end_line\":5}},\"neighbors\":[]}],\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/9\",\"calls_remaining\":15,\"event_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:9\"}}",
+      "serialized_bytes": 487,
+      "source_bytes": 0,
+      "elapsed_ms": 2.3154170194175094,
+      "spans": []
+    }
+  ],
+  "measurement": {
+    "task_id": "go_known_api_impact",
+    "session_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b",
+    "arm": "A",
+    "repetition": 3,
+    "snapshot": "go_impact",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1",
+    "schema_version": 3,
+    "measurement_method": "observed_tool_calls",
+    "intent_collection": "not_collected",
+    "outcome": "tool_failure",
+    "answer": {
+      "api_file": "api/api.go",
+      "known_direct_callers": [
+        "cmd/server/main.go::Serve",
+        "cmd/worker/main.go::Work"
+      ],
+      "request_field": "ID",
+      "request_field_type": "int64"
+    },
+    "answer_correct": true,
+    "task_correct": false,
+    "read_count": 9,
+    "validated_read_count": 9,
+    "required_context_delivered": [
+      "entry",
+      "package",
+      "request",
+      "serve",
+      "server_import",
+      "work",
+      "worker_import"
+    ],
+    "required_context_total": 8,
+    "context_recall": 0.875,
+    "serialized_tool_output_bytes": null,
+    "source_bytes": null,
+    "estimated_source_tokens": null,
+    "tool_elapsed_ms": 33.493332943180576,
+    "provider_usage": {
+      "input_tokens": 68240,
+      "cached_input_tokens": 54016,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 892,
+      "reasoning_output_tokens": 531
+    },
+    "usage_semantics": "One Codex turn.completed event; gross input includes cached input subset; output includes reasoning tokens.",
+    "token_status": "measured",
+    "measurement_complete": false,
+    "full_pass": false
+  },
+  "baseline": {
+    "end_to_end_seconds": 30.091764790995512,
+    "actual_process_seconds": 30.091764790995512,
+    "exit_code": 0,
+    "provider_thread_id": "01a0982b-f349-7a41-829e-974b9afd116a",
+    "failures": [
+      {
+        "attempt_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/7",
+        "category": "tool_error",
+        "message": "File not found in cache"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_8",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_9",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "unmatched_recorded_delivery"
+      }
+    ],
+    "tool_delivery_verified": false,
+    "output_accounting": {
+      "schema_version": 4,
+      "complete": false,
+      "tool_call_count": 9,
+      "recorded_payload_bytes": 7555,
+      "complete_payload_bytes": null,
+      "source_bytes": null,
+      "calls": [
+        {
+          "item_id": "item_1",
+          "server": "evaluation",
+          "tool": "search",
+          "arguments": {
+            "query": "Handle"
+          },
+          "status": "completed",
+          "attempt_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/1",
+          "trace_event_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:1",
+          "source_bytes": 128,
+          "serialized_bytes": 2052,
+          "elapsed_ms": 2.2265839797910303,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"api/api.go::Handle#function\",\"name\":\"Handle\",\"qualified_name\":\"Handle\",\"kind\":\"function\",\"language\":\"go\",\"file_path\":\"api/api.go\",\"byte_offset\":47,\"byte_length\":27,\"signature\":\"func Handle(req Request) {}\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"9cc68888af0f803728ab812ae6f49147f3a7f6e93037167e605d723ac3340822\",\"decorators\":[],\"keywords\":[\"handle\"],\"metadata\":{\"loci\":{\"go_package_level\":true,\"go_type_configuration\":\"unconditional\"}},\"line\":5,\"end_line\":5,\"score\":71.0},{\"id\":\"cmd/server/main.go::Serve#function\",\"name\":\"Serve\",\"qualified_name\":\"Serve\",\"kind\":\"function\",\"language\":\"go\",\"file_path\":\"cmd/server/main.go\",\"byte_offset\":45,\"byte_length\":47,\"signature\":\"func Serve(req api.Request) { api.Handle(req) }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"ce2d0feab9ecb91e9a7653020117aff4c6da66b222273ee4388494e38d09e9b2\",\"decorators\":[],\"keywords\":[\"serve\"],\"metadata\":{\"loci\":{\"go_package_level\":true,\"go_type_configuration\":\"unconditional\"}},\"line\":5,\"end_line\":5,\"score\":18.0},{\"id\":\"cmd/worker/main.go::Work#function\",\"name\":\"Work\",\"qualified_name\":\"Work\",\"kind\":\"function\",\"language\":\"go\",\"file_path\":\"cmd/worker/main.go\",\"byte_offset\":53,\"byte_length\":54,\"signature\":\"func Work(req service.Request) { service.Handle(req) }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"8782c2a12952b30c1f8a0ec7cca634b8cfda6fcd2eb673eab7229d29a765c505\",\"decorators\":[],\"keywords\":[\"work\"],\"metadata\":{\"loci\":{\"go_package_level\":true,\"go_type_configuration\":\"unconditional\"}},\"line\":5,\"end_line\":5,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"go.mod\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"62359cd7-75fb-431a-af8d-6bc582e90739\",\"_evaluation\":{\"attempt_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:1\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "search",
+          "arguments": {
+            "query": "Request"
+          },
+          "status": "completed",
+          "attempt_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/2",
+          "trace_event_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:2",
+          "source_bytes": 155,
+          "serialized_bytes": 2531,
+          "elapsed_ms": 2.6664999895729125,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"api/api.go::Request#type\",\"name\":\"Request\",\"qualified_name\":\"Request\",\"kind\":\"type\",\"language\":\"go\",\"file_path\":\"api/api.go\",\"byte_offset\":18,\"byte_length\":27,\"signature\":\"Request struct { ID int64 }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"c6a7e151be8d2ddcaca203b5445f3e9748ed11853af5396a18f61920494e6925\",\"decorators\":[],\"keywords\":[\"request\"],\"metadata\":{\"loci\":{\"go_package_level\":true,\"go_type_configuration\":\"unconditional\"}},\"line\":3,\"end_line\":3,\"score\":69.0},{\"id\":\"api/api.go::Handle#function\",\"name\":\"Handle\",\"qualified_name\":\"Handle\",\"kind\":\"function\",\"language\":\"go\",\"file_path\":\"api/api.go\",\"byte_offset\":47,\"byte_length\":27,\"signature\":\"func Handle(req Request) {}\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"9cc68888af0f803728ab812ae6f49147f3a7f6e93037167e605d723ac3340822\",\"decorators\":[],\"keywords\":[\"handle\"],\"metadata\":{\"loci\":{\"go_package_level\":true,\"go_type_configuration\":\"unconditional\"}},\"line\":5,\"end_line\":5,\"score\":18.0},{\"id\":\"cmd/server/main.go::Serve#function\",\"name\":\"Serve\",\"qualified_name\":\"Serve\",\"kind\":\"function\",\"language\":\"go\",\"file_path\":\"cmd/server/main.go\",\"byte_offset\":45,\"byte_length\":47,\"signature\":\"func Serve(req api.Request) { api.Handle(req) }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"ce2d0feab9ecb91e9a7653020117aff4c6da66b222273ee4388494e38d09e9b2\",\"decorators\":[],\"keywords\":[\"serve\"],\"metadata\":{\"loci\":{\"go_package_level\":true,\"go_type_configuration\":\"unconditional\"}},\"line\":5,\"end_line\":5,\"score\":18.0},{\"id\":\"cmd/worker/main.go::Work#function\",\"name\":\"Work\",\"qualified_name\":\"Work\",\"kind\":\"function\",\"language\":\"go\",\"file_path\":\"cmd/worker/main.go\",\"byte_offset\":53,\"byte_length\":54,\"signature\":\"func Work(req service.Request) { service.Handle(req) }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"8782c2a12952b30c1f8a0ec7cca634b8cfda6fcd2eb673eab7229d29a765c505\",\"decorators\":[],\"keywords\":[\"work\"],\"metadata\":{\"loci\":{\"go_package_level\":true,\"go_type_configuration\":\"unconditional\"}},\"line\":5,\"end_line\":5,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"go.mod\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"f9b6eda5-5894-41be-9c1e-1c6de50f46f9\",\"_evaluation\":{\"attempt_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:2\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "get",
+          "arguments": {
+            "context": 3,
+            "selected_from_search_id": "f9b6eda5-5894-41be-9c1e-1c6de50f46f9",
+            "symbol_ids": [
+              "api/api.go::Request#type",
+              "api/api.go::Handle#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/3",
+          "trace_event_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:3",
+          "source_bytes": 178,
+          "serialized_bytes": 755,
+          "elapsed_ms": 9.184790978906676,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"api/api.go::Request#type\",\"source\":\"Request struct { ID int64 }\",\"byte_offset\":18,\"byte_length\":27,\"line\":3,\"end_line\":3,\"signature\":\"Request struct { ID int64 }\",\"kind\":\"type\",\"language\":\"go\",\"context_before\":[\"package api\",\"\"],\"context_after\":[\"\",\"func Handle(req Request) {}\"]},{\"id\":\"api/api.go::Handle#function\",\"source\":\"func Handle(req Request) {}\",\"byte_offset\":47,\"byte_length\":27,\"line\":5,\"end_line\":5,\"signature\":\"func Handle(req Request) {}\",\"kind\":\"function\",\"language\":\"go\",\"context_before\":[\"\",\"type Request struct { ID int64 }\",\"\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:3\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "api/api.go",
+            "start_line": 1,
+            "end_line": 10
+          },
+          "status": "completed",
+          "attempt_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/4",
+          "trace_event_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:4",
+          "source_bytes": 75,
+          "serialized_bytes": 325,
+          "elapsed_ms": 1.8064580217469484,
+          "payload_texts": [
+            "{\"file\":\"api/api.go\",\"content\":\"package api\\n\\ntype Request struct { ID int64 }\\n\\nfunc Handle(req Request) {}\\n\",\"total_lines\":5,\"start_line\":1,\"end_line\":5,\"_evaluation\":{\"attempt_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:4\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_5",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "cmd/server/main.go",
+            "start_line": 1,
+            "end_line": 10
+          },
+          "status": "completed",
+          "attempt_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/5",
+          "trace_event_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:5",
+          "source_bytes": 93,
+          "serialized_bytes": 353,
+          "elapsed_ms": 3.0915829993318766,
+          "payload_texts": [
+            "{\"file\":\"cmd/server/main.go\",\"content\":\"package main\\n\\nimport \\\"example.com/acme/api\\\"\\n\\nfunc Serve(req api.Request) { api.Handle(req) }\\n\",\"total_lines\":5,\"start_line\":1,\"end_line\":5,\"_evaluation\":{\"attempt_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:5\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_6",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "cmd/worker/main.go",
+            "start_line": 1,
+            "end_line": 10
+          },
+          "status": "completed",
+          "attempt_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/6",
+          "trace_event_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:6",
+          "source_bytes": 108,
+          "serialized_bytes": 368,
+          "elapsed_ms": 2.4618750030640513,
+          "payload_texts": [
+            "{\"file\":\"cmd/worker/main.go\",\"content\":\"package main\\n\\nimport service \\\"example.com/acme/api\\\"\\n\\nfunc Work(req service.Request) { service.Handle(req) }\\n\",\"total_lines\":5,\"start_line\":1,\"end_line\":5,\"_evaluation\":{\"attempt_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:6\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_7",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "go.mod",
+            "start_line": 1,
+            "end_line": 10
+          },
+          "status": "completed",
+          "attempt_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/7",
+          "trace_event_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:7",
+          "source_bytes": 0,
+          "serialized_bytes": 233,
+          "elapsed_ms": 1.5195839805528522,
+          "payload_texts": [
+            "{\"error\":{\"code\":\"LociError\",\"message\":\"File not found in cache\"},\"_evaluation\":{\"attempt_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:7\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_8",
+          "server": "evaluation",
+          "tool": "graph_calls",
+          "arguments": {
+            "file": "api/api.go",
+            "limit": 20,
+            "offset": 0,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/8",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 451,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-ktry0zx9/snapshot\",\"file\":\"api/api.go\",\"status\":\"all\",\"items\":[],\"counts\":{\"total\":0,\"resolved\":0,\"unresolved\":0,\"returned\":0},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/8\",\"calls_remaining\":16,\"event_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:8\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_9",
+          "server": "evaluation",
+          "tool": "graph_neighbors",
+          "arguments": {
+            "seed_ids": [
+              "api/api.go::Handle#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/9",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 487,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-ktry0zx9/snapshot\",\"results\":[{\"seed\":{\"id\":\"api/api.go::Handle#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"go\",\"file\":\"api/api.go\",\"line\":5,\"end_line\":5}},\"neighbors\":[]}],\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b/attempt/9\",\"calls_remaining\":15,\"event_id\":\"session-703dbeaa-c8bf-4fa1-9372-840042ebb04b:9\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        }
+      ],
+      "failures": [
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_8",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_9",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "unmatched_recorded_delivery"
+        }
+      ]
+    },
+    "adapter_elapsed_ms": 34.28712594904937,
+    "recoverable_error_events": 1,
+    "relationships": {
+      "schema_version": 3,
+      "case_id": "go_known_api_impact",
+      "language": "go",
+      "required_semantic_dependencies_total": 5,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "serve",
+          "kind": "calls",
+          "to": "entry",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "calls",
+          "record_contexts": [],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "cmd/server/main.go::Serve#function",
+              "to": "api/api.go::Handle#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "cmd/server/main.go",
+                "line": 5,
+                "content_hash": "9a71af30fcac65e6443378eab3562c1dc659c28a86df882a3e12f13e5598c5b3"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 1,
+          "from": "work",
+          "kind": "calls",
+          "to": "entry",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "calls",
+          "record_contexts": [],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "cmd/worker/main.go::Work#function",
+              "to": "api/api.go::Handle#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "cmd/worker/main.go",
+                "line": 5,
+                "content_hash": "fc98aa964d34d18b7781e7c711f4cdc39fbfc22c8700b7eca5fd6732678ec5d6"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 2,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "request",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "api/api.go::Handle#function",
+              "to": "api/api.go::Request#type",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "api/api.go",
+                "line": 5,
+                "content_hash": "a7f10af67423f7dfb8cac758f519ce135834ee686b3ba6328b0575e26e010046"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 3,
+          "from": "serve",
+          "kind": "parameter_type",
+          "to": "request",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "cmd/server/main.go::Serve#function",
+              "to": "api/api.go::Request#type",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "cmd/server/main.go",
+                "line": 5,
+                "content_hash": "9a71af30fcac65e6443378eab3562c1dc659c28a86df882a3e12f13e5598c5b3"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 4,
+          "from": "work",
+          "kind": "parameter_type",
+          "to": "request",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "cmd/worker/main.go::Work#function",
+              "to": "api/api.go::Request#type",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "cmd/worker/main.go",
+                "line": 5,
+                "content_hash": "fc98aa964d34d18b7781e7c711f4cdc39fbfc22c8700b7eca5fd6732678ec5d6"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "available_dependency_links_total": 5,
+      "available_dependency_links": [
+        {
+          "index": 0,
+          "from": "serve",
+          "kind": "calls",
+          "to": "entry",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "calls",
+          "record_contexts": [],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "cmd/server/main.go::Serve#function",
+              "to": "api/api.go::Handle#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "cmd/server/main.go",
+                "line": 5,
+                "content_hash": "9a71af30fcac65e6443378eab3562c1dc659c28a86df882a3e12f13e5598c5b3"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 1,
+          "from": "work",
+          "kind": "calls",
+          "to": "entry",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "calls",
+          "record_contexts": [],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "cmd/worker/main.go::Work#function",
+              "to": "api/api.go::Handle#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "cmd/worker/main.go",
+                "line": 5,
+                "content_hash": "fc98aa964d34d18b7781e7c711f4cdc39fbfc22c8700b7eca5fd6732678ec5d6"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 2,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "request",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "api/api.go::Handle#function",
+              "to": "api/api.go::Request#type",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "api/api.go",
+                "line": 5,
+                "content_hash": "a7f10af67423f7dfb8cac758f519ce135834ee686b3ba6328b0575e26e010046"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 3,
+          "from": "serve",
+          "kind": "parameter_type",
+          "to": "request",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "cmd/server/main.go::Serve#function",
+              "to": "api/api.go::Request#type",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "cmd/server/main.go",
+                "line": 5,
+                "content_hash": "9a71af30fcac65e6443378eab3562c1dc659c28a86df882a3e12f13e5598c5b3"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 4,
+          "from": "work",
+          "kind": "parameter_type",
+          "to": "request",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "cmd/worker/main.go::Work#function",
+              "to": "api/api.go::Request#type",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "cmd/worker/main.go",
+                "line": 5,
+                "content_hash": "fc98aa964d34d18b7781e7c711f4cdc39fbfc22c8700b7eca5fd6732678ec5d6"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "Exact frozen meaning joined to persisted semantic record and delivered source proof.",
+        "required": 5,
+        "available": 5,
+        "delivered": 0,
+        "available_ratio": 1.0,
+        "delivered_ratio": 0.0
+      },
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_available_relationships": 0,
+      "forbidden_delivered_relationships": 0,
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_delivered_relationship_edges": [],
+      "delivery_integrity_violations": [],
+      "forbidden_scope": "Frozen multilingual negatives plus delivered edge/index and complete exploration-proof consistency."
+    },
+    "arm": "A",
+    "attempt_id": "go_known_api_impact-r3-A"
+  },
+  "attempt_id": "go_known_api_impact-r3-A",
+  "arm": "A",
+  "provenance": {
+    "attempt_id": "go_known_api_impact-r3-A",
+    "case_id": "go_known_api_impact",
+    "snapshot": "go_impact",
+    "repetition": 3,
+    "arm": "A",
+    "adapter_module": "benchmarks.multilingual_context_tools",
+    "model": "gpt-5.6-luna",
+    "reasoning_effort": "high",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "catalog_sha256": "f1c45cceac1c3ee90fa1af1007c341713e220571390c3b1eb086c443d7781062",
+    "runner_sha256": "5756278252a74c9e86c68a898b284108288b74a864b9424f6445223b3a7ca6db",
+    "source": {
+      "freeze_commit": "c910c5ac252a7c982f784d87d61bc4c50fc0c0ec",
+      "freeze_json_sha256": "254f38dd6247215928f4cce3fae379cf9dbf3acb74e51bd2d1ac91c12f290848",
+      "source_scope": "W4 evaluator snapshot; A exact retrieval/graph, B adds current loci_explore plus frozen guide"
+    },
+    "config": {
+      "project_doc_max_bytes": 0,
+      "web_search": "disabled",
+      "skills.include_instructions": false,
+      "developer_instructions": "",
+      "model_reasoning_effort": "high",
+      "model_catalog_json": "/Users/brummerv/phluxxed/loci-exploration/benchmarks/results/multilingual-context-workflow-v1/model-catalog.json",
+      "include_collaboration_mode_instructions": false,
+      "tools.update_plan.enabled": false,
+      "tools.experimental_request_user_input.enabled": false,
+      "features.skip_host_skill_discovery": true,
+      "mcp_servers.evaluation.command": "/Users/brummerv/phluxxed/loci-exploration/.venv/bin/python",
+      "mcp_servers.evaluation.args": [
+        "-m",
+        "benchmarks.multilingual_context_tools",
+        "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-ktry0zx9/run.json"
+      ],
+      "mcp_servers.evaluation.cwd": "/Users/brummerv/phluxxed/loci-exploration",
+      "mcp_servers.evaluation.env": {
+        "LOCI_BASE_DIR": "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-ktry0zx9/store",
+        "LOCI_STORE_NAMESPACE": "typescript-context-preflight"
+      },
+      "mcp_servers.evaluation.required": true,
+      "mcp_servers.evaluation.default_tools_approval_mode": "auto",
+      "mcp_servers.evaluation.tool_timeout_sec": 12,
+      "tool_output_token_limit": 32768,
+      "features.shell_tool": false,
+      "features.multi_agent": false,
+      "features.apps": false,
+      "features.plugins": false,
+      "features.hooks": false,
+      "features.memories": false,
+      "features.skill_search": false,
+      "features.skill_mcp_dependency_install": false,
+      "features.view_image": false,
+      "features.image_generation": false,
+      "features.browser_use": false,
+      "features.computer_use": false,
+      "features.in_app_browser": false,
+      "features.code_mode": false,
+      "features.code_mode_host": false,
+      "features.sleep_tool": false,
+      "features.goals": false,
+      "features.context_management": false,
+      "service_tier": "default"
+    },
+    "config_sha256": "468baa4c6a6396496fbc207628760662d88d8ee6309ed46967821dd2f67301d4",
+    "prompt_sha256": "9cbb3e708c6c385f92c2a280a0b36d9eb7a92956ff1ff4693fb2509c16de14ea",
+    "index_seconds": 0.018114709004294127,
+    "snapshot_files": {
+      "api/api.go": "a7f10af67423f7dfb8cac758f519ce135834ee686b3ba6328b0575e26e010046",
+      "cmd/server/main.go": "9a71af30fcac65e6443378eab3562c1dc659c28a86df882a3e12f13e5598c5b3",
+      "cmd/worker/main.go": "fc98aa964d34d18b7781e7c711f4cdc39fbfc22c8700b7eca5fd6732678ec5d6",
+      "go.mod": "01cc905450c59f6d3133f5fd339444536aa4d2b32468f197ea50d39884391d4d"
+    },
+    "extractor_version": 30,
+    "canonical_tool_schemas_sha256": "9119a51db6fc5ac2ab9834897a0a83bfef979c9dcb94fff08ab4ef3b71522753"
+  }
+}

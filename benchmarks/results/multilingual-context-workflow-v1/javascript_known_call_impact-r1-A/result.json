@@ -1,0 +1,743 @@
+{
+  "schema_version": 4,
+  "protocol": "multilingual-context-workflow-v1",
+  "identity": {
+    "task_id": "javascript_known_call_impact",
+    "session_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2",
+    "arm": "A",
+    "repetition": 1,
+    "snapshot": "javascript_dependencies",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1"
+  },
+  "events": [
+    {
+      "id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2:1",
+      "task_id": "javascript_known_call_impact",
+      "session_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "add"
+      },
+      "search_id": "38536662-0a09-4b87-b59e-3144de43b331",
+      "response_json": "{\"symbols\":[{\"id\":\"helper.js::add#function\",\"name\":\"add\",\"qualified_name\":\"add\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"helper.js\",\"byte_offset\":13,\"byte_length\":26,\"signature\":\"add = (value) => value + 1\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f\",\"decorators\":[],\"keywords\":[\"add\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":71.0},{\"id\":\"wrong.js::add#function\",\"name\":\"add\",\"qualified_name\":\"add\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"wrong.js\",\"byte_offset\":13,\"byte_length\":26,\"signature\":\"add = (value) => value - 1\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"c220ba4411800a47ed5011a262c6c728fef9acf997eddd63f87cac46446c9e75\",\"decorators\":[],\"keywords\":[\"add\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":71.0},{\"id\":\"app.js::run#function\",\"name\":\"run\",\"qualified_name\":\"run\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"app.js\",\"byte_offset\":56,\"byte_length\":42,\"signature\":\"function run() { return make() + add(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"decorators\":[],\"keywords\":[\"run\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":18.0},{\"id\":\"app.js::Worker.work#method\",\"name\":\"work\",\"qualified_name\":\"Worker.work\",\"kind\":\"method\",\"language\":\"javascript\",\"file_path\":\"app.js\",\"byte_offset\":136,\"byte_length\":25,\"signature\":\"work() { return add(2); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"fc5691268bb3ee147c5ce653cb740088ca42491be3a2d5ea3a26b85b2c08d953\",\"decorators\":[],\"keywords\":[\"work\"],\"metadata\":{},\"line\":3,\"end_line\":3,\"score\":18.0},{\"id\":\"helper.js::make#function\",\"name\":\"make\",\"qualified_name\":\"make\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"helper.js\",\"byte_offset\":41,\"byte_length\":34,\"signature\":\"function make() { return add(0); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df\",\"decorators\":[],\"keywords\":[\"make\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":5,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"38536662-0a09-4b87-b59e-3144de43b331\",\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:1\"}}",
+      "serialized_bytes": 2500,
+      "source_bytes": 153,
+      "elapsed_ms": 2.2685830190312117,
+      "spans": [
+        {
+          "file": "helper.js",
+          "start_byte": 13,
+          "end_byte": 39,
+          "sha256": "4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f",
+          "text": "add = (value) => value + 1"
+        },
+        {
+          "file": "wrong.js",
+          "start_byte": 13,
+          "end_byte": 39,
+          "sha256": "c220ba4411800a47ed5011a262c6c728fef9acf997eddd63f87cac46446c9e75",
+          "text": "add = (value) => value - 1"
+        },
+        {
+          "file": "app.js",
+          "start_byte": 56,
+          "end_byte": 98,
+          "sha256": "32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18",
+          "text": "function run() { return make() + add(1); }"
+        },
+        {
+          "file": "app.js",
+          "start_byte": 136,
+          "end_byte": 161,
+          "sha256": "fc5691268bb3ee147c5ce653cb740088ca42491be3a2d5ea3a26b85b2c08d953",
+          "text": "work() { return add(2); }"
+        },
+        {
+          "file": "helper.js",
+          "start_byte": 41,
+          "end_byte": 75,
+          "sha256": "2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df",
+          "text": "function make() { return add(0); }"
+        }
+      ]
+    },
+    {
+      "id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2:2",
+      "task_id": "javascript_known_call_impact",
+      "session_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "helper.js::add#function"
+        ],
+        "context": 0,
+        "selected_from_search_id": "38536662-0a09-4b87-b59e-3144de43b331"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"helper.js::add#function\",\"source\":\"add = (value) => value + 1\",\"byte_offset\":13,\"byte_length\":26,\"line\":1,\"end_line\":1,\"signature\":\"add = (value) => value + 1\",\"kind\":\"function\",\"language\":\"javascript\"}],\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:2\"}}",
+      "serialized_bytes": 390,
+      "source_bytes": 52,
+      "elapsed_ms": 4.17333299992606,
+      "spans": [
+        {
+          "file": "helper.js",
+          "start_byte": 13,
+          "end_byte": 39,
+          "sha256": "4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f",
+          "text": "add = (value) => value + 1"
+        },
+        {
+          "file": "helper.js",
+          "start_byte": 13,
+          "end_byte": 39,
+          "sha256": "4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f",
+          "text": "add = (value) => value + 1"
+        }
+      ]
+    },
+    {
+      "id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2:3",
+      "task_id": "javascript_known_call_impact",
+      "session_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "question": "What are the known direct callers of helper.js::add#function, including same-file and imported calls? Preserve unresolved relationships and do not infer runtime callers.",
+        "seed_ids": [
+          "helper.js::add#function"
+        ]
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-l0haecg4/snapshot\",\"question\":\"What are the known direct callers of helper.js::add#function, including same-file and imported calls? Preserve unresolved relationships and do not infer runtime callers.\",\"selection\":\"explicit\",\"question_terms\":[],\"anchors\":[{\"node\":{\"id\":\"helper.js::add#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"helper.js\",\"line\":1,\"end_line\":1}},\"matched_symbol_id\":\"helper.js::add#function\",\"name\":\"add\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}}],\"routing\":{\"kind\":\"relationship\",\"reason\":\"relationship_intent\"},\"filters\":{\"namespaces\":null,\"edge_types\":null,\"resolutions\":[\"exact\",\"declared\",\"import-resolved\"],\"direction\":\"outgoing\"},\"hub_threshold\":4,\"paths\":[],\"rejected_paths\":[],\"counts\":{\"filtered_edges\":12,\"examined_nodes\":10,\"examined_paths\":1,\"returned_paths\":0,\"rejected_paths\":0,\"duplicate_paths\":0,\"omitted_rejected_paths\":0,\"omitted_nodes\":0,\"omitted_paths\":0},\"budget\":{\"max_hops\":3,\"max_nodes\":64,\"max_paths\":16,\"path_offset\":0,\"evidence_bytes\":0,\"estimated_tokens\":0,\"max_evidence_bytes\":16384,\"max_estimated_tokens\":4096,\"hop_limit_reached\":false,\"node_limit_reached\":false,\"next_path_offset\":null},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:3\"}}",
+      "serialized_bytes": 1514,
+      "source_bytes": 0,
+      "elapsed_ms": 12.333416991168633,
+      "spans": []
+    },
+    {
+      "id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2:4",
+      "task_id": "javascript_known_call_impact",
+      "session_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "question": "Find symbols that directly call add in helper.js, including same-file and imported calls.",
+        "seed_ids": [
+          "helper.js::add#function"
+        ]
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-l0haecg4/snapshot\",\"question\":\"Find symbols that directly call add in helper.js, including same-file and imported calls.\",\"selection\":\"explicit\",\"question_terms\":[],\"anchors\":[{\"node\":{\"id\":\"helper.js::add#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"helper.js\",\"line\":1,\"end_line\":1}},\"matched_symbol_id\":\"helper.js::add#function\",\"name\":\"add\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}}],\"counts\":{\"indexed_nodes\":13,\"eligible_units\":13,\"qualified_candidates\":1,\"collapsed_symbols\":0,\"returned_anchors\":1,\"omitted_candidates\":0},\"budget\":{\"requested_max_anchors\":5,\"effective_max_anchors\":5},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:4\"}}",
+      "serialized_bytes": 967,
+      "source_bytes": 0,
+      "elapsed_ms": 2.0176249963697046,
+      "spans": []
+    },
+    {
+      "id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2:5",
+      "task_id": "javascript_known_call_impact",
+      "session_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 50
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"invalid record pagination\"},\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:5\"}}",
+      "serialized_bytes": 236,
+      "source_bytes": 0,
+      "elapsed_ms": 0.11266701039858162,
+      "spans": []
+    },
+    {
+      "id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2:6",
+      "task_id": "javascript_known_call_impact",
+      "session_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 10
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-l0haecg4/snapshot\",\"file\":null,\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"app.js\",\"language\":\"javascript\",\"line\":2,\"column\":32,\"start_byte\":80,\"end_byte\":86,\"callee_start_byte\":80,\"callee_end_byte\":84,\"callee_text\":\"make\",\"callee_path\":[\"make\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":56,\"definition_end_byte\":98,\"body_start_byte\":71,\"body_end_byte\":98},\"source_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\"},\"caller_id\":\"app.js::run#function\",\"caller_kind\":\"function\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::make#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"caller_definition\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"symbol_reference\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"helper.js::make#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"app.js\",\"language\":\"javascript\",\"line\":2,\"column\":41,\"start_byte\":89,\"end_byte\":95,\"callee_start_byte\":89,\"callee_end_byte\":92,\"callee_text\":\"add\",\"callee_path\":[\"add\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":56,\"definition_end_byte\":98,\"body_start_byte\":71,\"body_end_byte\":98},\"source_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\"},\"caller_id\":\"app.js::run#function\",\"caller_kind\":\"function\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::add#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"caller_definition\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"symbol_reference\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"helper.js::add#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"app.js\",\"language\":\"javascript\",\"line\":3,\"column\":54,\"start_byte\":152,\"end_byte\":158,\"callee_start_byte\":152,\"callee_end_byte\":155,\"callee_text\":\"add\",\"callee_path\":[\"add\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":136,\"definition_end_byte\":161,\"body_start_byte\":143,\"body_end_byte\":161},\"source_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\"},\"caller_id\":\"app.js::Worker.work#method\",\"caller_kind\":\"method\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::add#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"app.js\",\"line\":3,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"app.js::Worker.work#method\"},{\"kind\":\"caller_definition\",\"file\":\"app.js\",\"line\":3,\"content_hash\":\"fc5691268bb3ee147c5ce653cb740088ca42491be3a2d5ea3a26b85b2c08d953\",\"endpoint_id\":\"app.js::Worker.work#method\"},{\"kind\":\"symbol_reference\",\"file\":\"app.js\",\"line\":3,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"helper.js::add#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"helper.js\",\"language\":\"javascript\",\"line\":2,\"column\":26,\"start_byte\":66,\"end_byte\":72,\"callee_start_byte\":66,\"callee_end_byte\":69,\"callee_text\":\"add\",\"callee_path\":[\"add\"],\"callee_form\":\"identifier\",\"local_candidates\":[{\"name\":\"add\",\"callable_kind\":\"function\",\"definition_start_byte\":13,\"definition_end_byte\":39,\"definition_line\":1,\"scope_start_byte\":0,\"scope_end_byte\":97}],\"local_binding_state\":\"definite\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":41,\"definition_end_byte\":75,\"body_start_byte\":57,\"body_end_byte\":75},\"source_hash\":\"6a1835c96fc597b7c7a8ba7cd2717fbd1aef2ea8be4b0bf82e8fd00d0fa5911e\"},\"caller_id\":\"helper.js::make#function\",\"caller_kind\":\"function\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::add#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"exact\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"local_callable\",\"support\":[{\"kind\":\"call_site\",\"file\":\"helper.js\",\"line\":2,\"content_hash\":\"6a1835c96fc597b7c7a8ba7cd2717fbd1aef2ea8be4b0bf82e8fd00d0fa5911e\",\"endpoint_id\":\"helper.js::make#function\"},{\"kind\":\"caller_definition\",\"file\":\"helper.js\",\"line\":2,\"content_hash\":\"2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df\",\"endpoint_id\":\"helper.js::make#function\"},{\"kind\":\"local_definition\",\"file\":\"helper.js\",\"line\":1,\"content_hash\":\"4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f\",\"endpoint_id\":\"helper.js::add#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":4,\"resolved\":4,\"unresolved\":0,\"returned\":4},\"pagination\":{\"offset\":0,\"limit\":10,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:6\"}}",
+      "serialized_bytes": 6304,
+      "source_bytes": 0,
+      "elapsed_ms": 4.025958012789488,
+      "spans": []
+    }
+  ],
+  "measurement": {
+    "task_id": "javascript_known_call_impact",
+    "session_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2",
+    "arm": "A",
+    "repetition": 1,
+    "snapshot": "javascript_dependencies",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1",
+    "schema_version": 3,
+    "measurement_method": "observed_tool_calls",
+    "intent_collection": "not_collected",
+    "outcome": "tool_failure",
+    "answer": {
+      "origin_file": "helper.js",
+      "known_direct_callers": [
+        "app.js::run",
+        "app.js::Worker.work",
+        "helper.js::make"
+      ]
+    },
+    "answer_correct": false,
+    "task_correct": false,
+    "read_count": 6,
+    "validated_read_count": 6,
+    "required_context_delivered": [
+      "add",
+      "make",
+      "method",
+      "run"
+    ],
+    "required_context_total": 7,
+    "context_recall": 0.5714285714285714,
+    "serialized_tool_output_bytes": null,
+    "source_bytes": null,
+    "estimated_source_tokens": null,
+    "tool_elapsed_ms": 24.93158302968368,
+    "provider_usage": {
+      "input_tokens": 46254,
+      "cached_input_tokens": 32256,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 785,
+      "reasoning_output_tokens": 506
+    },
+    "usage_semantics": "One Codex turn.completed event; gross input includes cached input subset; output includes reasoning tokens.",
+    "token_status": "measured",
+    "measurement_complete": false,
+    "full_pass": false
+  },
+  "baseline": {
+    "end_to_end_seconds": 27.34255291701993,
+    "actual_process_seconds": 27.34255291701993,
+    "exit_code": 0,
+    "provider_thread_id": "01a09816-b46c-7da0-8452-7fe29408456c",
+    "failures": [
+      {
+        "attempt_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/5",
+        "category": "tool_error",
+        "message": "invalid record pagination"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_3",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_4",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_5",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_6",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "unmatched_recorded_delivery"
+      }
+    ],
+    "tool_delivery_verified": false,
+    "output_accounting": {
+      "schema_version": 4,
+      "complete": false,
+      "tool_call_count": 6,
+      "recorded_payload_bytes": 11911,
+      "complete_payload_bytes": null,
+      "source_bytes": null,
+      "calls": [
+        {
+          "item_id": "item_1",
+          "server": "evaluation",
+          "tool": "search",
+          "arguments": {
+            "query": "add"
+          },
+          "status": "completed",
+          "attempt_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/1",
+          "trace_event_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2:1",
+          "source_bytes": 153,
+          "serialized_bytes": 2500,
+          "elapsed_ms": 2.3938750091474503,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"helper.js::add#function\",\"name\":\"add\",\"qualified_name\":\"add\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"helper.js\",\"byte_offset\":13,\"byte_length\":26,\"signature\":\"add = (value) => value + 1\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f\",\"decorators\":[],\"keywords\":[\"add\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":71.0},{\"id\":\"wrong.js::add#function\",\"name\":\"add\",\"qualified_name\":\"add\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"wrong.js\",\"byte_offset\":13,\"byte_length\":26,\"signature\":\"add = (value) => value - 1\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"c220ba4411800a47ed5011a262c6c728fef9acf997eddd63f87cac46446c9e75\",\"decorators\":[],\"keywords\":[\"add\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":71.0},{\"id\":\"app.js::run#function\",\"name\":\"run\",\"qualified_name\":\"run\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"app.js\",\"byte_offset\":56,\"byte_length\":42,\"signature\":\"function run() { return make() + add(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"decorators\":[],\"keywords\":[\"run\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":18.0},{\"id\":\"app.js::Worker.work#method\",\"name\":\"work\",\"qualified_name\":\"Worker.work\",\"kind\":\"method\",\"language\":\"javascript\",\"file_path\":\"app.js\",\"byte_offset\":136,\"byte_length\":25,\"signature\":\"work() { return add(2); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"fc5691268bb3ee147c5ce653cb740088ca42491be3a2d5ea3a26b85b2c08d953\",\"decorators\":[],\"keywords\":[\"work\"],\"metadata\":{},\"line\":3,\"end_line\":3,\"score\":18.0},{\"id\":\"helper.js::make#function\",\"name\":\"make\",\"qualified_name\":\"make\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"helper.js\",\"byte_offset\":41,\"byte_length\":34,\"signature\":\"function make() { return add(0); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df\",\"decorators\":[],\"keywords\":[\"make\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":5,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"38536662-0a09-4b87-b59e-3144de43b331\",\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:1\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "get",
+          "arguments": {
+            "selected_from_search_id": "38536662-0a09-4b87-b59e-3144de43b331",
+            "symbol_ids": [
+              "helper.js::add#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/2",
+          "trace_event_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2:2",
+          "source_bytes": 52,
+          "serialized_bytes": 390,
+          "elapsed_ms": 4.241042013745755,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"helper.js::add#function\",\"source\":\"add = (value) => value + 1\",\"byte_offset\":13,\"byte_length\":26,\"line\":1,\"end_line\":1,\"signature\":\"add = (value) => value + 1\",\"kind\":\"function\",\"language\":\"javascript\"}],\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:2\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "graph_retrieve",
+          "arguments": {
+            "question": "What are the known direct callers of helper.js::add#function, including same-file and imported calls? Preserve unresolved relationships and do not infer runtime callers.",
+            "seed_ids": [
+              "helper.js::add#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/3",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 1514,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-l0haecg4/snapshot\",\"question\":\"What are the known direct callers of helper.js::add#function, including same-file and imported calls? Preserve unresolved relationships and do not infer runtime callers.\",\"selection\":\"explicit\",\"question_terms\":[],\"anchors\":[{\"node\":{\"id\":\"helper.js::add#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"helper.js\",\"line\":1,\"end_line\":1}},\"matched_symbol_id\":\"helper.js::add#function\",\"name\":\"add\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}}],\"routing\":{\"kind\":\"relationship\",\"reason\":\"relationship_intent\"},\"filters\":{\"namespaces\":null,\"edge_types\":null,\"resolutions\":[\"exact\",\"declared\",\"import-resolved\"],\"direction\":\"outgoing\"},\"hub_threshold\":4,\"paths\":[],\"rejected_paths\":[],\"counts\":{\"filtered_edges\":12,\"examined_nodes\":10,\"examined_paths\":1,\"returned_paths\":0,\"rejected_paths\":0,\"duplicate_paths\":0,\"omitted_rejected_paths\":0,\"omitted_nodes\":0,\"omitted_paths\":0},\"budget\":{\"max_hops\":3,\"max_nodes\":64,\"max_paths\":16,\"path_offset\":0,\"evidence_bytes\":0,\"estimated_tokens\":0,\"max_evidence_bytes\":16384,\"max_estimated_tokens\":4096,\"hop_limit_reached\":false,\"node_limit_reached\":false,\"next_path_offset\":null},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:3\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "graph_anchors",
+          "arguments": {
+            "question": "Find symbols that directly call add in helper.js, including same-file and imported calls.",
+            "seed_ids": [
+              "helper.js::add#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/4",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 967,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-l0haecg4/snapshot\",\"question\":\"Find symbols that directly call add in helper.js, including same-file and imported calls.\",\"selection\":\"explicit\",\"question_terms\":[],\"anchors\":[{\"node\":{\"id\":\"helper.js::add#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"helper.js\",\"line\":1,\"end_line\":1}},\"matched_symbol_id\":\"helper.js::add#function\",\"name\":\"add\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}}],\"counts\":{\"indexed_nodes\":13,\"eligible_units\":13,\"qualified_candidates\":1,\"collapsed_symbols\":0,\"returned_anchors\":1,\"omitted_candidates\":0},\"budget\":{\"requested_max_anchors\":5,\"effective_max_anchors\":5},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:4\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_5",
+          "server": "evaluation",
+          "tool": "graph_calls",
+          "arguments": {
+            "status": "all",
+            "limit": 50,
+            "offset": 0
+          },
+          "status": "completed",
+          "attempt_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/5",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 236,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"error\":{\"code\":\"ValueError\",\"message\":\"invalid record pagination\"},\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:5\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_6",
+          "server": "evaluation",
+          "tool": "graph_calls",
+          "arguments": {
+            "limit": 10,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/6",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 6304,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-l0haecg4/snapshot\",\"file\":null,\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"app.js\",\"language\":\"javascript\",\"line\":2,\"column\":32,\"start_byte\":80,\"end_byte\":86,\"callee_start_byte\":80,\"callee_end_byte\":84,\"callee_text\":\"make\",\"callee_path\":[\"make\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":56,\"definition_end_byte\":98,\"body_start_byte\":71,\"body_end_byte\":98},\"source_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\"},\"caller_id\":\"app.js::run#function\",\"caller_kind\":\"function\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::make#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"caller_definition\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"symbol_reference\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"helper.js::make#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"app.js\",\"language\":\"javascript\",\"line\":2,\"column\":41,\"start_byte\":89,\"end_byte\":95,\"callee_start_byte\":89,\"callee_end_byte\":92,\"callee_text\":\"add\",\"callee_path\":[\"add\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":56,\"definition_end_byte\":98,\"body_start_byte\":71,\"body_end_byte\":98},\"source_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\"},\"caller_id\":\"app.js::run#function\",\"caller_kind\":\"function\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::add#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"caller_definition\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"symbol_reference\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"helper.js::add#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"app.js\",\"language\":\"javascript\",\"line\":3,\"column\":54,\"start_byte\":152,\"end_byte\":158,\"callee_start_byte\":152,\"callee_end_byte\":155,\"callee_text\":\"add\",\"callee_path\":[\"add\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":136,\"definition_end_byte\":161,\"body_start_byte\":143,\"body_end_byte\":161},\"source_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\"},\"caller_id\":\"app.js::Worker.work#method\",\"caller_kind\":\"method\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::add#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"app.js\",\"line\":3,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"app.js::Worker.work#method\"},{\"kind\":\"caller_definition\",\"file\":\"app.js\",\"line\":3,\"content_hash\":\"fc5691268bb3ee147c5ce653cb740088ca42491be3a2d5ea3a26b85b2c08d953\",\"endpoint_id\":\"app.js::Worker.work#method\"},{\"kind\":\"symbol_reference\",\"file\":\"app.js\",\"line\":3,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"helper.js::add#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"helper.js\",\"language\":\"javascript\",\"line\":2,\"column\":26,\"start_byte\":66,\"end_byte\":72,\"callee_start_byte\":66,\"callee_end_byte\":69,\"callee_text\":\"add\",\"callee_path\":[\"add\"],\"callee_form\":\"identifier\",\"local_candidates\":[{\"name\":\"add\",\"callable_kind\":\"function\",\"definition_start_byte\":13,\"definition_end_byte\":39,\"definition_line\":1,\"scope_start_byte\":0,\"scope_end_byte\":97}],\"local_binding_state\":\"definite\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":41,\"definition_end_byte\":75,\"body_start_byte\":57,\"body_end_byte\":75},\"source_hash\":\"6a1835c96fc597b7c7a8ba7cd2717fbd1aef2ea8be4b0bf82e8fd00d0fa5911e\"},\"caller_id\":\"helper.js::make#function\",\"caller_kind\":\"function\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::add#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"exact\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"local_callable\",\"support\":[{\"kind\":\"call_site\",\"file\":\"helper.js\",\"line\":2,\"content_hash\":\"6a1835c96fc597b7c7a8ba7cd2717fbd1aef2ea8be4b0bf82e8fd00d0fa5911e\",\"endpoint_id\":\"helper.js::make#function\"},{\"kind\":\"caller_definition\",\"file\":\"helper.js\",\"line\":2,\"content_hash\":\"2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df\",\"endpoint_id\":\"helper.js::make#function\"},{\"kind\":\"local_definition\",\"file\":\"helper.js\",\"line\":1,\"content_hash\":\"4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f\",\"endpoint_id\":\"helper.js::add#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":4,\"resolved\":4,\"unresolved\":0,\"returned\":4},\"pagination\":{\"offset\":0,\"limit\":10,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-caa11583-75ca-4dcc-b689-32a3404e4dd2:6\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        }
+      ],
+      "failures": [
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_3",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_4",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_5",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_6",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "unmatched_recorded_delivery"
+        }
+      ]
+    },
+    "adapter_elapsed_ms": 25.653542048530653,
+    "recoverable_error_events": 1,
+    "relationships": {
+      "schema_version": 3,
+      "case_id": "javascript_known_call_impact",
+      "language": "javascript",
+      "required_semantic_dependencies_total": 3,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "run",
+          "kind": "calls",
+          "to": "add",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "calls",
+          "record_contexts": [],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "app.js::run#function",
+              "to": "helper.js::add#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app.js",
+                "line": 2,
+                "content_hash": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 1,
+          "from": "method",
+          "kind": "calls",
+          "to": "add",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "calls",
+          "record_contexts": [],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "app.js::Worker.work#method",
+              "to": "helper.js::add#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app.js",
+                "line": 3,
+                "content_hash": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 2,
+          "from": "make",
+          "kind": "calls",
+          "to": "add",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "calls",
+          "record_contexts": [],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "helper.js::make#function",
+              "to": "helper.js::add#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "helper.js",
+                "line": 2,
+                "content_hash": "6a1835c96fc597b7c7a8ba7cd2717fbd1aef2ea8be4b0bf82e8fd00d0fa5911e"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "available_dependency_links_total": 3,
+      "available_dependency_links": [
+        {
+          "index": 0,
+          "from": "run",
+          "kind": "calls",
+          "to": "add",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "calls",
+          "record_contexts": [],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "app.js::run#function",
+              "to": "helper.js::add#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app.js",
+                "line": 2,
+                "content_hash": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 1,
+          "from": "method",
+          "kind": "calls",
+          "to": "add",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "calls",
+          "record_contexts": [],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "app.js::Worker.work#method",
+              "to": "helper.js::add#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app.js",
+                "line": 3,
+                "content_hash": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 2,
+          "from": "make",
+          "kind": "calls",
+          "to": "add",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "calls",
+          "record_contexts": [],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "helper.js::make#function",
+              "to": "helper.js::add#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "helper.js",
+                "line": 2,
+                "content_hash": "6a1835c96fc597b7c7a8ba7cd2717fbd1aef2ea8be4b0bf82e8fd00d0fa5911e"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "Exact frozen meaning joined to persisted semantic record and delivered source proof.",
+        "required": 3,
+        "available": 3,
+        "delivered": 0,
+        "available_ratio": 1.0,
+        "delivered_ratio": 0.0
+      },
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_available_relationships": 0,
+      "forbidden_delivered_relationships": 0,
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_delivered_relationship_edges": [],
+      "delivery_integrity_violations": [],
+      "forbidden_scope": "Frozen multilingual negatives plus delivered edge/index and complete exploration-proof consistency."
+    },
+    "arm": "A",
+    "attempt_id": "javascript_known_call_impact-r1-A"
+  },
+  "attempt_id": "javascript_known_call_impact-r1-A",
+  "arm": "A",
+  "provenance": {
+    "attempt_id": "javascript_known_call_impact-r1-A",
+    "case_id": "javascript_known_call_impact",
+    "snapshot": "javascript_dependencies",
+    "repetition": 1,
+    "arm": "A",
+    "adapter_module": "benchmarks.multilingual_context_tools",
+    "model": "gpt-5.6-luna",
+    "reasoning_effort": "high",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "catalog_sha256": "f1c45cceac1c3ee90fa1af1007c341713e220571390c3b1eb086c443d7781062",
+    "runner_sha256": "5756278252a74c9e86c68a898b284108288b74a864b9424f6445223b3a7ca6db",
+    "source": {
+      "freeze_commit": "c910c5ac252a7c982f784d87d61bc4c50fc0c0ec",
+      "freeze_json_sha256": "254f38dd6247215928f4cce3fae379cf9dbf3acb74e51bd2d1ac91c12f290848",
+      "source_scope": "W4 evaluator snapshot; A exact retrieval/graph, B adds current loci_explore plus frozen guide"
+    },
+    "config": {
+      "project_doc_max_bytes": 0,
+      "web_search": "disabled",
+      "skills.include_instructions": false,
+      "developer_instructions": "",
+      "model_reasoning_effort": "high",
+      "model_catalog_json": "/Users/brummerv/phluxxed/loci-exploration/benchmarks/results/multilingual-context-workflow-v1/model-catalog.json",
+      "include_collaboration_mode_instructions": false,
+      "tools.update_plan.enabled": false,
+      "tools.experimental_request_user_input.enabled": false,
+      "features.skip_host_skill_discovery": true,
+      "mcp_servers.evaluation.command": "/Users/brummerv/phluxxed/loci-exploration/.venv/bin/python",
+      "mcp_servers.evaluation.args": [
+        "-m",
+        "benchmarks.multilingual_context_tools",
+        "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-l0haecg4/run.json"
+      ],
+      "mcp_servers.evaluation.cwd": "/Users/brummerv/phluxxed/loci-exploration",
+      "mcp_servers.evaluation.env": {
+        "LOCI_BASE_DIR": "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-l0haecg4/store",
+        "LOCI_STORE_NAMESPACE": "typescript-context-preflight"
+      },
+      "mcp_servers.evaluation.required": true,
+      "mcp_servers.evaluation.default_tools_approval_mode": "auto",
+      "mcp_servers.evaluation.tool_timeout_sec": 12,
+      "tool_output_token_limit": 32768,
+      "features.shell_tool": false,
+      "features.multi_agent": false,
+      "features.apps": false,
+      "features.plugins": false,
+      "features.hooks": false,
+      "features.memories": false,
+      "features.skill_search": false,
+      "features.skill_mcp_dependency_install": false,
+      "features.view_image": false,
+      "features.image_generation": false,
+      "features.browser_use": false,
+      "features.computer_use": false,
+      "features.in_app_browser": false,
+      "features.code_mode": false,
+      "features.code_mode_host": false,
+      "features.sleep_tool": false,
+      "features.goals": false,
+      "features.context_management": false,
+      "service_tier": "default"
+    },
+    "config_sha256": "27fb1f9bf45881c0571a77a07365bdfb97cc6e9eaef67e2b265956e2b7bcb8ca",
+    "prompt_sha256": "6f7cfbe26976b68d2c186c19301597aebba9a7a521cf21552d92696a82328856",
+    "index_seconds": 0.019534334016498178,
+    "snapshot_files": {
+      "app.js": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c",
+      "barrel.js": "b2b45765fdfa71f94888a5459919ab00ab243a0e5edad925de34a122ba346e04",
+      "contracts.js": "ab2c02fa56cd54099a9831ed7ed31bebef78597b48c1f29571d2eee5f4447822",
+      "helper.js": "6a1835c96fc597b7c7a8ba7cd2717fbd1aef2ea8be4b0bf82e8fd00d0fa5911e",
+      "wrong.js": "aa24a74d347a81052b1fda29ee57a221daf97ae7dc047205758af7a442582bf9"
+    },
+    "extractor_version": 30,
+    "canonical_tool_schemas_sha256": "9119a51db6fc5ac2ab9834897a0a83bfef979c9dcb94fff08ab4ef3b71522753"
+  }
+}

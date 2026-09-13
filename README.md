@@ -253,6 +253,13 @@ limits keep output bounded; clipped anchors are marked incomplete. See the
 The matrix describes the development branch's delivered semantic subsets;
 shared parsing and response schemas do not imply semantic parity.
 
+The [114-attempt multilingual workflow review](docs/reviews/2026-09-13-multilingual-workflow-measurement.md)
+retains all outcomes and exact replay. It supports the single Markdown navigation
+control; programming-language workflow efficiency remains unproven or withheld.
+The review separates evaluator accounting defects, exact control-file access,
+disclosed relationship omissions and answer-contract limits from implemented
+source-proven semantics.
+
 For plain JavaScript, `dependencies` follows definite calls, declaration-owned
 imported value references and direct class bases. It returns the helper/value/base
 definitions with their import and re-export proof. For TypeScript and Python it

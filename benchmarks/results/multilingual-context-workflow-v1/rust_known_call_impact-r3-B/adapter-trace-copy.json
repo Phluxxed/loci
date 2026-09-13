@@ -1,0 +1,484 @@
+{
+  "schema_version": 3,
+  "protocol": "multilingual-context-workflow-v1",
+  "identity": {
+    "task_id": "rust_known_call_impact",
+    "session_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d",
+    "arm": "B",
+    "repetition": 3,
+    "snapshot": "rust_impact",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1"
+  },
+  "events": [
+    {
+      "id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:1",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "dependencies",
+        "query": "Locate the authored declaration parse, its direct caller via authored module/import and definite static call, and Config with configuration field and field type.",
+        "max_output_bytes": 12000,
+        "max_evidence_bytes": 7000,
+        "max_hops": 2
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"dependencies\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"authored_dependencies\",\"exhaustive\":false},\"items\":[{\"id\":\"src/lib.rs::caller#function\",\"name\":\"caller\",\"kind\":\"function\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches parse, caller, config\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"src/api.rs::Config#struct\",\"name\":\"Config\",\"kind\":\"struct\",\"file\":\"src/api.rs\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"src/lib.rs::caller#function\",\"to\":\"src/api.rs::Config#struct\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"src/lib.rs\",\"line\":4,\"content_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5,6],\"resolution_configuration\":\"unconditional\"}],\"sources\":[{\"id\":1,\"file\":\"src/lib.rs\",\"start_byte\":47,\"end_byte\":102,\"start_line\":4,\"end_line\":4,\"content_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\",\"content\":\"pub fn caller(config: Config) -> bool { parse(config) }\"},{\"id\":2,\"file\":\"src/api.rs\",\"start_byte\":0,\"end_byte\":38,\"start_line\":1,\"end_line\":1,\"content_hash\":\"8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272\",\"content\":\"pub struct Config { pub strict: bool }\"},{\"id\":3,\"file\":\"src/lib.rs\",\"start_byte\":47,\"end_byte\":103,\"start_line\":4,\"end_line\":4,\"content_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\",\"content\":\"pub fn caller(config: Config) -> bool { parse(config) }\\n\"},{\"id\":4,\"file\":\"src/lib.rs\",\"start_byte\":0,\"end_byte\":45,\"start_line\":1,\"end_line\":2,\"content_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\",\"content\":\"pub mod api;\\nuse crate::api::{parse, Config};\"},{\"id\":5,\"file\":\"src/api.rs\",\"start_byte\":0,\"end_byte\":39,\"start_line\":1,\"end_line\":1,\"content_hash\":\"8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272\",\"content\":\"pub struct Config { pub strict: bool }\\n\"},{\"id\":6,\"file\":\"Cargo.toml\",\"start_byte\":0,\"end_byte\":61,\"start_line\":1,\"end_line\":4,\"content_hash\":\"734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9\",\"content\":\"[package]\\nname = \\\"ledger\\\"\\nversion = \\\"0.1.0\\\"\\nedition = \\\"2021\\\"\\n\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":2}],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":12000,\"max_evidence_bytes\":7000},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":201,\"output_bytes\":2824,\"estimated_tokens\":706,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:1\"}}",
+      "serialized_bytes": 2940,
+      "source_bytes": 294,
+      "elapsed_ms": 26.83704101946205,
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5",
+          "text": "pub struct Config { pub strict: bool }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 103,
+          "sha256": "26e55cc5dd6670d98f6717f1a49ec030300205da3bd1a39f253111b283b77a1a",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }\n"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 45,
+          "sha256": "20e70783ecf0725329e6a60873a8283abea80906880ffe315f3f19bcc54292a2",
+          "text": "pub mod api;\nuse crate::api::{parse, Config};"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 39,
+          "sha256": "d1dc24305b92199868846f17a8d65d9c46e104da4aac7b13bff86a46d03c923d",
+          "text": "pub struct Config { pub strict: bool }\n"
+        },
+        {
+          "file": "Cargo.toml",
+          "start_byte": 0,
+          "end_byte": 61,
+          "sha256": "734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9",
+          "text": "[package]\nname = \"ledger\"\nversion = \"0.1.0\"\nedition = \"2021\"\n"
+        }
+      ]
+    },
+    {
+      "id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:2",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "parse"
+      },
+      "search_id": "7f4d5531-d7c7-4508-8d16-00e48fb80065",
+      "response_json": "{\"symbols\":[{\"id\":\"src/api.rs::parse#function\",\"name\":\"parse\",\"qualified_name\":\"parse\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/api.rs\",\"byte_offset\":40,\"byte_length\":54,\"signature\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60\",\"decorators\":[],\"keywords\":[\"parse\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":3,\"end_line\":3,\"score\":71.0},{\"id\":\"src/lib.rs::caller#function\",\"name\":\"caller\",\"qualified_name\":\"caller\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":47,\"byte_length\":55,\"signature\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304\",\"decorators\":[],\"keywords\":[\"caller\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":4,\"end_line\":4,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"7f4d5531-d7c7-4508-8d16-00e48fb80065\",\"_evaluation\":{\"attempt_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:2\"}}",
+      "serialized_bytes": 1745,
+      "source_bytes": 109,
+      "elapsed_ms": 4.044166998937726,
+      "spans": [
+        {
+          "file": "src/api.rs",
+          "start_byte": 40,
+          "end_byte": 94,
+          "sha256": "91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60",
+          "text": "pub fn parse(config: Config) -> bool { config.strict }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }"
+        }
+      ]
+    },
+    {
+      "id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:3",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "src/api.rs::parse#function",
+          "src/lib.rs::caller#function"
+        ],
+        "context": 0,
+        "selected_from_search_id": "7f4d5531-d7c7-4508-8d16-00e48fb80065"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"src/api.rs::parse#function\",\"source\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"byte_offset\":40,\"byte_length\":54,\"line\":3,\"end_line\":3,\"signature\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"kind\":\"function\",\"language\":\"rust\"},{\"id\":\"src/lib.rs::caller#function\",\"source\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"byte_offset\":47,\"byte_length\":55,\"line\":4,\"end_line\":4,\"signature\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"kind\":\"function\",\"language\":\"rust\"}],\"_evaluation\":{\"attempt_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:3\"}}",
+      "serialized_bytes": 709,
+      "source_bytes": 218,
+      "elapsed_ms": 4.909750015940517,
+      "spans": [
+        {
+          "file": "src/api.rs",
+          "start_byte": 40,
+          "end_byte": 94,
+          "sha256": "91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60",
+          "text": "pub fn parse(config: Config) -> bool { config.strict }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 40,
+          "end_byte": 94,
+          "sha256": "91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60",
+          "text": "pub fn parse(config: Config) -> bool { config.strict }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }"
+        }
+      ]
+    },
+    {
+      "id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:4",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "Config"
+      },
+      "search_id": "1e10932c-503e-4b9a-860c-db52bb2f60bf",
+      "response_json": "{\"symbols\":[{\"id\":\"src/api.rs::Config#struct\",\"name\":\"Config\",\"qualified_name\":\"Config\",\"kind\":\"struct\",\"language\":\"rust\",\"file_path\":\"src/api.rs\",\"byte_offset\":0,\"byte_length\":38,\"signature\":\"pub struct Config { pub strict: bool }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5\",\"decorators\":[],\"keywords\":[\"config\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":1,\"end_line\":1,\"score\":61.0},{\"id\":\"src/api.rs::parse#function\",\"name\":\"parse\",\"qualified_name\":\"parse\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/api.rs\",\"byte_offset\":40,\"byte_length\":54,\"signature\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60\",\"decorators\":[],\"keywords\":[\"parse\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":3,\"end_line\":3,\"score\":18.0},{\"id\":\"src/lib.rs::caller#function\",\"name\":\"caller\",\"qualified_name\":\"caller\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":47,\"byte_length\":55,\"signature\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304\",\"decorators\":[],\"keywords\":[\"caller\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":4,\"end_line\":4,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"1e10932c-503e-4b9a-860c-db52bb2f60bf\",\"_evaluation\":{\"attempt_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:4\"}}",
+      "serialized_bytes": 2328,
+      "source_bytes": 147,
+      "elapsed_ms": 1.5555419959127903,
+      "spans": [
+        {
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5",
+          "text": "pub struct Config { pub strict: bool }"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 40,
+          "end_byte": 94,
+          "sha256": "91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60",
+          "text": "pub fn parse(config: Config) -> bool { config.strict }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }"
+        }
+      ]
+    },
+    {
+      "id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:5",
+      "task_id": "rust_known_call_impact",
+      "session_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "rust_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "src/api.rs::Config#struct"
+        ],
+        "context": 0,
+        "selected_from_search_id": "1e10932c-503e-4b9a-860c-db52bb2f60bf"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"src/api.rs::Config#struct\",\"source\":\"pub struct Config { pub strict: bool }\",\"byte_offset\":0,\"byte_length\":38,\"line\":1,\"end_line\":1,\"signature\":\"pub struct Config { pub strict: bool }\",\"kind\":\"struct\",\"language\":\"rust\"}],\"_evaluation\":{\"attempt_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:5\"}}",
+      "serialized_bytes": 407,
+      "source_bytes": 76,
+      "elapsed_ms": 3.3646670053713024,
+      "spans": [
+        {
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5",
+          "text": "pub struct Config { pub strict: bool }"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5",
+          "text": "pub struct Config { pub strict: bool }"
+        }
+      ]
+    }
+  ],
+  "failures": [],
+  "attempts": 5,
+  "deliveries": [
+    {
+      "attempt_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "dependencies",
+        "query": "Locate the authored declaration parse, its direct caller via authored module/import and definite static call, and Config with configuration field and field type.",
+        "max_output_bytes": 12000,
+        "max_evidence_bytes": 7000,
+        "max_hops": 2
+      },
+      "reason": "task_context",
+      "detail": "Observed loci_explore request.",
+      "because": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"dependencies\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"authored_dependencies\",\"exhaustive\":false},\"items\":[{\"id\":\"src/lib.rs::caller#function\",\"name\":\"caller\",\"kind\":\"function\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches parse, caller, config\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"src/api.rs::Config#struct\",\"name\":\"Config\",\"kind\":\"struct\",\"file\":\"src/api.rs\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"src/lib.rs::caller#function\",\"to\":\"src/api.rs::Config#struct\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"src/lib.rs\",\"line\":4,\"content_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5,6],\"resolution_configuration\":\"unconditional\"}],\"sources\":[{\"id\":1,\"file\":\"src/lib.rs\",\"start_byte\":47,\"end_byte\":102,\"start_line\":4,\"end_line\":4,\"content_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\",\"content\":\"pub fn caller(config: Config) -> bool { parse(config) }\"},{\"id\":2,\"file\":\"src/api.rs\",\"start_byte\":0,\"end_byte\":38,\"start_line\":1,\"end_line\":1,\"content_hash\":\"8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272\",\"content\":\"pub struct Config { pub strict: bool }\"},{\"id\":3,\"file\":\"src/lib.rs\",\"start_byte\":47,\"end_byte\":103,\"start_line\":4,\"end_line\":4,\"content_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\",\"content\":\"pub fn caller(config: Config) -> bool { parse(config) }\\n\"},{\"id\":4,\"file\":\"src/lib.rs\",\"start_byte\":0,\"end_byte\":45,\"start_line\":1,\"end_line\":2,\"content_hash\":\"5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710\",\"content\":\"pub mod api;\\nuse crate::api::{parse, Config};\"},{\"id\":5,\"file\":\"src/api.rs\",\"start_byte\":0,\"end_byte\":39,\"start_line\":1,\"end_line\":1,\"content_hash\":\"8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272\",\"content\":\"pub struct Config { pub strict: bool }\\n\"},{\"id\":6,\"file\":\"Cargo.toml\",\"start_byte\":0,\"end_byte\":61,\"start_line\":1,\"end_line\":4,\"content_hash\":\"734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9\",\"content\":\"[package]\\nname = \\\"ledger\\\"\\nversion = \\\"0.1.0\\\"\\nedition = \\\"2021\\\"\\n\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":2}],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":12000,\"max_evidence_bytes\":7000},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":201,\"output_bytes\":2824,\"estimated_tokens\":706,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:1\"}}",
+      "serialized_bytes": 2940,
+      "source_bytes": 294,
+      "elapsed_ms": 26.99062501778826,
+      "trace_event_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:1",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5",
+          "text": "pub struct Config { pub strict: bool }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 103,
+          "sha256": "26e55cc5dd6670d98f6717f1a49ec030300205da3bd1a39f253111b283b77a1a",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }\n"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 45,
+          "sha256": "20e70783ecf0725329e6a60873a8283abea80906880ffe315f3f19bcc54292a2",
+          "text": "pub mod api;\nuse crate::api::{parse, Config};"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 39,
+          "sha256": "d1dc24305b92199868846f17a8d65d9c46e104da4aac7b13bff86a46d03c923d",
+          "text": "pub struct Config { pub strict: bool }\n"
+        },
+        {
+          "file": "Cargo.toml",
+          "start_byte": 0,
+          "end_byte": 61,
+          "sha256": "734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9",
+          "text": "[package]\nname = \"ledger\"\nversion = \"0.1.0\"\nedition = \"2021\"\n"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/2",
+      "operation": "search",
+      "arguments": {
+        "query": "parse"
+      },
+      "reason": "task_context",
+      "detail": "Observed search request.",
+      "because": null,
+      "response_json": "{\"symbols\":[{\"id\":\"src/api.rs::parse#function\",\"name\":\"parse\",\"qualified_name\":\"parse\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/api.rs\",\"byte_offset\":40,\"byte_length\":54,\"signature\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60\",\"decorators\":[],\"keywords\":[\"parse\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":3,\"end_line\":3,\"score\":71.0},{\"id\":\"src/lib.rs::caller#function\",\"name\":\"caller\",\"qualified_name\":\"caller\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":47,\"byte_length\":55,\"signature\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304\",\"decorators\":[],\"keywords\":[\"caller\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":4,\"end_line\":4,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"7f4d5531-d7c7-4508-8d16-00e48fb80065\",\"_evaluation\":{\"attempt_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:2\"}}",
+      "serialized_bytes": 1745,
+      "source_bytes": 109,
+      "elapsed_ms": 4.3127500102855265,
+      "trace_event_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:2",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "src/api.rs",
+          "start_byte": 40,
+          "end_byte": 94,
+          "sha256": "91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60",
+          "text": "pub fn parse(config: Config) -> bool { config.strict }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/3",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "src/api.rs::parse#function",
+          "src/lib.rs::caller#function"
+        ],
+        "context": 0,
+        "selected_from_search_id": "7f4d5531-d7c7-4508-8d16-00e48fb80065"
+      },
+      "reason": "task_context",
+      "detail": "Observed get request.",
+      "because": null,
+      "response_json": "{\"symbols\":[{\"id\":\"src/api.rs::parse#function\",\"source\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"byte_offset\":40,\"byte_length\":54,\"line\":3,\"end_line\":3,\"signature\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"kind\":\"function\",\"language\":\"rust\"},{\"id\":\"src/lib.rs::caller#function\",\"source\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"byte_offset\":47,\"byte_length\":55,\"line\":4,\"end_line\":4,\"signature\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"kind\":\"function\",\"language\":\"rust\"}],\"_evaluation\":{\"attempt_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:3\"}}",
+      "serialized_bytes": 709,
+      "source_bytes": 218,
+      "elapsed_ms": 4.988334025256336,
+      "trace_event_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:3",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "src/api.rs",
+          "start_byte": 40,
+          "end_byte": 94,
+          "sha256": "91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60",
+          "text": "pub fn parse(config: Config) -> bool { config.strict }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 40,
+          "end_byte": 94,
+          "sha256": "91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60",
+          "text": "pub fn parse(config: Config) -> bool { config.strict }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/4",
+      "operation": "search",
+      "arguments": {
+        "query": "Config"
+      },
+      "reason": "task_context",
+      "detail": "Observed search request.",
+      "because": null,
+      "response_json": "{\"symbols\":[{\"id\":\"src/api.rs::Config#struct\",\"name\":\"Config\",\"qualified_name\":\"Config\",\"kind\":\"struct\",\"language\":\"rust\",\"file_path\":\"src/api.rs\",\"byte_offset\":0,\"byte_length\":38,\"signature\":\"pub struct Config { pub strict: bool }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5\",\"decorators\":[],\"keywords\":[\"config\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":1,\"end_line\":1,\"score\":61.0},{\"id\":\"src/api.rs::parse#function\",\"name\":\"parse\",\"qualified_name\":\"parse\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/api.rs\",\"byte_offset\":40,\"byte_length\":54,\"signature\":\"pub fn parse(config: Config) -> bool { config.strict }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60\",\"decorators\":[],\"keywords\":[\"parse\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":3,\"end_line\":3,\"score\":18.0},{\"id\":\"src/lib.rs::caller#function\",\"name\":\"caller\",\"qualified_name\":\"caller\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":47,\"byte_length\":55,\"signature\":\"pub fn caller(config: Config) -> bool { parse(config) }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304\",\"decorators\":[],\"keywords\":[\"caller\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":4,\"end_line\":4,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"1e10932c-503e-4b9a-860c-db52bb2f60bf\",\"_evaluation\":{\"attempt_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:4\"}}",
+      "serialized_bytes": 2328,
+      "source_bytes": 147,
+      "elapsed_ms": 1.6584170225542039,
+      "trace_event_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:4",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5",
+          "text": "pub struct Config { pub strict: bool }"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 40,
+          "end_byte": 94,
+          "sha256": "91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60",
+          "text": "pub fn parse(config: Config) -> bool { config.strict }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304",
+          "text": "pub fn caller(config: Config) -> bool { parse(config) }"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/5",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "src/api.rs::Config#struct"
+        ],
+        "context": 0,
+        "selected_from_search_id": "1e10932c-503e-4b9a-860c-db52bb2f60bf"
+      },
+      "reason": "task_context",
+      "detail": "Observed get request.",
+      "because": null,
+      "response_json": "{\"symbols\":[{\"id\":\"src/api.rs::Config#struct\",\"source\":\"pub struct Config { pub strict: bool }\",\"byte_offset\":0,\"byte_length\":38,\"line\":1,\"end_line\":1,\"signature\":\"pub struct Config { pub strict: bool }\",\"kind\":\"struct\",\"language\":\"rust\"}],\"_evaluation\":{\"attempt_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:5\"}}",
+      "serialized_bytes": 407,
+      "source_bytes": 76,
+      "elapsed_ms": 3.4349590132478625,
+      "trace_event_id": "session-dc82f908-e22a-4f16-8bdb-e6de89ad444d:5",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5",
+          "text": "pub struct Config { pub strict: bool }"
+        },
+        {
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5",
+          "text": "pub struct Config { pub strict: bool }"
+        }
+      ]
+    }
+  ]
+}

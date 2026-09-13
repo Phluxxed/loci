@@ -1,0 +1,1958 @@
+{
+  "schema_version": 4,
+  "protocol": "multilingual-context-workflow-v1",
+  "identity": {
+    "task_id": "rust_unproven_contracts",
+    "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+    "arm": "B",
+    "repetition": 1,
+    "snapshot": "rust_uncertainty",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1"
+  },
+  "events": [
+    {
+      "id": "session-b57906f6-5987-4389-b53f-2286a784d207:1",
+      "task_id": "rust_unproven_contracts",
+      "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "locate",
+        "query": "Review probe and generic under the bounded resolver: probe_type_origin generic_Thing_is_model_Thing choice_single_origin_proven hidden_accessible external_Display_contained macro_target_proven shared_import_may_be_guessed. Locate declarations and relevant imports/types/macros.",
+        "max_output_bytes": 16384,
+        "max_evidence_bytes": 8192,
+        "max_hops": 1
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"locate\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"none\",\"exhaustive\":false},\"items\":[{\"id\":\"src/model.rs::Shared#constant\",\"name\":\"Shared\",\"kind\":\"constant\",\"file\":\"src/model.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches model, shared\",\"source_id\":1,\"complete\":true,\"path\":[]}],\"relationships\":[],\"sources\":[{\"id\":1,\"file\":\"src/model.rs\",\"start_byte\":39,\"end_byte\":67,\"start_line\":4,\"end_line\":4,\"content_hash\":\"79efeb8d1c1b79ee6ebc0d927dcc44cde0a38b65166c005076fa756157087782\",\"content\":\"pub const Shared: usize = 1;\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":7}],\"limits\":{\"max_hops\":0,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":1,\"evidence_bytes\":28,\"output_bytes\":1040,\"estimated_tokens\":260,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:1\"}}",
+      "serialized_bytes": 1156,
+      "source_bytes": 28,
+      "elapsed_ms": 9.914041991578415,
+      "spans": [
+        {
+          "file": "src/model.rs",
+          "start_byte": 39,
+          "end_byte": 67,
+          "sha256": "c37b1cea28457ea5ccb4db87c9ca5a60ca107ffa81cc0e51ec579f0364d2fa6a",
+          "text": "pub const Shared: usize = 1;"
+        }
+      ]
+    },
+    {
+      "id": "session-b57906f6-5987-4389-b53f-2286a784d207:2",
+      "task_id": "rust_unproven_contracts",
+      "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "probe_type_origin generic_Thing_is_model_Thing choice_single_origin_proven hidden_accessible external_Display_contained macro_target_proven shared_import_may_be_guessed"
+      },
+      "search_id": "c32a3c7b-7609-4509-843c-16fe109ecd3a",
+      "response_json": "{\"symbols\":[{\"id\":\"src/lib.rs::probe#function\",\"name\":\"probe\",\"qualified_name\":\"probe\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":146,\"byte_length\":144,\"signature\":\"pub fn probe(value: Thing) {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"bec4429184159b5fd0f91ca1af7169ad1287096480708bb8864ba2ce75722e0c\",\"decorators\":[],\"keywords\":[\"probe\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":10,\"end_line\":17,\"score\":24.0},{\"id\":\"src/lib.rs::generic#function\",\"name\":\"generic\",\"qualified_name\":\"generic\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":292,\"byte_length\":54,\"signature\":\"pub fn generic<Thing>(value: Thing) -> Thing { value }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"99b99fbcead703a99a65de4df4bba557136e7f6e0fb590a89c2f8ce12626eb0f\",\"decorators\":[],\"keywords\":[\"generic\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":19,\"end_line\":19,\"score\":22.0},{\"id\":\"src/model.rs::Thing#struct\",\"name\":\"Thing\",\"qualified_name\":\"Thing\",\"kind\":\"struct\",\"language\":\"rust\",\"file_path\":\"src/model.rs\",\"byte_offset\":0,\"byte_length\":17,\"signature\":\"pub struct Thing;\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"5bbc80990efa85a1da0e82d019b5c581ac57bb214631059478160e63ce9e0112\",\"decorators\":[],\"keywords\":[\"thing\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":1,\"end_line\":1,\"score\":10.0},{\"id\":\"src/model.rs::Shared#trait\",\"name\":\"Shared\",\"qualified_name\":\"Shared\",\"kind\":\"trait\",\"language\":\"rust\",\"file_path\":\"src/model.rs\",\"byte_offset\":19,\"byte_length\":19,\"signature\":\"pub trait Shared {}\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"ecb91bb7443eef1ea1838833a8f07e301ab9fda2d4098f8d90b75004b4f6bb89\",\"decorators\":[],\"keywords\":[\"shared\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":3,\"end_line\":3,\"score\":10.0},{\"id\":\"src/private_api.rs::Hidden#struct\",\"name\":\"Hidden\",\"qualified_name\":\"Hidden\",\"kind\":\"struct\",\"language\":\"rust\",\"file_path\":\"src/private_api.rs\",\"byte_offset\":0,\"byte_length\":14,\"signature\":\"struct Hidden;\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"be69f0cfb1dd94f3683fa73a8b1eb9149ee7f6ad14015a3198d1eeee336d4b89\",\"decorators\":[],\"keywords\":[\"hidden\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"private\",\"visibility_scope\":[],\"configuration\":\"unconditional\"}}},\"line\":1,\"end_line\":1,\"score\":10.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":6,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"c32a3c7b-7609-4509-843c-16fe109ecd3a\",\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:2\"}}",
+      "serialized_bytes": 3435,
+      "source_bytes": 132,
+      "elapsed_ms": 5.444499984150752,
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 146,
+          "end_byte": 174,
+          "sha256": "991a9047524a7e1fc9dbe60ca4a1db446cb597d9bab5a39bacc0e77995260970",
+          "text": "pub fn probe(value: Thing) {"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 292,
+          "end_byte": 346,
+          "sha256": "99b99fbcead703a99a65de4df4bba557136e7f6e0fb590a89c2f8ce12626eb0f",
+          "text": "pub fn generic<Thing>(value: Thing) -> Thing { value }"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 0,
+          "end_byte": 17,
+          "sha256": "5bbc80990efa85a1da0e82d019b5c581ac57bb214631059478160e63ce9e0112",
+          "text": "pub struct Thing;"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 19,
+          "end_byte": 38,
+          "sha256": "ecb91bb7443eef1ea1838833a8f07e301ab9fda2d4098f8d90b75004b4f6bb89",
+          "text": "pub trait Shared {}"
+        },
+        {
+          "file": "src/private_api.rs",
+          "start_byte": 0,
+          "end_byte": 14,
+          "sha256": "be69f0cfb1dd94f3683fa73a8b1eb9149ee7f6ad14015a3198d1eeee336d4b89",
+          "text": "struct Hidden;"
+        }
+      ]
+    },
+    {
+      "id": "session-b57906f6-5987-4389-b53f-2286a784d207:3",
+      "task_id": "rust_unproven_contracts",
+      "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "src/lib.rs::probe#function",
+          "src/lib.rs::generic#function",
+          "src/model.rs::Thing#struct",
+          "src/model.rs::Shared#trait",
+          "src/private_api.rs::Hidden#struct"
+        ],
+        "context": 3
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"src/lib.rs::probe#function\",\"source\":\"pub fn probe(value: Thing) {\\n    let _: Thing = value;\\n    Shared;\\n    Generated!();\\n    let _: Choice;\\n    let _: Hidden;\\n    let _: Display;\\n}\",\"byte_offset\":146,\"byte_length\":144,\"line\":10,\"end_line\":17,\"signature\":\"pub fn probe(value: Thing) {\",\"kind\":\"function\",\"language\":\"rust\",\"context_before\":[\"use crate::private_api::Hidden;\",\"use std::fmt::Display;\",\"\"],\"context_after\":[\"\",\"pub fn generic<Thing>(value: Thing) -> Thing { value }\"]},{\"id\":\"src/lib.rs::generic#function\",\"source\":\"pub fn generic<Thing>(value: Thing) -> Thing { value }\",\"byte_offset\":292,\"byte_length\":54,\"line\":19,\"end_line\":19,\"signature\":\"pub fn generic<Thing>(value: Thing) -> Thing { value }\",\"kind\":\"function\",\"language\":\"rust\",\"context_before\":[\"    let _: Display;\",\"}\",\"\"],\"context_after\":[]},{\"id\":\"src/model.rs::Thing#struct\",\"source\":\"pub struct Thing;\",\"byte_offset\":0,\"byte_length\":17,\"line\":1,\"end_line\":1,\"signature\":\"pub struct Thing;\",\"kind\":\"struct\",\"language\":\"rust\",\"context_before\":[],\"context_after\":[\"\",\"pub trait Shared {}\",\"pub const Shared: usize = 1;\"]},{\"id\":\"src/model.rs::Shared#trait\",\"source\":\"pub trait Shared {}\",\"byte_offset\":19,\"byte_length\":19,\"line\":3,\"end_line\":3,\"signature\":\"pub trait Shared {}\",\"kind\":\"trait\",\"language\":\"rust\",\"context_before\":[\"pub struct Thing;\",\"\"],\"context_after\":[\"pub const Shared: usize = 1;\",\"\",\"#[cfg(feature = \\\"one\\\")]\"]},{\"id\":\"src/private_api.rs::Hidden#struct\",\"source\":\"struct Hidden;\",\"byte_offset\":0,\"byte_length\":14,\"line\":1,\"end_line\":1,\"signature\":\"struct Hidden;\",\"kind\":\"struct\",\"language\":\"rust\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:3\"}}",
+      "serialized_bytes": 1830,
+      "source_bytes": 622,
+      "elapsed_ms": 13.79354199161753,
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 146,
+          "end_byte": 290,
+          "sha256": "bec4429184159b5fd0f91ca1af7169ad1287096480708bb8864ba2ce75722e0c",
+          "text": "pub fn probe(value: Thing) {\n    let _: Thing = value;\n    Shared;\n    Generated!();\n    let _: Choice;\n    let _: Hidden;\n    let _: Display;\n}"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 90,
+          "end_byte": 121,
+          "sha256": "f09cc1c48801893e96eb5f6aa0255b9f5577cc5d7ccd9fa699c829993d616610",
+          "text": "use crate::private_api::Hidden;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 122,
+          "end_byte": 144,
+          "sha256": "dab62cae51092717a669330bf09f5f8f5722aaf41e67b0451eca25ea4f13f1a3",
+          "text": "use std::fmt::Display;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 292,
+          "end_byte": 346,
+          "sha256": "99b99fbcead703a99a65de4df4bba557136e7f6e0fb590a89c2f8ce12626eb0f",
+          "text": "pub fn generic<Thing>(value: Thing) -> Thing { value }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 292,
+          "end_byte": 346,
+          "sha256": "99b99fbcead703a99a65de4df4bba557136e7f6e0fb590a89c2f8ce12626eb0f",
+          "text": "pub fn generic<Thing>(value: Thing) -> Thing { value }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 269,
+          "end_byte": 288,
+          "sha256": "5255a9bc602bfc8819cba179f9d33c9d19bc9bb0faf436e205362c2ad3943bd7",
+          "text": "    let _: Display;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 289,
+          "end_byte": 290,
+          "sha256": "d10b36aa74a59bcf4a88185837f658afaf3646eff2bb16c3928d0e9335e945d2",
+          "text": "}"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 0,
+          "end_byte": 17,
+          "sha256": "5bbc80990efa85a1da0e82d019b5c581ac57bb214631059478160e63ce9e0112",
+          "text": "pub struct Thing;"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 19,
+          "end_byte": 38,
+          "sha256": "ecb91bb7443eef1ea1838833a8f07e301ab9fda2d4098f8d90b75004b4f6bb89",
+          "text": "pub trait Shared {}"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 39,
+          "end_byte": 67,
+          "sha256": "c37b1cea28457ea5ccb4db87c9ca5a60ca107ffa81cc0e51ec579f0364d2fa6a",
+          "text": "pub const Shared: usize = 1;"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 19,
+          "end_byte": 38,
+          "sha256": "ecb91bb7443eef1ea1838833a8f07e301ab9fda2d4098f8d90b75004b4f6bb89",
+          "text": "pub trait Shared {}"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 0,
+          "end_byte": 17,
+          "sha256": "5bbc80990efa85a1da0e82d019b5c581ac57bb214631059478160e63ce9e0112",
+          "text": "pub struct Thing;"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 39,
+          "end_byte": 67,
+          "sha256": "c37b1cea28457ea5ccb4db87c9ca5a60ca107ffa81cc0e51ec579f0364d2fa6a",
+          "text": "pub const Shared: usize = 1;"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 69,
+          "end_byte": 92,
+          "sha256": "49fd938a30827c948f38c58b0b98ccd9d15d9b94cb370bf4da08dacfc942c8ed",
+          "text": "#[cfg(feature = \"one\")]"
+        },
+        {
+          "file": "src/private_api.rs",
+          "start_byte": 0,
+          "end_byte": 14,
+          "sha256": "be69f0cfb1dd94f3683fa73a8b1eb9149ee7f6ad14015a3198d1eeee336d4b89",
+          "text": "struct Hidden;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 146,
+          "end_byte": 174,
+          "sha256": "991a9047524a7e1fc9dbe60ca4a1db446cb597d9bab5a39bacc0e77995260970",
+          "text": "pub fn probe(value: Thing) {"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 292,
+          "end_byte": 346,
+          "sha256": "99b99fbcead703a99a65de4df4bba557136e7f6e0fb590a89c2f8ce12626eb0f",
+          "text": "pub fn generic<Thing>(value: Thing) -> Thing { value }"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 0,
+          "end_byte": 17,
+          "sha256": "5bbc80990efa85a1da0e82d019b5c581ac57bb214631059478160e63ce9e0112",
+          "text": "pub struct Thing;"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 19,
+          "end_byte": 38,
+          "sha256": "ecb91bb7443eef1ea1838833a8f07e301ab9fda2d4098f8d90b75004b4f6bb89",
+          "text": "pub trait Shared {}"
+        },
+        {
+          "file": "src/private_api.rs",
+          "start_byte": 0,
+          "end_byte": 14,
+          "sha256": "be69f0cfb1dd94f3683fa73a8b1eb9149ee7f6ad14015a3198d1eeee336d4b89",
+          "text": "struct Hidden;"
+        }
+      ]
+    },
+    {
+      "id": "session-b57906f6-5987-4389-b53f-2286a784d207:4",
+      "task_id": "rust_unproven_contracts",
+      "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "outline",
+      "arguments": {
+        "file": "src/lib.rs"
+      },
+      "search_id": null,
+      "response_json": "{\"files\":[{\"file\":\"src/lib.rs\",\"symbols\":[{\"id\":\"src/lib.rs::probe#function\",\"name\":\"probe\",\"kind\":\"function\",\"line\":10,\"end_line\":17,\"signature\":\"pub fn probe(value: Thing) {\",\"summary\":\"\"},{\"id\":\"src/lib.rs::generic#function\",\"name\":\"generic\",\"kind\":\"function\",\"line\":19,\"end_line\":19,\"signature\":\"pub fn generic<Thing>(value: Thing) -> Thing { value }\",\"summary\":\"\"},{\"id\":\"src/lib.rs::__file__#file\",\"name\":\"lib.rs\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"src/lib.rs\",\"summary\":\"\"},{\"id\":\"Cargo.toml::lib:ledger#crate\",\"name\":\"ledger\",\"kind\":\"crate\",\"line\":1,\"end_line\":1,\"signature\":\"Cargo.toml::lib:ledger\",\"summary\":\"\"}]}],\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:4\"}}",
+      "serialized_bytes": 806,
+      "source_bytes": 82,
+      "elapsed_ms": 1.549540989799425,
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 146,
+          "end_byte": 174,
+          "sha256": "991a9047524a7e1fc9dbe60ca4a1db446cb597d9bab5a39bacc0e77995260970",
+          "text": "pub fn probe(value: Thing) {"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 292,
+          "end_byte": 346,
+          "sha256": "99b99fbcead703a99a65de4df4bba557136e7f6e0fb590a89c2f8ce12626eb0f",
+          "text": "pub fn generic<Thing>(value: Thing) -> Thing { value }"
+        }
+      ]
+    },
+    {
+      "id": "session-b57906f6-5987-4389-b53f-2286a784d207:5",
+      "task_id": "rust_unproven_contracts",
+      "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "src/lib.rs",
+        "start_line": 1,
+        "end_line": 40
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"src/lib.rs\",\"content\":\"pub mod model;\\nmod a;\\nmod b;\\nmod private_api;\\n\\nuse crate::model::{Thing, Shared, Choice};\\nuse crate::private_api::Hidden;\\nuse std::fmt::Display;\\n\\npub fn probe(value: Thing) {\\n    let _: Thing = value;\\n    Shared;\\n    Generated!();\\n    let _: Choice;\\n    let _: Hidden;\\n    let _: Display;\\n}\\n\\npub fn generic<Thing>(value: Thing) -> Thing { value }\\n\",\"total_lines\":19,\"start_line\":1,\"end_line\":19,\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:5\"}}",
+      "serialized_bytes": 613,
+      "source_bytes": 347,
+      "elapsed_ms": 4.475542024010792,
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 347,
+          "sha256": "4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7",
+          "text": "pub mod model;\nmod a;\nmod b;\nmod private_api;\n\nuse crate::model::{Thing, Shared, Choice};\nuse crate::private_api::Hidden;\nuse std::fmt::Display;\n\npub fn probe(value: Thing) {\n    let _: Thing = value;\n    Shared;\n    Generated!();\n    let _: Choice;\n    let _: Hidden;\n    let _: Display;\n}\n\npub fn generic<Thing>(value: Thing) -> Thing { value }\n"
+        }
+      ]
+    },
+    {
+      "id": "session-b57906f6-5987-4389-b53f-2286a784d207:6",
+      "task_id": "rust_unproven_contracts",
+      "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "src/model.rs",
+        "start_line": 1,
+        "end_line": 80
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"src/model.rs\",\"content\":\"pub struct Thing;\\n\\npub trait Shared {}\\npub const Shared: usize = 1;\\n\\n#[cfg(feature = \\\"one\\\")]\\npub use crate::a::Value as Choice;\\n\\n#[cfg(feature = \\\"two\\\")]\\npub use crate::b::Value as Choice;\\n\",\"total_lines\":10,\"start_line\":1,\"end_line\":10,\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:6\"}}",
+      "serialized_bytes": 451,
+      "source_bytes": 188,
+      "elapsed_ms": 3.5620419948827475,
+      "spans": [
+        {
+          "file": "src/model.rs",
+          "start_byte": 0,
+          "end_byte": 188,
+          "sha256": "79efeb8d1c1b79ee6ebc0d927dcc44cde0a38b65166c005076fa756157087782",
+          "text": "pub struct Thing;\n\npub trait Shared {}\npub const Shared: usize = 1;\n\n#[cfg(feature = \"one\")]\npub use crate::a::Value as Choice;\n\n#[cfg(feature = \"two\")]\npub use crate::b::Value as Choice;\n"
+        }
+      ]
+    },
+    {
+      "id": "session-b57906f6-5987-4389-b53f-2286a784d207:7",
+      "task_id": "rust_unproven_contracts",
+      "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "src/a.rs",
+        "start_line": 1,
+        "end_line": 40
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"src/a.rs\",\"content\":\"pub struct Value;\\n\",\"total_lines\":1,\"start_line\":1,\"end_line\":1,\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:7\"}}",
+      "serialized_bytes": 262,
+      "source_bytes": 18,
+      "elapsed_ms": 2.4548330111429095,
+      "spans": [
+        {
+          "file": "src/a.rs",
+          "start_byte": 0,
+          "end_byte": 18,
+          "sha256": "1b454ec3d972e0d45ebb255ed707b96aac33ad9e8fd36b259ae42046baef2bea",
+          "text": "pub struct Value;\n"
+        }
+      ]
+    },
+    {
+      "id": "session-b57906f6-5987-4389-b53f-2286a784d207:8",
+      "task_id": "rust_unproven_contracts",
+      "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "src/b.rs",
+        "start_line": 1,
+        "end_line": 40
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"src/b.rs\",\"content\":\"pub struct Value;\\n\",\"total_lines\":1,\"start_line\":1,\"end_line\":1,\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/8\",\"calls_remaining\":16,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:8\"}}",
+      "serialized_bytes": 262,
+      "source_bytes": 18,
+      "elapsed_ms": 3.9626250218134373,
+      "spans": [
+        {
+          "file": "src/b.rs",
+          "start_byte": 0,
+          "end_byte": 18,
+          "sha256": "1b454ec3d972e0d45ebb255ed707b96aac33ad9e8fd36b259ae42046baef2bea",
+          "text": "pub struct Value;\n"
+        }
+      ]
+    },
+    {
+      "id": "session-b57906f6-5987-4389-b53f-2286a784d207:9",
+      "task_id": "rust_unproven_contracts",
+      "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "src/private_api.rs",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"src/private_api.rs\",\"content\":\"struct Hidden;\\n\",\"total_lines\":1,\"start_line\":1,\"end_line\":1,\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/9\",\"calls_remaining\":15,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:9\"}}",
+      "serialized_bytes": 269,
+      "source_bytes": 15,
+      "elapsed_ms": 2.603666012873873,
+      "spans": [
+        {
+          "file": "src/private_api.rs",
+          "start_byte": 0,
+          "end_byte": 15,
+          "sha256": "0a99797371233e380848bdadade68da20eaad29843ab11cb06499eb1ba3725d1",
+          "text": "struct Hidden;\n"
+        }
+      ]
+    },
+    {
+      "id": "session-b57906f6-5987-4389-b53f-2286a784d207:10",
+      "task_id": "rust_unproven_contracts",
+      "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "grep",
+      "arguments": {
+        "pattern": "macro_rules|Generated|Display|Choice|Shared|Thing"
+      },
+      "search_id": null,
+      "response_json": "{\"matches\":[{\"file\":\"src/lib.rs\",\"line\":6,\"match\":\"use crate::model::{Thing, Shared, Choice};\",\"context_before\":[\"mod private_api;\",\"\"],\"context_after\":[\"use crate::private_api::Hidden;\",\"use std::fmt::Display;\"]},{\"file\":\"src/lib.rs\",\"line\":8,\"match\":\"use std::fmt::Display;\",\"context_before\":[\"use crate::model::{Thing, Shared, Choice};\",\"use crate::private_api::Hidden;\"],\"context_after\":[\"\",\"pub fn probe(value: Thing) {\"]},{\"file\":\"src/lib.rs\",\"line\":10,\"match\":\"pub fn probe(value: Thing) {\",\"context_before\":[\"use std::fmt::Display;\",\"\"],\"context_after\":[\"    let _: Thing = value;\",\"    Shared;\"]},{\"file\":\"src/lib.rs\",\"line\":11,\"match\":\"    let _: Thing = value;\",\"context_before\":[\"\",\"pub fn probe(value: Thing) {\"],\"context_after\":[\"    Shared;\",\"    Generated!();\"]},{\"file\":\"src/lib.rs\",\"line\":12,\"match\":\"    Shared;\",\"context_before\":[\"pub fn probe(value: Thing) {\",\"    let _: Thing = value;\"],\"context_after\":[\"    Generated!();\",\"    let _: Choice;\"]},{\"file\":\"src/lib.rs\",\"line\":13,\"match\":\"    Generated!();\",\"context_before\":[\"    let _: Thing = value;\",\"    Shared;\"],\"context_after\":[\"    let _: Choice;\",\"    let _: Hidden;\"]},{\"file\":\"src/lib.rs\",\"line\":14,\"match\":\"    let _: Choice;\",\"context_before\":[\"    Shared;\",\"    Generated!();\"],\"context_after\":[\"    let _: Hidden;\",\"    let _: Display;\"]},{\"file\":\"src/lib.rs\",\"line\":16,\"match\":\"    let _: Display;\",\"context_before\":[\"    let _: Choice;\",\"    let _: Hidden;\"],\"context_after\":[\"}\",\"\"]},{\"file\":\"src/lib.rs\",\"line\":19,\"match\":\"pub fn generic<Thing>(value: Thing) -> Thing { value }\",\"context_before\":[\"}\",\"\"],\"context_after\":[]},{\"file\":\"src/model.rs\",\"line\":1,\"match\":\"pub struct Thing;\",\"context_before\":[],\"context_after\":[\"\",\"pub trait Shared {}\"]},{\"file\":\"src/model.rs\",\"line\":3,\"match\":\"pub trait Shared {}\",\"context_before\":[\"pub struct Thing;\",\"\"],\"context_after\":[\"pub const Shared: usize = 1;\",\"\"]},{\"file\":\"src/model.rs\",\"line\":4,\"match\":\"pub const Shared: usize = 1;\",\"context_before\":[\"\",\"pub trait Shared {}\"],\"context_after\":[\"\",\"#[cfg(feature = \\\"one\\\")]\"]},{\"file\":\"src/model.rs\",\"line\":7,\"match\":\"pub use crate::a::Value as Choice;\",\"context_before\":[\"\",\"#[cfg(feature = \\\"one\\\")]\"],\"context_after\":[\"\",\"#[cfg(feature = \\\"two\\\")]\"]},{\"file\":\"src/model.rs\",\"line\":10,\"match\":\"pub use crate::b::Value as Choice;\",\"context_before\":[\"\",\"#[cfg(feature = \\\"two\\\")]\"],\"context_after\":[]},{\"file\":\"wrong.rs\",\"line\":1,\"match\":\"pub struct Thing;\",\"context_before\":[],\"context_after\":[\"pub struct Hidden;\"]}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":6,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_source_text\"},\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/10\",\"calls_remaining\":14,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:10\"}}",
+      "serialized_bytes": 2986,
+      "source_bytes": 1125,
+      "elapsed_ms": 2.9312499973457307,
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 89,
+          "sha256": "3aa03ceee1b8dd6e047b478514222ad174db30640a5541fa32cc39b37688b823",
+          "text": "use crate::model::{Thing, Shared, Choice};"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 29,
+          "end_byte": 45,
+          "sha256": "96cf238cd40ee5c2221cd56e5136db7a017411cc35c5b90d930207798a02fe71",
+          "text": "mod private_api;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 90,
+          "end_byte": 121,
+          "sha256": "f09cc1c48801893e96eb5f6aa0255b9f5577cc5d7ccd9fa699c829993d616610",
+          "text": "use crate::private_api::Hidden;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 122,
+          "end_byte": 144,
+          "sha256": "dab62cae51092717a669330bf09f5f8f5722aaf41e67b0451eca25ea4f13f1a3",
+          "text": "use std::fmt::Display;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 122,
+          "end_byte": 144,
+          "sha256": "dab62cae51092717a669330bf09f5f8f5722aaf41e67b0451eca25ea4f13f1a3",
+          "text": "use std::fmt::Display;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 89,
+          "sha256": "3aa03ceee1b8dd6e047b478514222ad174db30640a5541fa32cc39b37688b823",
+          "text": "use crate::model::{Thing, Shared, Choice};"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 90,
+          "end_byte": 121,
+          "sha256": "f09cc1c48801893e96eb5f6aa0255b9f5577cc5d7ccd9fa699c829993d616610",
+          "text": "use crate::private_api::Hidden;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 146,
+          "end_byte": 174,
+          "sha256": "991a9047524a7e1fc9dbe60ca4a1db446cb597d9bab5a39bacc0e77995260970",
+          "text": "pub fn probe(value: Thing) {"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 146,
+          "end_byte": 174,
+          "sha256": "991a9047524a7e1fc9dbe60ca4a1db446cb597d9bab5a39bacc0e77995260970",
+          "text": "pub fn probe(value: Thing) {"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 122,
+          "end_byte": 144,
+          "sha256": "dab62cae51092717a669330bf09f5f8f5722aaf41e67b0451eca25ea4f13f1a3",
+          "text": "use std::fmt::Display;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 175,
+          "end_byte": 200,
+          "sha256": "9621b1d6c130d81a9df8972d81c3e07e30f9ea8e50d3b44d95236504ae435838",
+          "text": "    let _: Thing = value;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 201,
+          "end_byte": 212,
+          "sha256": "2c329070f965a5529c023cd2129236774a6f46e8cc4c24d7e8195b7818237348",
+          "text": "    Shared;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 175,
+          "end_byte": 200,
+          "sha256": "9621b1d6c130d81a9df8972d81c3e07e30f9ea8e50d3b44d95236504ae435838",
+          "text": "    let _: Thing = value;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 146,
+          "end_byte": 174,
+          "sha256": "991a9047524a7e1fc9dbe60ca4a1db446cb597d9bab5a39bacc0e77995260970",
+          "text": "pub fn probe(value: Thing) {"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 201,
+          "end_byte": 212,
+          "sha256": "2c329070f965a5529c023cd2129236774a6f46e8cc4c24d7e8195b7818237348",
+          "text": "    Shared;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 213,
+          "end_byte": 230,
+          "sha256": "b235dbd80582701d0cc132b8028f8d7d1f03c22562b54a7301cf60de4b5bfcc2",
+          "text": "    Generated!();"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 201,
+          "end_byte": 212,
+          "sha256": "2c329070f965a5529c023cd2129236774a6f46e8cc4c24d7e8195b7818237348",
+          "text": "    Shared;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 146,
+          "end_byte": 174,
+          "sha256": "991a9047524a7e1fc9dbe60ca4a1db446cb597d9bab5a39bacc0e77995260970",
+          "text": "pub fn probe(value: Thing) {"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 175,
+          "end_byte": 200,
+          "sha256": "9621b1d6c130d81a9df8972d81c3e07e30f9ea8e50d3b44d95236504ae435838",
+          "text": "    let _: Thing = value;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 213,
+          "end_byte": 230,
+          "sha256": "b235dbd80582701d0cc132b8028f8d7d1f03c22562b54a7301cf60de4b5bfcc2",
+          "text": "    Generated!();"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 231,
+          "end_byte": 249,
+          "sha256": "5822f59c2d209e0fd9ee4c6ea6369595a84b3719e50a304771909d50c005441a",
+          "text": "    let _: Choice;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 213,
+          "end_byte": 230,
+          "sha256": "b235dbd80582701d0cc132b8028f8d7d1f03c22562b54a7301cf60de4b5bfcc2",
+          "text": "    Generated!();"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 175,
+          "end_byte": 200,
+          "sha256": "9621b1d6c130d81a9df8972d81c3e07e30f9ea8e50d3b44d95236504ae435838",
+          "text": "    let _: Thing = value;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 201,
+          "end_byte": 212,
+          "sha256": "2c329070f965a5529c023cd2129236774a6f46e8cc4c24d7e8195b7818237348",
+          "text": "    Shared;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 231,
+          "end_byte": 249,
+          "sha256": "5822f59c2d209e0fd9ee4c6ea6369595a84b3719e50a304771909d50c005441a",
+          "text": "    let _: Choice;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 250,
+          "end_byte": 268,
+          "sha256": "2c98257af2191fb948644c75032c5a8243516f54e73610276a58a3161639417c",
+          "text": "    let _: Hidden;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 231,
+          "end_byte": 249,
+          "sha256": "5822f59c2d209e0fd9ee4c6ea6369595a84b3719e50a304771909d50c005441a",
+          "text": "    let _: Choice;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 201,
+          "end_byte": 212,
+          "sha256": "2c329070f965a5529c023cd2129236774a6f46e8cc4c24d7e8195b7818237348",
+          "text": "    Shared;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 213,
+          "end_byte": 230,
+          "sha256": "b235dbd80582701d0cc132b8028f8d7d1f03c22562b54a7301cf60de4b5bfcc2",
+          "text": "    Generated!();"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 250,
+          "end_byte": 268,
+          "sha256": "2c98257af2191fb948644c75032c5a8243516f54e73610276a58a3161639417c",
+          "text": "    let _: Hidden;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 269,
+          "end_byte": 288,
+          "sha256": "5255a9bc602bfc8819cba179f9d33c9d19bc9bb0faf436e205362c2ad3943bd7",
+          "text": "    let _: Display;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 269,
+          "end_byte": 288,
+          "sha256": "5255a9bc602bfc8819cba179f9d33c9d19bc9bb0faf436e205362c2ad3943bd7",
+          "text": "    let _: Display;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 231,
+          "end_byte": 249,
+          "sha256": "5822f59c2d209e0fd9ee4c6ea6369595a84b3719e50a304771909d50c005441a",
+          "text": "    let _: Choice;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 250,
+          "end_byte": 268,
+          "sha256": "2c98257af2191fb948644c75032c5a8243516f54e73610276a58a3161639417c",
+          "text": "    let _: Hidden;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 289,
+          "end_byte": 290,
+          "sha256": "d10b36aa74a59bcf4a88185837f658afaf3646eff2bb16c3928d0e9335e945d2",
+          "text": "}"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 292,
+          "end_byte": 346,
+          "sha256": "99b99fbcead703a99a65de4df4bba557136e7f6e0fb590a89c2f8ce12626eb0f",
+          "text": "pub fn generic<Thing>(value: Thing) -> Thing { value }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 289,
+          "end_byte": 290,
+          "sha256": "d10b36aa74a59bcf4a88185837f658afaf3646eff2bb16c3928d0e9335e945d2",
+          "text": "}"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 0,
+          "end_byte": 17,
+          "sha256": "5bbc80990efa85a1da0e82d019b5c581ac57bb214631059478160e63ce9e0112",
+          "text": "pub struct Thing;"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 19,
+          "end_byte": 38,
+          "sha256": "ecb91bb7443eef1ea1838833a8f07e301ab9fda2d4098f8d90b75004b4f6bb89",
+          "text": "pub trait Shared {}"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 19,
+          "end_byte": 38,
+          "sha256": "ecb91bb7443eef1ea1838833a8f07e301ab9fda2d4098f8d90b75004b4f6bb89",
+          "text": "pub trait Shared {}"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 0,
+          "end_byte": 17,
+          "sha256": "5bbc80990efa85a1da0e82d019b5c581ac57bb214631059478160e63ce9e0112",
+          "text": "pub struct Thing;"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 39,
+          "end_byte": 67,
+          "sha256": "c37b1cea28457ea5ccb4db87c9ca5a60ca107ffa81cc0e51ec579f0364d2fa6a",
+          "text": "pub const Shared: usize = 1;"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 39,
+          "end_byte": 67,
+          "sha256": "c37b1cea28457ea5ccb4db87c9ca5a60ca107ffa81cc0e51ec579f0364d2fa6a",
+          "text": "pub const Shared: usize = 1;"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 19,
+          "end_byte": 38,
+          "sha256": "ecb91bb7443eef1ea1838833a8f07e301ab9fda2d4098f8d90b75004b4f6bb89",
+          "text": "pub trait Shared {}"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 69,
+          "end_byte": 92,
+          "sha256": "49fd938a30827c948f38c58b0b98ccd9d15d9b94cb370bf4da08dacfc942c8ed",
+          "text": "#[cfg(feature = \"one\")]"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 93,
+          "end_byte": 127,
+          "sha256": "b4ee24b8b262ff69eecbbbbf142c6ac45fcfb3a67e18d1d0e2894b57d85e1d42",
+          "text": "pub use crate::a::Value as Choice;"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 69,
+          "end_byte": 92,
+          "sha256": "49fd938a30827c948f38c58b0b98ccd9d15d9b94cb370bf4da08dacfc942c8ed",
+          "text": "#[cfg(feature = \"one\")]"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 129,
+          "end_byte": 152,
+          "sha256": "b326400e5c31b5b045385897a563743321d675779c5ea810d10325037223990b",
+          "text": "#[cfg(feature = \"two\")]"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 153,
+          "end_byte": 187,
+          "sha256": "5e4145f54b0d23a530e36d470d50a7d46362391bc0decd12aede944fcf84d699",
+          "text": "pub use crate::b::Value as Choice;"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 129,
+          "end_byte": 152,
+          "sha256": "b326400e5c31b5b045385897a563743321d675779c5ea810d10325037223990b",
+          "text": "#[cfg(feature = \"two\")]"
+        },
+        {
+          "file": "wrong.rs",
+          "start_byte": 0,
+          "end_byte": 17,
+          "sha256": "5bbc80990efa85a1da0e82d019b5c581ac57bb214631059478160e63ce9e0112",
+          "text": "pub struct Thing;"
+        },
+        {
+          "file": "wrong.rs",
+          "start_byte": 18,
+          "end_byte": 36,
+          "sha256": "9bf241dd3ce51687db2cf9c41cb9d874bb123c614061a006c0bebef0331e8e2e",
+          "text": "pub struct Hidden;"
+        }
+      ]
+    },
+    {
+      "id": "session-b57906f6-5987-4389-b53f-2286a784d207:11",
+      "task_id": "rust_unproven_contracts",
+      "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "dependencies",
+        "query": "",
+        "max_output_bytes": 16384,
+        "max_evidence_bytes": 8192,
+        "seed_ids": [
+          "src/lib.rs::probe#function",
+          "src/lib.rs::generic#function"
+        ],
+        "max_hops": 2
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"dependencies\",\"status\":\"partial\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"authored_dependencies\",\"exhaustive\":false},\"items\":[{\"id\":\"src/lib.rs::probe#function\",\"name\":\"probe\",\"kind\":\"function\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"src/lib.rs::generic#function\",\"name\":\"generic\",\"kind\":\"function\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":2,\"complete\":true,\"path\":[]},{\"id\":\"src/model.rs::Thing#struct\",\"name\":\"Thing\",\"kind\":\"struct\",\"file\":\"src/model.rs\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":3,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"src/lib.rs::probe#function\",\"to\":\"src/model.rs::Thing#struct\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"src/lib.rs\",\"line\":10,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\"}},\"traversed\":\"forward\",\"source_ids\":[1,4,5,6],\"resolution_configuration\":\"unconditional\"}],\"sources\":[{\"id\":1,\"file\":\"src/lib.rs\",\"start_byte\":146,\"end_byte\":290,\"start_line\":10,\"end_line\":17,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"content\":\"pub fn probe(value: Thing) {\\n    let _: Thing = value;\\n    Shared;\\n    Generated!();\\n    let _: Choice;\\n    let _: Hidden;\\n    let _: Display;\\n}\"},{\"id\":2,\"file\":\"src/lib.rs\",\"start_byte\":292,\"end_byte\":346,\"start_line\":19,\"end_line\":19,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"content\":\"pub fn generic<Thing>(value: Thing) -> Thing { value }\"},{\"id\":3,\"file\":\"src/model.rs\",\"start_byte\":0,\"end_byte\":17,\"start_line\":1,\"end_line\":1,\"content_hash\":\"79efeb8d1c1b79ee6ebc0d927dcc44cde0a38b65166c005076fa756157087782\",\"content\":\"pub struct Thing;\"},{\"id\":4,\"file\":\"src/lib.rs\",\"start_byte\":0,\"end_byte\":144,\"start_line\":1,\"end_line\":8,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"content\":\"pub mod model;\\nmod a;\\nmod b;\\nmod private_api;\\n\\nuse crate::model::{Thing, Shared, Choice};\\nuse crate::private_api::Hidden;\\nuse std::fmt::Display;\"},{\"id\":5,\"file\":\"src/model.rs\",\"start_byte\":0,\"end_byte\":18,\"start_line\":1,\"end_line\":1,\"content_hash\":\"79efeb8d1c1b79ee6ebc0d927dcc44cde0a38b65166c005076fa756157087782\",\"content\":\"pub struct Thing;\\n\"},{\"id\":6,\"file\":\"Cargo.toml\",\"start_byte\":0,\"end_byte\":91,\"start_line\":1,\"end_line\":8,\"content_hash\":\"5702cbe97faccb5347b9d50991fcceb3c6ffacbfae6bd0b50112716b2b9a5ec0\",\"content\":\"[package]\\nname = \\\"ledger\\\"\\nversion = \\\"0.1.0\\\"\\nedition = \\\"2021\\\"\\n\\n[features]\\none = []\\ntwo = []\\n\"}],\"omissions\":[{\"reason\":\"unresolved_relation\",\"count\":2}],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":3,\"evidence_bytes\":451,\"output_bytes\":3206,\"estimated_tokens\":802,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/11\",\"calls_remaining\":13,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:11\"}}",
+      "serialized_bytes": 3324,
+      "source_bytes": 468,
+      "elapsed_ms": 23.968374996911734,
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 146,
+          "end_byte": 290,
+          "sha256": "bec4429184159b5fd0f91ca1af7169ad1287096480708bb8864ba2ce75722e0c",
+          "text": "pub fn probe(value: Thing) {\n    let _: Thing = value;\n    Shared;\n    Generated!();\n    let _: Choice;\n    let _: Hidden;\n    let _: Display;\n}"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 292,
+          "end_byte": 346,
+          "sha256": "99b99fbcead703a99a65de4df4bba557136e7f6e0fb590a89c2f8ce12626eb0f",
+          "text": "pub fn generic<Thing>(value: Thing) -> Thing { value }"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 0,
+          "end_byte": 17,
+          "sha256": "5bbc80990efa85a1da0e82d019b5c581ac57bb214631059478160e63ce9e0112",
+          "text": "pub struct Thing;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 144,
+          "sha256": "6fd7befe33442b879c094266fa4fd0f3f7c67198bec0658d98e2e82afd886018",
+          "text": "pub mod model;\nmod a;\nmod b;\nmod private_api;\n\nuse crate::model::{Thing, Shared, Choice};\nuse crate::private_api::Hidden;\nuse std::fmt::Display;"
+        },
+        {
+          "file": "src/model.rs",
+          "start_byte": 0,
+          "end_byte": 18,
+          "sha256": "c3497a98e17edcd17cc41251aa7934d282600f0f0382781c5f630cbad2ee8361",
+          "text": "pub struct Thing;\n"
+        },
+        {
+          "file": "Cargo.toml",
+          "start_byte": 0,
+          "end_byte": 91,
+          "sha256": "5702cbe97faccb5347b9d50991fcceb3c6ffacbfae6bd0b50112716b2b9a5ec0",
+          "text": "[package]\nname = \"ledger\"\nversion = \"0.1.0\"\nedition = \"2021\"\n\n[features]\none = []\ntwo = []\n"
+        }
+      ]
+    },
+    {
+      "id": "session-b57906f6-5987-4389-b53f-2286a784d207:12",
+      "task_id": "rust_unproven_contracts",
+      "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 100,
+        "file": "src/lib.rs"
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"invalid record pagination\"},\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/12\",\"calls_remaining\":12,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:12\"}}",
+      "serialized_bytes": 238,
+      "source_bytes": 0,
+      "elapsed_ms": 0.051624985644593835,
+      "spans": []
+    },
+    {
+      "id": "session-b57906f6-5987-4389-b53f-2286a784d207:13",
+      "task_id": "rust_unproven_contracts",
+      "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 32,
+        "file": "src/lib.rs"
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-2b2z26ho/snapshot\",\"file\":\"src/lib.rs\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":1,\"text\":\"pub mod model;\",\"specifier\":\"model\",\"imported_name\":\"model\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"rust\":{\"kind\":\"module\",\"lexical_module_path\":[],\"visibility\":\"pub\",\"module_level\":true,\"configuration\":\"unconditional\",\"path_override\":null,\"lexical_module_visibilities\":[],\"lexical_module_configurations\":[],\"inline\":false}},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"target_file\":\"src/model.rs\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"src/model.rs::__file__#file\",\"specifier\":\"model\",\"imported_name\":\"model\",\"language\":\"rust\",\"line\":1,\"text\":\"pub mod model;\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"rust_module_declaration\",\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":2,\"text\":\"mod a;\",\"specifier\":\"a\",\"imported_name\":\"a\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"rust\":{\"kind\":\"module\",\"lexical_module_path\":[],\"visibility\":\"private\",\"module_level\":true,\"configuration\":\"unconditional\",\"path_override\":null,\"lexical_module_visibilities\":[],\"lexical_module_configurations\":[],\"inline\":false}},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"target_file\":\"src/a.rs\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"src/a.rs::__file__#file\",\"specifier\":\"a\",\"imported_name\":\"a\",\"language\":\"rust\",\"line\":2,\"text\":\"mod a;\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"rust_module_declaration\",\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":3,\"text\":\"mod b;\",\"specifier\":\"b\",\"imported_name\":\"b\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"rust\":{\"kind\":\"module\",\"lexical_module_path\":[],\"visibility\":\"private\",\"module_level\":true,\"configuration\":\"unconditional\",\"path_override\":null,\"lexical_module_visibilities\":[],\"lexical_module_configurations\":[],\"inline\":false}},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"target_file\":\"src/b.rs\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"src/b.rs::__file__#file\",\"specifier\":\"b\",\"imported_name\":\"b\",\"language\":\"rust\",\"line\":3,\"text\":\"mod b;\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"rust_module_declaration\",\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":4,\"text\":\"mod private_api;\",\"specifier\":\"private_api\",\"imported_name\":\"private_api\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"rust\":{\"kind\":\"module\",\"lexical_module_path\":[],\"visibility\":\"private\",\"module_level\":true,\"configuration\":\"unconditional\",\"path_override\":null,\"lexical_module_visibilities\":[],\"lexical_module_configurations\":[],\"inline\":false}},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"target_file\":\"src/private_api.rs\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"src/private_api.rs::__file__#file\",\"specifier\":\"private_api\",\"imported_name\":\"private_api\",\"language\":\"rust\",\"line\":4,\"text\":\"mod private_api;\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"rust_module_declaration\",\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":6,\"text\":\"use crate::model::{Thing, Shared, Choice};\",\"specifier\":\"crate::model::Choice\",\"imported_name\":\"Choice\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"rust\":{\"kind\":\"use\",\"lexical_module_path\":[],\"visibility\":\"private\",\"module_level\":true,\"configuration\":\"unconditional\",\"path_override\":null,\"lexical_module_visibilities\":[],\"lexical_module_configurations\":[],\"inline\":false}},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"target_file\":\"src/model.rs\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"src/model.rs::__file__#file\",\"specifier\":\"crate::model::Choice\",\"imported_name\":\"Choice\",\"language\":\"rust\",\"line\":6,\"text\":\"use crate::model::{Thing, Shared, Choice};\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"rust_module_path\",\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":6,\"text\":\"use crate::model::{Thing, Shared, Choice};\",\"specifier\":\"crate::model::Shared\",\"imported_name\":\"Shared\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"rust\":{\"kind\":\"use\",\"lexical_module_path\":[],\"visibility\":\"private\",\"module_level\":true,\"configuration\":\"unconditional\",\"path_override\":null,\"lexical_module_visibilities\":[],\"lexical_module_configurations\":[],\"inline\":false}},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"target_file\":\"src/model.rs\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"src/model.rs::__file__#file\",\"specifier\":\"crate::model::Shared\",\"imported_name\":\"Shared\",\"language\":\"rust\",\"line\":6,\"text\":\"use crate::model::{Thing, Shared, Choice};\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"rust_module_path\",\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":6,\"text\":\"use crate::model::{Thing, Shared, Choice};\",\"specifier\":\"crate::model::Thing\",\"imported_name\":\"Thing\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"rust\":{\"kind\":\"use\",\"lexical_module_path\":[],\"visibility\":\"private\",\"module_level\":true,\"configuration\":\"unconditional\",\"path_override\":null,\"lexical_module_visibilities\":[],\"lexical_module_configurations\":[],\"inline\":false}},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"target_file\":\"src/model.rs\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"src/model.rs::__file__#file\",\"specifier\":\"crate::model::Thing\",\"imported_name\":\"Thing\",\"language\":\"rust\",\"line\":6,\"text\":\"use crate::model::{Thing, Shared, Choice};\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"rust_module_path\",\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":7,\"text\":\"use crate::private_api::Hidden;\",\"specifier\":\"crate::private_api::Hidden\",\"imported_name\":\"Hidden\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"rust\":{\"kind\":\"use\",\"lexical_module_path\":[],\"visibility\":\"private\",\"module_level\":true,\"configuration\":\"unconditional\",\"path_override\":null,\"lexical_module_visibilities\":[],\"lexical_module_configurations\":[],\"inline\":false}},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"target_file\":\"src/private_api.rs\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"src/private_api.rs::__file__#file\",\"specifier\":\"crate::private_api::Hidden\",\"imported_name\":\"Hidden\",\"language\":\"rust\",\"line\":7,\"text\":\"use crate::private_api::Hidden;\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"rust_module_path\",\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":8,\"text\":\"use std::fmt::Display;\",\"specifier\":\"std::fmt::Display\",\"imported_name\":\"Display\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"rust\":{\"kind\":\"use\",\"lexical_module_path\":[],\"visibility\":\"private\",\"module_level\":true,\"configuration\":\"unconditional\",\"path_override\":null,\"lexical_module_visibilities\":[],\"lexical_module_configurations\":[],\"inline\":false}},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"target_file\":null,\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":null,\"target_id\":null,\"specifier\":\"std::fmt::Display\",\"imported_name\":\"Display\",\"language\":\"rust\",\"line\":8,\"text\":\"use std::fmt::Display;\",\"type_only\":false,\"is_reexport\":false,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"external\",\"resolution_basis\":null,\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":9,\"resolved\":8,\"unresolved\":1,\"returned\":9},\"pagination\":{\"offset\":0,\"limit\":32,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/13\",\"calls_remaining\":11,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:13\"}}",
+      "serialized_bytes": 10042,
+      "source_bytes": 0,
+      "elapsed_ms": 2.45370899210684,
+      "spans": []
+    },
+    {
+      "id": "session-b57906f6-5987-4389-b53f-2286a784d207:14",
+      "task_id": "rust_unproven_contracts",
+      "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 32,
+        "file": "src/lib.rs"
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-2b2z26ho/snapshot\",\"file\":\"src/lib.rs\",\"status\":\"all\",\"items\":[],\"counts\":{\"total\":0,\"resolved\":0,\"unresolved\":0,\"returned\":0},\"pagination\":{\"offset\":0,\"limit\":32,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/14\",\"calls_remaining\":10,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:14\"}}",
+      "serialized_bytes": 453,
+      "source_bytes": 0,
+      "elapsed_ms": 2.699959004530683,
+      "spans": []
+    },
+    {
+      "id": "session-b57906f6-5987-4389-b53f-2286a784d207:15",
+      "task_id": "rust_unproven_contracts",
+      "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 32,
+        "file": "src/lib.rs"
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-2b2z26ho/snapshot\",\"file\":\"src/lib.rs\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":10,\"column\":21,\"start_byte\":166,\"end_byte\":171,\"text\":\"Thing\",\"path\":[\"Thing\"],\"candidate_bindings\":[{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Thing\"}],\"binding_state\":\"definite\",\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"owner\":{\"kind\":\"file\",\"definition_start_byte\":null,\"definition_end_byte\":null,\"body_start_byte\":null,\"body_end_byte\":null}},\"binding\":{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Thing\"},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"source_kind\":\"file\",\"import_source_id\":\"src/lib.rs::__file__#file\",\"import_target_id\":\"src/model.rs::__file__#file\",\"target_file\":\"src/model.rs\",\"target_id\":\"src/model.rs::Thing#struct\",\"target_kind\":\"struct\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"import_unresolved_reason\":null,\"resolution_basis\":\"direct_binding\",\"support\":[{\"kind\":\"import_binding\",\"file\":\"src/lib.rs\",\"line\":6,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"endpoint_id\":\"src/model.rs::__file__#file\"},{\"kind\":\"definition\",\"file\":\"src/model.rs\",\"line\":1,\"content_hash\":\"79efeb8d1c1b79ee6ebc0d927dcc44cde0a38b65166c005076fa756157087782\",\"endpoint_id\":\"src/model.rs::Thing#struct\"}],\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":11,\"column\":12,\"start_byte\":186,\"end_byte\":191,\"text\":\"Thing\",\"path\":[\"Thing\"],\"candidate_bindings\":[{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Thing\"}],\"binding_state\":\"definite\",\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":146,\"definition_end_byte\":290,\"body_start_byte\":173,\"body_end_byte\":290}},\"binding\":{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Thing\"},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::probe#function\",\"source_kind\":\"function\",\"import_source_id\":\"src/lib.rs::__file__#file\",\"import_target_id\":\"src/model.rs::__file__#file\",\"target_file\":\"src/model.rs\",\"target_id\":\"src/model.rs::Thing#struct\",\"target_kind\":\"struct\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"import_unresolved_reason\":null,\"resolution_basis\":\"direct_binding\",\"support\":[{\"kind\":\"import_binding\",\"file\":\"src/lib.rs\",\"line\":6,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"endpoint_id\":\"src/model.rs::__file__#file\"},{\"kind\":\"definition\",\"file\":\"src/model.rs\",\"line\":1,\"content_hash\":\"79efeb8d1c1b79ee6ebc0d927dcc44cde0a38b65166c005076fa756157087782\",\"endpoint_id\":\"src/model.rs::Thing#struct\"}],\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":12,\"column\":5,\"start_byte\":205,\"end_byte\":211,\"text\":\"Shared\",\"path\":[\"Shared\"],\"candidate_bindings\":[{\"local_name\":\"Shared\",\"imported_name\":\"Shared\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Shared\"}],\"binding_state\":\"definite\",\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":146,\"definition_end_byte\":290,\"body_start_byte\":173,\"body_end_byte\":290}},\"binding\":{\"local_name\":\"Shared\",\"imported_name\":\"Shared\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Shared\"},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::probe#function\",\"source_kind\":\"function\",\"import_source_id\":\"src/lib.rs::__file__#file\",\"import_target_id\":\"src/model.rs::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"ambiguous_target\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[{\"kind\":\"import_binding\",\"file\":\"src/lib.rs\",\"line\":6,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"endpoint_id\":\"src/model.rs::__file__#file\"}],\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":14,\"column\":12,\"start_byte\":242,\"end_byte\":248,\"text\":\"Choice\",\"path\":[\"Choice\"],\"candidate_bindings\":[{\"local_name\":\"Choice\",\"imported_name\":\"Choice\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Choice\"}],\"binding_state\":\"definite\",\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":146,\"definition_end_byte\":290,\"body_start_byte\":173,\"body_end_byte\":290}},\"binding\":{\"local_name\":\"Choice\",\"imported_name\":\"Choice\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Choice\"},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::probe#function\",\"source_kind\":\"function\",\"import_source_id\":\"src/lib.rs::__file__#file\",\"import_target_id\":\"src/model.rs::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"configuration_divergent\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[{\"kind\":\"import_binding\",\"file\":\"src/lib.rs\",\"line\":6,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"endpoint_id\":\"src/model.rs::__file__#file\"}],\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":15,\"column\":12,\"start_byte\":261,\"end_byte\":267,\"text\":\"Hidden\",\"path\":[\"Hidden\"],\"candidate_bindings\":[{\"local_name\":\"Hidden\",\"imported_name\":\"Hidden\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":90,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":7,\"import_text\":\"use crate::private_api::Hidden;\",\"import_specifier\":\"crate::private_api::Hidden\"}],\"binding_state\":\"definite\",\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":146,\"definition_end_byte\":290,\"body_start_byte\":173,\"body_end_byte\":290}},\"binding\":{\"local_name\":\"Hidden\",\"imported_name\":\"Hidden\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":90,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":7,\"import_text\":\"use crate::private_api::Hidden;\",\"import_specifier\":\"crate::private_api::Hidden\"},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::probe#function\",\"source_kind\":\"function\",\"import_source_id\":\"src/lib.rs::__file__#file\",\"import_target_id\":\"src/private_api.rs::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"target_inaccessible\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[{\"kind\":\"import_binding\",\"file\":\"src/lib.rs\",\"line\":7,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"endpoint_id\":\"src/private_api.rs::__file__#file\"}],\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":16,\"column\":12,\"start_byte\":280,\"end_byte\":287,\"text\":\"Display\",\"path\":[\"Display\"],\"candidate_bindings\":[{\"local_name\":\"Display\",\"imported_name\":\"Display\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":122,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":8,\"import_text\":\"use std::fmt::Display;\",\"import_specifier\":\"std::fmt::Display\"}],\"binding_state\":\"definite\",\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":146,\"definition_end_byte\":290,\"body_start_byte\":173,\"body_end_byte\":290}},\"binding\":{\"local_name\":\"Display\",\"imported_name\":\"Display\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":122,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":8,\"import_text\":\"use std::fmt::Display;\",\"import_specifier\":\"std::fmt::Display\"},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::probe#function\",\"source_kind\":\"function\",\"import_source_id\":\"src/lib.rs::__file__#file\",\"import_target_id\":null,\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"import_unresolved\",\"import_unresolved_reason\":\"external\",\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":19,\"column\":16,\"start_byte\":307,\"end_byte\":312,\"text\":\"Thing\",\"path\":[\"Thing\"],\"candidate_bindings\":[{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Thing\"}],\"binding_state\":\"definite\",\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"owner\":{\"kind\":\"file\",\"definition_start_byte\":null,\"definition_end_byte\":null,\"body_start_byte\":null,\"body_end_byte\":null}},\"binding\":{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Thing\"},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"source_kind\":\"file\",\"import_source_id\":\"src/lib.rs::__file__#file\",\"import_target_id\":\"src/model.rs::__file__#file\",\"target_file\":\"src/model.rs\",\"target_id\":\"src/model.rs::Thing#struct\",\"target_kind\":\"struct\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"import_unresolved_reason\":null,\"resolution_basis\":\"direct_binding\",\"support\":[{\"kind\":\"import_binding\",\"file\":\"src/lib.rs\",\"line\":6,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"endpoint_id\":\"src/model.rs::__file__#file\"},{\"kind\":\"definition\",\"file\":\"src/model.rs\",\"line\":1,\"content_hash\":\"79efeb8d1c1b79ee6ebc0d927dcc44cde0a38b65166c005076fa756157087782\",\"endpoint_id\":\"src/model.rs::Thing#struct\"}],\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":19,\"column\":30,\"start_byte\":321,\"end_byte\":326,\"text\":\"Thing\",\"path\":[\"Thing\"],\"candidate_bindings\":[{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Thing\"}],\"binding_state\":\"definite\",\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"owner\":{\"kind\":\"file\",\"definition_start_byte\":null,\"definition_end_byte\":null,\"body_start_byte\":null,\"body_end_byte\":null}},\"binding\":{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Thing\"},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"source_kind\":\"file\",\"import_source_id\":\"src/lib.rs::__file__#file\",\"import_target_id\":\"src/model.rs::__file__#file\",\"target_file\":\"src/model.rs\",\"target_id\":\"src/model.rs::Thing#struct\",\"target_kind\":\"struct\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"import_unresolved_reason\":null,\"resolution_basis\":\"direct_binding\",\"support\":[{\"kind\":\"import_binding\",\"file\":\"src/lib.rs\",\"line\":6,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"endpoint_id\":\"src/model.rs::__file__#file\"},{\"kind\":\"definition\",\"file\":\"src/model.rs\",\"line\":1,\"content_hash\":\"79efeb8d1c1b79ee6ebc0d927dcc44cde0a38b65166c005076fa756157087782\",\"endpoint_id\":\"src/model.rs::Thing#struct\"}],\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":19,\"column\":40,\"start_byte\":331,\"end_byte\":336,\"text\":\"Thing\",\"path\":[\"Thing\"],\"candidate_bindings\":[{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Thing\"}],\"binding_state\":\"definite\",\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"owner\":{\"kind\":\"file\",\"definition_start_byte\":null,\"definition_end_byte\":null,\"body_start_byte\":null,\"body_end_byte\":null}},\"binding\":{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Thing\"},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"source_kind\":\"file\",\"import_source_id\":\"src/lib.rs::__file__#file\",\"import_target_id\":\"src/model.rs::__file__#file\",\"target_file\":\"src/model.rs\",\"target_id\":\"src/model.rs::Thing#struct\",\"target_kind\":\"struct\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"import_unresolved_reason\":null,\"resolution_basis\":\"direct_binding\",\"support\":[{\"kind\":\"import_binding\",\"file\":\"src/lib.rs\",\"line\":6,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"endpoint_id\":\"src/model.rs::__file__#file\"},{\"kind\":\"definition\",\"file\":\"src/model.rs\",\"line\":1,\"content_hash\":\"79efeb8d1c1b79ee6ebc0d927dcc44cde0a38b65166c005076fa756157087782\",\"endpoint_id\":\"src/model.rs::Thing#struct\"}],\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"}],\"counts\":{\"total\":9,\"resolved\":5,\"unresolved\":4,\"returned\":9},\"pagination\":{\"offset\":0,\"limit\":32,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/15\",\"calls_remaining\":9,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:15\"}}",
+      "serialized_bytes": 16418,
+      "source_bytes": 0,
+      "elapsed_ms": 2.9060410161037,
+      "spans": []
+    },
+    {
+      "id": "session-b57906f6-5987-4389-b53f-2286a784d207:16",
+      "task_id": "rust_unproven_contracts",
+      "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "wrong.rs",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"wrong.rs\",\"content\":\"pub struct Thing;\\npub struct Hidden;\\n\",\"total_lines\":2,\"start_line\":1,\"end_line\":2,\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/16\",\"calls_remaining\":8,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:16\"}}",
+      "serialized_bytes": 283,
+      "source_bytes": 37,
+      "elapsed_ms": 3.8735000125598162,
+      "spans": [
+        {
+          "file": "wrong.rs",
+          "start_byte": 0,
+          "end_byte": 37,
+          "sha256": "1a796ad3b7f2ca03b124522f2464bda468445c5d758f61359848987d2fb0c859",
+          "text": "pub struct Thing;\npub struct Hidden;\n"
+        }
+      ]
+    },
+    {
+      "id": "session-b57906f6-5987-4389-b53f-2286a784d207:17",
+      "task_id": "rust_unproven_contracts",
+      "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "",
+        "max_output_bytes": 16384,
+        "max_evidence_bytes": 8192,
+        "seed_ids": [
+          "src/lib.rs::generic#function"
+        ],
+        "max_hops": 2
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"partial\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"src/lib.rs::generic#function\",\"name\":\"generic\",\"kind\":\"function\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]}],\"relationships\":[],\"sources\":[{\"id\":1,\"file\":\"src/lib.rs\",\"start_byte\":292,\"end_byte\":346,\"start_line\":19,\"end_line\":19,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"content\":\"pub fn generic<Thing>(value: Thing) -> Thing { value }\"}],\"omissions\":[{\"reason\":\"unresolved_relation\",\"count\":2}],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":1,\"evidence_bytes\":54,\"output_bytes\":1087,\"estimated_tokens\":272,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/17\",\"calls_remaining\":7,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:17\"}}",
+      "serialized_bytes": 1204,
+      "source_bytes": 54,
+      "elapsed_ms": 11.415583023335785,
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 292,
+          "end_byte": 346,
+          "sha256": "99b99fbcead703a99a65de4df4bba557136e7f6e0fb590a89c2f8ce12626eb0f",
+          "text": "pub fn generic<Thing>(value: Thing) -> Thing { value }"
+        }
+      ]
+    },
+    {
+      "id": "session-b57906f6-5987-4389-b53f-2286a784d207:18",
+      "task_id": "rust_unproven_contracts",
+      "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "Generated"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":6,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":null,\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/18\",\"calls_remaining\":6,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:18\"}}",
+      "serialized_bytes": 508,
+      "source_bytes": 0,
+      "elapsed_ms": 2.645583008415997,
+      "spans": []
+    },
+    {
+      "id": "session-b57906f6-5987-4389-b53f-2286a784d207:19",
+      "task_id": "rust_unproven_contracts",
+      "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "question": "For probe and generic, determine the origin of probe's Thing, whether generic's Thing is model::Thing, whether Choice has one proven origin, whether Hidden is accessible, whether external Display is contained/resolved, whether Generated macro has a proven target, and whether Shared import has a guessable endpoint.",
+        "seed_ids": [
+          "src/lib.rs::probe#function",
+          "src/lib.rs::generic#function"
+        ]
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-2b2z26ho/snapshot\",\"question\":\"For probe and generic, determine the origin of probe's Thing, whether generic's Thing is model::Thing, whether Choice has one proven origin, whether Hidden is accessible, whether external Display is contained/resolved, whether Generated macro has a proven target, and whether Shared import has a guessable endpoint.\",\"selection\":\"explicit\",\"question_terms\":[],\"anchors\":[{\"node\":{\"id\":\"src/lib.rs::probe#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/lib.rs\",\"line\":10,\"end_line\":17}},\"matched_symbol_id\":\"src/lib.rs::probe#function\",\"name\":\"probe\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}},{\"node\":{\"id\":\"src/lib.rs::generic#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/lib.rs\",\"line\":19,\"end_line\":19}},\"matched_symbol_id\":\"src/lib.rs::generic#function\",\"name\":\"generic\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}}],\"routing\":{\"kind\":\"relationship\",\"reason\":\"relationship_intent\"},\"filters\":{\"namespaces\":null,\"edge_types\":null,\"resolutions\":[\"exact\",\"declared\",\"import-resolved\"],\"direction\":\"outgoing\"},\"hub_threshold\":4,\"paths\":[],\"rejected_paths\":[],\"counts\":{\"filtered_edges\":9,\"examined_nodes\":3,\"examined_paths\":3,\"returned_paths\":0,\"rejected_paths\":0,\"duplicate_paths\":0,\"omitted_rejected_paths\":0,\"omitted_nodes\":0,\"omitted_paths\":0},\"budget\":{\"max_hops\":3,\"max_nodes\":64,\"max_paths\":16,\"path_offset\":0,\"evidence_bytes\":0,\"estimated_tokens\":0,\"max_evidence_bytes\":16384,\"max_estimated_tokens\":4096,\"hop_limit_reached\":false,\"node_limit_reached\":false,\"next_path_offset\":null},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/19\",\"calls_remaining\":5,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:19\"}}",
+      "serialized_bytes": 1976,
+      "source_bytes": 0,
+      "elapsed_ms": 7.632833003299311,
+      "spans": []
+    }
+  ],
+  "measurement": {
+    "task_id": "rust_unproven_contracts",
+    "session_id": "session-b57906f6-5987-4389-b53f-2286a784d207",
+    "arm": "B",
+    "repetition": 1,
+    "snapshot": "rust_uncertainty",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1",
+    "schema_version": 3,
+    "measurement_method": "observed_tool_calls",
+    "intent_collection": "not_collected",
+    "outcome": "budget_exhausted",
+    "answer": {
+      "probe_type_origin": "src/model.rs::Thing#struct",
+      "generic_Thing_is_model_Thing": false,
+      "choice_single_origin_proven": false,
+      "hidden_accessible": false,
+      "external_Display_contained": false,
+      "macro_target_proven": false,
+      "shared_import_may_be_guessed": false
+    },
+    "answer_correct": false,
+    "task_correct": false,
+    "read_count": 19,
+    "validated_read_count": 19,
+    "required_context_delivered": [
+      "ambiguous",
+      "cargo",
+      "entry",
+      "generic",
+      "hidden",
+      "imports",
+      "thing"
+    ],
+    "required_context_total": 7,
+    "context_recall": 1.0,
+    "serialized_tool_output_bytes": null,
+    "source_bytes": null,
+    "estimated_source_tokens": null,
+    "tool_elapsed_ms": 108.33879106212407,
+    "provider_usage": {
+      "input_tokens": 239741,
+      "cached_input_tokens": 202752,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 3139,
+      "reasoning_output_tokens": 2185
+    },
+    "usage_semantics": "One Codex turn.completed event; gross input includes cached input subset; output includes reasoning tokens.",
+    "token_status": "measured",
+    "measurement_complete": false,
+    "full_pass": false
+  },
+  "baseline": {
+    "end_to_end_seconds": 85.40165579199675,
+    "actual_process_seconds": 85.40165579199675,
+    "exit_code": 0,
+    "provider_thread_id": "01a09843-248d-7cc3-94c7-7a85fd5f3b04",
+    "failures": [
+      {
+        "attempt_id": "session-b57906f6-5987-4389-b53f-2286a784d207/attempt/12",
+        "category": "tool_error",
+        "message": "invalid record pagination"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_13",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_14",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_15",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_16",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_20",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "unmatched_recorded_delivery"
+      },
+      {
+        "category": "budget_exhausted",
+        "limit": "input_tokens",
+        "actual": 239741,
+        "maximum": 200000
+      }
+    ],
+    "tool_delivery_verified": false,
+    "output_accounting": {
+      "schema_version": 4,
+      "complete": false,
+      "tool_call_count": 19,
+      "recorded_payload_bytes": 46516,
+      "complete_payload_bytes": null,
+      "source_bytes": null,
+      "calls": [
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "locate",
+            "max_hops": 1,
+            "query": "Review probe and generic under the bounded resolver: probe_type_origin generic_Thing_is_model_Thing choice_single_origin_proven hidden_accessible external_Display_contained macro_target_proven shared_import_may_be_guessed. Locate declarations and relevant imports/types/macros."
+          },
+          "status": "completed",
+          "attempt_id": "session-b57906f6-5987-4389-b53f-2286a784d207/attempt/1",
+          "trace_event_id": "session-b57906f6-5987-4389-b53f-2286a784d207:1",
+          "source_bytes": 28,
+          "serialized_bytes": 1156,
+          "elapsed_ms": 9.998583002015948,
+          "payload_texts": [
+            "{\"schema_version\":1,\"intent\":\"locate\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"none\",\"exhaustive\":false},\"items\":[{\"id\":\"src/model.rs::Shared#constant\",\"name\":\"Shared\",\"kind\":\"constant\",\"file\":\"src/model.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches model, shared\",\"source_id\":1,\"complete\":true,\"path\":[]}],\"relationships\":[],\"sources\":[{\"id\":1,\"file\":\"src/model.rs\",\"start_byte\":39,\"end_byte\":67,\"start_line\":4,\"end_line\":4,\"content_hash\":\"79efeb8d1c1b79ee6ebc0d927dcc44cde0a38b65166c005076fa756157087782\",\"content\":\"pub const Shared: usize = 1;\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":7}],\"limits\":{\"max_hops\":0,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":1,\"evidence_bytes\":28,\"output_bytes\":1040,\"estimated_tokens\":260,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:1\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": {
+            "nodes_examined": 1,
+            "evidence_bytes": 28,
+            "output_bytes": 1040,
+            "selected_items": 1,
+            "max_nodes": 64,
+            "max_neighbors": 32
+          }
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "search",
+          "arguments": {
+            "query": "probe_type_origin generic_Thing_is_model_Thing choice_single_origin_proven hidden_accessible external_Display_contained macro_target_proven shared_import_may_be_guessed"
+          },
+          "status": "completed",
+          "attempt_id": "session-b57906f6-5987-4389-b53f-2286a784d207/attempt/2",
+          "trace_event_id": "session-b57906f6-5987-4389-b53f-2286a784d207:2",
+          "source_bytes": 132,
+          "serialized_bytes": 3435,
+          "elapsed_ms": 5.713416991056874,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"src/lib.rs::probe#function\",\"name\":\"probe\",\"qualified_name\":\"probe\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":146,\"byte_length\":144,\"signature\":\"pub fn probe(value: Thing) {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"bec4429184159b5fd0f91ca1af7169ad1287096480708bb8864ba2ce75722e0c\",\"decorators\":[],\"keywords\":[\"probe\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":10,\"end_line\":17,\"score\":24.0},{\"id\":\"src/lib.rs::generic#function\",\"name\":\"generic\",\"qualified_name\":\"generic\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":292,\"byte_length\":54,\"signature\":\"pub fn generic<Thing>(value: Thing) -> Thing { value }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"99b99fbcead703a99a65de4df4bba557136e7f6e0fb590a89c2f8ce12626eb0f\",\"decorators\":[],\"keywords\":[\"generic\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":19,\"end_line\":19,\"score\":22.0},{\"id\":\"src/model.rs::Thing#struct\",\"name\":\"Thing\",\"qualified_name\":\"Thing\",\"kind\":\"struct\",\"language\":\"rust\",\"file_path\":\"src/model.rs\",\"byte_offset\":0,\"byte_length\":17,\"signature\":\"pub struct Thing;\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"5bbc80990efa85a1da0e82d019b5c581ac57bb214631059478160e63ce9e0112\",\"decorators\":[],\"keywords\":[\"thing\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":1,\"end_line\":1,\"score\":10.0},{\"id\":\"src/model.rs::Shared#trait\",\"name\":\"Shared\",\"qualified_name\":\"Shared\",\"kind\":\"trait\",\"language\":\"rust\",\"file_path\":\"src/model.rs\",\"byte_offset\":19,\"byte_length\":19,\"signature\":\"pub trait Shared {}\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"ecb91bb7443eef1ea1838833a8f07e301ab9fda2d4098f8d90b75004b4f6bb89\",\"decorators\":[],\"keywords\":[\"shared\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":3,\"end_line\":3,\"score\":10.0},{\"id\":\"src/private_api.rs::Hidden#struct\",\"name\":\"Hidden\",\"qualified_name\":\"Hidden\",\"kind\":\"struct\",\"language\":\"rust\",\"file_path\":\"src/private_api.rs\",\"byte_offset\":0,\"byte_length\":14,\"signature\":\"struct Hidden;\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"be69f0cfb1dd94f3683fa73a8b1eb9149ee7f6ad14015a3198d1eeee336d4b89\",\"decorators\":[],\"keywords\":[\"hidden\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"private\",\"visibility_scope\":[],\"configuration\":\"unconditional\"}}},\"line\":1,\"end_line\":1,\"score\":10.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":6,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"c32a3c7b-7609-4509-843c-16fe109ecd3a\",\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:2\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "get",
+          "arguments": {
+            "context": 3,
+            "symbol_ids": [
+              "src/lib.rs::probe#function",
+              "src/lib.rs::generic#function",
+              "src/model.rs::Thing#struct",
+              "src/model.rs::Shared#trait",
+              "src/private_api.rs::Hidden#struct"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-b57906f6-5987-4389-b53f-2286a784d207/attempt/3",
+          "trace_event_id": "session-b57906f6-5987-4389-b53f-2286a784d207:3",
+          "source_bytes": 622,
+          "serialized_bytes": 1830,
+          "elapsed_ms": 13.942083984147757,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"src/lib.rs::probe#function\",\"source\":\"pub fn probe(value: Thing) {\\n    let _: Thing = value;\\n    Shared;\\n    Generated!();\\n    let _: Choice;\\n    let _: Hidden;\\n    let _: Display;\\n}\",\"byte_offset\":146,\"byte_length\":144,\"line\":10,\"end_line\":17,\"signature\":\"pub fn probe(value: Thing) {\",\"kind\":\"function\",\"language\":\"rust\",\"context_before\":[\"use crate::private_api::Hidden;\",\"use std::fmt::Display;\",\"\"],\"context_after\":[\"\",\"pub fn generic<Thing>(value: Thing) -> Thing { value }\"]},{\"id\":\"src/lib.rs::generic#function\",\"source\":\"pub fn generic<Thing>(value: Thing) -> Thing { value }\",\"byte_offset\":292,\"byte_length\":54,\"line\":19,\"end_line\":19,\"signature\":\"pub fn generic<Thing>(value: Thing) -> Thing { value }\",\"kind\":\"function\",\"language\":\"rust\",\"context_before\":[\"    let _: Display;\",\"}\",\"\"],\"context_after\":[]},{\"id\":\"src/model.rs::Thing#struct\",\"source\":\"pub struct Thing;\",\"byte_offset\":0,\"byte_length\":17,\"line\":1,\"end_line\":1,\"signature\":\"pub struct Thing;\",\"kind\":\"struct\",\"language\":\"rust\",\"context_before\":[],\"context_after\":[\"\",\"pub trait Shared {}\",\"pub const Shared: usize = 1;\"]},{\"id\":\"src/model.rs::Shared#trait\",\"source\":\"pub trait Shared {}\",\"byte_offset\":19,\"byte_length\":19,\"line\":3,\"end_line\":3,\"signature\":\"pub trait Shared {}\",\"kind\":\"trait\",\"language\":\"rust\",\"context_before\":[\"pub struct Thing;\",\"\"],\"context_after\":[\"pub const Shared: usize = 1;\",\"\",\"#[cfg(feature = \\\"one\\\")]\"]},{\"id\":\"src/private_api.rs::Hidden#struct\",\"source\":\"struct Hidden;\",\"byte_offset\":0,\"byte_length\":14,\"line\":1,\"end_line\":1,\"signature\":\"struct Hidden;\",\"kind\":\"struct\",\"language\":\"rust\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:3\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_5",
+          "server": "evaluation",
+          "tool": "outline",
+          "arguments": {
+            "file": "src/lib.rs"
+          },
+          "status": "completed",
+          "attempt_id": "session-b57906f6-5987-4389-b53f-2286a784d207/attempt/4",
+          "trace_event_id": "session-b57906f6-5987-4389-b53f-2286a784d207:4",
+          "source_bytes": 82,
+          "serialized_bytes": 806,
+          "elapsed_ms": 1.6283330041915178,
+          "payload_texts": [
+            "{\"files\":[{\"file\":\"src/lib.rs\",\"symbols\":[{\"id\":\"src/lib.rs::probe#function\",\"name\":\"probe\",\"kind\":\"function\",\"line\":10,\"end_line\":17,\"signature\":\"pub fn probe(value: Thing) {\",\"summary\":\"\"},{\"id\":\"src/lib.rs::generic#function\",\"name\":\"generic\",\"kind\":\"function\",\"line\":19,\"end_line\":19,\"signature\":\"pub fn generic<Thing>(value: Thing) -> Thing { value }\",\"summary\":\"\"},{\"id\":\"src/lib.rs::__file__#file\",\"name\":\"lib.rs\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"src/lib.rs\",\"summary\":\"\"},{\"id\":\"Cargo.toml::lib:ledger#crate\",\"name\":\"ledger\",\"kind\":\"crate\",\"line\":1,\"end_line\":1,\"signature\":\"Cargo.toml::lib:ledger\",\"summary\":\"\"}]}],\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:4\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_6",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "src/lib.rs",
+            "start_line": 1,
+            "end_line": 40
+          },
+          "status": "completed",
+          "attempt_id": "session-b57906f6-5987-4389-b53f-2286a784d207/attempt/5",
+          "trace_event_id": "session-b57906f6-5987-4389-b53f-2286a784d207:5",
+          "source_bytes": 347,
+          "serialized_bytes": 613,
+          "elapsed_ms": 4.6529590035788715,
+          "payload_texts": [
+            "{\"file\":\"src/lib.rs\",\"content\":\"pub mod model;\\nmod a;\\nmod b;\\nmod private_api;\\n\\nuse crate::model::{Thing, Shared, Choice};\\nuse crate::private_api::Hidden;\\nuse std::fmt::Display;\\n\\npub fn probe(value: Thing) {\\n    let _: Thing = value;\\n    Shared;\\n    Generated!();\\n    let _: Choice;\\n    let _: Hidden;\\n    let _: Display;\\n}\\n\\npub fn generic<Thing>(value: Thing) -> Thing { value }\\n\",\"total_lines\":19,\"start_line\":1,\"end_line\":19,\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:5\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_7",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "src/model.rs",
+            "start_line": 1,
+            "end_line": 80
+          },
+          "status": "completed",
+          "attempt_id": "session-b57906f6-5987-4389-b53f-2286a784d207/attempt/6",
+          "trace_event_id": "session-b57906f6-5987-4389-b53f-2286a784d207:6",
+          "source_bytes": 188,
+          "serialized_bytes": 451,
+          "elapsed_ms": 3.7159170024096966,
+          "payload_texts": [
+            "{\"file\":\"src/model.rs\",\"content\":\"pub struct Thing;\\n\\npub trait Shared {}\\npub const Shared: usize = 1;\\n\\n#[cfg(feature = \\\"one\\\")]\\npub use crate::a::Value as Choice;\\n\\n#[cfg(feature = \\\"two\\\")]\\npub use crate::b::Value as Choice;\\n\",\"total_lines\":10,\"start_line\":1,\"end_line\":10,\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:6\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_8",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "src/a.rs",
+            "start_line": 1,
+            "end_line": 40
+          },
+          "status": "completed",
+          "attempt_id": "session-b57906f6-5987-4389-b53f-2286a784d207/attempt/7",
+          "trace_event_id": "session-b57906f6-5987-4389-b53f-2286a784d207:7",
+          "source_bytes": 18,
+          "serialized_bytes": 262,
+          "elapsed_ms": 2.5181249948218465,
+          "payload_texts": [
+            "{\"file\":\"src/a.rs\",\"content\":\"pub struct Value;\\n\",\"total_lines\":1,\"start_line\":1,\"end_line\":1,\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:7\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_9",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "src/b.rs",
+            "start_line": 1,
+            "end_line": 40
+          },
+          "status": "completed",
+          "attempt_id": "session-b57906f6-5987-4389-b53f-2286a784d207/attempt/8",
+          "trace_event_id": "session-b57906f6-5987-4389-b53f-2286a784d207:8",
+          "source_bytes": 18,
+          "serialized_bytes": 262,
+          "elapsed_ms": 4.1078340145759284,
+          "payload_texts": [
+            "{\"file\":\"src/b.rs\",\"content\":\"pub struct Value;\\n\",\"total_lines\":1,\"start_line\":1,\"end_line\":1,\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/8\",\"calls_remaining\":16,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:8\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_10",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "src/private_api.rs",
+            "start_line": 1,
+            "end_line": 20
+          },
+          "status": "completed",
+          "attempt_id": "session-b57906f6-5987-4389-b53f-2286a784d207/attempt/9",
+          "trace_event_id": "session-b57906f6-5987-4389-b53f-2286a784d207:9",
+          "source_bytes": 15,
+          "serialized_bytes": 269,
+          "elapsed_ms": 2.6774580182973295,
+          "payload_texts": [
+            "{\"file\":\"src/private_api.rs\",\"content\":\"struct Hidden;\\n\",\"total_lines\":1,\"start_line\":1,\"end_line\":1,\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/9\",\"calls_remaining\":15,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:9\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_11",
+          "server": "evaluation",
+          "tool": "grep",
+          "arguments": {
+            "pattern": "macro_rules|Generated|Display|Choice|Shared|Thing"
+          },
+          "status": "completed",
+          "attempt_id": "session-b57906f6-5987-4389-b53f-2286a784d207/attempt/10",
+          "trace_event_id": "session-b57906f6-5987-4389-b53f-2286a784d207:10",
+          "source_bytes": 1125,
+          "serialized_bytes": 2986,
+          "elapsed_ms": 3.210875001968816,
+          "payload_texts": [
+            "{\"matches\":[{\"file\":\"src/lib.rs\",\"line\":6,\"match\":\"use crate::model::{Thing, Shared, Choice};\",\"context_before\":[\"mod private_api;\",\"\"],\"context_after\":[\"use crate::private_api::Hidden;\",\"use std::fmt::Display;\"]},{\"file\":\"src/lib.rs\",\"line\":8,\"match\":\"use std::fmt::Display;\",\"context_before\":[\"use crate::model::{Thing, Shared, Choice};\",\"use crate::private_api::Hidden;\"],\"context_after\":[\"\",\"pub fn probe(value: Thing) {\"]},{\"file\":\"src/lib.rs\",\"line\":10,\"match\":\"pub fn probe(value: Thing) {\",\"context_before\":[\"use std::fmt::Display;\",\"\"],\"context_after\":[\"    let _: Thing = value;\",\"    Shared;\"]},{\"file\":\"src/lib.rs\",\"line\":11,\"match\":\"    let _: Thing = value;\",\"context_before\":[\"\",\"pub fn probe(value: Thing) {\"],\"context_after\":[\"    Shared;\",\"    Generated!();\"]},{\"file\":\"src/lib.rs\",\"line\":12,\"match\":\"    Shared;\",\"context_before\":[\"pub fn probe(value: Thing) {\",\"    let _: Thing = value;\"],\"context_after\":[\"    Generated!();\",\"    let _: Choice;\"]},{\"file\":\"src/lib.rs\",\"line\":13,\"match\":\"    Generated!();\",\"context_before\":[\"    let _: Thing = value;\",\"    Shared;\"],\"context_after\":[\"    let _: Choice;\",\"    let _: Hidden;\"]},{\"file\":\"src/lib.rs\",\"line\":14,\"match\":\"    let _: Choice;\",\"context_before\":[\"    Shared;\",\"    Generated!();\"],\"context_after\":[\"    let _: Hidden;\",\"    let _: Display;\"]},{\"file\":\"src/lib.rs\",\"line\":16,\"match\":\"    let _: Display;\",\"context_before\":[\"    let _: Choice;\",\"    let _: Hidden;\"],\"context_after\":[\"}\",\"\"]},{\"file\":\"src/lib.rs\",\"line\":19,\"match\":\"pub fn generic<Thing>(value: Thing) -> Thing { value }\",\"context_before\":[\"}\",\"\"],\"context_after\":[]},{\"file\":\"src/model.rs\",\"line\":1,\"match\":\"pub struct Thing;\",\"context_before\":[],\"context_after\":[\"\",\"pub trait Shared {}\"]},{\"file\":\"src/model.rs\",\"line\":3,\"match\":\"pub trait Shared {}\",\"context_before\":[\"pub struct Thing;\",\"\"],\"context_after\":[\"pub const Shared: usize = 1;\",\"\"]},{\"file\":\"src/model.rs\",\"line\":4,\"match\":\"pub const Shared: usize = 1;\",\"context_before\":[\"\",\"pub trait Shared {}\"],\"context_after\":[\"\",\"#[cfg(feature = \\\"one\\\")]\"]},{\"file\":\"src/model.rs\",\"line\":7,\"match\":\"pub use crate::a::Value as Choice;\",\"context_before\":[\"\",\"#[cfg(feature = \\\"one\\\")]\"],\"context_after\":[\"\",\"#[cfg(feature = \\\"two\\\")]\"]},{\"file\":\"src/model.rs\",\"line\":10,\"match\":\"pub use crate::b::Value as Choice;\",\"context_before\":[\"\",\"#[cfg(feature = \\\"two\\\")]\"],\"context_after\":[]},{\"file\":\"wrong.rs\",\"line\":1,\"match\":\"pub struct Thing;\",\"context_before\":[],\"context_after\":[\"pub struct Hidden;\"]}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":6,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_source_text\"},\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/10\",\"calls_remaining\":14,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:10\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_12",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "dependencies",
+            "max_hops": 2,
+            "max_output_bytes": 16384,
+            "max_evidence_bytes": 8192,
+            "seed_ids": [
+              "src/lib.rs::probe#function",
+              "src/lib.rs::generic#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-b57906f6-5987-4389-b53f-2286a784d207/attempt/11",
+          "trace_event_id": "session-b57906f6-5987-4389-b53f-2286a784d207:11",
+          "source_bytes": 468,
+          "serialized_bytes": 3324,
+          "elapsed_ms": 24.10379098728299,
+          "payload_texts": [
+            "{\"schema_version\":1,\"intent\":\"dependencies\",\"status\":\"partial\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"authored_dependencies\",\"exhaustive\":false},\"items\":[{\"id\":\"src/lib.rs::probe#function\",\"name\":\"probe\",\"kind\":\"function\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"src/lib.rs::generic#function\",\"name\":\"generic\",\"kind\":\"function\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":2,\"complete\":true,\"path\":[]},{\"id\":\"src/model.rs::Thing#struct\",\"name\":\"Thing\",\"kind\":\"struct\",\"file\":\"src/model.rs\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":3,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"src/lib.rs::probe#function\",\"to\":\"src/model.rs::Thing#struct\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"src/lib.rs\",\"line\":10,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\"}},\"traversed\":\"forward\",\"source_ids\":[1,4,5,6],\"resolution_configuration\":\"unconditional\"}],\"sources\":[{\"id\":1,\"file\":\"src/lib.rs\",\"start_byte\":146,\"end_byte\":290,\"start_line\":10,\"end_line\":17,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"content\":\"pub fn probe(value: Thing) {\\n    let _: Thing = value;\\n    Shared;\\n    Generated!();\\n    let _: Choice;\\n    let _: Hidden;\\n    let _: Display;\\n}\"},{\"id\":2,\"file\":\"src/lib.rs\",\"start_byte\":292,\"end_byte\":346,\"start_line\":19,\"end_line\":19,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"content\":\"pub fn generic<Thing>(value: Thing) -> Thing { value }\"},{\"id\":3,\"file\":\"src/model.rs\",\"start_byte\":0,\"end_byte\":17,\"start_line\":1,\"end_line\":1,\"content_hash\":\"79efeb8d1c1b79ee6ebc0d927dcc44cde0a38b65166c005076fa756157087782\",\"content\":\"pub struct Thing;\"},{\"id\":4,\"file\":\"src/lib.rs\",\"start_byte\":0,\"end_byte\":144,\"start_line\":1,\"end_line\":8,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"content\":\"pub mod model;\\nmod a;\\nmod b;\\nmod private_api;\\n\\nuse crate::model::{Thing, Shared, Choice};\\nuse crate::private_api::Hidden;\\nuse std::fmt::Display;\"},{\"id\":5,\"file\":\"src/model.rs\",\"start_byte\":0,\"end_byte\":18,\"start_line\":1,\"end_line\":1,\"content_hash\":\"79efeb8d1c1b79ee6ebc0d927dcc44cde0a38b65166c005076fa756157087782\",\"content\":\"pub struct Thing;\\n\"},{\"id\":6,\"file\":\"Cargo.toml\",\"start_byte\":0,\"end_byte\":91,\"start_line\":1,\"end_line\":8,\"content_hash\":\"5702cbe97faccb5347b9d50991fcceb3c6ffacbfae6bd0b50112716b2b9a5ec0\",\"content\":\"[package]\\nname = \\\"ledger\\\"\\nversion = \\\"0.1.0\\\"\\nedition = \\\"2021\\\"\\n\\n[features]\\none = []\\ntwo = []\\n\"}],\"omissions\":[{\"reason\":\"unresolved_relation\",\"count\":2}],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":3,\"evidence_bytes\":451,\"output_bytes\":3206,\"estimated_tokens\":802,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/11\",\"calls_remaining\":13,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:11\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": {
+            "nodes_examined": 3,
+            "evidence_bytes": 451,
+            "output_bytes": 3206,
+            "selected_items": 3,
+            "max_nodes": 64,
+            "max_neighbors": 32
+          }
+        },
+        {
+          "item_id": "item_13",
+          "server": "evaluation",
+          "tool": "graph_imports",
+          "arguments": {
+            "file": "src/lib.rs",
+            "limit": 100,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-b57906f6-5987-4389-b53f-2286a784d207/attempt/12",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 238,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"error\":{\"code\":\"ValueError\",\"message\":\"invalid record pagination\"},\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/12\",\"calls_remaining\":12,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:12\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_14",
+          "server": "evaluation",
+          "tool": "graph_imports",
+          "arguments": {
+            "file": "src/lib.rs",
+            "limit": 32,
+            "offset": 0,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-b57906f6-5987-4389-b53f-2286a784d207/attempt/13",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 10042,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-2b2z26ho/snapshot\",\"file\":\"src/lib.rs\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":1,\"text\":\"pub mod model;\",\"specifier\":\"model\",\"imported_name\":\"model\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"rust\":{\"kind\":\"module\",\"lexical_module_path\":[],\"visibility\":\"pub\",\"module_level\":true,\"configuration\":\"unconditional\",\"path_override\":null,\"lexical_module_visibilities\":[],\"lexical_module_configurations\":[],\"inline\":false}},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"target_file\":\"src/model.rs\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"src/model.rs::__file__#file\",\"specifier\":\"model\",\"imported_name\":\"model\",\"language\":\"rust\",\"line\":1,\"text\":\"pub mod model;\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"rust_module_declaration\",\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":2,\"text\":\"mod a;\",\"specifier\":\"a\",\"imported_name\":\"a\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"rust\":{\"kind\":\"module\",\"lexical_module_path\":[],\"visibility\":\"private\",\"module_level\":true,\"configuration\":\"unconditional\",\"path_override\":null,\"lexical_module_visibilities\":[],\"lexical_module_configurations\":[],\"inline\":false}},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"target_file\":\"src/a.rs\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"src/a.rs::__file__#file\",\"specifier\":\"a\",\"imported_name\":\"a\",\"language\":\"rust\",\"line\":2,\"text\":\"mod a;\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"rust_module_declaration\",\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":3,\"text\":\"mod b;\",\"specifier\":\"b\",\"imported_name\":\"b\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"rust\":{\"kind\":\"module\",\"lexical_module_path\":[],\"visibility\":\"private\",\"module_level\":true,\"configuration\":\"unconditional\",\"path_override\":null,\"lexical_module_visibilities\":[],\"lexical_module_configurations\":[],\"inline\":false}},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"target_file\":\"src/b.rs\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"src/b.rs::__file__#file\",\"specifier\":\"b\",\"imported_name\":\"b\",\"language\":\"rust\",\"line\":3,\"text\":\"mod b;\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"rust_module_declaration\",\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":4,\"text\":\"mod private_api;\",\"specifier\":\"private_api\",\"imported_name\":\"private_api\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"rust\":{\"kind\":\"module\",\"lexical_module_path\":[],\"visibility\":\"private\",\"module_level\":true,\"configuration\":\"unconditional\",\"path_override\":null,\"lexical_module_visibilities\":[],\"lexical_module_configurations\":[],\"inline\":false}},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"target_file\":\"src/private_api.rs\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"src/private_api.rs::__file__#file\",\"specifier\":\"private_api\",\"imported_name\":\"private_api\",\"language\":\"rust\",\"line\":4,\"text\":\"mod private_api;\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"rust_module_declaration\",\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":6,\"text\":\"use crate::model::{Thing, Shared, Choice};\",\"specifier\":\"crate::model::Choice\",\"imported_name\":\"Choice\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"rust\":{\"kind\":\"use\",\"lexical_module_path\":[],\"visibility\":\"private\",\"module_level\":true,\"configuration\":\"unconditional\",\"path_override\":null,\"lexical_module_visibilities\":[],\"lexical_module_configurations\":[],\"inline\":false}},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"target_file\":\"src/model.rs\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"src/model.rs::__file__#file\",\"specifier\":\"crate::model::Choice\",\"imported_name\":\"Choice\",\"language\":\"rust\",\"line\":6,\"text\":\"use crate::model::{Thing, Shared, Choice};\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"rust_module_path\",\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":6,\"text\":\"use crate::model::{Thing, Shared, Choice};\",\"specifier\":\"crate::model::Shared\",\"imported_name\":\"Shared\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"rust\":{\"kind\":\"use\",\"lexical_module_path\":[],\"visibility\":\"private\",\"module_level\":true,\"configuration\":\"unconditional\",\"path_override\":null,\"lexical_module_visibilities\":[],\"lexical_module_configurations\":[],\"inline\":false}},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"target_file\":\"src/model.rs\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"src/model.rs::__file__#file\",\"specifier\":\"crate::model::Shared\",\"imported_name\":\"Shared\",\"language\":\"rust\",\"line\":6,\"text\":\"use crate::model::{Thing, Shared, Choice};\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"rust_module_path\",\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":6,\"text\":\"use crate::model::{Thing, Shared, Choice};\",\"specifier\":\"crate::model::Thing\",\"imported_name\":\"Thing\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"rust\":{\"kind\":\"use\",\"lexical_module_path\":[],\"visibility\":\"private\",\"module_level\":true,\"configuration\":\"unconditional\",\"path_override\":null,\"lexical_module_visibilities\":[],\"lexical_module_configurations\":[],\"inline\":false}},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"target_file\":\"src/model.rs\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"src/model.rs::__file__#file\",\"specifier\":\"crate::model::Thing\",\"imported_name\":\"Thing\",\"language\":\"rust\",\"line\":6,\"text\":\"use crate::model::{Thing, Shared, Choice};\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"rust_module_path\",\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":7,\"text\":\"use crate::private_api::Hidden;\",\"specifier\":\"crate::private_api::Hidden\",\"imported_name\":\"Hidden\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"rust\":{\"kind\":\"use\",\"lexical_module_path\":[],\"visibility\":\"private\",\"module_level\":true,\"configuration\":\"unconditional\",\"path_override\":null,\"lexical_module_visibilities\":[],\"lexical_module_configurations\":[],\"inline\":false}},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"target_file\":\"src/private_api.rs\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"src/private_api.rs::__file__#file\",\"specifier\":\"crate::private_api::Hidden\",\"imported_name\":\"Hidden\",\"language\":\"rust\",\"line\":7,\"text\":\"use crate::private_api::Hidden;\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"rust_module_path\",\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":8,\"text\":\"use std::fmt::Display;\",\"specifier\":\"std::fmt::Display\",\"imported_name\":\"Display\",\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"rust\":{\"kind\":\"use\",\"lexical_module_path\":[],\"visibility\":\"private\",\"module_level\":true,\"configuration\":\"unconditional\",\"path_override\":null,\"lexical_module_visibilities\":[],\"lexical_module_configurations\":[],\"inline\":false}},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"target_file\":null,\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":null,\"target_id\":null,\"specifier\":\"std::fmt::Display\",\"imported_name\":\"Display\",\"language\":\"rust\",\"line\":8,\"text\":\"use std::fmt::Display;\",\"type_only\":false,\"is_reexport\":false,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"external\",\"resolution_basis\":null,\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":9,\"resolved\":8,\"unresolved\":1,\"returned\":9},\"pagination\":{\"offset\":0,\"limit\":32,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/13\",\"calls_remaining\":11,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:13\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_15",
+          "server": "evaluation",
+          "tool": "graph_calls",
+          "arguments": {
+            "file": "src/lib.rs",
+            "limit": 32,
+            "offset": 0,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-b57906f6-5987-4389-b53f-2286a784d207/attempt/14",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 453,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-2b2z26ho/snapshot\",\"file\":\"src/lib.rs\",\"status\":\"all\",\"items\":[],\"counts\":{\"total\":0,\"resolved\":0,\"unresolved\":0,\"returned\":0},\"pagination\":{\"offset\":0,\"limit\":32,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/14\",\"calls_remaining\":10,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:14\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_16",
+          "server": "evaluation",
+          "tool": "graph_references",
+          "arguments": {
+            "file": "src/lib.rs",
+            "limit": 32,
+            "offset": 0,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-b57906f6-5987-4389-b53f-2286a784d207/attempt/15",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 16418,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-2b2z26ho/snapshot\",\"file\":\"src/lib.rs\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":10,\"column\":21,\"start_byte\":166,\"end_byte\":171,\"text\":\"Thing\",\"path\":[\"Thing\"],\"candidate_bindings\":[{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Thing\"}],\"binding_state\":\"definite\",\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"owner\":{\"kind\":\"file\",\"definition_start_byte\":null,\"definition_end_byte\":null,\"body_start_byte\":null,\"body_end_byte\":null}},\"binding\":{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Thing\"},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"source_kind\":\"file\",\"import_source_id\":\"src/lib.rs::__file__#file\",\"import_target_id\":\"src/model.rs::__file__#file\",\"target_file\":\"src/model.rs\",\"target_id\":\"src/model.rs::Thing#struct\",\"target_kind\":\"struct\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"import_unresolved_reason\":null,\"resolution_basis\":\"direct_binding\",\"support\":[{\"kind\":\"import_binding\",\"file\":\"src/lib.rs\",\"line\":6,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"endpoint_id\":\"src/model.rs::__file__#file\"},{\"kind\":\"definition\",\"file\":\"src/model.rs\",\"line\":1,\"content_hash\":\"79efeb8d1c1b79ee6ebc0d927dcc44cde0a38b65166c005076fa756157087782\",\"endpoint_id\":\"src/model.rs::Thing#struct\"}],\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":11,\"column\":12,\"start_byte\":186,\"end_byte\":191,\"text\":\"Thing\",\"path\":[\"Thing\"],\"candidate_bindings\":[{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Thing\"}],\"binding_state\":\"definite\",\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":146,\"definition_end_byte\":290,\"body_start_byte\":173,\"body_end_byte\":290}},\"binding\":{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Thing\"},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::probe#function\",\"source_kind\":\"function\",\"import_source_id\":\"src/lib.rs::__file__#file\",\"import_target_id\":\"src/model.rs::__file__#file\",\"target_file\":\"src/model.rs\",\"target_id\":\"src/model.rs::Thing#struct\",\"target_kind\":\"struct\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"import_unresolved_reason\":null,\"resolution_basis\":\"direct_binding\",\"support\":[{\"kind\":\"import_binding\",\"file\":\"src/lib.rs\",\"line\":6,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"endpoint_id\":\"src/model.rs::__file__#file\"},{\"kind\":\"definition\",\"file\":\"src/model.rs\",\"line\":1,\"content_hash\":\"79efeb8d1c1b79ee6ebc0d927dcc44cde0a38b65166c005076fa756157087782\",\"endpoint_id\":\"src/model.rs::Thing#struct\"}],\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":12,\"column\":5,\"start_byte\":205,\"end_byte\":211,\"text\":\"Shared\",\"path\":[\"Shared\"],\"candidate_bindings\":[{\"local_name\":\"Shared\",\"imported_name\":\"Shared\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Shared\"}],\"binding_state\":\"definite\",\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":146,\"definition_end_byte\":290,\"body_start_byte\":173,\"body_end_byte\":290}},\"binding\":{\"local_name\":\"Shared\",\"imported_name\":\"Shared\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Shared\"},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::probe#function\",\"source_kind\":\"function\",\"import_source_id\":\"src/lib.rs::__file__#file\",\"import_target_id\":\"src/model.rs::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"ambiguous_target\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[{\"kind\":\"import_binding\",\"file\":\"src/lib.rs\",\"line\":6,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"endpoint_id\":\"src/model.rs::__file__#file\"}],\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":14,\"column\":12,\"start_byte\":242,\"end_byte\":248,\"text\":\"Choice\",\"path\":[\"Choice\"],\"candidate_bindings\":[{\"local_name\":\"Choice\",\"imported_name\":\"Choice\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Choice\"}],\"binding_state\":\"definite\",\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":146,\"definition_end_byte\":290,\"body_start_byte\":173,\"body_end_byte\":290}},\"binding\":{\"local_name\":\"Choice\",\"imported_name\":\"Choice\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Choice\"},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::probe#function\",\"source_kind\":\"function\",\"import_source_id\":\"src/lib.rs::__file__#file\",\"import_target_id\":\"src/model.rs::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"configuration_divergent\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[{\"kind\":\"import_binding\",\"file\":\"src/lib.rs\",\"line\":6,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"endpoint_id\":\"src/model.rs::__file__#file\"}],\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":15,\"column\":12,\"start_byte\":261,\"end_byte\":267,\"text\":\"Hidden\",\"path\":[\"Hidden\"],\"candidate_bindings\":[{\"local_name\":\"Hidden\",\"imported_name\":\"Hidden\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":90,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":7,\"import_text\":\"use crate::private_api::Hidden;\",\"import_specifier\":\"crate::private_api::Hidden\"}],\"binding_state\":\"definite\",\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":146,\"definition_end_byte\":290,\"body_start_byte\":173,\"body_end_byte\":290}},\"binding\":{\"local_name\":\"Hidden\",\"imported_name\":\"Hidden\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":90,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":7,\"import_text\":\"use crate::private_api::Hidden;\",\"import_specifier\":\"crate::private_api::Hidden\"},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::probe#function\",\"source_kind\":\"function\",\"import_source_id\":\"src/lib.rs::__file__#file\",\"import_target_id\":\"src/private_api.rs::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"target_inaccessible\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[{\"kind\":\"import_binding\",\"file\":\"src/lib.rs\",\"line\":7,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"endpoint_id\":\"src/private_api.rs::__file__#file\"}],\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":16,\"column\":12,\"start_byte\":280,\"end_byte\":287,\"text\":\"Display\",\"path\":[\"Display\"],\"candidate_bindings\":[{\"local_name\":\"Display\",\"imported_name\":\"Display\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":122,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":8,\"import_text\":\"use std::fmt::Display;\",\"import_specifier\":\"std::fmt::Display\"}],\"binding_state\":\"definite\",\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":146,\"definition_end_byte\":290,\"body_start_byte\":173,\"body_end_byte\":290}},\"binding\":{\"local_name\":\"Display\",\"imported_name\":\"Display\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":122,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":8,\"import_text\":\"use std::fmt::Display;\",\"import_specifier\":\"std::fmt::Display\"},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::probe#function\",\"source_kind\":\"function\",\"import_source_id\":\"src/lib.rs::__file__#file\",\"import_target_id\":null,\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"import_unresolved\",\"import_unresolved_reason\":\"external\",\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":19,\"column\":16,\"start_byte\":307,\"end_byte\":312,\"text\":\"Thing\",\"path\":[\"Thing\"],\"candidate_bindings\":[{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Thing\"}],\"binding_state\":\"definite\",\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"owner\":{\"kind\":\"file\",\"definition_start_byte\":null,\"definition_end_byte\":null,\"body_start_byte\":null,\"body_end_byte\":null}},\"binding\":{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Thing\"},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"source_kind\":\"file\",\"import_source_id\":\"src/lib.rs::__file__#file\",\"import_target_id\":\"src/model.rs::__file__#file\",\"target_file\":\"src/model.rs\",\"target_id\":\"src/model.rs::Thing#struct\",\"target_kind\":\"struct\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"import_unresolved_reason\":null,\"resolution_basis\":\"direct_binding\",\"support\":[{\"kind\":\"import_binding\",\"file\":\"src/lib.rs\",\"line\":6,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"endpoint_id\":\"src/model.rs::__file__#file\"},{\"kind\":\"definition\",\"file\":\"src/model.rs\",\"line\":1,\"content_hash\":\"79efeb8d1c1b79ee6ebc0d927dcc44cde0a38b65166c005076fa756157087782\",\"endpoint_id\":\"src/model.rs::Thing#struct\"}],\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":19,\"column\":30,\"start_byte\":321,\"end_byte\":326,\"text\":\"Thing\",\"path\":[\"Thing\"],\"candidate_bindings\":[{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Thing\"}],\"binding_state\":\"definite\",\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"owner\":{\"kind\":\"file\",\"definition_start_byte\":null,\"definition_end_byte\":null,\"body_start_byte\":null,\"body_end_byte\":null}},\"binding\":{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Thing\"},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"source_kind\":\"file\",\"import_source_id\":\"src/lib.rs::__file__#file\",\"import_target_id\":\"src/model.rs::__file__#file\",\"target_file\":\"src/model.rs\",\"target_id\":\"src/model.rs::Thing#struct\",\"target_kind\":\"struct\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"import_unresolved_reason\":null,\"resolution_basis\":\"direct_binding\",\"support\":[{\"kind\":\"import_binding\",\"file\":\"src/lib.rs\",\"line\":6,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"endpoint_id\":\"src/model.rs::__file__#file\"},{\"kind\":\"definition\",\"file\":\"src/model.rs\",\"line\":1,\"content_hash\":\"79efeb8d1c1b79ee6ebc0d927dcc44cde0a38b65166c005076fa756157087782\",\"endpoint_id\":\"src/model.rs::Thing#struct\"}],\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"},{\"raw\":{\"source_file\":\"src/lib.rs\",\"language\":\"rust\",\"line\":19,\"column\":40,\"start_byte\":331,\"end_byte\":336,\"text\":\"Thing\",\"path\":[\"Thing\"],\"candidate_bindings\":[{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Thing\"}],\"binding_state\":\"definite\",\"source_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"owner\":{\"kind\":\"file\",\"definition_start_byte\":null,\"definition_end_byte\":null,\"body_start_byte\":null,\"body_end_byte\":null}},\"binding\":{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":47,\"scope_start_byte\":0,\"scope_end_byte\":347,\"import_line\":6,\"import_text\":\"use crate::model::{Thing, Shared, Choice};\",\"import_specifier\":\"crate::model::Thing\"},\"source_file\":\"src/lib.rs\",\"source_id\":\"src/lib.rs::__file__#file\",\"source_kind\":\"file\",\"import_source_id\":\"src/lib.rs::__file__#file\",\"import_target_id\":\"src/model.rs::__file__#file\",\"target_file\":\"src/model.rs\",\"target_id\":\"src/model.rs::Thing#struct\",\"target_kind\":\"struct\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"import_unresolved_reason\":null,\"resolution_basis\":\"direct_binding\",\"support\":[{\"kind\":\"import_binding\",\"file\":\"src/lib.rs\",\"line\":6,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"endpoint_id\":\"src/model.rs::__file__#file\"},{\"kind\":\"definition\",\"file\":\"src/model.rs\",\"line\":1,\"content_hash\":\"79efeb8d1c1b79ee6ebc0d927dcc44cde0a38b65166c005076fa756157087782\",\"endpoint_id\":\"src/model.rs::Thing#struct\"}],\"resolution_control_files\":[\"Cargo.toml\"],\"resolution_configuration\":\"unconditional\"}],\"counts\":{\"total\":9,\"resolved\":5,\"unresolved\":4,\"returned\":9},\"pagination\":{\"offset\":0,\"limit\":32,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/15\",\"calls_remaining\":9,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:15\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_17",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "wrong.rs",
+            "start_line": 1,
+            "end_line": 20
+          },
+          "status": "completed",
+          "attempt_id": "session-b57906f6-5987-4389-b53f-2286a784d207/attempt/16",
+          "trace_event_id": "session-b57906f6-5987-4389-b53f-2286a784d207:16",
+          "source_bytes": 37,
+          "serialized_bytes": 283,
+          "elapsed_ms": 3.945625008782372,
+          "payload_texts": [
+            "{\"file\":\"wrong.rs\",\"content\":\"pub struct Thing;\\npub struct Hidden;\\n\",\"total_lines\":2,\"start_line\":1,\"end_line\":2,\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/16\",\"calls_remaining\":8,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:16\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_18",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "type_dependencies",
+            "max_hops": 2,
+            "max_output_bytes": 16384,
+            "max_evidence_bytes": 8192,
+            "seed_ids": [
+              "src/lib.rs::generic#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-b57906f6-5987-4389-b53f-2286a784d207/attempt/17",
+          "trace_event_id": "session-b57906f6-5987-4389-b53f-2286a784d207:17",
+          "source_bytes": 54,
+          "serialized_bytes": 1204,
+          "elapsed_ms": 11.497833009343594,
+          "payload_texts": [
+            "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"partial\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"src/lib.rs::generic#function\",\"name\":\"generic\",\"kind\":\"function\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]}],\"relationships\":[],\"sources\":[{\"id\":1,\"file\":\"src/lib.rs\",\"start_byte\":292,\"end_byte\":346,\"start_line\":19,\"end_line\":19,\"content_hash\":\"4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7\",\"content\":\"pub fn generic<Thing>(value: Thing) -> Thing { value }\"}],\"omissions\":[{\"reason\":\"unresolved_relation\",\"count\":2}],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":1,\"evidence_bytes\":54,\"output_bytes\":1087,\"estimated_tokens\":272,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/17\",\"calls_remaining\":7,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:17\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": {
+            "nodes_examined": 1,
+            "evidence_bytes": 54,
+            "output_bytes": 1087,
+            "selected_items": 1,
+            "max_nodes": 64,
+            "max_neighbors": 32
+          }
+        },
+        {
+          "item_id": "item_19",
+          "server": "evaluation",
+          "tool": "search",
+          "arguments": {
+            "query": "Generated"
+          },
+          "status": "completed",
+          "attempt_id": "session-b57906f6-5987-4389-b53f-2286a784d207/attempt/18",
+          "trace_event_id": "session-b57906f6-5987-4389-b53f-2286a784d207:18",
+          "source_bytes": 0,
+          "serialized_bytes": 508,
+          "elapsed_ms": 2.7110000082757324,
+          "payload_texts": [
+            "{\"symbols\":[],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":6,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":null,\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/18\",\"calls_remaining\":6,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:18\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_20",
+          "server": "evaluation",
+          "tool": "graph_retrieve",
+          "arguments": {
+            "question": "For probe and generic, determine the origin of probe's Thing, whether generic's Thing is model::Thing, whether Choice has one proven origin, whether Hidden is accessible, whether external Display is contained/resolved, whether Generated macro has a proven target, and whether Shared import has a guessable endpoint.",
+            "seed_ids": [
+              "src/lib.rs::probe#function",
+              "src/lib.rs::generic#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-b57906f6-5987-4389-b53f-2286a784d207/attempt/19",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 1976,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-2b2z26ho/snapshot\",\"question\":\"For probe and generic, determine the origin of probe's Thing, whether generic's Thing is model::Thing, whether Choice has one proven origin, whether Hidden is accessible, whether external Display is contained/resolved, whether Generated macro has a proven target, and whether Shared import has a guessable endpoint.\",\"selection\":\"explicit\",\"question_terms\":[],\"anchors\":[{\"node\":{\"id\":\"src/lib.rs::probe#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/lib.rs\",\"line\":10,\"end_line\":17}},\"matched_symbol_id\":\"src/lib.rs::probe#function\",\"name\":\"probe\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}},{\"node\":{\"id\":\"src/lib.rs::generic#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"rust\",\"file\":\"src/lib.rs\",\"line\":19,\"end_line\":19}},\"matched_symbol_id\":\"src/lib.rs::generic#function\",\"name\":\"generic\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}}],\"routing\":{\"kind\":\"relationship\",\"reason\":\"relationship_intent\"},\"filters\":{\"namespaces\":null,\"edge_types\":null,\"resolutions\":[\"exact\",\"declared\",\"import-resolved\"],\"direction\":\"outgoing\"},\"hub_threshold\":4,\"paths\":[],\"rejected_paths\":[],\"counts\":{\"filtered_edges\":9,\"examined_nodes\":3,\"examined_paths\":3,\"returned_paths\":0,\"rejected_paths\":0,\"duplicate_paths\":0,\"omitted_rejected_paths\":0,\"omitted_nodes\":0,\"omitted_paths\":0},\"budget\":{\"max_hops\":3,\"max_nodes\":64,\"max_paths\":16,\"path_offset\":0,\"evidence_bytes\":0,\"estimated_tokens\":0,\"max_evidence_bytes\":16384,\"max_estimated_tokens\":4096,\"hop_limit_reached\":false,\"node_limit_reached\":false,\"next_path_offset\":null},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207/attempt/19\",\"calls_remaining\":5,\"event_id\":\"session-b57906f6-5987-4389-b53f-2286a784d207:19\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        }
+      ],
+      "failures": [
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_13",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_14",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_15",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_16",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_20",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "unmatched_recorded_delivery"
+        }
+      ]
+    },
+    "adapter_elapsed_ms": 110.85670802276582,
+    "recoverable_error_events": 1,
+    "relationships": {
+      "schema_version": 3,
+      "case_id": "rust_unproven_contracts",
+      "language": "rust",
+      "required_semantic_dependencies_total": 1,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "thing",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "src/lib.rs::probe#function",
+              "to": "src/model.rs::Thing#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "src/lib.rs",
+                "line": 10,
+                "content_hash": "4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "src/lib.rs::probe#function",
+              "to": "src/model.rs::Thing#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "src/lib.rs",
+                "line": 10,
+                "content_hash": "4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7"
+              }
+            }
+          ]
+        }
+      ],
+      "available_dependency_links_total": 1,
+      "available_dependency_links": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "thing",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "src/lib.rs::probe#function",
+              "to": "src/model.rs::Thing#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "src/lib.rs",
+                "line": 10,
+                "content_hash": "4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "src/lib.rs::probe#function",
+              "to": "src/model.rs::Thing#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "src/lib.rs",
+                "line": 10,
+                "content_hash": "4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7"
+              }
+            }
+          ]
+        }
+      ],
+      "delivered_dependency_links_total": 1,
+      "delivered_dependency_links": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "thing",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "src/lib.rs::probe#function",
+              "to": "src/model.rs::Thing#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "src/lib.rs",
+                "line": 10,
+                "content_hash": "4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "src/lib.rs::probe#function",
+              "to": "src/model.rs::Thing#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "src/lib.rs",
+                "line": 10,
+                "content_hash": "4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7"
+              }
+            }
+          ]
+        }
+      ],
+      "dependency_link_recall": {
+        "label": "Exact frozen meaning joined to persisted semantic record and delivered source proof.",
+        "required": 1,
+        "available": 1,
+        "delivered": 1,
+        "available_ratio": 1.0,
+        "delivered_ratio": 1.0
+      },
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_available_relationships": 0,
+      "forbidden_delivered_relationships": 0,
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_delivered_relationship_edges": [],
+      "delivery_integrity_violations": [],
+      "forbidden_scope": "Frozen multilingual negatives plus delivered edge/index and complete exploration-proof consistency."
+    },
+    "arm": "B",
+    "attempt_id": "rust_unproven_contracts-r1-B"
+  },
+  "attempt_id": "rust_unproven_contracts-r1-B",
+  "arm": "B",
+  "provenance": {
+    "attempt_id": "rust_unproven_contracts-r1-B",
+    "case_id": "rust_unproven_contracts",
+    "snapshot": "rust_uncertainty",
+    "repetition": 1,
+    "arm": "B",
+    "adapter_module": "benchmarks.multilingual_context_tools",
+    "model": "gpt-5.6-luna",
+    "reasoning_effort": "high",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "catalog_sha256": "f1c45cceac1c3ee90fa1af1007c341713e220571390c3b1eb086c443d7781062",
+    "runner_sha256": "5756278252a74c9e86c68a898b284108288b74a864b9424f6445223b3a7ca6db",
+    "source": {
+      "freeze_commit": "c910c5ac252a7c982f784d87d61bc4c50fc0c0ec",
+      "freeze_json_sha256": "254f38dd6247215928f4cce3fae379cf9dbf3acb74e51bd2d1ac91c12f290848",
+      "source_scope": "W4 evaluator snapshot; A exact retrieval/graph, B adds current loci_explore plus frozen guide"
+    },
+    "config": {
+      "project_doc_max_bytes": 0,
+      "web_search": "disabled",
+      "skills.include_instructions": false,
+      "developer_instructions": "",
+      "model_reasoning_effort": "high",
+      "model_catalog_json": "/Users/brummerv/phluxxed/loci-exploration/benchmarks/results/multilingual-context-workflow-v1/model-catalog.json",
+      "include_collaboration_mode_instructions": false,
+      "tools.update_plan.enabled": false,
+      "tools.experimental_request_user_input.enabled": false,
+      "features.skip_host_skill_discovery": true,
+      "mcp_servers.evaluation.command": "/Users/brummerv/phluxxed/loci-exploration/.venv/bin/python",
+      "mcp_servers.evaluation.args": [
+        "-m",
+        "benchmarks.multilingual_context_tools",
+        "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-2b2z26ho/run.json"
+      ],
+      "mcp_servers.evaluation.cwd": "/Users/brummerv/phluxxed/loci-exploration",
+      "mcp_servers.evaluation.env": {
+        "LOCI_BASE_DIR": "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-2b2z26ho/store",
+        "LOCI_STORE_NAMESPACE": "typescript-context-preflight"
+      },
+      "mcp_servers.evaluation.required": true,
+      "mcp_servers.evaluation.default_tools_approval_mode": "auto",
+      "mcp_servers.evaluation.tool_timeout_sec": 12,
+      "tool_output_token_limit": 32768,
+      "features.shell_tool": false,
+      "features.multi_agent": false,
+      "features.apps": false,
+      "features.plugins": false,
+      "features.hooks": false,
+      "features.memories": false,
+      "features.skill_search": false,
+      "features.skill_mcp_dependency_install": false,
+      "features.view_image": false,
+      "features.image_generation": false,
+      "features.browser_use": false,
+      "features.computer_use": false,
+      "features.in_app_browser": false,
+      "features.code_mode": false,
+      "features.code_mode_host": false,
+      "features.sleep_tool": false,
+      "features.goals": false,
+      "features.context_management": false,
+      "service_tier": "default"
+    },
+    "config_sha256": "7f08a36577706b052a79407665875ef54049a65dc10a38f195c51ff9c368262d",
+    "prompt_sha256": "2c7307412db4dc7410a09dcbadf4d72ba0ab60e91a82d9efc587c8f569fdddc7",
+    "index_seconds": 0.027680458006216213,
+    "snapshot_files": {
+      "Cargo.toml": "5702cbe97faccb5347b9d50991fcceb3c6ffacbfae6bd0b50112716b2b9a5ec0",
+      "src/a.rs": "1b454ec3d972e0d45ebb255ed707b96aac33ad9e8fd36b259ae42046baef2bea",
+      "src/b.rs": "1b454ec3d972e0d45ebb255ed707b96aac33ad9e8fd36b259ae42046baef2bea",
+      "src/lib.rs": "4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7",
+      "src/model.rs": "79efeb8d1c1b79ee6ebc0d927dcc44cde0a38b65166c005076fa756157087782",
+      "src/private_api.rs": "0a99797371233e380848bdadade68da20eaad29843ab11cb06499eb1ba3725d1",
+      "wrong.rs": "1a796ad3b7f2ca03b124522f2464bda468445c5d758f61359848987d2fb0c859"
+    },
+    "extractor_version": 30,
+    "canonical_tool_schemas_sha256": "492ec2cf0a57ac05d4cb601c1ab44d0604406245f7dcdd865d7f8cbed7e8c90f"
+  }
+}
