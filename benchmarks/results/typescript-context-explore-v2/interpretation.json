@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "comparison": "typescript-context-explore-v2",
+  "frozen_verdict": "reject",
+  "replay_verified_runs": 102,
+  "verified_artifact_fingerprints": 1023,
+  "actual_tools_all_attempts": {
+    "A": {
+      "search": 99,
+      "get": 111,
+      "graph_imports": 8,
+      "outline": 22,
+      "graph_retrieve": 3,
+      "graph_anchors": 8,
+      "graph_neighbors": 4,
+      "file": 14,
+      "graph_references": 2,
+      "graph_calls": 4,
+      "grep": 1
+    },
+    "B": {
+      "search": 119,
+      "get": 112,
+      "graph_neighbors": 4,
+      "outline": 15,
+      "graph_traverse_neighbors": 1,
+      "loci_explore": 3,
+      "graph_retrieve": 1,
+      "file": 11,
+      "graph_imports": 12,
+      "graph_anchors": 5,
+      "graph_references": 2,
+      "graph_calls": 4,
+      "grep": 2
+    }
+  },
+  "actual_tools_maintained_attempts": {
+    "A": {
+      "search": 40,
+      "get": 35,
+      "grep": 1,
+      "outline": 2,
+      "file": 1,
+      "graph_anchors": 1
+    },
+    "B": {
+      "graph_anchors": 2,
+      "get": 28,
+      "search": 34,
+      "grep": 1,
+      "file": 3,
+      "outline": 2
+    }
+  },
+  "actual_exploration_calls": [
+    {
+      "attempt": "local_alias_chain-r3-B",
+      "group": "type_context",
+      "item_id": "item_6",
+      "arguments": {
+        "intent": "type_dependencies",
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ],
+        "query": "Second First Payload requestId amount return type",
+        "max_hops": 3,
+        "max_evidence_bytes": 12000,
+        "max_output_bytes": 20000
+      },
+      "status": "ok",
+      "output_bytes": 4273,
+      "source_bytes": 313,
+      "selected_items": 4,
+      "returned_relationships": 3,
+      "omissions": [],
+      "delivered_gold_dependency_links": 3,
+      "source": "benchmarks/results/typescript-context-explore-v2/local_alias_chain-r3-B/events.jsonl"
+    },
+    {
+      "attempt": "imported_alias_chain-r1-B",
+      "group": "type_context",
+      "item_id": "item_3",
+      "arguments": {
+        "intent": "type_dependencies",
+        "max_hops": 3,
+        "query": "Second requestId fields return type",
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "status": "ok",
+      "output_bytes": 4454,
+      "source_bytes": 355,
+      "selected_items": 4,
+      "returned_relationships": 3,
+      "omissions": [],
+      "delivered_gold_dependency_links": 3,
+      "source": "benchmarks/results/typescript-context-explore-v2/imported_alias_chain-r1-B/events.jsonl"
+    },
+    {
+      "attempt": "imported_alias_chain-r2-B",
+      "group": "type_context",
+      "item_id": "item_10",
+      "arguments": {
+        "intent": "type_dependencies",
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ],
+        "query": "parameter type Second aliases First Payload and returned field requestId",
+        "max_hops": 3,
+        "max_output_bytes": 12000,
+        "max_evidence_bytes": 8000
+      },
+      "status": "ok",
+      "output_bytes": 4454,
+      "source_bytes": 355,
+      "selected_items": 4,
+      "returned_relationships": 3,
+      "omissions": [],
+      "delivered_gold_dependency_links": 3,
+      "source": "benchmarks/results/typescript-context-explore-v2/imported_alias_chain-r2-B/events.jsonl"
+    }
+  ],
+  "temporal_candidate_source_gaps": [
+    {
+      "attempt": "anvil_temporal_arguments-r1-B",
+      "missing_required_span_labels": [
+        "transition"
+      ],
+      "recall": 0.8,
+      "actual_explore_calls": 0
+    },
+    {
+      "attempt": "anvil_temporal_arguments-r2-B",
+      "missing_required_span_labels": [],
+      "recall": 1.0,
+      "actual_explore_calls": 0
+    },
+    {
+      "attempt": "anvil_temporal_arguments-r3-B",
+      "missing_required_span_labels": [
+        "transition"
+      ],
+      "recall": 0.8,
+      "actual_explore_calls": 0
+    }
+  ],
+  "prior_invalid_trial": {
+    "comparison": "typescript-context-explore-v1",
+    "completed_result_files": 17,
+    "partial_attempts": 1,
+    "unstarted_attempts": 84,
+    "known_completed_attempt_usage": {
+      "input_tokens": 496663,
+      "cached_input_tokens": 307456,
+      "output_tokens": 7271
+    },
+    "known_completed_attempt_process_seconds": 312.35337012399395,
+    "partial_attempt_usage": null,
+    "qualification": "inconclusive",
+    "source": "../typescript-context-explore-v1/ABORTED.md"
+  },
+  "interpretation": [
+    "The frozen intervention is availability of one extra tool; actual use is optional and reported.",
+    "B used loci_explore in three of 51 attempts and zero of nine maintained attempts. All three calls returned type-dependency evidence successfully without omissions.",
+    "Maintained output growth and recall regression arise in observed workflows using existing tools; the data cannot attribute either effect to explore payload packing.",
+    "The maintained tasks provide no observed estimate of performance conditional on using loci_explore.",
+    "A subsequent workflow-routing or guidance intervention must be declared and verified before any new measured calls; this completed batch, its prompts, scores and numerical gates remain unchanged.",
+    "No new batch, product change, source merge or runtime promotion is part of this outcome record."
+  ]
+}

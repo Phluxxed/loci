@@ -8,6 +8,7 @@ import textwrap
 import yaml
 
 from .symbols import Symbol, make_symbol_id
+from ._python_type_syntax import is_python_type_alias
 from .languages import get_language_spec, EXTENSION_MAP, MARKDOWN_SUFFIXES, LanguageSpec
 
 
@@ -23,6 +24,16 @@ FRONTMATTER_SCALAR_FIELDS = (
     "timestamp",
 )
 FRONTMATTER_LIST_FIELDS = ("tags",)
+
+GOOS_SUFFIXES = frozenset({
+    "aix", "android", "darwin", "dragonfly", "freebsd", "hurd", "illumos", "ios",
+    "js", "linux", "netbsd", "openbsd", "plan9", "solaris", "wasip1", "windows", "zos",
+})
+GOARCH_SUFFIXES = frozenset({
+    "386", "amd64", "amd64p32", "arm", "arm64", "arm64be", "armbe", "loong64", "mips",
+    "mips64", "mips64le", "mips64p32", "mips64p32le", "mipsle", "ppc", "ppc64", "ppc64le",
+    "riscv", "riscv64", "s390", "s390x", "sparc", "sparc64", "wasm",
+})
 
 
 def parse_file(
@@ -52,16 +63,27 @@ def parse_file(
         return []
 
     rel_path = str(path)
+    tree_sitter_language = (
+        "tsx"
+        if language == "typescript" and suffix == ".tsx"
+        else spec.ts_language
+    )
 
     try:
         from tree_sitter_language_pack import get_parser
-        parser = get_parser(spec.ts_language)
+        parser = get_parser(tree_sitter_language)
         parse = getattr(parser, "parse", None)
         if parse is None:
             raise AttributeError("tree-sitter parser has no parse() method")
         tree = parse(source_bytes)
     except Exception:
-        return _parse_file_with_process(source_bytes, spec, language, rel_path)
+        return _parse_file_with_process(
+            source_bytes,
+            spec,
+            language,
+            rel_path,
+            tree_sitter_language,
+        )
 
     symbols: list[Symbol] = []
     _walk(tree.root_node, source_bytes, spec, language, rel_path, symbols, parent_name=None)
@@ -69,7 +91,13 @@ def parse_file(
     return symbols
 
 
-def _parse_file_with_process(source: bytes, spec: LanguageSpec, language: str, file_path: str) -> list[Symbol]:
+def _parse_file_with_process(
+    source: bytes,
+    spec: LanguageSpec,
+    language: str,
+    file_path: str,
+    tree_sitter_language: str,
+) -> list[Symbol]:
     """Parse using tree-sitter-language-pack's newer high-level process() API."""
     try:
         from tree_sitter_language_pack import ProcessConfig, process
@@ -78,7 +106,7 @@ def _parse_file_with_process(source: bytes, spec: LanguageSpec, language: str, f
         result = process(
             text,
             ProcessConfig(
-                language=spec.ts_language,
+                language=tree_sitter_language,
                 structure=True,
                 symbols=True,
                 comments=True,
@@ -455,8 +483,10 @@ def _rust_item_metadata(node, source: bytes) -> dict[str, Any]:
         _rust_cfg_dependent(item, source)
         for item in (node, *_rust_inline_module_ancestors(node))
     ) else "unconditional"
+    type_configuration = _rust_type_configuration(node, source)
     return {
         "loci": {
+            "rust_type_configuration": type_configuration,
             "rust_item": {
                 "lexical_module_path": list(lexical_path),
                 "visibility": visibility,
@@ -477,6 +507,29 @@ def _rust_inline_module_ancestors(node) -> list[Any]:
             modules.append(ancestor)
         ancestor = ancestor.parent
     return modules
+
+
+def _rust_type_configuration(node, source: bytes) -> str:
+    """Return the declared configuration of a Rust type declaration owner."""
+    declaration_nodes = {
+        "const_item",
+        "enum_item",
+        "foreign_mod_item",
+        "function_item",
+        "impl_item",
+        "mod_item",
+        "static_item",
+        "struct_item",
+        "trait_item",
+        "type_item",
+        "union_item",
+    }
+    current = node
+    while current is not None:
+        if current.type in declaration_nodes and _rust_cfg_dependent(current, source):
+            return "declared_possible"
+        current = current.parent
+    return "unconditional"
 
 
 def _rust_item_visibility(node, source: bytes) -> str:
@@ -592,7 +645,9 @@ def _walk(
                 )
         return
 
-    if node_type in spec.symbol_node_types:
+    if node_type in spec.symbol_node_types or (
+        language == "go" and node_type == "type_alias"
+    ) or (language == "rust" and node_type == "type_item"):
         _extract_symbol(
             node,
             source,
@@ -628,6 +683,26 @@ def _walk(
         )
 
 
+def _symbol_kind(node, spec: LanguageSpec, language: str, source: bytes) -> str | None:
+    if language == "go" and node.type == "type_alias":
+        return "type"
+    if language == "rust" and node.type == "type_item":
+        return "type"
+    if language == "python" and is_python_type_alias(node, source):
+        return "type"
+    if language in {"javascript", "typescript", "tsx"} and node.type == "variable_declarator":
+        name = node.child_by_field_name("name")
+        value = node.child_by_field_name("value")
+        if (
+            name is not None
+            and name.type == "identifier"
+            and value is not None
+            and value.type == "arrow_function"
+        ):
+            return "function"
+    return spec.symbol_node_types.get(node.type)
+
+
 def _recurse_body(
     node,
     source: bytes,
@@ -639,7 +714,7 @@ def _recurse_body(
 ) -> None:
     """Find named declarations nested inside a type or callable body."""
     node_type = node.type
-    symbol_kind = spec.symbol_node_types.get(node_type)
+    symbol_kind = _symbol_kind(node, spec, language, source)
     is_container = node_type in spec.container_node_types
     if not is_container and symbol_kind not in {"function", "method"}:
         return
@@ -649,7 +724,12 @@ def _recurse_body(
         return
     qualified_name = f"{parent_name}.{name}" if parent_name else name
 
-    body = node.child_by_field_name("body")
+    body_node = (
+        node.child_by_field_name("value")
+        if node_type == "variable_declarator" and symbol_kind == "function"
+        else node
+    )
+    body = body_node.child_by_field_name("body")
     if body is not None:
         for child in body.children:
             _walk(
@@ -691,7 +771,7 @@ def _extract_symbol(
     if not name:
         return
 
-    kind = spec.symbol_node_types.get(node.type, "function")
+    kind = _symbol_kind(node, spec, language, source) or "function"
     # Functions inside a class container become methods
     if parent_is_container and kind == "function":
         kind = "method"
@@ -730,6 +810,15 @@ def _extract_symbol(
 
     sym_id = make_symbol_id(file_path, qualified_name, kind)
 
+    metadata = _rust_item_metadata(node, source) if language == "rust" else {}
+    if language == "go":
+        metadata = {
+            "loci": {
+                "go_package_level": _go_package_level(node),
+                "go_type_configuration": _go_type_configuration(node, source, file_path),
+            }
+        }
+
     out.append(Symbol(
         id=sym_id,
         name=name,
@@ -744,10 +833,65 @@ def _extract_symbol(
         content_hash=content_hash,
         decorators=decorators,
         keywords=sorted(keywords),
-        metadata=_rust_item_metadata(node, source) if language == "rust" else {},
+        metadata=metadata,
         line=line,
         end_line=end_line,
     ))
+
+
+def _go_package_level(node) -> bool:
+    """Whether a Go declaration appears outside a callable body."""
+    if node.type == "method_declaration":
+        return False
+    current = node.parent
+    while current is not None:
+        if current.type == "source_file":
+            return True
+        if current.type in {"function_declaration", "method_declaration", "func_literal"}:
+            return False
+        current = current.parent
+    return False
+
+
+def _go_type_configuration(node, source: bytes, file_path: str) -> str:
+    """Classify source requiring an unevaluated Go build configuration."""
+    root = node
+    while root.parent is not None:
+        root = root.parent
+
+    if _go_filename_has_platform_suffix(file_path):
+        return "unsupported"
+    for item in _go_nodes(root):
+        if item.type == "comment":
+            text = source[item.start_byte:item.end_byte].decode("utf-8", errors="replace")
+            if re.match(r"//(?:go:build|\s+\+build)(?:\s|$)", text):
+                return "unsupported"
+        if item.type == "import_spec":
+            path = item.child_by_field_name("path")
+            if path is not None and source[path.start_byte:path.end_byte] in {b'"C"', b"`C`"}:
+                return "unsupported"
+    return "unconditional"
+
+
+def _go_filename_has_platform_suffix(file_path: str) -> bool:
+    stem = Path(file_path).stem
+    parts = stem.split("_")
+    if len(parts) < 2:
+        return False
+    return parts[-1] in GOOS_SUFFIXES | GOARCH_SUFFIXES or (
+        len(parts) >= 3
+        and parts[-2] in GOOS_SUFFIXES
+        and parts[-1] in GOARCH_SUFFIXES
+    )
+
+
+def _go_nodes(node):
+    """Yield a Go syntax subtree without interpreting its declarations."""
+    stack = [node]
+    while stack:
+        current = stack.pop()
+        yield current
+        stack.extend(reversed(current.children))
 
 
 def _extract_name(node, spec: LanguageSpec, source: bytes) -> Optional[str]:

@@ -1,0 +1,191 @@
+{
+  "schema_version": 3,
+  "protocol": "typescript-context-explore-v1",
+  "identity": {
+    "task_id": "imported_alias_chain",
+    "session_id": "imported_alias_chain-r3-B-4507986e-bdb2-4f34-a681-26a53e38ac34",
+    "arm": "B",
+    "repetition": 3,
+    "snapshot": "imported_alias_chain",
+    "corpus_sha256": "5d8f490a820f4e326aa522c2d963c8f0a56ea0c2d472f4d2b66caaeda9834b01",
+    "controls_sha256": "994af261fcee63cfe001e98bbf78c858b5ca462c14ef7788aa8290443b2bf56b",
+    "controls_version": "typescript-context-controls-v3"
+  },
+  "events": [
+    {
+      "id": "imported_alias_chain-r3-B-4507986e-bdb2-4f34-a681-26a53e38ac34:1",
+      "task_id": "imported_alias_chain",
+      "session_id": "imported_alias_chain-r3-B-4507986e-bdb2-4f34-a681-26a53e38ac34",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "imported_alias_chain",
+      "corpus_sha256": "5d8f490a820f4e326aa522c2d963c8f0a56ea0c2d472f4d2b66caaeda9834b01",
+      "controls_sha256": "994af261fcee63cfe001e98bbf78c858b5ca462c14ef7788aa8290443b2bf56b",
+      "controls_version": "typescript-context-controls-v3",
+      "operation": "explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder parameter input required fields return type returned field origin declaration alias chain",
+        "max_output_bytes": 16384,
+        "max_evidence_bytes": 8192,
+        "max_hops": 3
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"types.ts::Second#type\",\"name\":\"Second\",\"kind\":\"type\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]},{\"id\":\"types.ts::First#type\",\"name\":\"First\",\"kind\":\"type\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":2,\"why\":\"Authored type or heritage continuation\",\"source_id\":6,\"complete\":true,\"path\":[1,2]},{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"kind\":\"interface\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":3,\"why\":\"Authored type or heritage continuation\",\"source_id\":8,\"complete\":true,\"path\":[1,2,3]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Second#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"ea2b35b1cf194dbcf91fe9ab1ce6a14819260e681d2532cc5461d2b0b7e3964b\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5]},{\"id\":2,\"edge\":{\"from\":\"types.ts::Second#type\",\"to\":\"types.ts::First#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"types.ts\",\"line\":6,\"content_hash\":\"794bc2317c9dfa25f886bf36635243d88abcd1f1cca9cd20ab95c3591c17de89\"}},\"traversed\":\"forward\",\"source_ids\":[5,7]},{\"id\":3,\"edge\":{\"from\":\"types.ts::First#type\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"types.ts\",\"line\":5,\"content_hash\":\"794bc2317c9dfa25f886bf36635243d88abcd1f1cca9cd20ab95c3591c17de89\"}},\"traversed\":\"forward\",\"source_ids\":[7,9]}],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":49,\"end_byte\":123,\"start_line\":2,\"end_line\":4,\"content_hash\":\"ea2b35b1cf194dbcf91fe9ab1ce6a14819260e681d2532cc5461d2b0b7e3964b\",\"content\":\"function processOrder(value: Second): string {\\n  return value.requestId;\\n}\"},{\"id\":2,\"file\":\"types.ts\",\"start_byte\":104,\"end_byte\":124,\"start_line\":6,\"end_line\":6,\"content_hash\":\"794bc2317c9dfa25f886bf36635243d88abcd1f1cca9cd20ab95c3591c17de89\",\"content\":\"type Second = First;\"},{\"id\":3,\"file\":\"consumer.ts\",\"start_byte\":42,\"end_byte\":96,\"start_line\":2,\"end_line\":2,\"content_hash\":\"ea2b35b1cf194dbcf91fe9ab1ce6a14819260e681d2532cc5461d2b0b7e3964b\",\"content\":\"export function processOrder(value: Second): string {\\n\"},{\"id\":4,\"file\":\"consumer.ts\",\"start_byte\":0,\"end_byte\":42,\"start_line\":1,\"end_line\":1,\"content_hash\":\"ea2b35b1cf194dbcf91fe9ab1ce6a14819260e681d2532cc5461d2b0b7e3964b\",\"content\":\"import type { Second } from \\\"./types.js\\\";\\n\"},{\"id\":5,\"file\":\"types.ts\",\"start_byte\":97,\"end_byte\":125,\"start_line\":6,\"end_line\":6,\"content_hash\":\"794bc2317c9dfa25f886bf36635243d88abcd1f1cca9cd20ab95c3591c17de89\",\"content\":\"export type Second = First;\\n\"},{\"id\":6,\"file\":\"types.ts\",\"start_byte\":75,\"end_byte\":96,\"start_line\":5,\"end_line\":5,\"content_hash\":\"794bc2317c9dfa25f886bf36635243d88abcd1f1cca9cd20ab95c3591c17de89\",\"content\":\"type First = Payload;\"},{\"id\":7,\"file\":\"types.ts\",\"start_byte\":68,\"end_byte\":97,\"start_line\":5,\"end_line\":5,\"content_hash\":\"794bc2317c9dfa25f886bf36635243d88abcd1f1cca9cd20ab95c3591c17de89\",\"content\":\"export type First = Payload;\\n\"},{\"id\":8,\"file\":\"types.ts\",\"start_byte\":7,\"end_byte\":67,\"start_line\":1,\"end_line\":4,\"content_hash\":\"794bc2317c9dfa25f886bf36635243d88abcd1f1cca9cd20ab95c3591c17de89\",\"content\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\"},{\"id\":9,\"file\":\"types.ts\",\"start_byte\":0,\"end_byte\":27,\"start_line\":1,\"end_line\":1,\"content_hash\":\"794bc2317c9dfa25f886bf36635243d88abcd1f1cca9cd20ab95c3591c17de89\",\"content\":\"export interface Payload {\\n\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":3}],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":4,\"evidence_bytes\":247,\"output_bytes\":4426,\"estimated_tokens\":1107,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"imported_alias_chain-r3-B-4507986e-bdb2-4f34-a681-26a53e38ac34/attempt/1\",\"calls_remaining\":23}}",
+      "serialized_bytes": 4500,
+      "source_bytes": 355,
+      "elapsed_ms": 8.83529100974556,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 49,
+          "end_byte": 123,
+          "sha256": "8ee27bbc01b7958a094a619bf6c9653feef2db7eceb60fd9445600dab8eb6c8a",
+          "text": "function processOrder(value: Second): string {\n  return value.requestId;\n}"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 104,
+          "end_byte": 124,
+          "sha256": "a7be27d50b1bdc2f37264a03dd8aea8cd0c465888493f46fdd43fdb173b6a2ba",
+          "text": "type Second = First;"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 42,
+          "end_byte": 96,
+          "sha256": "7d5613aea2da1f1858ef0ccd5905da453e1f697266bb11d4c8dfa26aa390c02a",
+          "text": "export function processOrder(value: Second): string {\n"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 42,
+          "sha256": "b9b6e7f9f094f8ea9576f7ed45099563e4401bf8bf747520406e3356acbd18b1",
+          "text": "import type { Second } from \"./types.js\";\n"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 97,
+          "end_byte": 125,
+          "sha256": "7670847e8a887babbb36a7db80ef3ff3d8729fbae7b4c5e25611aa6dba09bb5f",
+          "text": "export type Second = First;\n"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 75,
+          "end_byte": 96,
+          "sha256": "148f2ce8bc6cb842bd4a683cf95615a969cdf08a004227244a7681b32f391b19",
+          "text": "type First = Payload;"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 68,
+          "end_byte": 97,
+          "sha256": "f94f8665c541da9e32fcc7b9e2b0ac78f93391c29fc72c7ca47756773c79b7e7",
+          "text": "export type First = Payload;\n"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 7,
+          "end_byte": 67,
+          "sha256": "1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d",
+          "text": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 0,
+          "end_byte": 27,
+          "sha256": "5ee6c66264e6f365acd3e9aa50e70879cd39daf5c763a64f43b3db4b09df5b24",
+          "text": "export interface Payload {\n"
+        }
+      ]
+    }
+  ],
+  "failures": [],
+  "attempts": 1,
+  "deliveries": [
+    {
+      "attempt_id": "imported_alias_chain-r3-B-4507986e-bdb2-4f34-a681-26a53e38ac34/attempt/1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "processOrder parameter input required fields return type returned field origin declaration alias chain",
+        "max_output_bytes": 16384,
+        "max_evidence_bytes": 8192,
+        "max_hops": 3
+      },
+      "response_json": "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"kind\":\"function\",\"file\":\"consumer.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches processorder\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"types.ts::Second#type\",\"name\":\"Second\",\"kind\":\"type\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]},{\"id\":\"types.ts::First#type\",\"name\":\"First\",\"kind\":\"type\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":2,\"why\":\"Authored type or heritage continuation\",\"source_id\":6,\"complete\":true,\"path\":[1,2]},{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"kind\":\"interface\",\"file\":\"types.ts\",\"role\":\"dependency\",\"depth\":3,\"why\":\"Authored type or heritage continuation\",\"source_id\":8,\"complete\":true,\"path\":[1,2,3]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"consumer.ts::processOrder#function\",\"to\":\"types.ts::Second#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"ea2b35b1cf194dbcf91fe9ab1ce6a14819260e681d2532cc5461d2b0b7e3964b\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5]},{\"id\":2,\"edge\":{\"from\":\"types.ts::Second#type\",\"to\":\"types.ts::First#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"types.ts\",\"line\":6,\"content_hash\":\"794bc2317c9dfa25f886bf36635243d88abcd1f1cca9cd20ab95c3591c17de89\"}},\"traversed\":\"forward\",\"source_ids\":[5,7]},{\"id\":3,\"edge\":{\"from\":\"types.ts::First#type\",\"to\":\"types.ts::Payload#interface\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"types.ts\",\"line\":5,\"content_hash\":\"794bc2317c9dfa25f886bf36635243d88abcd1f1cca9cd20ab95c3591c17de89\"}},\"traversed\":\"forward\",\"source_ids\":[7,9]}],\"sources\":[{\"id\":1,\"file\":\"consumer.ts\",\"start_byte\":49,\"end_byte\":123,\"start_line\":2,\"end_line\":4,\"content_hash\":\"ea2b35b1cf194dbcf91fe9ab1ce6a14819260e681d2532cc5461d2b0b7e3964b\",\"content\":\"function processOrder(value: Second): string {\\n  return value.requestId;\\n}\"},{\"id\":2,\"file\":\"types.ts\",\"start_byte\":104,\"end_byte\":124,\"start_line\":6,\"end_line\":6,\"content_hash\":\"794bc2317c9dfa25f886bf36635243d88abcd1f1cca9cd20ab95c3591c17de89\",\"content\":\"type Second = First;\"},{\"id\":3,\"file\":\"consumer.ts\",\"start_byte\":42,\"end_byte\":96,\"start_line\":2,\"end_line\":2,\"content_hash\":\"ea2b35b1cf194dbcf91fe9ab1ce6a14819260e681d2532cc5461d2b0b7e3964b\",\"content\":\"export function processOrder(value: Second): string {\\n\"},{\"id\":4,\"file\":\"consumer.ts\",\"start_byte\":0,\"end_byte\":42,\"start_line\":1,\"end_line\":1,\"content_hash\":\"ea2b35b1cf194dbcf91fe9ab1ce6a14819260e681d2532cc5461d2b0b7e3964b\",\"content\":\"import type { Second } from \\\"./types.js\\\";\\n\"},{\"id\":5,\"file\":\"types.ts\",\"start_byte\":97,\"end_byte\":125,\"start_line\":6,\"end_line\":6,\"content_hash\":\"794bc2317c9dfa25f886bf36635243d88abcd1f1cca9cd20ab95c3591c17de89\",\"content\":\"export type Second = First;\\n\"},{\"id\":6,\"file\":\"types.ts\",\"start_byte\":75,\"end_byte\":96,\"start_line\":5,\"end_line\":5,\"content_hash\":\"794bc2317c9dfa25f886bf36635243d88abcd1f1cca9cd20ab95c3591c17de89\",\"content\":\"type First = Payload;\"},{\"id\":7,\"file\":\"types.ts\",\"start_byte\":68,\"end_byte\":97,\"start_line\":5,\"end_line\":5,\"content_hash\":\"794bc2317c9dfa25f886bf36635243d88abcd1f1cca9cd20ab95c3591c17de89\",\"content\":\"export type First = Payload;\\n\"},{\"id\":8,\"file\":\"types.ts\",\"start_byte\":7,\"end_byte\":67,\"start_line\":1,\"end_line\":4,\"content_hash\":\"794bc2317c9dfa25f886bf36635243d88abcd1f1cca9cd20ab95c3591c17de89\",\"content\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\"},{\"id\":9,\"file\":\"types.ts\",\"start_byte\":0,\"end_byte\":27,\"start_line\":1,\"end_line\":1,\"content_hash\":\"794bc2317c9dfa25f886bf36635243d88abcd1f1cca9cd20ab95c3591c17de89\",\"content\":\"export interface Payload {\\n\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":3}],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":4,\"evidence_bytes\":247,\"output_bytes\":4426,\"estimated_tokens\":1107,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"imported_alias_chain-r3-B-4507986e-bdb2-4f34-a681-26a53e38ac34/attempt/1\",\"calls_remaining\":23}}",
+      "serialized_bytes": 4500,
+      "source_bytes": 355,
+      "elapsed_ms": 9.023291000630707,
+      "trace_event_id": "imported_alias_chain-r3-B-4507986e-bdb2-4f34-a681-26a53e38ac34:1",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 49,
+          "end_byte": 123,
+          "sha256": "8ee27bbc01b7958a094a619bf6c9653feef2db7eceb60fd9445600dab8eb6c8a",
+          "text": "function processOrder(value: Second): string {\n  return value.requestId;\n}"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 104,
+          "end_byte": 124,
+          "sha256": "a7be27d50b1bdc2f37264a03dd8aea8cd0c465888493f46fdd43fdb173b6a2ba",
+          "text": "type Second = First;"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 42,
+          "end_byte": 96,
+          "sha256": "7d5613aea2da1f1858ef0ccd5905da453e1f697266bb11d4c8dfa26aa390c02a",
+          "text": "export function processOrder(value: Second): string {\n"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 42,
+          "sha256": "b9b6e7f9f094f8ea9576f7ed45099563e4401bf8bf747520406e3356acbd18b1",
+          "text": "import type { Second } from \"./types.js\";\n"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 97,
+          "end_byte": 125,
+          "sha256": "7670847e8a887babbb36a7db80ef3ff3d8729fbae7b4c5e25611aa6dba09bb5f",
+          "text": "export type Second = First;\n"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 75,
+          "end_byte": 96,
+          "sha256": "148f2ce8bc6cb842bd4a683cf95615a969cdf08a004227244a7681b32f391b19",
+          "text": "type First = Payload;"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 68,
+          "end_byte": 97,
+          "sha256": "f94f8665c541da9e32fcc7b9e2b0ac78f93391c29fc72c7ca47756773c79b7e7",
+          "text": "export type First = Payload;\n"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 7,
+          "end_byte": 67,
+          "sha256": "1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d",
+          "text": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 0,
+          "end_byte": 27,
+          "sha256": "5ee6c66264e6f365acd3e9aa50e70879cd39daf5c763a64f43b3db4b09df5b24",
+          "text": "export interface Payload {\n"
+        }
+      ]
+    }
+  ]
+}

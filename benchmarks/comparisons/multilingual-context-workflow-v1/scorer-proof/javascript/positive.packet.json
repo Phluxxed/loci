@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "intent": "dependencies",
+  "status": "ok",
+  "selection": "explicit",
+  "scope": {
+    "source": "indexed_supported_source",
+    "coverage": "complete",
+    "relationships": "authored_dependencies",
+    "exhaustive": false
+  },
+  "items": [
+    {
+      "id": "app.js::run#function",
+      "name": "run",
+      "kind": "function",
+      "file": "app.js",
+      "role": "anchor",
+      "depth": 0,
+      "why": "Explicitly requested",
+      "source_id": 1,
+      "complete": true,
+      "path": []
+    },
+    {
+      "id": "helper.js::make#function",
+      "name": "make",
+      "kind": "function",
+      "file": "helper.js",
+      "role": "anchor",
+      "depth": 0,
+      "why": "Explicitly requested",
+      "source_id": 2,
+      "complete": true,
+      "path": []
+    },
+    {
+      "id": "helper.js::add#function",
+      "name": "add",
+      "kind": "function",
+      "file": "helper.js",
+      "role": "dependency",
+      "depth": 1,
+      "why": "Authored JavaScript dependency",
+      "source_id": 3,
+      "complete": true,
+      "path": [
+        1
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "id": 1,
+      "edge": {
+        "from": "app.js::run#function",
+        "to": "helper.js::add#function",
+        "type": "calls",
+        "directed": true,
+        "namespace": "loci",
+        "resolution": "import-resolved",
+        "evidence": {
+          "file": "app.js",
+          "line": 2,
+          "content_hash": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c"
+        }
+      },
+      "traversed": "forward",
+      "source_ids": [
+        4,
+        1,
+        5,
+        6,
+        7
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": 1,
+      "file": "app.js",
+      "start_byte": 56,
+      "end_byte": 98,
+      "start_line": 2,
+      "end_line": 2,
+      "content_hash": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c",
+      "content": "function run() { return make() + add(1); }"
+    },
+    {
+      "id": 2,
+      "file": "helper.js",
+      "start_byte": 41,
+      "end_byte": 75,
+      "start_line": 2,
+      "end_line": 2,
+      "content_hash": "6a1835c96fc597b7c7a8ba7cd2717fbd1aef2ea8be4b0bf82e8fd00d0fa5911e",
+      "content": "function make() { return add(0); }"
+    },
+    {
+      "id": 3,
+      "file": "helper.js",
+      "start_byte": 13,
+      "end_byte": 39,
+      "start_line": 1,
+      "end_line": 1,
+      "content_hash": "6a1835c96fc597b7c7a8ba7cd2717fbd1aef2ea8be4b0bf82e8fd00d0fa5911e",
+      "content": "add = (value) => value + 1"
+    },
+    {
+      "id": 4,
+      "file": "app.js",
+      "start_byte": 49,
+      "end_byte": 99,
+      "start_line": 2,
+      "end_line": 2,
+      "content_hash": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c",
+      "content": "export function run() { return make() + add(1); }\n"
+    },
+    {
+      "id": 5,
+      "file": "app.js",
+      "start_byte": 0,
+      "end_byte": 49,
+      "start_line": 1,
+      "end_line": 1,
+      "content_hash": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c",
+      "content": "import { make, add, Parent } from \"./barrel.js\";\n"
+    },
+    {
+      "id": 6,
+      "file": "barrel.js",
+      "start_byte": 0,
+      "end_byte": 52,
+      "start_line": 1,
+      "end_line": 1,
+      "content_hash": "b2b45765fdfa71f94888a5459919ab00ab243a0e5edad925de34a122ba346e04",
+      "content": "export { default as make, add } from \"./helper.js\";\n"
+    },
+    {
+      "id": 7,
+      "file": "helper.js",
+      "start_byte": 0,
+      "end_byte": 41,
+      "start_line": 1,
+      "end_line": 1,
+      "content_hash": "6a1835c96fc597b7c7a8ba7cd2717fbd1aef2ea8be4b0bf82e8fd00d0fa5911e",
+      "content": "export const add = (value) => value + 1;\n"
+    }
+  ],
+  "omissions": [
+    {
+      "reason": "alternative_path",
+      "count": 4
+    }
+  ],
+  "limits": {
+    "max_hops": 3,
+    "max_nodes": 64,
+    "max_items": 12,
+    "max_neighbors": 32,
+    "max_output_bytes": 16384,
+    "max_evidence_bytes": 8192
+  },
+  "usage": {
+    "nodes_examined": 3,
+    "evidence_bytes": 226,
+    "output_bytes": 3083,
+    "estimated_tokens": 771,
+    "token_estimate_method": "utf8_bytes_div_4",
+    "output_encoding": "mcp_result_json_utf8"
+  }
+}

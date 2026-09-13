@@ -210,7 +210,9 @@ def _extract_python_exports(
             target = declaration.child_by_field_name("left")
             if target is not None and target.type == "identifier":
                 value = _node_text(target, source)
-                if _python_constant_name(value):
+                from ._python_type_syntax import is_python_type_alias
+
+                if _python_constant_name(value) or is_python_type_alias(declaration, source):
                     _append_export(
                         exports,
                         evidence_node=child,
@@ -282,6 +284,12 @@ def _extract_javascript_exports(
     source_hash: str,
 ) -> None:
     definitions = _javascript_definition_nodes(root, source)
+    if language == "javascript":
+        from ._javascript_mutations import mutated_roots
+
+        mutations = mutated_roots(root, source)
+    else:
+        mutations = frozenset()
     for node in root.named_children:
         if node.type != "export_statement":
             continue
@@ -303,10 +311,27 @@ def _extract_javascript_exports(
                         "type_alias_declaration",
                         "interface_declaration",
                     },
-                    definition_node=definition,
+                    definition_node=definition if local_name not in mutations else None,
                 )
             continue
         if node.child_by_field_name("source") is not None:
+            continue
+        value = node.child_by_field_name("value")
+        if _has_token(node, "default") and value is not None and value.type == "identifier":
+            local_name = _node_text(value, source)
+            candidates = definitions.get(local_name, [])
+            _append_export(
+                exports,
+                evidence_node=node,
+                source=source,
+                source_file=source_file,
+                language=language,
+                source_hash=source_hash,
+                local_name=local_name,
+                exported_name="default",
+                type_only=False,
+                definition_node=candidates[0] if len(candidates) == 1 and local_name not in mutations else None,
+            )
             continue
         clause = next(
             (child for child in node.named_children if child.type == "export_clause"),
@@ -335,7 +360,7 @@ def _extract_javascript_exports(
                 local_name=local_name,
                 exported_name=exported_name,
                 type_only=declaration_type_only or _has_token(specifier, "type"),
-                definition_node=candidates[0] if len(candidates) == 1 else None,
+                definition_node=candidates[0] if len(candidates) == 1 and local_name not in mutations else None,
             )
 
 
@@ -366,7 +391,7 @@ def _extract_go_exports(
     source_hash: str,
 ) -> None:
     for node in _walk_nodes(root):
-        if node.type not in {"function_declaration", "type_spec", "const_spec"}:
+        if node.type not in {"function_declaration", "type_spec", "type_alias", "const_spec"}:
             continue
         if not _go_package_level(node):
             continue

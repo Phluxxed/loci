@@ -1,0 +1,465 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "task_id": "default_identifier",
+    "session_id": "a98ef3fb-9327-475b-b023-94a4afba7ef6",
+    "arm": "A",
+    "repetition": 3,
+    "snapshot": "default_identifier",
+    "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+    "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+    "controls_version": "typescript-context-controls-v2"
+  },
+  "events": [
+    {
+      "id": "a98ef3fb-9327-475b-b023-94a4afba7ef6:1",
+      "task_id": "default_identifier",
+      "session_id": "a98ef3fb-9327-475b-b023-94a4afba7ef6",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "default_identifier",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Find the useNumber declaration and its regression-test call site.",
+      "because": null,
+      "arguments": {
+        "query": "useNumber",
+        "kind": "function"
+      },
+      "search_id": "1e4e7f11-1cff-4cbb-900d-bffab5c468b4",
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::useNumber#function\",\"name\":\"useNumber\",\"qualified_name\":\"useNumber\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":38,\"byte_length\":47,\"signature\":\"function useNumber(): number { return num(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e\",\"decorators\":[],\"keywords\":[\"number\",\"use\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"1e4e7f11-1cff-4cbb-900d-bffab5c468b4\",\"_evaluation\":{\"attempt_id\":\"a98ef3fb-9327-475b-b023-94a4afba7ef6/attempt/1\",\"calls_remaining\":23,\"event_id\":\"a98ef3fb-9327-475b-b023-94a4afba7ef6:1\"}}",
+      "serialized_bytes": 892,
+      "source_bytes": 47,
+      "elapsed_ms": 3.0373749978025444,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 38,
+          "end_byte": 85,
+          "sha256": "eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e",
+          "text": "function useNumber(): number { return num(1); }"
+        }
+      ]
+    },
+    {
+      "id": "a98ef3fb-9327-475b-b023-94a4afba7ef6:2",
+      "task_id": "default_identifier",
+      "session_id": "a98ef3fb-9327-475b-b023-94a4afba7ef6",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "default_identifier",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "get",
+      "reason": "task_context",
+      "detail": "Retrieve the exact useNumber body and confirm the num call expression.",
+      "because": null,
+      "arguments": {
+        "symbol_ids": [
+          "consumer.ts::useNumber#function"
+        ],
+        "selected_from_search_id": "1e4e7f11-1cff-4cbb-900d-bffab5c468b4",
+        "context": 2
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::useNumber#function\",\"source\":\"function useNumber(): number { return num(1); }\",\"byte_offset\":38,\"byte_length\":47,\"line\":2,\"end_line\":2,\"signature\":\"function useNumber(): number { return num(1); }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import num from \\\"./number.js\\\";\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"a98ef3fb-9327-475b-b023-94a4afba7ef6/attempt/2\",\"calls_remaining\":22,\"event_id\":\"a98ef3fb-9327-475b-b023-94a4afba7ef6:2\"}}",
+      "serialized_bytes": 497,
+      "source_bytes": 124,
+      "elapsed_ms": 6.216250003490131,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 38,
+          "end_byte": 85,
+          "sha256": "eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e",
+          "text": "function useNumber(): number { return num(1); }"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 30,
+          "sha256": "cb005bb93a29b5d639c6aea61820c76673a79d260f821773be61e27017316b61",
+          "text": "import num from \"./number.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 38,
+          "end_byte": 85,
+          "sha256": "eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e",
+          "text": "function useNumber(): number { return num(1); }"
+        }
+      ]
+    },
+    {
+      "id": "a98ef3fb-9327-475b-b023-94a4afba7ef6:3",
+      "task_id": "default_identifier",
+      "session_id": "a98ef3fb-9327-475b-b023-94a4afba7ef6",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "default_identifier",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Locate the imported num declaration to trace the call target.",
+      "because": null,
+      "arguments": {
+        "query": "num",
+        "lang": "typescript"
+      },
+      "search_id": "b9e7019b-631c-4d9d-9d25-e04b8e9ed6e3",
+      "response_json": "{\"symbols\":[{\"id\":\"number.ts::num#function\",\"name\":\"num\",\"qualified_name\":\"num\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"number.ts\",\"byte_offset\":0,\"byte_length\":54,\"signature\":\"function num(v: unknown): number { return Number(v); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985\",\"decorators\":[],\"keywords\":[\"num\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":71.0},{\"id\":\"consumer.ts::useNumber#function\",\"name\":\"useNumber\",\"qualified_name\":\"useNumber\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":38,\"byte_length\":47,\"signature\":\"function useNumber(): number { return num(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e\",\"decorators\":[],\"keywords\":[\"number\",\"use\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":40.0},{\"id\":\"number.ts::__file__#file\",\"name\":\"number.ts\",\"qualified_name\":\"__file__\",\"kind\":\"file\",\"language\":\"typescript\",\"file_path\":\"number.ts\",\"byte_offset\":0,\"byte_length\":0,\"signature\":\"number.ts\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"d4941eeb404d8075da8f39536868e53f12b05ee4a82da02b913bc75e89b1b7ee\",\"decorators\":[],\"keywords\":[\"number\"],\"metadata\":{\"loci\":{\"file_node\":true}},\"line\":1,\"end_line\":1,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"b9e7019b-631c-4d9d-9d25-e04b8e9ed6e3\",\"_evaluation\":{\"attempt_id\":\"a98ef3fb-9327-475b-b023-94a4afba7ef6/attempt/3\",\"calls_remaining\":21,\"event_id\":\"a98ef3fb-9327-475b-b023-94a4afba7ef6:3\"}}",
+      "serialized_bytes": 1744,
+      "source_bytes": 101,
+      "elapsed_ms": 1.3404999990598299,
+      "spans": [
+        {
+          "file": "number.ts",
+          "start_byte": 0,
+          "end_byte": 54,
+          "sha256": "a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985",
+          "text": "function num(v: unknown): number { return Number(v); }"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 38,
+          "end_byte": 85,
+          "sha256": "eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e",
+          "text": "function useNumber(): number { return num(1); }"
+        }
+      ]
+    },
+    {
+      "id": "a98ef3fb-9327-475b-b023-94a4afba7ef6:4",
+      "task_id": "default_identifier",
+      "session_id": "a98ef3fb-9327-475b-b023-94a4afba7ef6",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "default_identifier",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "get",
+      "reason": "task_context",
+      "detail": "Retrieve the exact num declaration, including its parameter annotation and return type.",
+      "because": null,
+      "arguments": {
+        "symbol_ids": [
+          "number.ts::num#function"
+        ],
+        "selected_from_search_id": "b9e7019b-631c-4d9d-9d25-e04b8e9ed6e3",
+        "context": 1
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"number.ts::num#function\",\"source\":\"function num(v: unknown): number { return Number(v); }\",\"byte_offset\":0,\"byte_length\":54,\"line\":1,\"end_line\":1,\"signature\":\"function num(v: unknown): number { return Number(v); }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[\"export default num;\"]}],\"_evaluation\":{\"attempt_id\":\"a98ef3fb-9327-475b-b023-94a4afba7ef6/attempt/4\",\"calls_remaining\":20,\"event_id\":\"a98ef3fb-9327-475b-b023-94a4afba7ef6:4\"}}",
+      "serialized_bytes": 489,
+      "source_bytes": 127,
+      "elapsed_ms": 6.290792000072543,
+      "spans": [
+        {
+          "file": "number.ts",
+          "start_byte": 0,
+          "end_byte": 54,
+          "sha256": "a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985",
+          "text": "function num(v: unknown): number { return Number(v); }"
+        },
+        {
+          "file": "number.ts",
+          "start_byte": 55,
+          "end_byte": 74,
+          "sha256": "f8ab2a8d29d5b5ba7d01f5154aee5283e02ca0df9cd270a26dfad49cf3b975d0",
+          "text": "export default num;"
+        },
+        {
+          "file": "number.ts",
+          "start_byte": 0,
+          "end_byte": 54,
+          "sha256": "a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985",
+          "text": "function num(v: unknown): number { return Number(v); }"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "default_identifier",
+    "session_id": "a98ef3fb-9327-475b-b023-94a4afba7ef6",
+    "arm": "A",
+    "repetition": 3,
+    "snapshot": "default_identifier",
+    "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+    "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+    "controls_version": "typescript-context-controls-v2",
+    "schema_version": 1,
+    "outcome": "completed",
+    "task_correct": true,
+    "answer": {
+      "origin_file": "number.ts",
+      "declaration_name": "num",
+      "declared_parameter_type": "unknown",
+      "return_type": "number",
+      "result": 1
+    },
+    "read_count": 4,
+    "avoidable_reads": 0,
+    "proven_avoidable_reads": 0,
+    "lineage_status": "complete",
+    "classifications": [
+      {
+        "event_id": "a98ef3fb-9327-475b-b023-94a4afba7ef6:1",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "a98ef3fb-9327-475b-b023-94a4afba7ef6:2",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "a98ef3fb-9327-475b-b023-94a4afba7ef6:3",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "a98ef3fb-9327-475b-b023-94a4afba7ef6:4",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      }
+    ],
+    "required_context_delivered": [
+      "callee",
+      "entry",
+      "export",
+      "import"
+    ],
+    "required_context_total": 4,
+    "context_recall": 1.0,
+    "serialized_tool_output_bytes": 3622,
+    "source_bytes": 399,
+    "estimated_source_tokens": 100,
+    "tool_elapsed_ms": 16.884917000425048,
+    "provider_usage": {
+      "input_tokens": 29618,
+      "cached_input_tokens": 23296,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 482,
+      "reasoning_output_tokens": 151
+    },
+    "usage_semantics": "Codex turn.completed gross input; cached_input is a subset; output includes reasoning_output_tokens.",
+    "token_status": "measured"
+  },
+  "baseline": {
+    "end_to_end_seconds": 20.09690537500137,
+    "actual_process_seconds": 20.09690537500137,
+    "exit_code": 0,
+    "provider_thread_id": "01a08e49-01dd-7400-97dd-8b4c7eb0fa4e",
+    "failures": [],
+    "tool_delivery_verified": true,
+    "relationships": {
+      "schema_version": 1,
+      "case_id": "default_identifier",
+      "required_semantic_dependencies_total": 1,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "calls",
+          "to": "callee",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "exact_kind",
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "consumer.ts::useNumber#function",
+              "to": "number.ts::num#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "271a73bf1eed83ee538b9c9d1e39c1c04a6c3765de9cb304a493f2e0e1bcff2f"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "available_dependency_links_total": 1,
+      "available_dependency_links": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "calls",
+          "to": "callee",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "exact_kind",
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "consumer.ts::useNumber#function",
+              "to": "number.ts::num#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "271a73bf1eed83ee538b9c9d1e39c1c04a6c3765de9cb304a493f2e0e1bcff2f"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "dependency-link recall; references_type fallback is generic and does not establish precise subtype/kind recall",
+        "required": 1,
+        "available": 1,
+        "delivered": 0,
+        "available_ratio": 1.0,
+        "delivered_ratio": 0.0
+      },
+      "precise_kind_links_available_total": 1,
+      "precise_kind_links_delivered_total": 0,
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_scope": "authored frozen forbidden_relationships only; this is not exhaustive truth about unsupported or unrecorded edges"
+    },
+    "output_accounting": {
+      "schema_version": 2,
+      "complete": true,
+      "calls": [
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "useNumber",
+              "kind": "function"
+            },
+            "reason": "task_context",
+            "detail": "Find the useNumber declaration and its regression-test call site."
+          },
+          "attempt_id": "a98ef3fb-9327-475b-b023-94a4afba7ef6/attempt/1",
+          "trace_event_id": "a98ef3fb-9327-475b-b023-94a4afba7ef6:1",
+          "source_bytes": 47,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::useNumber#function\",\"name\":\"useNumber\",\"qualified_name\":\"useNumber\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":38,\"byte_length\":47,\"signature\":\"function useNumber(): number { return num(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e\",\"decorators\":[],\"keywords\":[\"number\",\"use\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"1e4e7f11-1cff-4cbb-900d-bffab5c468b4\",\"_evaluation\":{\"attempt_id\":\"a98ef3fb-9327-475b-b023-94a4afba7ef6/attempt/1\",\"calls_remaining\":23,\"event_id\":\"a98ef3fb-9327-475b-b023-94a4afba7ef6:1\"}}"
+          ],
+          "serialized_bytes": 892
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "get",
+            "parameters": {
+              "symbol_ids": [
+                "consumer.ts::useNumber#function"
+              ],
+              "selected_from_search_id": "1e4e7f11-1cff-4cbb-900d-bffab5c468b4",
+              "context": 2
+            },
+            "reason": "task_context",
+            "detail": "Retrieve the exact useNumber body and confirm the num call expression."
+          },
+          "attempt_id": "a98ef3fb-9327-475b-b023-94a4afba7ef6/attempt/2",
+          "trace_event_id": "a98ef3fb-9327-475b-b023-94a4afba7ef6:2",
+          "source_bytes": 124,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::useNumber#function\",\"source\":\"function useNumber(): number { return num(1); }\",\"byte_offset\":38,\"byte_length\":47,\"line\":2,\"end_line\":2,\"signature\":\"function useNumber(): number { return num(1); }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import num from \\\"./number.js\\\";\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"a98ef3fb-9327-475b-b023-94a4afba7ef6/attempt/2\",\"calls_remaining\":22,\"event_id\":\"a98ef3fb-9327-475b-b023-94a4afba7ef6:2\"}}"
+          ],
+          "serialized_bytes": 497
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "num",
+              "lang": "typescript"
+            },
+            "reason": "task_context",
+            "detail": "Locate the imported num declaration to trace the call target."
+          },
+          "attempt_id": "a98ef3fb-9327-475b-b023-94a4afba7ef6/attempt/3",
+          "trace_event_id": "a98ef3fb-9327-475b-b023-94a4afba7ef6:3",
+          "source_bytes": 101,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"number.ts::num#function\",\"name\":\"num\",\"qualified_name\":\"num\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"number.ts\",\"byte_offset\":0,\"byte_length\":54,\"signature\":\"function num(v: unknown): number { return Number(v); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985\",\"decorators\":[],\"keywords\":[\"num\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":71.0},{\"id\":\"consumer.ts::useNumber#function\",\"name\":\"useNumber\",\"qualified_name\":\"useNumber\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":38,\"byte_length\":47,\"signature\":\"function useNumber(): number { return num(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e\",\"decorators\":[],\"keywords\":[\"number\",\"use\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":40.0},{\"id\":\"number.ts::__file__#file\",\"name\":\"number.ts\",\"qualified_name\":\"__file__\",\"kind\":\"file\",\"language\":\"typescript\",\"file_path\":\"number.ts\",\"byte_offset\":0,\"byte_length\":0,\"signature\":\"number.ts\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"d4941eeb404d8075da8f39536868e53f12b05ee4a82da02b913bc75e89b1b7ee\",\"decorators\":[],\"keywords\":[\"number\"],\"metadata\":{\"loci\":{\"file_node\":true}},\"line\":1,\"end_line\":1,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"b9e7019b-631c-4d9d-9d25-e04b8e9ed6e3\",\"_evaluation\":{\"attempt_id\":\"a98ef3fb-9327-475b-b023-94a4afba7ef6/attempt/3\",\"calls_remaining\":21,\"event_id\":\"a98ef3fb-9327-475b-b023-94a4afba7ef6:3\"}}"
+          ],
+          "serialized_bytes": 1744
+        },
+        {
+          "item_id": "item_5",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "get",
+            "parameters": {
+              "symbol_ids": [
+                "number.ts::num#function"
+              ],
+              "selected_from_search_id": "b9e7019b-631c-4d9d-9d25-e04b8e9ed6e3",
+              "context": 1
+            },
+            "reason": "task_context",
+            "detail": "Retrieve the exact num declaration, including its parameter annotation and return type."
+          },
+          "attempt_id": "a98ef3fb-9327-475b-b023-94a4afba7ef6/attempt/4",
+          "trace_event_id": "a98ef3fb-9327-475b-b023-94a4afba7ef6:4",
+          "source_bytes": 127,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"number.ts::num#function\",\"source\":\"function num(v: unknown): number { return Number(v); }\",\"byte_offset\":0,\"byte_length\":54,\"line\":1,\"end_line\":1,\"signature\":\"function num(v: unknown): number { return Number(v); }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[\"export default num;\"]}],\"_evaluation\":{\"attempt_id\":\"a98ef3fb-9327-475b-b023-94a4afba7ef6/attempt/4\",\"calls_remaining\":20,\"event_id\":\"a98ef3fb-9327-475b-b023-94a4afba7ef6:4\"}}"
+          ],
+          "serialized_bytes": 489
+        }
+      ],
+      "tool_call_count": 4,
+      "recorded_payload_bytes": 3622,
+      "complete_payload_bytes": 3622,
+      "source_bytes": 399,
+      "failures": []
+    },
+    "lineage_valid": true,
+    "adapter_elapsed_ms": 17.496041997219436
+  }
+}

@@ -286,6 +286,12 @@ def _binding_is_shadowed(
         for local in local_bindings
         if local.scope_start_byte <= node.start_byte
         and node.end_byte <= local.scope_end_byte
+        # Generic parameters occupy TypeScript's type namespace. In particular,
+        # a same-named value call or `typeof` query still refers to the value.
+        and (
+            local.kind != "type_parameter"
+            or node.type in {"type_identifier", "nested_type_identifier"}
+        )
     ]
     if language == "python":
         for other in all_named_imports:

@@ -1,0 +1,1421 @@
+{
+  "schema_version": 4,
+  "protocol": "multilingual-context-workflow-v1",
+  "identity": {
+    "task_id": "go_explicit_embedding",
+    "session_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7",
+    "arm": "B",
+    "repetition": 1,
+    "snapshot": "go_embedding",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1"
+  },
+  "events": [
+    {
+      "id": "session-8ea29286-ee44-4449-8654-d7693916e8b7:1",
+      "task_id": "go_explicit_embedding",
+      "session_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "go_embedding",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "Start"
+      },
+      "search_id": "da463fa7-1e6e-4b85-b317-e2aba7092a4a",
+      "response_json": "{\"symbols\":[{\"id\":\"app/main.go::Start#function\",\"name\":\"Start\",\"qualified_name\":\"Start\",\"kind\":\"function\",\"language\":\"go\",\"file_path\":\"app/main.go\",\"byte_offset\":47,\"byte_length\":72,\"signature\":\"func Start(e model.Entity, r model.Combined) {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"c9f677a5d2d2902a1199ea86639320651fc69ce9804e1116f2b352e5046d429a\",\"decorators\":[],\"keywords\":[\"start\"],\"metadata\":{\"loci\":{\"go_package_level\":true,\"go_type_configuration\":\"unconditional\"}},\"line\":5,\"end_line\":8,\"score\":71.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"go.mod\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"da463fa7-1e6e-4b85-b317-e2aba7092a4a\",\"_evaluation\":{\"attempt_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7:1\"}}",
+      "serialized_bytes": 1036,
+      "source_bytes": 46,
+      "elapsed_ms": 2.0943749987054616,
+      "spans": [
+        {
+          "file": "app/main.go",
+          "start_byte": 47,
+          "end_byte": 93,
+          "sha256": "f72f7dd02d7413f0a85e3086316f5067d47c451804cde66d40867abab73ba58c",
+          "text": "func Start(e model.Entity, r model.Combined) {"
+        }
+      ]
+    },
+    {
+      "id": "session-8ea29286-ee44-4449-8654-d7693916e8b7:2",
+      "task_id": "go_explicit_embedding",
+      "session_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "go_embedding",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "Inspect Start parameter contracts, including Entity and Combined types and their struct/interface embedding, audit field, and runner method.",
+        "max_output_bytes": 12000,
+        "max_evidence_bytes": 8000,
+        "seed_ids": [
+          "app/main.go::Start#function"
+        ],
+        "max_hops": 2
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"ok\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"app/main.go::Start#function\",\"name\":\"Start\",\"kind\":\"function\",\"file\":\"app/main.go\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"model/model.go::Combined#type\",\"name\":\"Combined\",\"kind\":\"type\",\"file\":\"model/model.go\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]},{\"id\":\"model/model.go::Entity#type\",\"name\":\"Entity\",\"kind\":\"type\",\"file\":\"model/model.go\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":8,\"complete\":true,\"path\":[2]},{\"id\":\"model/model.go::Runner#type\",\"name\":\"Runner\",\"kind\":\"type\",\"file\":\"model/model.go\",\"role\":\"dependency\",\"depth\":2,\"why\":\"Authored type or heritage continuation\",\"source_id\":10,\"complete\":true,\"path\":[1,3]},{\"id\":\"model/model.go::Audit#type\",\"name\":\"Audit\",\"kind\":\"type\",\"file\":\"model/model.go\",\"role\":\"dependency\",\"depth\":2,\"why\":\"Authored type or heritage continuation\",\"source_id\":12,\"complete\":true,\"path\":[2,4]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"app/main.go::Start#function\",\"to\":\"model/model.go::Combined#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"app/main.go\",\"line\":5,\"content_hash\":\"28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0\"}},\"traversed\":\"forward\",\"source_ids\":[1,3,4,5,6,7]},{\"id\":2,\"edge\":{\"from\":\"app/main.go::Start#function\",\"to\":\"model/model.go::Entity#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"app/main.go\",\"line\":5,\"content_hash\":\"28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0\"}},\"traversed\":\"forward\",\"source_ids\":[1,3,4,5,9,7]},{\"id\":3,\"edge\":{\"from\":\"model/model.go::Combined#type\",\"to\":\"model/model.go::Runner#type\",\"type\":\"embeds\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"model/model.go\",\"line\":9,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\"}},\"traversed\":\"forward\",\"source_ids\":[6,5,11,7]},{\"id\":4,\"edge\":{\"from\":\"model/model.go::Entity#type\",\"to\":\"model/model.go::Audit#type\",\"type\":\"embeds\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"model/model.go\",\"line\":6,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\"}},\"traversed\":\"forward\",\"source_ids\":[9,5,13,7]}],\"sources\":[{\"id\":1,\"file\":\"app/main.go\",\"start_byte\":47,\"end_byte\":119,\"start_line\":5,\"end_line\":8,\"content_hash\":\"28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0\",\"content\":\"func Start(e model.Entity, r model.Combined) {\\n    e.Stamp()\\n    _ = r\\n}\"},{\"id\":2,\"file\":\"model/model.go\",\"start_byte\":149,\"end_byte\":178,\"start_line\":9,\"end_line\":9,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\",\"content\":\"Combined interface { Runner }\"},{\"id\":3,\"file\":\"app/main.go\",\"start_byte\":0,\"end_byte\":13,\"start_line\":1,\"end_line\":1,\"content_hash\":\"28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0\",\"content\":\"package main\\n\"},{\"id\":4,\"file\":\"app/main.go\",\"start_byte\":14,\"end_byte\":45,\"start_line\":3,\"end_line\":3,\"content_hash\":\"28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0\",\"content\":\"import \\\"example.com/acme/model\\\"\"},{\"id\":5,\"file\":\"model/model.go\",\"start_byte\":0,\"end_byte\":14,\"start_line\":1,\"end_line\":1,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\",\"content\":\"package model\\n\"},{\"id\":6,\"file\":\"model/model.go\",\"start_byte\":144,\"end_byte\":179,\"start_line\":9,\"end_line\":9,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\",\"content\":\"type Combined interface { Runner }\\n\"},{\"id\":7,\"file\":\"go.mod\",\"start_byte\":0,\"end_byte\":33,\"start_line\":1,\"end_line\":3,\"content_hash\":\"01cc905450c59f6d3133f5fd339444536aa4d2b32468f197ea50d39884391d4d\",\"content\":\"module example.com/acme\\n\\ngo 1.23\\n\"},{\"id\":8,\"file\":\"model/model.go\",\"start_byte\":81,\"end_byte\":104,\"start_line\":6,\"end_line\":6,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\",\"content\":\"Entity struct { Audit }\"},{\"id\":9,\"file\":\"model/model.go\",\"start_byte\":76,\"end_byte\":105,\"start_line\":6,\"end_line\":6,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\",\"content\":\"type Entity struct { Audit }\\n\"},{\"id\":10,\"file\":\"model/model.go\",\"start_byte\":111,\"end_byte\":143,\"start_line\":8,\"end_line\":8,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\",\"content\":\"Runner interface { Run() error }\"},{\"id\":11,\"file\":\"model/model.go\",\"start_byte\":106,\"end_byte\":144,\"start_line\":8,\"end_line\":8,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\",\"content\":\"type Runner interface { Run() error }\\n\"},{\"id\":12,\"file\":\"model/model.go\",\"start_byte\":20,\"end_byte\":50,\"start_line\":3,\"end_line\":3,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\",\"content\":\"Audit struct { Created int64 }\"},{\"id\":13,\"file\":\"model/model.go\",\"start_byte\":15,\"end_byte\":51,\"start_line\":3,\"end_line\":3,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\",\"content\":\"type Audit struct { Created int64 }\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":12000,\"max_evidence_bytes\":8000},\"usage\":{\"nodes_examined\":5,\"evidence_bytes\":301,\"output_bytes\":5822,\"estimated_tokens\":1456,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7:2\"}}",
+      "serialized_bytes": 5938,
+      "source_bytes": 415,
+      "elapsed_ms": 22.59141599643044,
+      "spans": [
+        {
+          "file": "app/main.go",
+          "start_byte": 47,
+          "end_byte": 119,
+          "sha256": "c9f677a5d2d2902a1199ea86639320651fc69ce9804e1116f2b352e5046d429a",
+          "text": "func Start(e model.Entity, r model.Combined) {\n    e.Stamp()\n    _ = r\n}"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 149,
+          "end_byte": 178,
+          "sha256": "85717ebbef9a5a0646cf61ede1ca33ea3fd085cb6742a7c26b96324b5d742a2f",
+          "text": "Combined interface { Runner }"
+        },
+        {
+          "file": "app/main.go",
+          "start_byte": 0,
+          "end_byte": 13,
+          "sha256": "df1d036cbbf3df46e2045071e082245ece204c7f53ecf0a4e022bff9bb228f47",
+          "text": "package main\n"
+        },
+        {
+          "file": "app/main.go",
+          "start_byte": 14,
+          "end_byte": 45,
+          "sha256": "e0a6d5037c09e2d342dd0792d9fa37211df29fe5f0333f8ba5376eb6699ccba3",
+          "text": "import \"example.com/acme/model\""
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 0,
+          "end_byte": 14,
+          "sha256": "61d28c8e16b0f1913aed9c8c47c3a1e2a728ec1f9f1318ffa90ba0ecbac13e29",
+          "text": "package model\n"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 144,
+          "end_byte": 179,
+          "sha256": "b4c94d5d4efb6686492673ca39c239475dccc19b6bad7e8ad3f45eb021f19344",
+          "text": "type Combined interface { Runner }\n"
+        },
+        {
+          "file": "go.mod",
+          "start_byte": 0,
+          "end_byte": 33,
+          "sha256": "01cc905450c59f6d3133f5fd339444536aa4d2b32468f197ea50d39884391d4d",
+          "text": "module example.com/acme\n\ngo 1.23\n"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 81,
+          "end_byte": 104,
+          "sha256": "ea03cc0c3cf117be25ce503da33686ef1f0701f69179b75c515758bc394e556f",
+          "text": "Entity struct { Audit }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 76,
+          "end_byte": 105,
+          "sha256": "42e0f2e3a0e1adf31346cbe74f5e996276935cbd51ba037e481b0da225f67c09",
+          "text": "type Entity struct { Audit }\n"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 111,
+          "end_byte": 143,
+          "sha256": "1de3affe96f8fd3dca4c09105f1b78d5dbda0a59a0beca815d74d77e20d90a83",
+          "text": "Runner interface { Run() error }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 106,
+          "end_byte": 144,
+          "sha256": "994a8bd024b4ba1e4cb89dc8a15109089e089740eb5934a59f1963e058fe389c",
+          "text": "type Runner interface { Run() error }\n"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 20,
+          "end_byte": 50,
+          "sha256": "164916ba74e0d75e3a63428a5e4fad13ac22edb46d32cd43c0f7abbe96ea08e2",
+          "text": "Audit struct { Created int64 }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 15,
+          "end_byte": 51,
+          "sha256": "fdedecf6551ef84263d2f7d26f67f3e1f32e5d6f096cfeb9f1802b292f62a602",
+          "text": "type Audit struct { Created int64 }\n"
+        }
+      ]
+    },
+    {
+      "id": "session-8ea29286-ee44-4449-8654-d7693916e8b7:3",
+      "task_id": "go_explicit_embedding",
+      "session_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "go_embedding",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "model/model.go::Audit#type",
+          "model/model.go::Entity#type",
+          "model/model.go::Runner#type",
+          "model/model.go::Combined#type",
+          "app/main.go::Start#function"
+        ],
+        "context": 2
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"model/model.go::Audit#type\",\"source\":\"Audit struct { Created int64 }\",\"byte_offset\":20,\"byte_length\":30,\"line\":3,\"end_line\":3,\"signature\":\"Audit struct { Created int64 }\",\"kind\":\"type\",\"language\":\"go\",\"context_before\":[\"package model\",\"\"],\"context_after\":[\"func (Audit) Stamp() {}\",\"\"]},{\"id\":\"model/model.go::Entity#type\",\"source\":\"Entity struct { Audit }\",\"byte_offset\":81,\"byte_length\":23,\"line\":6,\"end_line\":6,\"signature\":\"Entity struct { Audit }\",\"kind\":\"type\",\"language\":\"go\",\"context_before\":[\"func (Audit) Stamp() {}\",\"\"],\"context_after\":[\"\",\"type Runner interface { Run() error }\"]},{\"id\":\"model/model.go::Runner#type\",\"source\":\"Runner interface { Run() error }\",\"byte_offset\":111,\"byte_length\":32,\"line\":8,\"end_line\":8,\"signature\":\"Runner interface { Run() error }\",\"kind\":\"type\",\"language\":\"go\",\"context_before\":[\"type Entity struct { Audit }\",\"\"],\"context_after\":[\"type Combined interface { Runner }\"]},{\"id\":\"model/model.go::Combined#type\",\"source\":\"Combined interface { Runner }\",\"byte_offset\":149,\"byte_length\":29,\"line\":9,\"end_line\":9,\"signature\":\"Combined interface { Runner }\",\"kind\":\"type\",\"language\":\"go\",\"context_before\":[\"\",\"type Runner interface { Run() error }\"],\"context_after\":[]},{\"id\":\"app/main.go::Start#function\",\"source\":\"func Start(e model.Entity, r model.Combined) {\\n    e.Stamp()\\n    _ = r\\n}\",\"byte_offset\":47,\"byte_length\":72,\"line\":5,\"end_line\":8,\"signature\":\"func Start(e model.Entity, r model.Combined) {\",\"kind\":\"function\",\"language\":\"go\",\"context_before\":[\"import \\\"example.com/acme/model\\\"\",\"\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7:3\"}}",
+      "serialized_bytes": 1746,
+      "source_bytes": 572,
+      "elapsed_ms": 9.41400000010617,
+      "spans": [
+        {
+          "file": "model/model.go",
+          "start_byte": 20,
+          "end_byte": 50,
+          "sha256": "164916ba74e0d75e3a63428a5e4fad13ac22edb46d32cd43c0f7abbe96ea08e2",
+          "text": "Audit struct { Created int64 }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 0,
+          "end_byte": 13,
+          "sha256": "e21dd15ee683d5b3c7acbc9d2e50c0753f7cf565604024421ea8cd7196abd0f9",
+          "text": "package model"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 51,
+          "end_byte": 74,
+          "sha256": "14ca5aa77fa3411366d91db8c6e8b587965067c943874dd1dc465e25e2206934",
+          "text": "func (Audit) Stamp() {}"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 81,
+          "end_byte": 104,
+          "sha256": "ea03cc0c3cf117be25ce503da33686ef1f0701f69179b75c515758bc394e556f",
+          "text": "Entity struct { Audit }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 51,
+          "end_byte": 74,
+          "sha256": "14ca5aa77fa3411366d91db8c6e8b587965067c943874dd1dc465e25e2206934",
+          "text": "func (Audit) Stamp() {}"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 106,
+          "end_byte": 143,
+          "sha256": "2bad4c63dab83e0034f8ec0dc3ff17e2590b8cb347a02193cacabdd1d02455bc",
+          "text": "type Runner interface { Run() error }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 111,
+          "end_byte": 143,
+          "sha256": "1de3affe96f8fd3dca4c09105f1b78d5dbda0a59a0beca815d74d77e20d90a83",
+          "text": "Runner interface { Run() error }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 76,
+          "end_byte": 104,
+          "sha256": "aa43ba581453857918c03777fa5ed64a7de2c45ceb86b62228e5e75039fab644",
+          "text": "type Entity struct { Audit }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 144,
+          "end_byte": 178,
+          "sha256": "8bca5da13e41276e978b0140b9b8560dbef29da45b1c851d5f924f98c5c3eb8f",
+          "text": "type Combined interface { Runner }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 149,
+          "end_byte": 178,
+          "sha256": "85717ebbef9a5a0646cf61ede1ca33ea3fd085cb6742a7c26b96324b5d742a2f",
+          "text": "Combined interface { Runner }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 106,
+          "end_byte": 143,
+          "sha256": "2bad4c63dab83e0034f8ec0dc3ff17e2590b8cb347a02193cacabdd1d02455bc",
+          "text": "type Runner interface { Run() error }"
+        },
+        {
+          "file": "app/main.go",
+          "start_byte": 47,
+          "end_byte": 119,
+          "sha256": "c9f677a5d2d2902a1199ea86639320651fc69ce9804e1116f2b352e5046d429a",
+          "text": "func Start(e model.Entity, r model.Combined) {\n    e.Stamp()\n    _ = r\n}"
+        },
+        {
+          "file": "app/main.go",
+          "start_byte": 14,
+          "end_byte": 45,
+          "sha256": "e0a6d5037c09e2d342dd0792d9fa37211df29fe5f0333f8ba5376eb6699ccba3",
+          "text": "import \"example.com/acme/model\""
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 20,
+          "end_byte": 50,
+          "sha256": "164916ba74e0d75e3a63428a5e4fad13ac22edb46d32cd43c0f7abbe96ea08e2",
+          "text": "Audit struct { Created int64 }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 81,
+          "end_byte": 104,
+          "sha256": "ea03cc0c3cf117be25ce503da33686ef1f0701f69179b75c515758bc394e556f",
+          "text": "Entity struct { Audit }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 111,
+          "end_byte": 143,
+          "sha256": "1de3affe96f8fd3dca4c09105f1b78d5dbda0a59a0beca815d74d77e20d90a83",
+          "text": "Runner interface { Run() error }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 149,
+          "end_byte": 178,
+          "sha256": "85717ebbef9a5a0646cf61ede1ca33ea3fd085cb6742a7c26b96324b5d742a2f",
+          "text": "Combined interface { Runner }"
+        },
+        {
+          "file": "app/main.go",
+          "start_byte": 47,
+          "end_byte": 93,
+          "sha256": "f72f7dd02d7413f0a85e3086316f5067d47c451804cde66d40867abab73ba58c",
+          "text": "func Start(e model.Entity, r model.Combined) {"
+        }
+      ]
+    },
+    {
+      "id": "session-8ea29286-ee44-4449-8654-d7693916e8b7:4",
+      "task_id": "go_explicit_embedding",
+      "session_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "go_embedding",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 50,
+        "file": "app/main.go"
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"invalid record pagination\"},\"_evaluation\":{\"attempt_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7:4\"}}",
+      "serialized_bytes": 236,
+      "source_bytes": 0,
+      "elapsed_ms": 0.047290988732129335,
+      "spans": []
+    },
+    {
+      "id": "session-8ea29286-ee44-4449-8654-d7693916e8b7:5",
+      "task_id": "go_explicit_embedding",
+      "session_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "go_embedding",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 50,
+        "file": "app/main.go"
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"invalid record pagination\"},\"_evaluation\":{\"attempt_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7:5\"}}",
+      "serialized_bytes": 236,
+      "source_bytes": 0,
+      "elapsed_ms": 0.03979098983108997,
+      "spans": []
+    },
+    {
+      "id": "session-8ea29286-ee44-4449-8654-d7693916e8b7:6",
+      "task_id": "go_explicit_embedding",
+      "session_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "go_embedding",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 20
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-nuzxa_v2/snapshot\",\"file\":null,\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"app/main.go\",\"language\":\"go\",\"line\":6,\"column\":5,\"start_byte\":98,\"end_byte\":107,\"callee_start_byte\":98,\"callee_end_byte\":105,\"callee_text\":\"e.Stamp\",\"callee_path\":[\"e\",\"Stamp\"],\"callee_form\":\"static_path\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":47,\"definition_end_byte\":119,\"body_start_byte\":92,\"body_end_byte\":119},\"source_hash\":\"28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0\"},\"caller_id\":\"app/main.go::Start#function\",\"caller_kind\":\"function\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"callee_not_proven\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":1,\"resolved\":0,\"unresolved\":1,\"returned\":1},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7:6\"}}",
+      "serialized_bytes": 1319,
+      "source_bytes": 0,
+      "elapsed_ms": 2.8150000143796206,
+      "spans": []
+    },
+    {
+      "id": "session-8ea29286-ee44-4449-8654-d7693916e8b7:7",
+      "task_id": "go_explicit_embedding",
+      "session_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "go_embedding",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "Stamp"
+      },
+      "search_id": "9c1f4372-288b-4797-bf51-3ebc78805deb",
+      "response_json": "{\"symbols\":[{\"id\":\"model/model.go::Stamp#method\",\"name\":\"Stamp\",\"qualified_name\":\"Stamp\",\"kind\":\"method\",\"language\":\"go\",\"file_path\":\"model/model.go\",\"byte_offset\":51,\"byte_length\":23,\"signature\":\"func (Audit) Stamp() {}\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"14ca5aa77fa3411366d91db8c6e8b587965067c943874dd1dc465e25e2206934\",\"decorators\":[],\"keywords\":[\"stamp\"],\"metadata\":{\"loci\":{\"go_package_level\":false,\"go_type_configuration\":\"unconditional\"}},\"line\":4,\"end_line\":4,\"score\":71.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"go.mod\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"9c1f4372-288b-4797-bf51-3ebc78805deb\",\"_evaluation\":{\"attempt_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7:7\"}}",
+      "serialized_bytes": 1016,
+      "source_bytes": 23,
+      "elapsed_ms": 1.81124999653548,
+      "spans": [
+        {
+          "file": "model/model.go",
+          "start_byte": 51,
+          "end_byte": 74,
+          "sha256": "14ca5aa77fa3411366d91db8c6e8b587965067c943874dd1dc465e25e2206934",
+          "text": "func (Audit) Stamp() {}"
+        }
+      ]
+    },
+    {
+      "id": "session-8ea29286-ee44-4449-8654-d7693916e8b7:8",
+      "task_id": "go_explicit_embedding",
+      "session_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "go_embedding",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "model/model.go::Stamp#method"
+        ],
+        "context": 0
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"model/model.go::Stamp#method\",\"source\":\"func (Audit) Stamp() {}\",\"byte_offset\":51,\"byte_length\":23,\"line\":4,\"end_line\":4,\"signature\":\"func (Audit) Stamp() {}\",\"kind\":\"method\",\"language\":\"go\"}],\"_evaluation\":{\"attempt_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/8\",\"calls_remaining\":16,\"event_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7:8\"}}",
+      "serialized_bytes": 379,
+      "source_bytes": 46,
+      "elapsed_ms": 5.14983301400207,
+      "spans": [
+        {
+          "file": "model/model.go",
+          "start_byte": 51,
+          "end_byte": 74,
+          "sha256": "14ca5aa77fa3411366d91db8c6e8b587965067c943874dd1dc465e25e2206934",
+          "text": "func (Audit) Stamp() {}"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 51,
+          "end_byte": 74,
+          "sha256": "14ca5aa77fa3411366d91db8c6e8b587965067c943874dd1dc465e25e2206934",
+          "text": "func (Audit) Stamp() {}"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "go_explicit_embedding",
+    "session_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7",
+    "arm": "B",
+    "repetition": 1,
+    "snapshot": "go_embedding",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1",
+    "schema_version": 3,
+    "measurement_method": "observed_tool_calls",
+    "intent_collection": "not_collected",
+    "outcome": "tool_failure",
+    "answer": {
+      "struct_embedding": [
+        "Entity",
+        "Audit"
+      ],
+      "interface_embedding": [
+        "Combined",
+        "Runner"
+      ],
+      "audit_field": "Created",
+      "runner_method": "Run",
+      "embedding_is_class_inheritance": false,
+      "promoted_call_proven": false
+    },
+    "answer_correct": true,
+    "task_correct": false,
+    "read_count": 8,
+    "validated_read_count": 8,
+    "required_context_delivered": [
+      "audit",
+      "combined",
+      "entity",
+      "entry",
+      "import",
+      "module",
+      "package",
+      "runner"
+    ],
+    "required_context_total": 8,
+    "context_recall": 1.0,
+    "serialized_tool_output_bytes": null,
+    "source_bytes": null,
+    "estimated_source_tokens": null,
+    "tool_elapsed_ms": 43.962955998722464,
+    "provider_usage": {
+      "input_tokens": 74265,
+      "cached_input_tokens": 57344,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 1315,
+      "reasoning_output_tokens": 915
+    },
+    "usage_semantics": "One Codex turn.completed event; gross input includes cached input subset; output includes reasoning tokens.",
+    "token_status": "measured",
+    "measurement_complete": false,
+    "full_pass": false
+  },
+  "baseline": {
+    "end_to_end_seconds": 40.572984250000445,
+    "actual_process_seconds": 40.572984250000445,
+    "exit_code": 0,
+    "provider_thread_id": "01a09826-6491-75c0-8fcf-4a9991039036",
+    "failures": [
+      {
+        "attempt_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/4",
+        "category": "tool_error",
+        "message": "invalid record pagination"
+      },
+      {
+        "attempt_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/5",
+        "category": "tool_error",
+        "message": "invalid record pagination"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_5",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_6",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_7",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "unmatched_recorded_delivery"
+      }
+    ],
+    "tool_delivery_verified": false,
+    "output_accounting": {
+      "schema_version": 4,
+      "complete": false,
+      "tool_call_count": 8,
+      "recorded_payload_bytes": 11906,
+      "complete_payload_bytes": null,
+      "source_bytes": null,
+      "calls": [
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "search",
+          "arguments": {
+            "query": "Start"
+          },
+          "status": "completed",
+          "attempt_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/1",
+          "trace_event_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7:1",
+          "source_bytes": 46,
+          "serialized_bytes": 1036,
+          "elapsed_ms": 2.2092910076025873,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"app/main.go::Start#function\",\"name\":\"Start\",\"qualified_name\":\"Start\",\"kind\":\"function\",\"language\":\"go\",\"file_path\":\"app/main.go\",\"byte_offset\":47,\"byte_length\":72,\"signature\":\"func Start(e model.Entity, r model.Combined) {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"c9f677a5d2d2902a1199ea86639320651fc69ce9804e1116f2b352e5046d429a\",\"decorators\":[],\"keywords\":[\"start\"],\"metadata\":{\"loci\":{\"go_package_level\":true,\"go_type_configuration\":\"unconditional\"}},\"line\":5,\"end_line\":8,\"score\":71.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"go.mod\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"da463fa7-1e6e-4b85-b317-e2aba7092a4a\",\"_evaluation\":{\"attempt_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7:1\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "type_dependencies",
+            "max_hops": 2,
+            "max_output_bytes": 12000,
+            "max_evidence_bytes": 8000,
+            "seed_ids": [
+              "app/main.go::Start#function"
+            ],
+            "query": "Inspect Start parameter contracts, including Entity and Combined types and their struct/interface embedding, audit field, and runner method."
+          },
+          "status": "completed",
+          "attempt_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/2",
+          "trace_event_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7:2",
+          "source_bytes": 415,
+          "serialized_bytes": 5938,
+          "elapsed_ms": 22.86533298320137,
+          "payload_texts": [
+            "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"ok\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"app/main.go::Start#function\",\"name\":\"Start\",\"kind\":\"function\",\"file\":\"app/main.go\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"model/model.go::Combined#type\",\"name\":\"Combined\",\"kind\":\"type\",\"file\":\"model/model.go\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]},{\"id\":\"model/model.go::Entity#type\",\"name\":\"Entity\",\"kind\":\"type\",\"file\":\"model/model.go\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":8,\"complete\":true,\"path\":[2]},{\"id\":\"model/model.go::Runner#type\",\"name\":\"Runner\",\"kind\":\"type\",\"file\":\"model/model.go\",\"role\":\"dependency\",\"depth\":2,\"why\":\"Authored type or heritage continuation\",\"source_id\":10,\"complete\":true,\"path\":[1,3]},{\"id\":\"model/model.go::Audit#type\",\"name\":\"Audit\",\"kind\":\"type\",\"file\":\"model/model.go\",\"role\":\"dependency\",\"depth\":2,\"why\":\"Authored type or heritage continuation\",\"source_id\":12,\"complete\":true,\"path\":[2,4]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"app/main.go::Start#function\",\"to\":\"model/model.go::Combined#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"app/main.go\",\"line\":5,\"content_hash\":\"28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0\"}},\"traversed\":\"forward\",\"source_ids\":[1,3,4,5,6,7]},{\"id\":2,\"edge\":{\"from\":\"app/main.go::Start#function\",\"to\":\"model/model.go::Entity#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"app/main.go\",\"line\":5,\"content_hash\":\"28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0\"}},\"traversed\":\"forward\",\"source_ids\":[1,3,4,5,9,7]},{\"id\":3,\"edge\":{\"from\":\"model/model.go::Combined#type\",\"to\":\"model/model.go::Runner#type\",\"type\":\"embeds\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"model/model.go\",\"line\":9,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\"}},\"traversed\":\"forward\",\"source_ids\":[6,5,11,7]},{\"id\":4,\"edge\":{\"from\":\"model/model.go::Entity#type\",\"to\":\"model/model.go::Audit#type\",\"type\":\"embeds\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"model/model.go\",\"line\":6,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\"}},\"traversed\":\"forward\",\"source_ids\":[9,5,13,7]}],\"sources\":[{\"id\":1,\"file\":\"app/main.go\",\"start_byte\":47,\"end_byte\":119,\"start_line\":5,\"end_line\":8,\"content_hash\":\"28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0\",\"content\":\"func Start(e model.Entity, r model.Combined) {\\n    e.Stamp()\\n    _ = r\\n}\"},{\"id\":2,\"file\":\"model/model.go\",\"start_byte\":149,\"end_byte\":178,\"start_line\":9,\"end_line\":9,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\",\"content\":\"Combined interface { Runner }\"},{\"id\":3,\"file\":\"app/main.go\",\"start_byte\":0,\"end_byte\":13,\"start_line\":1,\"end_line\":1,\"content_hash\":\"28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0\",\"content\":\"package main\\n\"},{\"id\":4,\"file\":\"app/main.go\",\"start_byte\":14,\"end_byte\":45,\"start_line\":3,\"end_line\":3,\"content_hash\":\"28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0\",\"content\":\"import \\\"example.com/acme/model\\\"\"},{\"id\":5,\"file\":\"model/model.go\",\"start_byte\":0,\"end_byte\":14,\"start_line\":1,\"end_line\":1,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\",\"content\":\"package model\\n\"},{\"id\":6,\"file\":\"model/model.go\",\"start_byte\":144,\"end_byte\":179,\"start_line\":9,\"end_line\":9,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\",\"content\":\"type Combined interface { Runner }\\n\"},{\"id\":7,\"file\":\"go.mod\",\"start_byte\":0,\"end_byte\":33,\"start_line\":1,\"end_line\":3,\"content_hash\":\"01cc905450c59f6d3133f5fd339444536aa4d2b32468f197ea50d39884391d4d\",\"content\":\"module example.com/acme\\n\\ngo 1.23\\n\"},{\"id\":8,\"file\":\"model/model.go\",\"start_byte\":81,\"end_byte\":104,\"start_line\":6,\"end_line\":6,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\",\"content\":\"Entity struct { Audit }\"},{\"id\":9,\"file\":\"model/model.go\",\"start_byte\":76,\"end_byte\":105,\"start_line\":6,\"end_line\":6,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\",\"content\":\"type Entity struct { Audit }\\n\"},{\"id\":10,\"file\":\"model/model.go\",\"start_byte\":111,\"end_byte\":143,\"start_line\":8,\"end_line\":8,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\",\"content\":\"Runner interface { Run() error }\"},{\"id\":11,\"file\":\"model/model.go\",\"start_byte\":106,\"end_byte\":144,\"start_line\":8,\"end_line\":8,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\",\"content\":\"type Runner interface { Run() error }\\n\"},{\"id\":12,\"file\":\"model/model.go\",\"start_byte\":20,\"end_byte\":50,\"start_line\":3,\"end_line\":3,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\",\"content\":\"Audit struct { Created int64 }\"},{\"id\":13,\"file\":\"model/model.go\",\"start_byte\":15,\"end_byte\":51,\"start_line\":3,\"end_line\":3,\"content_hash\":\"ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6\",\"content\":\"type Audit struct { Created int64 }\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":12000,\"max_evidence_bytes\":8000},\"usage\":{\"nodes_examined\":5,\"evidence_bytes\":301,\"output_bytes\":5822,\"estimated_tokens\":1456,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7:2\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": {
+            "nodes_examined": 5,
+            "evidence_bytes": 301,
+            "output_bytes": 5822,
+            "selected_items": 5,
+            "max_nodes": 64,
+            "max_neighbors": 32
+          }
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "get",
+          "arguments": {
+            "symbol_ids": [
+              "model/model.go::Audit#type",
+              "model/model.go::Entity#type",
+              "model/model.go::Runner#type",
+              "model/model.go::Combined#type",
+              "app/main.go::Start#function"
+            ],
+            "context": 2
+          },
+          "status": "completed",
+          "attempt_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/3",
+          "trace_event_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7:3",
+          "source_bytes": 572,
+          "serialized_bytes": 1746,
+          "elapsed_ms": 9.544917003950104,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"model/model.go::Audit#type\",\"source\":\"Audit struct { Created int64 }\",\"byte_offset\":20,\"byte_length\":30,\"line\":3,\"end_line\":3,\"signature\":\"Audit struct { Created int64 }\",\"kind\":\"type\",\"language\":\"go\",\"context_before\":[\"package model\",\"\"],\"context_after\":[\"func (Audit) Stamp() {}\",\"\"]},{\"id\":\"model/model.go::Entity#type\",\"source\":\"Entity struct { Audit }\",\"byte_offset\":81,\"byte_length\":23,\"line\":6,\"end_line\":6,\"signature\":\"Entity struct { Audit }\",\"kind\":\"type\",\"language\":\"go\",\"context_before\":[\"func (Audit) Stamp() {}\",\"\"],\"context_after\":[\"\",\"type Runner interface { Run() error }\"]},{\"id\":\"model/model.go::Runner#type\",\"source\":\"Runner interface { Run() error }\",\"byte_offset\":111,\"byte_length\":32,\"line\":8,\"end_line\":8,\"signature\":\"Runner interface { Run() error }\",\"kind\":\"type\",\"language\":\"go\",\"context_before\":[\"type Entity struct { Audit }\",\"\"],\"context_after\":[\"type Combined interface { Runner }\"]},{\"id\":\"model/model.go::Combined#type\",\"source\":\"Combined interface { Runner }\",\"byte_offset\":149,\"byte_length\":29,\"line\":9,\"end_line\":9,\"signature\":\"Combined interface { Runner }\",\"kind\":\"type\",\"language\":\"go\",\"context_before\":[\"\",\"type Runner interface { Run() error }\"],\"context_after\":[]},{\"id\":\"app/main.go::Start#function\",\"source\":\"func Start(e model.Entity, r model.Combined) {\\n    e.Stamp()\\n    _ = r\\n}\",\"byte_offset\":47,\"byte_length\":72,\"line\":5,\"end_line\":8,\"signature\":\"func Start(e model.Entity, r model.Combined) {\",\"kind\":\"function\",\"language\":\"go\",\"context_before\":[\"import \\\"example.com/acme/model\\\"\",\"\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7:3\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_5",
+          "server": "evaluation",
+          "tool": "graph_calls",
+          "arguments": {
+            "file": "app/main.go",
+            "limit": 50,
+            "offset": 0,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/4",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 236,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"error\":{\"code\":\"ValueError\",\"message\":\"invalid record pagination\"},\"_evaluation\":{\"attempt_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7:4\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_6",
+          "server": "evaluation",
+          "tool": "graph_calls",
+          "arguments": {
+            "file": "app/main.go",
+            "limit": 50,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/5",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 236,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"error\":{\"code\":\"ValueError\",\"message\":\"invalid record pagination\"},\"_evaluation\":{\"attempt_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7:5\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_7",
+          "server": "evaluation",
+          "tool": "graph_calls",
+          "arguments": {
+            "limit": 20,
+            "offset": 0,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/6",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 1319,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-nuzxa_v2/snapshot\",\"file\":null,\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"app/main.go\",\"language\":\"go\",\"line\":6,\"column\":5,\"start_byte\":98,\"end_byte\":107,\"callee_start_byte\":98,\"callee_end_byte\":105,\"callee_text\":\"e.Stamp\",\"callee_path\":[\"e\",\"Stamp\"],\"callee_form\":\"static_path\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":47,\"definition_end_byte\":119,\"body_start_byte\":92,\"body_end_byte\":119},\"source_hash\":\"28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0\"},\"caller_id\":\"app/main.go::Start#function\",\"caller_kind\":\"function\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"callee_not_proven\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":1,\"resolved\":0,\"unresolved\":1,\"returned\":1},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7:6\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_8",
+          "server": "evaluation",
+          "tool": "search",
+          "arguments": {
+            "query": "Stamp"
+          },
+          "status": "completed",
+          "attempt_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/7",
+          "trace_event_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7:7",
+          "source_bytes": 23,
+          "serialized_bytes": 1016,
+          "elapsed_ms": 1.885749981738627,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"model/model.go::Stamp#method\",\"name\":\"Stamp\",\"qualified_name\":\"Stamp\",\"kind\":\"method\",\"language\":\"go\",\"file_path\":\"model/model.go\",\"byte_offset\":51,\"byte_length\":23,\"signature\":\"func (Audit) Stamp() {}\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"14ca5aa77fa3411366d91db8c6e8b587965067c943874dd1dc465e25e2206934\",\"decorators\":[],\"keywords\":[\"stamp\"],\"metadata\":{\"loci\":{\"go_package_level\":false,\"go_type_configuration\":\"unconditional\"}},\"line\":4,\"end_line\":4,\"score\":71.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"go.mod\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"9c1f4372-288b-4797-bf51-3ebc78805deb\",\"_evaluation\":{\"attempt_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7:7\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_9",
+          "server": "evaluation",
+          "tool": "get",
+          "arguments": {
+            "symbol_ids": [
+              "model/model.go::Stamp#method"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/8",
+          "trace_event_id": "session-8ea29286-ee44-4449-8654-d7693916e8b7:8",
+          "source_bytes": 46,
+          "serialized_bytes": 379,
+          "elapsed_ms": 5.267625005217269,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"model/model.go::Stamp#method\",\"source\":\"func (Audit) Stamp() {}\",\"byte_offset\":51,\"byte_length\":23,\"line\":4,\"end_line\":4,\"signature\":\"func (Audit) Stamp() {}\",\"kind\":\"method\",\"language\":\"go\"}],\"_evaluation\":{\"attempt_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7/attempt/8\",\"calls_remaining\":16,\"event_id\":\"session-8ea29286-ee44-4449-8654-d7693916e8b7:8\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        }
+      ],
+      "failures": [
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_5",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_6",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_7",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "unmatched_recorded_delivery"
+        }
+      ]
+    },
+    "adapter_elapsed_ms": 44.84716596198268,
+    "recoverable_error_events": 2,
+    "relationships": {
+      "schema_version": 3,
+      "case_id": "go_explicit_embedding",
+      "language": "go",
+      "required_semantic_dependencies_total": 4,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "entity",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "app/main.go::Start#function",
+              "to": "model/model.go::Entity#type",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/main.go",
+                "line": 5,
+                "content_hash": "28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "app/main.go::Start#function",
+              "to": "model/model.go::Entity#type",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/main.go",
+                "line": 5,
+                "content_hash": "28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0"
+              }
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "combined",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "app/main.go::Start#function",
+              "to": "model/model.go::Combined#type",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/main.go",
+                "line": 5,
+                "content_hash": "28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "app/main.go::Start#function",
+              "to": "model/model.go::Combined#type",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/main.go",
+                "line": 5,
+                "content_hash": "28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0"
+              }
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "from": "entity",
+          "kind": "struct_embedding",
+          "to": "audit",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "embeds",
+          "record_contexts": [
+            "struct_embedding"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "model/model.go::Entity#type",
+              "to": "model/model.go::Audit#type",
+              "type": "embeds",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "model/model.go",
+                "line": 6,
+                "content_hash": "ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "model/model.go::Entity#type",
+              "to": "model/model.go::Audit#type",
+              "type": "embeds",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "model/model.go",
+                "line": 6,
+                "content_hash": "ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6"
+              }
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "from": "combined",
+          "kind": "interface_embedding",
+          "to": "runner",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "embeds",
+          "record_contexts": [
+            "interface_embedding"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "model/model.go::Combined#type",
+              "to": "model/model.go::Runner#type",
+              "type": "embeds",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "model/model.go",
+                "line": 9,
+                "content_hash": "ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "model/model.go::Combined#type",
+              "to": "model/model.go::Runner#type",
+              "type": "embeds",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "model/model.go",
+                "line": 9,
+                "content_hash": "ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6"
+              }
+            }
+          ]
+        }
+      ],
+      "available_dependency_links_total": 4,
+      "available_dependency_links": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "entity",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "app/main.go::Start#function",
+              "to": "model/model.go::Entity#type",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/main.go",
+                "line": 5,
+                "content_hash": "28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "app/main.go::Start#function",
+              "to": "model/model.go::Entity#type",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/main.go",
+                "line": 5,
+                "content_hash": "28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0"
+              }
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "combined",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "app/main.go::Start#function",
+              "to": "model/model.go::Combined#type",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/main.go",
+                "line": 5,
+                "content_hash": "28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "app/main.go::Start#function",
+              "to": "model/model.go::Combined#type",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/main.go",
+                "line": 5,
+                "content_hash": "28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0"
+              }
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "from": "entity",
+          "kind": "struct_embedding",
+          "to": "audit",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "embeds",
+          "record_contexts": [
+            "struct_embedding"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "model/model.go::Entity#type",
+              "to": "model/model.go::Audit#type",
+              "type": "embeds",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "model/model.go",
+                "line": 6,
+                "content_hash": "ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "model/model.go::Entity#type",
+              "to": "model/model.go::Audit#type",
+              "type": "embeds",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "model/model.go",
+                "line": 6,
+                "content_hash": "ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6"
+              }
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "from": "combined",
+          "kind": "interface_embedding",
+          "to": "runner",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "embeds",
+          "record_contexts": [
+            "interface_embedding"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "model/model.go::Combined#type",
+              "to": "model/model.go::Runner#type",
+              "type": "embeds",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "model/model.go",
+                "line": 9,
+                "content_hash": "ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "model/model.go::Combined#type",
+              "to": "model/model.go::Runner#type",
+              "type": "embeds",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "model/model.go",
+                "line": 9,
+                "content_hash": "ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6"
+              }
+            }
+          ]
+        }
+      ],
+      "delivered_dependency_links_total": 4,
+      "delivered_dependency_links": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "entity",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "app/main.go::Start#function",
+              "to": "model/model.go::Entity#type",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/main.go",
+                "line": 5,
+                "content_hash": "28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "app/main.go::Start#function",
+              "to": "model/model.go::Entity#type",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/main.go",
+                "line": 5,
+                "content_hash": "28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0"
+              }
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "combined",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "app/main.go::Start#function",
+              "to": "model/model.go::Combined#type",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/main.go",
+                "line": 5,
+                "content_hash": "28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "app/main.go::Start#function",
+              "to": "model/model.go::Combined#type",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/main.go",
+                "line": 5,
+                "content_hash": "28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0"
+              }
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "from": "entity",
+          "kind": "struct_embedding",
+          "to": "audit",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "embeds",
+          "record_contexts": [
+            "struct_embedding"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "model/model.go::Entity#type",
+              "to": "model/model.go::Audit#type",
+              "type": "embeds",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "model/model.go",
+                "line": 6,
+                "content_hash": "ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "model/model.go::Entity#type",
+              "to": "model/model.go::Audit#type",
+              "type": "embeds",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "model/model.go",
+                "line": 6,
+                "content_hash": "ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6"
+              }
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "from": "combined",
+          "kind": "interface_embedding",
+          "to": "runner",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "embeds",
+          "record_contexts": [
+            "interface_embedding"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "model/model.go::Combined#type",
+              "to": "model/model.go::Runner#type",
+              "type": "embeds",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "model/model.go",
+                "line": 9,
+                "content_hash": "ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "model/model.go::Combined#type",
+              "to": "model/model.go::Runner#type",
+              "type": "embeds",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "model/model.go",
+                "line": 9,
+                "content_hash": "ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6"
+              }
+            }
+          ]
+        }
+      ],
+      "dependency_link_recall": {
+        "label": "Exact frozen meaning joined to persisted semantic record and delivered source proof.",
+        "required": 4,
+        "available": 4,
+        "delivered": 4,
+        "available_ratio": 1.0,
+        "delivered_ratio": 1.0
+      },
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_available_relationships": 0,
+      "forbidden_delivered_relationships": 0,
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_delivered_relationship_edges": [],
+      "delivery_integrity_violations": [],
+      "forbidden_scope": "Frozen multilingual negatives plus delivered edge/index and complete exploration-proof consistency."
+    },
+    "arm": "B",
+    "attempt_id": "go_explicit_embedding-r1-B"
+  },
+  "attempt_id": "go_explicit_embedding-r1-B",
+  "arm": "B",
+  "provenance": {
+    "attempt_id": "go_explicit_embedding-r1-B",
+    "case_id": "go_explicit_embedding",
+    "snapshot": "go_embedding",
+    "repetition": 1,
+    "arm": "B",
+    "adapter_module": "benchmarks.multilingual_context_tools",
+    "model": "gpt-5.6-luna",
+    "reasoning_effort": "high",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "catalog_sha256": "f1c45cceac1c3ee90fa1af1007c341713e220571390c3b1eb086c443d7781062",
+    "runner_sha256": "5756278252a74c9e86c68a898b284108288b74a864b9424f6445223b3a7ca6db",
+    "source": {
+      "freeze_commit": "c910c5ac252a7c982f784d87d61bc4c50fc0c0ec",
+      "freeze_json_sha256": "254f38dd6247215928f4cce3fae379cf9dbf3acb74e51bd2d1ac91c12f290848",
+      "source_scope": "W4 evaluator snapshot; A exact retrieval/graph, B adds current loci_explore plus frozen guide"
+    },
+    "config": {
+      "project_doc_max_bytes": 0,
+      "web_search": "disabled",
+      "skills.include_instructions": false,
+      "developer_instructions": "",
+      "model_reasoning_effort": "high",
+      "model_catalog_json": "/Users/brummerv/phluxxed/loci-exploration/benchmarks/results/multilingual-context-workflow-v1/model-catalog.json",
+      "include_collaboration_mode_instructions": false,
+      "tools.update_plan.enabled": false,
+      "tools.experimental_request_user_input.enabled": false,
+      "features.skip_host_skill_discovery": true,
+      "mcp_servers.evaluation.command": "/Users/brummerv/phluxxed/loci-exploration/.venv/bin/python",
+      "mcp_servers.evaluation.args": [
+        "-m",
+        "benchmarks.multilingual_context_tools",
+        "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-nuzxa_v2/run.json"
+      ],
+      "mcp_servers.evaluation.cwd": "/Users/brummerv/phluxxed/loci-exploration",
+      "mcp_servers.evaluation.env": {
+        "LOCI_BASE_DIR": "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-nuzxa_v2/store",
+        "LOCI_STORE_NAMESPACE": "typescript-context-preflight"
+      },
+      "mcp_servers.evaluation.required": true,
+      "mcp_servers.evaluation.default_tools_approval_mode": "auto",
+      "mcp_servers.evaluation.tool_timeout_sec": 12,
+      "tool_output_token_limit": 32768,
+      "features.shell_tool": false,
+      "features.multi_agent": false,
+      "features.apps": false,
+      "features.plugins": false,
+      "features.hooks": false,
+      "features.memories": false,
+      "features.skill_search": false,
+      "features.skill_mcp_dependency_install": false,
+      "features.view_image": false,
+      "features.image_generation": false,
+      "features.browser_use": false,
+      "features.computer_use": false,
+      "features.in_app_browser": false,
+      "features.code_mode": false,
+      "features.code_mode_host": false,
+      "features.sleep_tool": false,
+      "features.goals": false,
+      "features.context_management": false,
+      "service_tier": "default"
+    },
+    "config_sha256": "8ec791cfaeb65d58c6092f3aebf14ee38959e191ad558ef6009ec1a13d5f12d9",
+    "prompt_sha256": "435ca5d0da8df4f6e660d61bcc93e5cc2ccded1c75d79482bf1fd7cac5237ab8",
+    "index_seconds": 0.015260083018802106,
+    "snapshot_files": {
+      "app/main.go": "28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0",
+      "go.mod": "01cc905450c59f6d3133f5fd339444536aa4d2b32468f197ea50d39884391d4d",
+      "model/model.go": "ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6"
+    },
+    "extractor_version": 30,
+    "canonical_tool_schemas_sha256": "492ec2cf0a57ac05d4cb601c1ab44d0604406245f7dcdd865d7f8cbed7e8c90f"
+  }
+}

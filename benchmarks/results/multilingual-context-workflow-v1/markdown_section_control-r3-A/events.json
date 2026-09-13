@@ -1,0 +1,148 @@
+[
+  {
+    "type": "thread.started",
+    "thread_id": "01a0984e-1572-7ab0-96db-fdb5e212636a"
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_0",
+      "type": "error",
+      "message": "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-iyedlqln/agent-runtime/config.toml."
+    }
+  },
+  {
+    "type": "turn.started"
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_1",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "grep",
+      "arguments": {
+        "pattern": "Limits"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_1",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "grep",
+      "arguments": {
+        "pattern": "Limits"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "matches": [
+            {
+              "file": "guide.md",
+              "line": 5,
+              "match": "## Limits",
+              "context_before": [
+                "Use exact source.",
+                ""
+              ],
+              "context_after": [
+                "",
+                "Budget: 8,192 UTF-8 bytes; café remains intact."
+              ]
+            }
+          ],
+          "coverage": {
+            "schema_version": 1,
+            "state": "complete",
+            "scope": "repository",
+            "source_scope": "indexed_supported_source",
+            "indexed_files": 1,
+            "excluded_paths": 0,
+            "exclusions": [],
+            "unknown_reason": null,
+            "query_scope": "indexed_source_text"
+          },
+          "_evaluation": {
+            "attempt_id": "session-eedce53e-3e75-462b-b130-61b834b11219/attempt/1",
+            "calls_remaining": 23,
+            "event_id": "session-eedce53e-3e75-462b-b130-61b834b11219:1"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "guide.md",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "file",
+      "arguments": {
+        "file_path": "guide.md",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "file": "guide.md",
+          "content": "# Context guide\n\nUse exact source.\n\n## Limits\n\nBudget: 8,192 UTF-8 bytes; café remains intact.\n\n### Omissions\n\nReport missing evidence explicitly.\n\n## Ownership\n\nKeep the original declaration owner.\n",
+          "total_lines": 15,
+          "start_line": 1,
+          "end_line": 15,
+          "_evaluation": {
+            "attempt_id": "session-eedce53e-3e75-462b-b130-61b834b11219/attempt/2",
+            "calls_remaining": 22,
+            "event_id": "session-eedce53e-3e75-462b-b130-61b834b11219:2"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_3",
+      "type": "agent_message",
+      "text": "{\"heading\":\"Limits\",\"nested_heading\":\"Omissions\",\"budget_bytes\":8192,\"unicode_word\":\"café\",\"following_peer\":\"Ownership\"}"
+    }
+  },
+  {
+    "type": "turn.completed",
+    "usage": {
+      "input_tokens": 15350,
+      "cached_input_tokens": 3840,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 374,
+      "reasoning_output_tokens": 285
+    }
+  }
+]

@@ -1,0 +1,423 @@
+{
+  "work_id": "W2.3",
+  "schema_version": 1,
+  "meaning": "Deterministic authored relationship and opt-in source availability; no agent-efficiency claim.",
+  "corpus_sha256": "ad980c99a35eb67bc0623b06fea94a6e35cbd69afdbfd4e425157bd7681b4034",
+  "snapshot_sha256": "96bca2aa33863542c42433d7b1aba5ae3b9b3b1c31a44f909af04d8371b64ab4",
+  "extractor_version": 25,
+  "graph_schema_version": 13,
+  "cases": [
+    {
+      "id": "anvil_temporal_arguments",
+      "ids": {
+        "entry": "src/brain-context/temporal.ts::temporalCliArgs#function",
+        "query": "src/brain-context/temporal.ts::TemporalQuery#type",
+        "view": "src/brain-context/temporal.ts::TemporalView#type",
+        "views": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+        "transition": "src/brain-context/temporal.ts::TemporalTransition#type"
+      },
+      "required_edges": [
+        {
+          "gold": {
+            "from": "entry",
+            "kind": "parameter_type",
+            "to": "query"
+          },
+          "edge": {
+            "from": "src/brain-context/temporal.ts::temporalCliArgs#function",
+            "to": "src/brain-context/temporal.ts::TemporalQuery#type",
+            "type": "uses_type",
+            "directed": true,
+            "namespace": "loci",
+            "resolution": "exact",
+            "evidence": {
+              "file": "src/brain-context/temporal.ts",
+              "line": 222,
+              "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718"
+            }
+          }
+        },
+        {
+          "gold": {
+            "from": "query",
+            "kind": "property_type",
+            "to": "view"
+          },
+          "edge": {
+            "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+            "to": "src/brain-context/temporal.ts::TemporalView#type",
+            "type": "uses_type",
+            "directed": true,
+            "namespace": "loci",
+            "resolution": "exact",
+            "evidence": {
+              "file": "src/brain-context/temporal.ts",
+              "line": 14,
+              "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718"
+            }
+          }
+        },
+        {
+          "gold": {
+            "from": "view",
+            "kind": "type_query",
+            "to": "views"
+          },
+          "edge": {
+            "from": "src/brain-context/temporal.ts::TemporalView#type",
+            "to": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+            "type": "uses_type",
+            "directed": true,
+            "namespace": "loci",
+            "resolution": "exact",
+            "evidence": {
+              "file": "src/brain-context/temporal.ts",
+              "line": 5,
+              "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718"
+            }
+          }
+        },
+        {
+          "gold": {
+            "from": "query",
+            "kind": "property_type",
+            "to": "transition"
+          },
+          "edge": {
+            "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+            "to": "src/brain-context/temporal.ts::TemporalTransition#type",
+            "type": "uses_type",
+            "directed": true,
+            "namespace": "loci",
+            "resolution": "exact",
+            "evidence": {
+              "file": "src/brain-context/temporal.ts",
+              "line": 18,
+              "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718"
+            }
+          }
+        }
+      ],
+      "required_type_definitions": [
+        "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+        "src/brain-context/temporal.ts::TemporalQuery#type",
+        "src/brain-context/temporal.ts::TemporalTransition#type",
+        "src/brain-context/temporal.ts::TemporalView#type"
+      ],
+      "delivered_type_definitions": [
+        "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+        "src/brain-context/temporal.ts::TemporalQuery#type",
+        "src/brain-context/temporal.ts::TemporalTransition#type",
+        "src/brain-context/temporal.ts::TemporalView#type"
+      ],
+      "omissions": {
+        "unresolved_reference": 2
+      },
+      "default_get_preserved": true
+    },
+    {
+      "id": "anvil_retrieval_limits",
+      "ids": {
+        "entry": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+        "input": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+        "omission": "src/brain-context/retrieve.ts::BrainCompilerOmission#type",
+        "stop": "src/brain-context/retrieve.ts::BrainCompilerStop#type",
+        "reporting": "src/brain-context/retrieve.ts::BrainCompilerReporting#type",
+        "evidence": "src/brain-context/retrieve.ts::BrainCompiledEvidence#type",
+        "diagnostic": "src/brain-context/retrieve.ts::BrainCompilerDiagnostic#type",
+        "unavailable": "src/brain-context/render.ts::compilerHasUnavailableEvidence#function",
+        "messages": "src/brain-context/render.ts::RETRIEVAL_LIMIT_MESSAGES#constant"
+      },
+      "required_edges": [
+        {
+          "gold": {
+            "from": "entry",
+            "kind": "parameter_type",
+            "to": "input"
+          },
+          "edge": {
+            "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+            "to": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+            "type": "uses_type",
+            "directed": true,
+            "namespace": "loci",
+            "resolution": "import-resolved",
+            "evidence": {
+              "file": "src/brain-context/render.ts",
+              "line": 34,
+              "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd"
+            }
+          }
+        },
+        {
+          "gold": {
+            "from": "input",
+            "kind": "property_type",
+            "to": "omission"
+          },
+          "edge": {
+            "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+            "to": "src/brain-context/retrieve.ts::BrainCompilerOmission#type",
+            "type": "uses_type",
+            "directed": true,
+            "namespace": "loci",
+            "resolution": "exact",
+            "evidence": {
+              "file": "src/brain-context/retrieve.ts",
+              "line": 135,
+              "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+            }
+          }
+        },
+        {
+          "gold": {
+            "from": "input",
+            "kind": "property_type",
+            "to": "stop"
+          },
+          "edge": {
+            "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+            "to": "src/brain-context/retrieve.ts::BrainCompilerStop#type",
+            "type": "uses_type",
+            "directed": true,
+            "namespace": "loci",
+            "resolution": "exact",
+            "evidence": {
+              "file": "src/brain-context/retrieve.ts",
+              "line": 138,
+              "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+            }
+          }
+        },
+        {
+          "gold": {
+            "from": "input",
+            "kind": "property_type",
+            "to": "reporting"
+          },
+          "edge": {
+            "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+            "to": "src/brain-context/retrieve.ts::BrainCompilerReporting#type",
+            "type": "uses_type",
+            "directed": true,
+            "namespace": "loci",
+            "resolution": "exact",
+            "evidence": {
+              "file": "src/brain-context/retrieve.ts",
+              "line": 141,
+              "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+            }
+          }
+        },
+        {
+          "gold": {
+            "from": "input",
+            "kind": "property_type",
+            "to": "evidence"
+          },
+          "edge": {
+            "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+            "to": "src/brain-context/retrieve.ts::BrainCompiledEvidence#type",
+            "type": "uses_type",
+            "directed": true,
+            "namespace": "loci",
+            "resolution": "exact",
+            "evidence": {
+              "file": "src/brain-context/retrieve.ts",
+              "line": 134,
+              "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+            }
+          }
+        },
+        {
+          "gold": {
+            "from": "input",
+            "kind": "property_type",
+            "to": "diagnostic"
+          },
+          "edge": {
+            "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+            "to": "src/brain-context/retrieve.ts::BrainCompilerDiagnostic#type",
+            "type": "uses_type",
+            "directed": true,
+            "namespace": "loci",
+            "resolution": "exact",
+            "evidence": {
+              "file": "src/brain-context/retrieve.ts",
+              "line": 140,
+              "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+            }
+          }
+        },
+        {
+          "gold": {
+            "from": "entry",
+            "kind": "calls",
+            "to": "unavailable"
+          },
+          "edge": {
+            "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+            "to": "src/brain-context/render.ts::compilerHasUnavailableEvidence#function",
+            "type": "calls",
+            "directed": true,
+            "namespace": "loci",
+            "resolution": "exact",
+            "evidence": {
+              "file": "src/brain-context/render.ts",
+              "line": 35,
+              "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd"
+            }
+          }
+        }
+      ],
+      "required_type_definitions": [
+        "src/brain-context/retrieve.ts::BrainCompiledEvidence#type",
+        "src/brain-context/retrieve.ts::BrainCompilerDiagnostic#type",
+        "src/brain-context/retrieve.ts::BrainCompilerOmission#type",
+        "src/brain-context/retrieve.ts::BrainCompilerReporting#type",
+        "src/brain-context/retrieve.ts::BrainCompilerStop#type",
+        "src/brain-context/retrieve.ts::BrainRetrievalResult#type"
+      ],
+      "delivered_type_definitions": [
+        "src/brain-context/retrieve.ts::BrainCompiledEvidence#type",
+        "src/brain-context/retrieve.ts::BrainCompilerBudget#type",
+        "src/brain-context/retrieve.ts::BrainCompilerCoverage#type",
+        "src/brain-context/retrieve.ts::BrainCompilerDiagnostic#type",
+        "src/brain-context/retrieve.ts::BrainCompilerOmission#type",
+        "src/brain-context/retrieve.ts::BrainCompilerReporting#type",
+        "src/brain-context/retrieve.ts::BrainCompilerStop#type",
+        "src/brain-context/retrieve.ts::BrainProjectResolution#type",
+        "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+        "src/brain-context/temporal.ts::TemporalQuery#type",
+        "src/brain-context/temporal.ts::TemporalTransition#type",
+        "src/brain-context/temporal.ts::TemporalView#type"
+      ],
+      "omissions": {
+        "hop_limit": 1,
+        "unresolved_reference": 6
+      },
+      "default_get_preserved": true
+    },
+    {
+      "id": "anvil_renderer_result_contract",
+      "ids": {
+        "entry": "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function",
+        "input": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+        "project": "src/brain-context/retrieve.ts::BrainProjectResolution#type",
+        "output": "src/brain-context/render.ts::PromptBrainContextRender#type",
+        "base": "src/brain-context/render.ts::BrainContextRender#type"
+      },
+      "required_edges": [
+        {
+          "gold": {
+            "from": "entry",
+            "kind": "parameter_type",
+            "to": "input"
+          },
+          "edge": {
+            "from": "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function",
+            "to": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+            "type": "uses_type",
+            "directed": true,
+            "namespace": "loci",
+            "resolution": "import-resolved",
+            "evidence": {
+              "file": "src/brain-context/render.ts",
+              "line": 96,
+              "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd"
+            }
+          }
+        },
+        {
+          "gold": {
+            "from": "input",
+            "kind": "property_type",
+            "to": "project"
+          },
+          "edge": {
+            "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+            "to": "src/brain-context/retrieve.ts::BrainProjectResolution#type",
+            "type": "uses_type",
+            "directed": true,
+            "namespace": "loci",
+            "resolution": "exact",
+            "evidence": {
+              "file": "src/brain-context/retrieve.ts",
+              "line": 131,
+              "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+            }
+          }
+        },
+        {
+          "gold": {
+            "from": "entry",
+            "kind": "return_type",
+            "to": "output"
+          },
+          "edge": {
+            "from": "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function",
+            "to": "src/brain-context/render.ts::PromptBrainContextRender#type",
+            "type": "uses_type",
+            "directed": true,
+            "namespace": "loci",
+            "resolution": "exact",
+            "evidence": {
+              "file": "src/brain-context/render.ts",
+              "line": 96,
+              "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd"
+            }
+          }
+        },
+        {
+          "gold": {
+            "from": "output",
+            "kind": "intersection_member",
+            "to": "base"
+          },
+          "edge": {
+            "from": "src/brain-context/render.ts::PromptBrainContextRender#type",
+            "to": "src/brain-context/render.ts::BrainContextRender#type",
+            "type": "uses_type",
+            "directed": true,
+            "namespace": "loci",
+            "resolution": "exact",
+            "evidence": {
+              "file": "src/brain-context/render.ts",
+              "line": 125,
+              "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd"
+            }
+          }
+        }
+      ],
+      "required_type_definitions": [
+        "src/brain-context/render.ts::BrainContextRender#type",
+        "src/brain-context/render.ts::PromptBrainContextRender#type",
+        "src/brain-context/retrieve.ts::BrainProjectResolution#type",
+        "src/brain-context/retrieve.ts::BrainRetrievalResult#type"
+      ],
+      "delivered_type_definitions": [
+        "src/brain-context/render.ts::BrainContextRender#type",
+        "src/brain-context/render.ts::PromptBrainContextRender#type",
+        "src/brain-context/retrieve.ts::BrainCompiledEvidence#type",
+        "src/brain-context/retrieve.ts::BrainCompilerBudget#type",
+        "src/brain-context/retrieve.ts::BrainCompilerCoverage#type",
+        "src/brain-context/retrieve.ts::BrainCompilerDiagnostic#type",
+        "src/brain-context/retrieve.ts::BrainCompilerOmission#type",
+        "src/brain-context/retrieve.ts::BrainCompilerReporting#type",
+        "src/brain-context/retrieve.ts::BrainCompilerStop#type",
+        "src/brain-context/retrieve.ts::BrainProjectResolution#type",
+        "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+        "src/brain-context/temporal.ts::TemporalQuery#type",
+        "src/brain-context/temporal.ts::TemporalTransition#type",
+        "src/brain-context/temporal.ts::TemporalView#type"
+      ],
+      "omissions": {
+        "hop_limit": 1,
+        "unresolved_reference": 6
+      },
+      "default_get_preserved": true
+    }
+  ],
+  "type_observations": 2991,
+  "passed": true
+}

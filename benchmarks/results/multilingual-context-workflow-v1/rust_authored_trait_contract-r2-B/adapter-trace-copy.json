@@ -1,0 +1,916 @@
+{
+  "schema_version": 3,
+  "protocol": "multilingual-context-workflow-v1",
+  "identity": {
+    "task_id": "rust_authored_trait_contract",
+    "session_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f",
+    "arm": "B",
+    "repetition": 2,
+    "snapshot": "rust_contracts",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1"
+  },
+  "events": [
+    {
+      "id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:1",
+      "task_id": "rust_authored_trait_contract",
+      "session_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "rust_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "locate",
+        "query": "Locate the Rust declarations for Build and Receipt, and the related UserId alias, Render trait, and Receipt implementation.",
+        "max_output_bytes": 12000,
+        "max_evidence_bytes": 8000,
+        "max_hops": 1
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"locate\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"none\",\"exhaustive\":false},\"items\":[{\"id\":\"src/lib.rs::build#function\",\"name\":\"build\",\"kind\":\"function\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches build, userid, render\",\"source_id\":1,\"complete\":true,\"path\":[]}],\"relationships\":[],\"sources\":[{\"id\":1,\"file\":\"src/lib.rs\",\"start_byte\":321,\"end_byte\":410,\"start_line\":17,\"end_line\":19,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\\n    Envelope { id, body }\\n}\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":7}],\"limits\":{\"max_hops\":0,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":12000,\"max_evidence_bytes\":8000},\"usage\":{\"nodes_examined\":1,\"evidence_bytes\":89,\"output_bytes\":1107,\"estimated_tokens\":277,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:1\"}}",
+      "serialized_bytes": 1223,
+      "source_bytes": 89,
+      "elapsed_ms": 9.486875002039596,
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 321,
+          "end_byte": 410,
+          "sha256": "103803b47b750508d508763653e9c705ec596008cca52b98b58915e6132f382d",
+          "text": "pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\n    Envelope { id, body }\n}"
+        }
+      ]
+    },
+    {
+      "id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:2",
+      "task_id": "rust_authored_trait_contract",
+      "session_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "rust_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "Build Receipt UserId Render",
+        "lang": "rust"
+      },
+      "search_id": "37779e1f-bd97-4699-833f-a535a0adbc51",
+      "response_json": "{\"symbols\":[{\"id\":\"src/lib.rs::build#function\",\"name\":\"build\",\"qualified_name\":\"build\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":321,\"byte_length\":89,\"signature\":\"pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"103803b47b750508d508763653e9c705ec596008cca52b98b58915e6132f382d\",\"decorators\":[],\"keywords\":[\"build\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":17,\"end_line\":19,\"score\":24.0},{\"id\":\"src/lib.rs::Receipt.render#method\",\"name\":\"render\",\"qualified_name\":\"Receipt.render\",\"kind\":\"method\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":200,\"byte_length\":53,\"signature\":\"fn render(&self) -> String { format!(\\\"{}\\\", self.id) }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"2edbbd9749254e2d9d6cc18f54f12e2a841c72569424824b7ff9b57d209ebf50\",\"decorators\":[],\"keywords\":[\"render\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"private\",\"visibility_scope\":[],\"configuration\":\"unconditional\"}}},\"line\":12,\"end_line\":12,\"score\":20.0},{\"id\":\"src/lib.rs::Receipt#struct\",\"name\":\"Receipt\",\"qualified_name\":\"Receipt\",\"kind\":\"struct\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":103,\"byte_length\":37,\"signature\":\"pub struct Receipt { pub id: UserId }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"ebc6f499055ca48ef7c8f503f971ec7dd9d2bb0af945e7202ee903ed6de789fc\",\"decorators\":[],\"keywords\":[\"receipt\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":7,\"end_line\":7,\"score\":12.0},{\"id\":\"src/lib.rs::Receipt#impl~1\",\"name\":\"Receipt\",\"qualified_name\":\"Receipt\",\"kind\":\"impl\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":170,\"byte_length\":85,\"signature\":\"impl Render for Receipt {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"5a49dda0064889477c044fe2b0e3de90d68d942265695fffa6b19965ac219ef4\",\"decorators\":[],\"keywords\":[\"receipt\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"private\",\"visibility_scope\":[],\"configuration\":\"unconditional\"}}},\"line\":11,\"end_line\":13,\"score\":12.0},{\"id\":\"src/lib.rs::Render#trait\",\"name\":\"Render\",\"qualified_name\":\"Render\",\"kind\":\"trait\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":45,\"byte_length\":56,\"signature\":\"pub trait Render: Format { fn render(&self) -> String; }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"358c17c1aa01f6b15cb8960a1c3347bd546337d117cb05328cedbf2314282f40\",\"decorators\":[],\"keywords\":[\"render\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":5,\"end_line\":5,\"score\":10.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":1,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"37779e1f-bd97-4699-833f-a535a0adbc51\",\"_evaluation\":{\"attempt_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:2\"}}",
+      "serialized_bytes": 3538,
+      "source_bytes": 232,
+      "elapsed_ms": 3.052624990232289,
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 321,
+          "end_byte": 382,
+          "sha256": "bcda9f7f354ebd6e85a603802bf70e115dbd28f49c57904f5436c8d97a9423b9",
+          "text": "pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 200,
+          "end_byte": 253,
+          "sha256": "2edbbd9749254e2d9d6cc18f54f12e2a841c72569424824b7ff9b57d209ebf50",
+          "text": "fn render(&self) -> String { format!(\"{}\", self.id) }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 103,
+          "end_byte": 140,
+          "sha256": "ebc6f499055ca48ef7c8f503f971ec7dd9d2bb0af945e7202ee903ed6de789fc",
+          "text": "pub struct Receipt { pub id: UserId }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 170,
+          "end_byte": 195,
+          "sha256": "fcf3c0597247395c5ed6ce228026b22797e782255ed1d33c62e62b672c9ba1b5",
+          "text": "impl Render for Receipt {"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 45,
+          "end_byte": 101,
+          "sha256": "358c17c1aa01f6b15cb8960a1c3347bd546337d117cb05328cedbf2314282f40",
+          "text": "pub trait Render: Format { fn render(&self) -> String; }"
+        }
+      ]
+    },
+    {
+      "id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:3",
+      "task_id": "rust_authored_trait_contract",
+      "session_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "rust_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "UserId Build",
+        "lang": "rust",
+        "file_paths": [
+          "src/lib.rs"
+        ]
+      },
+      "search_id": "4fdf5a06-8bd2-4ac1-9a72-c4677f0abf98",
+      "response_json": "{\"symbols\":[{\"id\":\"src/lib.rs::build#function\",\"name\":\"build\",\"qualified_name\":\"build\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":321,\"byte_length\":89,\"signature\":\"pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"103803b47b750508d508763653e9c705ec596008cca52b98b58915e6132f382d\",\"decorators\":[],\"keywords\":[\"build\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":17,\"end_line\":19,\"score\":22.0},{\"id\":\"src/lib.rs::UserId#type\",\"name\":\"UserId\",\"qualified_name\":\"UserId\",\"kind\":\"type\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":0,\"byte_length\":22,\"signature\":\"pub type UserId = u64;\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"50f58848b9237239f8bcac7b5818b4243fc1ccd738cc668384124a4c4cda8fba\",\"decorators\":[],\"keywords\":[\"id\",\"user\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":1,\"end_line\":1,\"score\":8.0},{\"id\":\"src/lib.rs::Receipt#struct\",\"name\":\"Receipt\",\"qualified_name\":\"Receipt\",\"kind\":\"struct\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":103,\"byte_length\":37,\"signature\":\"pub struct Receipt { pub id: UserId }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"ebc6f499055ca48ef7c8f503f971ec7dd9d2bb0af945e7202ee903ed6de789fc\",\"decorators\":[],\"keywords\":[\"receipt\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":7,\"end_line\":7,\"score\":2.0},{\"id\":\"src/lib.rs::Envelope#struct\",\"name\":\"Envelope\",\"qualified_name\":\"Envelope\",\"kind\":\"struct\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":257,\"byte_length\":62,\"signature\":\"pub struct Envelope<T: Render> { pub id: UserId, pub body: T }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"351db124225d48639721ea1d510e24e472343b261bc636747de4d28cc9de7dd6\",\"decorators\":[],\"keywords\":[\"envelope\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":15,\"end_line\":15,\"score\":2.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":1,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"4fdf5a06-8bd2-4ac1-9a72-c4677f0abf98\",\"_evaluation\":{\"attempt_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:3\"}}",
+      "serialized_bytes": 2920,
+      "source_bytes": 182,
+      "elapsed_ms": 4.1230409988202155,
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 321,
+          "end_byte": 382,
+          "sha256": "bcda9f7f354ebd6e85a603802bf70e115dbd28f49c57904f5436c8d97a9423b9",
+          "text": "pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 22,
+          "sha256": "50f58848b9237239f8bcac7b5818b4243fc1ccd738cc668384124a4c4cda8fba",
+          "text": "pub type UserId = u64;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 103,
+          "end_byte": 140,
+          "sha256": "ebc6f499055ca48ef7c8f503f971ec7dd9d2bb0af945e7202ee903ed6de789fc",
+          "text": "pub struct Receipt { pub id: UserId }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 257,
+          "end_byte": 319,
+          "sha256": "351db124225d48639721ea1d510e24e472343b261bc636747de4d28cc9de7dd6",
+          "text": "pub struct Envelope<T: Render> { pub id: UserId, pub body: T }"
+        }
+      ]
+    },
+    {
+      "id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:4",
+      "task_id": "rust_authored_trait_contract",
+      "session_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "rust_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "src/lib.rs::UserId#type",
+          "src/lib.rs::build#function",
+          "src/lib.rs::Receipt#struct",
+          "src/lib.rs::Envelope#struct"
+        ],
+        "context": 0,
+        "selected_from_search_id": "4fdf5a06-8bd2-4ac1-9a72-c4677f0abf98"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"src/lib.rs::UserId#type\",\"source\":\"pub type UserId = u64;\",\"byte_offset\":0,\"byte_length\":22,\"line\":1,\"end_line\":1,\"signature\":\"pub type UserId = u64;\",\"kind\":\"type\",\"language\":\"rust\"},{\"id\":\"src/lib.rs::build#function\",\"source\":\"pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\\n    Envelope { id, body }\\n}\",\"byte_offset\":321,\"byte_length\":89,\"line\":17,\"end_line\":19,\"signature\":\"pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\",\"kind\":\"function\",\"language\":\"rust\"},{\"id\":\"src/lib.rs::Receipt#struct\",\"source\":\"pub struct Receipt { pub id: UserId }\",\"byte_offset\":103,\"byte_length\":37,\"line\":7,\"end_line\":7,\"signature\":\"pub struct Receipt { pub id: UserId }\",\"kind\":\"struct\",\"language\":\"rust\"},{\"id\":\"src/lib.rs::Envelope#struct\",\"source\":\"pub struct Envelope<T: Render> { pub id: UserId, pub body: T }\",\"byte_offset\":257,\"byte_length\":62,\"line\":15,\"end_line\":15,\"signature\":\"pub struct Envelope<T: Render> { pub id: UserId, pub body: T }\",\"kind\":\"struct\",\"language\":\"rust\"}],\"_evaluation\":{\"attempt_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:4\"}}",
+      "serialized_bytes": 1190,
+      "source_bytes": 392,
+      "elapsed_ms": 9.705750009743497,
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 22,
+          "sha256": "50f58848b9237239f8bcac7b5818b4243fc1ccd738cc668384124a4c4cda8fba",
+          "text": "pub type UserId = u64;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 321,
+          "end_byte": 410,
+          "sha256": "103803b47b750508d508763653e9c705ec596008cca52b98b58915e6132f382d",
+          "text": "pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\n    Envelope { id, body }\n}"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 103,
+          "end_byte": 140,
+          "sha256": "ebc6f499055ca48ef7c8f503f971ec7dd9d2bb0af945e7202ee903ed6de789fc",
+          "text": "pub struct Receipt { pub id: UserId }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 257,
+          "end_byte": 319,
+          "sha256": "351db124225d48639721ea1d510e24e472343b261bc636747de4d28cc9de7dd6",
+          "text": "pub struct Envelope<T: Render> { pub id: UserId, pub body: T }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 22,
+          "sha256": "50f58848b9237239f8bcac7b5818b4243fc1ccd738cc668384124a4c4cda8fba",
+          "text": "pub type UserId = u64;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 321,
+          "end_byte": 382,
+          "sha256": "bcda9f7f354ebd6e85a603802bf70e115dbd28f49c57904f5436c8d97a9423b9",
+          "text": "pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 103,
+          "end_byte": 140,
+          "sha256": "ebc6f499055ca48ef7c8f503f971ec7dd9d2bb0af945e7202ee903ed6de789fc",
+          "text": "pub struct Receipt { pub id: UserId }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 257,
+          "end_byte": 319,
+          "sha256": "351db124225d48639721ea1d510e24e472343b261bc636747de4d28cc9de7dd6",
+          "text": "pub struct Envelope<T: Render> { pub id: UserId, pub body: T }"
+        }
+      ]
+    },
+    {
+      "id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:5",
+      "task_id": "rust_authored_trait_contract",
+      "session_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "rust_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "src/lib.rs::Render#trait",
+          "src/lib.rs::Receipt#impl~1",
+          "src/lib.rs::Receipt.render#method"
+        ],
+        "context": 0,
+        "selected_from_search_id": "37779e1f-bd97-4699-833f-a535a0adbc51"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"src/lib.rs::Render#trait\",\"source\":\"pub trait Render: Format { fn render(&self) -> String; }\",\"byte_offset\":45,\"byte_length\":56,\"line\":5,\"end_line\":5,\"signature\":\"pub trait Render: Format { fn render(&self) -> String; }\",\"kind\":\"trait\",\"language\":\"rust\"},{\"id\":\"src/lib.rs::Receipt#impl~1\",\"source\":\"impl Render for Receipt {\\n    fn render(&self) -> String { format!(\\\"{}\\\", self.id) }\\n}\",\"byte_offset\":170,\"byte_length\":85,\"line\":11,\"end_line\":13,\"signature\":\"impl Render for Receipt {\",\"kind\":\"impl\",\"language\":\"rust\"},{\"id\":\"src/lib.rs::Receipt.render#method\",\"source\":\"fn render(&self) -> String { format!(\\\"{}\\\", self.id) }\",\"byte_offset\":200,\"byte_length\":53,\"line\":12,\"end_line\":12,\"signature\":\"fn render(&self) -> String { format!(\\\"{}\\\", self.id) }\",\"kind\":\"method\",\"language\":\"rust\"}],\"_evaluation\":{\"attempt_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:5\"}}",
+      "serialized_bytes": 983,
+      "source_bytes": 328,
+      "elapsed_ms": 10.005374992033467,
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 45,
+          "end_byte": 101,
+          "sha256": "358c17c1aa01f6b15cb8960a1c3347bd546337d117cb05328cedbf2314282f40",
+          "text": "pub trait Render: Format { fn render(&self) -> String; }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 170,
+          "end_byte": 255,
+          "sha256": "5a49dda0064889477c044fe2b0e3de90d68d942265695fffa6b19965ac219ef4",
+          "text": "impl Render for Receipt {\n    fn render(&self) -> String { format!(\"{}\", self.id) }\n}"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 200,
+          "end_byte": 253,
+          "sha256": "2edbbd9749254e2d9d6cc18f54f12e2a841c72569424824b7ff9b57d209ebf50",
+          "text": "fn render(&self) -> String { format!(\"{}\", self.id) }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 45,
+          "end_byte": 101,
+          "sha256": "358c17c1aa01f6b15cb8960a1c3347bd546337d117cb05328cedbf2314282f40",
+          "text": "pub trait Render: Format { fn render(&self) -> String; }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 170,
+          "end_byte": 195,
+          "sha256": "fcf3c0597247395c5ed6ce228026b22797e782255ed1d33c62e62b672c9ba1b5",
+          "text": "impl Render for Receipt {"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 200,
+          "end_byte": 253,
+          "sha256": "2edbbd9749254e2d9d6cc18f54f12e2a841c72569424824b7ff9b57d209ebf50",
+          "text": "fn render(&self) -> String { format!(\"{}\", self.id) }"
+        }
+      ]
+    },
+    {
+      "id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:6",
+      "task_id": "rust_authored_trait_contract",
+      "session_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "rust_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "",
+        "max_output_bytes": 14000,
+        "max_evidence_bytes": 8000,
+        "seed_ids": [
+          "src/lib.rs::UserId#type",
+          "src/lib.rs::build#function",
+          "src/lib.rs::Render#trait",
+          "src/lib.rs::Receipt#struct",
+          "src/lib.rs::Receipt#impl~1"
+        ],
+        "max_hops": 2
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"partial\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"src/lib.rs::UserId#type\",\"name\":\"UserId\",\"kind\":\"type\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"src/lib.rs::build#function\",\"name\":\"build\",\"kind\":\"function\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":2,\"complete\":true,\"path\":[]},{\"id\":\"src/lib.rs::Render#trait\",\"name\":\"Render\",\"kind\":\"trait\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":3,\"complete\":true,\"path\":[]},{\"id\":\"src/lib.rs::Receipt#struct\",\"name\":\"Receipt\",\"kind\":\"struct\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":4,\"complete\":true,\"path\":[]},{\"id\":\"src/lib.rs::Receipt#impl~1\",\"name\":\"Receipt\",\"kind\":\"impl\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":5,\"complete\":true,\"path\":[]},{\"id\":\"src/lib.rs::Format#trait\",\"name\":\"Format\",\"kind\":\"trait\",\"file\":\"src/lib.rs\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":6,\"complete\":true,\"path\":[1]},{\"id\":\"src/lib.rs::Envelope#struct\",\"name\":\"Envelope\",\"kind\":\"struct\",\"file\":\"src/lib.rs\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":10,\"complete\":true,\"path\":[2]},{\"id\":\"src/lib.rs::Receipt#impl\",\"name\":\"Receipt\",\"kind\":\"impl\",\"file\":\"src/lib.rs\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":12,\"complete\":true,\"path\":[3]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"src/lib.rs::Render#trait\",\"to\":\"src/lib.rs::Format#trait\",\"type\":\"supertrait\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"src/lib.rs\",\"line\":5,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\"}},\"traversed\":\"forward\",\"source_ids\":[7,8,9],\"resolution_configuration\":\"unconditional\"},{\"id\":2,\"edge\":{\"from\":\"src/lib.rs::build#function\",\"to\":\"src/lib.rs::Envelope#struct\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"src/lib.rs\",\"line\":17,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\"}},\"traversed\":\"forward\",\"source_ids\":[2,11,9],\"resolution_configuration\":\"unconditional\"},{\"id\":3,\"edge\":{\"from\":\"src/lib.rs::Receipt#impl\",\"to\":\"src/lib.rs::Receipt#struct\",\"type\":\"impl_self_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"src/lib.rs\",\"line\":9,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\"}},\"traversed\":\"reverse\",\"source_ids\":[13,14,9],\"resolution_configuration\":\"unconditional\"}],\"sources\":[{\"id\":1,\"file\":\"src/lib.rs\",\"start_byte\":0,\"end_byte\":22,\"start_line\":1,\"end_line\":1,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub type UserId = u64;\"},{\"id\":2,\"file\":\"src/lib.rs\",\"start_byte\":321,\"end_byte\":410,\"start_line\":17,\"end_line\":19,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\\n    Envelope { id, body }\\n}\"},{\"id\":3,\"file\":\"src/lib.rs\",\"start_byte\":45,\"end_byte\":101,\"start_line\":5,\"end_line\":5,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub trait Render: Format { fn render(&self) -> String; }\"},{\"id\":4,\"file\":\"src/lib.rs\",\"start_byte\":103,\"end_byte\":140,\"start_line\":7,\"end_line\":7,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub struct Receipt { pub id: UserId }\"},{\"id\":5,\"file\":\"src/lib.rs\",\"start_byte\":170,\"end_byte\":255,\"start_line\":11,\"end_line\":13,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"impl Render for Receipt {\\n    fn render(&self) -> String { format!(\\\"{}\\\", self.id) }\\n}\"},{\"id\":6,\"file\":\"src/lib.rs\",\"start_byte\":24,\"end_byte\":43,\"start_line\":3,\"end_line\":3,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub trait Format {}\"},{\"id\":7,\"file\":\"src/lib.rs\",\"start_byte\":45,\"end_byte\":102,\"start_line\":5,\"end_line\":5,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub trait Render: Format { fn render(&self) -> String; }\\n\"},{\"id\":8,\"file\":\"src/lib.rs\",\"start_byte\":24,\"end_byte\":44,\"start_line\":3,\"end_line\":3,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub trait Format {}\\n\"},{\"id\":9,\"file\":\"Cargo.toml\",\"start_byte\":0,\"end_byte\":61,\"start_line\":1,\"end_line\":4,\"content_hash\":\"734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9\",\"content\":\"[package]\\nname = \\\"ledger\\\"\\nversion = \\\"0.1.0\\\"\\nedition = \\\"2021\\\"\\n\"},{\"id\":10,\"file\":\"src/lib.rs\",\"start_byte\":257,\"end_byte\":319,\"start_line\":15,\"end_line\":15,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub struct Envelope<T: Render> { pub id: UserId, pub body: T }\"},{\"id\":11,\"file\":\"src/lib.rs\",\"start_byte\":257,\"end_byte\":320,\"start_line\":15,\"end_line\":15,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub struct Envelope<T: Render> { pub id: UserId, pub body: T }\\n\"},{\"id\":12,\"file\":\"src/lib.rs\",\"start_byte\":142,\"end_byte\":168,\"start_line\":9,\"end_line\":9,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"impl Format for Receipt {}\"},{\"id\":13,\"file\":\"src/lib.rs\",\"start_byte\":142,\"end_byte\":169,\"start_line\":9,\"end_line\":9,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"impl Format for Receipt {}\\n\"},{\"id\":14,\"file\":\"src/lib.rs\",\"start_byte\":103,\"end_byte\":141,\"start_line\":7,\"end_line\":7,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub struct Receipt { pub id: UserId }\\n\"}],\"omissions\":[{\"reason\":\"alternative_path\",\"count\":8},{\"reason\":\"cycle\",\"count\":1},{\"reason\":\"not_selected\",\"count\":1},{\"reason\":\"unresolved_relation\",\"count\":3}],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":14000,\"max_evidence_bytes\":8000},\"usage\":{\"nodes_examined\":8,\"evidence_bytes\":462,\"output_bytes\":6620,\"estimated_tokens\":1655,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:6\"}}",
+      "serialized_bytes": 6736,
+      "source_bytes": 662,
+      "elapsed_ms": 21.526416996493936,
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 22,
+          "sha256": "50f58848b9237239f8bcac7b5818b4243fc1ccd738cc668384124a4c4cda8fba",
+          "text": "pub type UserId = u64;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 321,
+          "end_byte": 410,
+          "sha256": "103803b47b750508d508763653e9c705ec596008cca52b98b58915e6132f382d",
+          "text": "pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\n    Envelope { id, body }\n}"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 45,
+          "end_byte": 101,
+          "sha256": "358c17c1aa01f6b15cb8960a1c3347bd546337d117cb05328cedbf2314282f40",
+          "text": "pub trait Render: Format { fn render(&self) -> String; }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 103,
+          "end_byte": 140,
+          "sha256": "ebc6f499055ca48ef7c8f503f971ec7dd9d2bb0af945e7202ee903ed6de789fc",
+          "text": "pub struct Receipt { pub id: UserId }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 170,
+          "end_byte": 255,
+          "sha256": "5a49dda0064889477c044fe2b0e3de90d68d942265695fffa6b19965ac219ef4",
+          "text": "impl Render for Receipt {\n    fn render(&self) -> String { format!(\"{}\", self.id) }\n}"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 24,
+          "end_byte": 43,
+          "sha256": "f63bb930956ee5af63a25d30a3a0e73d7958cb1b6b8c1d82196e4d190cc06837",
+          "text": "pub trait Format {}"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 45,
+          "end_byte": 102,
+          "sha256": "ee16722f1a2189b8c159dfbccccb870ae3f21525627e11888632f3aac2e23f7a",
+          "text": "pub trait Render: Format { fn render(&self) -> String; }\n"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 24,
+          "end_byte": 44,
+          "sha256": "7eb417fee3b4b679b253f7f4a82e0564e1df6e7611cf697532da663295d85428",
+          "text": "pub trait Format {}\n"
+        },
+        {
+          "file": "Cargo.toml",
+          "start_byte": 0,
+          "end_byte": 61,
+          "sha256": "734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9",
+          "text": "[package]\nname = \"ledger\"\nversion = \"0.1.0\"\nedition = \"2021\"\n"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 257,
+          "end_byte": 319,
+          "sha256": "351db124225d48639721ea1d510e24e472343b261bc636747de4d28cc9de7dd6",
+          "text": "pub struct Envelope<T: Render> { pub id: UserId, pub body: T }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 257,
+          "end_byte": 320,
+          "sha256": "006e239c3563127d92075695a869d262a7fb8efdd744713673245c4f85336663",
+          "text": "pub struct Envelope<T: Render> { pub id: UserId, pub body: T }\n"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 142,
+          "end_byte": 168,
+          "sha256": "7f8e415ccb367c952eff88c4080e98d0e050843e8ef114fbdb5d2e03dd883c22",
+          "text": "impl Format for Receipt {}"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 142,
+          "end_byte": 169,
+          "sha256": "67e9ea6278b10de361358034043b469db11dd5f2e5fcd55a239293aa0788bad4",
+          "text": "impl Format for Receipt {}\n"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 103,
+          "end_byte": 141,
+          "sha256": "f547f1867a16a5643f3ba306829c1f86ef4f9bf4d05e01437d045fafc4110cd8",
+          "text": "pub struct Receipt { pub id: UserId }\n"
+        }
+      ]
+    },
+    {
+      "id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:7",
+      "task_id": "rust_authored_trait_contract",
+      "session_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "rust_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "src/lib.rs",
+        "start_line": 1,
+        "end_line": 19
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"src/lib.rs\",\"content\":\"pub type UserId = u64;\\n\\npub trait Format {}\\n\\npub trait Render: Format { fn render(&self) -> String; }\\n\\npub struct Receipt { pub id: UserId }\\n\\nimpl Format for Receipt {}\\n\\nimpl Render for Receipt {\\n    fn render(&self) -> String { format!(\\\"{}\\\", self.id) }\\n}\\n\\npub struct Envelope<T: Render> { pub id: UserId, pub body: T }\\n\\npub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\\n    Envelope { id, body }\\n}\\n\",\"total_lines\":19,\"start_line\":1,\"end_line\":19,\"_evaluation\":{\"attempt_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:7\"}}",
+      "serialized_bytes": 679,
+      "source_bytes": 411,
+      "elapsed_ms": 1.8138329905923456,
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 411,
+          "sha256": "855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b",
+          "text": "pub type UserId = u64;\n\npub trait Format {}\n\npub trait Render: Format { fn render(&self) -> String; }\n\npub struct Receipt { pub id: UserId }\n\nimpl Format for Receipt {}\n\nimpl Render for Receipt {\n    fn render(&self) -> String { format!(\"{}\", self.id) }\n}\n\npub struct Envelope<T: Render> { pub id: UserId, pub body: T }\n\npub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\n    Envelope { id, body }\n}\n"
+        }
+      ]
+    }
+  ],
+  "failures": [],
+  "attempts": 7,
+  "deliveries": [
+    {
+      "attempt_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "locate",
+        "query": "Locate the Rust declarations for Build and Receipt, and the related UserId alias, Render trait, and Receipt implementation.",
+        "max_output_bytes": 12000,
+        "max_evidence_bytes": 8000,
+        "max_hops": 1
+      },
+      "reason": "task_context",
+      "detail": "Observed loci_explore request.",
+      "because": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"locate\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"none\",\"exhaustive\":false},\"items\":[{\"id\":\"src/lib.rs::build#function\",\"name\":\"build\",\"kind\":\"function\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches build, userid, render\",\"source_id\":1,\"complete\":true,\"path\":[]}],\"relationships\":[],\"sources\":[{\"id\":1,\"file\":\"src/lib.rs\",\"start_byte\":321,\"end_byte\":410,\"start_line\":17,\"end_line\":19,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\\n    Envelope { id, body }\\n}\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":7}],\"limits\":{\"max_hops\":0,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":12000,\"max_evidence_bytes\":8000},\"usage\":{\"nodes_examined\":1,\"evidence_bytes\":89,\"output_bytes\":1107,\"estimated_tokens\":277,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:1\"}}",
+      "serialized_bytes": 1223,
+      "source_bytes": 89,
+      "elapsed_ms": 9.56354200025089,
+      "trace_event_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:1",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 321,
+          "end_byte": 410,
+          "sha256": "103803b47b750508d508763653e9c705ec596008cca52b98b58915e6132f382d",
+          "text": "pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\n    Envelope { id, body }\n}"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/2",
+      "operation": "search",
+      "arguments": {
+        "query": "Build Receipt UserId Render",
+        "lang": "rust"
+      },
+      "reason": "task_context",
+      "detail": "Observed search request.",
+      "because": null,
+      "response_json": "{\"symbols\":[{\"id\":\"src/lib.rs::build#function\",\"name\":\"build\",\"qualified_name\":\"build\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":321,\"byte_length\":89,\"signature\":\"pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"103803b47b750508d508763653e9c705ec596008cca52b98b58915e6132f382d\",\"decorators\":[],\"keywords\":[\"build\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":17,\"end_line\":19,\"score\":24.0},{\"id\":\"src/lib.rs::Receipt.render#method\",\"name\":\"render\",\"qualified_name\":\"Receipt.render\",\"kind\":\"method\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":200,\"byte_length\":53,\"signature\":\"fn render(&self) -> String { format!(\\\"{}\\\", self.id) }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"2edbbd9749254e2d9d6cc18f54f12e2a841c72569424824b7ff9b57d209ebf50\",\"decorators\":[],\"keywords\":[\"render\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"private\",\"visibility_scope\":[],\"configuration\":\"unconditional\"}}},\"line\":12,\"end_line\":12,\"score\":20.0},{\"id\":\"src/lib.rs::Receipt#struct\",\"name\":\"Receipt\",\"qualified_name\":\"Receipt\",\"kind\":\"struct\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":103,\"byte_length\":37,\"signature\":\"pub struct Receipt { pub id: UserId }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"ebc6f499055ca48ef7c8f503f971ec7dd9d2bb0af945e7202ee903ed6de789fc\",\"decorators\":[],\"keywords\":[\"receipt\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":7,\"end_line\":7,\"score\":12.0},{\"id\":\"src/lib.rs::Receipt#impl~1\",\"name\":\"Receipt\",\"qualified_name\":\"Receipt\",\"kind\":\"impl\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":170,\"byte_length\":85,\"signature\":\"impl Render for Receipt {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"5a49dda0064889477c044fe2b0e3de90d68d942265695fffa6b19965ac219ef4\",\"decorators\":[],\"keywords\":[\"receipt\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"private\",\"visibility_scope\":[],\"configuration\":\"unconditional\"}}},\"line\":11,\"end_line\":13,\"score\":12.0},{\"id\":\"src/lib.rs::Render#trait\",\"name\":\"Render\",\"qualified_name\":\"Render\",\"kind\":\"trait\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":45,\"byte_length\":56,\"signature\":\"pub trait Render: Format { fn render(&self) -> String; }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"358c17c1aa01f6b15cb8960a1c3347bd546337d117cb05328cedbf2314282f40\",\"decorators\":[],\"keywords\":[\"render\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":5,\"end_line\":5,\"score\":10.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":1,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"37779e1f-bd97-4699-833f-a535a0adbc51\",\"_evaluation\":{\"attempt_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:2\"}}",
+      "serialized_bytes": 3538,
+      "source_bytes": 232,
+      "elapsed_ms": 3.244958003051579,
+      "trace_event_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:2",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 321,
+          "end_byte": 382,
+          "sha256": "bcda9f7f354ebd6e85a603802bf70e115dbd28f49c57904f5436c8d97a9423b9",
+          "text": "pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 200,
+          "end_byte": 253,
+          "sha256": "2edbbd9749254e2d9d6cc18f54f12e2a841c72569424824b7ff9b57d209ebf50",
+          "text": "fn render(&self) -> String { format!(\"{}\", self.id) }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 103,
+          "end_byte": 140,
+          "sha256": "ebc6f499055ca48ef7c8f503f971ec7dd9d2bb0af945e7202ee903ed6de789fc",
+          "text": "pub struct Receipt { pub id: UserId }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 170,
+          "end_byte": 195,
+          "sha256": "fcf3c0597247395c5ed6ce228026b22797e782255ed1d33c62e62b672c9ba1b5",
+          "text": "impl Render for Receipt {"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 45,
+          "end_byte": 101,
+          "sha256": "358c17c1aa01f6b15cb8960a1c3347bd546337d117cb05328cedbf2314282f40",
+          "text": "pub trait Render: Format { fn render(&self) -> String; }"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/3",
+      "operation": "search",
+      "arguments": {
+        "query": "UserId Build",
+        "lang": "rust",
+        "file_paths": [
+          "src/lib.rs"
+        ]
+      },
+      "reason": "task_context",
+      "detail": "Observed search request.",
+      "because": null,
+      "response_json": "{\"symbols\":[{\"id\":\"src/lib.rs::build#function\",\"name\":\"build\",\"qualified_name\":\"build\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":321,\"byte_length\":89,\"signature\":\"pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"103803b47b750508d508763653e9c705ec596008cca52b98b58915e6132f382d\",\"decorators\":[],\"keywords\":[\"build\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":17,\"end_line\":19,\"score\":22.0},{\"id\":\"src/lib.rs::UserId#type\",\"name\":\"UserId\",\"qualified_name\":\"UserId\",\"kind\":\"type\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":0,\"byte_length\":22,\"signature\":\"pub type UserId = u64;\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"50f58848b9237239f8bcac7b5818b4243fc1ccd738cc668384124a4c4cda8fba\",\"decorators\":[],\"keywords\":[\"id\",\"user\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":1,\"end_line\":1,\"score\":8.0},{\"id\":\"src/lib.rs::Receipt#struct\",\"name\":\"Receipt\",\"qualified_name\":\"Receipt\",\"kind\":\"struct\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":103,\"byte_length\":37,\"signature\":\"pub struct Receipt { pub id: UserId }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"ebc6f499055ca48ef7c8f503f971ec7dd9d2bb0af945e7202ee903ed6de789fc\",\"decorators\":[],\"keywords\":[\"receipt\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":7,\"end_line\":7,\"score\":2.0},{\"id\":\"src/lib.rs::Envelope#struct\",\"name\":\"Envelope\",\"qualified_name\":\"Envelope\",\"kind\":\"struct\",\"language\":\"rust\",\"file_path\":\"src/lib.rs\",\"byte_offset\":257,\"byte_length\":62,\"signature\":\"pub struct Envelope<T: Render> { pub id: UserId, pub body: T }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"351db124225d48639721ea1d510e24e472343b261bc636747de4d28cc9de7dd6\",\"decorators\":[],\"keywords\":[\"envelope\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":15,\"end_line\":15,\"score\":2.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":1,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"4fdf5a06-8bd2-4ac1-9a72-c4677f0abf98\",\"_evaluation\":{\"attempt_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:3\"}}",
+      "serialized_bytes": 2920,
+      "source_bytes": 182,
+      "elapsed_ms": 4.35054098488763,
+      "trace_event_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:3",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 321,
+          "end_byte": 382,
+          "sha256": "bcda9f7f354ebd6e85a603802bf70e115dbd28f49c57904f5436c8d97a9423b9",
+          "text": "pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 22,
+          "sha256": "50f58848b9237239f8bcac7b5818b4243fc1ccd738cc668384124a4c4cda8fba",
+          "text": "pub type UserId = u64;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 103,
+          "end_byte": 140,
+          "sha256": "ebc6f499055ca48ef7c8f503f971ec7dd9d2bb0af945e7202ee903ed6de789fc",
+          "text": "pub struct Receipt { pub id: UserId }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 257,
+          "end_byte": 319,
+          "sha256": "351db124225d48639721ea1d510e24e472343b261bc636747de4d28cc9de7dd6",
+          "text": "pub struct Envelope<T: Render> { pub id: UserId, pub body: T }"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/4",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "src/lib.rs::UserId#type",
+          "src/lib.rs::build#function",
+          "src/lib.rs::Receipt#struct",
+          "src/lib.rs::Envelope#struct"
+        ],
+        "context": 0,
+        "selected_from_search_id": "4fdf5a06-8bd2-4ac1-9a72-c4677f0abf98"
+      },
+      "reason": "task_context",
+      "detail": "Observed get request.",
+      "because": null,
+      "response_json": "{\"symbols\":[{\"id\":\"src/lib.rs::UserId#type\",\"source\":\"pub type UserId = u64;\",\"byte_offset\":0,\"byte_length\":22,\"line\":1,\"end_line\":1,\"signature\":\"pub type UserId = u64;\",\"kind\":\"type\",\"language\":\"rust\"},{\"id\":\"src/lib.rs::build#function\",\"source\":\"pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\\n    Envelope { id, body }\\n}\",\"byte_offset\":321,\"byte_length\":89,\"line\":17,\"end_line\":19,\"signature\":\"pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\",\"kind\":\"function\",\"language\":\"rust\"},{\"id\":\"src/lib.rs::Receipt#struct\",\"source\":\"pub struct Receipt { pub id: UserId }\",\"byte_offset\":103,\"byte_length\":37,\"line\":7,\"end_line\":7,\"signature\":\"pub struct Receipt { pub id: UserId }\",\"kind\":\"struct\",\"language\":\"rust\"},{\"id\":\"src/lib.rs::Envelope#struct\",\"source\":\"pub struct Envelope<T: Render> { pub id: UserId, pub body: T }\",\"byte_offset\":257,\"byte_length\":62,\"line\":15,\"end_line\":15,\"signature\":\"pub struct Envelope<T: Render> { pub id: UserId, pub body: T }\",\"kind\":\"struct\",\"language\":\"rust\"}],\"_evaluation\":{\"attempt_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:4\"}}",
+      "serialized_bytes": 1190,
+      "source_bytes": 392,
+      "elapsed_ms": 9.82674999977462,
+      "trace_event_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:4",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 22,
+          "sha256": "50f58848b9237239f8bcac7b5818b4243fc1ccd738cc668384124a4c4cda8fba",
+          "text": "pub type UserId = u64;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 321,
+          "end_byte": 410,
+          "sha256": "103803b47b750508d508763653e9c705ec596008cca52b98b58915e6132f382d",
+          "text": "pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\n    Envelope { id, body }\n}"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 103,
+          "end_byte": 140,
+          "sha256": "ebc6f499055ca48ef7c8f503f971ec7dd9d2bb0af945e7202ee903ed6de789fc",
+          "text": "pub struct Receipt { pub id: UserId }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 257,
+          "end_byte": 319,
+          "sha256": "351db124225d48639721ea1d510e24e472343b261bc636747de4d28cc9de7dd6",
+          "text": "pub struct Envelope<T: Render> { pub id: UserId, pub body: T }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 22,
+          "sha256": "50f58848b9237239f8bcac7b5818b4243fc1ccd738cc668384124a4c4cda8fba",
+          "text": "pub type UserId = u64;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 321,
+          "end_byte": 382,
+          "sha256": "bcda9f7f354ebd6e85a603802bf70e115dbd28f49c57904f5436c8d97a9423b9",
+          "text": "pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 103,
+          "end_byte": 140,
+          "sha256": "ebc6f499055ca48ef7c8f503f971ec7dd9d2bb0af945e7202ee903ed6de789fc",
+          "text": "pub struct Receipt { pub id: UserId }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 257,
+          "end_byte": 319,
+          "sha256": "351db124225d48639721ea1d510e24e472343b261bc636747de4d28cc9de7dd6",
+          "text": "pub struct Envelope<T: Render> { pub id: UserId, pub body: T }"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/5",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "src/lib.rs::Render#trait",
+          "src/lib.rs::Receipt#impl~1",
+          "src/lib.rs::Receipt.render#method"
+        ],
+        "context": 0,
+        "selected_from_search_id": "37779e1f-bd97-4699-833f-a535a0adbc51"
+      },
+      "reason": "task_context",
+      "detail": "Observed get request.",
+      "because": null,
+      "response_json": "{\"symbols\":[{\"id\":\"src/lib.rs::Render#trait\",\"source\":\"pub trait Render: Format { fn render(&self) -> String; }\",\"byte_offset\":45,\"byte_length\":56,\"line\":5,\"end_line\":5,\"signature\":\"pub trait Render: Format { fn render(&self) -> String; }\",\"kind\":\"trait\",\"language\":\"rust\"},{\"id\":\"src/lib.rs::Receipt#impl~1\",\"source\":\"impl Render for Receipt {\\n    fn render(&self) -> String { format!(\\\"{}\\\", self.id) }\\n}\",\"byte_offset\":170,\"byte_length\":85,\"line\":11,\"end_line\":13,\"signature\":\"impl Render for Receipt {\",\"kind\":\"impl\",\"language\":\"rust\"},{\"id\":\"src/lib.rs::Receipt.render#method\",\"source\":\"fn render(&self) -> String { format!(\\\"{}\\\", self.id) }\",\"byte_offset\":200,\"byte_length\":53,\"line\":12,\"end_line\":12,\"signature\":\"fn render(&self) -> String { format!(\\\"{}\\\", self.id) }\",\"kind\":\"method\",\"language\":\"rust\"}],\"_evaluation\":{\"attempt_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:5\"}}",
+      "serialized_bytes": 983,
+      "source_bytes": 328,
+      "elapsed_ms": 10.119958984432742,
+      "trace_event_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:5",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 45,
+          "end_byte": 101,
+          "sha256": "358c17c1aa01f6b15cb8960a1c3347bd546337d117cb05328cedbf2314282f40",
+          "text": "pub trait Render: Format { fn render(&self) -> String; }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 170,
+          "end_byte": 255,
+          "sha256": "5a49dda0064889477c044fe2b0e3de90d68d942265695fffa6b19965ac219ef4",
+          "text": "impl Render for Receipt {\n    fn render(&self) -> String { format!(\"{}\", self.id) }\n}"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 200,
+          "end_byte": 253,
+          "sha256": "2edbbd9749254e2d9d6cc18f54f12e2a841c72569424824b7ff9b57d209ebf50",
+          "text": "fn render(&self) -> String { format!(\"{}\", self.id) }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 45,
+          "end_byte": 101,
+          "sha256": "358c17c1aa01f6b15cb8960a1c3347bd546337d117cb05328cedbf2314282f40",
+          "text": "pub trait Render: Format { fn render(&self) -> String; }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 170,
+          "end_byte": 195,
+          "sha256": "fcf3c0597247395c5ed6ce228026b22797e782255ed1d33c62e62b672c9ba1b5",
+          "text": "impl Render for Receipt {"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 200,
+          "end_byte": 253,
+          "sha256": "2edbbd9749254e2d9d6cc18f54f12e2a841c72569424824b7ff9b57d209ebf50",
+          "text": "fn render(&self) -> String { format!(\"{}\", self.id) }"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/6",
+      "operation": "explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "",
+        "max_output_bytes": 14000,
+        "max_evidence_bytes": 8000,
+        "seed_ids": [
+          "src/lib.rs::UserId#type",
+          "src/lib.rs::build#function",
+          "src/lib.rs::Render#trait",
+          "src/lib.rs::Receipt#struct",
+          "src/lib.rs::Receipt#impl~1"
+        ],
+        "max_hops": 2
+      },
+      "reason": "task_context",
+      "detail": "Observed loci_explore request.",
+      "because": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"partial\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"src/lib.rs::UserId#type\",\"name\":\"UserId\",\"kind\":\"type\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"src/lib.rs::build#function\",\"name\":\"build\",\"kind\":\"function\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":2,\"complete\":true,\"path\":[]},{\"id\":\"src/lib.rs::Render#trait\",\"name\":\"Render\",\"kind\":\"trait\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":3,\"complete\":true,\"path\":[]},{\"id\":\"src/lib.rs::Receipt#struct\",\"name\":\"Receipt\",\"kind\":\"struct\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":4,\"complete\":true,\"path\":[]},{\"id\":\"src/lib.rs::Receipt#impl~1\",\"name\":\"Receipt\",\"kind\":\"impl\",\"file\":\"src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":5,\"complete\":true,\"path\":[]},{\"id\":\"src/lib.rs::Format#trait\",\"name\":\"Format\",\"kind\":\"trait\",\"file\":\"src/lib.rs\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":6,\"complete\":true,\"path\":[1]},{\"id\":\"src/lib.rs::Envelope#struct\",\"name\":\"Envelope\",\"kind\":\"struct\",\"file\":\"src/lib.rs\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":10,\"complete\":true,\"path\":[2]},{\"id\":\"src/lib.rs::Receipt#impl\",\"name\":\"Receipt\",\"kind\":\"impl\",\"file\":\"src/lib.rs\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":12,\"complete\":true,\"path\":[3]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"src/lib.rs::Render#trait\",\"to\":\"src/lib.rs::Format#trait\",\"type\":\"supertrait\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"src/lib.rs\",\"line\":5,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\"}},\"traversed\":\"forward\",\"source_ids\":[7,8,9],\"resolution_configuration\":\"unconditional\"},{\"id\":2,\"edge\":{\"from\":\"src/lib.rs::build#function\",\"to\":\"src/lib.rs::Envelope#struct\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"src/lib.rs\",\"line\":17,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\"}},\"traversed\":\"forward\",\"source_ids\":[2,11,9],\"resolution_configuration\":\"unconditional\"},{\"id\":3,\"edge\":{\"from\":\"src/lib.rs::Receipt#impl\",\"to\":\"src/lib.rs::Receipt#struct\",\"type\":\"impl_self_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"src/lib.rs\",\"line\":9,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\"}},\"traversed\":\"reverse\",\"source_ids\":[13,14,9],\"resolution_configuration\":\"unconditional\"}],\"sources\":[{\"id\":1,\"file\":\"src/lib.rs\",\"start_byte\":0,\"end_byte\":22,\"start_line\":1,\"end_line\":1,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub type UserId = u64;\"},{\"id\":2,\"file\":\"src/lib.rs\",\"start_byte\":321,\"end_byte\":410,\"start_line\":17,\"end_line\":19,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\\n    Envelope { id, body }\\n}\"},{\"id\":3,\"file\":\"src/lib.rs\",\"start_byte\":45,\"end_byte\":101,\"start_line\":5,\"end_line\":5,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub trait Render: Format { fn render(&self) -> String; }\"},{\"id\":4,\"file\":\"src/lib.rs\",\"start_byte\":103,\"end_byte\":140,\"start_line\":7,\"end_line\":7,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub struct Receipt { pub id: UserId }\"},{\"id\":5,\"file\":\"src/lib.rs\",\"start_byte\":170,\"end_byte\":255,\"start_line\":11,\"end_line\":13,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"impl Render for Receipt {\\n    fn render(&self) -> String { format!(\\\"{}\\\", self.id) }\\n}\"},{\"id\":6,\"file\":\"src/lib.rs\",\"start_byte\":24,\"end_byte\":43,\"start_line\":3,\"end_line\":3,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub trait Format {}\"},{\"id\":7,\"file\":\"src/lib.rs\",\"start_byte\":45,\"end_byte\":102,\"start_line\":5,\"end_line\":5,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub trait Render: Format { fn render(&self) -> String; }\\n\"},{\"id\":8,\"file\":\"src/lib.rs\",\"start_byte\":24,\"end_byte\":44,\"start_line\":3,\"end_line\":3,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub trait Format {}\\n\"},{\"id\":9,\"file\":\"Cargo.toml\",\"start_byte\":0,\"end_byte\":61,\"start_line\":1,\"end_line\":4,\"content_hash\":\"734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9\",\"content\":\"[package]\\nname = \\\"ledger\\\"\\nversion = \\\"0.1.0\\\"\\nedition = \\\"2021\\\"\\n\"},{\"id\":10,\"file\":\"src/lib.rs\",\"start_byte\":257,\"end_byte\":319,\"start_line\":15,\"end_line\":15,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub struct Envelope<T: Render> { pub id: UserId, pub body: T }\"},{\"id\":11,\"file\":\"src/lib.rs\",\"start_byte\":257,\"end_byte\":320,\"start_line\":15,\"end_line\":15,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub struct Envelope<T: Render> { pub id: UserId, pub body: T }\\n\"},{\"id\":12,\"file\":\"src/lib.rs\",\"start_byte\":142,\"end_byte\":168,\"start_line\":9,\"end_line\":9,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"impl Format for Receipt {}\"},{\"id\":13,\"file\":\"src/lib.rs\",\"start_byte\":142,\"end_byte\":169,\"start_line\":9,\"end_line\":9,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"impl Format for Receipt {}\\n\"},{\"id\":14,\"file\":\"src/lib.rs\",\"start_byte\":103,\"end_byte\":141,\"start_line\":7,\"end_line\":7,\"content_hash\":\"855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b\",\"content\":\"pub struct Receipt { pub id: UserId }\\n\"}],\"omissions\":[{\"reason\":\"alternative_path\",\"count\":8},{\"reason\":\"cycle\",\"count\":1},{\"reason\":\"not_selected\",\"count\":1},{\"reason\":\"unresolved_relation\",\"count\":3}],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":14000,\"max_evidence_bytes\":8000},\"usage\":{\"nodes_examined\":8,\"evidence_bytes\":462,\"output_bytes\":6620,\"estimated_tokens\":1655,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:6\"}}",
+      "serialized_bytes": 6736,
+      "source_bytes": 662,
+      "elapsed_ms": 21.81591698899865,
+      "trace_event_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:6",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 22,
+          "sha256": "50f58848b9237239f8bcac7b5818b4243fc1ccd738cc668384124a4c4cda8fba",
+          "text": "pub type UserId = u64;"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 321,
+          "end_byte": 410,
+          "sha256": "103803b47b750508d508763653e9c705ec596008cca52b98b58915e6132f382d",
+          "text": "pub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\n    Envelope { id, body }\n}"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 45,
+          "end_byte": 101,
+          "sha256": "358c17c1aa01f6b15cb8960a1c3347bd546337d117cb05328cedbf2314282f40",
+          "text": "pub trait Render: Format { fn render(&self) -> String; }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 103,
+          "end_byte": 140,
+          "sha256": "ebc6f499055ca48ef7c8f503f971ec7dd9d2bb0af945e7202ee903ed6de789fc",
+          "text": "pub struct Receipt { pub id: UserId }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 170,
+          "end_byte": 255,
+          "sha256": "5a49dda0064889477c044fe2b0e3de90d68d942265695fffa6b19965ac219ef4",
+          "text": "impl Render for Receipt {\n    fn render(&self) -> String { format!(\"{}\", self.id) }\n}"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 24,
+          "end_byte": 43,
+          "sha256": "f63bb930956ee5af63a25d30a3a0e73d7958cb1b6b8c1d82196e4d190cc06837",
+          "text": "pub trait Format {}"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 45,
+          "end_byte": 102,
+          "sha256": "ee16722f1a2189b8c159dfbccccb870ae3f21525627e11888632f3aac2e23f7a",
+          "text": "pub trait Render: Format { fn render(&self) -> String; }\n"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 24,
+          "end_byte": 44,
+          "sha256": "7eb417fee3b4b679b253f7f4a82e0564e1df6e7611cf697532da663295d85428",
+          "text": "pub trait Format {}\n"
+        },
+        {
+          "file": "Cargo.toml",
+          "start_byte": 0,
+          "end_byte": 61,
+          "sha256": "734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9",
+          "text": "[package]\nname = \"ledger\"\nversion = \"0.1.0\"\nedition = \"2021\"\n"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 257,
+          "end_byte": 319,
+          "sha256": "351db124225d48639721ea1d510e24e472343b261bc636747de4d28cc9de7dd6",
+          "text": "pub struct Envelope<T: Render> { pub id: UserId, pub body: T }"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 257,
+          "end_byte": 320,
+          "sha256": "006e239c3563127d92075695a869d262a7fb8efdd744713673245c4f85336663",
+          "text": "pub struct Envelope<T: Render> { pub id: UserId, pub body: T }\n"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 142,
+          "end_byte": 168,
+          "sha256": "7f8e415ccb367c952eff88c4080e98d0e050843e8ef114fbdb5d2e03dd883c22",
+          "text": "impl Format for Receipt {}"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 142,
+          "end_byte": 169,
+          "sha256": "67e9ea6278b10de361358034043b469db11dd5f2e5fcd55a239293aa0788bad4",
+          "text": "impl Format for Receipt {}\n"
+        },
+        {
+          "file": "src/lib.rs",
+          "start_byte": 103,
+          "end_byte": 141,
+          "sha256": "f547f1867a16a5643f3ba306829c1f86ef4f9bf4d05e01437d045fafc4110cd8",
+          "text": "pub struct Receipt { pub id: UserId }\n"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/7",
+      "operation": "file",
+      "arguments": {
+        "file_path": "src/lib.rs",
+        "start_line": 1,
+        "end_line": 19
+      },
+      "reason": "task_context",
+      "detail": "Observed file request.",
+      "because": null,
+      "response_json": "{\"file\":\"src/lib.rs\",\"content\":\"pub type UserId = u64;\\n\\npub trait Format {}\\n\\npub trait Render: Format { fn render(&self) -> String; }\\n\\npub struct Receipt { pub id: UserId }\\n\\nimpl Format for Receipt {}\\n\\nimpl Render for Receipt {\\n    fn render(&self) -> String { format!(\\\"{}\\\", self.id) }\\n}\\n\\npub struct Envelope<T: Render> { pub id: UserId, pub body: T }\\n\\npub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\\n    Envelope { id, body }\\n}\\n\",\"total_lines\":19,\"start_line\":1,\"end_line\":19,\"_evaluation\":{\"attempt_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:7\"}}",
+      "serialized_bytes": 679,
+      "source_bytes": 411,
+      "elapsed_ms": 1.8755829951260239,
+      "trace_event_id": "session-0c7ae913-85d4-4b3a-91fb-c63c7137e02f:7",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 411,
+          "sha256": "855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b",
+          "text": "pub type UserId = u64;\n\npub trait Format {}\n\npub trait Render: Format { fn render(&self) -> String; }\n\npub struct Receipt { pub id: UserId }\n\nimpl Format for Receipt {}\n\nimpl Render for Receipt {\n    fn render(&self) -> String { format!(\"{}\", self.id) }\n}\n\npub struct Envelope<T: Render> { pub id: UserId, pub body: T }\n\npub fn build<T: Render>(id: UserId, body: T) -> Envelope<T> {\n    Envelope { id, body }\n}\n"
+        }
+      ]
+    }
+  ]
+}

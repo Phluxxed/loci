@@ -1,0 +1,335 @@
+{
+  "schema_version": 1,
+  "intent": "type_dependencies",
+  "status": "partial",
+  "selection": "explicit",
+  "scope": {
+    "source": "indexed_supported_source",
+    "coverage": "partial",
+    "relationships": "authored_types",
+    "exhaustive": false
+  },
+  "items": [
+    {
+      "id": "src/lib.rs::build#function",
+      "name": "build",
+      "kind": "function",
+      "file": "src/lib.rs",
+      "role": "anchor",
+      "depth": 0,
+      "why": "Explicitly requested",
+      "source_id": 1,
+      "complete": true,
+      "path": []
+    },
+    {
+      "id": "src/lib.rs::Receipt#struct",
+      "name": "Receipt",
+      "kind": "struct",
+      "file": "src/lib.rs",
+      "role": "anchor",
+      "depth": 0,
+      "why": "Explicitly requested",
+      "source_id": 2,
+      "complete": true,
+      "path": []
+    },
+    {
+      "id": "src/lib.rs::Envelope#struct",
+      "name": "Envelope",
+      "kind": "struct",
+      "file": "src/lib.rs",
+      "role": "anchor",
+      "depth": 0,
+      "why": "Explicitly requested",
+      "source_id": 3,
+      "complete": true,
+      "path": []
+    },
+    {
+      "id": "src/lib.rs::Receipt#impl",
+      "name": "Receipt",
+      "kind": "impl",
+      "file": "src/lib.rs",
+      "role": "anchor",
+      "depth": 0,
+      "why": "Explicitly requested",
+      "source_id": 4,
+      "complete": true,
+      "path": []
+    },
+    {
+      "id": "src/lib.rs::Receipt#impl~1",
+      "name": "Receipt",
+      "kind": "impl",
+      "file": "src/lib.rs",
+      "role": "anchor",
+      "depth": 0,
+      "why": "Explicitly requested",
+      "source_id": 5,
+      "complete": true,
+      "path": []
+    },
+    {
+      "id": "src/lib.rs::Render#trait",
+      "name": "Render",
+      "kind": "trait",
+      "file": "src/lib.rs",
+      "role": "dependency",
+      "depth": 1,
+      "why": "Direct declared type",
+      "source_id": 6,
+      "complete": true,
+      "path": [
+        1
+      ]
+    },
+    {
+      "id": "src/lib.rs::UserId#type",
+      "name": "UserId",
+      "kind": "type",
+      "file": "src/lib.rs",
+      "role": "dependency",
+      "depth": 1,
+      "why": "Direct declared type",
+      "source_id": 9,
+      "complete": true,
+      "path": [
+        2
+      ]
+    },
+    {
+      "id": "src/lib.rs::Format#trait",
+      "name": "Format",
+      "kind": "trait",
+      "file": "src/lib.rs",
+      "role": "dependency",
+      "depth": 1,
+      "why": "Direct declared type",
+      "source_id": 11,
+      "complete": true,
+      "path": [
+        3
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "id": 1,
+      "edge": {
+        "from": "src/lib.rs::build#function",
+        "to": "src/lib.rs::Render#trait",
+        "type": "uses_type",
+        "directed": true,
+        "namespace": "loci",
+        "resolution": "exact",
+        "evidence": {
+          "file": "src/lib.rs",
+          "line": 17,
+          "content_hash": "855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b"
+        }
+      },
+      "traversed": "forward",
+      "source_ids": [
+        1,
+        7,
+        8
+      ],
+      "resolution_configuration": "unconditional"
+    },
+    {
+      "id": 2,
+      "edge": {
+        "from": "src/lib.rs::build#function",
+        "to": "src/lib.rs::UserId#type",
+        "type": "uses_type",
+        "directed": true,
+        "namespace": "loci",
+        "resolution": "exact",
+        "evidence": {
+          "file": "src/lib.rs",
+          "line": 17,
+          "content_hash": "855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b"
+        }
+      },
+      "traversed": "forward",
+      "source_ids": [
+        1,
+        10,
+        8
+      ],
+      "resolution_configuration": "unconditional"
+    },
+    {
+      "id": 3,
+      "edge": {
+        "from": "src/lib.rs::Receipt#impl",
+        "to": "src/lib.rs::Format#trait",
+        "type": "impl_trait",
+        "directed": true,
+        "namespace": "loci",
+        "resolution": "exact",
+        "evidence": {
+          "file": "src/lib.rs",
+          "line": 9,
+          "content_hash": "855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b"
+        }
+      },
+      "traversed": "forward",
+      "source_ids": [
+        12,
+        13,
+        8
+      ],
+      "resolution_configuration": "unconditional"
+    }
+  ],
+  "sources": [
+    {
+      "id": 2,
+      "file": "src/lib.rs",
+      "start_byte": 103,
+      "end_byte": 140,
+      "start_line": 7,
+      "end_line": 7,
+      "content_hash": "855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b",
+      "content": "pub struct Receipt { pub id: UserId }"
+    },
+    {
+      "id": 3,
+      "file": "src/lib.rs",
+      "start_byte": 257,
+      "end_byte": 319,
+      "start_line": 15,
+      "end_line": 15,
+      "content_hash": "855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b",
+      "content": "pub struct Envelope<T: Render> { pub id: UserId, pub body: T }"
+    },
+    {
+      "id": 4,
+      "file": "src/lib.rs",
+      "start_byte": 142,
+      "end_byte": 168,
+      "start_line": 9,
+      "end_line": 9,
+      "content_hash": "855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b",
+      "content": "impl Format for Receipt {}"
+    },
+    {
+      "id": 5,
+      "file": "src/lib.rs",
+      "start_byte": 170,
+      "end_byte": 255,
+      "start_line": 11,
+      "end_line": 13,
+      "content_hash": "855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b",
+      "content": "impl Render for Receipt {\n    fn render(&self) -> String { format!(\"{}\", self.id) }\n}"
+    },
+    {
+      "id": 6,
+      "file": "src/lib.rs",
+      "start_byte": 45,
+      "end_byte": 101,
+      "start_line": 5,
+      "end_line": 5,
+      "content_hash": "855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b",
+      "content": "pub trait Render: Format { fn render(&self) -> String; }"
+    },
+    {
+      "id": 7,
+      "file": "src/lib.rs",
+      "start_byte": 45,
+      "end_byte": 102,
+      "start_line": 5,
+      "end_line": 5,
+      "content_hash": "855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b",
+      "content": "pub trait Render: Format { fn render(&self) -> String; }\n"
+    },
+    {
+      "id": 8,
+      "file": "Cargo.toml",
+      "start_byte": 0,
+      "end_byte": 61,
+      "start_line": 1,
+      "end_line": 4,
+      "content_hash": "734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9",
+      "content": "[package]\nname = \"ledger\"\nversion = \"0.1.0\"\nedition = \"2021\"\n"
+    },
+    {
+      "id": 9,
+      "file": "src/lib.rs",
+      "start_byte": 0,
+      "end_byte": 22,
+      "start_line": 1,
+      "end_line": 1,
+      "content_hash": "855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b",
+      "content": "pub type UserId = u64;"
+    },
+    {
+      "id": 10,
+      "file": "src/lib.rs",
+      "start_byte": 0,
+      "end_byte": 23,
+      "start_line": 1,
+      "end_line": 1,
+      "content_hash": "855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b",
+      "content": "pub type UserId = u64;\n"
+    },
+    {
+      "id": 11,
+      "file": "src/lib.rs",
+      "start_byte": 24,
+      "end_byte": 43,
+      "start_line": 3,
+      "end_line": 3,
+      "content_hash": "855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b",
+      "content": "pub trait Format {}"
+    },
+    {
+      "id": 12,
+      "file": "src/lib.rs",
+      "start_byte": 142,
+      "end_byte": 169,
+      "start_line": 9,
+      "end_line": 9,
+      "content_hash": "855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b",
+      "content": "impl Format for Receipt {}\n"
+    },
+    {
+      "id": 13,
+      "file": "src/lib.rs",
+      "start_byte": 24,
+      "end_byte": 44,
+      "start_line": 3,
+      "end_line": 3,
+      "content_hash": "855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b",
+      "content": "pub trait Format {}\n"
+    }
+  ],
+  "omissions": [
+    {
+      "reason": "alternative_path",
+      "count": 10
+    },
+    {
+      "reason": "unresolved_relation",
+      "count": 3
+    }
+  ],
+  "limits": {
+    "max_hops": 3,
+    "max_nodes": 64,
+    "max_items": 12,
+    "max_neighbors": 32,
+    "max_output_bytes": 16384,
+    "max_evidence_bytes": 8192
+  },
+  "usage": {
+    "nodes_examined": 8,
+    "evidence_bytes": 461,
+    "output_bytes": 6278,
+    "estimated_tokens": 1570,
+    "token_estimate_method": "utf8_bytes_div_4",
+    "output_encoding": "mcp_result_json_utf8"
+  }
+}

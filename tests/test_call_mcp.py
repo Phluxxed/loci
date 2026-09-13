@@ -148,15 +148,20 @@ def test_installed_mcp_call_diagnostics_survive_fresh_process_for_each_language(
     assert result["verify"]["failed"] == []
     assert result["index_before"] == result["index_after"]
 
-    for existing_schema in (result["imports_schema"], result["references_schema"]):
+    for name in ("imports_schema", "references_schema"):
+        existing_schema = result[name]
         assert existing_schema["required"] == ["repo"]
-        assert set(existing_schema["properties"]) == {
+        expected_properties = {
             "repo",
             "file",
             "status",
             "offset",
             "limit",
         }
+        if name == "references_schema":
+            expected_properties.add("family")
+            assert existing_schema["properties"]["family"]["default"] == "symbol"
+        assert set(existing_schema["properties"]) == expected_properties
 
 
 def test_mcp_call_diagnostics_return_structured_boundary_errors(

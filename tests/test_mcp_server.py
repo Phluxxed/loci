@@ -173,6 +173,7 @@ def test_mcp_index_outline_get_round_trip(tmp_path: Path, fixtures_dir: Path):
     assert result["indexed"]["symbols_indexed"] > 0
     assert result["tools"] == [
         "loci_analyze",
+        "loci_explore",
         "loci_file",
         "loci_get",
         "loci_graph_anchors",

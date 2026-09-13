@@ -1,0 +1,13 @@
+{
+  "node": "v26.5.0",
+  "source_commit": "4d5afbcb54ab9d4bbb12e39357108b3caa4f6874",
+  "cases": 3,
+  "status": "passed",
+  "scope": "Runtime behavior portions of the three independently authored answers; no agent execution or TypeScript typecheck claim.",
+  "command": [
+    "node",
+    "corpus-runtime-check.mjs"
+  ],
+  "working_directory": "A freshly materialized anvil snapshot from this corpus",
+  "script": "import assert from 'node:assert/strict';\nimport { temporalCliArgs } from './src/brain-context/temporal.ts';\nimport { compilerRetrievalLimits, renderCompilerPromptEvidenceContext } from './src/brain-context/render.ts';\nconst args=temporalCliArgs({view:'transition',request_time:'2026-09-10T00:00:00Z',known_at:'2026-09-10',transition:{from:'2026-09-01',to:'2026-09-09'}});\nassert.deepEqual(args,['--temporal-view','transition','--request-time','2026-09-10T00:00:00Z','--known-at','2026-09-10','--transition-from','2026-09-01','--transition-to','2026-09-09']);\nconst retrieval={contractVersion:'3',query:{projectResolution:{status:'matched',projectId:'anvil',page:'projects/anvil.md',matchedBy:'alias'}},evidence:[],diagnostics:[{code:'PROVIDER_FAILED',message:'x',provider:null,details:{}}],omissions:[{candidateId:'x',reason:'byte_limit',estimatedBytes:null}],stop:{reason:'provider_degraded',sufficient:false,detail:'x'},reporting:{diagnostics:{total:2,returned:1},omissions:{total:2,returned:1}}};\nassert.equal(compilerRetrievalLimits(retrieval),['Some sources or retrieval providers could not supply evidence; retrieval may be incomplete.','Additional candidate evidence was omitted or shortened to fit the context limit.','Some diagnostic details were not returned; their categories are unavailable here.','Some omission details were not returned; their reasons are unavailable here.'].join(' '));\nconst v3=renderCompilerPromptEvidenceContext(retrieval);\nconst v1=renderCompilerPromptEvidenceContext({...retrieval,contractVersion:'1'});\nassert.deepEqual(Object.fromEntries(Object.entries(v3).map(([k,v])=>[k,typeof v])),{markdown:'string',renderedBytes:'number',truncated:'boolean',attemptedBytes:'number',guidanceBytes:'number',retrievedContextBytes:'number',framingBytes:'number'});\nassert.ok(v3.markdown.includes('projects/anvil.md'));\nassert.ok(!v1.markdown.includes('projects/anvil.md'));\nconsole.log(JSON.stringify({node:process.version,source_commit:'4d5afbcb54ab9d4bbb12e39357108b3caa4f6874',cases:3,status:'passed',scope:'Runtime behavior portions of the three independently authored answers; no agent execution or TypeScript typecheck claim.'}));\n"
+}

@@ -1,0 +1,1316 @@
+{
+  "schema_version": 4,
+  "protocol": "multilingual-context-workflow-v1",
+  "identity": {
+    "task_id": "go_unproven_package_uses",
+    "session_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6",
+    "arm": "A",
+    "repetition": 2,
+    "snapshot": "go_uncertainty",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1"
+  },
+  "events": [
+    {
+      "id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:1",
+      "task_id": "go_unproven_package_uses",
+      "session_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "go_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "outline",
+      "arguments": {},
+      "search_id": null,
+      "response_json": "{\"files\":[{\"file\":\"cmd/main.go\",\"symbols\":[{\"id\":\"cmd/main.go::Keep#function\",\"name\":\"Keep\",\"kind\":\"function\",\"line\":10,\"end_line\":10,\"signature\":\"func Keep(req api.Request) {}\",\"summary\":\"\"},{\"id\":\"cmd/main.go::Probe#function\",\"name\":\"Probe\",\"kind\":\"function\",\"line\":12,\"end_line\":16,\"signature\":\"func Probe(api int) {\",\"summary\":\"\"},{\"id\":\"cmd/main.go::Missing#function\",\"name\":\"Missing\",\"kind\":\"function\",\"line\":18,\"end_line\":18,\"signature\":\"func Missing() { api.Absent() }\",\"summary\":\"\"},{\"id\":\"cmd/main.go::__file__#file\",\"name\":\"main.go\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"cmd/main.go\",\"summary\":\"\"}]},{\"file\":\"model/model.go\",\"symbols\":[{\"id\":\"model/model.go::Request#type\",\"name\":\"Request\",\"kind\":\"type\",\"line\":3,\"end_line\":3,\"signature\":\"Request struct{}\",\"summary\":\"\"},{\"id\":\"model/model.go::Handle#function\",\"name\":\"Handle\",\"kind\":\"function\",\"line\":4,\"end_line\":4,\"signature\":\"func Handle() {}\",\"summary\":\"\"},{\"id\":\"model/model.go::__file__#file\",\"name\":\"model.go\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"model/model.go\",\"summary\":\"\"},{\"id\":\"model::example.com/acme/model#package\",\"name\":\"model\",\"kind\":\"package\",\"line\":1,\"end_line\":1,\"signature\":\"example.com/acme/model\",\"summary\":\"\"}]},{\"file\":\"one/one.go\",\"symbols\":[{\"id\":\"one/one.go::Open#function\",\"name\":\"Open\",\"kind\":\"function\",\"line\":3,\"end_line\":3,\"signature\":\"func Open() {}\",\"summary\":\"\"},{\"id\":\"one/one.go::__file__#file\",\"name\":\"one.go\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"one/one.go\",\"summary\":\"\"},{\"id\":\"one::example.com/acme/one#package\",\"name\":\"shared\",\"kind\":\"package\",\"line\":1,\"end_line\":1,\"signature\":\"example.com/acme/one\",\"summary\":\"\"}]},{\"file\":\"two/two.go\",\"symbols\":[{\"id\":\"two/two.go::Open#function\",\"name\":\"Open\",\"kind\":\"function\",\"line\":3,\"end_line\":3,\"signature\":\"func Open() {}\",\"summary\":\"\"},{\"id\":\"two/two.go::__file__#file\",\"name\":\"two.go\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"two/two.go\",\"summary\":\"\"},{\"id\":\"two::example.com/acme/two#package\",\"name\":\"shared\",\"kind\":\"package\",\"line\":1,\"end_line\":1,\"signature\":\"example.com/acme/two\",\"summary\":\"\"}]},{\"file\":\"wrong/model.go\",\"symbols\":[{\"id\":\"wrong/model.go::Request#type\",\"name\":\"Request\",\"kind\":\"type\",\"line\":3,\"end_line\":3,\"signature\":\"Request struct{}\",\"summary\":\"\"},{\"id\":\"wrong/model.go::Handle#function\",\"name\":\"Handle\",\"kind\":\"function\",\"line\":4,\"end_line\":4,\"signature\":\"func Handle() {}\",\"summary\":\"\"},{\"id\":\"wrong/model.go::Absent#function\",\"name\":\"Absent\",\"kind\":\"function\",\"line\":5,\"end_line\":5,\"signature\":\"func Absent() {}\",\"summary\":\"\"},{\"id\":\"wrong/model.go::__file__#file\",\"name\":\"model.go\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"wrong/model.go\",\"summary\":\"\"},{\"id\":\"wrong::example.com/acme/wrong#package\",\"name\":\"model\",\"kind\":\"package\",\"line\":1,\"end_line\":1,\"signature\":\"example.com/acme/wrong\",\"summary\":\"\"}]}],\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:1\"}}",
+      "serialized_bytes": 3003,
+      "source_bytes": 189,
+      "elapsed_ms": 1.7722920165397227,
+      "spans": [
+        {
+          "file": "cmd/main.go",
+          "start_byte": 123,
+          "end_byte": 152,
+          "sha256": "271dedf9a4f1ae4488ff940ab60621c51b52800d1543d086b02de93fd5f76925",
+          "text": "func Keep(req api.Request) {}"
+        },
+        {
+          "file": "cmd/main.go",
+          "start_byte": 154,
+          "end_byte": 175,
+          "sha256": "50ad9d92af17a909b26e3d507f359b60a2dced275eeb2298d867ac43ace74f63",
+          "text": "func Probe(api int) {"
+        },
+        {
+          "file": "cmd/main.go",
+          "start_byte": 235,
+          "end_byte": 266,
+          "sha256": "f13e4733cff5722acf920ae34920f4cda4e5271df9e6be53331e1fc758b6ca42",
+          "text": "func Missing() { api.Absent() }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 20,
+          "end_byte": 36,
+          "sha256": "86e5f87aecbd626f6648c9f2b6bf3bf501ee8e3dcbae947bf08aeb28d53c0ee2",
+          "text": "Request struct{}"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 37,
+          "end_byte": 53,
+          "sha256": "2d0230ea88ea200472e219dde0a9ad38f35daba7b992f9a829cca42f1c5c3235",
+          "text": "func Handle() {}"
+        },
+        {
+          "file": "one/one.go",
+          "start_byte": 16,
+          "end_byte": 30,
+          "sha256": "943be965979ec8363ef81ae9356ea1eef4ebba32c675ebb89333db028682ab98",
+          "text": "func Open() {}"
+        },
+        {
+          "file": "two/two.go",
+          "start_byte": 16,
+          "end_byte": 30,
+          "sha256": "943be965979ec8363ef81ae9356ea1eef4ebba32c675ebb89333db028682ab98",
+          "text": "func Open() {}"
+        },
+        {
+          "file": "wrong/model.go",
+          "start_byte": 20,
+          "end_byte": 36,
+          "sha256": "86e5f87aecbd626f6648c9f2b6bf3bf501ee8e3dcbae947bf08aeb28d53c0ee2",
+          "text": "Request struct{}"
+        },
+        {
+          "file": "wrong/model.go",
+          "start_byte": 37,
+          "end_byte": 53,
+          "sha256": "2d0230ea88ea200472e219dde0a9ad38f35daba7b992f9a829cca42f1c5c3235",
+          "text": "func Handle() {}"
+        },
+        {
+          "file": "wrong/model.go",
+          "start_byte": 54,
+          "end_byte": 70,
+          "sha256": "d88260f434211002fce46f9928768208e2911f24f2009968021366908f90a21a",
+          "text": "func Absent() {}"
+        }
+      ]
+    },
+    {
+      "id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:2",
+      "task_id": "go_unproven_package_uses",
+      "session_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "go_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "cmd/main.go",
+        "start_line": 1,
+        "end_line": 30
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"cmd/main.go\",\"content\":\"package main\\n\\nimport (\\n    api \\\"example.com/acme/model\\\"\\n    \\\"example.com/acme/one\\\"\\n    \\\"example.com/acme/two\\\"\\n    \\\"fmt\\\"\\n)\\n\\nfunc Keep(req api.Request) {}\\n\\nfunc Probe(api int) {\\n    api.Handle()\\n    shared.Open()\\n    fmt.Println(api)\\n}\\n\\nfunc Missing() { api.Absent() }\\n\",\"total_lines\":18,\"start_line\":1,\"end_line\":18,\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:2\"}}",
+      "serialized_bytes": 541,
+      "source_bytes": 267,
+      "elapsed_ms": 3.0603749910369515,
+      "spans": [
+        {
+          "file": "cmd/main.go",
+          "start_byte": 0,
+          "end_byte": 267,
+          "sha256": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15",
+          "text": "package main\n\nimport (\n    api \"example.com/acme/model\"\n    \"example.com/acme/one\"\n    \"example.com/acme/two\"\n    \"fmt\"\n)\n\nfunc Keep(req api.Request) {}\n\nfunc Probe(api int) {\n    api.Handle()\n    shared.Open()\n    fmt.Println(api)\n}\n\nfunc Missing() { api.Absent() }\n"
+        }
+      ]
+    },
+    {
+      "id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:3",
+      "task_id": "go_unproven_package_uses",
+      "session_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "go_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "model/model.go",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"model/model.go\",\"content\":\"package model\\n\\ntype Request struct{}\\nfunc Handle() {}\\n\",\"total_lines\":4,\"start_line\":1,\"end_line\":4,\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:3\"}}",
+      "serialized_bytes": 307,
+      "source_bytes": 54,
+      "elapsed_ms": 2.4944999895524234,
+      "spans": [
+        {
+          "file": "model/model.go",
+          "start_byte": 0,
+          "end_byte": 54,
+          "sha256": "6d478b1b050450fc228dc1a04d79f699dbf67a6c2604e6e3a37c8b283f58a0cc",
+          "text": "package model\n\ntype Request struct{}\nfunc Handle() {}\n"
+        }
+      ]
+    },
+    {
+      "id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:4",
+      "task_id": "go_unproven_package_uses",
+      "session_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "go_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "wrong/model.go",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"wrong/model.go\",\"content\":\"package model\\n\\ntype Request struct{}\\nfunc Handle() {}\\nfunc Absent() {}\\n\",\"total_lines\":5,\"start_line\":1,\"end_line\":5,\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:4\"}}",
+      "serialized_bytes": 325,
+      "source_bytes": 71,
+      "elapsed_ms": 2.801958005875349,
+      "spans": [
+        {
+          "file": "wrong/model.go",
+          "start_byte": 0,
+          "end_byte": 71,
+          "sha256": "735d698d25508944a983c66e26ea47872482bb9f451d8b6517db968ade3fa97c",
+          "text": "package model\n\ntype Request struct{}\nfunc Handle() {}\nfunc Absent() {}\n"
+        }
+      ]
+    },
+    {
+      "id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:5",
+      "task_id": "go_unproven_package_uses",
+      "session_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "go_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "one/one.go",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"one/one.go\",\"content\":\"package shared\\n\\nfunc Open() {}\\n\",\"total_lines\":3,\"start_line\":1,\"end_line\":3,\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:5\"}}",
+      "serialized_bytes": 279,
+      "source_bytes": 31,
+      "elapsed_ms": 2.845999988494441,
+      "spans": [
+        {
+          "file": "one/one.go",
+          "start_byte": 0,
+          "end_byte": 31,
+          "sha256": "4e64908f4809dab4c8edb15950795243ed2d683926a7ad0161aee3e339348548",
+          "text": "package shared\n\nfunc Open() {}\n"
+        }
+      ]
+    },
+    {
+      "id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:6",
+      "task_id": "go_unproven_package_uses",
+      "session_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "go_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "two/two.go",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"two/two.go\",\"content\":\"package shared\\n\\nfunc Open() {}\\n\",\"total_lines\":3,\"start_line\":1,\"end_line\":3,\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:6\"}}",
+      "serialized_bytes": 279,
+      "source_bytes": 31,
+      "elapsed_ms": 3.709125012392178,
+      "spans": [
+        {
+          "file": "two/two.go",
+          "start_byte": 0,
+          "end_byte": 31,
+          "sha256": "4e64908f4809dab4c8edb15950795243ed2d683926a7ad0161aee3e339348548",
+          "text": "package shared\n\nfunc Open() {}\n"
+        }
+      ]
+    },
+    {
+      "id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:7",
+      "task_id": "go_unproven_package_uses",
+      "session_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "go_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "go.mod",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"LociError\",\"message\":\"File not found in cache\"},\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:7\"}}",
+      "serialized_bytes": 233,
+      "source_bytes": 0,
+      "elapsed_ms": 1.5467500197701156,
+      "spans": []
+    },
+    {
+      "id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:8",
+      "task_id": "go_unproven_package_uses",
+      "session_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "go_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "question": "For Keep, Probe, and Missing, resolve type origins, exact call callees including shadowed and ambiguous package selectors, and missing/external endpoints; determine module path impact of changing go.mod from example.com/acme to example.com/other.",
+        "seed_ids": [
+          "cmd/main.go::Keep#function",
+          "cmd/main.go::Probe#function",
+          "cmd/main.go::Missing#function"
+        ]
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-_5bd2_px/snapshot\",\"question\":\"For Keep, Probe, and Missing, resolve type origins, exact call callees including shadowed and ambiguous package selectors, and missing/external endpoints; determine module path impact of changing go.mod from example.com/acme to example.com/other.\",\"selection\":\"explicit\",\"question_terms\":[],\"anchors\":[{\"node\":{\"id\":\"cmd/main.go::Keep#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"go\",\"file\":\"cmd/main.go\",\"line\":10,\"end_line\":10}},\"matched_symbol_id\":\"cmd/main.go::Keep#function\",\"name\":\"Keep\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}},{\"node\":{\"id\":\"cmd/main.go::Probe#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"go\",\"file\":\"cmd/main.go\",\"line\":12,\"end_line\":16}},\"matched_symbol_id\":\"cmd/main.go::Probe#function\",\"name\":\"Probe\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}},{\"node\":{\"id\":\"cmd/main.go::Missing#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"go\",\"file\":\"cmd/main.go\",\"line\":18,\"end_line\":18}},\"matched_symbol_id\":\"cmd/main.go::Missing#function\",\"name\":\"Missing\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}}],\"routing\":{\"kind\":\"relationship\",\"reason\":\"relationship_intent\"},\"filters\":{\"namespaces\":null,\"edge_types\":null,\"resolutions\":[\"exact\",\"declared\",\"import-resolved\"],\"direction\":\"outgoing\"},\"hub_threshold\":4,\"paths\":[],\"rejected_paths\":[],\"counts\":{\"filtered_edges\":5,\"examined_nodes\":4,\"examined_paths\":2,\"returned_paths\":0,\"rejected_paths\":0,\"duplicate_paths\":0,\"omitted_rejected_paths\":0,\"omitted_nodes\":0,\"omitted_paths\":0},\"budget\":{\"max_hops\":3,\"max_nodes\":64,\"max_paths\":16,\"path_offset\":0,\"evidence_bytes\":0,\"estimated_tokens\":0,\"max_evidence_bytes\":16384,\"max_estimated_tokens\":4096,\"hop_limit_reached\":false,\"node_limit_reached\":false,\"next_path_offset\":null},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/8\",\"calls_remaining\":16,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:8\"}}",
+      "serialized_bytes": 2212,
+      "source_bytes": 0,
+      "elapsed_ms": 4.1592500056140125,
+      "spans": []
+    },
+    {
+      "id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:9",
+      "task_id": "go_unproven_package_uses",
+      "session_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "go_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "seed_ids": [
+          "cmd/main.go::Keep#function",
+          "cmd/main.go::Probe#function",
+          "cmd/main.go::Missing#function"
+        ]
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-_5bd2_px/snapshot\",\"results\":[{\"seed\":{\"id\":\"cmd/main.go::Keep#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"go\",\"file\":\"cmd/main.go\",\"line\":10,\"end_line\":10}},\"neighbors\":[]},{\"seed\":{\"id\":\"cmd/main.go::Probe#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"go\",\"file\":\"cmd/main.go\",\"line\":12,\"end_line\":16}},\"neighbors\":[]},{\"seed\":{\"id\":\"cmd/main.go::Missing#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"go\",\"file\":\"cmd/main.go\",\"line\":18,\"end_line\":18}},\"neighbors\":[]}],\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/9\",\"calls_remaining\":15,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:9\"}}",
+      "serialized_bytes": 839,
+      "source_bytes": 0,
+      "elapsed_ms": 2.218208013800904,
+      "spans": []
+    },
+    {
+      "id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:10",
+      "task_id": "go_unproven_package_uses",
+      "session_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "go_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 100,
+        "file": "cmd/main.go"
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"invalid record pagination\"},\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/10\",\"calls_remaining\":14,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:10\"}}",
+      "serialized_bytes": 238,
+      "source_bytes": 0,
+      "elapsed_ms": 0.049875001423060894,
+      "spans": []
+    },
+    {
+      "id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:11",
+      "task_id": "go_unproven_package_uses",
+      "session_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "go_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 20,
+        "file": "cmd/main.go"
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-_5bd2_px/snapshot\",\"file\":\"cmd/main.go\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":13,\"column\":5,\"start_byte\":180,\"end_byte\":192,\"callee_start_byte\":180,\"callee_end_byte\":190,\"callee_text\":\"api.Handle\",\"callee_path\":[\"api\",\"Handle\"],\"callee_form\":\"static_path\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":154,\"definition_end_byte\":233,\"body_start_byte\":174,\"body_end_byte\":233},\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\"},\"caller_id\":\"cmd/main.go::Probe#function\",\"caller_kind\":\"function\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"reference_unresolved\",\"reference_unresolved_reason\":\"binding_shadowed\",\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":14,\"column\":5,\"start_byte\":197,\"end_byte\":210,\"callee_start_byte\":197,\"callee_end_byte\":208,\"callee_text\":\"shared.Open\",\"callee_path\":[\"shared\",\"Open\"],\"callee_form\":\"static_path\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":154,\"definition_end_byte\":233,\"body_start_byte\":174,\"body_end_byte\":233},\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\"},\"caller_id\":\"cmd/main.go::Probe#function\",\"caller_kind\":\"function\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"reference_unresolved\",\"reference_unresolved_reason\":\"ambiguous_binding\",\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":15,\"column\":5,\"start_byte\":215,\"end_byte\":231,\"callee_start_byte\":215,\"callee_end_byte\":226,\"callee_text\":\"fmt.Println\",\"callee_path\":[\"fmt\",\"Println\"],\"callee_form\":\"static_path\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":154,\"definition_end_byte\":233,\"body_start_byte\":174,\"body_end_byte\":233},\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\"},\"caller_id\":\"cmd/main.go::Probe#function\",\"caller_kind\":\"function\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"reference_unresolved\",\"reference_unresolved_reason\":\"import_unresolved\",\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":18,\"column\":18,\"start_byte\":252,\"end_byte\":264,\"callee_start_byte\":252,\"callee_end_byte\":262,\"callee_text\":\"api.Absent\",\"callee_path\":[\"api\",\"Absent\"],\"callee_form\":\"static_path\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":235,\"definition_end_byte\":266,\"body_start_byte\":250,\"body_end_byte\":266},\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\"},\"caller_id\":\"cmd/main.go::Missing#function\",\"caller_kind\":\"function\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"reference_unresolved\",\"reference_unresolved_reason\":\"target_not_indexed\",\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":4,\"resolved\":0,\"unresolved\":4,\"returned\":4},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/11\",\"calls_remaining\":13,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:11\"}}",
+      "serialized_bytes": 4084,
+      "source_bytes": 0,
+      "elapsed_ms": 1.8237500044051558,
+      "spans": []
+    },
+    {
+      "id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:12",
+      "task_id": "go_unproven_package_uses",
+      "session_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "go_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 20,
+        "file": "cmd/main.go"
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-_5bd2_px/snapshot\",\"file\":\"cmd/main.go\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":4,\"text\":\"api \\\"example.com/acme/model\\\"\",\"specifier\":\"example.com/acme/model\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"rust\":null},\"source_file\":\"cmd/main.go\",\"source_id\":\"cmd/main.go::__file__#file\",\"target_file\":null,\"target_package\":\"example.com/acme/model\",\"target_crate\":null,\"target_module\":null,\"target_kind\":\"package\",\"target_id\":\"model::example.com/acme/model#package\",\"specifier\":\"example.com/acme/model\",\"imported_name\":null,\"language\":\"go\",\"line\":4,\"text\":\"api \\\"example.com/acme/model\\\"\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":null,\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":5,\"text\":\"\\\"example.com/acme/one\\\"\",\"specifier\":\"example.com/acme/one\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"rust\":null},\"source_file\":\"cmd/main.go\",\"source_id\":\"cmd/main.go::__file__#file\",\"target_file\":null,\"target_package\":\"example.com/acme/one\",\"target_crate\":null,\"target_module\":null,\"target_kind\":\"package\",\"target_id\":\"one::example.com/acme/one#package\",\"specifier\":\"example.com/acme/one\",\"imported_name\":null,\"language\":\"go\",\"line\":5,\"text\":\"\\\"example.com/acme/one\\\"\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":null,\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":6,\"text\":\"\\\"example.com/acme/two\\\"\",\"specifier\":\"example.com/acme/two\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"rust\":null},\"source_file\":\"cmd/main.go\",\"source_id\":\"cmd/main.go::__file__#file\",\"target_file\":null,\"target_package\":\"example.com/acme/two\",\"target_crate\":null,\"target_module\":null,\"target_kind\":\"package\",\"target_id\":\"two::example.com/acme/two#package\",\"specifier\":\"example.com/acme/two\",\"imported_name\":null,\"language\":\"go\",\"line\":6,\"text\":\"\\\"example.com/acme/two\\\"\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":null,\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":7,\"text\":\"\\\"fmt\\\"\",\"specifier\":\"fmt\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"rust\":null},\"source_file\":\"cmd/main.go\",\"source_id\":\"cmd/main.go::__file__#file\",\"target_file\":null,\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":null,\"target_id\":null,\"specifier\":\"fmt\",\"imported_name\":null,\"language\":\"go\",\"line\":7,\"text\":\"\\\"fmt\\\"\",\"type_only\":false,\"is_reexport\":false,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"external\",\"resolution_basis\":null,\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":4,\"resolved\":3,\"unresolved\":1,\"returned\":4},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/12\",\"calls_remaining\":12,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:12\"}}",
+      "serialized_bytes": 3708,
+      "source_bytes": 0,
+      "elapsed_ms": 1.9081660138908774,
+      "spans": []
+    },
+    {
+      "id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:13",
+      "task_id": "go_unproven_package_uses",
+      "session_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "go_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 20,
+        "file": "cmd/main.go"
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-_5bd2_px/snapshot\",\"file\":\"cmd/main.go\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":10,\"column\":15,\"start_byte\":137,\"end_byte\":148,\"text\":\"api.Request\",\"path\":[\"api\",\"Request\"],\"candidate_bindings\":[{\"local_name\":\"api\",\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":27,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":4,\"import_text\":\"api \\\"example.com/acme/model\\\"\",\"import_specifier\":\"example.com/acme/model\"}],\"binding_state\":\"definite\",\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"owner\":{\"kind\":\"file\",\"definition_start_byte\":null,\"definition_end_byte\":null,\"body_start_byte\":null,\"body_end_byte\":null}},\"binding\":{\"local_name\":\"api\",\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":27,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":4,\"import_text\":\"api \\\"example.com/acme/model\\\"\",\"import_specifier\":\"example.com/acme/model\"},\"source_file\":\"cmd/main.go\",\"source_id\":\"cmd/main.go::__file__#file\",\"source_kind\":\"file\",\"import_source_id\":\"cmd/main.go::__file__#file\",\"import_target_id\":\"model::example.com/acme/model#package\",\"target_file\":\"model/model.go\",\"target_id\":\"model/model.go::Request#type\",\"target_kind\":\"type\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"import_unresolved_reason\":null,\"resolution_basis\":\"qualified_member\",\"support\":[{\"kind\":\"import_binding\",\"file\":\"cmd/main.go\",\"line\":4,\"content_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"endpoint_id\":\"model::example.com/acme/model#package\"},{\"kind\":\"definition\",\"file\":\"model/model.go\",\"line\":3,\"content_hash\":\"6d478b1b050450fc228dc1a04d79f699dbf67a6c2604e6e3a37c8b283f58a0cc\",\"endpoint_id\":\"model/model.go::Request#type\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":13,\"column\":5,\"start_byte\":180,\"end_byte\":190,\"text\":\"api.Handle\",\"path\":[\"api\",\"Handle\"],\"candidate_bindings\":[{\"local_name\":\"api\",\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":27,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":4,\"import_text\":\"api \\\"example.com/acme/model\\\"\",\"import_specifier\":\"example.com/acme/model\"}],\"binding_state\":\"shadowed\",\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":154,\"definition_end_byte\":233,\"body_start_byte\":174,\"body_end_byte\":233}},\"binding\":{\"local_name\":\"api\",\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":27,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":4,\"import_text\":\"api \\\"example.com/acme/model\\\"\",\"import_specifier\":\"example.com/acme/model\"},\"source_file\":\"cmd/main.go\",\"source_id\":\"cmd/main.go::Probe#function\",\"source_kind\":\"function\",\"import_source_id\":\"cmd/main.go::__file__#file\",\"import_target_id\":\"model::example.com/acme/model#package\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"binding_shadowed\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":14,\"column\":5,\"start_byte\":197,\"end_byte\":208,\"text\":\"shared.Open\",\"path\":[\"shared\",\"Open\"],\"candidate_bindings\":[{\"local_name\":null,\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":60,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":5,\"import_text\":\"\\\"example.com/acme/one\\\"\",\"import_specifier\":\"example.com/acme/one\"},{\"local_name\":null,\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":87,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":6,\"import_text\":\"\\\"example.com/acme/two\\\"\",\"import_specifier\":\"example.com/acme/two\"},{\"local_name\":null,\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":114,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":7,\"import_text\":\"\\\"fmt\\\"\",\"import_specifier\":\"fmt\"}],\"binding_state\":\"deferred\",\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":154,\"definition_end_byte\":233,\"body_start_byte\":174,\"body_end_byte\":233}},\"binding\":null,\"source_file\":\"cmd/main.go\",\"source_id\":\"cmd/main.go::Probe#function\",\"source_kind\":\"function\",\"import_source_id\":\"cmd/main.go::__file__#file\",\"import_target_id\":null,\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"ambiguous_binding\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":15,\"column\":5,\"start_byte\":215,\"end_byte\":226,\"text\":\"fmt.Println\",\"path\":[\"fmt\",\"Println\"],\"candidate_bindings\":[{\"local_name\":null,\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":60,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":5,\"import_text\":\"\\\"example.com/acme/one\\\"\",\"import_specifier\":\"example.com/acme/one\"},{\"local_name\":null,\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":87,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":6,\"import_text\":\"\\\"example.com/acme/two\\\"\",\"import_specifier\":\"example.com/acme/two\"},{\"local_name\":null,\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":114,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":7,\"import_text\":\"\\\"fmt\\\"\",\"import_specifier\":\"fmt\"}],\"binding_state\":\"deferred\",\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":154,\"definition_end_byte\":233,\"body_start_byte\":174,\"body_end_byte\":233}},\"binding\":{\"local_name\":null,\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":114,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":7,\"import_text\":\"\\\"fmt\\\"\",\"import_specifier\":\"fmt\"},\"source_file\":\"cmd/main.go\",\"source_id\":\"cmd/main.go::Probe#function\",\"source_kind\":\"function\",\"import_source_id\":\"cmd/main.go::__file__#file\",\"import_target_id\":null,\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"import_unresolved\",\"import_unresolved_reason\":\"external\",\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":18,\"column\":18,\"start_byte\":252,\"end_byte\":262,\"text\":\"api.Absent\",\"path\":[\"api\",\"Absent\"],\"candidate_bindings\":[{\"local_name\":\"api\",\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":27,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":4,\"import_text\":\"api \\\"example.com/acme/model\\\"\",\"import_specifier\":\"example.com/acme/model\"}],\"binding_state\":\"definite\",\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":235,\"definition_end_byte\":266,\"body_start_byte\":250,\"body_end_byte\":266}},\"binding\":{\"local_name\":\"api\",\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":27,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":4,\"import_text\":\"api \\\"example.com/acme/model\\\"\",\"import_specifier\":\"example.com/acme/model\"},\"source_file\":\"cmd/main.go\",\"source_id\":\"cmd/main.go::Missing#function\",\"source_kind\":\"function\",\"import_source_id\":\"cmd/main.go::__file__#file\",\"import_target_id\":\"model::example.com/acme/model#package\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"target_not_indexed\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[{\"kind\":\"import_binding\",\"file\":\"cmd/main.go\",\"line\":4,\"content_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"endpoint_id\":\"model::example.com/acme/model#package\"}],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":5,\"resolved\":1,\"unresolved\":4,\"returned\":5},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/13\",\"calls_remaining\":11,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:13\"}}",
+      "serialized_bytes": 9132,
+      "source_bytes": 0,
+      "elapsed_ms": 3.178290993673727,
+      "spans": []
+    },
+    {
+      "id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:14",
+      "task_id": "go_unproven_package_uses",
+      "session_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "go_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "cmd/main.go::Keep#function",
+          "cmd/main.go::Probe#function",
+          "cmd/main.go::Missing#function",
+          "model/model.go::Request#type",
+          "model/model.go::Handle#function",
+          "one/one.go::Open#function",
+          "two/two.go::Open#function",
+          "wrong/model.go::Absent#function"
+        ],
+        "context": 2
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"cmd/main.go::Keep#function\",\"source\":\"func Keep(req api.Request) {}\",\"byte_offset\":123,\"byte_length\":29,\"line\":10,\"end_line\":10,\"signature\":\"func Keep(req api.Request) {}\",\"kind\":\"function\",\"language\":\"go\",\"context_before\":[\")\",\"\"],\"context_after\":[\"\",\"func Probe(api int) {\"]},{\"id\":\"cmd/main.go::Probe#function\",\"source\":\"func Probe(api int) {\\n    api.Handle()\\n    shared.Open()\\n    fmt.Println(api)\\n}\",\"byte_offset\":154,\"byte_length\":79,\"line\":12,\"end_line\":16,\"signature\":\"func Probe(api int) {\",\"kind\":\"function\",\"language\":\"go\",\"context_before\":[\"func Keep(req api.Request) {}\",\"\"],\"context_after\":[\"\",\"func Missing() { api.Absent() }\"]},{\"id\":\"cmd/main.go::Missing#function\",\"source\":\"func Missing() { api.Absent() }\",\"byte_offset\":235,\"byte_length\":31,\"line\":18,\"end_line\":18,\"signature\":\"func Missing() { api.Absent() }\",\"kind\":\"function\",\"language\":\"go\",\"context_before\":[\"}\",\"\"],\"context_after\":[]},{\"id\":\"model/model.go::Request#type\",\"source\":\"Request struct{}\",\"byte_offset\":20,\"byte_length\":16,\"line\":3,\"end_line\":3,\"signature\":\"Request struct{}\",\"kind\":\"type\",\"language\":\"go\",\"context_before\":[\"package model\",\"\"],\"context_after\":[\"func Handle() {}\"]},{\"id\":\"model/model.go::Handle#function\",\"source\":\"func Handle() {}\",\"byte_offset\":37,\"byte_length\":16,\"line\":4,\"end_line\":4,\"signature\":\"func Handle() {}\",\"kind\":\"function\",\"language\":\"go\",\"context_before\":[\"\",\"type Request struct{}\"],\"context_after\":[]},{\"id\":\"one/one.go::Open#function\",\"source\":\"func Open() {}\",\"byte_offset\":16,\"byte_length\":14,\"line\":3,\"end_line\":3,\"signature\":\"func Open() {}\",\"kind\":\"function\",\"language\":\"go\",\"context_before\":[\"package shared\",\"\"],\"context_after\":[]},{\"id\":\"two/two.go::Open#function\",\"source\":\"func Open() {}\",\"byte_offset\":16,\"byte_length\":14,\"line\":3,\"end_line\":3,\"signature\":\"func Open() {}\",\"kind\":\"function\",\"language\":\"go\",\"context_before\":[\"package shared\",\"\"],\"context_after\":[]},{\"id\":\"wrong/model.go::Absent#function\",\"source\":\"func Absent() {}\",\"byte_offset\":54,\"byte_length\":16,\"line\":5,\"end_line\":5,\"signature\":\"func Absent() {}\",\"kind\":\"function\",\"language\":\"go\",\"context_before\":[\"type Request struct{}\",\"func Handle() {}\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/14\",\"calls_remaining\":10,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:14\"}}",
+      "serialized_bytes": 2363,
+      "source_bytes": 570,
+      "elapsed_ms": 18.607125006383285,
+      "spans": [
+        {
+          "file": "cmd/main.go",
+          "start_byte": 123,
+          "end_byte": 152,
+          "sha256": "271dedf9a4f1ae4488ff940ab60621c51b52800d1543d086b02de93fd5f76925",
+          "text": "func Keep(req api.Request) {}"
+        },
+        {
+          "file": "cmd/main.go",
+          "start_byte": 120,
+          "end_byte": 121,
+          "sha256": "ba5ec51d07a4ac0e951608704431d59a02b21a4e951acc10505a8dc407c501ee",
+          "text": ")"
+        },
+        {
+          "file": "cmd/main.go",
+          "start_byte": 154,
+          "end_byte": 175,
+          "sha256": "50ad9d92af17a909b26e3d507f359b60a2dced275eeb2298d867ac43ace74f63",
+          "text": "func Probe(api int) {"
+        },
+        {
+          "file": "cmd/main.go",
+          "start_byte": 154,
+          "end_byte": 233,
+          "sha256": "8f417d777639cc7cd28e30aaeb50d9ae6de4bdec133969ef6011ef8cf26ae970",
+          "text": "func Probe(api int) {\n    api.Handle()\n    shared.Open()\n    fmt.Println(api)\n}"
+        },
+        {
+          "file": "cmd/main.go",
+          "start_byte": 123,
+          "end_byte": 152,
+          "sha256": "271dedf9a4f1ae4488ff940ab60621c51b52800d1543d086b02de93fd5f76925",
+          "text": "func Keep(req api.Request) {}"
+        },
+        {
+          "file": "cmd/main.go",
+          "start_byte": 235,
+          "end_byte": 266,
+          "sha256": "f13e4733cff5722acf920ae34920f4cda4e5271df9e6be53331e1fc758b6ca42",
+          "text": "func Missing() { api.Absent() }"
+        },
+        {
+          "file": "cmd/main.go",
+          "start_byte": 235,
+          "end_byte": 266,
+          "sha256": "f13e4733cff5722acf920ae34920f4cda4e5271df9e6be53331e1fc758b6ca42",
+          "text": "func Missing() { api.Absent() }"
+        },
+        {
+          "file": "cmd/main.go",
+          "start_byte": 232,
+          "end_byte": 233,
+          "sha256": "d10b36aa74a59bcf4a88185837f658afaf3646eff2bb16c3928d0e9335e945d2",
+          "text": "}"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 20,
+          "end_byte": 36,
+          "sha256": "86e5f87aecbd626f6648c9f2b6bf3bf501ee8e3dcbae947bf08aeb28d53c0ee2",
+          "text": "Request struct{}"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 0,
+          "end_byte": 13,
+          "sha256": "e21dd15ee683d5b3c7acbc9d2e50c0753f7cf565604024421ea8cd7196abd0f9",
+          "text": "package model"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 37,
+          "end_byte": 53,
+          "sha256": "2d0230ea88ea200472e219dde0a9ad38f35daba7b992f9a829cca42f1c5c3235",
+          "text": "func Handle() {}"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 37,
+          "end_byte": 53,
+          "sha256": "2d0230ea88ea200472e219dde0a9ad38f35daba7b992f9a829cca42f1c5c3235",
+          "text": "func Handle() {}"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 15,
+          "end_byte": 36,
+          "sha256": "2d69e9f0ca887cc04814d5b22aa7b6be95485292573ff22778b2110288a92165",
+          "text": "type Request struct{}"
+        },
+        {
+          "file": "one/one.go",
+          "start_byte": 16,
+          "end_byte": 30,
+          "sha256": "943be965979ec8363ef81ae9356ea1eef4ebba32c675ebb89333db028682ab98",
+          "text": "func Open() {}"
+        },
+        {
+          "file": "one/one.go",
+          "start_byte": 0,
+          "end_byte": 14,
+          "sha256": "6d3ac9b4481077aa145e162d86269d2e835608b978141b8ced4dcf4d21489956",
+          "text": "package shared"
+        },
+        {
+          "file": "two/two.go",
+          "start_byte": 16,
+          "end_byte": 30,
+          "sha256": "943be965979ec8363ef81ae9356ea1eef4ebba32c675ebb89333db028682ab98",
+          "text": "func Open() {}"
+        },
+        {
+          "file": "two/two.go",
+          "start_byte": 0,
+          "end_byte": 14,
+          "sha256": "6d3ac9b4481077aa145e162d86269d2e835608b978141b8ced4dcf4d21489956",
+          "text": "package shared"
+        },
+        {
+          "file": "wrong/model.go",
+          "start_byte": 54,
+          "end_byte": 70,
+          "sha256": "d88260f434211002fce46f9928768208e2911f24f2009968021366908f90a21a",
+          "text": "func Absent() {}"
+        },
+        {
+          "file": "wrong/model.go",
+          "start_byte": 15,
+          "end_byte": 36,
+          "sha256": "2d69e9f0ca887cc04814d5b22aa7b6be95485292573ff22778b2110288a92165",
+          "text": "type Request struct{}"
+        },
+        {
+          "file": "wrong/model.go",
+          "start_byte": 37,
+          "end_byte": 53,
+          "sha256": "2d0230ea88ea200472e219dde0a9ad38f35daba7b992f9a829cca42f1c5c3235",
+          "text": "func Handle() {}"
+        },
+        {
+          "file": "cmd/main.go",
+          "start_byte": 123,
+          "end_byte": 152,
+          "sha256": "271dedf9a4f1ae4488ff940ab60621c51b52800d1543d086b02de93fd5f76925",
+          "text": "func Keep(req api.Request) {}"
+        },
+        {
+          "file": "cmd/main.go",
+          "start_byte": 154,
+          "end_byte": 175,
+          "sha256": "50ad9d92af17a909b26e3d507f359b60a2dced275eeb2298d867ac43ace74f63",
+          "text": "func Probe(api int) {"
+        },
+        {
+          "file": "cmd/main.go",
+          "start_byte": 235,
+          "end_byte": 266,
+          "sha256": "f13e4733cff5722acf920ae34920f4cda4e5271df9e6be53331e1fc758b6ca42",
+          "text": "func Missing() { api.Absent() }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 20,
+          "end_byte": 36,
+          "sha256": "86e5f87aecbd626f6648c9f2b6bf3bf501ee8e3dcbae947bf08aeb28d53c0ee2",
+          "text": "Request struct{}"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 37,
+          "end_byte": 53,
+          "sha256": "2d0230ea88ea200472e219dde0a9ad38f35daba7b992f9a829cca42f1c5c3235",
+          "text": "func Handle() {}"
+        },
+        {
+          "file": "one/one.go",
+          "start_byte": 16,
+          "end_byte": 30,
+          "sha256": "943be965979ec8363ef81ae9356ea1eef4ebba32c675ebb89333db028682ab98",
+          "text": "func Open() {}"
+        },
+        {
+          "file": "two/two.go",
+          "start_byte": 16,
+          "end_byte": 30,
+          "sha256": "943be965979ec8363ef81ae9356ea1eef4ebba32c675ebb89333db028682ab98",
+          "text": "func Open() {}"
+        },
+        {
+          "file": "wrong/model.go",
+          "start_byte": 54,
+          "end_byte": 70,
+          "sha256": "d88260f434211002fce46f9928768208e2911f24f2009968021366908f90a21a",
+          "text": "func Absent() {}"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "go_unproven_package_uses",
+    "session_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6",
+    "arm": "A",
+    "repetition": 2,
+    "snapshot": "go_uncertainty",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1",
+    "schema_version": 3,
+    "measurement_method": "observed_tool_calls",
+    "intent_collection": "not_collected",
+    "outcome": "tool_failure",
+    "answer": {
+      "keep_type_origin": "example.com/acme/model.Request",
+      "exact_probe_or_missing_callees": {
+        "Missing": [
+          {
+            "callee": "api.Absent",
+            "status": "missing",
+            "endpoint": "example.com/acme/model.Absent"
+          }
+        ],
+        "Probe": [
+          {
+            "callee": "api.Handle",
+            "status": "shadowed",
+            "endpoint": "example.com/acme/model.Handle"
+          },
+          {
+            "callee": "fmt.Println",
+            "status": "external",
+            "endpoint": "fmt.Println"
+          },
+          {
+            "callee": "shared.Open",
+            "status": "ambiguous",
+            "endpoints": [
+              "example.com/acme/one.Open",
+              "example.com/acme/two.Open"
+            ]
+          }
+        ]
+      },
+      "old_proof_survives_module_change": false
+    },
+    "answer_correct": false,
+    "task_correct": false,
+    "read_count": 14,
+    "validated_read_count": 14,
+    "required_context_delivered": [
+      "entry",
+      "imports",
+      "missing",
+      "package",
+      "probe",
+      "request"
+    ],
+    "required_context_total": 7,
+    "context_recall": 0.8571428571428571,
+    "serialized_tool_output_bytes": null,
+    "source_bytes": null,
+    "estimated_source_tokens": null,
+    "tool_elapsed_ms": 50.175665062852204,
+    "provider_usage": {
+      "input_tokens": 123623,
+      "cached_input_tokens": 99584,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 4448,
+      "reasoning_output_tokens": 3731
+    },
+    "usage_semantics": "One Codex turn.completed event; gross input includes cached input subset; output includes reasoning tokens.",
+    "token_status": "measured",
+    "measurement_complete": false,
+    "full_pass": false
+  },
+  "baseline": {
+    "end_to_end_seconds": 107.19943345800857,
+    "actual_process_seconds": 107.19943345800857,
+    "exit_code": 0,
+    "provider_thread_id": "01a0982f-d814-7740-bf94-bc8e2c665456",
+    "failures": [
+      {
+        "attempt_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/7",
+        "category": "tool_error",
+        "message": "File not found in cache"
+      },
+      {
+        "attempt_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/10",
+        "category": "tool_error",
+        "message": "invalid record pagination"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_8",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_9",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_10",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_11",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_12",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_13",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "unmatched_recorded_delivery"
+      }
+    ],
+    "tool_delivery_verified": false,
+    "output_accounting": {
+      "schema_version": 4,
+      "complete": false,
+      "tool_call_count": 14,
+      "recorded_payload_bytes": 27543,
+      "complete_payload_bytes": null,
+      "source_bytes": null,
+      "calls": [
+        {
+          "item_id": "item_1",
+          "server": "evaluation",
+          "tool": "outline",
+          "arguments": {
+            "file": null
+          },
+          "status": "completed",
+          "attempt_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/1",
+          "trace_event_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:1",
+          "source_bytes": 189,
+          "serialized_bytes": 3003,
+          "elapsed_ms": 1.9352080125827342,
+          "payload_texts": [
+            "{\"files\":[{\"file\":\"cmd/main.go\",\"symbols\":[{\"id\":\"cmd/main.go::Keep#function\",\"name\":\"Keep\",\"kind\":\"function\",\"line\":10,\"end_line\":10,\"signature\":\"func Keep(req api.Request) {}\",\"summary\":\"\"},{\"id\":\"cmd/main.go::Probe#function\",\"name\":\"Probe\",\"kind\":\"function\",\"line\":12,\"end_line\":16,\"signature\":\"func Probe(api int) {\",\"summary\":\"\"},{\"id\":\"cmd/main.go::Missing#function\",\"name\":\"Missing\",\"kind\":\"function\",\"line\":18,\"end_line\":18,\"signature\":\"func Missing() { api.Absent() }\",\"summary\":\"\"},{\"id\":\"cmd/main.go::__file__#file\",\"name\":\"main.go\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"cmd/main.go\",\"summary\":\"\"}]},{\"file\":\"model/model.go\",\"symbols\":[{\"id\":\"model/model.go::Request#type\",\"name\":\"Request\",\"kind\":\"type\",\"line\":3,\"end_line\":3,\"signature\":\"Request struct{}\",\"summary\":\"\"},{\"id\":\"model/model.go::Handle#function\",\"name\":\"Handle\",\"kind\":\"function\",\"line\":4,\"end_line\":4,\"signature\":\"func Handle() {}\",\"summary\":\"\"},{\"id\":\"model/model.go::__file__#file\",\"name\":\"model.go\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"model/model.go\",\"summary\":\"\"},{\"id\":\"model::example.com/acme/model#package\",\"name\":\"model\",\"kind\":\"package\",\"line\":1,\"end_line\":1,\"signature\":\"example.com/acme/model\",\"summary\":\"\"}]},{\"file\":\"one/one.go\",\"symbols\":[{\"id\":\"one/one.go::Open#function\",\"name\":\"Open\",\"kind\":\"function\",\"line\":3,\"end_line\":3,\"signature\":\"func Open() {}\",\"summary\":\"\"},{\"id\":\"one/one.go::__file__#file\",\"name\":\"one.go\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"one/one.go\",\"summary\":\"\"},{\"id\":\"one::example.com/acme/one#package\",\"name\":\"shared\",\"kind\":\"package\",\"line\":1,\"end_line\":1,\"signature\":\"example.com/acme/one\",\"summary\":\"\"}]},{\"file\":\"two/two.go\",\"symbols\":[{\"id\":\"two/two.go::Open#function\",\"name\":\"Open\",\"kind\":\"function\",\"line\":3,\"end_line\":3,\"signature\":\"func Open() {}\",\"summary\":\"\"},{\"id\":\"two/two.go::__file__#file\",\"name\":\"two.go\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"two/two.go\",\"summary\":\"\"},{\"id\":\"two::example.com/acme/two#package\",\"name\":\"shared\",\"kind\":\"package\",\"line\":1,\"end_line\":1,\"signature\":\"example.com/acme/two\",\"summary\":\"\"}]},{\"file\":\"wrong/model.go\",\"symbols\":[{\"id\":\"wrong/model.go::Request#type\",\"name\":\"Request\",\"kind\":\"type\",\"line\":3,\"end_line\":3,\"signature\":\"Request struct{}\",\"summary\":\"\"},{\"id\":\"wrong/model.go::Handle#function\",\"name\":\"Handle\",\"kind\":\"function\",\"line\":4,\"end_line\":4,\"signature\":\"func Handle() {}\",\"summary\":\"\"},{\"id\":\"wrong/model.go::Absent#function\",\"name\":\"Absent\",\"kind\":\"function\",\"line\":5,\"end_line\":5,\"signature\":\"func Absent() {}\",\"summary\":\"\"},{\"id\":\"wrong/model.go::__file__#file\",\"name\":\"model.go\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"wrong/model.go\",\"summary\":\"\"},{\"id\":\"wrong::example.com/acme/wrong#package\",\"name\":\"model\",\"kind\":\"package\",\"line\":1,\"end_line\":1,\"signature\":\"example.com/acme/wrong\",\"summary\":\"\"}]}],\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:1\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "cmd/main.go",
+            "start_line": 1,
+            "end_line": 30
+          },
+          "status": "completed",
+          "attempt_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/2",
+          "trace_event_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:2",
+          "source_bytes": 267,
+          "serialized_bytes": 541,
+          "elapsed_ms": 3.136999992420897,
+          "payload_texts": [
+            "{\"file\":\"cmd/main.go\",\"content\":\"package main\\n\\nimport (\\n    api \\\"example.com/acme/model\\\"\\n    \\\"example.com/acme/one\\\"\\n    \\\"example.com/acme/two\\\"\\n    \\\"fmt\\\"\\n)\\n\\nfunc Keep(req api.Request) {}\\n\\nfunc Probe(api int) {\\n    api.Handle()\\n    shared.Open()\\n    fmt.Println(api)\\n}\\n\\nfunc Missing() { api.Absent() }\\n\",\"total_lines\":18,\"start_line\":1,\"end_line\":18,\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:2\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "model/model.go",
+            "start_line": 1,
+            "end_line": 10
+          },
+          "status": "completed",
+          "attempt_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/3",
+          "trace_event_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:3",
+          "source_bytes": 54,
+          "serialized_bytes": 307,
+          "elapsed_ms": 2.5578330096323043,
+          "payload_texts": [
+            "{\"file\":\"model/model.go\",\"content\":\"package model\\n\\ntype Request struct{}\\nfunc Handle() {}\\n\",\"total_lines\":4,\"start_line\":1,\"end_line\":4,\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:3\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "wrong/model.go",
+            "start_line": 1,
+            "end_line": 10
+          },
+          "status": "completed",
+          "attempt_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/4",
+          "trace_event_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:4",
+          "source_bytes": 71,
+          "serialized_bytes": 325,
+          "elapsed_ms": 2.85950000397861,
+          "payload_texts": [
+            "{\"file\":\"wrong/model.go\",\"content\":\"package model\\n\\ntype Request struct{}\\nfunc Handle() {}\\nfunc Absent() {}\\n\",\"total_lines\":5,\"start_line\":1,\"end_line\":5,\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:4\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_5",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "one/one.go",
+            "start_line": 1,
+            "end_line": 10
+          },
+          "status": "completed",
+          "attempt_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/5",
+          "trace_event_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:5",
+          "source_bytes": 31,
+          "serialized_bytes": 279,
+          "elapsed_ms": 2.9056670027785003,
+          "payload_texts": [
+            "{\"file\":\"one/one.go\",\"content\":\"package shared\\n\\nfunc Open() {}\\n\",\"total_lines\":3,\"start_line\":1,\"end_line\":3,\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:5\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_6",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "two/two.go",
+            "start_line": 1,
+            "end_line": 10
+          },
+          "status": "completed",
+          "attempt_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/6",
+          "trace_event_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:6",
+          "source_bytes": 31,
+          "serialized_bytes": 279,
+          "elapsed_ms": 3.763959015486762,
+          "payload_texts": [
+            "{\"file\":\"two/two.go\",\"content\":\"package shared\\n\\nfunc Open() {}\\n\",\"total_lines\":3,\"start_line\":1,\"end_line\":3,\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:6\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_7",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "go.mod",
+            "start_line": 1,
+            "end_line": 10
+          },
+          "status": "completed",
+          "attempt_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/7",
+          "trace_event_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:7",
+          "source_bytes": 0,
+          "serialized_bytes": 233,
+          "elapsed_ms": 1.607042009709403,
+          "payload_texts": [
+            "{\"error\":{\"code\":\"LociError\",\"message\":\"File not found in cache\"},\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:7\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_8",
+          "server": "evaluation",
+          "tool": "graph_retrieve",
+          "arguments": {
+            "question": "For Keep, Probe, and Missing, resolve type origins, exact call callees including shadowed and ambiguous package selectors, and missing/external endpoints; determine module path impact of changing go.mod from example.com/acme to example.com/other.",
+            "seed_ids": [
+              "cmd/main.go::Keep#function",
+              "cmd/main.go::Probe#function",
+              "cmd/main.go::Missing#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/8",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 2212,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-_5bd2_px/snapshot\",\"question\":\"For Keep, Probe, and Missing, resolve type origins, exact call callees including shadowed and ambiguous package selectors, and missing/external endpoints; determine module path impact of changing go.mod from example.com/acme to example.com/other.\",\"selection\":\"explicit\",\"question_terms\":[],\"anchors\":[{\"node\":{\"id\":\"cmd/main.go::Keep#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"go\",\"file\":\"cmd/main.go\",\"line\":10,\"end_line\":10}},\"matched_symbol_id\":\"cmd/main.go::Keep#function\",\"name\":\"Keep\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}},{\"node\":{\"id\":\"cmd/main.go::Probe#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"go\",\"file\":\"cmd/main.go\",\"line\":12,\"end_line\":16}},\"matched_symbol_id\":\"cmd/main.go::Probe#function\",\"name\":\"Probe\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}},{\"node\":{\"id\":\"cmd/main.go::Missing#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"go\",\"file\":\"cmd/main.go\",\"line\":18,\"end_line\":18}},\"matched_symbol_id\":\"cmd/main.go::Missing#function\",\"name\":\"Missing\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}}],\"routing\":{\"kind\":\"relationship\",\"reason\":\"relationship_intent\"},\"filters\":{\"namespaces\":null,\"edge_types\":null,\"resolutions\":[\"exact\",\"declared\",\"import-resolved\"],\"direction\":\"outgoing\"},\"hub_threshold\":4,\"paths\":[],\"rejected_paths\":[],\"counts\":{\"filtered_edges\":5,\"examined_nodes\":4,\"examined_paths\":2,\"returned_paths\":0,\"rejected_paths\":0,\"duplicate_paths\":0,\"omitted_rejected_paths\":0,\"omitted_nodes\":0,\"omitted_paths\":0},\"budget\":{\"max_hops\":3,\"max_nodes\":64,\"max_paths\":16,\"path_offset\":0,\"evidence_bytes\":0,\"estimated_tokens\":0,\"max_evidence_bytes\":16384,\"max_estimated_tokens\":4096,\"hop_limit_reached\":false,\"node_limit_reached\":false,\"next_path_offset\":null},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/8\",\"calls_remaining\":16,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:8\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_9",
+          "server": "evaluation",
+          "tool": "graph_neighbors",
+          "arguments": {
+            "seed_ids": [
+              "cmd/main.go::Keep#function",
+              "cmd/main.go::Probe#function",
+              "cmd/main.go::Missing#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/9",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 839,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-_5bd2_px/snapshot\",\"results\":[{\"seed\":{\"id\":\"cmd/main.go::Keep#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"go\",\"file\":\"cmd/main.go\",\"line\":10,\"end_line\":10}},\"neighbors\":[]},{\"seed\":{\"id\":\"cmd/main.go::Probe#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"go\",\"file\":\"cmd/main.go\",\"line\":12,\"end_line\":16}},\"neighbors\":[]},{\"seed\":{\"id\":\"cmd/main.go::Missing#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"go\",\"file\":\"cmd/main.go\",\"line\":18,\"end_line\":18}},\"neighbors\":[]}],\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/9\",\"calls_remaining\":15,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:9\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_10",
+          "server": "evaluation",
+          "tool": "graph_calls",
+          "arguments": {
+            "file": "cmd/main.go",
+            "limit": 100,
+            "offset": 0,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/10",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 238,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"error\":{\"code\":\"ValueError\",\"message\":\"invalid record pagination\"},\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/10\",\"calls_remaining\":14,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:10\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_11",
+          "server": "evaluation",
+          "tool": "graph_calls",
+          "arguments": {
+            "file": "cmd/main.go",
+            "limit": 20,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/11",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 4084,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-_5bd2_px/snapshot\",\"file\":\"cmd/main.go\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":13,\"column\":5,\"start_byte\":180,\"end_byte\":192,\"callee_start_byte\":180,\"callee_end_byte\":190,\"callee_text\":\"api.Handle\",\"callee_path\":[\"api\",\"Handle\"],\"callee_form\":\"static_path\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":154,\"definition_end_byte\":233,\"body_start_byte\":174,\"body_end_byte\":233},\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\"},\"caller_id\":\"cmd/main.go::Probe#function\",\"caller_kind\":\"function\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"reference_unresolved\",\"reference_unresolved_reason\":\"binding_shadowed\",\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":14,\"column\":5,\"start_byte\":197,\"end_byte\":210,\"callee_start_byte\":197,\"callee_end_byte\":208,\"callee_text\":\"shared.Open\",\"callee_path\":[\"shared\",\"Open\"],\"callee_form\":\"static_path\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":154,\"definition_end_byte\":233,\"body_start_byte\":174,\"body_end_byte\":233},\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\"},\"caller_id\":\"cmd/main.go::Probe#function\",\"caller_kind\":\"function\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"reference_unresolved\",\"reference_unresolved_reason\":\"ambiguous_binding\",\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":15,\"column\":5,\"start_byte\":215,\"end_byte\":231,\"callee_start_byte\":215,\"callee_end_byte\":226,\"callee_text\":\"fmt.Println\",\"callee_path\":[\"fmt\",\"Println\"],\"callee_form\":\"static_path\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":154,\"definition_end_byte\":233,\"body_start_byte\":174,\"body_end_byte\":233},\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\"},\"caller_id\":\"cmd/main.go::Probe#function\",\"caller_kind\":\"function\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"reference_unresolved\",\"reference_unresolved_reason\":\"import_unresolved\",\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":18,\"column\":18,\"start_byte\":252,\"end_byte\":264,\"callee_start_byte\":252,\"callee_end_byte\":262,\"callee_text\":\"api.Absent\",\"callee_path\":[\"api\",\"Absent\"],\"callee_form\":\"static_path\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":235,\"definition_end_byte\":266,\"body_start_byte\":250,\"body_end_byte\":266},\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\"},\"caller_id\":\"cmd/main.go::Missing#function\",\"caller_kind\":\"function\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"reference_unresolved\",\"reference_unresolved_reason\":\"target_not_indexed\",\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":4,\"resolved\":0,\"unresolved\":4,\"returned\":4},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/11\",\"calls_remaining\":13,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:11\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_12",
+          "server": "evaluation",
+          "tool": "graph_imports",
+          "arguments": {
+            "file": "cmd/main.go",
+            "limit": 20,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/12",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 3708,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-_5bd2_px/snapshot\",\"file\":\"cmd/main.go\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":4,\"text\":\"api \\\"example.com/acme/model\\\"\",\"specifier\":\"example.com/acme/model\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"rust\":null},\"source_file\":\"cmd/main.go\",\"source_id\":\"cmd/main.go::__file__#file\",\"target_file\":null,\"target_package\":\"example.com/acme/model\",\"target_crate\":null,\"target_module\":null,\"target_kind\":\"package\",\"target_id\":\"model::example.com/acme/model#package\",\"specifier\":\"example.com/acme/model\",\"imported_name\":null,\"language\":\"go\",\"line\":4,\"text\":\"api \\\"example.com/acme/model\\\"\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":null,\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":5,\"text\":\"\\\"example.com/acme/one\\\"\",\"specifier\":\"example.com/acme/one\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"rust\":null},\"source_file\":\"cmd/main.go\",\"source_id\":\"cmd/main.go::__file__#file\",\"target_file\":null,\"target_package\":\"example.com/acme/one\",\"target_crate\":null,\"target_module\":null,\"target_kind\":\"package\",\"target_id\":\"one::example.com/acme/one#package\",\"specifier\":\"example.com/acme/one\",\"imported_name\":null,\"language\":\"go\",\"line\":5,\"text\":\"\\\"example.com/acme/one\\\"\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":null,\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":6,\"text\":\"\\\"example.com/acme/two\\\"\",\"specifier\":\"example.com/acme/two\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"rust\":null},\"source_file\":\"cmd/main.go\",\"source_id\":\"cmd/main.go::__file__#file\",\"target_file\":null,\"target_package\":\"example.com/acme/two\",\"target_crate\":null,\"target_module\":null,\"target_kind\":\"package\",\"target_id\":\"two::example.com/acme/two#package\",\"specifier\":\"example.com/acme/two\",\"imported_name\":null,\"language\":\"go\",\"line\":6,\"text\":\"\\\"example.com/acme/two\\\"\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":null,\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":7,\"text\":\"\\\"fmt\\\"\",\"specifier\":\"fmt\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"rust\":null},\"source_file\":\"cmd/main.go\",\"source_id\":\"cmd/main.go::__file__#file\",\"target_file\":null,\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":null,\"target_id\":null,\"specifier\":\"fmt\",\"imported_name\":null,\"language\":\"go\",\"line\":7,\"text\":\"\\\"fmt\\\"\",\"type_only\":false,\"is_reexport\":false,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"external\",\"resolution_basis\":null,\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":4,\"resolved\":3,\"unresolved\":1,\"returned\":4},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/12\",\"calls_remaining\":12,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:12\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_13",
+          "server": "evaluation",
+          "tool": "graph_references",
+          "arguments": {
+            "file": "cmd/main.go",
+            "limit": 20,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/13",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 9132,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-_5bd2_px/snapshot\",\"file\":\"cmd/main.go\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":10,\"column\":15,\"start_byte\":137,\"end_byte\":148,\"text\":\"api.Request\",\"path\":[\"api\",\"Request\"],\"candidate_bindings\":[{\"local_name\":\"api\",\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":27,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":4,\"import_text\":\"api \\\"example.com/acme/model\\\"\",\"import_specifier\":\"example.com/acme/model\"}],\"binding_state\":\"definite\",\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"owner\":{\"kind\":\"file\",\"definition_start_byte\":null,\"definition_end_byte\":null,\"body_start_byte\":null,\"body_end_byte\":null}},\"binding\":{\"local_name\":\"api\",\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":27,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":4,\"import_text\":\"api \\\"example.com/acme/model\\\"\",\"import_specifier\":\"example.com/acme/model\"},\"source_file\":\"cmd/main.go\",\"source_id\":\"cmd/main.go::__file__#file\",\"source_kind\":\"file\",\"import_source_id\":\"cmd/main.go::__file__#file\",\"import_target_id\":\"model::example.com/acme/model#package\",\"target_file\":\"model/model.go\",\"target_id\":\"model/model.go::Request#type\",\"target_kind\":\"type\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"import_unresolved_reason\":null,\"resolution_basis\":\"qualified_member\",\"support\":[{\"kind\":\"import_binding\",\"file\":\"cmd/main.go\",\"line\":4,\"content_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"endpoint_id\":\"model::example.com/acme/model#package\"},{\"kind\":\"definition\",\"file\":\"model/model.go\",\"line\":3,\"content_hash\":\"6d478b1b050450fc228dc1a04d79f699dbf67a6c2604e6e3a37c8b283f58a0cc\",\"endpoint_id\":\"model/model.go::Request#type\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":13,\"column\":5,\"start_byte\":180,\"end_byte\":190,\"text\":\"api.Handle\",\"path\":[\"api\",\"Handle\"],\"candidate_bindings\":[{\"local_name\":\"api\",\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":27,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":4,\"import_text\":\"api \\\"example.com/acme/model\\\"\",\"import_specifier\":\"example.com/acme/model\"}],\"binding_state\":\"shadowed\",\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":154,\"definition_end_byte\":233,\"body_start_byte\":174,\"body_end_byte\":233}},\"binding\":{\"local_name\":\"api\",\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":27,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":4,\"import_text\":\"api \\\"example.com/acme/model\\\"\",\"import_specifier\":\"example.com/acme/model\"},\"source_file\":\"cmd/main.go\",\"source_id\":\"cmd/main.go::Probe#function\",\"source_kind\":\"function\",\"import_source_id\":\"cmd/main.go::__file__#file\",\"import_target_id\":\"model::example.com/acme/model#package\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"binding_shadowed\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":14,\"column\":5,\"start_byte\":197,\"end_byte\":208,\"text\":\"shared.Open\",\"path\":[\"shared\",\"Open\"],\"candidate_bindings\":[{\"local_name\":null,\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":60,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":5,\"import_text\":\"\\\"example.com/acme/one\\\"\",\"import_specifier\":\"example.com/acme/one\"},{\"local_name\":null,\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":87,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":6,\"import_text\":\"\\\"example.com/acme/two\\\"\",\"import_specifier\":\"example.com/acme/two\"},{\"local_name\":null,\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":114,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":7,\"import_text\":\"\\\"fmt\\\"\",\"import_specifier\":\"fmt\"}],\"binding_state\":\"deferred\",\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":154,\"definition_end_byte\":233,\"body_start_byte\":174,\"body_end_byte\":233}},\"binding\":null,\"source_file\":\"cmd/main.go\",\"source_id\":\"cmd/main.go::Probe#function\",\"source_kind\":\"function\",\"import_source_id\":\"cmd/main.go::__file__#file\",\"import_target_id\":null,\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"ambiguous_binding\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":15,\"column\":5,\"start_byte\":215,\"end_byte\":226,\"text\":\"fmt.Println\",\"path\":[\"fmt\",\"Println\"],\"candidate_bindings\":[{\"local_name\":null,\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":60,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":5,\"import_text\":\"\\\"example.com/acme/one\\\"\",\"import_specifier\":\"example.com/acme/one\"},{\"local_name\":null,\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":87,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":6,\"import_text\":\"\\\"example.com/acme/two\\\"\",\"import_specifier\":\"example.com/acme/two\"},{\"local_name\":null,\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":114,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":7,\"import_text\":\"\\\"fmt\\\"\",\"import_specifier\":\"fmt\"}],\"binding_state\":\"deferred\",\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":154,\"definition_end_byte\":233,\"body_start_byte\":174,\"body_end_byte\":233}},\"binding\":{\"local_name\":null,\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":114,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":7,\"import_text\":\"\\\"fmt\\\"\",\"import_specifier\":\"fmt\"},\"source_file\":\"cmd/main.go\",\"source_id\":\"cmd/main.go::Probe#function\",\"source_kind\":\"function\",\"import_source_id\":\"cmd/main.go::__file__#file\",\"import_target_id\":null,\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"import_unresolved\",\"import_unresolved_reason\":\"external\",\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"cmd/main.go\",\"language\":\"go\",\"line\":18,\"column\":18,\"start_byte\":252,\"end_byte\":262,\"text\":\"api.Absent\",\"path\":[\"api\",\"Absent\"],\"candidate_bindings\":[{\"local_name\":\"api\",\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":27,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":4,\"import_text\":\"api \\\"example.com/acme/model\\\"\",\"import_specifier\":\"example.com/acme/model\"}],\"binding_state\":\"definite\",\"source_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":235,\"definition_end_byte\":266,\"body_start_byte\":250,\"body_end_byte\":266}},\"binding\":{\"local_name\":\"api\",\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":27,\"scope_start_byte\":0,\"scope_end_byte\":267,\"import_line\":4,\"import_text\":\"api \\\"example.com/acme/model\\\"\",\"import_specifier\":\"example.com/acme/model\"},\"source_file\":\"cmd/main.go\",\"source_id\":\"cmd/main.go::Missing#function\",\"source_kind\":\"function\",\"import_source_id\":\"cmd/main.go::__file__#file\",\"import_target_id\":\"model::example.com/acme/model#package\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"target_not_indexed\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[{\"kind\":\"import_binding\",\"file\":\"cmd/main.go\",\"line\":4,\"content_hash\":\"15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15\",\"endpoint_id\":\"model::example.com/acme/model#package\"}],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":5,\"resolved\":1,\"unresolved\":4,\"returned\":5},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/13\",\"calls_remaining\":11,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:13\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_14",
+          "server": "evaluation",
+          "tool": "get",
+          "arguments": {
+            "context": 2,
+            "symbol_ids": [
+              "cmd/main.go::Keep#function",
+              "cmd/main.go::Probe#function",
+              "cmd/main.go::Missing#function",
+              "model/model.go::Request#type",
+              "model/model.go::Handle#function",
+              "one/one.go::Open#function",
+              "two/two.go::Open#function",
+              "wrong/model.go::Absent#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/14",
+          "trace_event_id": "session-248fb182-3690-420b-ba71-13d2b4f88bb6:14",
+          "source_bytes": 570,
+          "serialized_bytes": 2363,
+          "elapsed_ms": 18.816208001226187,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"cmd/main.go::Keep#function\",\"source\":\"func Keep(req api.Request) {}\",\"byte_offset\":123,\"byte_length\":29,\"line\":10,\"end_line\":10,\"signature\":\"func Keep(req api.Request) {}\",\"kind\":\"function\",\"language\":\"go\",\"context_before\":[\")\",\"\"],\"context_after\":[\"\",\"func Probe(api int) {\"]},{\"id\":\"cmd/main.go::Probe#function\",\"source\":\"func Probe(api int) {\\n    api.Handle()\\n    shared.Open()\\n    fmt.Println(api)\\n}\",\"byte_offset\":154,\"byte_length\":79,\"line\":12,\"end_line\":16,\"signature\":\"func Probe(api int) {\",\"kind\":\"function\",\"language\":\"go\",\"context_before\":[\"func Keep(req api.Request) {}\",\"\"],\"context_after\":[\"\",\"func Missing() { api.Absent() }\"]},{\"id\":\"cmd/main.go::Missing#function\",\"source\":\"func Missing() { api.Absent() }\",\"byte_offset\":235,\"byte_length\":31,\"line\":18,\"end_line\":18,\"signature\":\"func Missing() { api.Absent() }\",\"kind\":\"function\",\"language\":\"go\",\"context_before\":[\"}\",\"\"],\"context_after\":[]},{\"id\":\"model/model.go::Request#type\",\"source\":\"Request struct{}\",\"byte_offset\":20,\"byte_length\":16,\"line\":3,\"end_line\":3,\"signature\":\"Request struct{}\",\"kind\":\"type\",\"language\":\"go\",\"context_before\":[\"package model\",\"\"],\"context_after\":[\"func Handle() {}\"]},{\"id\":\"model/model.go::Handle#function\",\"source\":\"func Handle() {}\",\"byte_offset\":37,\"byte_length\":16,\"line\":4,\"end_line\":4,\"signature\":\"func Handle() {}\",\"kind\":\"function\",\"language\":\"go\",\"context_before\":[\"\",\"type Request struct{}\"],\"context_after\":[]},{\"id\":\"one/one.go::Open#function\",\"source\":\"func Open() {}\",\"byte_offset\":16,\"byte_length\":14,\"line\":3,\"end_line\":3,\"signature\":\"func Open() {}\",\"kind\":\"function\",\"language\":\"go\",\"context_before\":[\"package shared\",\"\"],\"context_after\":[]},{\"id\":\"two/two.go::Open#function\",\"source\":\"func Open() {}\",\"byte_offset\":16,\"byte_length\":14,\"line\":3,\"end_line\":3,\"signature\":\"func Open() {}\",\"kind\":\"function\",\"language\":\"go\",\"context_before\":[\"package shared\",\"\"],\"context_after\":[]},{\"id\":\"wrong/model.go::Absent#function\",\"source\":\"func Absent() {}\",\"byte_offset\":54,\"byte_length\":16,\"line\":5,\"end_line\":5,\"signature\":\"func Absent() {}\",\"kind\":\"function\",\"language\":\"go\",\"context_before\":[\"type Request struct{}\",\"func Handle() {}\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6/attempt/14\",\"calls_remaining\":10,\"event_id\":\"session-248fb182-3690-420b-ba71-13d2b4f88bb6:14\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        }
+      ],
+      "failures": [
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_8",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_9",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_10",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_11",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_12",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_13",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "unmatched_recorded_delivery"
+        }
+      ]
+    },
+    "adapter_elapsed_ms": 51.587874128017575,
+    "recoverable_error_events": 2,
+    "relationships": {
+      "schema_version": 3,
+      "case_id": "go_unproven_package_uses",
+      "language": "go",
+      "required_semantic_dependencies_total": 1,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "request",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "cmd/main.go::Keep#function",
+              "to": "model/model.go::Request#type",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "cmd/main.go",
+                "line": 10,
+                "content_hash": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "available_dependency_links_total": 1,
+      "available_dependency_links": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "request",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "cmd/main.go::Keep#function",
+              "to": "model/model.go::Request#type",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "cmd/main.go",
+                "line": 10,
+                "content_hash": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "Exact frozen meaning joined to persisted semantic record and delivered source proof.",
+        "required": 1,
+        "available": 1,
+        "delivered": 0,
+        "available_ratio": 1.0,
+        "delivered_ratio": 0.0
+      },
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_available_relationships": 0,
+      "forbidden_delivered_relationships": 0,
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_delivered_relationship_edges": [],
+      "delivery_integrity_violations": [],
+      "forbidden_scope": "Frozen multilingual negatives plus delivered edge/index and complete exploration-proof consistency."
+    },
+    "arm": "A",
+    "attempt_id": "go_unproven_package_uses-r2-A"
+  },
+  "attempt_id": "go_unproven_package_uses-r2-A",
+  "arm": "A",
+  "provenance": {
+    "attempt_id": "go_unproven_package_uses-r2-A",
+    "case_id": "go_unproven_package_uses",
+    "snapshot": "go_uncertainty",
+    "repetition": 2,
+    "arm": "A",
+    "adapter_module": "benchmarks.multilingual_context_tools",
+    "model": "gpt-5.6-luna",
+    "reasoning_effort": "high",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "catalog_sha256": "f1c45cceac1c3ee90fa1af1007c341713e220571390c3b1eb086c443d7781062",
+    "runner_sha256": "5756278252a74c9e86c68a898b284108288b74a864b9424f6445223b3a7ca6db",
+    "source": {
+      "freeze_commit": "c910c5ac252a7c982f784d87d61bc4c50fc0c0ec",
+      "freeze_json_sha256": "254f38dd6247215928f4cce3fae379cf9dbf3acb74e51bd2d1ac91c12f290848",
+      "source_scope": "W4 evaluator snapshot; A exact retrieval/graph, B adds current loci_explore plus frozen guide"
+    },
+    "config": {
+      "project_doc_max_bytes": 0,
+      "web_search": "disabled",
+      "skills.include_instructions": false,
+      "developer_instructions": "",
+      "model_reasoning_effort": "high",
+      "model_catalog_json": "/Users/brummerv/phluxxed/loci-exploration/benchmarks/results/multilingual-context-workflow-v1/model-catalog.json",
+      "include_collaboration_mode_instructions": false,
+      "tools.update_plan.enabled": false,
+      "tools.experimental_request_user_input.enabled": false,
+      "features.skip_host_skill_discovery": true,
+      "mcp_servers.evaluation.command": "/Users/brummerv/phluxxed/loci-exploration/.venv/bin/python",
+      "mcp_servers.evaluation.args": [
+        "-m",
+        "benchmarks.multilingual_context_tools",
+        "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-_5bd2_px/run.json"
+      ],
+      "mcp_servers.evaluation.cwd": "/Users/brummerv/phluxxed/loci-exploration",
+      "mcp_servers.evaluation.env": {
+        "LOCI_BASE_DIR": "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-_5bd2_px/store",
+        "LOCI_STORE_NAMESPACE": "typescript-context-preflight"
+      },
+      "mcp_servers.evaluation.required": true,
+      "mcp_servers.evaluation.default_tools_approval_mode": "auto",
+      "mcp_servers.evaluation.tool_timeout_sec": 12,
+      "tool_output_token_limit": 32768,
+      "features.shell_tool": false,
+      "features.multi_agent": false,
+      "features.apps": false,
+      "features.plugins": false,
+      "features.hooks": false,
+      "features.memories": false,
+      "features.skill_search": false,
+      "features.skill_mcp_dependency_install": false,
+      "features.view_image": false,
+      "features.image_generation": false,
+      "features.browser_use": false,
+      "features.computer_use": false,
+      "features.in_app_browser": false,
+      "features.code_mode": false,
+      "features.code_mode_host": false,
+      "features.sleep_tool": false,
+      "features.goals": false,
+      "features.context_management": false,
+      "service_tier": "default"
+    },
+    "config_sha256": "dc8fe4614ae2b1b4a375a7f583c91cbd6d7da2dcfc2b1e3ae317090c54e45828",
+    "prompt_sha256": "82fe1f7bf51fb113a02d219378d30763fb844ce9cb5d583d1f6d6817cd5f3fbd",
+    "index_seconds": 0.019991540990304202,
+    "snapshot_files": {
+      "cmd/main.go": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15",
+      "go.mod": "01cc905450c59f6d3133f5fd339444536aa4d2b32468f197ea50d39884391d4d",
+      "model/model.go": "6d478b1b050450fc228dc1a04d79f699dbf67a6c2604e6e3a37c8b283f58a0cc",
+      "one/one.go": "4e64908f4809dab4c8edb15950795243ed2d683926a7ad0161aee3e339348548",
+      "two/two.go": "4e64908f4809dab4c8edb15950795243ed2d683926a7ad0161aee3e339348548",
+      "wrong/model.go": "735d698d25508944a983c66e26ea47872482bb9f451d8b6517db968ade3fa97c"
+    },
+    "extractor_version": 30,
+    "canonical_tool_schemas_sha256": "9119a51db6fc5ac2ab9834897a0a83bfef979c9dcb94fff08ab4ef3b71522753"
+  }
+}

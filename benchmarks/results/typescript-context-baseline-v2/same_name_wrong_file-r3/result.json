@@ -1,0 +1,421 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "task_id": "same_name_wrong_file",
+    "session_id": "617e3319-782e-43c8-a81a-44461f212d9e",
+    "arm": "A",
+    "repetition": 3,
+    "snapshot": "same_name_wrong_file",
+    "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+    "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+    "controls_version": "typescript-context-controls-v2"
+  },
+  "events": [
+    {
+      "id": "617e3319-782e-43c8-a81a-44461f212d9e:1",
+      "task_id": "same_name_wrong_file",
+      "session_id": "617e3319-782e-43c8-a81a-44461f212d9e",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "same_name_wrong_file",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Locate the processOrder declaration and related references so I can inspect its exact input and output types.",
+      "because": null,
+      "arguments": {
+        "query": "processOrder"
+      },
+      "search_id": "cca3bb76-96d8-4f82-98d4-4f217fc98ceb",
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"qualified_name\":\"processOrder\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":69,\"byte_length\":83,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"10ff5e5d2a4918055984c04b730e5c8efc809afc556c79c0adf351c6d1b7d303\",\"decorators\":[],\"keywords\":[\"order\",\"process\"],\"metadata\":{},\"line\":2,\"end_line\":4,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"cca3bb76-96d8-4f82-98d4-4f217fc98ceb\",\"_evaluation\":{\"attempt_id\":\"617e3319-782e-43c8-a81a-44461f212d9e/attempt/1\",\"calls_remaining\":23,\"event_id\":\"617e3319-782e-43c8-a81a-44461f212d9e:1\"}}",
+      "serialized_bytes": 912,
+      "source_bytes": 55,
+      "elapsed_ms": 2.409082997473888,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 69,
+          "end_byte": 124,
+          "sha256": "08653276f18caff75a7f70cd621f7b7e923bcbbbd2cb47ed8d3ac2b68ecaeec2",
+          "text": "function processOrder(value: ImportedPayload): string {"
+        }
+      ]
+    },
+    {
+      "id": "617e3319-782e-43c8-a81a-44461f212d9e:2",
+      "task_id": "same_name_wrong_file",
+      "session_id": "617e3319-782e-43c8-a81a-44461f212d9e",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "same_name_wrong_file",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "get",
+      "reason": "task_context",
+      "detail": "Retrieve the exact processOrder declaration and body to identify its required input fields and returned field.",
+      "because": null,
+      "arguments": {
+        "symbol_ids": [
+          "consumer.ts::processOrder#function"
+        ],
+        "context": 4,
+        "selected_from_search_id": "cca3bb76-96d8-4f82-98d4-4f217fc98ceb"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"source\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\",\"byte_offset\":69,\"byte_length\":83,\"line\":2,\"end_line\":4,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"617e3319-782e-43c8-a81a-44461f212d9e/attempt/2\",\"calls_remaining\":22,\"event_id\":\"617e3319-782e-43c8-a81a-44461f212d9e:2\"}}",
+      "serialized_bytes": 577,
+      "source_bytes": 199,
+      "elapsed_ms": 5.908874998567626,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 69,
+          "end_byte": 152,
+          "sha256": "10ff5e5d2a4918055984c04b730e5c8efc809afc556c79c0adf351c6d1b7d303",
+          "text": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 61,
+          "sha256": "0dbb3288339f9f31eeaf89b1c6e7fa1043c3756ea85c70b5e6a49cc5c32ec10b",
+          "text": "import type { Payload as ImportedPayload } from \"./types.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 69,
+          "end_byte": 124,
+          "sha256": "08653276f18caff75a7f70cd621f7b7e923bcbbbd2cb47ed8d3ac2b68ecaeec2",
+          "text": "function processOrder(value: ImportedPayload): string {"
+        }
+      ]
+    },
+    {
+      "id": "617e3319-782e-43c8-a81a-44461f212d9e:3",
+      "task_id": "same_name_wrong_file",
+      "session_id": "617e3319-782e-43c8-a81a-44461f212d9e",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "same_name_wrong_file",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "missing_context",
+      "detail": "The processOrder body uses the imported ImportedPayload type, so locate the source declaration that defines its fields and types.",
+      "because": "617e3319-782e-43c8-a81a-44461f212d9e:2",
+      "arguments": {
+        "query": "Payload",
+        "kind": "interface"
+      },
+      "search_id": "bab09933-4a23-4ccf-9f9a-7c66907702c2",
+      "response_json": "{\"symbols\":[{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"qualified_name\":\"Payload\",\"kind\":\"interface\",\"language\":\"typescript\",\"file_path\":\"types.ts\",\"byte_offset\":7,\"byte_length\":60,\"signature\":\"interface Payload {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d\",\"decorators\":[],\"keywords\":[\"payload\"],\"metadata\":{},\"line\":1,\"end_line\":4,\"score\":61.0},{\"id\":\"wrong.ts::Payload#interface\",\"name\":\"Payload\",\"qualified_name\":\"Payload\",\"kind\":\"interface\",\"language\":\"typescript\",\"file_path\":\"wrong.ts\",\"byte_offset\":7,\"byte_length\":41,\"signature\":\"interface Payload { unrelated: boolean; }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"229676f3def3337cec636e40764ae72a802ad6687272d67e471cf971dd40cc64\",\"decorators\":[],\"keywords\":[\"payload\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":61.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"bab09933-4a23-4ccf-9f9a-7c66907702c2\",\"_evaluation\":{\"attempt_id\":\"617e3319-782e-43c8-a81a-44461f212d9e/attempt/3\",\"calls_remaining\":21,\"event_id\":\"617e3319-782e-43c8-a81a-44461f212d9e:3\"}}",
+      "serialized_bytes": 1282,
+      "source_bytes": 60,
+      "elapsed_ms": 2.7744580002035946,
+      "spans": [
+        {
+          "file": "types.ts",
+          "start_byte": 7,
+          "end_byte": 26,
+          "sha256": "3c35bccaf71be1031a5c44b0fa3c7771b5743bb6ebedfda88fca7b184f983641",
+          "text": "interface Payload {"
+        },
+        {
+          "file": "wrong.ts",
+          "start_byte": 7,
+          "end_byte": 48,
+          "sha256": "229676f3def3337cec636e40764ae72a802ad6687272d67e471cf971dd40cc64",
+          "text": "interface Payload { unrelated: boolean; }"
+        }
+      ]
+    },
+    {
+      "id": "617e3319-782e-43c8-a81a-44461f212d9e:4",
+      "task_id": "same_name_wrong_file",
+      "session_id": "617e3319-782e-43c8-a81a-44461f212d9e",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "same_name_wrong_file",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "get",
+      "reason": "missing_context",
+      "detail": "Retrieve the imported Payload interface selected from the search to obtain the exact required field names and TypeScript types.",
+      "because": "617e3319-782e-43c8-a81a-44461f212d9e:3",
+      "arguments": {
+        "symbol_ids": [
+          "types.ts::Payload#interface"
+        ],
+        "context": 2,
+        "selected_from_search_id": "bab09933-4a23-4ccf-9f9a-7c66907702c2"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"types.ts::Payload#interface\",\"source\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\",\"byte_offset\":7,\"byte_length\":60,\"line\":1,\"end_line\":4,\"signature\":\"interface Payload {\",\"kind\":\"interface\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"617e3319-782e-43c8-a81a-44461f212d9e/attempt/4\",\"calls_remaining\":20,\"event_id\":\"617e3319-782e-43c8-a81a-44461f212d9e:4\"}}",
+      "serialized_bytes": 447,
+      "source_bytes": 79,
+      "elapsed_ms": 5.581624995102175,
+      "spans": [
+        {
+          "file": "types.ts",
+          "start_byte": 7,
+          "end_byte": 67,
+          "sha256": "1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d",
+          "text": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+        },
+        {
+          "file": "types.ts",
+          "start_byte": 7,
+          "end_byte": 26,
+          "sha256": "3c35bccaf71be1031a5c44b0fa3c7771b5743bb6ebedfda88fca7b184f983641",
+          "text": "interface Payload {"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "same_name_wrong_file",
+    "session_id": "617e3319-782e-43c8-a81a-44461f212d9e",
+    "arm": "A",
+    "repetition": 3,
+    "snapshot": "same_name_wrong_file",
+    "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+    "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+    "controls_version": "typescript-context-controls-v2",
+    "schema_version": 1,
+    "outcome": "completed",
+    "task_correct": true,
+    "answer": {
+      "required_fields": {
+        "amount": "number",
+        "requestId": "string"
+      },
+      "return_type": "string",
+      "returned_field": "requestId",
+      "origin_file": "types.ts"
+    },
+    "read_count": 4,
+    "avoidable_reads": 2,
+    "proven_avoidable_reads": 2,
+    "lineage_status": "complete",
+    "classifications": [
+      {
+        "event_id": "617e3319-782e-43c8-a81a-44461f212d9e:1",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "617e3319-782e-43c8-a81a-44461f212d9e:2",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "617e3319-782e-43c8-a81a-44461f212d9e:3",
+        "classification": "avoidable",
+        "reason": "missing_context",
+        "because": "617e3319-782e-43c8-a81a-44461f212d9e:2",
+        "recovered_gold": [
+          "payload"
+        ]
+      },
+      {
+        "event_id": "617e3319-782e-43c8-a81a-44461f212d9e:4",
+        "classification": "avoidable",
+        "reason": "missing_context",
+        "because": "617e3319-782e-43c8-a81a-44461f212d9e:3",
+        "recovered_gold": [
+          "payload"
+        ]
+      }
+    ],
+    "required_context_delivered": [
+      "entry",
+      "import",
+      "payload"
+    ],
+    "required_context_total": 3,
+    "context_recall": 1.0,
+    "serialized_tool_output_bytes": 3218,
+    "source_bytes": 393,
+    "estimated_source_tokens": 99,
+    "tool_elapsed_ms": 16.674040991347283,
+    "provider_usage": {
+      "input_tokens": 29312,
+      "cached_input_tokens": 14592,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 647,
+      "reasoning_output_tokens": 237
+    },
+    "usage_semantics": "Codex turn.completed gross input; cached_input is a subset; output includes reasoning_output_tokens.",
+    "token_status": "measured"
+  },
+  "baseline": {
+    "end_to_end_seconds": 25.823243250000814,
+    "actual_process_seconds": 25.823243250000814,
+    "exit_code": 0,
+    "provider_thread_id": "01a08e41-90b5-79d1-bf91-a4b1d7673a51",
+    "failures": [],
+    "tool_delivery_verified": true,
+    "relationships": {
+      "schema_version": 1,
+      "case_id": "same_name_wrong_file",
+      "required_semantic_dependencies_total": 1,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "payload",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "generic_references_type",
+          "available": false,
+          "delivered": false,
+          "available_edges": [],
+          "delivered_edges": []
+        }
+      ],
+      "available_dependency_links_total": 0,
+      "available_dependency_links": [],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "dependency-link recall; references_type fallback is generic and does not establish precise subtype/kind recall",
+        "required": 1,
+        "available": 0,
+        "delivered": 0,
+        "available_ratio": 0.0,
+        "delivered_ratio": 0.0
+      },
+      "precise_kind_links_available_total": 0,
+      "precise_kind_links_delivered_total": 0,
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_scope": "authored frozen forbidden_relationships only; this is not exhaustive truth about unsupported or unrecorded edges"
+    },
+    "output_accounting": {
+      "schema_version": 2,
+      "complete": true,
+      "calls": [
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "processOrder"
+            },
+            "reason": "task_context",
+            "detail": "Locate the processOrder declaration and related references so I can inspect its exact input and output types."
+          },
+          "attempt_id": "617e3319-782e-43c8-a81a-44461f212d9e/attempt/1",
+          "trace_event_id": "617e3319-782e-43c8-a81a-44461f212d9e:1",
+          "source_bytes": 55,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"qualified_name\":\"processOrder\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":69,\"byte_length\":83,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"10ff5e5d2a4918055984c04b730e5c8efc809afc556c79c0adf351c6d1b7d303\",\"decorators\":[],\"keywords\":[\"order\",\"process\"],\"metadata\":{},\"line\":2,\"end_line\":4,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"cca3bb76-96d8-4f82-98d4-4f217fc98ceb\",\"_evaluation\":{\"attempt_id\":\"617e3319-782e-43c8-a81a-44461f212d9e/attempt/1\",\"calls_remaining\":23,\"event_id\":\"617e3319-782e-43c8-a81a-44461f212d9e:1\"}}"
+          ],
+          "serialized_bytes": 912
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "get",
+            "parameters": {
+              "symbol_ids": [
+                "consumer.ts::processOrder#function"
+              ],
+              "context": 4,
+              "selected_from_search_id": "cca3bb76-96d8-4f82-98d4-4f217fc98ceb"
+            },
+            "reason": "task_context",
+            "detail": "Retrieve the exact processOrder declaration and body to identify its required input fields and returned field."
+          },
+          "attempt_id": "617e3319-782e-43c8-a81a-44461f212d9e/attempt/2",
+          "trace_event_id": "617e3319-782e-43c8-a81a-44461f212d9e:2",
+          "source_bytes": 199,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"source\":\"function processOrder(value: ImportedPayload): string {\\n  return value.requestId;\\n}\",\"byte_offset\":69,\"byte_length\":83,\"line\":2,\"end_line\":4,\"signature\":\"function processOrder(value: ImportedPayload): string {\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import type { Payload as ImportedPayload } from \\\"./types.js\\\";\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"617e3319-782e-43c8-a81a-44461f212d9e/attempt/2\",\"calls_remaining\":22,\"event_id\":\"617e3319-782e-43c8-a81a-44461f212d9e:2\"}}"
+          ],
+          "serialized_bytes": 577
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "Payload",
+              "kind": "interface"
+            },
+            "reason": "missing_context",
+            "because": "617e3319-782e-43c8-a81a-44461f212d9e:2",
+            "detail": "The processOrder body uses the imported ImportedPayload type, so locate the source declaration that defines its fields and types."
+          },
+          "attempt_id": "617e3319-782e-43c8-a81a-44461f212d9e/attempt/3",
+          "trace_event_id": "617e3319-782e-43c8-a81a-44461f212d9e:3",
+          "source_bytes": 60,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"types.ts::Payload#interface\",\"name\":\"Payload\",\"qualified_name\":\"Payload\",\"kind\":\"interface\",\"language\":\"typescript\",\"file_path\":\"types.ts\",\"byte_offset\":7,\"byte_length\":60,\"signature\":\"interface Payload {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d\",\"decorators\":[],\"keywords\":[\"payload\"],\"metadata\":{},\"line\":1,\"end_line\":4,\"score\":61.0},{\"id\":\"wrong.ts::Payload#interface\",\"name\":\"Payload\",\"qualified_name\":\"Payload\",\"kind\":\"interface\",\"language\":\"typescript\",\"file_path\":\"wrong.ts\",\"byte_offset\":7,\"byte_length\":41,\"signature\":\"interface Payload { unrelated: boolean; }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"229676f3def3337cec636e40764ae72a802ad6687272d67e471cf971dd40cc64\",\"decorators\":[],\"keywords\":[\"payload\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":61.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"bab09933-4a23-4ccf-9f9a-7c66907702c2\",\"_evaluation\":{\"attempt_id\":\"617e3319-782e-43c8-a81a-44461f212d9e/attempt/3\",\"calls_remaining\":21,\"event_id\":\"617e3319-782e-43c8-a81a-44461f212d9e:3\"}}"
+          ],
+          "serialized_bytes": 1282
+        },
+        {
+          "item_id": "item_5",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "get",
+            "parameters": {
+              "symbol_ids": [
+                "types.ts::Payload#interface"
+              ],
+              "context": 2,
+              "selected_from_search_id": "bab09933-4a23-4ccf-9f9a-7c66907702c2"
+            },
+            "reason": "missing_context",
+            "because": "617e3319-782e-43c8-a81a-44461f212d9e:3",
+            "detail": "Retrieve the imported Payload interface selected from the search to obtain the exact required field names and TypeScript types."
+          },
+          "attempt_id": "617e3319-782e-43c8-a81a-44461f212d9e/attempt/4",
+          "trace_event_id": "617e3319-782e-43c8-a81a-44461f212d9e:4",
+          "source_bytes": 79,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"types.ts::Payload#interface\",\"source\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\",\"byte_offset\":7,\"byte_length\":60,\"line\":1,\"end_line\":4,\"signature\":\"interface Payload {\",\"kind\":\"interface\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"617e3319-782e-43c8-a81a-44461f212d9e/attempt/4\",\"calls_remaining\":20,\"event_id\":\"617e3319-782e-43c8-a81a-44461f212d9e:4\"}}"
+          ],
+          "serialized_bytes": 447
+        }
+      ],
+      "tool_call_count": 4,
+      "recorded_payload_bytes": 3218,
+      "complete_payload_bytes": 3218,
+      "source_bytes": 393,
+      "failures": []
+    },
+    "lineage_valid": true,
+    "adapter_elapsed_ms": 17.019373983202968
+  }
+}

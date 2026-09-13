@@ -1,0 +1,3336 @@
+{
+  "schema_version": 1,
+  "meaning": "Gold-seeded diagnostic source probes; excluded from all measured calls, source, cost and latency.",
+  "candidate_source_tree": "a7b0f5e94df1c25a8554a8119d3254d2c60771cc",
+  "cases": {
+    "imported_interface": {
+      "entry_ids": [
+        "consumer.ts::processOrder#function"
+      ],
+      "gold_relationships": [
+        {
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "payload"
+        }
+      ],
+      "endpoint_probes": {
+        "consumer.ts::processOrder#function": {
+          "gold_label": "entry",
+          "source": {
+            "id": "consumer.ts::processOrder#function",
+            "source": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}",
+            "byte_offset": 69,
+            "byte_length": 83,
+            "line": 2,
+            "end_line": 4,
+            "signature": "function processOrder(value: ImportedPayload): string {",
+            "kind": "function",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [
+              {
+                "id": "types.ts::Payload#interface",
+                "source": "interface Payload {\n  requestId: string;\n  amount: number;\n}",
+                "byte_offset": 7,
+                "byte_length": 60,
+                "line": 1,
+                "end_line": 4,
+                "signature": "interface Payload {",
+                "kind": "interface",
+                "language": "typescript"
+              }
+            ],
+            "references": [
+              {
+                "owner_id": "consumer.ts::processOrder#function",
+                "target_id": "types.ts::Payload#interface",
+                "reference": {
+                  "file": "consumer.ts",
+                  "start_byte": 98,
+                  "end_byte": 113
+                },
+                "edge": {
+                  "from": "consumer.ts::__file__#file",
+                  "to": "types.ts::Payload#interface",
+                  "type": "references_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "consumer.ts",
+                    "line": 2,
+                    "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                  }
+                },
+                "support": [
+                  {
+                    "kind": "import_binding",
+                    "file": "consumer.ts",
+                    "line": 1,
+                    "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                    "endpoint_id": "types.ts::__file__#file"
+                  },
+                  {
+                    "kind": "definition",
+                    "file": "types.ts",
+                    "line": 1,
+                    "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                    "endpoint_id": "types.ts::Payload#interface"
+                  }
+                ]
+              }
+            ],
+            "evidence": [
+              {
+                "file": "consumer.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "byte_offset": 0,
+                "content": "import type { Payload as ImportedPayload } from \"./types.js\";\n",
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+              },
+              {
+                "file": "types.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "byte_offset": 0,
+                "content": "export interface Payload {\n",
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d"
+              }
+            ],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": [
+            {
+              "text": "ImportedPayload",
+              "file": "consumer.ts",
+              "start_byte": 98,
+              "end_byte": 113,
+              "status": "resolved",
+              "original_source_id": "consumer.ts::__file__#file",
+              "target_id": "types.ts::Payload#interface",
+              "has_type_only_candidate": true,
+              "smallest_declaration_ids": [
+                "consumer.ts::processOrder#function"
+              ]
+            }
+          ]
+        },
+        "types.ts::Payload#interface": {
+          "gold_label": "payload",
+          "source": {
+            "id": "types.ts::Payload#interface",
+            "source": "interface Payload {\n  requestId: string;\n  amount: number;\n}",
+            "byte_offset": 7,
+            "byte_length": 60,
+            "line": 1,
+            "end_line": 4,
+            "signature": "interface Payload {",
+            "kind": "interface",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        }
+      }
+    },
+    "local_interface": {
+      "entry_ids": [
+        "consumer.ts::processOrder#function"
+      ],
+      "gold_relationships": [
+        {
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "payload"
+        }
+      ],
+      "endpoint_probes": {
+        "consumer.ts::processOrder#function": {
+          "gold_label": "entry",
+          "source": {
+            "id": "consumer.ts::processOrder#function",
+            "source": "function processOrder(value: Payload): string {\n  return value.requestId;\n}",
+            "byte_offset": 75,
+            "byte_length": 75,
+            "line": 5,
+            "end_line": 7,
+            "signature": "function processOrder(value: Payload): string {",
+            "kind": "function",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "consumer.ts::Payload#interface": {
+          "gold_label": "payload",
+          "source": {
+            "id": "consumer.ts::Payload#interface",
+            "source": "interface Payload {\n  requestId: string;\n  amount: number;\n}",
+            "byte_offset": 7,
+            "byte_length": 60,
+            "line": 1,
+            "end_line": 4,
+            "signature": "interface Payload {",
+            "kind": "interface",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        }
+      }
+    },
+    "local_alias_chain": {
+      "entry_ids": [
+        "consumer.ts::processOrder#function"
+      ],
+      "gold_relationships": [
+        {
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "second"
+        },
+        {
+          "from": "second",
+          "kind": "alias_of",
+          "to": "first"
+        },
+        {
+          "from": "first",
+          "kind": "alias_of",
+          "to": "payload"
+        }
+      ],
+      "endpoint_probes": {
+        "consumer.ts::processOrder#function": {
+          "gold_label": "entry",
+          "source": {
+            "id": "consumer.ts::processOrder#function",
+            "source": "function processOrder(value: Second): string {\n  return value.requestId;\n}",
+            "byte_offset": 132,
+            "byte_length": 74,
+            "line": 7,
+            "end_line": 9,
+            "signature": "function processOrder(value: Second): string {",
+            "kind": "function",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "consumer.ts::Payload#interface": {
+          "gold_label": "payload",
+          "source": {
+            "id": "consumer.ts::Payload#interface",
+            "source": "interface Payload {\n  requestId: string;\n  amount: number;\n}",
+            "byte_offset": 7,
+            "byte_length": 60,
+            "line": 1,
+            "end_line": 4,
+            "signature": "interface Payload {",
+            "kind": "interface",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "consumer.ts::First#type": {
+          "gold_label": "first",
+          "source": {
+            "id": "consumer.ts::First#type",
+            "source": "type First = Payload;",
+            "byte_offset": 75,
+            "byte_length": 21,
+            "line": 5,
+            "end_line": 5,
+            "signature": "type First = Payload;",
+            "kind": "type",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "consumer.ts::Second#type": {
+          "gold_label": "second",
+          "source": {
+            "id": "consumer.ts::Second#type",
+            "source": "type Second = First;",
+            "byte_offset": 104,
+            "byte_length": 20,
+            "line": 6,
+            "end_line": 6,
+            "signature": "type Second = First;",
+            "kind": "type",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        }
+      }
+    },
+    "imported_alias_chain": {
+      "entry_ids": [
+        "consumer.ts::processOrder#function"
+      ],
+      "gold_relationships": [
+        {
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "second"
+        },
+        {
+          "from": "second",
+          "kind": "alias_of",
+          "to": "first"
+        },
+        {
+          "from": "first",
+          "kind": "alias_of",
+          "to": "payload"
+        }
+      ],
+      "endpoint_probes": {
+        "consumer.ts::processOrder#function": {
+          "gold_label": "entry",
+          "source": {
+            "id": "consumer.ts::processOrder#function",
+            "source": "function processOrder(value: Second): string {\n  return value.requestId;\n}",
+            "byte_offset": 49,
+            "byte_length": 74,
+            "line": 2,
+            "end_line": 4,
+            "signature": "function processOrder(value: Second): string {",
+            "kind": "function",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [
+              {
+                "id": "types.ts::Second#type",
+                "source": "type Second = First;",
+                "byte_offset": 104,
+                "byte_length": 20,
+                "line": 6,
+                "end_line": 6,
+                "signature": "type Second = First;",
+                "kind": "type",
+                "language": "typescript"
+              }
+            ],
+            "references": [
+              {
+                "owner_id": "consumer.ts::processOrder#function",
+                "target_id": "types.ts::Second#type",
+                "reference": {
+                  "file": "consumer.ts",
+                  "start_byte": 78,
+                  "end_byte": 84
+                },
+                "edge": {
+                  "from": "consumer.ts::__file__#file",
+                  "to": "types.ts::Second#type",
+                  "type": "references_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "consumer.ts",
+                    "line": 2,
+                    "content_hash": "ea2b35b1cf194dbcf91fe9ab1ce6a14819260e681d2532cc5461d2b0b7e3964b"
+                  }
+                },
+                "support": [
+                  {
+                    "kind": "import_binding",
+                    "file": "consumer.ts",
+                    "line": 1,
+                    "content_hash": "ea2b35b1cf194dbcf91fe9ab1ce6a14819260e681d2532cc5461d2b0b7e3964b",
+                    "endpoint_id": "types.ts::__file__#file"
+                  },
+                  {
+                    "kind": "definition",
+                    "file": "types.ts",
+                    "line": 6,
+                    "content_hash": "794bc2317c9dfa25f886bf36635243d88abcd1f1cca9cd20ab95c3591c17de89",
+                    "endpoint_id": "types.ts::Second#type"
+                  }
+                ]
+              }
+            ],
+            "evidence": [
+              {
+                "file": "consumer.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "byte_offset": 0,
+                "content": "import type { Second } from \"./types.js\";\n",
+                "content_hash": "ea2b35b1cf194dbcf91fe9ab1ce6a14819260e681d2532cc5461d2b0b7e3964b"
+              },
+              {
+                "file": "types.ts",
+                "start_line": 6,
+                "end_line": 6,
+                "byte_offset": 97,
+                "content": "export type Second = First;\n",
+                "content_hash": "794bc2317c9dfa25f886bf36635243d88abcd1f1cca9cd20ab95c3591c17de89"
+              }
+            ],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": [
+            {
+              "text": "Second",
+              "file": "consumer.ts",
+              "start_byte": 78,
+              "end_byte": 84,
+              "status": "resolved",
+              "original_source_id": "consumer.ts::__file__#file",
+              "target_id": "types.ts::Second#type",
+              "has_type_only_candidate": true,
+              "smallest_declaration_ids": [
+                "consumer.ts::processOrder#function"
+              ]
+            }
+          ]
+        },
+        "types.ts::Payload#interface": {
+          "gold_label": "payload",
+          "source": {
+            "id": "types.ts::Payload#interface",
+            "source": "interface Payload {\n  requestId: string;\n  amount: number;\n}",
+            "byte_offset": 7,
+            "byte_length": 60,
+            "line": 1,
+            "end_line": 4,
+            "signature": "interface Payload {",
+            "kind": "interface",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "types.ts::First#type": {
+          "gold_label": "first",
+          "source": {
+            "id": "types.ts::First#type",
+            "source": "type First = Payload;",
+            "byte_offset": 75,
+            "byte_length": 21,
+            "line": 5,
+            "end_line": 5,
+            "signature": "type First = Payload;",
+            "kind": "type",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "types.ts::Second#type": {
+          "gold_label": "second",
+          "source": {
+            "id": "types.ts::Second#type",
+            "source": "type Second = First;",
+            "byte_offset": 104,
+            "byte_length": 20,
+            "line": 6,
+            "end_line": 6,
+            "signature": "type Second = First;",
+            "kind": "type",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        }
+      }
+    },
+    "named_type_reexport_chain": {
+      "entry_ids": [
+        "consumer.ts::processOrder#function"
+      ],
+      "gold_relationships": [
+        {
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "payload"
+        }
+      ],
+      "endpoint_probes": {
+        "consumer.ts::processOrder#function": {
+          "gold_label": "entry",
+          "source": {
+            "id": "consumer.ts::processOrder#function",
+            "source": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}",
+            "byte_offset": 76,
+            "byte_length": 83,
+            "line": 2,
+            "end_line": 4,
+            "signature": "function processOrder(value: ImportedPayload): string {",
+            "kind": "function",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [
+              {
+                "id": "types.ts::Payload#interface",
+                "source": "interface Payload {\n  requestId: string;\n  amount: number;\n}",
+                "byte_offset": 7,
+                "byte_length": 60,
+                "line": 1,
+                "end_line": 4,
+                "signature": "interface Payload {",
+                "kind": "interface",
+                "language": "typescript"
+              }
+            ],
+            "references": [
+              {
+                "owner_id": "consumer.ts::processOrder#function",
+                "target_id": "types.ts::Payload#interface",
+                "reference": {
+                  "file": "consumer.ts",
+                  "start_byte": 105,
+                  "end_byte": 120
+                },
+                "edge": {
+                  "from": "consumer.ts::__file__#file",
+                  "to": "types.ts::Payload#interface",
+                  "type": "references_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "consumer.ts",
+                    "line": 2,
+                    "content_hash": "16cac1334e9c04988782f752daad728bdd5b83cdf1619b38ae35213fb3e20b55"
+                  }
+                },
+                "support": [
+                  {
+                    "kind": "import_binding",
+                    "file": "consumer.ts",
+                    "line": 1,
+                    "content_hash": "16cac1334e9c04988782f752daad728bdd5b83cdf1619b38ae35213fb3e20b55",
+                    "endpoint_id": "barrel.ts::__file__#file"
+                  },
+                  {
+                    "kind": "reexport",
+                    "file": "barrel.ts",
+                    "line": 1,
+                    "content_hash": "841be26434600c9360eacf2d07a564d2670915c60b6ff071700be764167f07d7",
+                    "endpoint_id": "types.ts::__file__#file"
+                  },
+                  {
+                    "kind": "definition",
+                    "file": "types.ts",
+                    "line": 1,
+                    "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                    "endpoint_id": "types.ts::Payload#interface"
+                  }
+                ]
+              }
+            ],
+            "evidence": [
+              {
+                "file": "barrel.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "byte_offset": 0,
+                "content": "export type { Payload as PublicPayload } from \"./types.js\";\n",
+                "content_hash": "841be26434600c9360eacf2d07a564d2670915c60b6ff071700be764167f07d7"
+              },
+              {
+                "file": "consumer.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "byte_offset": 0,
+                "content": "import type { PublicPayload as ImportedPayload } from \"./barrel.js\";\n",
+                "content_hash": "16cac1334e9c04988782f752daad728bdd5b83cdf1619b38ae35213fb3e20b55"
+              },
+              {
+                "file": "types.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "byte_offset": 0,
+                "content": "export interface Payload {\n",
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d"
+              }
+            ],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": [
+            {
+              "text": "ImportedPayload",
+              "file": "consumer.ts",
+              "start_byte": 105,
+              "end_byte": 120,
+              "status": "resolved",
+              "original_source_id": "consumer.ts::__file__#file",
+              "target_id": "types.ts::Payload#interface",
+              "has_type_only_candidate": true,
+              "smallest_declaration_ids": [
+                "consumer.ts::processOrder#function"
+              ]
+            }
+          ]
+        },
+        "types.ts::Payload#interface": {
+          "gold_label": "payload",
+          "source": {
+            "id": "types.ts::Payload#interface",
+            "source": "interface Payload {\n  requestId: string;\n  amount: number;\n}",
+            "byte_offset": 7,
+            "byte_length": 60,
+            "line": 1,
+            "end_line": 4,
+            "signature": "interface Payload {",
+            "kind": "interface",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        }
+      }
+    },
+    "same_name_wrong_file": {
+      "entry_ids": [
+        "consumer.ts::processOrder#function"
+      ],
+      "gold_relationships": [
+        {
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "payload"
+        }
+      ],
+      "endpoint_probes": {
+        "consumer.ts::processOrder#function": {
+          "gold_label": "entry",
+          "source": {
+            "id": "consumer.ts::processOrder#function",
+            "source": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}",
+            "byte_offset": 69,
+            "byte_length": 83,
+            "line": 2,
+            "end_line": 4,
+            "signature": "function processOrder(value: ImportedPayload): string {",
+            "kind": "function",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [
+              {
+                "id": "types.ts::Payload#interface",
+                "source": "interface Payload {\n  requestId: string;\n  amount: number;\n}",
+                "byte_offset": 7,
+                "byte_length": 60,
+                "line": 1,
+                "end_line": 4,
+                "signature": "interface Payload {",
+                "kind": "interface",
+                "language": "typescript"
+              }
+            ],
+            "references": [
+              {
+                "owner_id": "consumer.ts::processOrder#function",
+                "target_id": "types.ts::Payload#interface",
+                "reference": {
+                  "file": "consumer.ts",
+                  "start_byte": 98,
+                  "end_byte": 113
+                },
+                "edge": {
+                  "from": "consumer.ts::__file__#file",
+                  "to": "types.ts::Payload#interface",
+                  "type": "references_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "consumer.ts",
+                    "line": 2,
+                    "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+                  }
+                },
+                "support": [
+                  {
+                    "kind": "import_binding",
+                    "file": "consumer.ts",
+                    "line": 1,
+                    "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+                    "endpoint_id": "types.ts::__file__#file"
+                  },
+                  {
+                    "kind": "definition",
+                    "file": "types.ts",
+                    "line": 1,
+                    "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+                    "endpoint_id": "types.ts::Payload#interface"
+                  }
+                ]
+              }
+            ],
+            "evidence": [
+              {
+                "file": "consumer.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "byte_offset": 0,
+                "content": "import type { Payload as ImportedPayload } from \"./types.js\";\n",
+                "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+              },
+              {
+                "file": "types.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "byte_offset": 0,
+                "content": "export interface Payload {\n",
+                "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d"
+              }
+            ],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": [
+            {
+              "text": "ImportedPayload",
+              "file": "consumer.ts",
+              "start_byte": 98,
+              "end_byte": 113,
+              "status": "resolved",
+              "original_source_id": "consumer.ts::__file__#file",
+              "target_id": "types.ts::Payload#interface",
+              "has_type_only_candidate": true,
+              "smallest_declaration_ids": [
+                "consumer.ts::processOrder#function"
+              ]
+            }
+          ]
+        },
+        "types.ts::Payload#interface": {
+          "gold_label": "payload",
+          "source": {
+            "id": "types.ts::Payload#interface",
+            "source": "interface Payload {\n  requestId: string;\n  amount: number;\n}",
+            "byte_offset": 7,
+            "byte_length": 60,
+            "line": 1,
+            "end_line": 4,
+            "signature": "interface Payload {",
+            "kind": "interface",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        }
+      }
+    },
+    "local_heritage": {
+      "entry_ids": [
+        "consumer.ts::Processor#class"
+      ],
+      "gold_relationships": [
+        {
+          "from": "entry",
+          "kind": "extends",
+          "to": "base"
+        },
+        {
+          "from": "entry",
+          "kind": "implements",
+          "to": "contract"
+        },
+        {
+          "from": "child",
+          "kind": "extends",
+          "to": "contract"
+        }
+      ],
+      "endpoint_probes": {
+        "consumer.ts::Processor#class": {
+          "gold_label": "entry",
+          "source": {
+            "id": "consumer.ts::Processor#class",
+            "source": "class Processor extends Base implements Contract {\n  process(): string { return this.requestId; }\n}",
+            "byte_offset": 153,
+            "byte_length": 99,
+            "line": 4,
+            "end_line": 6,
+            "signature": "class Processor extends Base implements Contract {",
+            "kind": "class",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "consumer.ts::Contract#interface": {
+          "gold_label": "contract",
+          "source": {
+            "id": "consumer.ts::Contract#interface",
+            "source": "interface Contract { requestId: string; }",
+            "byte_offset": 0,
+            "byte_length": 41,
+            "line": 1,
+            "end_line": 1,
+            "signature": "interface Contract { requestId: string; }",
+            "kind": "interface",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "consumer.ts::Base#class": {
+          "gold_label": "base",
+          "source": {
+            "id": "consumer.ts::Base#class",
+            "source": "class Base { requestId: string = \"base\"; }",
+            "byte_offset": 103,
+            "byte_length": 42,
+            "line": 3,
+            "end_line": 3,
+            "signature": "class Base { requestId: string = \"base\"; }",
+            "kind": "class",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "consumer.ts::ChildContract#interface": {
+          "gold_label": "child",
+          "source": {
+            "id": "consumer.ts::ChildContract#interface",
+            "source": "interface ChildContract extends Contract { amount: number; }",
+            "byte_offset": 42,
+            "byte_length": 60,
+            "line": 2,
+            "end_line": 2,
+            "signature": "interface ChildContract extends Contract { amount: number; }",
+            "kind": "interface",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        }
+      }
+    },
+    "imported_heritage": {
+      "entry_ids": [
+        "consumer.ts::Processor#class"
+      ],
+      "gold_relationships": [
+        {
+          "from": "entry",
+          "kind": "extends",
+          "to": "base"
+        },
+        {
+          "from": "entry",
+          "kind": "implements",
+          "to": "contract"
+        },
+        {
+          "from": "child",
+          "kind": "extends",
+          "to": "contract"
+        }
+      ],
+      "endpoint_probes": {
+        "consumer.ts::Processor#class": {
+          "gold_label": "entry",
+          "source": {
+            "id": "consumer.ts::Processor#class",
+            "source": "class Processor extends Base implements Contract {\n  process(): string { return this.requestId; }\n}",
+            "byte_offset": 125,
+            "byte_length": 99,
+            "line": 3,
+            "end_line": 5,
+            "signature": "class Processor extends Base implements Contract {",
+            "kind": "class",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [
+              {
+                "id": "types.ts::Contract#interface",
+                "source": "interface Contract { requestId: string; }",
+                "byte_offset": 7,
+                "byte_length": 41,
+                "line": 1,
+                "end_line": 1,
+                "signature": "interface Contract { requestId: string; }",
+                "kind": "interface",
+                "language": "typescript"
+              }
+            ],
+            "references": [
+              {
+                "owner_id": "consumer.ts::Processor#class",
+                "target_id": "types.ts::Contract#interface",
+                "reference": {
+                  "file": "consumer.ts",
+                  "start_byte": 165,
+                  "end_byte": 173
+                },
+                "edge": {
+                  "from": "consumer.ts::__file__#file",
+                  "to": "types.ts::Contract#interface",
+                  "type": "references_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "consumer.ts",
+                    "line": 2,
+                    "content_hash": "477f3fd9026e6e693fd0ea1fd91e5ed54ec316ba77367e18ef8f71b7dd4ff365"
+                  }
+                },
+                "support": [
+                  {
+                    "kind": "import_binding",
+                    "file": "consumer.ts",
+                    "line": 1,
+                    "content_hash": "477f3fd9026e6e693fd0ea1fd91e5ed54ec316ba77367e18ef8f71b7dd4ff365",
+                    "endpoint_id": "types.ts::__file__#file"
+                  },
+                  {
+                    "kind": "definition",
+                    "file": "types.ts",
+                    "line": 1,
+                    "content_hash": "81c0c5b3aa4070ca36c0a1cd734dc3648f9ad2499c9244b9cc4611bfdd5c4ca2",
+                    "endpoint_id": "types.ts::Contract#interface"
+                  }
+                ]
+              }
+            ],
+            "evidence": [
+              {
+                "file": "consumer.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "byte_offset": 0,
+                "content": "import { Base, type Contract } from \"./types.js\";\n",
+                "content_hash": "477f3fd9026e6e693fd0ea1fd91e5ed54ec316ba77367e18ef8f71b7dd4ff365"
+              },
+              {
+                "file": "types.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "byte_offset": 0,
+                "content": "export interface Contract { requestId: string; }\n",
+                "content_hash": "81c0c5b3aa4070ca36c0a1cd734dc3648f9ad2499c9244b9cc4611bfdd5c4ca2"
+              }
+            ],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": [
+            {
+              "text": "Base",
+              "file": "consumer.ts",
+              "start_byte": 149,
+              "end_byte": 153,
+              "status": "resolved",
+              "original_source_id": "consumer.ts::__file__#file",
+              "target_id": "types.ts::Base#class",
+              "has_type_only_candidate": false,
+              "smallest_declaration_ids": [
+                "consumer.ts::Processor#class"
+              ]
+            },
+            {
+              "text": "Contract",
+              "file": "consumer.ts",
+              "start_byte": 165,
+              "end_byte": 173,
+              "status": "resolved",
+              "original_source_id": "consumer.ts::__file__#file",
+              "target_id": "types.ts::Contract#interface",
+              "has_type_only_candidate": true,
+              "smallest_declaration_ids": [
+                "consumer.ts::Processor#class"
+              ]
+            }
+          ]
+        },
+        "types.ts::Contract#interface": {
+          "gold_label": "contract",
+          "source": {
+            "id": "types.ts::Contract#interface",
+            "source": "interface Contract { requestId: string; }",
+            "byte_offset": 7,
+            "byte_length": 41,
+            "line": 1,
+            "end_line": 1,
+            "signature": "interface Contract { requestId: string; }",
+            "kind": "interface",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "types.ts::Base#class": {
+          "gold_label": "base",
+          "source": {
+            "id": "types.ts::Base#class",
+            "source": "class Base { requestId: string = \"base\"; }",
+            "byte_offset": 56,
+            "byte_length": 42,
+            "line": 2,
+            "end_line": 2,
+            "signature": "class Base { requestId: string = \"base\"; }",
+            "kind": "class",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "consumer.ts::ChildContract#interface": {
+          "gold_label": "child",
+          "source": {
+            "id": "consumer.ts::ChildContract#interface",
+            "source": "interface ChildContract extends Contract { amount: number; }",
+            "byte_offset": 57,
+            "byte_length": 60,
+            "line": 2,
+            "end_line": 2,
+            "signature": "interface ChildContract extends Contract { amount: number; }",
+            "kind": "interface",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [
+              {
+                "id": "types.ts::Contract#interface",
+                "source": "interface Contract { requestId: string; }",
+                "byte_offset": 7,
+                "byte_length": 41,
+                "line": 1,
+                "end_line": 1,
+                "signature": "interface Contract { requestId: string; }",
+                "kind": "interface",
+                "language": "typescript"
+              }
+            ],
+            "references": [
+              {
+                "owner_id": "consumer.ts::ChildContract#interface",
+                "target_id": "types.ts::Contract#interface",
+                "reference": {
+                  "file": "consumer.ts",
+                  "start_byte": 89,
+                  "end_byte": 97
+                },
+                "edge": {
+                  "from": "consumer.ts::__file__#file",
+                  "to": "types.ts::Contract#interface",
+                  "type": "references_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "consumer.ts",
+                    "line": 2,
+                    "content_hash": "477f3fd9026e6e693fd0ea1fd91e5ed54ec316ba77367e18ef8f71b7dd4ff365"
+                  }
+                },
+                "support": [
+                  {
+                    "kind": "import_binding",
+                    "file": "consumer.ts",
+                    "line": 1,
+                    "content_hash": "477f3fd9026e6e693fd0ea1fd91e5ed54ec316ba77367e18ef8f71b7dd4ff365",
+                    "endpoint_id": "types.ts::__file__#file"
+                  },
+                  {
+                    "kind": "definition",
+                    "file": "types.ts",
+                    "line": 1,
+                    "content_hash": "81c0c5b3aa4070ca36c0a1cd734dc3648f9ad2499c9244b9cc4611bfdd5c4ca2",
+                    "endpoint_id": "types.ts::Contract#interface"
+                  }
+                ]
+              }
+            ],
+            "evidence": [
+              {
+                "file": "consumer.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "byte_offset": 0,
+                "content": "import { Base, type Contract } from \"./types.js\";\n",
+                "content_hash": "477f3fd9026e6e693fd0ea1fd91e5ed54ec316ba77367e18ef8f71b7dd4ff365"
+              },
+              {
+                "file": "types.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "byte_offset": 0,
+                "content": "export interface Contract { requestId: string; }\n",
+                "content_hash": "81c0c5b3aa4070ca36c0a1cd734dc3648f9ad2499c9244b9cc4611bfdd5c4ca2"
+              }
+            ],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": [
+            {
+              "text": "Contract",
+              "file": "consumer.ts",
+              "start_byte": 89,
+              "end_byte": 97,
+              "status": "resolved",
+              "original_source_id": "consumer.ts::__file__#file",
+              "target_id": "types.ts::Contract#interface",
+              "has_type_only_candidate": true,
+              "smallest_declaration_ids": [
+                "consumer.ts::ChildContract#interface"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "ambiguous_star_exports": {
+      "entry_ids": [
+        "consumer.ts::processOrder#function"
+      ],
+      "gold_relationships": [],
+      "endpoint_probes": {
+        "consumer.ts::processOrder#function": {
+          "gold_label": "entry",
+          "source": {
+            "id": "consumer.ts::processOrder#function",
+            "source": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}",
+            "byte_offset": 70,
+            "byte_length": 83,
+            "line": 2,
+            "end_line": 4,
+            "signature": "function processOrder(value: ImportedPayload): string {",
+            "kind": "function",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "partial",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {
+              "unresolved_reference": 1
+            }
+          },
+          "contained_reference_records": [
+            {
+              "text": "ImportedPayload",
+              "file": "consumer.ts",
+              "start_byte": 99,
+              "end_byte": 114,
+              "status": "unresolved",
+              "original_source_id": "consumer.ts::__file__#file",
+              "target_id": null,
+              "has_type_only_candidate": true,
+              "smallest_declaration_ids": [
+                "consumer.ts::processOrder#function"
+              ]
+            }
+          ]
+        },
+        "left.ts::Payload#interface": {
+          "gold_label": "left",
+          "source": {
+            "id": "left.ts::Payload#interface",
+            "source": "interface Payload {\n  requestId: string;\n  amount: number;\n}",
+            "byte_offset": 7,
+            "byte_length": 60,
+            "line": 1,
+            "end_line": 4,
+            "signature": "interface Payload {",
+            "kind": "interface",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "right.ts::Payload#interface": {
+          "gold_label": "right",
+          "source": {
+            "id": "right.ts::Payload#interface",
+            "source": "interface Payload {\n  requestId: string;\n  amount: number;\n}",
+            "byte_offset": 7,
+            "byte_length": 60,
+            "line": 1,
+            "end_line": 4,
+            "signature": "interface Payload {",
+            "kind": "interface",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        }
+      }
+    },
+    "generic_shadow": {
+      "entry_ids": [
+        "consumer.ts::processOrder#function"
+      ],
+      "gold_relationships": [],
+      "endpoint_probes": {
+        "consumer.ts::processOrder#function": {
+          "gold_label": "entry",
+          "source": {
+            "id": "consumer.ts::processOrder#function",
+            "source": "function processOrder<Payload>(value: Payload): Payload {\n  return value;\n}",
+            "byte_offset": 50,
+            "byte_length": 75,
+            "line": 2,
+            "end_line": 4,
+            "signature": "function processOrder<Payload>(value: Payload): Payload {",
+            "kind": "function",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "partial",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {
+              "unresolved_reference": 2
+            }
+          },
+          "contained_reference_records": [
+            {
+              "text": "Payload",
+              "file": "consumer.ts",
+              "start_byte": 88,
+              "end_byte": 95,
+              "status": "unresolved",
+              "original_source_id": "consumer.ts::__file__#file",
+              "target_id": null,
+              "has_type_only_candidate": true,
+              "smallest_declaration_ids": [
+                "consumer.ts::processOrder#function"
+              ]
+            },
+            {
+              "text": "Payload",
+              "file": "consumer.ts",
+              "start_byte": 98,
+              "end_byte": 105,
+              "status": "unresolved",
+              "original_source_id": "consumer.ts::__file__#file",
+              "target_id": null,
+              "has_type_only_candidate": true,
+              "smallest_declaration_ids": [
+                "consumer.ts::processOrder#function"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "exported_arrow": {
+      "entry_ids": [
+        "consumer.ts::useNumber#function"
+      ],
+      "gold_relationships": [
+        {
+          "from": "entry",
+          "kind": "calls",
+          "to": "callee"
+        }
+      ],
+      "endpoint_probes": {
+        "consumer.ts::useNumber#function": {
+          "gold_label": "entry",
+          "source": {
+            "id": "consumer.ts::useNumber#function",
+            "source": "function useNumber(): number { return num(1); }",
+            "byte_offset": 42,
+            "byte_length": 47,
+            "line": 2,
+            "end_line": 2,
+            "signature": "function useNumber(): number { return num(1); }",
+            "kind": "function",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": [
+            {
+              "text": "num",
+              "file": "consumer.ts",
+              "start_byte": 80,
+              "end_byte": 83,
+              "status": "resolved",
+              "original_source_id": "consumer.ts::useNumber#function",
+              "target_id": "number.ts::num#function",
+              "has_type_only_candidate": false,
+              "smallest_declaration_ids": [
+                "consumer.ts::useNumber#function"
+              ]
+            }
+          ]
+        },
+        "number.ts::num#function": {
+          "gold_label": "callee",
+          "source": {
+            "id": "number.ts::num#function",
+            "source": "num = (v: unknown): number => Number(v)",
+            "byte_offset": 13,
+            "byte_length": 39,
+            "line": 1,
+            "end_line": 1,
+            "signature": "num = (v: unknown): number => Number(v)",
+            "kind": "function",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        }
+      }
+    },
+    "default_identifier": {
+      "entry_ids": [
+        "consumer.ts::useNumber#function"
+      ],
+      "gold_relationships": [
+        {
+          "from": "entry",
+          "kind": "calls",
+          "to": "callee"
+        }
+      ],
+      "endpoint_probes": {
+        "consumer.ts::useNumber#function": {
+          "gold_label": "entry",
+          "source": {
+            "id": "consumer.ts::useNumber#function",
+            "source": "function useNumber(): number { return num(1); }",
+            "byte_offset": 38,
+            "byte_length": 47,
+            "line": 2,
+            "end_line": 2,
+            "signature": "function useNumber(): number { return num(1); }",
+            "kind": "function",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": [
+            {
+              "text": "num",
+              "file": "consumer.ts",
+              "start_byte": 76,
+              "end_byte": 79,
+              "status": "resolved",
+              "original_source_id": "consumer.ts::useNumber#function",
+              "target_id": "number.ts::num#function",
+              "has_type_only_candidate": false,
+              "smallest_declaration_ids": [
+                "consumer.ts::useNumber#function"
+              ]
+            }
+          ]
+        },
+        "number.ts::num#function": {
+          "gold_label": "callee",
+          "source": {
+            "id": "number.ts::num#function",
+            "source": "function num(v: unknown): number { return Number(v); }",
+            "byte_offset": 0,
+            "byte_length": 54,
+            "line": 1,
+            "end_line": 1,
+            "signature": "function num(v: unknown): number { return Number(v); }",
+            "kind": "function",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        }
+      }
+    },
+    "named_function_control": {
+      "entry_ids": [
+        "consumer.ts::useNumber#function"
+      ],
+      "gold_relationships": [
+        {
+          "from": "entry",
+          "kind": "calls",
+          "to": "callee"
+        }
+      ],
+      "endpoint_probes": {
+        "consumer.ts::useNumber#function": {
+          "gold_label": "entry",
+          "source": {
+            "id": "consumer.ts::useNumber#function",
+            "source": "function useNumber(): number { return num(1); }",
+            "byte_offset": 42,
+            "byte_length": 47,
+            "line": 2,
+            "end_line": 2,
+            "signature": "function useNumber(): number { return num(1); }",
+            "kind": "function",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": [
+            {
+              "text": "num",
+              "file": "consumer.ts",
+              "start_byte": 80,
+              "end_byte": 83,
+              "status": "resolved",
+              "original_source_id": "consumer.ts::useNumber#function",
+              "target_id": "number.ts::num#function",
+              "has_type_only_candidate": false,
+              "smallest_declaration_ids": [
+                "consumer.ts::useNumber#function"
+              ]
+            }
+          ]
+        },
+        "number.ts::num#function": {
+          "gold_label": "callee",
+          "source": {
+            "id": "number.ts::num#function",
+            "source": "function num(v: unknown): number { return Number(v); }",
+            "byte_offset": 7,
+            "byte_length": 54,
+            "line": 1,
+            "end_line": 1,
+            "signature": "function num(v: unknown): number { return Number(v); }",
+            "kind": "function",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        }
+      }
+    },
+    "inline_default_control": {
+      "entry_ids": [
+        "consumer.ts::useNumber#function"
+      ],
+      "gold_relationships": [
+        {
+          "from": "entry",
+          "kind": "calls",
+          "to": "callee"
+        }
+      ],
+      "endpoint_probes": {
+        "consumer.ts::useNumber#function": {
+          "gold_label": "entry",
+          "source": {
+            "id": "consumer.ts::useNumber#function",
+            "source": "function useNumber(): number { return num(1); }",
+            "byte_offset": 38,
+            "byte_length": 47,
+            "line": 2,
+            "end_line": 2,
+            "signature": "function useNumber(): number { return num(1); }",
+            "kind": "function",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": [
+            {
+              "text": "num",
+              "file": "consumer.ts",
+              "start_byte": 76,
+              "end_byte": 79,
+              "status": "resolved",
+              "original_source_id": "consumer.ts::useNumber#function",
+              "target_id": "number.ts::num#function",
+              "has_type_only_candidate": false,
+              "smallest_declaration_ids": [
+                "consumer.ts::useNumber#function"
+              ]
+            }
+          ]
+        },
+        "number.ts::num#function": {
+          "gold_label": "callee",
+          "source": {
+            "id": "number.ts::num#function",
+            "source": "function num(v: unknown): number { return Number(v); }",
+            "byte_offset": 15,
+            "byte_length": 54,
+            "line": 1,
+            "end_line": 1,
+            "signature": "function num(v: unknown): number { return Number(v); }",
+            "kind": "function",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        }
+      }
+    },
+    "anvil_temporal_arguments": {
+      "entry_ids": [
+        "src/brain-context/temporal.ts::temporalCliArgs#function"
+      ],
+      "gold_relationships": [
+        {
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "query"
+        },
+        {
+          "from": "query",
+          "kind": "property_type",
+          "to": "view"
+        },
+        {
+          "from": "view",
+          "kind": "type_query",
+          "to": "views"
+        },
+        {
+          "from": "query",
+          "kind": "property_type",
+          "to": "transition"
+        }
+      ],
+      "endpoint_probes": {
+        "src/brain-context/temporal.ts::temporalCliArgs#function": {
+          "gold_label": "entry",
+          "source": {
+            "id": "src/brain-context/temporal.ts::temporalCliArgs#function",
+            "source": "function temporalCliArgs(query: TemporalQuery): string[] {\n  return [\n    \"--temporal-view\",\n    query.view,\n    \"--request-time\",\n    query.request_time,\n    ...(query.world_at === undefined ? [] : [\"--world-at\", query.world_at]),\n    \"--known-at\",\n    query.known_at,\n    ...(query.transition === undefined\n      ? []\n      : [\"--transition-from\", query.transition.from, \"--transition-to\", query.transition.to]),\n  ];\n}",
+            "byte_offset": 8841,
+            "byte_length": 421,
+            "line": 222,
+            "end_line": 235,
+            "signature": "function temporalCliArgs(query: TemporalQuery): string[] {",
+            "kind": "function",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "src/brain-context/temporal.ts::TemporalQuery#type": {
+          "gold_label": "query",
+          "source": {
+            "id": "src/brain-context/temporal.ts::TemporalQuery#type",
+            "source": "type TemporalQuery = Readonly<{\n  view: TemporalView;\n  request_time: string;\n  world_at?: string;\n  known_at: string;\n  transition?: TemporalTransition;\n}>;",
+            "byte_offset": 382,
+            "byte_length": 157,
+            "line": 13,
+            "end_line": 19,
+            "signature": "type TemporalQuery = Readonly<{",
+            "kind": "type",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "src/brain-context/temporal.ts::TemporalView#type": {
+          "gold_label": "view",
+          "source": {
+            "id": "src/brain-context/temporal.ts::TemporalView#type",
+            "source": "type TemporalView = (typeof TEMPORAL_VIEWS)[number];",
+            "byte_offset": 163,
+            "byte_length": 52,
+            "line": 5,
+            "end_line": 5,
+            "signature": "type TemporalView = (typeof TEMPORAL_VIEWS)[number];",
+            "kind": "type",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant": {
+          "gold_label": "views",
+          "source": {
+            "id": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+            "source": "TEMPORAL_VIEWS = [\"current\", \"historical\", \"transition\", \"lineage\", \"conflict\"] as const",
+            "byte_offset": 65,
+            "byte_length": 88,
+            "line": 3,
+            "end_line": 3,
+            "signature": "TEMPORAL_VIEWS = [\"current\", \"historical\", \"transition\", \"lineage\", \"conflict\"] as const",
+            "kind": "constant",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "src/brain-context/temporal.ts::TemporalTransition#type": {
+          "gold_label": "transition",
+          "source": {
+            "id": "src/brain-context/temporal.ts::TemporalTransition#type",
+            "source": "type TemporalTransition = Readonly<{\n  from: string;\n  to: string;\n}>;",
+            "byte_offset": 224,
+            "byte_length": 70,
+            "line": 7,
+            "end_line": 10,
+            "signature": "type TemporalTransition = Readonly<{",
+            "kind": "type",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        }
+      }
+    },
+    "anvil_retrieval_limits": {
+      "entry_ids": [
+        "src/brain-context/render.ts::compilerRetrievalLimits#function"
+      ],
+      "gold_relationships": [
+        {
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "input"
+        },
+        {
+          "from": "input",
+          "kind": "property_type",
+          "to": "omission"
+        },
+        {
+          "from": "input",
+          "kind": "property_type",
+          "to": "stop"
+        },
+        {
+          "from": "input",
+          "kind": "property_type",
+          "to": "reporting"
+        },
+        {
+          "from": "input",
+          "kind": "property_type",
+          "to": "diagnostic"
+        },
+        {
+          "from": "entry",
+          "kind": "calls",
+          "to": "unavailable"
+        }
+      ],
+      "endpoint_probes": {
+        "src/brain-context/render.ts::compilerRetrievalLimits#function": {
+          "gold_label": "entry",
+          "source": {
+            "id": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+            "source": "function compilerRetrievalLimits(retrieval: BrainRetrievalResult): string | undefined {\n  const unavailable = compilerHasUnavailableEvidence(retrieval.diagnostics);\n  const budgetLimited = retrieval.omissions.some(({ reason }) =>\n    [\"byte_limit\", \"content_byte_limit\", \"delivery_byte_limit\", \"item_limit\"].includes(reason),\n  ) || [\n    \"byte_budget_exhausted\", \"content_budget_exhausted\", \"delivery_budget_exhausted\", \"item_budget_exhausted\",\n  ].includes(retrieval.stop.reason) || retrieval.evidence.some(({ selectionReasons }) =>\n    selectionReasons.some((reason) =>\n      [\"hard_limit_excerpt\", \"content_limit_excerpt\", \"delivered_limit_excerpt\"].includes(reason)),\n  );\n  const messages = [\n    ...(unavailable ? [RETRIEVAL_LIMIT_MESSAGES.unavailable]\n      : retrieval.stop.reason === \"provider_degraded\" ? [RETRIEVAL_LIMIT_MESSAGES.problem] : []),\n    ...(budgetLimited ? [RETRIEVAL_LIMIT_MESSAGES.budget] : []),\n    ...(retrieval.reporting.diagnostics.total > retrieval.reporting.diagnostics.returned\n      ? [RETRIEVAL_LIMIT_MESSAGES.diagnostics] : []),\n    ...(retrieval.reporting.omissions.total > retrieval.reporting.omissions.returned\n      ? [RETRIEVAL_LIMIT_MESSAGES.omissions] : []),\n  ];\n  return messages.length > 0 ? messages.join(\" \") : undefined;\n}",
+            "byte_offset": 1664,
+            "byte_length": 1272,
+            "line": 34,
+            "end_line": 54,
+            "signature": "function compilerRetrievalLimits(retrieval: BrainRetrievalResult): string | undefined {",
+            "kind": "function",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [
+              {
+                "id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+                "source": "type BrainRetrievalResult = {\n  contractVersion: \"1\" | \"3\";\n  wiki: {\n    alias: string;\n    schemaVersion: string;\n    runtimeContract: string;\n  };\n  query: {\n    question: string;\n    shapes: string[];\n    stateView: string;\n    resolvedSeeds: string[];\n    projectResolution?: BrainProjectResolution;\n    temporal?: TemporalQuery;\n  };\n  evidence: BrainCompiledEvidence[];\n  omissions: BrainCompilerOmission[];\n  coverage: BrainCompilerCoverage;\n  budget: BrainCompilerBudget;\n  stop: BrainCompilerStop;\n  continuation: Record<string, unknown> | null;\n  diagnostics: BrainCompilerDiagnostic[];\n  reporting: BrainCompilerReporting;\n  selectedPages: string[];\n  evidenceCount: number;\n  candidateCount: number;\n};",
+                "byte_offset": 3020,
+                "byte_length": 715,
+                "line": 119,
+                "end_line": 145,
+                "signature": "type BrainRetrievalResult = {",
+                "kind": "type",
+                "language": "typescript"
+              },
+              {
+                "id": "src/brain-context/temporal.ts::TemporalQuery#type",
+                "source": "type TemporalQuery = Readonly<{\n  view: TemporalView;\n  request_time: string;\n  world_at?: string;\n  known_at: string;\n  transition?: TemporalTransition;\n}>;",
+                "byte_offset": 382,
+                "byte_length": 157,
+                "line": 13,
+                "end_line": 19,
+                "signature": "type TemporalQuery = Readonly<{",
+                "kind": "type",
+                "language": "typescript"
+              }
+            ],
+            "references": [
+              {
+                "owner_id": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+                "target_id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+                "reference": {
+                  "file": "src/brain-context/render.ts",
+                  "start_byte": 1708,
+                  "end_byte": 1728
+                },
+                "edge": {
+                  "from": "src/brain-context/render.ts::__file__#file",
+                  "to": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+                  "type": "references_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "src/brain-context/render.ts",
+                    "line": 26,
+                    "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd"
+                  }
+                },
+                "support": [
+                  {
+                    "kind": "import_binding",
+                    "file": "src/brain-context/render.ts",
+                    "line": 2,
+                    "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                    "endpoint_id": "src/brain-context/retrieve.ts::__file__#file"
+                  },
+                  {
+                    "kind": "definition",
+                    "file": "src/brain-context/retrieve.ts",
+                    "line": 119,
+                    "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                    "endpoint_id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type"
+                  }
+                ]
+              },
+              {
+                "owner_id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+                "target_id": "src/brain-context/temporal.ts::TemporalQuery#type",
+                "reference": {
+                  "file": "src/brain-context/retrieve.ts",
+                  "start_byte": 3340,
+                  "end_byte": 3353
+                },
+                "edge": {
+                  "from": "src/brain-context/retrieve.ts::__file__#file",
+                  "to": "src/brain-context/temporal.ts::TemporalQuery#type",
+                  "type": "references_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "src/brain-context/retrieve.ts",
+                    "line": 32,
+                    "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+                  }
+                },
+                "support": [
+                  {
+                    "kind": "import_binding",
+                    "file": "src/brain-context/retrieve.ts",
+                    "line": 9,
+                    "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                    "endpoint_id": "src/brain-context/temporal.ts::__file__#file"
+                  },
+                  {
+                    "kind": "definition",
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 13,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                    "endpoint_id": "src/brain-context/temporal.ts::TemporalQuery#type"
+                  }
+                ]
+              }
+            ],
+            "evidence": [
+              {
+                "file": "src/brain-context/render.ts",
+                "start_line": 2,
+                "end_line": 2,
+                "byte_offset": 58,
+                "content": "import type { BrainCompiledEvidence, BrainRetrievalResult } from \"./retrieve.ts\";\n",
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd"
+              },
+              {
+                "file": "src/brain-context/retrieve.ts",
+                "start_line": 119,
+                "end_line": 119,
+                "byte_offset": 3013,
+                "content": "export type BrainRetrievalResult = {\n",
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+              },
+              {
+                "file": "src/brain-context/retrieve.ts",
+                "start_line": 9,
+                "end_line": 9,
+                "byte_offset": 459,
+                "content": "import {\n",
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+              },
+              {
+                "file": "src/brain-context/temporal.ts",
+                "start_line": 13,
+                "end_line": 13,
+                "byte_offset": 375,
+                "content": "export type TemporalQuery = Readonly<{\n",
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718"
+              }
+            ],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": [
+            {
+              "text": "BrainRetrievalResult",
+              "file": "src/brain-context/render.ts",
+              "start_byte": 1708,
+              "end_byte": 1728,
+              "status": "resolved",
+              "original_source_id": "src/brain-context/render.ts::__file__#file",
+              "target_id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "has_type_only_candidate": true,
+              "smallest_declaration_ids": [
+                "src/brain-context/render.ts::compilerRetrievalLimits#function"
+              ]
+            }
+          ]
+        },
+        "src/brain-context/retrieve.ts::BrainRetrievalResult#type": {
+          "gold_label": "input",
+          "source": {
+            "id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+            "source": "type BrainRetrievalResult = {\n  contractVersion: \"1\" | \"3\";\n  wiki: {\n    alias: string;\n    schemaVersion: string;\n    runtimeContract: string;\n  };\n  query: {\n    question: string;\n    shapes: string[];\n    stateView: string;\n    resolvedSeeds: string[];\n    projectResolution?: BrainProjectResolution;\n    temporal?: TemporalQuery;\n  };\n  evidence: BrainCompiledEvidence[];\n  omissions: BrainCompilerOmission[];\n  coverage: BrainCompilerCoverage;\n  budget: BrainCompilerBudget;\n  stop: BrainCompilerStop;\n  continuation: Record<string, unknown> | null;\n  diagnostics: BrainCompilerDiagnostic[];\n  reporting: BrainCompilerReporting;\n  selectedPages: string[];\n  evidenceCount: number;\n  candidateCount: number;\n};",
+            "byte_offset": 3020,
+            "byte_length": 715,
+            "line": 119,
+            "end_line": 145,
+            "signature": "type BrainRetrievalResult = {",
+            "kind": "type",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [
+              {
+                "id": "src/brain-context/temporal.ts::TemporalQuery#type",
+                "source": "type TemporalQuery = Readonly<{\n  view: TemporalView;\n  request_time: string;\n  world_at?: string;\n  known_at: string;\n  transition?: TemporalTransition;\n}>;",
+                "byte_offset": 382,
+                "byte_length": 157,
+                "line": 13,
+                "end_line": 19,
+                "signature": "type TemporalQuery = Readonly<{",
+                "kind": "type",
+                "language": "typescript"
+              }
+            ],
+            "references": [
+              {
+                "owner_id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+                "target_id": "src/brain-context/temporal.ts::TemporalQuery#type",
+                "reference": {
+                  "file": "src/brain-context/retrieve.ts",
+                  "start_byte": 3340,
+                  "end_byte": 3353
+                },
+                "edge": {
+                  "from": "src/brain-context/retrieve.ts::__file__#file",
+                  "to": "src/brain-context/temporal.ts::TemporalQuery#type",
+                  "type": "references_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "src/brain-context/retrieve.ts",
+                    "line": 32,
+                    "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+                  }
+                },
+                "support": [
+                  {
+                    "kind": "import_binding",
+                    "file": "src/brain-context/retrieve.ts",
+                    "line": 9,
+                    "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                    "endpoint_id": "src/brain-context/temporal.ts::__file__#file"
+                  },
+                  {
+                    "kind": "definition",
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 13,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                    "endpoint_id": "src/brain-context/temporal.ts::TemporalQuery#type"
+                  }
+                ]
+              }
+            ],
+            "evidence": [
+              {
+                "file": "src/brain-context/retrieve.ts",
+                "start_line": 9,
+                "end_line": 9,
+                "byte_offset": 459,
+                "content": "import {\n",
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+              },
+              {
+                "file": "src/brain-context/temporal.ts",
+                "start_line": 13,
+                "end_line": 13,
+                "byte_offset": 375,
+                "content": "export type TemporalQuery = Readonly<{\n",
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718"
+              }
+            ],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": [
+            {
+              "text": "TemporalQuery",
+              "file": "src/brain-context/retrieve.ts",
+              "start_byte": 3340,
+              "end_byte": 3353,
+              "status": "resolved",
+              "original_source_id": "src/brain-context/retrieve.ts::__file__#file",
+              "target_id": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "has_type_only_candidate": true,
+              "smallest_declaration_ids": [
+                "src/brain-context/retrieve.ts::BrainRetrievalResult#type"
+              ]
+            }
+          ]
+        },
+        "src/brain-context/retrieve.ts::BrainCompilerOmission#type": {
+          "gold_label": "omission",
+          "source": {
+            "id": "src/brain-context/retrieve.ts::BrainCompilerOmission#type",
+            "source": "type BrainCompilerOmission = {\n  candidateId: string;\n  reason: string;\n  estimatedBytes: number | null;\n};",
+            "byte_offset": 1896,
+            "byte_length": 107,
+            "line": 69,
+            "end_line": 73,
+            "signature": "type BrainCompilerOmission = {",
+            "kind": "type",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "src/brain-context/retrieve.ts::BrainCompilerStop#type": {
+          "gold_label": "stop",
+          "source": {
+            "id": "src/brain-context/retrieve.ts::BrainCompilerStop#type",
+            "source": "type BrainCompilerStop = {\n  reason: string;\n  sufficient: boolean;\n  detail: string;\n};",
+            "byte_offset": 2636,
+            "byte_length": 88,
+            "line": 101,
+            "end_line": 105,
+            "signature": "type BrainCompilerStop = {",
+            "kind": "type",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "src/brain-context/retrieve.ts::BrainCompilerReporting#type": {
+          "gold_label": "reporting",
+          "source": {
+            "id": "src/brain-context/retrieve.ts::BrainCompilerReporting#type",
+            "source": "type BrainCompilerReporting = {\n  omissions: { total: number; returned: number };\n  diagnostics: { total: number; returned: number };\n};",
+            "byte_offset": 2875,
+            "byte_length": 136,
+            "line": 114,
+            "end_line": 117,
+            "signature": "type BrainCompilerReporting = {",
+            "kind": "type",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "src/brain-context/retrieve.ts::BrainCompilerDiagnostic#type": {
+          "gold_label": "diagnostic",
+          "source": {
+            "id": "src/brain-context/retrieve.ts::BrainCompilerDiagnostic#type",
+            "source": "type BrainCompilerDiagnostic = {\n  code: string;\n  message: string;\n  provider: string | null;\n  details: Record<string, unknown>;\n};",
+            "byte_offset": 2733,
+            "byte_length": 133,
+            "line": 107,
+            "end_line": 112,
+            "signature": "type BrainCompilerDiagnostic = {",
+            "kind": "type",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "src/brain-context/render.ts::compilerHasUnavailableEvidence#function": {
+          "gold_label": "unavailable",
+          "source": {
+            "id": "src/brain-context/render.ts::compilerHasUnavailableEvidence#function",
+            "source": "function compilerHasUnavailableEvidence(diagnostics: BrainRetrievalResult[\"diagnostics\"]): boolean {\n  return diagnostics.some(({ code }) =>\n    [\"SOURCE_PATH_INVALID\", \"SOURCE_NOT_FOUND\", \"SOURCE_NOT_TEXT\", \"PROVIDER_FAILED\"].includes(code) ||\n    (code.startsWith(\"LOCI_\") &&\n      /(?:FAILED|TIMEOUT|UNAVAILABLE|CONFIG_MISSING|NOT_INDEXED|RESULT_INVALID|RESULT_OUT_OF_SCOPE)$/.test(code)),\n  );\n}",
+            "byte_offset": 1256,
+            "byte_length": 399,
+            "line": 26,
+            "end_line": 32,
+            "signature": "function compilerHasUnavailableEvidence(diagnostics: BrainRetrievalResult[\"diagnostics\"]): boolean {",
+            "kind": "function",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [
+              {
+                "id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+                "source": "type BrainRetrievalResult = {\n  contractVersion: \"1\" | \"3\";\n  wiki: {\n    alias: string;\n    schemaVersion: string;\n    runtimeContract: string;\n  };\n  query: {\n    question: string;\n    shapes: string[];\n    stateView: string;\n    resolvedSeeds: string[];\n    projectResolution?: BrainProjectResolution;\n    temporal?: TemporalQuery;\n  };\n  evidence: BrainCompiledEvidence[];\n  omissions: BrainCompilerOmission[];\n  coverage: BrainCompilerCoverage;\n  budget: BrainCompilerBudget;\n  stop: BrainCompilerStop;\n  continuation: Record<string, unknown> | null;\n  diagnostics: BrainCompilerDiagnostic[];\n  reporting: BrainCompilerReporting;\n  selectedPages: string[];\n  evidenceCount: number;\n  candidateCount: number;\n};",
+                "byte_offset": 3020,
+                "byte_length": 715,
+                "line": 119,
+                "end_line": 145,
+                "signature": "type BrainRetrievalResult = {",
+                "kind": "type",
+                "language": "typescript"
+              },
+              {
+                "id": "src/brain-context/temporal.ts::TemporalQuery#type",
+                "source": "type TemporalQuery = Readonly<{\n  view: TemporalView;\n  request_time: string;\n  world_at?: string;\n  known_at: string;\n  transition?: TemporalTransition;\n}>;",
+                "byte_offset": 382,
+                "byte_length": 157,
+                "line": 13,
+                "end_line": 19,
+                "signature": "type TemporalQuery = Readonly<{",
+                "kind": "type",
+                "language": "typescript"
+              }
+            ],
+            "references": [
+              {
+                "owner_id": "src/brain-context/render.ts::compilerHasUnavailableEvidence#function",
+                "target_id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+                "reference": {
+                  "file": "src/brain-context/render.ts",
+                  "start_byte": 1309,
+                  "end_byte": 1329
+                },
+                "edge": {
+                  "from": "src/brain-context/render.ts::__file__#file",
+                  "to": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+                  "type": "references_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "src/brain-context/render.ts",
+                    "line": 26,
+                    "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd"
+                  }
+                },
+                "support": [
+                  {
+                    "kind": "import_binding",
+                    "file": "src/brain-context/render.ts",
+                    "line": 2,
+                    "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                    "endpoint_id": "src/brain-context/retrieve.ts::__file__#file"
+                  },
+                  {
+                    "kind": "definition",
+                    "file": "src/brain-context/retrieve.ts",
+                    "line": 119,
+                    "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                    "endpoint_id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type"
+                  }
+                ]
+              },
+              {
+                "owner_id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+                "target_id": "src/brain-context/temporal.ts::TemporalQuery#type",
+                "reference": {
+                  "file": "src/brain-context/retrieve.ts",
+                  "start_byte": 3340,
+                  "end_byte": 3353
+                },
+                "edge": {
+                  "from": "src/brain-context/retrieve.ts::__file__#file",
+                  "to": "src/brain-context/temporal.ts::TemporalQuery#type",
+                  "type": "references_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "src/brain-context/retrieve.ts",
+                    "line": 32,
+                    "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+                  }
+                },
+                "support": [
+                  {
+                    "kind": "import_binding",
+                    "file": "src/brain-context/retrieve.ts",
+                    "line": 9,
+                    "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                    "endpoint_id": "src/brain-context/temporal.ts::__file__#file"
+                  },
+                  {
+                    "kind": "definition",
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 13,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                    "endpoint_id": "src/brain-context/temporal.ts::TemporalQuery#type"
+                  }
+                ]
+              }
+            ],
+            "evidence": [
+              {
+                "file": "src/brain-context/render.ts",
+                "start_line": 2,
+                "end_line": 2,
+                "byte_offset": 58,
+                "content": "import type { BrainCompiledEvidence, BrainRetrievalResult } from \"./retrieve.ts\";\n",
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd"
+              },
+              {
+                "file": "src/brain-context/retrieve.ts",
+                "start_line": 119,
+                "end_line": 119,
+                "byte_offset": 3013,
+                "content": "export type BrainRetrievalResult = {\n",
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+              },
+              {
+                "file": "src/brain-context/retrieve.ts",
+                "start_line": 9,
+                "end_line": 9,
+                "byte_offset": 459,
+                "content": "import {\n",
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+              },
+              {
+                "file": "src/brain-context/temporal.ts",
+                "start_line": 13,
+                "end_line": 13,
+                "byte_offset": 375,
+                "content": "export type TemporalQuery = Readonly<{\n",
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718"
+              }
+            ],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": [
+            {
+              "text": "BrainRetrievalResult",
+              "file": "src/brain-context/render.ts",
+              "start_byte": 1309,
+              "end_byte": 1329,
+              "status": "resolved",
+              "original_source_id": "src/brain-context/render.ts::__file__#file",
+              "target_id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "has_type_only_candidate": true,
+              "smallest_declaration_ids": [
+                "src/brain-context/render.ts::compilerHasUnavailableEvidence#function"
+              ]
+            }
+          ]
+        },
+        "src/brain-context/render.ts::RETRIEVAL_LIMIT_MESSAGES#constant": {
+          "gold_label": "messages",
+          "source": {
+            "id": "src/brain-context/render.ts::RETRIEVAL_LIMIT_MESSAGES#constant",
+            "source": "RETRIEVAL_LIMIT_MESSAGES = {\n  unavailable: \"Some sources or retrieval providers could not supply evidence; retrieval may be incomplete.\",\n  problem: \"The compiler reported retrieval problems; evidence may be incomplete.\",\n  budget: \"Additional candidate evidence was omitted or shortened to fit the context limit.\",\n  diagnostics: \"Some diagnostic details were not returned; their categories are unavailable here.\",\n  omissions: \"Some omission details were not returned; their reasons are unavailable here.\",\n} as const",
+            "byte_offset": 223,
+            "byte_length": 520,
+            "line": 6,
+            "end_line": 12,
+            "signature": "RETRIEVAL_LIMIT_MESSAGES = {",
+            "kind": "constant",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        }
+      }
+    },
+    "anvil_renderer_result_contract": {
+      "entry_ids": [
+        "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function"
+      ],
+      "gold_relationships": [
+        {
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "input"
+        },
+        {
+          "from": "input",
+          "kind": "property_type",
+          "to": "project"
+        },
+        {
+          "from": "entry",
+          "kind": "return_type",
+          "to": "output"
+        },
+        {
+          "from": "output",
+          "kind": "intersection_member",
+          "to": "base"
+        }
+      ],
+      "endpoint_probes": {
+        "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function": {
+          "gold_label": "entry",
+          "source": {
+            "id": "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function",
+            "source": "function renderCompilerPromptEvidenceContext(retrieval: BrainRetrievalResult): PromptBrainContextRender {\n  const resolution = retrieval.contractVersion === \"3\" ? retrieval.query.projectResolution : undefined;\n  return renderPromptEvidenceContext({\n    matchedProject: resolution?.status === \"matched\" ? resolution.page : undefined,\n    includeRoute: true,\n    diagnostics: retrieval.contractVersion === \"3\" ? compilerContextDiagnostics(retrieval) : [],\n    temporal: retrieval.query.temporal,\n    evidence: retrieval.evidence,\n    hardBytes: Number.MAX_SAFE_INTEGER,\n  });\n}",
+            "byte_offset": 4860,
+            "byte_length": 575,
+            "line": 96,
+            "end_line": 106,
+            "signature": "function renderCompilerPromptEvidenceContext(retrieval: BrainRetrievalResult): PromptBrainContextRender {",
+            "kind": "function",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [
+              {
+                "id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+                "source": "type BrainRetrievalResult = {\n  contractVersion: \"1\" | \"3\";\n  wiki: {\n    alias: string;\n    schemaVersion: string;\n    runtimeContract: string;\n  };\n  query: {\n    question: string;\n    shapes: string[];\n    stateView: string;\n    resolvedSeeds: string[];\n    projectResolution?: BrainProjectResolution;\n    temporal?: TemporalQuery;\n  };\n  evidence: BrainCompiledEvidence[];\n  omissions: BrainCompilerOmission[];\n  coverage: BrainCompilerCoverage;\n  budget: BrainCompilerBudget;\n  stop: BrainCompilerStop;\n  continuation: Record<string, unknown> | null;\n  diagnostics: BrainCompilerDiagnostic[];\n  reporting: BrainCompilerReporting;\n  selectedPages: string[];\n  evidenceCount: number;\n  candidateCount: number;\n};",
+                "byte_offset": 3020,
+                "byte_length": 715,
+                "line": 119,
+                "end_line": 145,
+                "signature": "type BrainRetrievalResult = {",
+                "kind": "type",
+                "language": "typescript"
+              },
+              {
+                "id": "src/brain-context/temporal.ts::TemporalQuery#type",
+                "source": "type TemporalQuery = Readonly<{\n  view: TemporalView;\n  request_time: string;\n  world_at?: string;\n  known_at: string;\n  transition?: TemporalTransition;\n}>;",
+                "byte_offset": 382,
+                "byte_length": 157,
+                "line": 13,
+                "end_line": 19,
+                "signature": "type TemporalQuery = Readonly<{",
+                "kind": "type",
+                "language": "typescript"
+              }
+            ],
+            "references": [
+              {
+                "owner_id": "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function",
+                "target_id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+                "reference": {
+                  "file": "src/brain-context/render.ts",
+                  "start_byte": 4916,
+                  "end_byte": 4936
+                },
+                "edge": {
+                  "from": "src/brain-context/render.ts::__file__#file",
+                  "to": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+                  "type": "references_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "src/brain-context/render.ts",
+                    "line": 26,
+                    "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd"
+                  }
+                },
+                "support": [
+                  {
+                    "kind": "import_binding",
+                    "file": "src/brain-context/render.ts",
+                    "line": 2,
+                    "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                    "endpoint_id": "src/brain-context/retrieve.ts::__file__#file"
+                  },
+                  {
+                    "kind": "definition",
+                    "file": "src/brain-context/retrieve.ts",
+                    "line": 119,
+                    "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                    "endpoint_id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type"
+                  }
+                ]
+              },
+              {
+                "owner_id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+                "target_id": "src/brain-context/temporal.ts::TemporalQuery#type",
+                "reference": {
+                  "file": "src/brain-context/retrieve.ts",
+                  "start_byte": 3340,
+                  "end_byte": 3353
+                },
+                "edge": {
+                  "from": "src/brain-context/retrieve.ts::__file__#file",
+                  "to": "src/brain-context/temporal.ts::TemporalQuery#type",
+                  "type": "references_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "src/brain-context/retrieve.ts",
+                    "line": 32,
+                    "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+                  }
+                },
+                "support": [
+                  {
+                    "kind": "import_binding",
+                    "file": "src/brain-context/retrieve.ts",
+                    "line": 9,
+                    "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                    "endpoint_id": "src/brain-context/temporal.ts::__file__#file"
+                  },
+                  {
+                    "kind": "definition",
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 13,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                    "endpoint_id": "src/brain-context/temporal.ts::TemporalQuery#type"
+                  }
+                ]
+              }
+            ],
+            "evidence": [
+              {
+                "file": "src/brain-context/render.ts",
+                "start_line": 2,
+                "end_line": 2,
+                "byte_offset": 58,
+                "content": "import type { BrainCompiledEvidence, BrainRetrievalResult } from \"./retrieve.ts\";\n",
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd"
+              },
+              {
+                "file": "src/brain-context/retrieve.ts",
+                "start_line": 119,
+                "end_line": 119,
+                "byte_offset": 3013,
+                "content": "export type BrainRetrievalResult = {\n",
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+              },
+              {
+                "file": "src/brain-context/retrieve.ts",
+                "start_line": 9,
+                "end_line": 9,
+                "byte_offset": 459,
+                "content": "import {\n",
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+              },
+              {
+                "file": "src/brain-context/temporal.ts",
+                "start_line": 13,
+                "end_line": 13,
+                "byte_offset": 375,
+                "content": "export type TemporalQuery = Readonly<{\n",
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718"
+              }
+            ],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": [
+            {
+              "text": "BrainRetrievalResult",
+              "file": "src/brain-context/render.ts",
+              "start_byte": 4916,
+              "end_byte": 4936,
+              "status": "resolved",
+              "original_source_id": "src/brain-context/render.ts::__file__#file",
+              "target_id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "has_type_only_candidate": true,
+              "smallest_declaration_ids": [
+                "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function"
+              ]
+            }
+          ]
+        },
+        "src/brain-context/retrieve.ts::BrainRetrievalResult#type": {
+          "gold_label": "input",
+          "source": {
+            "id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+            "source": "type BrainRetrievalResult = {\n  contractVersion: \"1\" | \"3\";\n  wiki: {\n    alias: string;\n    schemaVersion: string;\n    runtimeContract: string;\n  };\n  query: {\n    question: string;\n    shapes: string[];\n    stateView: string;\n    resolvedSeeds: string[];\n    projectResolution?: BrainProjectResolution;\n    temporal?: TemporalQuery;\n  };\n  evidence: BrainCompiledEvidence[];\n  omissions: BrainCompilerOmission[];\n  coverage: BrainCompilerCoverage;\n  budget: BrainCompilerBudget;\n  stop: BrainCompilerStop;\n  continuation: Record<string, unknown> | null;\n  diagnostics: BrainCompilerDiagnostic[];\n  reporting: BrainCompilerReporting;\n  selectedPages: string[];\n  evidenceCount: number;\n  candidateCount: number;\n};",
+            "byte_offset": 3020,
+            "byte_length": 715,
+            "line": 119,
+            "end_line": 145,
+            "signature": "type BrainRetrievalResult = {",
+            "kind": "type",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [
+              {
+                "id": "src/brain-context/temporal.ts::TemporalQuery#type",
+                "source": "type TemporalQuery = Readonly<{\n  view: TemporalView;\n  request_time: string;\n  world_at?: string;\n  known_at: string;\n  transition?: TemporalTransition;\n}>;",
+                "byte_offset": 382,
+                "byte_length": 157,
+                "line": 13,
+                "end_line": 19,
+                "signature": "type TemporalQuery = Readonly<{",
+                "kind": "type",
+                "language": "typescript"
+              }
+            ],
+            "references": [
+              {
+                "owner_id": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+                "target_id": "src/brain-context/temporal.ts::TemporalQuery#type",
+                "reference": {
+                  "file": "src/brain-context/retrieve.ts",
+                  "start_byte": 3340,
+                  "end_byte": 3353
+                },
+                "edge": {
+                  "from": "src/brain-context/retrieve.ts::__file__#file",
+                  "to": "src/brain-context/temporal.ts::TemporalQuery#type",
+                  "type": "references_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "import-resolved",
+                  "evidence": {
+                    "file": "src/brain-context/retrieve.ts",
+                    "line": 32,
+                    "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+                  }
+                },
+                "support": [
+                  {
+                    "kind": "import_binding",
+                    "file": "src/brain-context/retrieve.ts",
+                    "line": 9,
+                    "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                    "endpoint_id": "src/brain-context/temporal.ts::__file__#file"
+                  },
+                  {
+                    "kind": "definition",
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 13,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                    "endpoint_id": "src/brain-context/temporal.ts::TemporalQuery#type"
+                  }
+                ]
+              }
+            ],
+            "evidence": [
+              {
+                "file": "src/brain-context/retrieve.ts",
+                "start_line": 9,
+                "end_line": 9,
+                "byte_offset": 459,
+                "content": "import {\n",
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+              },
+              {
+                "file": "src/brain-context/temporal.ts",
+                "start_line": 13,
+                "end_line": 13,
+                "byte_offset": 375,
+                "content": "export type TemporalQuery = Readonly<{\n",
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718"
+              }
+            ],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": [
+            {
+              "text": "TemporalQuery",
+              "file": "src/brain-context/retrieve.ts",
+              "start_byte": 3340,
+              "end_byte": 3353,
+              "status": "resolved",
+              "original_source_id": "src/brain-context/retrieve.ts::__file__#file",
+              "target_id": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "has_type_only_candidate": true,
+              "smallest_declaration_ids": [
+                "src/brain-context/retrieve.ts::BrainRetrievalResult#type"
+              ]
+            }
+          ]
+        },
+        "src/brain-context/retrieve.ts::BrainProjectResolution#type": {
+          "gold_label": "project",
+          "source": {
+            "id": "src/brain-context/retrieve.ts::BrainProjectResolution#type",
+            "source": "type BrainProjectResolution =\n  | { status: \"not_requested\" }\n  | { status: \"unknown\" }\n  | {\n      status: \"matched\";\n      projectId: string;\n      page: string;\n      matchedBy: \"remote\" | \"alias\";\n    }\n  | {\n      status: \"ambiguous\";\n      matchedBy: \"remote\" | \"alias\";\n      candidates: Array<{ projectId: string; page: string }>;\n      candidateCount: number;\n    };",
+            "byte_offset": 1125,
+            "byte_length": 375,
+            "line": 35,
+            "end_line": 49,
+            "signature": "type BrainProjectResolution =",
+            "kind": "type",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "src/brain-context/render.ts::PromptBrainContextRender#type": {
+          "gold_label": "output",
+          "source": {
+            "id": "src/brain-context/render.ts::PromptBrainContextRender#type",
+            "source": "type PromptBrainContextRender = BrainContextRender & {\n  attemptedBytes: number;\n  guidanceBytes: number;\n  retrievedContextBytes: number;\n  framingBytes: number;\n};",
+            "byte_offset": 5875,
+            "byte_length": 165,
+            "line": 125,
+            "end_line": 130,
+            "signature": "type PromptBrainContextRender = BrainContextRender & {",
+            "kind": "type",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        },
+        "src/brain-context/render.ts::BrainContextRender#type": {
+          "gold_label": "base",
+          "source": {
+            "id": "src/brain-context/render.ts::BrainContextRender#type",
+            "source": "type BrainContextRender = {\n  markdown: string;\n  renderedBytes: number;\n  truncated: boolean;\n};",
+            "byte_offset": 5769,
+            "byte_length": 97,
+            "line": 119,
+            "end_line": 123,
+            "signature": "type BrainContextRender = {",
+            "kind": "type",
+            "language": "typescript"
+          },
+          "type_context": {
+            "scope": "existing_imported_type_references",
+            "status": "complete",
+            "symbols": [],
+            "references": [],
+            "evidence": [],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {}
+          },
+          "contained_reference_records": []
+        }
+      }
+    }
+  }
+}

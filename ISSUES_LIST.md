@@ -11,8 +11,15 @@ Maintained tests and supported fixtures are indexed like other source files.
 The shared repository-relative policy excludes only generated, cached,
 vendored, build, temporary, ignored, sensitive, or unsupported material.
 
-### TypeScript arrow-function `const` exports produce no symbol
+### ~~TypeScript arrow-function `const` exports produce no symbol~~ ✓ FIXED
 Found 2026-09-07 while covering the export-clause fix.
+
+Fixed 2026-09-10 (W2.1.2): direct identifier bindings to arrow functions are
+classified as functions before the uppercase-only constant filter, preserving
+the declaration's exact source span. JavaScript, TypeScript and TSX share this
+repair. Extractor version 22 forces stale indexes to rebuild. Focused regressions
+assert the symbol, imported target and call edge with a same-name distractor.
+The following describes the original failure; W2.1.1's evidence is retained.
 
 `export const num = (v: unknown): number => Number(v)` in a `.ts` file yields no symbol from
 `parse_file` — only the file node. The export record itself is extracted correctly (`local_name`
@@ -27,8 +34,14 @@ checks for the absence of a `GraphContractError`, not for resolution.
 Repro: the `inline-export-const` case in `.scratch/repro-export-clause-index-failure.sh`, or
 materialize the two-file pair and assert `status == "resolved"`.
 
-### `export default <identifier>` produces no export record
+### ~~`export default <identifier>` produces no export record~~ ✓ FIXED
 Found 2026-09-07 while covering the export-clause fix.
+
+Fixed 2026-09-10 (W2.1.3): a direct default-export identifier now records its
+authored export statement and binds to a unique module-level declaration.
+Resolved support retains the export and declaration anchors separately;
+missing or ambiguous declarations remain unresolved. Extractor version 23
+refreshes old caches. The following describes the original failure.
 
 `function num(...) {...}` followed by `export default num` extracts zero export records for that file,
 so an importer resolves to `unresolved` with reason `target_not_indexed`. The inline form
