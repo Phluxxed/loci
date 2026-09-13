@@ -262,6 +262,32 @@ limits keep output bounded; clipped anchors are marked incomplete. See the
 The matrix describes the development branch's delivered semantic subsets;
 shared parsing and response schemas do not imply semantic parity.
 
+If a needed relationship is missing, inspect `items[].path` and `omissions`
+before changing the request. A returned declaration can have several graph
+relationships, while a compact packet selects one proof path to it:
+
+- `alternative_path`: the declaration already has a selected path. To inspect
+  a different relationship, use its owning declaration as the sole seed for
+  a focused follow-up. Seeding both endpoints makes both anchors; it does not
+  ask for a proof connecting them. Increasing byte limits alone does not add
+  alternate paths.
+- `not_selected`: for deeper type fields, include the relevant field or type
+  name in `query`, or start from the nearer declaration. Immediate contracts
+  and structural alias/heritage continuations are selected without that focus.
+- `hop_limit` or `anchor_limit`: narrow to an explicit source seed, and set
+  the required supported hop limit. `impact` defaults to one hop and follows
+  incoming known static relationships; seed the callee to inspect callers.
+  `locate` returns declarations without relationship paths. Outgoing call
+  selection under `dependencies` is currently a JavaScript capability.
+- `output_budget`, `evidence_budget`, or `ancestor_unavailable`: narrow the
+  request or allow enough room for the definition and its complete proof.
+  A proof whose required ancestor was not delivered is omitted as a whole.
+
+Check the follow-up's selected paths and source, not just the declaration names.
+`ok` and a non-exhaustive packet do not establish complete answer coverage.
+The [compact-selection assessment](docs/reviews/2026-09-13-compact-selection-assessment.md)
+records reproduced JavaScript/Python/Go/Rust omissions and focused follow-ups.
+
 The [114-attempt multilingual workflow review](docs/reviews/2026-09-13-multilingual-workflow-measurement.md)
 retains all outcomes and exact replay. It supports the single Markdown navigation
 control; programming-language workflow efficiency remains unproven or withheld.
