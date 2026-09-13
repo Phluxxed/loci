@@ -1,0 +1,517 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "task_id": "inline_default_control",
+    "session_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc",
+    "arm": "A",
+    "repetition": 1,
+    "snapshot": "inline_default_control",
+    "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+    "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+    "controls_version": "typescript-context-controls-v2"
+  },
+  "events": [
+    {
+      "id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc:1",
+      "task_id": "inline_default_control",
+      "session_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "inline_default_control",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Locate the useNumber declaration and its body so I can trace the num call.",
+      "because": null,
+      "arguments": {
+        "query": "useNumber",
+        "kind": "function"
+      },
+      "search_id": "7c349283-904e-4ce4-b1b9-83666d18c7f7",
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::useNumber#function\",\"name\":\"useNumber\",\"qualified_name\":\"useNumber\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":38,\"byte_length\":47,\"signature\":\"function useNumber(): number { return num(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e\",\"decorators\":[],\"keywords\":[\"number\",\"use\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"7c349283-904e-4ce4-b1b9-83666d18c7f7\",\"_evaluation\":{\"attempt_id\":\"055aedb1-a7a5-4c48-b068-5af2f10b06bc/attempt/1\",\"calls_remaining\":23,\"event_id\":\"055aedb1-a7a5-4c48-b068-5af2f10b06bc:1\"}}",
+      "serialized_bytes": 892,
+      "source_bytes": 47,
+      "elapsed_ms": 2.4782500040601008,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 38,
+          "end_byte": 85,
+          "sha256": "eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e",
+          "text": "function useNumber(): number { return num(1); }"
+        }
+      ]
+    },
+    {
+      "id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc:2",
+      "task_id": "inline_default_control",
+      "session_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "inline_default_control",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "get",
+      "reason": "task_context",
+      "detail": "Retrieve the exact useNumber source and nearby context to identify the num call and its imported or referenced declaration.",
+      "because": null,
+      "arguments": {
+        "symbol_ids": [
+          "consumer.ts::useNumber#function"
+        ],
+        "context": 2,
+        "selected_from_search_id": "7c349283-904e-4ce4-b1b9-83666d18c7f7"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::useNumber#function\",\"source\":\"function useNumber(): number { return num(1); }\",\"byte_offset\":38,\"byte_length\":47,\"line\":2,\"end_line\":2,\"signature\":\"function useNumber(): number { return num(1); }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import num from \\\"./number.js\\\";\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"055aedb1-a7a5-4c48-b068-5af2f10b06bc/attempt/2\",\"calls_remaining\":22,\"event_id\":\"055aedb1-a7a5-4c48-b068-5af2f10b06bc:2\"}}",
+      "serialized_bytes": 497,
+      "source_bytes": 124,
+      "elapsed_ms": 2.9748339948127978,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 38,
+          "end_byte": 85,
+          "sha256": "eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e",
+          "text": "function useNumber(): number { return num(1); }"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 0,
+          "end_byte": 30,
+          "sha256": "cb005bb93a29b5d639c6aea61820c76673a79d260f821773be61e27017316b61",
+          "text": "import num from \"./number.js\";"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 38,
+          "end_byte": 85,
+          "sha256": "eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e",
+          "text": "function useNumber(): number { return num(1); }"
+        }
+      ]
+    },
+    {
+      "id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc:3",
+      "task_id": "inline_default_control",
+      "session_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "inline_default_control",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "missing_context",
+      "detail": "The retrieved useNumber body shows an import from ./number.js but not the callee declaration; find the exported num declaration and any related regression-test symbol.",
+      "because": "055aedb1-a7a5-4c48-b068-5af2f10b06bc:2",
+      "arguments": {
+        "query": "num",
+        "lang": "typescript"
+      },
+      "search_id": "86a34c11-20d4-4180-9240-491850648224",
+      "response_json": "{\"symbols\":[{\"id\":\"number.ts::num#function\",\"name\":\"num\",\"qualified_name\":\"num\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"number.ts\",\"byte_offset\":15,\"byte_length\":54,\"signature\":\"function num(v: unknown): number { return Number(v); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985\",\"decorators\":[],\"keywords\":[\"num\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":71.0},{\"id\":\"consumer.ts::useNumber#function\",\"name\":\"useNumber\",\"qualified_name\":\"useNumber\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":38,\"byte_length\":47,\"signature\":\"function useNumber(): number { return num(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e\",\"decorators\":[],\"keywords\":[\"number\",\"use\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":40.0},{\"id\":\"number.ts::__file__#file\",\"name\":\"number.ts\",\"qualified_name\":\"__file__\",\"kind\":\"file\",\"language\":\"typescript\",\"file_path\":\"number.ts\",\"byte_offset\":0,\"byte_length\":0,\"signature\":\"number.ts\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"c641177d9c3dfef9b966d128cf490e35eadcd15f13ed4558df59c728b681ba60\",\"decorators\":[],\"keywords\":[\"number\"],\"metadata\":{\"loci\":{\"file_node\":true}},\"line\":1,\"end_line\":1,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"86a34c11-20d4-4180-9240-491850648224\",\"_evaluation\":{\"attempt_id\":\"055aedb1-a7a5-4c48-b068-5af2f10b06bc/attempt/3\",\"calls_remaining\":21,\"event_id\":\"055aedb1-a7a5-4c48-b068-5af2f10b06bc:3\"}}",
+      "serialized_bytes": 1745,
+      "source_bytes": 101,
+      "elapsed_ms": 1.4091669945628382,
+      "spans": [
+        {
+          "file": "number.ts",
+          "start_byte": 15,
+          "end_byte": 69,
+          "sha256": "a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985",
+          "text": "function num(v: unknown): number { return Number(v); }"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 38,
+          "end_byte": 85,
+          "sha256": "eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e",
+          "text": "function useNumber(): number { return num(1); }"
+        }
+      ]
+    },
+    {
+      "id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc:4",
+      "task_id": "inline_default_control",
+      "session_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "inline_default_control",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "get",
+      "reason": "task_context",
+      "detail": "Retrieve the exact num declaration to capture its parameter annotation and declared return type.",
+      "because": null,
+      "arguments": {
+        "symbol_ids": [
+          "number.ts::num#function"
+        ],
+        "context": 2,
+        "selected_from_search_id": "86a34c11-20d4-4180-9240-491850648224"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"number.ts::num#function\",\"source\":\"function num(v: unknown): number { return Number(v); }\",\"byte_offset\":15,\"byte_length\":54,\"line\":1,\"end_line\":1,\"signature\":\"function num(v: unknown): number { return Number(v); }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"055aedb1-a7a5-4c48-b068-5af2f10b06bc/attempt/4\",\"calls_remaining\":20,\"event_id\":\"055aedb1-a7a5-4c48-b068-5af2f10b06bc:4\"}}",
+      "serialized_bytes": 469,
+      "source_bytes": 108,
+      "elapsed_ms": 4.0932920019258745,
+      "spans": [
+        {
+          "file": "number.ts",
+          "start_byte": 15,
+          "end_byte": 69,
+          "sha256": "a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985",
+          "text": "function num(v: unknown): number { return Number(v); }"
+        },
+        {
+          "file": "number.ts",
+          "start_byte": 15,
+          "end_byte": 69,
+          "sha256": "a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985",
+          "text": "function num(v: unknown): number { return Number(v); }"
+        }
+      ]
+    },
+    {
+      "id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc:5",
+      "task_id": "inline_default_control",
+      "session_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "inline_default_control",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "graph",
+      "reason": "verification",
+      "detail": "Verify that the num call in useNumber resolves to the retrieved num declaration rather than relying on the matching name alone.",
+      "because": null,
+      "arguments": {
+        "file": "consumer.ts",
+        "status": "resolved",
+        "limit": 32
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-baseline-q_i1j_5j/snapshot\",\"file\":\"consumer.ts\",\"status\":\"resolved\",\"items\":[{\"raw\":{\"source_file\":\"consumer.ts\",\"language\":\"typescript\",\"line\":2,\"column\":46,\"start_byte\":76,\"end_byte\":82,\"callee_start_byte\":76,\"callee_end_byte\":79,\"callee_text\":\"num\",\"callee_path\":[\"num\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":38,\"definition_end_byte\":85,\"body_start_byte\":67,\"body_end_byte\":85},\"source_hash\":\"271a73bf1eed83ee538b9c9d1e39c1c04a6c3765de9cb304a493f2e0e1bcff2f\"},\"caller_id\":\"consumer.ts::useNumber#function\",\"caller_kind\":\"function\",\"target_file\":\"number.ts\",\"target_id\":\"number.ts::num#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"271a73bf1eed83ee538b9c9d1e39c1c04a6c3765de9cb304a493f2e0e1bcff2f\",\"endpoint_id\":\"consumer.ts::useNumber#function\"},{\"kind\":\"caller_definition\",\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e\",\"endpoint_id\":\"consumer.ts::useNumber#function\"},{\"kind\":\"symbol_reference\",\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"271a73bf1eed83ee538b9c9d1e39c1c04a6c3765de9cb304a493f2e0e1bcff2f\",\"endpoint_id\":\"number.ts::num#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":1,\"resolved\":1,\"unresolved\":0,\"returned\":1},\"pagination\":{\"offset\":0,\"limit\":32,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"055aedb1-a7a5-4c48-b068-5af2f10b06bc/attempt/5\",\"calls_remaining\":19,\"event_id\":\"055aedb1-a7a5-4c48-b068-5af2f10b06bc:5\"}}",
+      "serialized_bytes": 1908,
+      "source_bytes": 0,
+      "elapsed_ms": 7.631583001057152,
+      "spans": []
+    }
+  ],
+  "measurement": {
+    "task_id": "inline_default_control",
+    "session_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc",
+    "arm": "A",
+    "repetition": 1,
+    "snapshot": "inline_default_control",
+    "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+    "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+    "controls_version": "typescript-context-controls-v2",
+    "schema_version": 1,
+    "outcome": "completed",
+    "task_correct": true,
+    "answer": {
+      "origin_file": "number.ts",
+      "declaration_name": "num",
+      "declared_parameter_type": "unknown",
+      "return_type": "number",
+      "result": 1
+    },
+    "read_count": 5,
+    "avoidable_reads": 1,
+    "proven_avoidable_reads": 1,
+    "lineage_status": "complete",
+    "classifications": [
+      {
+        "event_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc:1",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc:2",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc:3",
+        "classification": "avoidable",
+        "reason": "missing_context",
+        "because": "055aedb1-a7a5-4c48-b068-5af2f10b06bc:2",
+        "recovered_gold": [
+          "callee"
+        ]
+      },
+      {
+        "event_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc:4",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc:5",
+        "classification": "excluded",
+        "reason": "verification",
+        "because": null,
+        "recovered_gold": []
+      }
+    ],
+    "required_context_delivered": [
+      "callee",
+      "entry",
+      "import"
+    ],
+    "required_context_total": 4,
+    "context_recall": 0.75,
+    "serialized_tool_output_bytes": 5511,
+    "source_bytes": 380,
+    "estimated_source_tokens": 95,
+    "tool_elapsed_ms": 18.587125996418763,
+    "provider_usage": {
+      "input_tokens": 37673,
+      "cached_input_tokens": 25344,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 808,
+      "reasoning_output_tokens": 317
+    },
+    "usage_semantics": "Codex turn.completed gross input; cached_input is a subset; output includes reasoning_output_tokens.",
+    "token_status": "measured"
+  },
+  "baseline": {
+    "end_to_end_seconds": 23.778146124997875,
+    "actual_process_seconds": 23.778146124997875,
+    "exit_code": 0,
+    "provider_thread_id": "01a08e4a-6a8b-7e52-a504-9d5ee2cfb05c",
+    "failures": [],
+    "tool_delivery_verified": true,
+    "relationships": {
+      "schema_version": 1,
+      "case_id": "inline_default_control",
+      "required_semantic_dependencies_total": 1,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "calls",
+          "to": "callee",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "exact_kind",
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "consumer.ts::useNumber#function",
+              "to": "number.ts::num#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "271a73bf1eed83ee538b9c9d1e39c1c04a6c3765de9cb304a493f2e0e1bcff2f"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "available_dependency_links_total": 1,
+      "available_dependency_links": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "calls",
+          "to": "callee",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "exact_kind",
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "consumer.ts::useNumber#function",
+              "to": "number.ts::num#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "consumer.ts",
+                "line": 2,
+                "content_hash": "271a73bf1eed83ee538b9c9d1e39c1c04a6c3765de9cb304a493f2e0e1bcff2f"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "dependency-link recall; references_type fallback is generic and does not establish precise subtype/kind recall",
+        "required": 1,
+        "available": 1,
+        "delivered": 0,
+        "available_ratio": 1.0,
+        "delivered_ratio": 0.0
+      },
+      "precise_kind_links_available_total": 1,
+      "precise_kind_links_delivered_total": 0,
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_scope": "authored frozen forbidden_relationships only; this is not exhaustive truth about unsupported or unrecorded edges"
+    },
+    "output_accounting": {
+      "schema_version": 2,
+      "complete": true,
+      "calls": [
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "useNumber",
+              "kind": "function"
+            },
+            "reason": "task_context",
+            "detail": "Locate the useNumber declaration and its body so I can trace the num call."
+          },
+          "attempt_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc/attempt/1",
+          "trace_event_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc:1",
+          "source_bytes": 47,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::useNumber#function\",\"name\":\"useNumber\",\"qualified_name\":\"useNumber\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":38,\"byte_length\":47,\"signature\":\"function useNumber(): number { return num(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e\",\"decorators\":[],\"keywords\":[\"number\",\"use\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"7c349283-904e-4ce4-b1b9-83666d18c7f7\",\"_evaluation\":{\"attempt_id\":\"055aedb1-a7a5-4c48-b068-5af2f10b06bc/attempt/1\",\"calls_remaining\":23,\"event_id\":\"055aedb1-a7a5-4c48-b068-5af2f10b06bc:1\"}}"
+          ],
+          "serialized_bytes": 892
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "get",
+            "parameters": {
+              "symbol_ids": [
+                "consumer.ts::useNumber#function"
+              ],
+              "context": 2,
+              "selected_from_search_id": "7c349283-904e-4ce4-b1b9-83666d18c7f7"
+            },
+            "reason": "task_context",
+            "detail": "Retrieve the exact useNumber source and nearby context to identify the num call and its imported or referenced declaration."
+          },
+          "attempt_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc/attempt/2",
+          "trace_event_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc:2",
+          "source_bytes": 124,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::useNumber#function\",\"source\":\"function useNumber(): number { return num(1); }\",\"byte_offset\":38,\"byte_length\":47,\"line\":2,\"end_line\":2,\"signature\":\"function useNumber(): number { return num(1); }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"import num from \\\"./number.js\\\";\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"055aedb1-a7a5-4c48-b068-5af2f10b06bc/attempt/2\",\"calls_remaining\":22,\"event_id\":\"055aedb1-a7a5-4c48-b068-5af2f10b06bc:2\"}}"
+          ],
+          "serialized_bytes": 497
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "num",
+              "lang": "typescript"
+            },
+            "reason": "missing_context",
+            "because": "055aedb1-a7a5-4c48-b068-5af2f10b06bc:2",
+            "detail": "The retrieved useNumber body shows an import from ./number.js but not the callee declaration; find the exported num declaration and any related regression-test symbol."
+          },
+          "attempt_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc/attempt/3",
+          "trace_event_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc:3",
+          "source_bytes": 101,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"number.ts::num#function\",\"name\":\"num\",\"qualified_name\":\"num\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"number.ts\",\"byte_offset\":15,\"byte_length\":54,\"signature\":\"function num(v: unknown): number { return Number(v); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"a2163ba1945ac7eff1006e7575ae846b3c085454fdfa9a87b1f426c1a9054985\",\"decorators\":[],\"keywords\":[\"num\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":71.0},{\"id\":\"consumer.ts::useNumber#function\",\"name\":\"useNumber\",\"qualified_name\":\"useNumber\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":38,\"byte_length\":47,\"signature\":\"function useNumber(): number { return num(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e\",\"decorators\":[],\"keywords\":[\"number\",\"use\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":40.0},{\"id\":\"number.ts::__file__#file\",\"name\":\"number.ts\",\"qualified_name\":\"__file__\",\"kind\":\"file\",\"language\":\"typescript\",\"file_path\":\"number.ts\",\"byte_offset\":0,\"byte_length\":0,\"signature\":\"number.ts\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"c641177d9c3dfef9b966d128cf490e35eadcd15f13ed4558df59c728b681ba60\",\"decorators\":[],\"keywords\":[\"number\"],\"metadata\":{\"loci\":{\"file_node\":true}},\"line\":1,\"end_line\":1,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":2,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"86a34c11-20d4-4180-9240-491850648224\",\"_evaluation\":{\"attempt_id\":\"055aedb1-a7a5-4c48-b068-5af2f10b06bc/attempt/3\",\"calls_remaining\":21,\"event_id\":\"055aedb1-a7a5-4c48-b068-5af2f10b06bc:3\"}}"
+          ],
+          "serialized_bytes": 1745
+        },
+        {
+          "item_id": "item_5",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "get",
+            "parameters": {
+              "symbol_ids": [
+                "number.ts::num#function"
+              ],
+              "context": 2,
+              "selected_from_search_id": "86a34c11-20d4-4180-9240-491850648224"
+            },
+            "reason": "task_context",
+            "detail": "Retrieve the exact num declaration to capture its parameter annotation and declared return type."
+          },
+          "attempt_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc/attempt/4",
+          "trace_event_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc:4",
+          "source_bytes": 108,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"number.ts::num#function\",\"source\":\"function num(v: unknown): number { return Number(v); }\",\"byte_offset\":15,\"byte_length\":54,\"line\":1,\"end_line\":1,\"signature\":\"function num(v: unknown): number { return Number(v); }\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"055aedb1-a7a5-4c48-b068-5af2f10b06bc/attempt/4\",\"calls_remaining\":20,\"event_id\":\"055aedb1-a7a5-4c48-b068-5af2f10b06bc:4\"}}"
+          ],
+          "serialized_bytes": 469
+        },
+        {
+          "item_id": "item_6",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "graph_calls",
+            "parameters": {
+              "file": "consumer.ts",
+              "status": "resolved",
+              "limit": 32
+            },
+            "reason": "verification",
+            "detail": "Verify that the num call in useNumber resolves to the retrieved num declaration rather than relying on the matching name alone."
+          },
+          "attempt_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc/attempt/5",
+          "trace_event_id": "055aedb1-a7a5-4c48-b068-5af2f10b06bc:5",
+          "source_bytes": 0,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-baseline-q_i1j_5j/snapshot\",\"file\":\"consumer.ts\",\"status\":\"resolved\",\"items\":[{\"raw\":{\"source_file\":\"consumer.ts\",\"language\":\"typescript\",\"line\":2,\"column\":46,\"start_byte\":76,\"end_byte\":82,\"callee_start_byte\":76,\"callee_end_byte\":79,\"callee_text\":\"num\",\"callee_path\":[\"num\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":38,\"definition_end_byte\":85,\"body_start_byte\":67,\"body_end_byte\":85},\"source_hash\":\"271a73bf1eed83ee538b9c9d1e39c1c04a6c3765de9cb304a493f2e0e1bcff2f\"},\"caller_id\":\"consumer.ts::useNumber#function\",\"caller_kind\":\"function\",\"target_file\":\"number.ts\",\"target_id\":\"number.ts::num#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"271a73bf1eed83ee538b9c9d1e39c1c04a6c3765de9cb304a493f2e0e1bcff2f\",\"endpoint_id\":\"consumer.ts::useNumber#function\"},{\"kind\":\"caller_definition\",\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"eb6f1a074482e39272b9e9aa7c3b7375a64a5f1fb48c0946ed439cd7f096403e\",\"endpoint_id\":\"consumer.ts::useNumber#function\"},{\"kind\":\"symbol_reference\",\"file\":\"consumer.ts\",\"line\":2,\"content_hash\":\"271a73bf1eed83ee538b9c9d1e39c1c04a6c3765de9cb304a493f2e0e1bcff2f\",\"endpoint_id\":\"number.ts::num#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":1,\"resolved\":1,\"unresolved\":0,\"returned\":1},\"pagination\":{\"offset\":0,\"limit\":32,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"055aedb1-a7a5-4c48-b068-5af2f10b06bc/attempt/5\",\"calls_remaining\":19,\"event_id\":\"055aedb1-a7a5-4c48-b068-5af2f10b06bc:5\"}}"
+          ],
+          "serialized_bytes": 1908
+        }
+      ],
+      "tool_call_count": 5,
+      "recorded_payload_bytes": 5511,
+      "complete_payload_bytes": 5511,
+      "source_bytes": 380,
+      "failures": []
+    },
+    "lineage_valid": true,
+    "adapter_elapsed_ms": 19.098667995422147
+  }
+}

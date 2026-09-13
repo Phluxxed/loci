@@ -1,0 +1,124 @@
+{
+  "work_id": "W2.4.3",
+  "meaning": "Actual host-mediated MCP integration, not comparative evaluation.",
+  "host": "codex-cli 0.154.0",
+  "model": "gpt-5.6-luna",
+  "reasoning_effort": "high",
+  "fixture": "imported_interface",
+  "fixture_sha256": {
+    "types.ts": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+    "consumer.ts": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+  },
+  "source_sha256": {
+    "src/loci/exploration.py": "e3131116e5b885e2865cd4b451ae7de7b1ee43371acd1d8c98ea1a861eb6601e",
+    "src/loci/_exploration_output.py": "3088c657a03f3b8724fe14f133888837f7b74edd80fbb0b726aaead75a5b2270",
+    "src/loci/service.py": "784880ed2b71f82c644cd100e030f8b33d7cc688b7338273a787ae76289c53ff",
+    "src/loci/mcp_server.py": "b65533898a012d2565dc8e648f52caa07eb87e61861909f05d44d911b0dbabb2",
+    "src/loci/mcp_output_models.py": "480c6cc455b8ab16dd88c095f8f6161a2ecc14b813abd89d2bb4de626843e2fa"
+  },
+  "model_catalog_sha256": "f1c45cceac1c3ee90fa1af1007c341713e220571390c3b1eb086c443d7781062",
+  "prompt": "Complete this assignment directly. Do not spawn other agents. Use only the connected Loci tools on repo <temporary-host-root>/repo. This is a bounded navigation acceptance exercise. First call loci_explore with intent=locate and query=processOrder. Using its returned symbol ID, call loci_explore with intent=type_dependencies and query=\"processOrder input contract\", max_output_bytes=4096 and max_evidence_bytes=1024. Inspect the delivered source and relationship proof. Then repeat that type request with max_evidence_bytes=0 to exercise an exhausted evidence budget. Report the input type and its fields, the proven relationship and its resolution, and what the two type responses report for status, omissions and output bytes. Stop after these three calls. Use no other repository or data source and make no edits.",
+  "exit_code": 0,
+  "calls": [
+    {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "loci",
+      "tool": "loci_explore",
+      "arguments": {
+        "intent": "locate",
+        "query": "processOrder",
+        "repo": "<temporary-host-root>/repo"
+      },
+      "result": null,
+      "error": {
+        "message": "MCP tool call requires approval, but approval policy is never"
+      },
+      "status": "failed"
+    }
+  ],
+  "final_messages": [
+    "I’ll perform exactly the three requested Loci calls, using only the returned symbol ID for the two type-dependency requests, then report the source, relationship proof, and response budgets/status.",
+    "Unable to complete: the first `loci_explore` call was blocked because the environment requires approval, while the approval policy is `never`. No repository data was accessed or modified."
+  ],
+  "stderr": "Reading additional input from stdin...\n",
+  "events": [
+    {
+      "type": "thread.started",
+      "thread_id": "01a08f96-5ce9-7251-9aa8-e0194e309d5a"
+    },
+    {
+      "type": "item.completed",
+      "item": {
+        "id": "item_0",
+        "type": "error",
+        "message": "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/brummerv/.codex/config.toml."
+      }
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "item": {
+        "id": "item_1",
+        "type": "agent_message",
+        "text": "I’ll perform exactly the three requested Loci calls, using only the returned symbol ID for the two type-dependency requests, then report the source, relationship proof, and response budgets/status."
+      }
+    },
+    {
+      "type": "item.started",
+      "item": {
+        "id": "item_2",
+        "type": "mcp_tool_call",
+        "server": "loci",
+        "tool": "loci_explore",
+        "arguments": {
+          "intent": "locate",
+          "query": "processOrder",
+          "repo": "<temporary-host-root>/repo"
+        },
+        "result": null,
+        "error": null,
+        "status": "in_progress"
+      }
+    },
+    {
+      "type": "item.completed",
+      "item": {
+        "id": "item_2",
+        "type": "mcp_tool_call",
+        "server": "loci",
+        "tool": "loci_explore",
+        "arguments": {
+          "intent": "locate",
+          "query": "processOrder",
+          "repo": "<temporary-host-root>/repo"
+        },
+        "result": null,
+        "error": {
+          "message": "MCP tool call requires approval, but approval policy is never"
+        },
+        "status": "failed"
+      }
+    },
+    {
+      "type": "item.completed",
+      "item": {
+        "id": "item_3",
+        "type": "agent_message",
+        "text": "Unable to complete: the first `loci_explore` call was blocked because the environment requires approval, while the approval policy is `never`. No repository data was accessed or modified."
+      }
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 10823,
+        "cached_input_tokens": 4864,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 502,
+        "reasoning_output_tokens": 339
+      }
+    }
+  ]
+}

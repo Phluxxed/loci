@@ -1,0 +1,433 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "task_id": "local_interface",
+    "session_id": "4f37a500-2bb1-4ce3-8a46-3874428635e0",
+    "arm": "A",
+    "repetition": 1,
+    "snapshot": "local_interface",
+    "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+    "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+    "controls_version": "typescript-context-controls-v2"
+  },
+  "events": [
+    {
+      "id": "4f37a500-2bb1-4ce3-8a46-3874428635e0:1",
+      "task_id": "local_interface",
+      "session_id": "4f37a500-2bb1-4ce3-8a46-3874428635e0",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "local_interface",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "task_context",
+      "detail": "Find the processOrder declaration so I can inspect its signature and required regression input shape.",
+      "because": null,
+      "arguments": {
+        "query": "processOrder",
+        "kind": "function",
+        "lang": "typescript"
+      },
+      "search_id": "98c29b71-0f19-4d22-952b-63a7170aced7",
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"qualified_name\":\"processOrder\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":75,\"byte_length\":75,\"signature\":\"function processOrder(value: Payload): string {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"9c4c2b8126fdfcccd44d07752454e8e446cb3837f8e181059c241f2b29e4d9ef\",\"decorators\":[],\"keywords\":[\"order\",\"process\"],\"metadata\":{},\"line\":5,\"end_line\":7,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":1,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"98c29b71-0f19-4d22-952b-63a7170aced7\",\"_evaluation\":{\"attempt_id\":\"4f37a500-2bb1-4ce3-8a46-3874428635e0/attempt/1\",\"calls_remaining\":23,\"event_id\":\"4f37a500-2bb1-4ce3-8a46-3874428635e0:1\"}}",
+      "serialized_bytes": 904,
+      "source_bytes": 47,
+      "elapsed_ms": 4.985374995158054,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 75,
+          "end_byte": 122,
+          "sha256": "1e99c76d1c3950cc07c699cd9e3e0b1895cd15203d5f8f64459b21d6c8f48550",
+          "text": "function processOrder(value: Payload): string {"
+        }
+      ]
+    },
+    {
+      "id": "4f37a500-2bb1-4ce3-8a46-3874428635e0:2",
+      "task_id": "local_interface",
+      "session_id": "4f37a500-2bb1-4ce3-8a46-3874428635e0",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "local_interface",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "get",
+      "reason": "task_context",
+      "detail": "Retrieve the exact processOrder signature and body to determine which input fields are required and which output field is returned.",
+      "because": null,
+      "arguments": {
+        "symbol_ids": [
+          "consumer.ts::processOrder#function"
+        ],
+        "context": 2,
+        "selected_from_search_id": "98c29b71-0f19-4d22-952b-63a7170aced7"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"source\":\"function processOrder(value: Payload): string {\\n  return value.requestId;\\n}\",\"byte_offset\":75,\"byte_length\":75,\"line\":5,\"end_line\":7,\"signature\":\"function processOrder(value: Payload): string {\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"  amount: number;\",\"}\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"4f37a500-2bb1-4ce3-8a46-3874428635e0/attempt/2\",\"calls_remaining\":22,\"event_id\":\"4f37a500-2bb1-4ce3-8a46-3874428635e0:2\"}}",
+      "serialized_bytes": 519,
+      "source_bytes": 140,
+      "elapsed_ms": 7.391749997623265,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 75,
+          "end_byte": 150,
+          "sha256": "9c4c2b8126fdfcccd44d07752454e8e446cb3837f8e181059c241f2b29e4d9ef",
+          "text": "function processOrder(value: Payload): string {\n  return value.requestId;\n}"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 48,
+          "end_byte": 65,
+          "sha256": "e0c2874bd0f1502da6ed3b80183482cd366550fba16ad2f57ef8aea917b1053b",
+          "text": "  amount: number;"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 66,
+          "end_byte": 67,
+          "sha256": "d10b36aa74a59bcf4a88185837f658afaf3646eff2bb16c3928d0e9335e945d2",
+          "text": "}"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 75,
+          "end_byte": 122,
+          "sha256": "1e99c76d1c3950cc07c699cd9e3e0b1895cd15203d5f8f64459b21d6c8f48550",
+          "text": "function processOrder(value: Payload): string {"
+        }
+      ]
+    },
+    {
+      "id": "4f37a500-2bb1-4ce3-8a46-3874428635e0:3",
+      "task_id": "local_interface",
+      "session_id": "4f37a500-2bb1-4ce3-8a46-3874428635e0",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "local_interface",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "search",
+      "reason": "missing_context",
+      "detail": "The processOrder body reveals its parameter type is Payload, so I need the Payload declaration to identify all required fields, their types, and the defining file.",
+      "because": "4f37a500-2bb1-4ce3-8a46-3874428635e0:2",
+      "arguments": {
+        "query": "Payload",
+        "kind": "interface",
+        "lang": "typescript"
+      },
+      "search_id": "b2e57838-d07a-4d1d-849a-aa96db621091",
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::Payload#interface\",\"name\":\"Payload\",\"qualified_name\":\"Payload\",\"kind\":\"interface\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":7,\"byte_length\":60,\"signature\":\"interface Payload {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d\",\"decorators\":[],\"keywords\":[\"payload\"],\"metadata\":{},\"line\":1,\"end_line\":4,\"score\":61.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":1,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"b2e57838-d07a-4d1d-849a-aa96db621091\",\"_evaluation\":{\"attempt_id\":\"4f37a500-2bb1-4ce3-8a46-3874428635e0/attempt/3\",\"calls_remaining\":21,\"event_id\":\"4f37a500-2bb1-4ce3-8a46-3874428635e0:3\"}}",
+      "serialized_bytes": 854,
+      "source_bytes": 19,
+      "elapsed_ms": 1.5644169980078004,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 7,
+          "end_byte": 26,
+          "sha256": "3c35bccaf71be1031a5c44b0fa3c7771b5743bb6ebedfda88fca7b184f983641",
+          "text": "interface Payload {"
+        }
+      ]
+    },
+    {
+      "id": "4f37a500-2bb1-4ce3-8a46-3874428635e0:4",
+      "task_id": "local_interface",
+      "session_id": "4f37a500-2bb1-4ce3-8a46-3874428635e0",
+      "arm": "A",
+      "repetition": 1,
+      "snapshot": "local_interface",
+      "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+      "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+      "controls_version": "typescript-context-controls-v2",
+      "operation": "get",
+      "reason": "missing_context",
+      "detail": "Retrieve the exact Payload fields and declared types after locating the parameter type used by processOrder.",
+      "because": "4f37a500-2bb1-4ce3-8a46-3874428635e0:3",
+      "arguments": {
+        "symbol_ids": [
+          "consumer.ts::Payload#interface"
+        ],
+        "context": 1,
+        "selected_from_search_id": "b2e57838-d07a-4d1d-849a-aa96db621091"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"consumer.ts::Payload#interface\",\"source\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\",\"byte_offset\":7,\"byte_length\":60,\"line\":1,\"end_line\":4,\"signature\":\"interface Payload {\",\"kind\":\"interface\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[\"export function processOrder(value: Payload): string {\"]}],\"_evaluation\":{\"attempt_id\":\"4f37a500-2bb1-4ce3-8a46-3874428635e0/attempt/4\",\"calls_remaining\":20,\"event_id\":\"4f37a500-2bb1-4ce3-8a46-3874428635e0:4\"}}",
+      "serialized_bytes": 506,
+      "source_bytes": 133,
+      "elapsed_ms": 4.128540997044183,
+      "spans": [
+        {
+          "file": "consumer.ts",
+          "start_byte": 7,
+          "end_byte": 67,
+          "sha256": "1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d",
+          "text": "interface Payload {\n  requestId: string;\n  amount: number;\n}"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 68,
+          "end_byte": 122,
+          "sha256": "0f675a4cf37017e97177bbb2fae01b0d2b04e73f8cc244424058a8103b19136a",
+          "text": "export function processOrder(value: Payload): string {"
+        },
+        {
+          "file": "consumer.ts",
+          "start_byte": 7,
+          "end_byte": 26,
+          "sha256": "3c35bccaf71be1031a5c44b0fa3c7771b5743bb6ebedfda88fca7b184f983641",
+          "text": "interface Payload {"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "local_interface",
+    "session_id": "4f37a500-2bb1-4ce3-8a46-3874428635e0",
+    "arm": "A",
+    "repetition": 1,
+    "snapshot": "local_interface",
+    "corpus_sha256": "08a635ae2a65cd70d33f161a15392413d23da1c48a107730e3b5548fe7e4455d",
+    "controls_sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62",
+    "controls_version": "typescript-context-controls-v2",
+    "schema_version": 1,
+    "outcome": "completed",
+    "task_correct": true,
+    "answer": {
+      "required_fields": {
+        "amount": "number",
+        "requestId": "string"
+      },
+      "return_type": "string",
+      "returned_field": "requestId",
+      "origin_file": "consumer.ts"
+    },
+    "read_count": 4,
+    "avoidable_reads": 2,
+    "proven_avoidable_reads": 2,
+    "lineage_status": "complete",
+    "classifications": [
+      {
+        "event_id": "4f37a500-2bb1-4ce3-8a46-3874428635e0:1",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "4f37a500-2bb1-4ce3-8a46-3874428635e0:2",
+        "classification": "initial_context",
+        "reason": "task_context",
+        "because": null,
+        "recovered_gold": []
+      },
+      {
+        "event_id": "4f37a500-2bb1-4ce3-8a46-3874428635e0:3",
+        "classification": "avoidable",
+        "reason": "missing_context",
+        "because": "4f37a500-2bb1-4ce3-8a46-3874428635e0:2",
+        "recovered_gold": [
+          "payload"
+        ]
+      },
+      {
+        "event_id": "4f37a500-2bb1-4ce3-8a46-3874428635e0:4",
+        "classification": "avoidable",
+        "reason": "missing_context",
+        "because": "4f37a500-2bb1-4ce3-8a46-3874428635e0:3",
+        "recovered_gold": [
+          "payload"
+        ]
+      }
+    ],
+    "required_context_delivered": [
+      "entry",
+      "payload"
+    ],
+    "required_context_total": 2,
+    "context_recall": 1.0,
+    "serialized_tool_output_bytes": 2783,
+    "source_bytes": 339,
+    "estimated_source_tokens": 85,
+    "tool_elapsed_ms": 18.070082987833302,
+    "provider_usage": {
+      "input_tokens": 29168,
+      "cached_input_tokens": 15616,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 580,
+      "reasoning_output_tokens": 124
+    },
+    "usage_semantics": "Codex turn.completed gross input; cached_input is a subset; output includes reasoning_output_tokens.",
+    "token_status": "measured"
+  },
+  "baseline": {
+    "end_to_end_seconds": 25.22262483400118,
+    "actual_process_seconds": 25.22262483400118,
+    "exit_code": 0,
+    "provider_thread_id": "01a08e3a-1cb8-7352-a84c-75a767ea633f",
+    "failures": [],
+    "tool_delivery_verified": true,
+    "relationships": {
+      "schema_version": 1,
+      "case_id": "local_interface",
+      "required_semantic_dependencies_total": 1,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "payload",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "generic_references_type",
+          "available": false,
+          "delivered": false,
+          "available_edges": [],
+          "delivered_edges": []
+        }
+      ],
+      "available_dependency_links_total": 0,
+      "available_dependency_links": [],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "dependency-link recall; references_type fallback is generic and does not establish precise subtype/kind recall",
+        "required": 1,
+        "available": 0,
+        "delivered": 0,
+        "available_ratio": 0.0,
+        "delivered_ratio": 0.0
+      },
+      "precise_kind_links_available_total": 0,
+      "precise_kind_links_delivered_total": 0,
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_scope": "authored frozen forbidden_relationships only; this is not exhaustive truth about unsupported or unrecorded edges"
+    },
+    "output_accounting": {
+      "schema_version": 2,
+      "complete": true,
+      "calls": [
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "processOrder",
+              "kind": "function",
+              "lang": "typescript"
+            },
+            "reason": "task_context",
+            "detail": "Find the processOrder declaration so I can inspect its signature and required regression input shape."
+          },
+          "attempt_id": "4f37a500-2bb1-4ce3-8a46-3874428635e0/attempt/1",
+          "trace_event_id": "4f37a500-2bb1-4ce3-8a46-3874428635e0:1",
+          "source_bytes": 47,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"name\":\"processOrder\",\"qualified_name\":\"processOrder\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":75,\"byte_length\":75,\"signature\":\"function processOrder(value: Payload): string {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"9c4c2b8126fdfcccd44d07752454e8e446cb3837f8e181059c241f2b29e4d9ef\",\"decorators\":[],\"keywords\":[\"order\",\"process\"],\"metadata\":{},\"line\":5,\"end_line\":7,\"score\":63.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":1,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"98c29b71-0f19-4d22-952b-63a7170aced7\",\"_evaluation\":{\"attempt_id\":\"4f37a500-2bb1-4ce3-8a46-3874428635e0/attempt/1\",\"calls_remaining\":23,\"event_id\":\"4f37a500-2bb1-4ce3-8a46-3874428635e0:1\"}}"
+          ],
+          "serialized_bytes": 904
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "get",
+            "parameters": {
+              "symbol_ids": [
+                "consumer.ts::processOrder#function"
+              ],
+              "context": 2,
+              "selected_from_search_id": "98c29b71-0f19-4d22-952b-63a7170aced7"
+            },
+            "reason": "task_context",
+            "detail": "Retrieve the exact processOrder signature and body to determine which input fields are required and which output field is returned."
+          },
+          "attempt_id": "4f37a500-2bb1-4ce3-8a46-3874428635e0/attempt/2",
+          "trace_event_id": "4f37a500-2bb1-4ce3-8a46-3874428635e0:2",
+          "source_bytes": 140,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::processOrder#function\",\"source\":\"function processOrder(value: Payload): string {\\n  return value.requestId;\\n}\",\"byte_offset\":75,\"byte_length\":75,\"line\":5,\"end_line\":7,\"signature\":\"function processOrder(value: Payload): string {\",\"kind\":\"function\",\"language\":\"typescript\",\"context_before\":[\"  amount: number;\",\"}\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"4f37a500-2bb1-4ce3-8a46-3874428635e0/attempt/2\",\"calls_remaining\":22,\"event_id\":\"4f37a500-2bb1-4ce3-8a46-3874428635e0:2\"}}"
+          ],
+          "serialized_bytes": 519
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "search",
+            "parameters": {
+              "query": "Payload",
+              "kind": "interface",
+              "lang": "typescript"
+            },
+            "reason": "missing_context",
+            "because": "4f37a500-2bb1-4ce3-8a46-3874428635e0:2",
+            "detail": "The processOrder body reveals its parameter type is Payload, so I need the Payload declaration to identify all required fields, their types, and the defining file."
+          },
+          "attempt_id": "4f37a500-2bb1-4ce3-8a46-3874428635e0/attempt/3",
+          "trace_event_id": "4f37a500-2bb1-4ce3-8a46-3874428635e0:3",
+          "source_bytes": 19,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::Payload#interface\",\"name\":\"Payload\",\"qualified_name\":\"Payload\",\"kind\":\"interface\",\"language\":\"typescript\",\"file_path\":\"consumer.ts\",\"byte_offset\":7,\"byte_length\":60,\"signature\":\"interface Payload {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"1f42d7cf7dc4733d4c81740ea0fe2970d27c6e126910c7a48e7b87cf3bec9f7d\",\"decorators\":[],\"keywords\":[\"payload\"],\"metadata\":{},\"line\":1,\"end_line\":4,\"score\":61.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":1,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"b2e57838-d07a-4d1d-849a-aa96db621091\",\"_evaluation\":{\"attempt_id\":\"4f37a500-2bb1-4ce3-8a46-3874428635e0/attempt/3\",\"calls_remaining\":21,\"event_id\":\"4f37a500-2bb1-4ce3-8a46-3874428635e0:3\"}}"
+          ],
+          "serialized_bytes": 854
+        },
+        {
+          "item_id": "item_5",
+          "server": "evaluation",
+          "tool": "read",
+          "status": "completed",
+          "arguments": {
+            "operation": "get",
+            "parameters": {
+              "symbol_ids": [
+                "consumer.ts::Payload#interface"
+              ],
+              "context": 1,
+              "selected_from_search_id": "b2e57838-d07a-4d1d-849a-aa96db621091"
+            },
+            "reason": "missing_context",
+            "because": "4f37a500-2bb1-4ce3-8a46-3874428635e0:3",
+            "detail": "Retrieve the exact Payload fields and declared types after locating the parameter type used by processOrder."
+          },
+          "attempt_id": "4f37a500-2bb1-4ce3-8a46-3874428635e0/attempt/4",
+          "trace_event_id": "4f37a500-2bb1-4ce3-8a46-3874428635e0:4",
+          "source_bytes": 133,
+          "payload_format": "compact_json",
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"consumer.ts::Payload#interface\",\"source\":\"interface Payload {\\n  requestId: string;\\n  amount: number;\\n}\",\"byte_offset\":7,\"byte_length\":60,\"line\":1,\"end_line\":4,\"signature\":\"interface Payload {\",\"kind\":\"interface\",\"language\":\"typescript\",\"context_before\":[],\"context_after\":[\"export function processOrder(value: Payload): string {\"]}],\"_evaluation\":{\"attempt_id\":\"4f37a500-2bb1-4ce3-8a46-3874428635e0/attempt/4\",\"calls_remaining\":20,\"event_id\":\"4f37a500-2bb1-4ce3-8a46-3874428635e0:4\"}}"
+          ],
+          "serialized_bytes": 506
+        }
+      ],
+      "tool_call_count": 4,
+      "recorded_payload_bytes": 2783,
+      "complete_payload_bytes": 2783,
+      "source_bytes": 339,
+      "failures": []
+    },
+    "lineage_valid": true,
+    "adapter_elapsed_ms": 18.667832999199163
+  }
+}

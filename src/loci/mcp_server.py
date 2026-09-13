@@ -45,10 +45,11 @@ _startup_phase("module_entered")
 from mcp.server.mcpserver import Context, MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import CallToolResult, InputRequiredResult, TextContent
-from pydantic import SkipValidation
+from pydantic import Field, SkipValidation
 
 from loci.mcp_output_models import (
     LociAnalyzeOutput,
+    LociExploreOutput,
     LociFileOutput,
     LociGetOutput,
     LociGraphAnchorsOutput,
@@ -165,18 +166,84 @@ def create_server() -> MCPServer:
         symbol_ids: list[str],
         context: int = 0,
         selected_from_search_id: str | None = None,
+        include_type_context: bool = False,
     ) -> Annotated[CallToolResult, LociGetOutput]:
-        """Return exact source. Set lineage only for deliberate search selections; omit it for direct, outline, or hydration gets."""
+        """Return exact source; opt in to bounded outgoing type definitions and supporting lines. Use loci_explore for complete import/re-export statements and Go/Rust control source. Set lineage only for deliberate search selections, not direct or hydration gets."""
         return _handle_loci_error(
-            lambda service: {
-                "symbols": service.get_symbols(
-                    repo,
-                    symbol_ids,
-                    context=context,
-                    ensure_fresh=True,
-                    selected_from_search_id=selected_from_search_id,
-                )
-            }
+            lambda service: service.get_symbols_result(
+                repo,
+                symbol_ids,
+                context=context,
+                ensure_fresh=True,
+                selected_from_search_id=selected_from_search_id,
+                include_type_context=include_type_context,
+            )
+        )
+
+    @mcp.tool()
+    def loci_explore(
+        repo: str,
+        intent: str,
+        query: Annotated[str, Field(json_schema_extra={"maxLength": 4096})] = "",
+        seed_ids: Annotated[
+            list[str] | None,
+            Field(json_schema_extra={"maxItems": 5, "uniqueItems": True}),
+        ] = None,
+        max_hops: Annotated[
+            int | None,
+            Field(json_schema_extra={"minimum": 0, "maximum": 4}),
+        ] = None,
+        max_output_bytes: Annotated[
+            int | None,
+            Field(
+                strict=True,
+                json_schema_extra={"minimum": 2048, "maximum": 262144},
+            ),
+        ] = 16_384,
+        max_evidence_bytes: Annotated[
+            int | None,
+            Field(
+                strict=True,
+                json_schema_extra={"minimum": 0, "maximum": 65536},
+            ),
+        ] = 8_192,
+        resolutions: list[str] | None = None,
+    ) -> Annotated[CallToolResult, LociExploreOutput]:
+        """Select bounded source for one explicit retrieval intent.
+
+        ``locate`` returns anchors only. ``type_dependencies`` selects authored
+        TypeScript/TSX and Python types/bases, Go types/embeddings, or Rust
+        types/bounds/traits/impl sites. ``dependencies`` uses that selection and
+        also supports JavaScript definite calls, imported values and direct bases.
+        Rust self types can select explicit impl sites by reverse traversal;
+        stored relationship direction and possible configuration remain explicit.
+        ``impact`` follows incoming known static dependents, without runtime
+        dispatch or exhaustive impact claims. Parsing support is broader than
+        these semantic subsets; inspect unsupported-language and unresolved omissions.
+        Query text is at most 4096 UTF-8 bytes; seeds are at most five
+        unique IDs; hops are 0..4 (defaults: locate 0, dependencies 3, impact 1), output
+        is 2048..262144 bytes for the complete MCP result, and source evidence
+        is 0..65536 bytes. Omitted or null byte limits use 16384 and 8192 bytes.
+        Use query terms to focus deeper type fields; inspect
+        omissions and incomplete anchors. Impact is non-exhaustive. Use ``loci_get``
+        for an exact symbol read and graph tools for diagnostics or other edges.
+        """
+        return _handle_loci_error(
+            lambda service: service.explore(
+                repo,
+                query=query,
+                intent=intent,
+                seed_ids=seed_ids,
+                max_hops=max_hops,
+                max_output_bytes=(
+                    16_384 if max_output_bytes is None else max_output_bytes
+                ),
+                max_evidence_bytes=(
+                    8_192 if max_evidence_bytes is None else max_evidence_bytes
+                ),
+                resolutions=resolutions,
+                ensure_fresh=True,
+            )
         )
 
     @mcp.tool()
@@ -343,8 +410,9 @@ def create_server() -> MCPServer:
         status: str = "all",
         offset: int = 0,
         limit: int = 100,
+        family: str = "symbol",
     ) -> Annotated[CallToolResult, LociGraphReferencesOutput]:
-        """Inspect bounded resolved and unresolved imported-symbol references."""
+        """Inspect bounded authored symbol or TypeScript/Python type relationships."""
         return _handle_loci_error(
             lambda service: service.graph_references(
                 repo,
@@ -352,6 +420,7 @@ def create_server() -> MCPServer:
                 status=cast(Literal["all", "resolved", "unresolved"], status),
                 offset=offset,
                 limit=limit,
+                family=cast(Literal["symbol", "type"], family),
                 ensure_fresh=True,
             )
         )
@@ -405,7 +474,7 @@ def create_server() -> MCPServer:
         start_line: int | None = None,
         end_line: int | None = None,
     ) -> Annotated[CallToolResult, LociFileOutput]:
-        """Return cached file content by relative path and optional line range."""
+        """Read indexed source or tracked Go/Cargo controls by relative path and line range."""
         return _handle_loci_error(
             lambda service: service.get_cached_file(
                 repo,

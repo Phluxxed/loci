@@ -190,7 +190,7 @@ returning data. A first retrieval against a valid, readable root indexes it and
 completes the request in the same call, without a separate pre-index step.
 `loci_index`
 still performs explicit indexing, while `loci_outline`, `loci_search`,
-`loci_get`, `loci_file`, `loci_grep`, `loci_graph_anchors`,
+`loci_get`, `loci_explore`, `loci_file`, `loci_grep`, `loci_graph_anchors`,
 `loci_graph_neighbors`, `loci_graph_traverse_neighbors`, `loci_graph_paths`,
 `loci_graph_retrieve`, `loci_graph_imports`, `loci_graph_references`, and
 `loci_graph_calls`, and `loci_graph_health` first check indexed source, profile,
@@ -198,6 +198,15 @@ and contribution hashes against the current repository and run a locked
 incremental refresh if needed.
 Freshness also includes Go module/workspace controls, JavaScript/TypeScript
 project/package/workspace controls, and Cargo manifests.
+`loci_file` can read tracked `go.mod`, `go.work`, and `Cargo.toml` controls
+directly without indexing them as language source. These reads require a
+contained regular file, at most 1 MiB of UTF-8 source, and bytes matching the
+indexed resolver-input hash. They preserve newlines and the existing file/line
+response envelope. Missing or untracked controls return `FILE_NOT_FOUND`;
+unsafe, oversized, non-UTF-8, or changed controls return
+`CONTROL_SOURCE_UNAVAILABLE`. Other configuration files remain unsupported by
+this route. Direct service/CLI callers that skip automatic freshness must
+refresh the index after editing a control.
 `loci_store_health` is deliberately different: it diagnoses the active store
 without repairing, refreshing, rewriting, pruning, or otherwise mutating it.
 
@@ -212,8 +221,9 @@ names.
 | `loci_index` | Index a local repo path, optionally incrementally |
 | `loci_outline` | Return indexed symbols grouped by file |
 | `loci_search` | Search indexed symbols and return an opaque ID for explicit downstream selections |
-| `loci_get` | Return exact source; optionally declare deliberate selection from a specific search |
-| `loci_file` | Return cached file content with optional line range |
+| `loci_get` | Return exact source, with optional bounded type context and deliberate search-selection lineage |
+| `loci_explore` | Select compact source for locating code, JavaScript dependencies, TypeScript/Python/Go/Rust contracts, or known static impact |
+| `loci_file` | Read indexed source or tracked Go/Cargo controls with optional line range |
 | `loci_grep` | Regex-search cached files |
 | `loci_graph_anchors` | Select a bounded, explained set of graph start nodes from a question or exact seeds |
 | `loci_graph_neighbors` | Return exact outgoing one-hop neighbours for indexed seed nodes |
@@ -229,6 +239,111 @@ names.
 | `loci_list` | List indexed repos |
 | `loci_stats` | Return structured retrieval savings stats |
 | `loci_analyze` | Return structured search and extraction diagnostics |
+
+Use `loci_explore` for source selected by an explicit purpose:
+
+```text
+loci_explore(repo="/path/to/repo", intent="locate", query="processOrder")
+loci_explore(repo="/path/to/repo", intent="type_dependencies",
+             seed_ids=["src/order.ts::processOrder#function"], query="customer field")
+loci_explore(repo="/path/to/repo", intent="dependencies",
+             seed_ids=["src/app.js::run#function"])
+loci_explore(repo="/path/to/repo", intent="impact",
+             seed_ids=["src/order.ts::processOrder#function"])
+```
+
+The result includes source, stored proof paths and omissions. Type selection
+prioritizes immediate contracts, aliases and heritage, and uses the query to
+select deeper fields. Impact follows known static incoming relationships and
+reports non-exhaustive scope. Independent source and complete MCP-result byte
+limits keep output bounded; clipped anchors are marked incomplete. See the
+[intent and evidence contract](docs/design/2026-09-11-intent-evidence.md) and the
+[implemented language-by-capability matrix](skills/loci/references/language-resolution.md#exploration-capabilities).
+The matrix describes the development branch's delivered semantic subsets;
+shared parsing and response schemas do not imply semantic parity.
+
+If a needed relationship is missing, inspect `items[].path` and `omissions`
+before changing the request. A returned declaration can have several graph
+relationships, while a compact packet selects one proof path to it:
+
+- `alternative_path`: the declaration already has a selected path. To inspect
+  a different relationship, use its owning declaration as the sole seed for
+  a focused follow-up. Seeding both endpoints makes both anchors; it does not
+  ask for a proof connecting them. Increasing byte limits alone does not add
+  alternate paths.
+- `not_selected`: for deeper type fields, include the relevant field or type
+  name in `query`, or start from the nearer declaration. Immediate contracts
+  and structural alias/heritage continuations are selected without that focus.
+- `hop_limit` or `anchor_limit`: narrow to an explicit source seed, and set
+  the required supported hop limit. `impact` defaults to one hop and follows
+  incoming known static relationships; seed the callee to inspect callers.
+  `locate` returns declarations without relationship paths. Outgoing call
+  selection under `dependencies` is currently a JavaScript capability.
+- `output_budget`, `evidence_budget`, or `ancestor_unavailable`: narrow the
+  request or allow enough room for the definition and its complete proof.
+  A proof whose required ancestor was not delivered is omitted as a whole.
+
+Check the follow-up's selected paths and source, not just the declaration names.
+`ok` and a non-exhaustive packet do not establish complete answer coverage.
+The [compact-selection assessment](docs/reviews/2026-09-13-compact-selection-assessment.md)
+records reproduced JavaScript/Python/Go/Rust omissions and focused follow-ups.
+
+The [114-attempt multilingual workflow review](docs/reviews/2026-09-13-multilingual-workflow-measurement.md)
+retains all outcomes and exact replay. It supports the single Markdown navigation
+control; programming-language workflow efficiency remains unproven or withheld.
+The review separates evaluator accounting defects, exact control-file access,
+disclosed relationship omissions and answer-contract limits from implemented
+source-proven semantics.
+The [future evaluator contract repair](docs/reviews/2026-09-13-evaluator-contract-repair.md)
+provides versioned graph accounting, explicit tool bounds and answer formats.
+It preserves those historical results; any new provider comparison needs its
+own pre-outcome freeze of the repaired components.
+
+For plain JavaScript, `dependencies` follows definite calls, declaration-owned
+imported value references and direct class bases. It returns the helper/value/base
+definitions with their import and re-export proof. For TypeScript and Python it
+uses the existing `type_dependencies` selection. JavaScript JSDoc, computed
+targets and runtime dispatch are outside this subset; `type_dependencies` remains
+explicitly unsupported for JavaScript. See the
+[JavaScript acceptance record](docs/reviews/2026-09-12-javascript-context.md).
+
+For Go, `type_dependencies` and `dependencies` return declared type uses,
+aliases, generic arguments/constraints and explicit struct/interface embeddings.
+The `embeds` relationship retains Go meaning without inferring method sets or
+promoted calls. Definitions carry exact package/import proof and complete
+contained module/workspace controls. See the
+[Go acceptance record](docs/reviews/2026-09-12-go-context.md).
+
+For Rust, `type_dependencies` and `dependencies` return authored aliases,
+field/signature types, generic bounds, supertraits and separate implementation
+sites. `supertrait` points from the trait to its required trait; `impl_trait`
+and `impl_self_type` point from the implementation site to its trait and self
+type. Selecting a self type may follow the latter in reverse to include its
+explicit implementation sites. This never proves dynamic dispatch or all
+implementations. Exact definitions carry import/re-export/module source and
+complete contained Cargo controls. Rust relationships retain `unconditional`
+or `declared_possible` configuration; active features are never assumed.
+See the [Rust acceptance record](docs/reviews/2026-09-13-rust-context.md).
+
+Pass `include_type_context: true` to `loci_get` to add bounded definitions from
+stored authored type relationships and explicit heritage. The response keeps the requested
+`symbols` and adds `type_context` with definitions, original graph edges,
+declaration ownership, supporting source and omissions. The default remains
+exact retrieval. Search-selection lineage applies only to the requested symbols.
+This compatibility expansion follows outgoing records and supplies supporting
+lines. Use `loci_explore` for complete selected import/re-export statements,
+Go/Rust control source, Rust configuration and reverse selection of explicit
+implementation sites. JS/TS resolver controls affect validation and refresh;
+their paths/hashes are diagnostic metadata and their full source requires a
+separate read.
+
+Expansion follows at most three hops from five requested declarations, within
+fixed node, source and output limits. It excludes references owned by nested
+declarations and follows authored local/imported type uses, extends and implements
+clauses. Unsupported or ambiguous bindings remain unresolved.
+An empty expansion therefore does not prove there are no type dependencies.
+See the [type relation contract](docs/design/2026-09-11-type-observations.md) and
+the [selection and budget contract](docs/design/2026-09-11-existing-type-context.md).
 
 `loci_search` and `loci_grep` include a versioned `coverage` object alongside
 their existing `symbols` or `matches` arrays. It reports whether repository
@@ -261,8 +376,8 @@ loci get abc123 --repo /path/to/repo --context 5  # +5 lines surrounding context
 loci search "parse file" --repo /path/to/repo
 loci search "auth" --repo /path/to/repo --kind function --lang python
 
-# Read a non-symbol file (config, docs, etc.)
-loci file pyproject.toml --repo /path/to/repo
+# Read indexed source or a tracked resolver control
+loci file go.mod --repo /path/to/repo
 loci file src/foo.py --repo /path/to/repo --start 10 --end 40
 
 # Search file contents by regex
@@ -607,7 +722,8 @@ default arguments, class/module initialization, nested named functions, and
 anonymous functions are not silently assigned to a broader enclosing symbol.
 Module-level calls use the source file node; named nested functions keep their
 own indexed identity. A proven recursive call may be a trusted self-edge, while
-every other graph self-edge remains invalid.
+recursive authored `uses_type` relationships are also permitted with validated
+evidence. Other graph self-edges remain invalid.
 
 Inspect every stored outcome through the MCP-only diagnostic read:
 
@@ -657,6 +773,57 @@ no trusted call edge. Loci never falls back to a repository-wide same-name
 search. There is no call CLI, model or judge call, runtime/toolchain execution,
 repository-code execution, package-manager access, or network access in this
 path.
+
+### Built-in TypeScript contract relationships
+
+Loci records declaration-owned `uses_type`, `extends` and `implements` edges
+for exact local bindings and proven contained import/export routes. Alias chains,
+annotations, properties, generic arguments and bare `typeof` queries preserve
+their authored endpoints. Generic parameter shadowing, ambiguous exports and
+unsupported computations retain diagnostics without creating trusted edges.
+
+```text
+loci_graph_references(repo="/path/to/repo", family="type", status="all", limit=100)
+loci_graph_traverse_neighbors(
+  repo="/path/to/repo",
+  seed_ids=["src/consumer.ts::processOrder#function"],
+  edge_types=["uses_type", "extends", "implements"],
+  resolutions=["exact", "import-resolved"],
+  direction="outgoing",
+)
+```
+
+The paginated type family exposes exact occurrences, ownership, candidate scope
+and completeness, supporting source hashes and unresolved reasons. Default
+reference diagnostics retain the existing symbol-reference response. Generic
+paths hydrate relationship evidence; incoming traversal answers which
+declarations depend on a target. Compatibility `loci_graph_neighbors` remains
+contains-only. Graph health includes type counts and resolution-reason summaries.
+
+These relationships describe source declarations; they do not establish
+structural compatibility, inferred implementations or runtime dispatch.
+See the [contract and supported subset](docs/design/2026-09-11-type-observations.md).
+
+Plain JavaScript uses this family only for authored direct `class ... extends`
+syntax in the value namespace. It does not produce `uses_type` or `implements`
+records. Exact local classes and contained ESM import/re-export routes can prove
+the base; shadowed, computed, ambiguous and visibly mutated bindings stay
+unresolved. Prototype changes do not create inheritance or dispatch edges.
+
+Python uses the same type family and context interfaces for annotations,
+generic type arguments, explicit module `TypeAlias` assignments and direct
+class bases. Exact local bindings and contained named import/reexport routes
+retain source spans, hashes and origin proof. Unescaped string literals
+containing one bare or dotted name can act as forward references.
+
+Python `extends` records the authored base expression. It does not establish
+MROs, protocol/ABC compatibility or runtime dispatch. Computed annotations,
+compound string forwards, wildcard or shadowed bindings and type-parameter
+names remain unresolved. The initial alias subset requires an unambiguous
+canonical `TypeAlias` marker imported from `typing` or `typing_extensions`;
+nested aliases and renamed markers are outside it. `Literal` value arguments
+and `Annotated` metadata are also outside this type-expression subset.
+See the [Python acceptance record](docs/reviews/2026-09-12-python-context.md).
 
 ## Analytics
 

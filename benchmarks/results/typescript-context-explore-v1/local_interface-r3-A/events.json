@@ -1,0 +1,175 @@
+[
+  {
+    "type": "thread.started",
+    "thread_id": "01a092e1-fd38-7780-8623-a65928e75c3a"
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_0",
+      "type": "error",
+      "message": "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-c1kfvzbk/agent-runtime/config.toml."
+    }
+  },
+  {
+    "type": "turn.started"
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_1",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "outline",
+      "arguments": {
+        "file": null
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_1",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "outline",
+      "arguments": {
+        "file": null
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "files": [
+            {
+              "file": "consumer.ts",
+              "symbols": [
+                {
+                  "id": "consumer.ts::Payload#interface",
+                  "name": "Payload",
+                  "kind": "interface",
+                  "line": 1,
+                  "end_line": 4,
+                  "signature": "interface Payload {",
+                  "summary": ""
+                },
+                {
+                  "id": "consumer.ts::processOrder#function",
+                  "name": "processOrder",
+                  "kind": "function",
+                  "line": 5,
+                  "end_line": 7,
+                  "signature": "function processOrder(value: Payload): string {",
+                  "summary": ""
+                },
+                {
+                  "id": "consumer.ts::__file__#file",
+                  "name": "consumer.ts",
+                  "kind": "file",
+                  "line": 1,
+                  "end_line": 1,
+                  "signature": "consumer.ts",
+                  "summary": ""
+                }
+              ]
+            }
+          ],
+          "_evaluation": {
+            "attempt_id": "local_interface-r3-A-8df4d74b-ca88-4de7-810c-646698b9392f/attempt/1",
+            "calls_remaining": 23
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "consumer.ts::Payload#interface",
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "consumer.ts::Payload#interface",
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "consumer.ts::Payload#interface",
+              "source": "interface Payload {\n  requestId: string;\n  amount: number;\n}",
+              "byte_offset": 7,
+              "byte_length": 60,
+              "line": 1,
+              "end_line": 4,
+              "signature": "interface Payload {",
+              "kind": "interface",
+              "language": "typescript"
+            },
+            {
+              "id": "consumer.ts::processOrder#function",
+              "source": "function processOrder(value: Payload): string {\n  return value.requestId;\n}",
+              "byte_offset": 75,
+              "byte_length": 75,
+              "line": 5,
+              "end_line": 7,
+              "signature": "function processOrder(value: Payload): string {",
+              "kind": "function",
+              "language": "typescript"
+            }
+          ],
+          "_evaluation": {
+            "attempt_id": "local_interface-r3-A-8df4d74b-ca88-4de7-810c-646698b9392f/attempt/2",
+            "calls_remaining": 22
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_3",
+      "type": "agent_message",
+      "text": "{\"required_fields\":{\"amount\":\"number\",\"requestId\":\"string\"},\"return_type\":\"string\",\"returned_field\":\"requestId\",\"origin_file\":\"consumer.ts\"}"
+    }
+  },
+  {
+    "type": "turn.completed",
+    "usage": {
+      "input_tokens": 15381,
+      "cached_input_tokens": 12544,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 200,
+      "reasoning_output_tokens": 105
+    }
+  }
+]

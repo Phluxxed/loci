@@ -1,0 +1,1227 @@
+{
+  "schema_version": 4,
+  "protocol": "multilingual-context-workflow-v1",
+  "identity": {
+    "task_id": "javascript_value_dependencies",
+    "session_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7",
+    "arm": "A",
+    "repetition": 2,
+    "snapshot": "javascript_dependencies",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1"
+  },
+  "events": [
+    {
+      "id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:1",
+      "task_id": "javascript_value_dependencies",
+      "session_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "run"
+      },
+      "search_id": "9083d5f0-ee9b-4698-9def-124529053353",
+      "response_json": "{\"symbols\":[{\"id\":\"app.js::run#function\",\"name\":\"run\",\"qualified_name\":\"run\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"app.js\",\"byte_offset\":56,\"byte_length\":42,\"signature\":\"function run() { return make() + add(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"decorators\":[],\"keywords\":[\"run\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":71.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":5,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"9083d5f0-ee9b-4698-9def-124529053353\",\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:1\"}}",
+      "serialized_bytes": 866,
+      "source_bytes": 42,
+      "elapsed_ms": 4.79300000006333,
+      "spans": [
+        {
+          "file": "app.js",
+          "start_byte": 56,
+          "end_byte": 98,
+          "sha256": "32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18",
+          "text": "function run() { return make() + add(1); }"
+        }
+      ]
+    },
+    {
+      "id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:2",
+      "task_id": "javascript_value_dependencies",
+      "session_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "app.js::run#function"
+        ],
+        "context": 4,
+        "selected_from_search_id": "9083d5f0-ee9b-4698-9def-124529053353"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"app.js::run#function\",\"source\":\"function run() { return make() + add(1); }\",\"byte_offset\":56,\"byte_length\":42,\"line\":2,\"end_line\":2,\"signature\":\"function run() { return make() + add(1); }\",\"kind\":\"function\",\"language\":\"javascript\",\"context_before\":[\"import { make, add, Parent } from \\\"./barrel.js\\\";\"],\"context_after\":[\"export class Worker extends Parent { work() { return add(2); } }\"]}],\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:2\"}}",
+      "serialized_bytes": 576,
+      "source_bytes": 196,
+      "elapsed_ms": 3.9362499956041574,
+      "spans": [
+        {
+          "file": "app.js",
+          "start_byte": 56,
+          "end_byte": 98,
+          "sha256": "32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18",
+          "text": "function run() { return make() + add(1); }"
+        },
+        {
+          "file": "app.js",
+          "start_byte": 0,
+          "end_byte": 48,
+          "sha256": "5bfc3c4c47940fb978e1cd4c03b7aaa9dc1b42cb9aa5c4fa3ef62f98113dac30",
+          "text": "import { make, add, Parent } from \"./barrel.js\";"
+        },
+        {
+          "file": "app.js",
+          "start_byte": 99,
+          "end_byte": 163,
+          "sha256": "cf922a2ed05b4210316fdfa67ef92489ffa205268638b3c32300415d18e7a492",
+          "text": "export class Worker extends Parent { work() { return add(2); } }"
+        },
+        {
+          "file": "app.js",
+          "start_byte": 56,
+          "end_byte": 98,
+          "sha256": "32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18",
+          "text": "function run() { return make() + add(1); }"
+        }
+      ]
+    },
+    {
+      "id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:3",
+      "task_id": "javascript_value_dependencies",
+      "session_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "outline",
+      "arguments": {
+        "file": "app.js"
+      },
+      "search_id": null,
+      "response_json": "{\"files\":[{\"file\":\"app.js\",\"symbols\":[{\"id\":\"app.js::run#function\",\"name\":\"run\",\"kind\":\"function\",\"line\":2,\"end_line\":2,\"signature\":\"function run() { return make() + add(1); }\",\"summary\":\"\"},{\"id\":\"app.js::Worker#class\",\"name\":\"Worker\",\"kind\":\"class\",\"line\":3,\"end_line\":3,\"signature\":\"class Worker extends Parent { work() { return add(2); } }\",\"summary\":\"\"},{\"id\":\"app.js::Worker.work#method\",\"name\":\"work\",\"kind\":\"method\",\"line\":3,\"end_line\":3,\"signature\":\"work() { return add(2); }\",\"summary\":\"\"},{\"id\":\"app.js::__file__#file\",\"name\":\"app.js\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"app.js\",\"summary\":\"\"}]}],\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:3\"}}",
+      "serialized_bytes": 787,
+      "source_bytes": 124,
+      "elapsed_ms": 2.694333001272753,
+      "spans": [
+        {
+          "file": "app.js",
+          "start_byte": 56,
+          "end_byte": 98,
+          "sha256": "32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18",
+          "text": "function run() { return make() + add(1); }"
+        },
+        {
+          "file": "app.js",
+          "start_byte": 106,
+          "end_byte": 163,
+          "sha256": "bc5db1762411251ec1c2aaf40c7d9ad35605067cb12ead39defcc3a11742fecd",
+          "text": "class Worker extends Parent { work() { return add(2); } }"
+        },
+        {
+          "file": "app.js",
+          "start_byte": 136,
+          "end_byte": 161,
+          "sha256": "fc5691268bb3ee147c5ce653cb740088ca42491be3a2d5ea3a26b85b2c08d953",
+          "text": "work() { return add(2); }"
+        }
+      ]
+    },
+    {
+      "id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:4",
+      "task_id": "javascript_value_dependencies",
+      "session_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "app.js",
+        "start_line": 1,
+        "end_line": 4
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"app.js\",\"content\":\"import { make, add, Parent } from \\\"./barrel.js\\\";\\nexport function run() { return make() + add(1); }\\nexport class Worker extends Parent { work() { return add(2); } }\\n\",\"total_lines\":3,\"start_line\":1,\"end_line\":3,\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:4\"}}",
+      "serialized_bytes": 410,
+      "source_bytes": 164,
+      "elapsed_ms": 2.693666989216581,
+      "spans": [
+        {
+          "file": "app.js",
+          "start_byte": 0,
+          "end_byte": 164,
+          "sha256": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c",
+          "text": "import { make, add, Parent } from \"./barrel.js\";\nexport function run() { return make() + add(1); }\nexport class Worker extends Parent { work() { return add(2); } }\n"
+        }
+      ]
+    },
+    {
+      "id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:5",
+      "task_id": "javascript_value_dependencies",
+      "session_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "outline",
+      "arguments": {
+        "file": "barrel.js"
+      },
+      "search_id": null,
+      "response_json": "{\"files\":[{\"file\":\"barrel.js\",\"symbols\":[{\"id\":\"barrel.js::__file__#file\",\"name\":\"barrel.js\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"barrel.js\",\"summary\":\"\"}]}],\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:5\"}}",
+      "serialized_bytes": 337,
+      "source_bytes": 0,
+      "elapsed_ms": 3.9672499988228083,
+      "spans": []
+    },
+    {
+      "id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:6",
+      "task_id": "javascript_value_dependencies",
+      "session_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "barrel.js",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"barrel.js\",\"content\":\"export { default as make, add } from \\\"./helper.js\\\";\\nexport { Base as Parent } from \\\"./contracts.js\\\";\\n\",\"total_lines\":2,\"start_line\":1,\"end_line\":2,\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:6\"}}",
+      "serialized_bytes": 351,
+      "source_bytes": 101,
+      "elapsed_ms": 1.7335409938823432,
+      "spans": [
+        {
+          "file": "barrel.js",
+          "start_byte": 0,
+          "end_byte": 101,
+          "sha256": "b2b45765fdfa71f94888a5459919ab00ab243a0e5edad925de34a122ba346e04",
+          "text": "export { default as make, add } from \"./helper.js\";\nexport { Base as Parent } from \"./contracts.js\";\n"
+        }
+      ]
+    },
+    {
+      "id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:7",
+      "task_id": "javascript_value_dependencies",
+      "session_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "helper.js",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"helper.js\",\"content\":\"export const add = (value) => value + 1;\\nfunction make() { return add(0); }\\nexport default make;\\n\",\"total_lines\":3,\"start_line\":1,\"end_line\":3,\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:7\"}}",
+      "serialized_bytes": 344,
+      "source_bytes": 97,
+      "elapsed_ms": 3.176583006279543,
+      "spans": [
+        {
+          "file": "helper.js",
+          "start_byte": 0,
+          "end_byte": 97,
+          "sha256": "6a1835c96fc597b7c7a8ba7cd2717fbd1aef2ea8be4b0bf82e8fd00d0fa5911e",
+          "text": "export const add = (value) => value + 1;\nfunction make() { return add(0); }\nexport default make;\n"
+        }
+      ]
+    },
+    {
+      "id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:8",
+      "task_id": "javascript_value_dependencies",
+      "session_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "contracts.js",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"contracts.js\",\"content\":\"export class Base { enabled() { return true; } }\\n\",\"total_lines\":1,\"start_line\":1,\"end_line\":1,\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/8\",\"calls_remaining\":16,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:8\"}}",
+      "serialized_bytes": 297,
+      "source_bytes": 49,
+      "elapsed_ms": 3.22154100285843,
+      "spans": [
+        {
+          "file": "contracts.js",
+          "start_byte": 0,
+          "end_byte": 49,
+          "sha256": "ab2c02fa56cd54099a9831ed7ed31bebef78597b48c1f29571d2eee5f4447822",
+          "text": "export class Base { enabled() { return true; } }\n"
+        }
+      ]
+    },
+    {
+      "id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:9",
+      "task_id": "javascript_value_dependencies",
+      "session_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "make"
+      },
+      "search_id": "9d3b1f06-78f5-48a3-b1cd-0c15ee38c691",
+      "response_json": "{\"symbols\":[{\"id\":\"helper.js::make#function\",\"name\":\"make\",\"qualified_name\":\"make\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"helper.js\",\"byte_offset\":41,\"byte_length\":34,\"signature\":\"function make() { return add(0); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df\",\"decorators\":[],\"keywords\":[\"make\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":71.0},{\"id\":\"app.js::run#function\",\"name\":\"run\",\"qualified_name\":\"run\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"app.js\",\"byte_offset\":56,\"byte_length\":42,\"signature\":\"function run() { return make() + add(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"decorators\":[],\"keywords\":[\"run\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":5,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"9d3b1f06-78f5-48a3-b1cd-0c15ee38c691\",\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/9\",\"calls_remaining\":15,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:9\"}}",
+      "serialized_bytes": 1282,
+      "source_bytes": 76,
+      "elapsed_ms": 4.403999977512285,
+      "spans": [
+        {
+          "file": "helper.js",
+          "start_byte": 41,
+          "end_byte": 75,
+          "sha256": "2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df",
+          "text": "function make() { return add(0); }"
+        },
+        {
+          "file": "app.js",
+          "start_byte": 56,
+          "end_byte": 98,
+          "sha256": "32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18",
+          "text": "function run() { return make() + add(1); }"
+        }
+      ]
+    },
+    {
+      "id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:10",
+      "task_id": "javascript_value_dependencies",
+      "session_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "add"
+      },
+      "search_id": "c146d9d3-dfd5-4957-9a67-f50828e13e93",
+      "response_json": "{\"symbols\":[{\"id\":\"helper.js::add#function\",\"name\":\"add\",\"qualified_name\":\"add\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"helper.js\",\"byte_offset\":13,\"byte_length\":26,\"signature\":\"add = (value) => value + 1\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f\",\"decorators\":[],\"keywords\":[\"add\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":71.0},{\"id\":\"wrong.js::add#function\",\"name\":\"add\",\"qualified_name\":\"add\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"wrong.js\",\"byte_offset\":13,\"byte_length\":26,\"signature\":\"add = (value) => value - 1\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"c220ba4411800a47ed5011a262c6c728fef9acf997eddd63f87cac46446c9e75\",\"decorators\":[],\"keywords\":[\"add\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":71.0},{\"id\":\"app.js::run#function\",\"name\":\"run\",\"qualified_name\":\"run\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"app.js\",\"byte_offset\":56,\"byte_length\":42,\"signature\":\"function run() { return make() + add(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"decorators\":[],\"keywords\":[\"run\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":18.0},{\"id\":\"app.js::Worker.work#method\",\"name\":\"work\",\"qualified_name\":\"Worker.work\",\"kind\":\"method\",\"language\":\"javascript\",\"file_path\":\"app.js\",\"byte_offset\":136,\"byte_length\":25,\"signature\":\"work() { return add(2); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"fc5691268bb3ee147c5ce653cb740088ca42491be3a2d5ea3a26b85b2c08d953\",\"decorators\":[],\"keywords\":[\"work\"],\"metadata\":{},\"line\":3,\"end_line\":3,\"score\":18.0},{\"id\":\"helper.js::make#function\",\"name\":\"make\",\"qualified_name\":\"make\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"helper.js\",\"byte_offset\":41,\"byte_length\":34,\"signature\":\"function make() { return add(0); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df\",\"decorators\":[],\"keywords\":[\"make\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":5,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"c146d9d3-dfd5-4957-9a67-f50828e13e93\",\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/10\",\"calls_remaining\":14,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:10\"}}",
+      "serialized_bytes": 2502,
+      "source_bytes": 153,
+      "elapsed_ms": 4.254709027009085,
+      "spans": [
+        {
+          "file": "helper.js",
+          "start_byte": 13,
+          "end_byte": 39,
+          "sha256": "4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f",
+          "text": "add = (value) => value + 1"
+        },
+        {
+          "file": "wrong.js",
+          "start_byte": 13,
+          "end_byte": 39,
+          "sha256": "c220ba4411800a47ed5011a262c6c728fef9acf997eddd63f87cac46446c9e75",
+          "text": "add = (value) => value - 1"
+        },
+        {
+          "file": "app.js",
+          "start_byte": 56,
+          "end_byte": 98,
+          "sha256": "32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18",
+          "text": "function run() { return make() + add(1); }"
+        },
+        {
+          "file": "app.js",
+          "start_byte": 136,
+          "end_byte": 161,
+          "sha256": "fc5691268bb3ee147c5ce653cb740088ca42491be3a2d5ea3a26b85b2c08d953",
+          "text": "work() { return add(2); }"
+        },
+        {
+          "file": "helper.js",
+          "start_byte": 41,
+          "end_byte": 75,
+          "sha256": "2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df",
+          "text": "function make() { return add(0); }"
+        }
+      ]
+    },
+    {
+      "id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:11",
+      "task_id": "javascript_value_dependencies",
+      "session_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 20,
+        "file": "app.js"
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-cx3bf058/snapshot\",\"file\":\"app.js\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"app.js\",\"language\":\"javascript\",\"line\":1,\"text\":\"import { make, add, Parent } from \\\"./barrel.js\\\";\",\"specifier\":\"./barrel.js\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"rust\":null},\"source_file\":\"app.js\",\"source_id\":\"app.js::__file__#file\",\"target_file\":\"barrel.js\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"barrel.js::__file__#file\",\"specifier\":\"./barrel.js\",\"imported_name\":null,\"language\":\"javascript\",\"line\":1,\"text\":\"import { make, add, Parent } from \\\"./barrel.js\\\";\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"relative_path\",\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":1,\"resolved\":1,\"unresolved\":0,\"returned\":1},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/11\",\"calls_remaining\":13,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:11\"}}",
+      "serialized_bytes": 1311,
+      "source_bytes": 0,
+      "elapsed_ms": 3.6139579897280782,
+      "spans": []
+    },
+    {
+      "id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:12",
+      "task_id": "javascript_value_dependencies",
+      "session_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 20,
+        "file": "barrel.js"
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-cx3bf058/snapshot\",\"file\":\"barrel.js\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"barrel.js\",\"language\":\"javascript\",\"line\":1,\"text\":\"export { default as make, add } from \\\"./helper.js\\\";\",\"specifier\":\"./helper.js\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":true,\"source_hash\":\"b2b45765fdfa71f94888a5459919ab00ab243a0e5edad925de34a122ba346e04\",\"rust\":null},\"source_file\":\"barrel.js\",\"source_id\":\"barrel.js::__file__#file\",\"target_file\":\"helper.js\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"helper.js::__file__#file\",\"specifier\":\"./helper.js\",\"imported_name\":null,\"language\":\"javascript\",\"line\":1,\"text\":\"export { default as make, add } from \\\"./helper.js\\\";\",\"type_only\":false,\"is_reexport\":true,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"relative_path\",\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"barrel.js\",\"language\":\"javascript\",\"line\":2,\"text\":\"export { Base as Parent } from \\\"./contracts.js\\\";\",\"specifier\":\"./contracts.js\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":true,\"source_hash\":\"b2b45765fdfa71f94888a5459919ab00ab243a0e5edad925de34a122ba346e04\",\"rust\":null},\"source_file\":\"barrel.js\",\"source_id\":\"barrel.js::__file__#file\",\"target_file\":\"contracts.js\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"contracts.js::__file__#file\",\"specifier\":\"./contracts.js\",\"imported_name\":null,\"language\":\"javascript\",\"line\":2,\"text\":\"export { Base as Parent } from \\\"./contracts.js\\\";\",\"type_only\":false,\"is_reexport\":true,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"relative_path\",\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":2,\"resolved\":2,\"unresolved\":0,\"returned\":2},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/12\",\"calls_remaining\":12,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:12\"}}",
+      "serialized_bytes": 2209,
+      "source_bytes": 0,
+      "elapsed_ms": 5.3736249974463135,
+      "spans": []
+    },
+    {
+      "id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:13",
+      "task_id": "javascript_value_dependencies",
+      "session_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 20,
+        "file": "app.js"
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-cx3bf058/snapshot\",\"file\":\"app.js\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"app.js\",\"language\":\"javascript\",\"line\":2,\"column\":32,\"start_byte\":80,\"end_byte\":86,\"callee_start_byte\":80,\"callee_end_byte\":84,\"callee_text\":\"make\",\"callee_path\":[\"make\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":56,\"definition_end_byte\":98,\"body_start_byte\":71,\"body_end_byte\":98},\"source_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\"},\"caller_id\":\"app.js::run#function\",\"caller_kind\":\"function\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::make#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"caller_definition\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"symbol_reference\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"helper.js::make#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"app.js\",\"language\":\"javascript\",\"line\":2,\"column\":41,\"start_byte\":89,\"end_byte\":95,\"callee_start_byte\":89,\"callee_end_byte\":92,\"callee_text\":\"add\",\"callee_path\":[\"add\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":56,\"definition_end_byte\":98,\"body_start_byte\":71,\"body_end_byte\":98},\"source_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\"},\"caller_id\":\"app.js::run#function\",\"caller_kind\":\"function\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::add#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"caller_definition\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"symbol_reference\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"helper.js::add#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"app.js\",\"language\":\"javascript\",\"line\":3,\"column\":54,\"start_byte\":152,\"end_byte\":158,\"callee_start_byte\":152,\"callee_end_byte\":155,\"callee_text\":\"add\",\"callee_path\":[\"add\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":136,\"definition_end_byte\":161,\"body_start_byte\":143,\"body_end_byte\":161},\"source_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\"},\"caller_id\":\"app.js::Worker.work#method\",\"caller_kind\":\"method\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::add#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"app.js\",\"line\":3,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"app.js::Worker.work#method\"},{\"kind\":\"caller_definition\",\"file\":\"app.js\",\"line\":3,\"content_hash\":\"fc5691268bb3ee147c5ce653cb740088ca42491be3a2d5ea3a26b85b2c08d953\",\"endpoint_id\":\"app.js::Worker.work#method\"},{\"kind\":\"symbol_reference\",\"file\":\"app.js\",\"line\":3,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"helper.js::add#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":3,\"resolved\":3,\"unresolved\":0,\"returned\":3},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/13\",\"calls_remaining\":11,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:13\"}}",
+      "serialized_bytes": 4727,
+      "source_bytes": 0,
+      "elapsed_ms": 2.9830420098733157,
+      "spans": []
+    },
+    {
+      "id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:14",
+      "task_id": "javascript_value_dependencies",
+      "session_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "javascript_dependencies",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "helper.js::add#function",
+          "helper.js::make#function"
+        ],
+        "context": 2,
+        "selected_from_search_id": "c146d9d3-dfd5-4957-9a67-f50828e13e93"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"helper.js::add#function\",\"source\":\"add = (value) => value + 1\",\"byte_offset\":13,\"byte_length\":26,\"line\":1,\"end_line\":1,\"signature\":\"add = (value) => value + 1\",\"kind\":\"function\",\"language\":\"javascript\",\"context_before\":[],\"context_after\":[\"function make() { return add(0); }\",\"export default make;\"]},{\"id\":\"helper.js::make#function\",\"source\":\"function make() { return add(0); }\",\"byte_offset\":41,\"byte_length\":34,\"line\":2,\"end_line\":2,\"signature\":\"function make() { return add(0); }\",\"kind\":\"function\",\"language\":\"javascript\",\"context_before\":[\"export const add = (value) => value + 1;\"],\"context_after\":[\"export default make;\"]}],\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/14\",\"calls_remaining\":10,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:14\"}}",
+      "serialized_bytes": 820,
+      "source_bytes": 234,
+      "elapsed_ms": 10.997750010574237,
+      "spans": [
+        {
+          "file": "helper.js",
+          "start_byte": 13,
+          "end_byte": 39,
+          "sha256": "4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f",
+          "text": "add = (value) => value + 1"
+        },
+        {
+          "file": "helper.js",
+          "start_byte": 41,
+          "end_byte": 75,
+          "sha256": "2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df",
+          "text": "function make() { return add(0); }"
+        },
+        {
+          "file": "helper.js",
+          "start_byte": 76,
+          "end_byte": 96,
+          "sha256": "0ef92751d948994840414eedb75cbcfbefc49b9a8433089373ba6a04fe3e712f",
+          "text": "export default make;"
+        },
+        {
+          "file": "helper.js",
+          "start_byte": 41,
+          "end_byte": 75,
+          "sha256": "2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df",
+          "text": "function make() { return add(0); }"
+        },
+        {
+          "file": "helper.js",
+          "start_byte": 0,
+          "end_byte": 40,
+          "sha256": "4a122cce248d876d6be3c189ae370689255fab442718353f33f350ae828036ff",
+          "text": "export const add = (value) => value + 1;"
+        },
+        {
+          "file": "helper.js",
+          "start_byte": 76,
+          "end_byte": 96,
+          "sha256": "0ef92751d948994840414eedb75cbcfbefc49b9a8433089373ba6a04fe3e712f",
+          "text": "export default make;"
+        },
+        {
+          "file": "helper.js",
+          "start_byte": 13,
+          "end_byte": 39,
+          "sha256": "4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f",
+          "text": "add = (value) => value + 1"
+        },
+        {
+          "file": "helper.js",
+          "start_byte": 41,
+          "end_byte": 75,
+          "sha256": "2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df",
+          "text": "function make() { return add(0); }"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "javascript_value_dependencies",
+    "session_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7",
+    "arm": "A",
+    "repetition": 2,
+    "snapshot": "javascript_dependencies",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1",
+    "schema_version": 3,
+    "measurement_method": "observed_tool_calls",
+    "intent_collection": "not_collected",
+    "outcome": "tool_failure",
+    "answer": {
+      "function_file": "app.js",
+      "direct_callees": [
+        "add",
+        "make"
+      ],
+      "helper_origin": {
+        "add": "helper.js",
+        "make": "helper.js"
+      },
+      "add_expression": "value + 1",
+      "default_export_binding": "make"
+    },
+    "answer_correct": false,
+    "task_correct": false,
+    "read_count": 14,
+    "validated_read_count": 14,
+    "required_context_delivered": [
+      "add",
+      "arrow_export",
+      "barrel",
+      "default",
+      "import",
+      "make",
+      "run"
+    ],
+    "required_context_total": 7,
+    "context_recall": 1.0,
+    "serialized_tool_output_bytes": null,
+    "source_bytes": null,
+    "estimated_source_tokens": null,
+    "tool_elapsed_ms": 57.84324900014326,
+    "provider_usage": {
+      "input_tokens": 112483,
+      "cached_input_tokens": 95488,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 1997,
+      "reasoning_output_tokens": 1489
+    },
+    "usage_semantics": "One Codex turn.completed event; gross input includes cached input subset; output includes reasoning tokens.",
+    "token_status": "measured",
+    "measurement_complete": false,
+    "full_pass": false
+  },
+  "baseline": {
+    "end_to_end_seconds": 56.475450375000946,
+    "actual_process_seconds": 56.475450375000946,
+    "exit_code": 0,
+    "provider_thread_id": "01a09810-a461-70f2-8655-dd7871936c6a",
+    "failures": [
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_11",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_12",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_13",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "unmatched_recorded_delivery"
+      }
+    ],
+    "tool_delivery_verified": false,
+    "output_accounting": {
+      "schema_version": 4,
+      "complete": false,
+      "tool_call_count": 14,
+      "recorded_payload_bytes": 16819,
+      "complete_payload_bytes": null,
+      "source_bytes": null,
+      "calls": [
+        {
+          "item_id": "item_1",
+          "server": "evaluation",
+          "tool": "search",
+          "arguments": {
+            "query": "run"
+          },
+          "status": "completed",
+          "attempt_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/1",
+          "trace_event_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:1",
+          "source_bytes": 42,
+          "serialized_bytes": 866,
+          "elapsed_ms": 5.029124993598089,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"app.js::run#function\",\"name\":\"run\",\"qualified_name\":\"run\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"app.js\",\"byte_offset\":56,\"byte_length\":42,\"signature\":\"function run() { return make() + add(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"decorators\":[],\"keywords\":[\"run\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":71.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":5,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"9083d5f0-ee9b-4698-9def-124529053353\",\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:1\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "get",
+          "arguments": {
+            "context": 4,
+            "selected_from_search_id": "9083d5f0-ee9b-4698-9def-124529053353",
+            "symbol_ids": [
+              "app.js::run#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/2",
+          "trace_event_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:2",
+          "source_bytes": 196,
+          "serialized_bytes": 576,
+          "elapsed_ms": 4.001624998636544,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"app.js::run#function\",\"source\":\"function run() { return make() + add(1); }\",\"byte_offset\":56,\"byte_length\":42,\"line\":2,\"end_line\":2,\"signature\":\"function run() { return make() + add(1); }\",\"kind\":\"function\",\"language\":\"javascript\",\"context_before\":[\"import { make, add, Parent } from \\\"./barrel.js\\\";\"],\"context_after\":[\"export class Worker extends Parent { work() { return add(2); } }\"]}],\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:2\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "outline",
+          "arguments": {
+            "file": "app.js"
+          },
+          "status": "completed",
+          "attempt_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/3",
+          "trace_event_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:3",
+          "source_bytes": 124,
+          "serialized_bytes": 787,
+          "elapsed_ms": 2.8782080044038594,
+          "payload_texts": [
+            "{\"files\":[{\"file\":\"app.js\",\"symbols\":[{\"id\":\"app.js::run#function\",\"name\":\"run\",\"kind\":\"function\",\"line\":2,\"end_line\":2,\"signature\":\"function run() { return make() + add(1); }\",\"summary\":\"\"},{\"id\":\"app.js::Worker#class\",\"name\":\"Worker\",\"kind\":\"class\",\"line\":3,\"end_line\":3,\"signature\":\"class Worker extends Parent { work() { return add(2); } }\",\"summary\":\"\"},{\"id\":\"app.js::Worker.work#method\",\"name\":\"work\",\"kind\":\"method\",\"line\":3,\"end_line\":3,\"signature\":\"work() { return add(2); }\",\"summary\":\"\"},{\"id\":\"app.js::__file__#file\",\"name\":\"app.js\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"app.js\",\"summary\":\"\"}]}],\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:3\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "app.js",
+            "start_line": 1,
+            "end_line": 4
+          },
+          "status": "completed",
+          "attempt_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/4",
+          "trace_event_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:4",
+          "source_bytes": 164,
+          "serialized_bytes": 410,
+          "elapsed_ms": 2.743709017522633,
+          "payload_texts": [
+            "{\"file\":\"app.js\",\"content\":\"import { make, add, Parent } from \\\"./barrel.js\\\";\\nexport function run() { return make() + add(1); }\\nexport class Worker extends Parent { work() { return add(2); } }\\n\",\"total_lines\":3,\"start_line\":1,\"end_line\":3,\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:4\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_5",
+          "server": "evaluation",
+          "tool": "outline",
+          "arguments": {
+            "file": "barrel.js"
+          },
+          "status": "completed",
+          "attempt_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/5",
+          "trace_event_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:5",
+          "source_bytes": 0,
+          "serialized_bytes": 337,
+          "elapsed_ms": 4.0257080108858645,
+          "payload_texts": [
+            "{\"files\":[{\"file\":\"barrel.js\",\"symbols\":[{\"id\":\"barrel.js::__file__#file\",\"name\":\"barrel.js\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"barrel.js\",\"summary\":\"\"}]}],\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:5\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_6",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "barrel.js",
+            "start_line": 1,
+            "end_line": 20
+          },
+          "status": "completed",
+          "attempt_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/6",
+          "trace_event_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:6",
+          "source_bytes": 101,
+          "serialized_bytes": 351,
+          "elapsed_ms": 1.7875829944387078,
+          "payload_texts": [
+            "{\"file\":\"barrel.js\",\"content\":\"export { default as make, add } from \\\"./helper.js\\\";\\nexport { Base as Parent } from \\\"./contracts.js\\\";\\n\",\"total_lines\":2,\"start_line\":1,\"end_line\":2,\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:6\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_7",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "helper.js",
+            "start_line": 1,
+            "end_line": 20
+          },
+          "status": "completed",
+          "attempt_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/7",
+          "trace_event_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:7",
+          "source_bytes": 97,
+          "serialized_bytes": 344,
+          "elapsed_ms": 3.2524999987799674,
+          "payload_texts": [
+            "{\"file\":\"helper.js\",\"content\":\"export const add = (value) => value + 1;\\nfunction make() { return add(0); }\\nexport default make;\\n\",\"total_lines\":3,\"start_line\":1,\"end_line\":3,\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:7\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_8",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "contracts.js",
+            "start_line": 1,
+            "end_line": 20
+          },
+          "status": "completed",
+          "attempt_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/8",
+          "trace_event_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:8",
+          "source_bytes": 49,
+          "serialized_bytes": 297,
+          "elapsed_ms": 3.281875018728897,
+          "payload_texts": [
+            "{\"file\":\"contracts.js\",\"content\":\"export class Base { enabled() { return true; } }\\n\",\"total_lines\":1,\"start_line\":1,\"end_line\":1,\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/8\",\"calls_remaining\":16,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:8\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_9",
+          "server": "evaluation",
+          "tool": "search",
+          "arguments": {
+            "query": "make"
+          },
+          "status": "completed",
+          "attempt_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/9",
+          "trace_event_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:9",
+          "source_bytes": 76,
+          "serialized_bytes": 1282,
+          "elapsed_ms": 4.615416983142495,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"helper.js::make#function\",\"name\":\"make\",\"qualified_name\":\"make\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"helper.js\",\"byte_offset\":41,\"byte_length\":34,\"signature\":\"function make() { return add(0); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df\",\"decorators\":[],\"keywords\":[\"make\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":71.0},{\"id\":\"app.js::run#function\",\"name\":\"run\",\"qualified_name\":\"run\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"app.js\",\"byte_offset\":56,\"byte_length\":42,\"signature\":\"function run() { return make() + add(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"decorators\":[],\"keywords\":[\"run\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":5,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"9d3b1f06-78f5-48a3-b1cd-0c15ee38c691\",\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/9\",\"calls_remaining\":15,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:9\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_10",
+          "server": "evaluation",
+          "tool": "search",
+          "arguments": {
+            "query": "add"
+          },
+          "status": "completed",
+          "attempt_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/10",
+          "trace_event_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:10",
+          "source_bytes": 153,
+          "serialized_bytes": 2502,
+          "elapsed_ms": 4.51075000455603,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"helper.js::add#function\",\"name\":\"add\",\"qualified_name\":\"add\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"helper.js\",\"byte_offset\":13,\"byte_length\":26,\"signature\":\"add = (value) => value + 1\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f\",\"decorators\":[],\"keywords\":[\"add\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":71.0},{\"id\":\"wrong.js::add#function\",\"name\":\"add\",\"qualified_name\":\"add\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"wrong.js\",\"byte_offset\":13,\"byte_length\":26,\"signature\":\"add = (value) => value - 1\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"c220ba4411800a47ed5011a262c6c728fef9acf997eddd63f87cac46446c9e75\",\"decorators\":[],\"keywords\":[\"add\"],\"metadata\":{},\"line\":1,\"end_line\":1,\"score\":71.0},{\"id\":\"app.js::run#function\",\"name\":\"run\",\"qualified_name\":\"run\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"app.js\",\"byte_offset\":56,\"byte_length\":42,\"signature\":\"function run() { return make() + add(1); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"decorators\":[],\"keywords\":[\"run\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":18.0},{\"id\":\"app.js::Worker.work#method\",\"name\":\"work\",\"qualified_name\":\"Worker.work\",\"kind\":\"method\",\"language\":\"javascript\",\"file_path\":\"app.js\",\"byte_offset\":136,\"byte_length\":25,\"signature\":\"work() { return add(2); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"fc5691268bb3ee147c5ce653cb740088ca42491be3a2d5ea3a26b85b2c08d953\",\"decorators\":[],\"keywords\":[\"work\"],\"metadata\":{},\"line\":3,\"end_line\":3,\"score\":18.0},{\"id\":\"helper.js::make#function\",\"name\":\"make\",\"qualified_name\":\"make\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"helper.js\",\"byte_offset\":41,\"byte_length\":34,\"signature\":\"function make() { return add(0); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df\",\"decorators\":[],\"keywords\":[\"make\"],\"metadata\":{},\"line\":2,\"end_line\":2,\"score\":18.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":5,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"c146d9d3-dfd5-4957-9a67-f50828e13e93\",\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/10\",\"calls_remaining\":14,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:10\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_11",
+          "server": "evaluation",
+          "tool": "graph_imports",
+          "arguments": {
+            "file": "app.js",
+            "status": "all",
+            "limit": 20
+          },
+          "status": "completed",
+          "attempt_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/11",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 1311,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-cx3bf058/snapshot\",\"file\":\"app.js\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"app.js\",\"language\":\"javascript\",\"line\":1,\"text\":\"import { make, add, Parent } from \\\"./barrel.js\\\";\",\"specifier\":\"./barrel.js\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"rust\":null},\"source_file\":\"app.js\",\"source_id\":\"app.js::__file__#file\",\"target_file\":\"barrel.js\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"barrel.js::__file__#file\",\"specifier\":\"./barrel.js\",\"imported_name\":null,\"language\":\"javascript\",\"line\":1,\"text\":\"import { make, add, Parent } from \\\"./barrel.js\\\";\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"relative_path\",\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":1,\"resolved\":1,\"unresolved\":0,\"returned\":1},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/11\",\"calls_remaining\":13,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:11\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_12",
+          "server": "evaluation",
+          "tool": "graph_imports",
+          "arguments": {
+            "file": "barrel.js",
+            "status": "all",
+            "limit": 20
+          },
+          "status": "completed",
+          "attempt_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/12",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 2209,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-cx3bf058/snapshot\",\"file\":\"barrel.js\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"barrel.js\",\"language\":\"javascript\",\"line\":1,\"text\":\"export { default as make, add } from \\\"./helper.js\\\";\",\"specifier\":\"./helper.js\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":true,\"source_hash\":\"b2b45765fdfa71f94888a5459919ab00ab243a0e5edad925de34a122ba346e04\",\"rust\":null},\"source_file\":\"barrel.js\",\"source_id\":\"barrel.js::__file__#file\",\"target_file\":\"helper.js\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"helper.js::__file__#file\",\"specifier\":\"./helper.js\",\"imported_name\":null,\"language\":\"javascript\",\"line\":1,\"text\":\"export { default as make, add } from \\\"./helper.js\\\";\",\"type_only\":false,\"is_reexport\":true,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"relative_path\",\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"barrel.js\",\"language\":\"javascript\",\"line\":2,\"text\":\"export { Base as Parent } from \\\"./contracts.js\\\";\",\"specifier\":\"./contracts.js\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":true,\"source_hash\":\"b2b45765fdfa71f94888a5459919ab00ab243a0e5edad925de34a122ba346e04\",\"rust\":null},\"source_file\":\"barrel.js\",\"source_id\":\"barrel.js::__file__#file\",\"target_file\":\"contracts.js\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"contracts.js::__file__#file\",\"specifier\":\"./contracts.js\",\"imported_name\":null,\"language\":\"javascript\",\"line\":2,\"text\":\"export { Base as Parent } from \\\"./contracts.js\\\";\",\"type_only\":false,\"is_reexport\":true,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"relative_path\",\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":2,\"resolved\":2,\"unresolved\":0,\"returned\":2},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/12\",\"calls_remaining\":12,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:12\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_13",
+          "server": "evaluation",
+          "tool": "graph_calls",
+          "arguments": {
+            "file": "app.js",
+            "status": "all",
+            "limit": 20
+          },
+          "status": "completed",
+          "attempt_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/13",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 4727,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-cx3bf058/snapshot\",\"file\":\"app.js\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"app.js\",\"language\":\"javascript\",\"line\":2,\"column\":32,\"start_byte\":80,\"end_byte\":86,\"callee_start_byte\":80,\"callee_end_byte\":84,\"callee_text\":\"make\",\"callee_path\":[\"make\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":56,\"definition_end_byte\":98,\"body_start_byte\":71,\"body_end_byte\":98},\"source_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\"},\"caller_id\":\"app.js::run#function\",\"caller_kind\":\"function\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::make#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"caller_definition\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"symbol_reference\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"helper.js::make#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"app.js\",\"language\":\"javascript\",\"line\":2,\"column\":41,\"start_byte\":89,\"end_byte\":95,\"callee_start_byte\":89,\"callee_end_byte\":92,\"callee_text\":\"add\",\"callee_path\":[\"add\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":56,\"definition_end_byte\":98,\"body_start_byte\":71,\"body_end_byte\":98},\"source_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\"},\"caller_id\":\"app.js::run#function\",\"caller_kind\":\"function\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::add#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"caller_definition\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18\",\"endpoint_id\":\"app.js::run#function\"},{\"kind\":\"symbol_reference\",\"file\":\"app.js\",\"line\":2,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"helper.js::add#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"app.js\",\"language\":\"javascript\",\"line\":3,\"column\":54,\"start_byte\":152,\"end_byte\":158,\"callee_start_byte\":152,\"callee_end_byte\":155,\"callee_text\":\"add\",\"callee_path\":[\"add\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":136,\"definition_end_byte\":161,\"body_start_byte\":143,\"body_end_byte\":161},\"source_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\"},\"caller_id\":\"app.js::Worker.work#method\",\"caller_kind\":\"method\",\"target_file\":\"helper.js\",\"target_id\":\"helper.js::add#function\",\"target_kind\":\"function\",\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"reference_unresolved_reason\":null,\"resolution_basis\":\"imported_reference\",\"support\":[{\"kind\":\"call_site\",\"file\":\"app.js\",\"line\":3,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"app.js::Worker.work#method\"},{\"kind\":\"caller_definition\",\"file\":\"app.js\",\"line\":3,\"content_hash\":\"fc5691268bb3ee147c5ce653cb740088ca42491be3a2d5ea3a26b85b2c08d953\",\"endpoint_id\":\"app.js::Worker.work#method\"},{\"kind\":\"symbol_reference\",\"file\":\"app.js\",\"line\":3,\"content_hash\":\"1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c\",\"endpoint_id\":\"helper.js::add#function\"}],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":3,\"resolved\":3,\"unresolved\":0,\"returned\":3},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/13\",\"calls_remaining\":11,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:13\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_14",
+          "server": "evaluation",
+          "tool": "get",
+          "arguments": {
+            "context": 2,
+            "selected_from_search_id": "c146d9d3-dfd5-4957-9a67-f50828e13e93",
+            "symbol_ids": [
+              "helper.js::add#function",
+              "helper.js::make#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/14",
+          "trace_event_id": "session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:14",
+          "source_bytes": 234,
+          "serialized_bytes": 820,
+          "elapsed_ms": 11.11720799235627,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"helper.js::add#function\",\"source\":\"add = (value) => value + 1\",\"byte_offset\":13,\"byte_length\":26,\"line\":1,\"end_line\":1,\"signature\":\"add = (value) => value + 1\",\"kind\":\"function\",\"language\":\"javascript\",\"context_before\":[],\"context_after\":[\"function make() { return add(0); }\",\"export default make;\"]},{\"id\":\"helper.js::make#function\",\"source\":\"function make() { return add(0); }\",\"byte_offset\":41,\"byte_length\":34,\"line\":2,\"end_line\":2,\"signature\":\"function make() { return add(0); }\",\"kind\":\"function\",\"language\":\"javascript\",\"context_before\":[\"export const add = (value) => value + 1;\"],\"context_after\":[\"export default make;\"]}],\"_evaluation\":{\"attempt_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7/attempt/14\",\"calls_remaining\":10,\"event_id\":\"session-d9989efd-e994-4637-ac4b-3eb2ff7ea9f7:14\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        }
+      ],
+      "failures": [
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_11",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_12",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_13",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "unmatched_recorded_delivery"
+        }
+      ]
+    },
+    "adapter_elapsed_ms": 59.589292999589816,
+    "recoverable_error_events": 0,
+    "relationships": {
+      "schema_version": 3,
+      "case_id": "javascript_value_dependencies",
+      "language": "javascript",
+      "required_semantic_dependencies_total": 3,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "run",
+          "kind": "calls",
+          "to": "add",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "calls",
+          "record_contexts": [],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "app.js::run#function",
+              "to": "helper.js::add#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app.js",
+                "line": 2,
+                "content_hash": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 1,
+          "from": "run",
+          "kind": "calls",
+          "to": "make",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "calls",
+          "record_contexts": [],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "app.js::run#function",
+              "to": "helper.js::make#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app.js",
+                "line": 2,
+                "content_hash": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 2,
+          "from": "make",
+          "kind": "calls",
+          "to": "add",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "calls",
+          "record_contexts": [],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "helper.js::make#function",
+              "to": "helper.js::add#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "helper.js",
+                "line": 2,
+                "content_hash": "6a1835c96fc597b7c7a8ba7cd2717fbd1aef2ea8be4b0bf82e8fd00d0fa5911e"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "available_dependency_links_total": 3,
+      "available_dependency_links": [
+        {
+          "index": 0,
+          "from": "run",
+          "kind": "calls",
+          "to": "add",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "calls",
+          "record_contexts": [],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "app.js::run#function",
+              "to": "helper.js::add#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app.js",
+                "line": 2,
+                "content_hash": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 1,
+          "from": "run",
+          "kind": "calls",
+          "to": "make",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "calls",
+          "record_contexts": [],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "app.js::run#function",
+              "to": "helper.js::make#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app.js",
+                "line": 2,
+                "content_hash": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c"
+              }
+            }
+          ],
+          "delivered_edges": []
+        },
+        {
+          "index": 2,
+          "from": "make",
+          "kind": "calls",
+          "to": "add",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "calls",
+          "record_contexts": [],
+          "available": true,
+          "delivered": false,
+          "available_edges": [
+            {
+              "from": "helper.js::make#function",
+              "to": "helper.js::add#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "helper.js",
+                "line": 2,
+                "content_hash": "6a1835c96fc597b7c7a8ba7cd2717fbd1aef2ea8be4b0bf82e8fd00d0fa5911e"
+              }
+            }
+          ],
+          "delivered_edges": []
+        }
+      ],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "Exact frozen meaning joined to persisted semantic record and delivered source proof.",
+        "required": 3,
+        "available": 3,
+        "delivered": 0,
+        "available_ratio": 1.0,
+        "delivered_ratio": 0.0
+      },
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_available_relationships": 0,
+      "forbidden_delivered_relationships": 0,
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_delivered_relationship_edges": [],
+      "delivery_integrity_violations": [],
+      "forbidden_scope": "Frozen multilingual negatives plus delivered edge/index and complete exploration-proof consistency."
+    },
+    "arm": "A",
+    "attempt_id": "javascript_value_dependencies-r2-A"
+  },
+  "attempt_id": "javascript_value_dependencies-r2-A",
+  "arm": "A",
+  "provenance": {
+    "attempt_id": "javascript_value_dependencies-r2-A",
+    "case_id": "javascript_value_dependencies",
+    "snapshot": "javascript_dependencies",
+    "repetition": 2,
+    "arm": "A",
+    "adapter_module": "benchmarks.multilingual_context_tools",
+    "model": "gpt-5.6-luna",
+    "reasoning_effort": "high",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "catalog_sha256": "f1c45cceac1c3ee90fa1af1007c341713e220571390c3b1eb086c443d7781062",
+    "runner_sha256": "5756278252a74c9e86c68a898b284108288b74a864b9424f6445223b3a7ca6db",
+    "source": {
+      "freeze_commit": "c910c5ac252a7c982f784d87d61bc4c50fc0c0ec",
+      "freeze_json_sha256": "254f38dd6247215928f4cce3fae379cf9dbf3acb74e51bd2d1ac91c12f290848",
+      "source_scope": "W4 evaluator snapshot; A exact retrieval/graph, B adds current loci_explore plus frozen guide"
+    },
+    "config": {
+      "project_doc_max_bytes": 0,
+      "web_search": "disabled",
+      "skills.include_instructions": false,
+      "developer_instructions": "",
+      "model_reasoning_effort": "high",
+      "model_catalog_json": "/Users/brummerv/phluxxed/loci-exploration/benchmarks/results/multilingual-context-workflow-v1/model-catalog.json",
+      "include_collaboration_mode_instructions": false,
+      "tools.update_plan.enabled": false,
+      "tools.experimental_request_user_input.enabled": false,
+      "features.skip_host_skill_discovery": true,
+      "mcp_servers.evaluation.command": "/Users/brummerv/phluxxed/loci-exploration/.venv/bin/python",
+      "mcp_servers.evaluation.args": [
+        "-m",
+        "benchmarks.multilingual_context_tools",
+        "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-cx3bf058/run.json"
+      ],
+      "mcp_servers.evaluation.cwd": "/Users/brummerv/phluxxed/loci-exploration",
+      "mcp_servers.evaluation.env": {
+        "LOCI_BASE_DIR": "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-cx3bf058/store",
+        "LOCI_STORE_NAMESPACE": "typescript-context-preflight"
+      },
+      "mcp_servers.evaluation.required": true,
+      "mcp_servers.evaluation.default_tools_approval_mode": "auto",
+      "mcp_servers.evaluation.tool_timeout_sec": 12,
+      "tool_output_token_limit": 32768,
+      "features.shell_tool": false,
+      "features.multi_agent": false,
+      "features.apps": false,
+      "features.plugins": false,
+      "features.hooks": false,
+      "features.memories": false,
+      "features.skill_search": false,
+      "features.skill_mcp_dependency_install": false,
+      "features.view_image": false,
+      "features.image_generation": false,
+      "features.browser_use": false,
+      "features.computer_use": false,
+      "features.in_app_browser": false,
+      "features.code_mode": false,
+      "features.code_mode_host": false,
+      "features.sleep_tool": false,
+      "features.goals": false,
+      "features.context_management": false,
+      "service_tier": "default"
+    },
+    "config_sha256": "2ab21eec39f47eec58f3da69ed395a865d1e2fc756474fa35bc2dbc1ae8b97ac",
+    "prompt_sha256": "e10e41f48d70047717c18f6bc7f85a2ae2dc8faea7f403d136939790ef7304a9",
+    "index_seconds": 0.01878954199492,
+    "snapshot_files": {
+      "app.js": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c",
+      "barrel.js": "b2b45765fdfa71f94888a5459919ab00ab243a0e5edad925de34a122ba346e04",
+      "contracts.js": "ab2c02fa56cd54099a9831ed7ed31bebef78597b48c1f29571d2eee5f4447822",
+      "helper.js": "6a1835c96fc597b7c7a8ba7cd2717fbd1aef2ea8be4b0bf82e8fd00d0fa5911e",
+      "wrong.js": "aa24a74d347a81052b1fda29ee57a221daf97ae7dc047205758af7a442582bf9"
+    },
+    "extractor_version": 30,
+    "canonical_tool_schemas_sha256": "9119a51db6fc5ac2ab9834897a0a83bfef979c9dcb94fff08ab4ef3b71522753"
+  }
+}

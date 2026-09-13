@@ -1,0 +1,781 @@
+{
+  "schema_version": 4,
+  "protocol": "multilingual-context-workflow-v1",
+  "identity": {
+    "task_id": "rust_contained_optional_reexport",
+    "session_id": "session-e355c72e-105e-48ab-8743-ce8a009faa75",
+    "arm": "B",
+    "repetition": 1,
+    "snapshot": "rust_workspace",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1"
+  },
+  "events": [
+    {
+      "id": "session-e355c72e-105e-48ab-8743-ce8a009faa75:1",
+      "task_id": "rust_contained_optional_reexport",
+      "session_id": "session-e355c72e-105e-48ab-8743-ce8a009faa75",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_workspace",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "use_it"
+      },
+      "search_id": "ef535458-154e-49a9-b6eb-d9aa76280024",
+      "response_json": "{\"symbols\":[{\"id\":\"app/src/lib.rs::use_it#function\",\"name\":\"use_it\",\"qualified_name\":\"use_it\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"app/src/lib.rs\",\"byte_offset\":28,\"byte_length\":58,\"signature\":\"pub fn use_it(value: PublicThing) -> PublicThing { value }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"5d2535cfd098cb88cd6b1f0db4a7946f7585cd16110db2226cdbcfc72eddc889\",\"decorators\":[],\"keywords\":[\"it\",\"use\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":3,\"end_line\":3,\"score\":79.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":3,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":3,\"samples\":[\"Cargo.toml\",\"app/Cargo.toml\",\"core/Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"ef535458-154e-49a9-b6eb-d9aa76280024\",\"_evaluation\":{\"attempt_id\":\"session-e355c72e-105e-48ab-8743-ce8a009faa75/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-e355c72e-105e-48ab-8743-ce8a009faa75:1\"}}",
+      "serialized_bytes": 1193,
+      "source_bytes": 58,
+      "elapsed_ms": 2.2769579954911023,
+      "spans": [
+        {
+          "file": "app/src/lib.rs",
+          "start_byte": 28,
+          "end_byte": 86,
+          "sha256": "5d2535cfd098cb88cd6b1f0db4a7946f7585cd16110db2226cdbcfc72eddc889",
+          "text": "pub fn use_it(value: PublicThing) -> PublicThing { value }"
+        }
+      ]
+    },
+    {
+      "id": "session-e355c72e-105e-48ab-8743-ce8a009faa75:2",
+      "task_id": "rust_contained_optional_reexport",
+      "session_id": "session-e355c72e-105e-48ab-8743-ce8a009faa75",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_workspace",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "type_dependencies",
+        "query": "use_it public_name field_name field_type dependency_package configuration active_feature_proven",
+        "max_output_bytes": 12000,
+        "max_evidence_bytes": 8192,
+        "seed_ids": [
+          "app/src/lib.rs::use_it#function"
+        ],
+        "max_hops": 2
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"ok\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"app/src/lib.rs::use_it#function\",\"name\":\"use_it\",\"kind\":\"function\",\"file\":\"app/src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"core/src/api.rs::Thing#struct\",\"name\":\"Thing\",\"kind\":\"struct\",\"file\":\"core/src/api.rs\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"app/src/lib.rs::use_it#function\",\"to\":\"core/src/api.rs::Thing#struct\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"app/src/lib.rs\",\"line\":3,\"content_hash\":\"d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5,6,7,8,9],\"resolution_configuration\":\"declared_possible\"}],\"sources\":[{\"id\":1,\"file\":\"app/src/lib.rs\",\"start_byte\":28,\"end_byte\":86,\"start_line\":3,\"end_line\":3,\"content_hash\":\"d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5\",\"content\":\"pub fn use_it(value: PublicThing) -> PublicThing { value }\"},{\"id\":2,\"file\":\"core/src/api.rs\",\"start_byte\":0,\"end_byte\":32,\"start_line\":1,\"end_line\":1,\"content_hash\":\"2e34330f38722bdc3736ced392800acf892b66797390ea6a2beb3db596240c66\",\"content\":\"pub struct Thing { pub id: u64 }\"},{\"id\":3,\"file\":\"app/src/lib.rs\",\"start_byte\":28,\"end_byte\":87,\"start_line\":3,\"end_line\":3,\"content_hash\":\"d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5\",\"content\":\"pub fn use_it(value: PublicThing) -> PublicThing { value }\\n\"},{\"id\":4,\"file\":\"app/src/lib.rs\",\"start_byte\":0,\"end_byte\":26,\"start_line\":1,\"end_line\":1,\"content_hash\":\"d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5\",\"content\":\"use core_api::PublicThing;\"},{\"id\":5,\"file\":\"core/src/lib.rs\",\"start_byte\":0,\"end_byte\":54,\"start_line\":1,\"end_line\":2,\"content_hash\":\"7186e7e71accaa9d217e75e361754288c8c0eec1f1fe5ceee0f5786c5536217b\",\"content\":\"pub mod api;\\npub use crate::api::Thing as PublicThing;\"},{\"id\":6,\"file\":\"core/src/api.rs\",\"start_byte\":0,\"end_byte\":33,\"start_line\":1,\"end_line\":1,\"content_hash\":\"2e34330f38722bdc3736ced392800acf892b66797390ea6a2beb3db596240c66\",\"content\":\"pub struct Thing { pub id: u64 }\\n\"},{\"id\":7,\"file\":\"Cargo.toml\",\"start_byte\":0,\"end_byte\":115,\"start_line\":1,\"end_line\":5,\"content_hash\":\"0b2cca07d060390b0a8ade7f1d04c040e37e27e7d171fb49f15da4d20b44309d\",\"content\":\"[workspace]\\nmembers = [\\\"app\\\", \\\"core\\\"]\\n\\n[workspace.dependencies]\\ncore_api = { package = \\\"core-api\\\", path = \\\"core\\\" }\\n\"},{\"id\":8,\"file\":\"app/Cargo.toml\",\"start_byte\":0,\"end_byte\":123,\"start_line\":1,\"end_line\":7,\"content_hash\":\"2b7f9afdc90c9c79ec3fad92297a865073758ed8857bf503b866d2e83da896f2\",\"content\":\"[package]\\nname = \\\"app\\\"\\nversion = \\\"0.1.0\\\"\\nedition = \\\"2021\\\"\\n\\n[dependencies]\\ncore_api = { workspace = true, optional = true }\\n\"},{\"id\":9,\"file\":\"core/Cargo.toml\",\"start_byte\":0,\"end_byte\":63,\"start_line\":1,\"end_line\":4,\"content_hash\":\"3bb9f9c34a1c780a54ae360478a23d86ced98be6b966c9fe3e20eec9ec33f29b\",\"content\":\"[package]\\nname = \\\"core-api\\\"\\nversion = \\\"0.1.0\\\"\\nedition = \\\"2021\\\"\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":12000,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":473,\"output_bytes\":3679,\"estimated_tokens\":920,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-e355c72e-105e-48ab-8743-ce8a009faa75/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-e355c72e-105e-48ab-8743-ce8a009faa75:2\"}}",
+      "serialized_bytes": 3795,
+      "source_bytes": 563,
+      "elapsed_ms": 22.706457995809615,
+      "spans": [
+        {
+          "file": "app/src/lib.rs",
+          "start_byte": 28,
+          "end_byte": 86,
+          "sha256": "5d2535cfd098cb88cd6b1f0db4a7946f7585cd16110db2226cdbcfc72eddc889",
+          "text": "pub fn use_it(value: PublicThing) -> PublicThing { value }"
+        },
+        {
+          "file": "core/src/api.rs",
+          "start_byte": 0,
+          "end_byte": 32,
+          "sha256": "820b79e8f30c30a15e73e961b7f9e4383ff1705a0f25db7bbdc5f242c0755fc7",
+          "text": "pub struct Thing { pub id: u64 }"
+        },
+        {
+          "file": "app/src/lib.rs",
+          "start_byte": 28,
+          "end_byte": 87,
+          "sha256": "803db3635bb0bba8010efcf44a64ed3a6595799173d8fa4813b1eb20fd478871",
+          "text": "pub fn use_it(value: PublicThing) -> PublicThing { value }\n"
+        },
+        {
+          "file": "app/src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 26,
+          "sha256": "1ae83d661c6efda247a92c18de9c02a95c3d84406d930453986deca79fe315b0",
+          "text": "use core_api::PublicThing;"
+        },
+        {
+          "file": "core/src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 54,
+          "sha256": "b389333932cf9945613f4ffaf4573352ef7b2555401c7078ccbdf0a7848ac51b",
+          "text": "pub mod api;\npub use crate::api::Thing as PublicThing;"
+        },
+        {
+          "file": "core/src/api.rs",
+          "start_byte": 0,
+          "end_byte": 33,
+          "sha256": "2e34330f38722bdc3736ced392800acf892b66797390ea6a2beb3db596240c66",
+          "text": "pub struct Thing { pub id: u64 }\n"
+        },
+        {
+          "file": "Cargo.toml",
+          "start_byte": 0,
+          "end_byte": 115,
+          "sha256": "0b2cca07d060390b0a8ade7f1d04c040e37e27e7d171fb49f15da4d20b44309d",
+          "text": "[workspace]\nmembers = [\"app\", \"core\"]\n\n[workspace.dependencies]\ncore_api = { package = \"core-api\", path = \"core\" }\n"
+        },
+        {
+          "file": "app/Cargo.toml",
+          "start_byte": 0,
+          "end_byte": 123,
+          "sha256": "2b7f9afdc90c9c79ec3fad92297a865073758ed8857bf503b866d2e83da896f2",
+          "text": "[package]\nname = \"app\"\nversion = \"0.1.0\"\nedition = \"2021\"\n\n[dependencies]\ncore_api = { workspace = true, optional = true }\n"
+        },
+        {
+          "file": "core/Cargo.toml",
+          "start_byte": 0,
+          "end_byte": 63,
+          "sha256": "3bb9f9c34a1c780a54ae360478a23d86ced98be6b966c9fe3e20eec9ec33f29b",
+          "text": "[package]\nname = \"core-api\"\nversion = \"0.1.0\"\nedition = \"2021\"\n"
+        }
+      ]
+    },
+    {
+      "id": "session-e355c72e-105e-48ab-8743-ce8a009faa75:3",
+      "task_id": "rust_contained_optional_reexport",
+      "session_id": "session-e355c72e-105e-48ab-8743-ce8a009faa75",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_workspace",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "app/src/lib.rs::use_it#function"
+        ],
+        "context": 2,
+        "selected_from_search_id": "ef535458-154e-49a9-b6eb-d9aa76280024"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"app/src/lib.rs::use_it#function\",\"source\":\"pub fn use_it(value: PublicThing) -> PublicThing { value }\",\"byte_offset\":28,\"byte_length\":58,\"line\":3,\"end_line\":3,\"signature\":\"pub fn use_it(value: PublicThing) -> PublicThing { value }\",\"kind\":\"function\",\"language\":\"rust\",\"context_before\":[\"use core_api::PublicThing;\",\"\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-e355c72e-105e-48ab-8743-ce8a009faa75/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-e355c72e-105e-48ab-8743-ce8a009faa75:3\"}}",
+      "serialized_bytes": 526,
+      "source_bytes": 142,
+      "elapsed_ms": 4.66795900138095,
+      "spans": [
+        {
+          "file": "app/src/lib.rs",
+          "start_byte": 28,
+          "end_byte": 86,
+          "sha256": "5d2535cfd098cb88cd6b1f0db4a7946f7585cd16110db2226cdbcfc72eddc889",
+          "text": "pub fn use_it(value: PublicThing) -> PublicThing { value }"
+        },
+        {
+          "file": "app/src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 26,
+          "sha256": "1ae83d661c6efda247a92c18de9c02a95c3d84406d930453986deca79fe315b0",
+          "text": "use core_api::PublicThing;"
+        },
+        {
+          "file": "app/src/lib.rs",
+          "start_byte": 28,
+          "end_byte": 86,
+          "sha256": "5d2535cfd098cb88cd6b1f0db4a7946f7585cd16110db2226cdbcfc72eddc889",
+          "text": "pub fn use_it(value: PublicThing) -> PublicThing { value }"
+        }
+      ]
+    },
+    {
+      "id": "session-e355c72e-105e-48ab-8743-ce8a009faa75:4",
+      "task_id": "rust_contained_optional_reexport",
+      "session_id": "session-e355c72e-105e-48ab-8743-ce8a009faa75",
+      "arm": "B",
+      "repetition": 1,
+      "snapshot": "rust_workspace",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "core/src/api.rs::Thing#struct"
+        ],
+        "context": 2
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"core/src/api.rs::Thing#struct\",\"source\":\"pub struct Thing { pub id: u64 }\",\"byte_offset\":0,\"byte_length\":32,\"line\":1,\"end_line\":1,\"signature\":\"pub struct Thing { pub id: u64 }\",\"kind\":\"struct\",\"language\":\"rust\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-e355c72e-105e-48ab-8743-ce8a009faa75/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-e355c72e-105e-48ab-8743-ce8a009faa75:4\"}}",
+      "serialized_bytes": 438,
+      "source_bytes": 64,
+      "elapsed_ms": 6.005375005770475,
+      "spans": [
+        {
+          "file": "core/src/api.rs",
+          "start_byte": 0,
+          "end_byte": 32,
+          "sha256": "820b79e8f30c30a15e73e961b7f9e4383ff1705a0f25db7bbdc5f242c0755fc7",
+          "text": "pub struct Thing { pub id: u64 }"
+        },
+        {
+          "file": "core/src/api.rs",
+          "start_byte": 0,
+          "end_byte": 32,
+          "sha256": "820b79e8f30c30a15e73e961b7f9e4383ff1705a0f25db7bbdc5f242c0755fc7",
+          "text": "pub struct Thing { pub id: u64 }"
+        }
+      ]
+    }
+  ],
+  "measurement": {
+    "task_id": "rust_contained_optional_reexport",
+    "session_id": "session-e355c72e-105e-48ab-8743-ce8a009faa75",
+    "arm": "B",
+    "repetition": 1,
+    "snapshot": "rust_workspace",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1",
+    "schema_version": 3,
+    "measurement_method": "observed_tool_calls",
+    "intent_collection": "not_collected",
+    "outcome": "completed",
+    "answer": {
+      "public_name": "PublicThing",
+      "declaration_origin": "core_api::api::Thing",
+      "field_name": "id",
+      "field_type": "u64",
+      "dependency_package": "core-api",
+      "configuration": "declared_possible",
+      "active_feature_proven": false
+    },
+    "answer_correct": false,
+    "task_correct": false,
+    "read_count": 4,
+    "validated_read_count": 4,
+    "required_context_delivered": [
+      "app_cargo",
+      "core_cargo",
+      "entry",
+      "import",
+      "module",
+      "reexport",
+      "thing",
+      "workspace"
+    ],
+    "required_context_total": 8,
+    "context_recall": 1.0,
+    "serialized_tool_output_bytes": 5952,
+    "source_bytes": 827,
+    "estimated_source_tokens": 207,
+    "tool_elapsed_ms": 35.65674999845214,
+    "provider_usage": {
+      "input_tokens": 34102,
+      "cached_input_tokens": 20480,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 1176,
+      "reasoning_output_tokens": 928
+    },
+    "usage_semantics": "One Codex turn.completed event; gross input includes cached input subset; output includes reasoning tokens.",
+    "token_status": "measured",
+    "measurement_complete": true,
+    "full_pass": false
+  },
+  "baseline": {
+    "end_to_end_seconds": 31.38049724997836,
+    "actual_process_seconds": 31.38049724997836,
+    "exit_code": 0,
+    "provider_thread_id": "01a0983a-71a5-7533-a266-5fab0e14c1e2",
+    "failures": [],
+    "tool_delivery_verified": true,
+    "output_accounting": {
+      "schema_version": 4,
+      "complete": true,
+      "tool_call_count": 4,
+      "recorded_payload_bytes": 5952,
+      "complete_payload_bytes": 5952,
+      "source_bytes": 827,
+      "calls": [
+        {
+          "item_id": "item_1",
+          "server": "evaluation",
+          "tool": "search",
+          "arguments": {
+            "query": "use_it"
+          },
+          "status": "completed",
+          "attempt_id": "session-e355c72e-105e-48ab-8743-ce8a009faa75/attempt/1",
+          "trace_event_id": "session-e355c72e-105e-48ab-8743-ce8a009faa75:1",
+          "source_bytes": 58,
+          "serialized_bytes": 1193,
+          "elapsed_ms": 2.3679169826209545,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"app/src/lib.rs::use_it#function\",\"name\":\"use_it\",\"qualified_name\":\"use_it\",\"kind\":\"function\",\"language\":\"rust\",\"file_path\":\"app/src/lib.rs\",\"byte_offset\":28,\"byte_length\":58,\"signature\":\"pub fn use_it(value: PublicThing) -> PublicThing { value }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"5d2535cfd098cb88cd6b1f0db4a7946f7585cd16110db2226cdbcfc72eddc889\",\"decorators\":[],\"keywords\":[\"it\",\"use\"],\"metadata\":{\"loci\":{\"rust_type_configuration\":\"unconditional\",\"rust_item\":{\"lexical_module_path\":[],\"visibility\":\"pub\",\"visibility_scope\":null,\"configuration\":\"unconditional\"}}},\"line\":3,\"end_line\":3,\"score\":79.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":3,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":3,\"samples\":[\"Cargo.toml\",\"app/Cargo.toml\",\"core/Cargo.toml\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"ef535458-154e-49a9-b6eb-d9aa76280024\",\"_evaluation\":{\"attempt_id\":\"session-e355c72e-105e-48ab-8743-ce8a009faa75/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-e355c72e-105e-48ab-8743-ce8a009faa75:1\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "type_dependencies",
+            "max_hops": 2,
+            "query": "use_it public_name field_name field_type dependency_package configuration active_feature_proven",
+            "seed_ids": [
+              "app/src/lib.rs::use_it#function"
+            ],
+            "max_output_bytes": 12000,
+            "max_evidence_bytes": 8192
+          },
+          "status": "completed",
+          "attempt_id": "session-e355c72e-105e-48ab-8743-ce8a009faa75/attempt/2",
+          "trace_event_id": "session-e355c72e-105e-48ab-8743-ce8a009faa75:2",
+          "source_bytes": 563,
+          "serialized_bytes": 3795,
+          "elapsed_ms": 22.85329098231159,
+          "payload_texts": [
+            "{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"ok\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"app/src/lib.rs::use_it#function\",\"name\":\"use_it\",\"kind\":\"function\",\"file\":\"app/src/lib.rs\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"core/src/api.rs::Thing#struct\",\"name\":\"Thing\",\"kind\":\"struct\",\"file\":\"core/src/api.rs\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"app/src/lib.rs::use_it#function\",\"to\":\"core/src/api.rs::Thing#struct\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"app/src/lib.rs\",\"line\":3,\"content_hash\":\"d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5\"}},\"traversed\":\"forward\",\"source_ids\":[3,4,5,6,7,8,9],\"resolution_configuration\":\"declared_possible\"}],\"sources\":[{\"id\":1,\"file\":\"app/src/lib.rs\",\"start_byte\":28,\"end_byte\":86,\"start_line\":3,\"end_line\":3,\"content_hash\":\"d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5\",\"content\":\"pub fn use_it(value: PublicThing) -> PublicThing { value }\"},{\"id\":2,\"file\":\"core/src/api.rs\",\"start_byte\":0,\"end_byte\":32,\"start_line\":1,\"end_line\":1,\"content_hash\":\"2e34330f38722bdc3736ced392800acf892b66797390ea6a2beb3db596240c66\",\"content\":\"pub struct Thing { pub id: u64 }\"},{\"id\":3,\"file\":\"app/src/lib.rs\",\"start_byte\":28,\"end_byte\":87,\"start_line\":3,\"end_line\":3,\"content_hash\":\"d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5\",\"content\":\"pub fn use_it(value: PublicThing) -> PublicThing { value }\\n\"},{\"id\":4,\"file\":\"app/src/lib.rs\",\"start_byte\":0,\"end_byte\":26,\"start_line\":1,\"end_line\":1,\"content_hash\":\"d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5\",\"content\":\"use core_api::PublicThing;\"},{\"id\":5,\"file\":\"core/src/lib.rs\",\"start_byte\":0,\"end_byte\":54,\"start_line\":1,\"end_line\":2,\"content_hash\":\"7186e7e71accaa9d217e75e361754288c8c0eec1f1fe5ceee0f5786c5536217b\",\"content\":\"pub mod api;\\npub use crate::api::Thing as PublicThing;\"},{\"id\":6,\"file\":\"core/src/api.rs\",\"start_byte\":0,\"end_byte\":33,\"start_line\":1,\"end_line\":1,\"content_hash\":\"2e34330f38722bdc3736ced392800acf892b66797390ea6a2beb3db596240c66\",\"content\":\"pub struct Thing { pub id: u64 }\\n\"},{\"id\":7,\"file\":\"Cargo.toml\",\"start_byte\":0,\"end_byte\":115,\"start_line\":1,\"end_line\":5,\"content_hash\":\"0b2cca07d060390b0a8ade7f1d04c040e37e27e7d171fb49f15da4d20b44309d\",\"content\":\"[workspace]\\nmembers = [\\\"app\\\", \\\"core\\\"]\\n\\n[workspace.dependencies]\\ncore_api = { package = \\\"core-api\\\", path = \\\"core\\\" }\\n\"},{\"id\":8,\"file\":\"app/Cargo.toml\",\"start_byte\":0,\"end_byte\":123,\"start_line\":1,\"end_line\":7,\"content_hash\":\"2b7f9afdc90c9c79ec3fad92297a865073758ed8857bf503b866d2e83da896f2\",\"content\":\"[package]\\nname = \\\"app\\\"\\nversion = \\\"0.1.0\\\"\\nedition = \\\"2021\\\"\\n\\n[dependencies]\\ncore_api = { workspace = true, optional = true }\\n\"},{\"id\":9,\"file\":\"core/Cargo.toml\",\"start_byte\":0,\"end_byte\":63,\"start_line\":1,\"end_line\":4,\"content_hash\":\"3bb9f9c34a1c780a54ae360478a23d86ced98be6b966c9fe3e20eec9ec33f29b\",\"content\":\"[package]\\nname = \\\"core-api\\\"\\nversion = \\\"0.1.0\\\"\\nedition = \\\"2021\\\"\\n\"}],\"omissions\":[],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":12000,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":473,\"output_bytes\":3679,\"estimated_tokens\":920,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-e355c72e-105e-48ab-8743-ce8a009faa75/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-e355c72e-105e-48ab-8743-ce8a009faa75:2\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": {
+            "nodes_examined": 2,
+            "evidence_bytes": 473,
+            "output_bytes": 3679,
+            "selected_items": 2,
+            "max_nodes": 64,
+            "max_neighbors": 32
+          }
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "get",
+          "arguments": {
+            "context": 2,
+            "selected_from_search_id": "ef535458-154e-49a9-b6eb-d9aa76280024",
+            "symbol_ids": [
+              "app/src/lib.rs::use_it#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-e355c72e-105e-48ab-8743-ce8a009faa75/attempt/3",
+          "trace_event_id": "session-e355c72e-105e-48ab-8743-ce8a009faa75:3",
+          "source_bytes": 142,
+          "serialized_bytes": 526,
+          "elapsed_ms": 4.7350839886348695,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"app/src/lib.rs::use_it#function\",\"source\":\"pub fn use_it(value: PublicThing) -> PublicThing { value }\",\"byte_offset\":28,\"byte_length\":58,\"line\":3,\"end_line\":3,\"signature\":\"pub fn use_it(value: PublicThing) -> PublicThing { value }\",\"kind\":\"function\",\"language\":\"rust\",\"context_before\":[\"use core_api::PublicThing;\",\"\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-e355c72e-105e-48ab-8743-ce8a009faa75/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-e355c72e-105e-48ab-8743-ce8a009faa75:3\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "get",
+          "arguments": {
+            "context": 2,
+            "symbol_ids": [
+              "core/src/api.rs::Thing#struct"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-e355c72e-105e-48ab-8743-ce8a009faa75/attempt/4",
+          "trace_event_id": "session-e355c72e-105e-48ab-8743-ce8a009faa75:4",
+          "source_bytes": 64,
+          "serialized_bytes": 438,
+          "elapsed_ms": 6.103207997512072,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"core/src/api.rs::Thing#struct\",\"source\":\"pub struct Thing { pub id: u64 }\",\"byte_offset\":0,\"byte_length\":32,\"line\":1,\"end_line\":1,\"signature\":\"pub struct Thing { pub id: u64 }\",\"kind\":\"struct\",\"language\":\"rust\",\"context_before\":[],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-e355c72e-105e-48ab-8743-ce8a009faa75/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-e355c72e-105e-48ab-8743-ce8a009faa75:4\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        }
+      ],
+      "failures": []
+    },
+    "adapter_elapsed_ms": 36.05949995107949,
+    "recoverable_error_events": 0,
+    "relationships": {
+      "schema_version": 3,
+      "case_id": "rust_contained_optional_reexport",
+      "language": "rust",
+      "required_semantic_dependencies_total": 2,
+      "required_semantic_dependencies": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "thing",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "app/src/lib.rs::use_it#function",
+              "to": "core/src/api.rs::Thing#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/src/lib.rs",
+                "line": 3,
+                "content_hash": "d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "app/src/lib.rs::use_it#function",
+              "to": "core/src/api.rs::Thing#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/src/lib.rs",
+                "line": 3,
+                "content_hash": "d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5"
+              }
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "from": "entry",
+          "kind": "return_type",
+          "to": "thing",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "return"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "app/src/lib.rs::use_it#function",
+              "to": "core/src/api.rs::Thing#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/src/lib.rs",
+                "line": 3,
+                "content_hash": "d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "app/src/lib.rs::use_it#function",
+              "to": "core/src/api.rs::Thing#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/src/lib.rs",
+                "line": 3,
+                "content_hash": "d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5"
+              }
+            }
+          ]
+        }
+      ],
+      "available_dependency_links_total": 2,
+      "available_dependency_links": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "thing",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "app/src/lib.rs::use_it#function",
+              "to": "core/src/api.rs::Thing#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/src/lib.rs",
+                "line": 3,
+                "content_hash": "d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "app/src/lib.rs::use_it#function",
+              "to": "core/src/api.rs::Thing#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/src/lib.rs",
+                "line": 3,
+                "content_hash": "d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5"
+              }
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "from": "entry",
+          "kind": "return_type",
+          "to": "thing",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "return"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "app/src/lib.rs::use_it#function",
+              "to": "core/src/api.rs::Thing#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/src/lib.rs",
+                "line": 3,
+                "content_hash": "d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "app/src/lib.rs::use_it#function",
+              "to": "core/src/api.rs::Thing#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/src/lib.rs",
+                "line": 3,
+                "content_hash": "d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5"
+              }
+            }
+          ]
+        }
+      ],
+      "delivered_dependency_links_total": 2,
+      "delivered_dependency_links": [
+        {
+          "index": 0,
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "thing",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "annotation"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "app/src/lib.rs::use_it#function",
+              "to": "core/src/api.rs::Thing#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/src/lib.rs",
+                "line": 3,
+                "content_hash": "d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "app/src/lib.rs::use_it#function",
+              "to": "core/src/api.rs::Thing#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/src/lib.rs",
+                "line": 3,
+                "content_hash": "d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5"
+              }
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "from": "entry",
+          "kind": "return_type",
+          "to": "thing",
+          "from_status": "indexed",
+          "to_status": "indexed",
+          "match_mode": "semantic_record",
+          "graph_type": "uses_type",
+          "record_contexts": [
+            "return"
+          ],
+          "available": true,
+          "delivered": true,
+          "available_edges": [
+            {
+              "from": "app/src/lib.rs::use_it#function",
+              "to": "core/src/api.rs::Thing#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/src/lib.rs",
+                "line": 3,
+                "content_hash": "d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5"
+              }
+            }
+          ],
+          "delivered_edges": [
+            {
+              "from": "app/src/lib.rs::use_it#function",
+              "to": "core/src/api.rs::Thing#struct",
+              "type": "uses_type",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "app/src/lib.rs",
+                "line": 3,
+                "content_hash": "d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5"
+              }
+            }
+          ]
+        }
+      ],
+      "dependency_link_recall": {
+        "label": "Exact frozen meaning joined to persisted semantic record and delivered source proof.",
+        "required": 2,
+        "available": 2,
+        "delivered": 2,
+        "available_ratio": 1.0,
+        "delivered_ratio": 1.0
+      },
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_available_relationships": 0,
+      "forbidden_delivered_relationships": 0,
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_delivered_relationship_edges": [],
+      "delivery_integrity_violations": [],
+      "forbidden_scope": "Frozen multilingual negatives plus delivered edge/index and complete exploration-proof consistency."
+    },
+    "arm": "B",
+    "attempt_id": "rust_contained_optional_reexport-r1-B"
+  },
+  "attempt_id": "rust_contained_optional_reexport-r1-B",
+  "arm": "B",
+  "provenance": {
+    "attempt_id": "rust_contained_optional_reexport-r1-B",
+    "case_id": "rust_contained_optional_reexport",
+    "snapshot": "rust_workspace",
+    "repetition": 1,
+    "arm": "B",
+    "adapter_module": "benchmarks.multilingual_context_tools",
+    "model": "gpt-5.6-luna",
+    "reasoning_effort": "high",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "catalog_sha256": "f1c45cceac1c3ee90fa1af1007c341713e220571390c3b1eb086c443d7781062",
+    "runner_sha256": "5756278252a74c9e86c68a898b284108288b74a864b9424f6445223b3a7ca6db",
+    "source": {
+      "freeze_commit": "c910c5ac252a7c982f784d87d61bc4c50fc0c0ec",
+      "freeze_json_sha256": "254f38dd6247215928f4cce3fae379cf9dbf3acb74e51bd2d1ac91c12f290848",
+      "source_scope": "W4 evaluator snapshot; A exact retrieval/graph, B adds current loci_explore plus frozen guide"
+    },
+    "config": {
+      "project_doc_max_bytes": 0,
+      "web_search": "disabled",
+      "skills.include_instructions": false,
+      "developer_instructions": "",
+      "model_reasoning_effort": "high",
+      "model_catalog_json": "/Users/brummerv/phluxxed/loci-exploration/benchmarks/results/multilingual-context-workflow-v1/model-catalog.json",
+      "include_collaboration_mode_instructions": false,
+      "tools.update_plan.enabled": false,
+      "tools.experimental_request_user_input.enabled": false,
+      "features.skip_host_skill_discovery": true,
+      "mcp_servers.evaluation.command": "/Users/brummerv/phluxxed/loci-exploration/.venv/bin/python",
+      "mcp_servers.evaluation.args": [
+        "-m",
+        "benchmarks.multilingual_context_tools",
+        "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-lugwj0n8/run.json"
+      ],
+      "mcp_servers.evaluation.cwd": "/Users/brummerv/phluxxed/loci-exploration",
+      "mcp_servers.evaluation.env": {
+        "LOCI_BASE_DIR": "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-lugwj0n8/store",
+        "LOCI_STORE_NAMESPACE": "typescript-context-preflight"
+      },
+      "mcp_servers.evaluation.required": true,
+      "mcp_servers.evaluation.default_tools_approval_mode": "auto",
+      "mcp_servers.evaluation.tool_timeout_sec": 12,
+      "tool_output_token_limit": 32768,
+      "features.shell_tool": false,
+      "features.multi_agent": false,
+      "features.apps": false,
+      "features.plugins": false,
+      "features.hooks": false,
+      "features.memories": false,
+      "features.skill_search": false,
+      "features.skill_mcp_dependency_install": false,
+      "features.view_image": false,
+      "features.image_generation": false,
+      "features.browser_use": false,
+      "features.computer_use": false,
+      "features.in_app_browser": false,
+      "features.code_mode": false,
+      "features.code_mode_host": false,
+      "features.sleep_tool": false,
+      "features.goals": false,
+      "features.context_management": false,
+      "service_tier": "default"
+    },
+    "config_sha256": "a69c1fa06010ac425d107fd63c12b3746c51d8eb1e8b8d8719a10ca74170bd31",
+    "prompt_sha256": "59acbea5660e5ba6bf9f994161ac9f2467757c59edb371a59b3f053b96143f9f",
+    "index_seconds": 0.02349304102244787,
+    "snapshot_files": {
+      "Cargo.toml": "0b2cca07d060390b0a8ade7f1d04c040e37e27e7d171fb49f15da4d20b44309d",
+      "app/Cargo.toml": "2b7f9afdc90c9c79ec3fad92297a865073758ed8857bf503b866d2e83da896f2",
+      "app/src/lib.rs": "d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5",
+      "core/Cargo.toml": "3bb9f9c34a1c780a54ae360478a23d86ced98be6b966c9fe3e20eec9ec33f29b",
+      "core/src/api.rs": "2e34330f38722bdc3736ced392800acf892b66797390ea6a2beb3db596240c66",
+      "core/src/lib.rs": "7186e7e71accaa9d217e75e361754288c8c0eec1f1fe5ceee0f5786c5536217b",
+      "wrong.rs": "9cdbd7232e39e03e652cc5958c94e4b1d35fa16e3a1ff3d5e1c7ca746c245b0e"
+    },
+    "extractor_version": 30,
+    "canonical_tool_schemas_sha256": "492ec2cf0a57ac05d4cb601c1ab44d0604406245f7dcdd865d7f8cbed7e8c90f"
+  }
+}

@@ -1,0 +1,1127 @@
+{
+  "schema_version": 4,
+  "protocol": "multilingual-context-workflow-v1",
+  "identity": {
+    "task_id": "javascript_unproven_dependencies",
+    "session_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496",
+    "arm": "A",
+    "repetition": 3,
+    "snapshot": "javascript_uncertainty",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1"
+  },
+  "events": [
+    {
+      "id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:1",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "outline",
+      "arguments": {},
+      "search_id": null,
+      "response_json": "{\"files\":[{\"file\":\"bad.js\",\"symbols\":[{\"id\":\"bad.js::unproven#function\",\"name\":\"unproven\",\"kind\":\"function\",\"line\":5,\"end_line\":5,\"signature\":\"function unproven() { return [Thing, Factory, External]; }\",\"summary\":\"\"},{\"id\":\"bad.js::shadowed#function\",\"name\":\"shadowed\",\"kind\":\"function\",\"line\":6,\"end_line\":6,\"signature\":\"function shadowed(Thing) { return Thing(); }\",\"summary\":\"\"},{\"id\":\"bad.js::computed#function\",\"name\":\"computed\",\"kind\":\"function\",\"line\":7,\"end_line\":7,\"signature\":\"function computed(key) { return model[key](); }\",\"summary\":\"\"},{\"id\":\"bad.js::legacy#function\",\"name\":\"legacy\",\"kind\":\"function\",\"line\":8,\"end_line\":8,\"signature\":\"function legacy() { const loaded = require(\\\"./left.js\\\"); return loaded.Thing; }\",\"summary\":\"\"},{\"id\":\"bad.js::dynamic#function\",\"name\":\"dynamic\",\"kind\":\"function\",\"line\":9,\"end_line\":9,\"signature\":\"function dynamic(path) { return import(path); }\",\"summary\":\"\"},{\"id\":\"bad.js::Dynamic#class\",\"name\":\"Dynamic\",\"kind\":\"class\",\"line\":10,\"end_line\":10,\"signature\":\"class Dynamic extends chooseBase() {}\",\"summary\":\"\"},{\"id\":\"bad.js::documented#function\",\"name\":\"documented\",\"kind\":\"function\",\"line\":12,\"end_line\":12,\"signature\":\"function documented(value) { return value; }\",\"summary\":\"\"},{\"id\":\"bad.js::__file__#file\",\"name\":\"bad.js\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"bad.js\",\"summary\":\"\"}]},{\"file\":\"barrel.js\",\"symbols\":[{\"id\":\"barrel.js::__file__#file\",\"name\":\"barrel.js\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"barrel.js\",\"summary\":\"\"}]},{\"file\":\"left.js\",\"symbols\":[{\"id\":\"left.js::Thing#class\",\"name\":\"Thing\",\"kind\":\"class\",\"line\":1,\"end_line\":1,\"signature\":\"class Thing {}\",\"summary\":\"\"},{\"id\":\"left.js::Factory#function\",\"name\":\"Factory\",\"kind\":\"function\",\"line\":2,\"end_line\":2,\"signature\":\"function Factory() {}\",\"summary\":\"\"},{\"id\":\"left.js::__file__#file\",\"name\":\"left.js\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"left.js\",\"summary\":\"\"}]},{\"file\":\"right.js\",\"symbols\":[{\"id\":\"right.js::Thing#class\",\"name\":\"Thing\",\"kind\":\"class\",\"line\":1,\"end_line\":1,\"signature\":\"class Thing {}\",\"summary\":\"\"},{\"id\":\"right.js::__file__#file\",\"name\":\"right.js\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"right.js\",\"summary\":\"\"}]}],\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:1\"}}",
+      "serialized_bytes": 2379,
+      "source_bytes": 405,
+      "elapsed_ms": 1.6199579986277968,
+      "spans": [
+        {
+          "file": "bad.js",
+          "start_byte": 138,
+          "end_byte": 196,
+          "sha256": "6522ac544fc6e9dca38c175edc521c5470035abbdeb32b6a3aad7b1ad03c6450",
+          "text": "function unproven() { return [Thing, Factory, External]; }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 204,
+          "end_byte": 248,
+          "sha256": "2c2941ecb270d8c5f2fd8eb5c8c133a0b3b2d5d5e79922fabfe4e060c8b05343",
+          "text": "function shadowed(Thing) { return Thing(); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 256,
+          "end_byte": 303,
+          "sha256": "a3655a9a9c72e59c1c4af1d6a00fce7de36149a6011d7f5d17a9af79ba4d9708",
+          "text": "function computed(key) { return model[key](); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 311,
+          "end_byte": 390,
+          "sha256": "7155d04e15a978b88333aaadfa6f0e049bbe2fcab728b7244b7008a8efdaba1f",
+          "text": "function legacy() { const loaded = require(\"./left.js\"); return loaded.Thing; }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 398,
+          "end_byte": 445,
+          "sha256": "d079757c6cb4cbacb0f4ffd111e2c4b0490ebd0f902ed37d01ef3ac8c607cace",
+          "text": "function dynamic(path) { return import(path); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 453,
+          "end_byte": 490,
+          "sha256": "6c30aa9b97acc481eb4b5014e63bf8510bc43d2274ac357763d176c093c67176",
+          "text": "class Dynamic extends chooseBase() {}"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 526,
+          "end_byte": 570,
+          "sha256": "db2f3eb065e8caf47992208f54e577faf40df1a8ee81f38201e8de324c664a8f",
+          "text": "function documented(value) { return value; }"
+        },
+        {
+          "file": "left.js",
+          "start_byte": 7,
+          "end_byte": 21,
+          "sha256": "06e4c6b5c320516a81eee7a58dcd7a910f5ef0bcc0b5a3fd801c6cfc8e8e9a36",
+          "text": "class Thing {}"
+        },
+        {
+          "file": "left.js",
+          "start_byte": 37,
+          "end_byte": 58,
+          "sha256": "09a29ae6624f3c832b41ec74c91946fc5ed37eac743493d2e01c50ba11d3a4ff",
+          "text": "function Factory() {}"
+        },
+        {
+          "file": "right.js",
+          "start_byte": 7,
+          "end_byte": 21,
+          "sha256": "06e4c6b5c320516a81eee7a58dcd7a910f5ef0bcc0b5a3fd801c6cfc8e8e9a36",
+          "text": "class Thing {}"
+        }
+      ]
+    },
+    {
+      "id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:2",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "bad.js",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"bad.js\",\"content\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\\nimport * as model from \\\"./left.js\\\";\\nimport { External } from \\\"uninstalled-package\\\";\\n\\nexport function unproven() { return [Thing, Factory, External]; }\\nexport function shadowed(Thing) { return Thing(); }\\nexport function computed(key) { return model[key](); }\\nexport function legacy() { const loaded = require(\\\"./left.js\\\"); return loaded.Thing; }\\nexport function dynamic(path) { return import(path); }\\nexport class Dynamic extends chooseBase() {}\\n/** @param {Thing} value */\\nexport function documented(value) { return value; }\\n\",\"total_lines\":12,\"start_line\":1,\"end_line\":12,\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:2\"}}",
+      "serialized_bytes": 834,
+      "source_bytes": 571,
+      "elapsed_ms": 4.452958004549146,
+      "spans": [
+        {
+          "file": "bad.js",
+          "start_byte": 0,
+          "end_byte": 571,
+          "sha256": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+          "text": "import Factory, { Thing } from \"./barrel.js\";\nimport * as model from \"./left.js\";\nimport { External } from \"uninstalled-package\";\n\nexport function unproven() { return [Thing, Factory, External]; }\nexport function shadowed(Thing) { return Thing(); }\nexport function computed(key) { return model[key](); }\nexport function legacy() { const loaded = require(\"./left.js\"); return loaded.Thing; }\nexport function dynamic(path) { return import(path); }\nexport class Dynamic extends chooseBase() {}\n/** @param {Thing} value */\nexport function documented(value) { return value; }\n"
+        }
+      ]
+    },
+    {
+      "id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:3",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "question": "In bad.js, what dependency targets are proven for unproven, default_forwarded_by_star, computed_call_exact, shadowed_Thing_is_import, commonjs_member_proven, dynamic_import_proven, computed_base_proven, and jsdoc_type_supported? Preserve unresolved relationships; CommonJS member inference and JSDoc types are outside this slice."
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-sxykvrhv/snapshot\",\"question\":\"In bad.js, what dependency targets are proven for unproven, default_forwarded_by_star, computed_call_exact, shadowed_Thing_is_import, commonjs_member_proven, dynamic_import_proven, computed_base_proven, and jsdoc_type_supported? Preserve unresolved relationships; CommonJS member inference and JSDoc types are outside this slice.\",\"selection\":\"inferred\",\"question_terms\":[\"bad\",\"js\",\"dependency\",\"target\",\"unproven\",\"default\",\"forwarded\",\"star\",\"computed\",\"call\",\"shadowed\",\"thing\",\"import\",\"commonj\",\"member\",\"dynamic\",\"base\",\"jsdoc\",\"type\",\"supported\",\"preserve\",\"unresolved\",\"relationship\",\"inference\",\"outside\",\"slice\"],\"anchors\":[{\"node\":{\"id\":\"bad.js::shadowed#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"bad.js\",\"line\":6,\"end_line\":6}},\"matched_symbol_id\":\"bad.js::shadowed#function\",\"name\":\"shadowed\",\"score\":40.643,\"reason\":{\"kind\":\"inferred\",\"matched_terms\":[\"bad\",\"js\",\"shadowed\",\"thing\"],\"match_scope\":[\"file_basename\",\"file_path\",\"symbol_name\",\"qualified_name\",\"signature\",\"keywords\"]}}],\"counts\":{\"indexed_nodes\":14,\"eligible_units\":14,\"qualified_candidates\":13,\"collapsed_symbols\":0,\"returned_anchors\":1,\"omitted_candidates\":12},\"budget\":{\"requested_max_anchors\":5,\"effective_max_anchors\":1},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:3\"}}",
+      "serialized_bytes": 1572,
+      "source_bytes": 0,
+      "elapsed_ms": 3.762250009458512,
+      "spans": []
+    },
+    {
+      "id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:4",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 100,
+        "file": "bad.js"
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"invalid record pagination\"},\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:4\"}}",
+      "serialized_bytes": 236,
+      "source_bytes": 0,
+      "elapsed_ms": 0.05054200300946832,
+      "spans": []
+    },
+    {
+      "id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:5",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 20,
+        "file": "bad.js"
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-sxykvrhv/snapshot\",\"file\":\"bad.js\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":1,\"text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"specifier\":\"./barrel.js\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"rust\":null},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::__file__#file\",\"target_file\":\"barrel.js\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"barrel.js::__file__#file\",\"specifier\":\"./barrel.js\",\"imported_name\":null,\"language\":\"javascript\",\"line\":1,\"text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"relative_path\",\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":2,\"text\":\"import * as model from \\\"./left.js\\\";\",\"specifier\":\"./left.js\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"rust\":null},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::__file__#file\",\"target_file\":\"left.js\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"left.js::__file__#file\",\"specifier\":\"./left.js\",\"imported_name\":null,\"language\":\"javascript\",\"line\":2,\"text\":\"import * as model from \\\"./left.js\\\";\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"relative_path\",\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":3,\"text\":\"import { External } from \\\"uninstalled-package\\\";\",\"specifier\":\"uninstalled-package\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"rust\":null},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::__file__#file\",\"target_file\":null,\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":null,\"target_id\":null,\"specifier\":\"uninstalled-package\",\"imported_name\":null,\"language\":\"javascript\",\"line\":3,\"text\":\"import { External } from \\\"uninstalled-package\\\";\",\"type_only\":false,\"is_reexport\":false,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"external\",\"resolution_basis\":null,\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":3,\"resolved\":2,\"unresolved\":1,\"returned\":3},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:5\"}}",
+      "serialized_bytes": 2962,
+      "source_bytes": 0,
+      "elapsed_ms": 3.3757500059437007,
+      "spans": []
+    },
+    {
+      "id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:6",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "barrel.js",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"barrel.js\",\"content\":\"export * from \\\"./left.js\\\";\\nexport * from \\\"./right.js\\\";\\n\",\"total_lines\":2,\"start_line\":1,\"end_line\":2,\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:6\"}}",
+      "serialized_bytes": 305,
+      "source_bytes": 55,
+      "elapsed_ms": 2.5698330136947334,
+      "spans": [
+        {
+          "file": "barrel.js",
+          "start_byte": 0,
+          "end_byte": 55,
+          "sha256": "c63a9e4e681e57529e38d14442b791fc8d8a58a7066fc8328a8db6116c8a19c7",
+          "text": "export * from \"./left.js\";\nexport * from \"./right.js\";\n"
+        }
+      ]
+    },
+    {
+      "id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:7",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 20,
+        "file": "bad.js"
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-sxykvrhv/snapshot\",\"file\":\"bad.js\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":5,\"column\":38,\"start_byte\":168,\"end_byte\":173,\"text\":\"Thing\",\"path\":[\"Thing\"],\"candidate_bindings\":[{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"}],\"binding_state\":\"definite\",\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":138,\"definition_end_byte\":196,\"body_start_byte\":158,\"body_end_byte\":196}},\"binding\":{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::unproven#function\",\"source_kind\":\"function\",\"import_source_id\":\"bad.js::__file__#file\",\"import_target_id\":\"barrel.js::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"ambiguous_target\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[{\"kind\":\"import_binding\",\"file\":\"bad.js\",\"line\":1,\"content_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"endpoint_id\":\"barrel.js::__file__#file\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":5,\"column\":45,\"start_byte\":175,\"end_byte\":182,\"text\":\"Factory\",\"path\":[\"Factory\"],\"candidate_bindings\":[{\"local_name\":\"Factory\",\"imported_name\":\"default\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"}],\"binding_state\":\"definite\",\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":138,\"definition_end_byte\":196,\"body_start_byte\":158,\"body_end_byte\":196}},\"binding\":{\"local_name\":\"Factory\",\"imported_name\":\"default\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::unproven#function\",\"source_kind\":\"function\",\"import_source_id\":\"bad.js::__file__#file\",\"import_target_id\":\"barrel.js::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"target_not_indexed\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[{\"kind\":\"import_binding\",\"file\":\"bad.js\",\"line\":1,\"content_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"endpoint_id\":\"barrel.js::__file__#file\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":5,\"column\":54,\"start_byte\":184,\"end_byte\":192,\"text\":\"External\",\"path\":[\"External\"],\"candidate_bindings\":[{\"local_name\":\"External\",\"imported_name\":\"External\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":82,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":3,\"import_text\":\"import { External } from \\\"uninstalled-package\\\";\",\"import_specifier\":\"uninstalled-package\"}],\"binding_state\":\"definite\",\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":138,\"definition_end_byte\":196,\"body_start_byte\":158,\"body_end_byte\":196}},\"binding\":{\"local_name\":\"External\",\"imported_name\":\"External\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":82,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":3,\"import_text\":\"import { External } from \\\"uninstalled-package\\\";\",\"import_specifier\":\"uninstalled-package\"},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::unproven#function\",\"source_kind\":\"function\",\"import_source_id\":\"bad.js::__file__#file\",\"import_target_id\":null,\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"import_unresolved\",\"import_unresolved_reason\":\"external\",\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":6,\"column\":42,\"start_byte\":238,\"end_byte\":243,\"text\":\"Thing\",\"path\":[\"Thing\"],\"candidate_bindings\":[{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"}],\"binding_state\":\"shadowed\",\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":204,\"definition_end_byte\":248,\"body_start_byte\":229,\"body_end_byte\":248}},\"binding\":{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::shadowed#function\",\"source_kind\":\"function\",\"import_source_id\":\"bad.js::__file__#file\",\"import_target_id\":\"barrel.js::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"binding_shadowed\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":7,\"column\":40,\"start_byte\":288,\"end_byte\":298,\"text\":\"model[key]\",\"path\":[\"model\"],\"candidate_bindings\":[{\"local_name\":\"model\",\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":46,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":2,\"import_text\":\"import * as model from \\\"./left.js\\\";\",\"import_specifier\":\"./left.js\"}],\"binding_state\":\"unsupported\",\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":256,\"definition_end_byte\":303,\"body_start_byte\":279,\"body_end_byte\":303}},\"binding\":{\"local_name\":\"model\",\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":46,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":2,\"import_text\":\"import * as model from \\\"./left.js\\\";\",\"import_specifier\":\"./left.js\"},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::computed#function\",\"source_kind\":\"function\",\"import_source_id\":\"bad.js::__file__#file\",\"import_target_id\":\"left.js::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"unsupported_reference\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":5,\"resolved\":0,\"unresolved\":5,\"returned\":5},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:7\"}}",
+      "serialized_bytes": 8105,
+      "source_bytes": 0,
+      "elapsed_ms": 3.174374985974282,
+      "spans": []
+    },
+    {
+      "id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:8",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 20,
+        "file": "bad.js"
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-sxykvrhv/snapshot\",\"file\":\"bad.js\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":6,\"column\":42,\"start_byte\":238,\"end_byte\":245,\"callee_start_byte\":238,\"callee_end_byte\":243,\"callee_text\":\"Thing\",\"callee_path\":[\"Thing\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"shadowed\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":204,\"definition_end_byte\":248,\"body_start_byte\":229,\"body_end_byte\":248},\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\"},\"caller_id\":\"bad.js::shadowed#function\",\"caller_kind\":\"function\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"local_binding_shadowed\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":7,\"column\":40,\"start_byte\":288,\"end_byte\":300,\"callee_start_byte\":288,\"callee_end_byte\":298,\"callee_text\":\"model[key]\",\"callee_path\":[],\"callee_form\":\"dynamic\",\"local_candidates\":[],\"local_binding_state\":\"unsupported\",\"member_candidates\":[],\"member_binding_state\":\"unsupported\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":256,\"definition_end_byte\":303,\"body_start_byte\":279,\"body_end_byte\":303},\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\"},\"caller_id\":null,\"caller_kind\":null,\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"unsupported_callee\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":8,\"column\":43,\"start_byte\":346,\"end_byte\":366,\"callee_start_byte\":346,\"callee_end_byte\":353,\"callee_text\":\"require\",\"callee_path\":[\"require\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":311,\"definition_end_byte\":390,\"body_start_byte\":329,\"body_end_byte\":390},\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\"},\"caller_id\":\"bad.js::legacy#function\",\"caller_kind\":\"function\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"callee_not_proven\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":9,\"column\":40,\"start_byte\":430,\"end_byte\":442,\"callee_start_byte\":430,\"callee_end_byte\":436,\"callee_text\":\"import\",\"callee_path\":[],\"callee_form\":\"dynamic\",\"local_candidates\":[],\"local_binding_state\":\"unsupported\",\"member_candidates\":[],\"member_binding_state\":\"unsupported\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":398,\"definition_end_byte\":445,\"body_start_byte\":421,\"body_end_byte\":445},\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\"},\"caller_id\":null,\"caller_kind\":null,\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"unsupported_callee\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":10,\"column\":30,\"start_byte\":475,\"end_byte\":487,\"callee_start_byte\":475,\"callee_end_byte\":485,\"callee_text\":\"chooseBase\",\"callee_path\":[\"chooseBase\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"file\",\"definition_start_byte\":null,\"definition_end_byte\":null,\"body_start_byte\":null,\"body_end_byte\":null},\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\"},\"caller_id\":\"bad.js::__file__#file\",\"caller_kind\":\"file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"callee_not_proven\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":5,\"resolved\":0,\"unresolved\":5,\"returned\":5},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/8\",\"calls_remaining\":16,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:8\"}}",
+      "serialized_bytes": 4788,
+      "source_bytes": 0,
+      "elapsed_ms": 5.135000013979152,
+      "spans": []
+    },
+    {
+      "id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:9",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "left.js",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"left.js\",\"content\":\"export class Thing {}\\nexport default function Factory() {}\\n\",\"total_lines\":2,\"start_line\":1,\"end_line\":2,\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/9\",\"calls_remaining\":15,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:9\"}}",
+      "serialized_bytes": 303,
+      "source_bytes": 59,
+      "elapsed_ms": 4.415667004650459,
+      "spans": [
+        {
+          "file": "left.js",
+          "start_byte": 0,
+          "end_byte": 59,
+          "sha256": "db0854f581ead5e079842120c2a245bbf369f81ed596d61bbdc076905ddc387f",
+          "text": "export class Thing {}\nexport default function Factory() {}\n"
+        }
+      ]
+    },
+    {
+      "id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:10",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "right.js",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"right.js\",\"content\":\"export class Thing {}\\n\",\"total_lines\":1,\"start_line\":1,\"end_line\":1,\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/10\",\"calls_remaining\":14,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:10\"}}",
+      "serialized_bytes": 268,
+      "source_bytes": 22,
+      "elapsed_ms": 2.5749999913387,
+      "spans": [
+        {
+          "file": "right.js",
+          "start_byte": 0,
+          "end_byte": 22,
+          "sha256": "3636ac75818c1f4605ef9b0eded69264ce9ef6d1a07354cfda03bafa00f591e3",
+          "text": "export class Thing {}\n"
+        }
+      ]
+    },
+    {
+      "id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:11",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "seed_ids": [
+          "bad.js::unproven#function",
+          "bad.js::shadowed#function",
+          "bad.js::computed#function",
+          "bad.js::legacy#function",
+          "bad.js::dynamic#function",
+          "bad.js::Dynamic#class",
+          "bad.js::documented#function"
+        ]
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"explicit IDs exceed the frozen node/anchor limit\"},\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/11\",\"calls_remaining\":13,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:11\"}}",
+      "serialized_bytes": 261,
+      "source_bytes": 0,
+      "elapsed_ms": 0.04395801806822419,
+      "spans": []
+    },
+    {
+      "id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:12",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "default_forwarded_by_star"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":null,\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/12\",\"calls_remaining\":12,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:12\"}}",
+      "serialized_bytes": 421,
+      "source_bytes": 0,
+      "elapsed_ms": 1.8572499975562096,
+      "spans": []
+    },
+    {
+      "id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:13",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "bad.js::unproven#function",
+          "bad.js::shadowed#function",
+          "bad.js::computed#function",
+          "bad.js::legacy#function",
+          "bad.js::dynamic#function",
+          "bad.js::Dynamic#class",
+          "bad.js::documented#function"
+        ],
+        "context": 0
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"bad.js::unproven#function\",\"source\":\"function unproven() { return [Thing, Factory, External]; }\",\"byte_offset\":138,\"byte_length\":58,\"line\":5,\"end_line\":5,\"signature\":\"function unproven() { return [Thing, Factory, External]; }\",\"kind\":\"function\",\"language\":\"javascript\"},{\"id\":\"bad.js::shadowed#function\",\"source\":\"function shadowed(Thing) { return Thing(); }\",\"byte_offset\":204,\"byte_length\":44,\"line\":6,\"end_line\":6,\"signature\":\"function shadowed(Thing) { return Thing(); }\",\"kind\":\"function\",\"language\":\"javascript\"},{\"id\":\"bad.js::computed#function\",\"source\":\"function computed(key) { return model[key](); }\",\"byte_offset\":256,\"byte_length\":47,\"line\":7,\"end_line\":7,\"signature\":\"function computed(key) { return model[key](); }\",\"kind\":\"function\",\"language\":\"javascript\"},{\"id\":\"bad.js::legacy#function\",\"source\":\"function legacy() { const loaded = require(\\\"./left.js\\\"); return loaded.Thing; }\",\"byte_offset\":311,\"byte_length\":79,\"line\":8,\"end_line\":8,\"signature\":\"function legacy() { const loaded = require(\\\"./left.js\\\"); return loaded.Thing; }\",\"kind\":\"function\",\"language\":\"javascript\"},{\"id\":\"bad.js::dynamic#function\",\"source\":\"function dynamic(path) { return import(path); }\",\"byte_offset\":398,\"byte_length\":47,\"line\":9,\"end_line\":9,\"signature\":\"function dynamic(path) { return import(path); }\",\"kind\":\"function\",\"language\":\"javascript\"},{\"id\":\"bad.js::Dynamic#class\",\"source\":\"class Dynamic extends chooseBase() {}\",\"byte_offset\":453,\"byte_length\":37,\"line\":10,\"end_line\":10,\"signature\":\"class Dynamic extends chooseBase() {}\",\"kind\":\"class\",\"language\":\"javascript\"},{\"id\":\"bad.js::documented#function\",\"source\":\"function documented(value) { return value; }\",\"byte_offset\":526,\"byte_length\":44,\"line\":12,\"end_line\":12,\"signature\":\"function documented(value) { return value; }\",\"kind\":\"function\",\"language\":\"javascript\"}],\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/13\",\"calls_remaining\":11,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:13\"}}",
+      "serialized_bytes": 2021,
+      "source_bytes": 712,
+      "elapsed_ms": 9.519375016679987,
+      "spans": [
+        {
+          "file": "bad.js",
+          "start_byte": 138,
+          "end_byte": 196,
+          "sha256": "6522ac544fc6e9dca38c175edc521c5470035abbdeb32b6a3aad7b1ad03c6450",
+          "text": "function unproven() { return [Thing, Factory, External]; }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 204,
+          "end_byte": 248,
+          "sha256": "2c2941ecb270d8c5f2fd8eb5c8c133a0b3b2d5d5e79922fabfe4e060c8b05343",
+          "text": "function shadowed(Thing) { return Thing(); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 256,
+          "end_byte": 303,
+          "sha256": "a3655a9a9c72e59c1c4af1d6a00fce7de36149a6011d7f5d17a9af79ba4d9708",
+          "text": "function computed(key) { return model[key](); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 311,
+          "end_byte": 390,
+          "sha256": "7155d04e15a978b88333aaadfa6f0e049bbe2fcab728b7244b7008a8efdaba1f",
+          "text": "function legacy() { const loaded = require(\"./left.js\"); return loaded.Thing; }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 398,
+          "end_byte": 445,
+          "sha256": "d079757c6cb4cbacb0f4ffd111e2c4b0490ebd0f902ed37d01ef3ac8c607cace",
+          "text": "function dynamic(path) { return import(path); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 453,
+          "end_byte": 490,
+          "sha256": "6c30aa9b97acc481eb4b5014e63bf8510bc43d2274ac357763d176c093c67176",
+          "text": "class Dynamic extends chooseBase() {}"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 526,
+          "end_byte": 570,
+          "sha256": "db2f3eb065e8caf47992208f54e577faf40df1a8ee81f38201e8de324c664a8f",
+          "text": "function documented(value) { return value; }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 138,
+          "end_byte": 196,
+          "sha256": "6522ac544fc6e9dca38c175edc521c5470035abbdeb32b6a3aad7b1ad03c6450",
+          "text": "function unproven() { return [Thing, Factory, External]; }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 204,
+          "end_byte": 248,
+          "sha256": "2c2941ecb270d8c5f2fd8eb5c8c133a0b3b2d5d5e79922fabfe4e060c8b05343",
+          "text": "function shadowed(Thing) { return Thing(); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 256,
+          "end_byte": 303,
+          "sha256": "a3655a9a9c72e59c1c4af1d6a00fce7de36149a6011d7f5d17a9af79ba4d9708",
+          "text": "function computed(key) { return model[key](); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 311,
+          "end_byte": 390,
+          "sha256": "7155d04e15a978b88333aaadfa6f0e049bbe2fcab728b7244b7008a8efdaba1f",
+          "text": "function legacy() { const loaded = require(\"./left.js\"); return loaded.Thing; }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 398,
+          "end_byte": 445,
+          "sha256": "d079757c6cb4cbacb0f4ffd111e2c4b0490ebd0f902ed37d01ef3ac8c607cace",
+          "text": "function dynamic(path) { return import(path); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 453,
+          "end_byte": 490,
+          "sha256": "6c30aa9b97acc481eb4b5014e63bf8510bc43d2274ac357763d176c093c67176",
+          "text": "class Dynamic extends chooseBase() {}"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 526,
+          "end_byte": 570,
+          "sha256": "db2f3eb065e8caf47992208f54e577faf40df1a8ee81f38201e8de324c664a8f",
+          "text": "function documented(value) { return value; }"
+        }
+      ]
+    },
+    {
+      "id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:14",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496",
+      "arm": "A",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 20,
+        "file": "barrel.js"
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-sxykvrhv/snapshot\",\"file\":\"barrel.js\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"barrel.js\",\"language\":\"javascript\",\"line\":1,\"text\":\"export * from \\\"./left.js\\\";\",\"specifier\":\"./left.js\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":true,\"source_hash\":\"c63a9e4e681e57529e38d14442b791fc8d8a58a7066fc8328a8db6116c8a19c7\",\"rust\":null},\"source_file\":\"barrel.js\",\"source_id\":\"barrel.js::__file__#file\",\"target_file\":\"left.js\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"left.js::__file__#file\",\"specifier\":\"./left.js\",\"imported_name\":null,\"language\":\"javascript\",\"line\":1,\"text\":\"export * from \\\"./left.js\\\";\",\"type_only\":false,\"is_reexport\":true,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"relative_path\",\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"barrel.js\",\"language\":\"javascript\",\"line\":2,\"text\":\"export * from \\\"./right.js\\\";\",\"specifier\":\"./right.js\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":true,\"source_hash\":\"c63a9e4e681e57529e38d14442b791fc8d8a58a7066fc8328a8db6116c8a19c7\",\"rust\":null},\"source_file\":\"barrel.js\",\"source_id\":\"barrel.js::__file__#file\",\"target_file\":\"right.js\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"right.js::__file__#file\",\"specifier\":\"./right.js\",\"imported_name\":null,\"language\":\"javascript\",\"line\":2,\"text\":\"export * from \\\"./right.js\\\";\",\"type_only\":false,\"is_reexport\":true,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"relative_path\",\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":2,\"resolved\":2,\"unresolved\":0,\"returned\":2},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/14\",\"calls_remaining\":10,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:14\"}}",
+      "serialized_bytes": 2093,
+      "source_bytes": 0,
+      "elapsed_ms": 3.8381250051315874,
+      "spans": []
+    }
+  ],
+  "measurement": {
+    "task_id": "javascript_unproven_dependencies",
+    "session_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496",
+    "arm": "A",
+    "repetition": 3,
+    "snapshot": "javascript_uncertainty",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1",
+    "schema_version": 3,
+    "measurement_method": "observed_tool_calls",
+    "intent_collection": "not_collected",
+    "outcome": "tool_failure",
+    "answer": {
+      "unproven": [],
+      "default_forwarded_by_star": [],
+      "computed_call_exact": [],
+      "shadowed_Thing_is_import": [],
+      "commonjs_member_proven": [],
+      "dynamic_import_proven": [],
+      "computed_base_proven": [],
+      "jsdoc_type_supported": []
+    },
+    "answer_correct": false,
+    "task_correct": false,
+    "read_count": 14,
+    "validated_read_count": 14,
+    "required_context_delivered": [
+      "barrel",
+      "entry",
+      "imports",
+      "left",
+      "remaining",
+      "right"
+    ],
+    "required_context_total": 6,
+    "context_recall": 1.0,
+    "serialized_tool_output_bytes": null,
+    "source_bytes": null,
+    "estimated_source_tokens": null,
+    "tool_elapsed_ms": 46.39004106866196,
+    "provider_usage": {
+      "input_tokens": 146555,
+      "cached_input_tokens": 108288,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 2474,
+      "reasoning_output_tokens": 1781
+    },
+    "usage_semantics": "One Codex turn.completed event; gross input includes cached input subset; output includes reasoning tokens.",
+    "token_status": "measured",
+    "measurement_complete": false,
+    "full_pass": false
+  },
+  "baseline": {
+    "end_to_end_seconds": 66.83887670797412,
+    "actual_process_seconds": 66.83887670797412,
+    "exit_code": 0,
+    "provider_thread_id": "01a09822-0a8e-7720-890b-f34ccbe6252b",
+    "failures": [
+      {
+        "attempt_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/4",
+        "category": "tool_error",
+        "message": "invalid record pagination"
+      },
+      {
+        "attempt_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/11",
+        "category": "tool_error",
+        "message": "explicit IDs exceed the frozen node/anchor limit"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_4",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_5",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_6",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_8",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_9",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_12",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_15",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "unmatched_recorded_delivery"
+      }
+    ],
+    "tool_delivery_verified": false,
+    "output_accounting": {
+      "schema_version": 4,
+      "complete": false,
+      "tool_call_count": 14,
+      "recorded_payload_bytes": 26548,
+      "complete_payload_bytes": null,
+      "source_bytes": null,
+      "calls": [
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "outline",
+          "arguments": {
+            "file": null
+          },
+          "status": "completed",
+          "attempt_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/1",
+          "trace_event_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:1",
+          "source_bytes": 405,
+          "serialized_bytes": 2379,
+          "elapsed_ms": 1.7687919898889959,
+          "payload_texts": [
+            "{\"files\":[{\"file\":\"bad.js\",\"symbols\":[{\"id\":\"bad.js::unproven#function\",\"name\":\"unproven\",\"kind\":\"function\",\"line\":5,\"end_line\":5,\"signature\":\"function unproven() { return [Thing, Factory, External]; }\",\"summary\":\"\"},{\"id\":\"bad.js::shadowed#function\",\"name\":\"shadowed\",\"kind\":\"function\",\"line\":6,\"end_line\":6,\"signature\":\"function shadowed(Thing) { return Thing(); }\",\"summary\":\"\"},{\"id\":\"bad.js::computed#function\",\"name\":\"computed\",\"kind\":\"function\",\"line\":7,\"end_line\":7,\"signature\":\"function computed(key) { return model[key](); }\",\"summary\":\"\"},{\"id\":\"bad.js::legacy#function\",\"name\":\"legacy\",\"kind\":\"function\",\"line\":8,\"end_line\":8,\"signature\":\"function legacy() { const loaded = require(\\\"./left.js\\\"); return loaded.Thing; }\",\"summary\":\"\"},{\"id\":\"bad.js::dynamic#function\",\"name\":\"dynamic\",\"kind\":\"function\",\"line\":9,\"end_line\":9,\"signature\":\"function dynamic(path) { return import(path); }\",\"summary\":\"\"},{\"id\":\"bad.js::Dynamic#class\",\"name\":\"Dynamic\",\"kind\":\"class\",\"line\":10,\"end_line\":10,\"signature\":\"class Dynamic extends chooseBase() {}\",\"summary\":\"\"},{\"id\":\"bad.js::documented#function\",\"name\":\"documented\",\"kind\":\"function\",\"line\":12,\"end_line\":12,\"signature\":\"function documented(value) { return value; }\",\"summary\":\"\"},{\"id\":\"bad.js::__file__#file\",\"name\":\"bad.js\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"bad.js\",\"summary\":\"\"}]},{\"file\":\"barrel.js\",\"symbols\":[{\"id\":\"barrel.js::__file__#file\",\"name\":\"barrel.js\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"barrel.js\",\"summary\":\"\"}]},{\"file\":\"left.js\",\"symbols\":[{\"id\":\"left.js::Thing#class\",\"name\":\"Thing\",\"kind\":\"class\",\"line\":1,\"end_line\":1,\"signature\":\"class Thing {}\",\"summary\":\"\"},{\"id\":\"left.js::Factory#function\",\"name\":\"Factory\",\"kind\":\"function\",\"line\":2,\"end_line\":2,\"signature\":\"function Factory() {}\",\"summary\":\"\"},{\"id\":\"left.js::__file__#file\",\"name\":\"left.js\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"left.js\",\"summary\":\"\"}]},{\"file\":\"right.js\",\"symbols\":[{\"id\":\"right.js::Thing#class\",\"name\":\"Thing\",\"kind\":\"class\",\"line\":1,\"end_line\":1,\"signature\":\"class Thing {}\",\"summary\":\"\"},{\"id\":\"right.js::__file__#file\",\"name\":\"right.js\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"right.js\",\"summary\":\"\"}]}],\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:1\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "bad.js",
+            "start_line": 1,
+            "end_line": 20
+          },
+          "status": "completed",
+          "attempt_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/2",
+          "trace_event_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:2",
+          "source_bytes": 571,
+          "serialized_bytes": 834,
+          "elapsed_ms": 4.585042013786733,
+          "payload_texts": [
+            "{\"file\":\"bad.js\",\"content\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\\nimport * as model from \\\"./left.js\\\";\\nimport { External } from \\\"uninstalled-package\\\";\\n\\nexport function unproven() { return [Thing, Factory, External]; }\\nexport function shadowed(Thing) { return Thing(); }\\nexport function computed(key) { return model[key](); }\\nexport function legacy() { const loaded = require(\\\"./left.js\\\"); return loaded.Thing; }\\nexport function dynamic(path) { return import(path); }\\nexport class Dynamic extends chooseBase() {}\\n/** @param {Thing} value */\\nexport function documented(value) { return value; }\\n\",\"total_lines\":12,\"start_line\":1,\"end_line\":12,\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:2\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "graph_anchors",
+          "arguments": {
+            "question": "In bad.js, what dependency targets are proven for unproven, default_forwarded_by_star, computed_call_exact, shadowed_Thing_is_import, commonjs_member_proven, dynamic_import_proven, computed_base_proven, and jsdoc_type_supported? Preserve unresolved relationships; CommonJS member inference and JSDoc types are outside this slice."
+          },
+          "status": "completed",
+          "attempt_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/3",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 1572,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-sxykvrhv/snapshot\",\"question\":\"In bad.js, what dependency targets are proven for unproven, default_forwarded_by_star, computed_call_exact, shadowed_Thing_is_import, commonjs_member_proven, dynamic_import_proven, computed_base_proven, and jsdoc_type_supported? Preserve unresolved relationships; CommonJS member inference and JSDoc types are outside this slice.\",\"selection\":\"inferred\",\"question_terms\":[\"bad\",\"js\",\"dependency\",\"target\",\"unproven\",\"default\",\"forwarded\",\"star\",\"computed\",\"call\",\"shadowed\",\"thing\",\"import\",\"commonj\",\"member\",\"dynamic\",\"base\",\"jsdoc\",\"type\",\"supported\",\"preserve\",\"unresolved\",\"relationship\",\"inference\",\"outside\",\"slice\"],\"anchors\":[{\"node\":{\"id\":\"bad.js::shadowed#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"bad.js\",\"line\":6,\"end_line\":6}},\"matched_symbol_id\":\"bad.js::shadowed#function\",\"name\":\"shadowed\",\"score\":40.643,\"reason\":{\"kind\":\"inferred\",\"matched_terms\":[\"bad\",\"js\",\"shadowed\",\"thing\"],\"match_scope\":[\"file_basename\",\"file_path\",\"symbol_name\",\"qualified_name\",\"signature\",\"keywords\"]}}],\"counts\":{\"indexed_nodes\":14,\"eligible_units\":14,\"qualified_candidates\":13,\"collapsed_symbols\":0,\"returned_anchors\":1,\"omitted_candidates\":12},\"budget\":{\"requested_max_anchors\":5,\"effective_max_anchors\":1},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:3\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_5",
+          "server": "evaluation",
+          "tool": "graph_imports",
+          "arguments": {
+            "file": "bad.js",
+            "limit": 100,
+            "offset": 0,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/4",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 236,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"error\":{\"code\":\"ValueError\",\"message\":\"invalid record pagination\"},\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:4\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_6",
+          "server": "evaluation",
+          "tool": "graph_imports",
+          "arguments": {
+            "file": "bad.js",
+            "limit": 20,
+            "offset": 0,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/5",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 2962,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-sxykvrhv/snapshot\",\"file\":\"bad.js\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":1,\"text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"specifier\":\"./barrel.js\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"rust\":null},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::__file__#file\",\"target_file\":\"barrel.js\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"barrel.js::__file__#file\",\"specifier\":\"./barrel.js\",\"imported_name\":null,\"language\":\"javascript\",\"line\":1,\"text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"relative_path\",\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":2,\"text\":\"import * as model from \\\"./left.js\\\";\",\"specifier\":\"./left.js\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"rust\":null},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::__file__#file\",\"target_file\":\"left.js\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"left.js::__file__#file\",\"specifier\":\"./left.js\",\"imported_name\":null,\"language\":\"javascript\",\"line\":2,\"text\":\"import * as model from \\\"./left.js\\\";\",\"type_only\":false,\"is_reexport\":false,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"relative_path\",\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":3,\"text\":\"import { External } from \\\"uninstalled-package\\\";\",\"specifier\":\"uninstalled-package\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":false,\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"rust\":null},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::__file__#file\",\"target_file\":null,\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":null,\"target_id\":null,\"specifier\":\"uninstalled-package\",\"imported_name\":null,\"language\":\"javascript\",\"line\":3,\"text\":\"import { External } from \\\"uninstalled-package\\\";\",\"type_only\":false,\"is_reexport\":false,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"external\",\"resolution_basis\":null,\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":3,\"resolved\":2,\"unresolved\":1,\"returned\":3},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:5\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_7",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "barrel.js",
+            "start_line": 1,
+            "end_line": 20
+          },
+          "status": "completed",
+          "attempt_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/6",
+          "trace_event_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:6",
+          "source_bytes": 55,
+          "serialized_bytes": 305,
+          "elapsed_ms": 2.6341660122852772,
+          "payload_texts": [
+            "{\"file\":\"barrel.js\",\"content\":\"export * from \\\"./left.js\\\";\\nexport * from \\\"./right.js\\\";\\n\",\"total_lines\":2,\"start_line\":1,\"end_line\":2,\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:6\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_8",
+          "server": "evaluation",
+          "tool": "graph_references",
+          "arguments": {
+            "file": "bad.js",
+            "limit": 20,
+            "offset": 0,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/7",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 8105,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-sxykvrhv/snapshot\",\"file\":\"bad.js\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":5,\"column\":38,\"start_byte\":168,\"end_byte\":173,\"text\":\"Thing\",\"path\":[\"Thing\"],\"candidate_bindings\":[{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"}],\"binding_state\":\"definite\",\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":138,\"definition_end_byte\":196,\"body_start_byte\":158,\"body_end_byte\":196}},\"binding\":{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::unproven#function\",\"source_kind\":\"function\",\"import_source_id\":\"bad.js::__file__#file\",\"import_target_id\":\"barrel.js::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"ambiguous_target\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[{\"kind\":\"import_binding\",\"file\":\"bad.js\",\"line\":1,\"content_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"endpoint_id\":\"barrel.js::__file__#file\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":5,\"column\":45,\"start_byte\":175,\"end_byte\":182,\"text\":\"Factory\",\"path\":[\"Factory\"],\"candidate_bindings\":[{\"local_name\":\"Factory\",\"imported_name\":\"default\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"}],\"binding_state\":\"definite\",\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":138,\"definition_end_byte\":196,\"body_start_byte\":158,\"body_end_byte\":196}},\"binding\":{\"local_name\":\"Factory\",\"imported_name\":\"default\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::unproven#function\",\"source_kind\":\"function\",\"import_source_id\":\"bad.js::__file__#file\",\"import_target_id\":\"barrel.js::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"target_not_indexed\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[{\"kind\":\"import_binding\",\"file\":\"bad.js\",\"line\":1,\"content_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"endpoint_id\":\"barrel.js::__file__#file\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":5,\"column\":54,\"start_byte\":184,\"end_byte\":192,\"text\":\"External\",\"path\":[\"External\"],\"candidate_bindings\":[{\"local_name\":\"External\",\"imported_name\":\"External\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":82,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":3,\"import_text\":\"import { External } from \\\"uninstalled-package\\\";\",\"import_specifier\":\"uninstalled-package\"}],\"binding_state\":\"definite\",\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":138,\"definition_end_byte\":196,\"body_start_byte\":158,\"body_end_byte\":196}},\"binding\":{\"local_name\":\"External\",\"imported_name\":\"External\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":82,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":3,\"import_text\":\"import { External } from \\\"uninstalled-package\\\";\",\"import_specifier\":\"uninstalled-package\"},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::unproven#function\",\"source_kind\":\"function\",\"import_source_id\":\"bad.js::__file__#file\",\"import_target_id\":null,\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"import_unresolved\",\"import_unresolved_reason\":\"external\",\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":6,\"column\":42,\"start_byte\":238,\"end_byte\":243,\"text\":\"Thing\",\"path\":[\"Thing\"],\"candidate_bindings\":[{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"}],\"binding_state\":\"shadowed\",\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":204,\"definition_end_byte\":248,\"body_start_byte\":229,\"body_end_byte\":248}},\"binding\":{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::shadowed#function\",\"source_kind\":\"function\",\"import_source_id\":\"bad.js::__file__#file\",\"import_target_id\":\"barrel.js::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"binding_shadowed\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":7,\"column\":40,\"start_byte\":288,\"end_byte\":298,\"text\":\"model[key]\",\"path\":[\"model\"],\"candidate_bindings\":[{\"local_name\":\"model\",\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":46,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":2,\"import_text\":\"import * as model from \\\"./left.js\\\";\",\"import_specifier\":\"./left.js\"}],\"binding_state\":\"unsupported\",\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":256,\"definition_end_byte\":303,\"body_start_byte\":279,\"body_end_byte\":303}},\"binding\":{\"local_name\":\"model\",\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":46,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":2,\"import_text\":\"import * as model from \\\"./left.js\\\";\",\"import_specifier\":\"./left.js\"},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::computed#function\",\"source_kind\":\"function\",\"import_source_id\":\"bad.js::__file__#file\",\"import_target_id\":\"left.js::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"unsupported_reference\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":5,\"resolved\":0,\"unresolved\":5,\"returned\":5},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:7\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_9",
+          "server": "evaluation",
+          "tool": "graph_calls",
+          "arguments": {
+            "file": "bad.js",
+            "limit": 20,
+            "offset": 0,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/8",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 4788,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-sxykvrhv/snapshot\",\"file\":\"bad.js\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":6,\"column\":42,\"start_byte\":238,\"end_byte\":245,\"callee_start_byte\":238,\"callee_end_byte\":243,\"callee_text\":\"Thing\",\"callee_path\":[\"Thing\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"shadowed\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":204,\"definition_end_byte\":248,\"body_start_byte\":229,\"body_end_byte\":248},\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\"},\"caller_id\":\"bad.js::shadowed#function\",\"caller_kind\":\"function\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"local_binding_shadowed\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":7,\"column\":40,\"start_byte\":288,\"end_byte\":300,\"callee_start_byte\":288,\"callee_end_byte\":298,\"callee_text\":\"model[key]\",\"callee_path\":[],\"callee_form\":\"dynamic\",\"local_candidates\":[],\"local_binding_state\":\"unsupported\",\"member_candidates\":[],\"member_binding_state\":\"unsupported\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":256,\"definition_end_byte\":303,\"body_start_byte\":279,\"body_end_byte\":303},\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\"},\"caller_id\":null,\"caller_kind\":null,\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"unsupported_callee\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":8,\"column\":43,\"start_byte\":346,\"end_byte\":366,\"callee_start_byte\":346,\"callee_end_byte\":353,\"callee_text\":\"require\",\"callee_path\":[\"require\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":311,\"definition_end_byte\":390,\"body_start_byte\":329,\"body_end_byte\":390},\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\"},\"caller_id\":\"bad.js::legacy#function\",\"caller_kind\":\"function\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"callee_not_proven\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":9,\"column\":40,\"start_byte\":430,\"end_byte\":442,\"callee_start_byte\":430,\"callee_end_byte\":436,\"callee_text\":\"import\",\"callee_path\":[],\"callee_form\":\"dynamic\",\"local_candidates\":[],\"local_binding_state\":\"unsupported\",\"member_candidates\":[],\"member_binding_state\":\"unsupported\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":398,\"definition_end_byte\":445,\"body_start_byte\":421,\"body_end_byte\":445},\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\"},\"caller_id\":null,\"caller_kind\":null,\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"unsupported_callee\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":10,\"column\":30,\"start_byte\":475,\"end_byte\":487,\"callee_start_byte\":475,\"callee_end_byte\":485,\"callee_text\":\"chooseBase\",\"callee_path\":[\"chooseBase\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"file\",\"definition_start_byte\":null,\"definition_end_byte\":null,\"body_start_byte\":null,\"body_end_byte\":null},\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\"},\"caller_id\":\"bad.js::__file__#file\",\"caller_kind\":\"file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"callee_not_proven\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":5,\"resolved\":0,\"unresolved\":5,\"returned\":5},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/8\",\"calls_remaining\":16,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:8\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_10",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "left.js",
+            "start_line": 1,
+            "end_line": 10
+          },
+          "status": "completed",
+          "attempt_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/9",
+          "trace_event_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:9",
+          "source_bytes": 59,
+          "serialized_bytes": 303,
+          "elapsed_ms": 4.527041979599744,
+          "payload_texts": [
+            "{\"file\":\"left.js\",\"content\":\"export class Thing {}\\nexport default function Factory() {}\\n\",\"total_lines\":2,\"start_line\":1,\"end_line\":2,\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/9\",\"calls_remaining\":15,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:9\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_11",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "right.js",
+            "start_line": 1,
+            "end_line": 10
+          },
+          "status": "completed",
+          "attempt_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/10",
+          "trace_event_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:10",
+          "source_bytes": 22,
+          "serialized_bytes": 268,
+          "elapsed_ms": 2.637792000314221,
+          "payload_texts": [
+            "{\"file\":\"right.js\",\"content\":\"export class Thing {}\\n\",\"total_lines\":1,\"start_line\":1,\"end_line\":1,\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/10\",\"calls_remaining\":14,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:10\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_12",
+          "server": "evaluation",
+          "tool": "graph_neighbors",
+          "arguments": {
+            "seed_ids": [
+              "bad.js::unproven#function",
+              "bad.js::shadowed#function",
+              "bad.js::computed#function",
+              "bad.js::legacy#function",
+              "bad.js::dynamic#function",
+              "bad.js::Dynamic#class",
+              "bad.js::documented#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/11",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 261,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"error\":{\"code\":\"ValueError\",\"message\":\"explicit IDs exceed the frozen node/anchor limit\"},\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/11\",\"calls_remaining\":13,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:11\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_13",
+          "server": "evaluation",
+          "tool": "search",
+          "arguments": {
+            "query": "default_forwarded_by_star"
+          },
+          "status": "completed",
+          "attempt_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/12",
+          "trace_event_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:12",
+          "source_bytes": 0,
+          "serialized_bytes": 421,
+          "elapsed_ms": 1.9120829820167273,
+          "payload_texts": [
+            "{\"symbols\":[],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":null,\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/12\",\"calls_remaining\":12,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:12\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_14",
+          "server": "evaluation",
+          "tool": "get",
+          "arguments": {
+            "symbol_ids": [
+              "bad.js::unproven#function",
+              "bad.js::shadowed#function",
+              "bad.js::computed#function",
+              "bad.js::legacy#function",
+              "bad.js::dynamic#function",
+              "bad.js::Dynamic#class",
+              "bad.js::documented#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/13",
+          "trace_event_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496:13",
+          "source_bytes": 712,
+          "serialized_bytes": 2021,
+          "elapsed_ms": 9.644333011237904,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"bad.js::unproven#function\",\"source\":\"function unproven() { return [Thing, Factory, External]; }\",\"byte_offset\":138,\"byte_length\":58,\"line\":5,\"end_line\":5,\"signature\":\"function unproven() { return [Thing, Factory, External]; }\",\"kind\":\"function\",\"language\":\"javascript\"},{\"id\":\"bad.js::shadowed#function\",\"source\":\"function shadowed(Thing) { return Thing(); }\",\"byte_offset\":204,\"byte_length\":44,\"line\":6,\"end_line\":6,\"signature\":\"function shadowed(Thing) { return Thing(); }\",\"kind\":\"function\",\"language\":\"javascript\"},{\"id\":\"bad.js::computed#function\",\"source\":\"function computed(key) { return model[key](); }\",\"byte_offset\":256,\"byte_length\":47,\"line\":7,\"end_line\":7,\"signature\":\"function computed(key) { return model[key](); }\",\"kind\":\"function\",\"language\":\"javascript\"},{\"id\":\"bad.js::legacy#function\",\"source\":\"function legacy() { const loaded = require(\\\"./left.js\\\"); return loaded.Thing; }\",\"byte_offset\":311,\"byte_length\":79,\"line\":8,\"end_line\":8,\"signature\":\"function legacy() { const loaded = require(\\\"./left.js\\\"); return loaded.Thing; }\",\"kind\":\"function\",\"language\":\"javascript\"},{\"id\":\"bad.js::dynamic#function\",\"source\":\"function dynamic(path) { return import(path); }\",\"byte_offset\":398,\"byte_length\":47,\"line\":9,\"end_line\":9,\"signature\":\"function dynamic(path) { return import(path); }\",\"kind\":\"function\",\"language\":\"javascript\"},{\"id\":\"bad.js::Dynamic#class\",\"source\":\"class Dynamic extends chooseBase() {}\",\"byte_offset\":453,\"byte_length\":37,\"line\":10,\"end_line\":10,\"signature\":\"class Dynamic extends chooseBase() {}\",\"kind\":\"class\",\"language\":\"javascript\"},{\"id\":\"bad.js::documented#function\",\"source\":\"function documented(value) { return value; }\",\"byte_offset\":526,\"byte_length\":44,\"line\":12,\"end_line\":12,\"signature\":\"function documented(value) { return value; }\",\"kind\":\"function\",\"language\":\"javascript\"}],\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/13\",\"calls_remaining\":11,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:13\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_15",
+          "server": "evaluation",
+          "tool": "graph_imports",
+          "arguments": {
+            "file": "barrel.js",
+            "limit": 20,
+            "offset": 0,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/14",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 2093,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-sxykvrhv/snapshot\",\"file\":\"barrel.js\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"barrel.js\",\"language\":\"javascript\",\"line\":1,\"text\":\"export * from \\\"./left.js\\\";\",\"specifier\":\"./left.js\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":true,\"source_hash\":\"c63a9e4e681e57529e38d14442b791fc8d8a58a7066fc8328a8db6116c8a19c7\",\"rust\":null},\"source_file\":\"barrel.js\",\"source_id\":\"barrel.js::__file__#file\",\"target_file\":\"left.js\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"left.js::__file__#file\",\"specifier\":\"./left.js\",\"imported_name\":null,\"language\":\"javascript\",\"line\":1,\"text\":\"export * from \\\"./left.js\\\";\",\"type_only\":false,\"is_reexport\":true,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"relative_path\",\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"barrel.js\",\"language\":\"javascript\",\"line\":2,\"text\":\"export * from \\\"./right.js\\\";\",\"specifier\":\"./right.js\",\"imported_name\":null,\"type_only\":false,\"is_reexport\":true,\"source_hash\":\"c63a9e4e681e57529e38d14442b791fc8d8a58a7066fc8328a8db6116c8a19c7\",\"rust\":null},\"source_file\":\"barrel.js\",\"source_id\":\"barrel.js::__file__#file\",\"target_file\":\"right.js\",\"target_package\":null,\"target_crate\":null,\"target_module\":null,\"target_kind\":\"file\",\"target_id\":\"right.js::__file__#file\",\"specifier\":\"./right.js\",\"imported_name\":null,\"language\":\"javascript\",\"line\":2,\"text\":\"export * from \\\"./right.js\\\";\",\"type_only\":false,\"is_reexport\":true,\"status\":\"resolved\",\"resolution\":\"import-resolved\",\"unresolved_reason\":null,\"resolution_basis\":\"relative_path\",\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":2,\"resolved\":2,\"unresolved\":0,\"returned\":2},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496/attempt/14\",\"calls_remaining\":10,\"event_id\":\"session-dd24b994-24f4-4d2e-8542-8bedef1cc496:14\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        }
+      ],
+      "failures": [
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_4",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_5",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_6",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_8",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_9",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_12",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_15",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "unmatched_recorded_delivery"
+        }
+      ]
+    },
+    "adapter_elapsed_ms": 48.04575099842623,
+    "recoverable_error_events": 2,
+    "relationships": {
+      "schema_version": 3,
+      "case_id": "javascript_unproven_dependencies",
+      "language": "javascript",
+      "required_semantic_dependencies_total": 0,
+      "required_semantic_dependencies": [],
+      "available_dependency_links_total": 0,
+      "available_dependency_links": [],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "Exact frozen meaning joined to persisted semantic record and delivered source proof.",
+        "required": 0,
+        "available": 0,
+        "delivered": 0,
+        "available_ratio": null,
+        "delivered_ratio": null
+      },
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_available_relationships": 0,
+      "forbidden_delivered_relationships": 0,
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_delivered_relationship_edges": [],
+      "delivery_integrity_violations": [],
+      "forbidden_scope": "Frozen multilingual negatives plus delivered edge/index and complete exploration-proof consistency."
+    },
+    "arm": "A",
+    "attempt_id": "javascript_unproven_dependencies-r3-A"
+  },
+  "attempt_id": "javascript_unproven_dependencies-r3-A",
+  "arm": "A",
+  "provenance": {
+    "attempt_id": "javascript_unproven_dependencies-r3-A",
+    "case_id": "javascript_unproven_dependencies",
+    "snapshot": "javascript_uncertainty",
+    "repetition": 3,
+    "arm": "A",
+    "adapter_module": "benchmarks.multilingual_context_tools",
+    "model": "gpt-5.6-luna",
+    "reasoning_effort": "high",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "catalog_sha256": "f1c45cceac1c3ee90fa1af1007c341713e220571390c3b1eb086c443d7781062",
+    "runner_sha256": "5756278252a74c9e86c68a898b284108288b74a864b9424f6445223b3a7ca6db",
+    "source": {
+      "freeze_commit": "c910c5ac252a7c982f784d87d61bc4c50fc0c0ec",
+      "freeze_json_sha256": "254f38dd6247215928f4cce3fae379cf9dbf3acb74e51bd2d1ac91c12f290848",
+      "source_scope": "W4 evaluator snapshot; A exact retrieval/graph, B adds current loci_explore plus frozen guide"
+    },
+    "config": {
+      "project_doc_max_bytes": 0,
+      "web_search": "disabled",
+      "skills.include_instructions": false,
+      "developer_instructions": "",
+      "model_reasoning_effort": "high",
+      "model_catalog_json": "/Users/brummerv/phluxxed/loci-exploration/benchmarks/results/multilingual-context-workflow-v1/model-catalog.json",
+      "include_collaboration_mode_instructions": false,
+      "tools.update_plan.enabled": false,
+      "tools.experimental_request_user_input.enabled": false,
+      "features.skip_host_skill_discovery": true,
+      "mcp_servers.evaluation.command": "/Users/brummerv/phluxxed/loci-exploration/.venv/bin/python",
+      "mcp_servers.evaluation.args": [
+        "-m",
+        "benchmarks.multilingual_context_tools",
+        "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-sxykvrhv/run.json"
+      ],
+      "mcp_servers.evaluation.cwd": "/Users/brummerv/phluxxed/loci-exploration",
+      "mcp_servers.evaluation.env": {
+        "LOCI_BASE_DIR": "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-sxykvrhv/store",
+        "LOCI_STORE_NAMESPACE": "typescript-context-preflight"
+      },
+      "mcp_servers.evaluation.required": true,
+      "mcp_servers.evaluation.default_tools_approval_mode": "auto",
+      "mcp_servers.evaluation.tool_timeout_sec": 12,
+      "tool_output_token_limit": 32768,
+      "features.shell_tool": false,
+      "features.multi_agent": false,
+      "features.apps": false,
+      "features.plugins": false,
+      "features.hooks": false,
+      "features.memories": false,
+      "features.skill_search": false,
+      "features.skill_mcp_dependency_install": false,
+      "features.view_image": false,
+      "features.image_generation": false,
+      "features.browser_use": false,
+      "features.computer_use": false,
+      "features.in_app_browser": false,
+      "features.code_mode": false,
+      "features.code_mode_host": false,
+      "features.sleep_tool": false,
+      "features.goals": false,
+      "features.context_management": false,
+      "service_tier": "default"
+    },
+    "config_sha256": "528f429984ede507298cdf750f21604d530d86292ac5fc580826a1c51c9284f6",
+    "prompt_sha256": "1944a2a394ccb016c3f9d647586285cdbe7f146e75a69bc586e56dc016961749",
+    "index_seconds": 0.030907540989574045,
+    "snapshot_files": {
+      "bad.js": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+      "barrel.js": "c63a9e4e681e57529e38d14442b791fc8d8a58a7066fc8328a8db6116c8a19c7",
+      "left.js": "db0854f581ead5e079842120c2a245bbf369f81ed596d61bbdc076905ddc387f",
+      "right.js": "3636ac75818c1f4605ef9b0eded69264ce9ef6d1a07354cfda03bafa00f591e3"
+    },
+    "extractor_version": 30,
+    "canonical_tool_schemas_sha256": "9119a51db6fc5ac2ab9834897a0a83bfef979c9dcb94fff08ab4ef3b71522753"
+  }
+}

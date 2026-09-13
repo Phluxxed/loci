@@ -1,0 +1,871 @@
+{
+  "cases": {
+    "go_alias": {
+      "attempt": "go_alias_generic_contract-r1-B",
+      "available_graph_edges": [
+        [
+          "app/main.go::Build#function",
+          "model/model.go::AliasID#type",
+          "uses_type"
+        ],
+        [
+          "app/main.go::Build#function",
+          "model/model.go::Page#type",
+          "uses_type"
+        ],
+        [
+          "app/main.go::Build#function",
+          "model/model.go::UserID#type",
+          "uses_type"
+        ],
+        [
+          "model/model.go::AliasID#type",
+          "model/model.go::UserID#type",
+          "uses_type"
+        ],
+        [
+          "model/model.go::Page#type",
+          "model/model.go::Number#type",
+          "uses_type"
+        ]
+      ],
+      "available_not_selected": [
+        [
+          "model/model.go::AliasID#type",
+          "model/model.go::UserID#type",
+          "uses_type"
+        ]
+      ],
+      "classification": "expected_bounded_omission",
+      "engine_change_needed": false,
+      "followup_effective_limits": [
+        {
+          "max_evidence_bytes": 8000,
+          "max_hops": 1,
+          "max_items": 12,
+          "max_neighbors": 32,
+          "max_nodes": 64,
+          "max_output_bytes": 12000
+        }
+      ],
+      "followup_packet_sha256": "894827eee40642ee204f5babc3e7e3a0fe9316b4490d0c709fc58f6afdde72ff",
+      "followup_request_sha256": "511f4e031045507be9cf437689bbc044553ae664224e121226f9dedc27f52aa7",
+      "followup_requests": [
+        {
+          "intent": "type_dependencies",
+          "max_evidence_bytes": 8000,
+          "max_hops": 1,
+          "max_output_bytes": 12000,
+          "seed_ids": [
+            "model/model.go::AliasID#type"
+          ]
+        }
+      ],
+      "followup_selected_edges": [
+        [
+          [
+            "model/model.go::AliasID#type",
+            "model/model.go::UserID#type",
+            "uses_type"
+          ]
+        ]
+      ],
+      "followups_recover_all_available_not_selected": true,
+      "frozen_packet_sha256": "41e44f2b516133648e5d61910617e1061091291e2e7ee13db0b12371645d4048",
+      "graph_counts": {
+        "edges": 11,
+        "nodes": 11
+      },
+      "graph_projection_sha256": "1f260d12b0f8bf31ebb5b05e78d9a17fe65d8217c60a570f931febb7e9b2d421",
+      "graph_state_sha256": "bba457a5ba58b741d4ad5a36ba13fcb69d10dd18a726f681ba2e13cff51fd6c7",
+      "proof_checks": {
+        "available_edges_in_state": true,
+        "selected_edges_in_state": true,
+        "selected_paths_connected": true,
+        "source_spans_match_snapshot": true
+      },
+      "reason": "The global visited set retains one proof path per selected node: Build selects UserID directly, so AliasID -> UserID is disclosed as an alternative path.",
+      "replay_matches_frozen_packet": true,
+      "replay_packet_sha256": "41e44f2b516133648e5d61910617e1061091291e2e7ee13db0b12371645d4048",
+      "retained_configuration": [
+        [
+          null,
+          null,
+          null,
+          null
+        ]
+      ],
+      "retained_effective_limits": [
+        {
+          "max_evidence_bytes": 8000,
+          "max_hops": 2,
+          "max_items": 12,
+          "max_neighbors": 32,
+          "max_nodes": 64,
+          "max_output_bytes": 12000
+        }
+      ],
+      "retained_omissions": [
+        [
+          {
+            "count": 1,
+            "reason": "alternative_path"
+          },
+          {
+            "count": 2,
+            "reason": "unresolved_relation"
+          }
+        ]
+      ],
+      "retained_request_sha256": "e8124d0e1e25ef95db9f592bb1e8a7028c6efb8797cfe10e732bcdb06429069f",
+      "retained_requests": [
+        {
+          "intent": "type_dependencies",
+          "max_evidence_bytes": 8000,
+          "max_hops": 2,
+          "max_output_bytes": 12000,
+          "seed_ids": [
+            "app/main.go::Build#function"
+          ]
+        }
+      ],
+      "retained_selected_edges": [
+        [
+          [
+            "app/main.go::Build#function",
+            "model/model.go::AliasID#type",
+            "uses_type"
+          ],
+          [
+            "app/main.go::Build#function",
+            "model/model.go::Page#type",
+            "uses_type"
+          ],
+          [
+            "app/main.go::Build#function",
+            "model/model.go::UserID#type",
+            "uses_type"
+          ],
+          [
+            "model/model.go::Page#type",
+            "model/model.go::Number#type",
+            "uses_type"
+          ]
+        ]
+      ],
+      "snapshot": "go_contracts",
+      "snapshot_files": {
+        "app/main.go": "42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3",
+        "go.mod": "01cc905450c59f6d3133f5fd339444536aa4d2b32468f197ea50d39884391d4d",
+        "model/model.go": "a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5",
+        "wrong/model.go": "afd89e0ea37700984c51ba225df307201ecc05521d1c8a9aabe3afc23792291b"
+      },
+      "snapshot_files_sha256": "1a8fc8d7e834cbaa4d778a8a3b5bce031d73902b177678fc2b9be63e4a9df39e"
+    },
+    "go_api_impact": {
+      "attempt": "go_known_api_impact-r1-B",
+      "available_graph_edges": [
+        [
+          "cmd/server/main.go::Serve#function",
+          "api/api.go::Handle#function",
+          "calls"
+        ],
+        [
+          "cmd/worker/main.go::Work#function",
+          "api/api.go::Handle#function",
+          "calls"
+        ],
+        [
+          "api/api.go::Handle#function",
+          "api/api.go::Request#type",
+          "uses_type"
+        ],
+        [
+          "cmd/server/main.go::Serve#function",
+          "api/api.go::Request#type",
+          "uses_type"
+        ],
+        [
+          "cmd/worker/main.go::Work#function",
+          "api/api.go::Request#type",
+          "uses_type"
+        ]
+      ],
+      "available_not_selected": [
+        [
+          "cmd/server/main.go::Serve#function",
+          "api/api.go::Request#type",
+          "uses_type"
+        ],
+        [
+          "cmd/worker/main.go::Work#function",
+          "api/api.go::Request#type",
+          "uses_type"
+        ]
+      ],
+      "classification": "task_agent_request_choice_with_expected_bounded_omission",
+      "engine_change_needed": false,
+      "followup_effective_limits": [
+        {
+          "max_evidence_bytes": 8192,
+          "max_hops": 1,
+          "max_items": 12,
+          "max_neighbors": 32,
+          "max_nodes": 64,
+          "max_output_bytes": 16384
+        },
+        {
+          "max_evidence_bytes": 8192,
+          "max_hops": 1,
+          "max_items": 12,
+          "max_neighbors": 32,
+          "max_nodes": 64,
+          "max_output_bytes": 16384
+        }
+      ],
+      "followup_packet_sha256": "fc5f7bd53e068e1d64bf559544122c356947925e1d57a1e8a22799891a9dfc14",
+      "followup_request_sha256": "79a451870afd3bdf39283c653ad1cc0edeff87e1b2f9ab6f98ffcdf920504acd",
+      "followup_requests": [
+        {
+          "intent": "type_dependencies",
+          "max_hops": 1,
+          "seed_ids": [
+            "cmd/server/main.go::Serve#function"
+          ]
+        },
+        {
+          "intent": "type_dependencies",
+          "max_hops": 1,
+          "seed_ids": [
+            "cmd/worker/main.go::Work#function"
+          ]
+        }
+      ],
+      "followup_selected_edges": [
+        [
+          [
+            "cmd/server/main.go::Serve#function",
+            "api/api.go::Request#type",
+            "uses_type"
+          ]
+        ],
+        [
+          [
+            "cmd/worker/main.go::Work#function",
+            "api/api.go::Request#type",
+            "uses_type"
+          ]
+        ]
+      ],
+      "followups_recover_all_available_not_selected": true,
+      "frozen_packet_sha256": "964f11c67c816ad088d3649e224ea70249daa4c9326162fa130bd7ef30a5dcb1",
+      "graph_counts": {
+        "edges": 11,
+        "nodes": 8
+      },
+      "graph_projection_sha256": "575ce2024614da7fefe66c0062c52a682f8caf8b2034d14cc86cd8b08e4eb74c",
+      "graph_state_sha256": "6252983fe79c06fa75de388da98a3ecb126009654d282a2458a0847a956212ff",
+      "proof_checks": {
+        "available_edges_in_state": true,
+        "selected_edges_in_state": true,
+        "selected_paths_connected": true,
+        "source_spans_match_snapshot": true
+      },
+      "reason": "Impact walks incoming known dependents of Handle; it does not then walk each caller's outgoing Go type dependencies. Separate caller seeds are required because shared Request also retains one selected proof path.",
+      "replay_matches_frozen_packet": true,
+      "replay_packet_sha256": "964f11c67c816ad088d3649e224ea70249daa4c9326162fa130bd7ef30a5dcb1",
+      "retained_configuration": [
+        [
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "retained_effective_limits": [
+        {
+          "max_evidence_bytes": 8192,
+          "max_hops": 2,
+          "max_items": 12,
+          "max_neighbors": 32,
+          "max_nodes": 64,
+          "max_output_bytes": 16384
+        },
+        {
+          "max_evidence_bytes": 8192,
+          "max_hops": 2,
+          "max_items": 12,
+          "max_neighbors": 32,
+          "max_nodes": 64,
+          "max_output_bytes": 16384
+        }
+      ],
+      "retained_omissions": [
+        [
+          {
+            "count": 3,
+            "reason": "anchor_limit"
+          }
+        ],
+        [
+          {
+            "count": 2,
+            "reason": "alternative_path"
+          }
+        ]
+      ],
+      "retained_request_sha256": "80b687b32bd47ee8a1c63ebd39b92facc5927e4ab5748165b92a16b3743aa911",
+      "retained_requests": [
+        {
+          "intent": "dependencies",
+          "max_hops": 2,
+          "query": "Locate the authored api declarations named Handle and Request. Determine the exact api file, Request fields and field types, and proven direct callers of Handle, preserving unresolved relationships and package/import routes."
+        },
+        {
+          "intent": "impact",
+          "max_hops": 2,
+          "query": "Find known direct callers of api.Handle, including imported package routes.",
+          "seed_ids": [
+            "api/api.go::Handle#function"
+          ]
+        }
+      ],
+      "retained_selected_edges": [
+        [
+          [
+            "api/api.go::Handle#function",
+            "api/api.go::Request#type",
+            "uses_type"
+          ]
+        ],
+        [
+          [
+            "cmd/server/main.go::Serve#function",
+            "api/api.go::Handle#function",
+            "calls"
+          ],
+          [
+            "cmd/worker/main.go::Work#function",
+            "api/api.go::Handle#function",
+            "calls"
+          ]
+        ]
+      ],
+      "snapshot": "go_impact",
+      "snapshot_files": {
+        "api/api.go": "a7f10af67423f7dfb8cac758f519ce135834ee686b3ba6328b0575e26e010046",
+        "cmd/server/main.go": "9a71af30fcac65e6443378eab3562c1dc659c28a86df882a3e12f13e5598c5b3",
+        "cmd/worker/main.go": "fc98aa964d34d18b7781e7c711f4cdc39fbfc22c8700b7eca5fd6732678ec5d6",
+        "go.mod": "01cc905450c59f6d3133f5fd339444536aa4d2b32468f197ea50d39884391d4d"
+      },
+      "snapshot_files_sha256": "ebde5c9ab9e8d6c42e4218d3562d0070a5a8601f2d880c652198da179bc124fd"
+    },
+    "rust_declared_possible_control": {
+      "attempt": "rust_contained_optional_reexport-r1-B",
+      "available_graph_edges": [
+        [
+          "app/src/lib.rs::use_it#function",
+          "core/src/api.rs::Thing#struct",
+          "uses_type"
+        ]
+      ],
+      "available_not_selected": [],
+      "classification": "resolved_uncertainty_control",
+      "engine_change_needed": false,
+      "followup_effective_limits": [],
+      "followup_packet_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "followup_request_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "followup_requests": [],
+      "followup_selected_edges": [],
+      "followups_recover_all_available_not_selected": true,
+      "frozen_packet_sha256": "f7a0950209426f7742b67bfd6228a6d7dbe89c7696980971244b2d09c4fa75f0",
+      "graph_counts": {
+        "edges": 4,
+        "nodes": 9
+      },
+      "graph_projection_sha256": "3f0e63076fc2c083fe53685ff5f50533f77de8cf4e6b32e63d2635cd30e584d9",
+      "graph_state_sha256": "1c994a42e4a6aca04e8c696512de8552379a3cc05accec34e7edb1ed39a97bbd",
+      "proof_checks": {
+        "available_edges_in_state": true,
+        "selected_edges_in_state": true,
+        "selected_paths_connected": true,
+        "source_spans_match_snapshot": true
+      },
+      "reason": "The retained workspace packet preserves declared_possible on the optional path dependency and does not claim an active feature.",
+      "replay_matches_frozen_packet": true,
+      "replay_packet_sha256": "f7a0950209426f7742b67bfd6228a6d7dbe89c7696980971244b2d09c4fa75f0",
+      "retained_configuration": [
+        [
+          "declared_possible"
+        ]
+      ],
+      "retained_effective_limits": [
+        {
+          "max_evidence_bytes": 8192,
+          "max_hops": 2,
+          "max_items": 12,
+          "max_neighbors": 32,
+          "max_nodes": 64,
+          "max_output_bytes": 12000
+        }
+      ],
+      "retained_omissions": [
+        []
+      ],
+      "retained_request_sha256": "aa63702458d4c6936934276e3ea1d898a530c2a256880083678d660533542cd2",
+      "retained_requests": [
+        {
+          "intent": "type_dependencies",
+          "max_evidence_bytes": 8192,
+          "max_hops": 2,
+          "max_output_bytes": 12000,
+          "query": "use_it public_name field_name field_type dependency_package configuration active_feature_proven",
+          "seed_ids": [
+            "app/src/lib.rs::use_it#function"
+          ]
+        }
+      ],
+      "retained_selected_edges": [
+        [
+          [
+            "app/src/lib.rs::use_it#function",
+            "core/src/api.rs::Thing#struct",
+            "uses_type"
+          ]
+        ]
+      ],
+      "snapshot": "rust_workspace",
+      "snapshot_files": {
+        "Cargo.toml": "0b2cca07d060390b0a8ade7f1d04c040e37e27e7d171fb49f15da4d20b44309d",
+        "app/Cargo.toml": "2b7f9afdc90c9c79ec3fad92297a865073758ed8857bf503b866d2e83da896f2",
+        "app/src/lib.rs": "d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5",
+        "core/Cargo.toml": "3bb9f9c34a1c780a54ae360478a23d86ced98be6b966c9fe3e20eec9ec33f29b",
+        "core/src/api.rs": "2e34330f38722bdc3736ced392800acf892b66797390ea6a2beb3db596240c66",
+        "core/src/lib.rs": "7186e7e71accaa9d217e75e361754288c8c0eec1f1fe5ceee0f5786c5536217b",
+        "wrong.rs": "9cdbd7232e39e03e652cc5958c94e4b1d35fa16e3a1ff3d5e1c7ca746c245b0e"
+      },
+      "snapshot_files_sha256": "e21b474623acc5d3a3ee18918c20a37d0c34e55ee4a609060c7506c5a223e05a"
+    },
+    "rust_known_call": {
+      "attempt": "rust_known_call_impact-r2-B",
+      "available_graph_edges": [
+        [
+          "src/lib.rs::caller#function",
+          "src/api.rs::parse#function",
+          "calls"
+        ],
+        [
+          "src/lib.rs::caller#function",
+          "src/api.rs::Config#struct",
+          "uses_type"
+        ],
+        [
+          "src/api.rs::parse#function",
+          "src/api.rs::Config#struct",
+          "uses_type"
+        ]
+      ],
+      "available_not_selected": [
+        [
+          "src/lib.rs::caller#function",
+          "src/api.rs::parse#function",
+          "calls"
+        ],
+        [
+          "src/api.rs::parse#function",
+          "src/api.rs::Config#struct",
+          "uses_type"
+        ]
+      ],
+      "classification": "task_agent_request_choice",
+      "engine_change_needed": false,
+      "followup_effective_limits": [
+        {
+          "max_evidence_bytes": 8192,
+          "max_hops": 1,
+          "max_items": 12,
+          "max_neighbors": 32,
+          "max_nodes": 64,
+          "max_output_bytes": 16384
+        },
+        {
+          "max_evidence_bytes": 8192,
+          "max_hops": 1,
+          "max_items": 12,
+          "max_neighbors": 32,
+          "max_nodes": 64,
+          "max_output_bytes": 16384
+        }
+      ],
+      "followup_packet_sha256": "b4234572e9be74b94211b94148189664a48626f3807b9817d7605ae0d3193f7e",
+      "followup_request_sha256": "90c3e8c25189f261dfddd057ce18b9e8acee9b838efe155aeb99c28dd4e9a1a8",
+      "followup_requests": [
+        {
+          "intent": "impact",
+          "max_hops": 1,
+          "seed_ids": [
+            "src/api.rs::parse#function"
+          ]
+        },
+        {
+          "intent": "type_dependencies",
+          "max_hops": 1,
+          "seed_ids": [
+            "src/api.rs::parse#function"
+          ]
+        }
+      ],
+      "followup_selected_edges": [
+        [
+          [
+            "src/lib.rs::caller#function",
+            "src/api.rs::parse#function",
+            "calls"
+          ]
+        ],
+        [
+          [
+            "src/api.rs::parse#function",
+            "src/api.rs::Config#struct",
+            "uses_type"
+          ]
+        ]
+      ],
+      "followups_recover_all_available_not_selected": true,
+      "frozen_packet_sha256": "864ff17af3046a86be0d62c9fded751c18c75a0e04d848fe217c42a4f84f2aa7",
+      "graph_counts": {
+        "edges": 6,
+        "nodes": 6
+      },
+      "graph_projection_sha256": "09922a63431724944330fa8afe2a1d93fbfaedf6551ea1e12f3969fdd5cfdbdf",
+      "graph_state_sha256": "6f06b563d8b5e51433391025f54c54b059c8f4810560d1112a9957582cd431de",
+      "proof_checks": {
+        "available_edges_in_state": true,
+        "selected_edges_in_state": true,
+        "selected_paths_connected": true,
+        "source_spans_match_snapshot": true
+      },
+      "reason": "Rust dependencies selects authored type edges and anchored caller, while definite calls require impact from parse and parse's parameter type requires a type-dependency request from parse.",
+      "replay_matches_frozen_packet": true,
+      "replay_packet_sha256": "864ff17af3046a86be0d62c9fded751c18c75a0e04d848fe217c42a4f84f2aa7",
+      "retained_configuration": [
+        [
+          "unconditional"
+        ]
+      ],
+      "retained_effective_limits": [
+        {
+          "max_evidence_bytes": 8192,
+          "max_hops": 3,
+          "max_items": 12,
+          "max_neighbors": 32,
+          "max_nodes": 64,
+          "max_output_bytes": 16384
+        }
+      ],
+      "retained_omissions": [
+        [
+          {
+            "count": 2,
+            "reason": "anchor_limit"
+          }
+        ]
+      ],
+      "retained_request_sha256": "1e2409cc5cb454f9503460836528739abd9a35f588f2becbf5a03139898d4335",
+      "retained_requests": [
+        {
+          "intent": "dependencies",
+          "max_hops": 3,
+          "query": "Locate the authored declaration parse and Config, the module/import relationship between them, and definite static callers of parse. Report parse file, direct caller, Config field and type, and configuration value."
+        }
+      ],
+      "retained_selected_edges": [
+        [
+          [
+            "src/lib.rs::caller#function",
+            "src/api.rs::Config#struct",
+            "uses_type"
+          ]
+        ]
+      ],
+      "snapshot": "rust_impact",
+      "snapshot_files": {
+        "Cargo.toml": "734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9",
+        "src/api.rs": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+        "src/lib.rs": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710"
+      },
+      "snapshot_files_sha256": "dca1e5153ac7eb6f3ac338510a95b255c26e4457b29f57c121f7539268deb2a0"
+    },
+    "rust_trait_impl": {
+      "attempt": "rust_authored_trait_contract-r1-B",
+      "available_graph_edges": [
+        [
+          "src/lib.rs::build#function",
+          "src/lib.rs::Render#trait",
+          "uses_type"
+        ],
+        [
+          "src/lib.rs::build#function",
+          "src/lib.rs::UserId#type",
+          "uses_type"
+        ],
+        [
+          "src/lib.rs::build#function",
+          "src/lib.rs::Envelope#struct",
+          "uses_type"
+        ],
+        [
+          "src/lib.rs::Envelope#struct",
+          "src/lib.rs::Render#trait",
+          "uses_type"
+        ],
+        [
+          "src/lib.rs::Envelope#struct",
+          "src/lib.rs::UserId#type",
+          "uses_type"
+        ],
+        [
+          "src/lib.rs::Render#trait",
+          "src/lib.rs::Format#trait",
+          "supertrait"
+        ],
+        [
+          "src/lib.rs::Receipt#struct",
+          "src/lib.rs::UserId#type",
+          "uses_type"
+        ],
+        [
+          "src/lib.rs::Receipt#impl",
+          "src/lib.rs::Format#trait",
+          "impl_trait"
+        ],
+        [
+          "src/lib.rs::Receipt#impl",
+          "src/lib.rs::Receipt#struct",
+          "impl_self_type"
+        ],
+        [
+          "src/lib.rs::Receipt#impl~1",
+          "src/lib.rs::Render#trait",
+          "impl_trait"
+        ],
+        [
+          "src/lib.rs::Receipt#impl~1",
+          "src/lib.rs::Receipt#struct",
+          "impl_self_type"
+        ]
+      ],
+      "available_not_selected": [
+        [
+          "src/lib.rs::Envelope#struct",
+          "src/lib.rs::Render#trait",
+          "uses_type"
+        ],
+        [
+          "src/lib.rs::Envelope#struct",
+          "src/lib.rs::UserId#type",
+          "uses_type"
+        ]
+      ],
+      "classification": "expected_bounded_omission",
+      "engine_change_needed": false,
+      "followup_effective_limits": [
+        {
+          "max_evidence_bytes": 8192,
+          "max_hops": 1,
+          "max_items": 12,
+          "max_neighbors": 32,
+          "max_nodes": 64,
+          "max_output_bytes": 16384
+        }
+      ],
+      "followup_packet_sha256": "89b5b80089aa4f23d5d2d2e328819a4b8b4de0eb728eb3a56bd56c9f6013e841",
+      "followup_request_sha256": "3c65ed3ee71b47e7f2fc03ab5863c18baf705c77ba99c4ac8720345da7bd7de1",
+      "followup_requests": [
+        {
+          "intent": "type_dependencies",
+          "max_hops": 1,
+          "seed_ids": [
+            "src/lib.rs::Envelope#struct"
+          ]
+        }
+      ],
+      "followup_selected_edges": [
+        [
+          [
+            "src/lib.rs::Envelope#struct",
+            "src/lib.rs::Render#trait",
+            "uses_type"
+          ],
+          [
+            "src/lib.rs::Envelope#struct",
+            "src/lib.rs::UserId#type",
+            "uses_type"
+          ]
+        ]
+      ],
+      "followups_recover_all_available_not_selected": true,
+      "frozen_packet_sha256": "80f9d4423d967f14f62b4682f43d93b5ec025e9c2d58c1fc427e297285b0e11f",
+      "graph_counts": {
+        "edges": 11,
+        "nodes": 11
+      },
+      "graph_projection_sha256": "1c311555024e6aa8366713dbfa82a48bf43247e44bbe09b91f476c9930620886",
+      "graph_state_sha256": "20a77508a0cf86147b3735a90a0e82c28dbb4b33204b5cf7022977acf33d69bd",
+      "proof_checks": {
+        "available_edges_in_state": true,
+        "selected_edges_in_state": true,
+        "selected_paths_connected": true,
+        "source_spans_match_snapshot": true
+      },
+      "reason": "The inferred build packet and explicit Receipt packet select nine of eleven meanings; Envelope's deeper fields require Envelope as a focused seed.",
+      "replay_matches_frozen_packet": true,
+      "replay_packet_sha256": "80f9d4423d967f14f62b4682f43d93b5ec025e9c2d58c1fc427e297285b0e11f",
+      "retained_configuration": [
+        [
+          "unconditional",
+          "unconditional",
+          "unconditional",
+          "unconditional"
+        ],
+        [
+          "unconditional",
+          "unconditional",
+          "unconditional",
+          "unconditional",
+          "unconditional"
+        ]
+      ],
+      "retained_effective_limits": [
+        {
+          "max_evidence_bytes": 8192,
+          "max_hops": 2,
+          "max_items": 12,
+          "max_neighbors": 32,
+          "max_nodes": 64,
+          "max_output_bytes": 16384
+        },
+        {
+          "max_evidence_bytes": 8192,
+          "max_hops": 2,
+          "max_items": 12,
+          "max_neighbors": 32,
+          "max_nodes": 64,
+          "max_output_bytes": 16384
+        }
+      ],
+      "retained_omissions": [
+        [
+          {
+            "count": 2,
+            "reason": "alternative_path"
+          },
+          {
+            "count": 7,
+            "reason": "anchor_limit"
+          },
+          {
+            "count": 3,
+            "reason": "unresolved_relation"
+          }
+        ],
+        [
+          {
+            "count": 2,
+            "reason": "cycle"
+          },
+          {
+            "count": 1,
+            "reason": "hop_limit"
+          }
+        ]
+      ],
+      "retained_request_sha256": "81dc9b58ddf601f52f3b20c1acf3d39672af692dc081dcf7203470f0e9305944",
+      "retained_requests": [
+        {
+          "intent": "type_dependencies",
+          "max_hops": 2,
+          "query": "For build and Receipt, identify UserId alias underlying type, build generic bounds and return constructor, Render supertrait, Receipt fields, and traits explicitly implemented for Receipt."
+        },
+        {
+          "intent": "type_dependencies",
+          "max_hops": 2,
+          "seed_ids": [
+            "src/lib.rs::Receipt#struct"
+          ]
+        }
+      ],
+      "retained_selected_edges": [
+        [
+          [
+            "src/lib.rs::build#function",
+            "src/lib.rs::Envelope#struct",
+            "uses_type"
+          ],
+          [
+            "src/lib.rs::build#function",
+            "src/lib.rs::Render#trait",
+            "uses_type"
+          ],
+          [
+            "src/lib.rs::build#function",
+            "src/lib.rs::UserId#type",
+            "uses_type"
+          ],
+          [
+            "src/lib.rs::Render#trait",
+            "src/lib.rs::Format#trait",
+            "supertrait"
+          ]
+        ],
+        [
+          [
+            "src/lib.rs::Receipt#impl",
+            "src/lib.rs::Receipt#struct",
+            "impl_self_type"
+          ],
+          [
+            "src/lib.rs::Receipt#impl~1",
+            "src/lib.rs::Receipt#struct",
+            "impl_self_type"
+          ],
+          [
+            "src/lib.rs::Receipt#struct",
+            "src/lib.rs::UserId#type",
+            "uses_type"
+          ],
+          [
+            "src/lib.rs::Receipt#impl",
+            "src/lib.rs::Format#trait",
+            "impl_trait"
+          ],
+          [
+            "src/lib.rs::Receipt#impl~1",
+            "src/lib.rs::Render#trait",
+            "impl_trait"
+          ]
+        ]
+      ],
+      "snapshot": "rust_contracts",
+      "snapshot_files": {
+        "Cargo.toml": "734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9",
+        "src/lib.rs": "855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b"
+      },
+      "snapshot_files_sha256": "7eecb1d999a8d6ff0db3e8d1ca0982cc47cb14703a4e012d553ecfc2269422ef"
+    }
+  },
+  "contract": "One selected proof path per source item; scope.exhaustive is false.",
+  "schema_version": 1,
+  "source_identity": {
+    "corpus_declared_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "frozen_engine": {
+      "commit": "4f2668160df59bfb114a28a2069f9a0198da469b",
+      "extractor_version": 30,
+      "graph_state_version": 14,
+      "source_tree": "240e1267df018c5b70cffe51b70aaae566db9939"
+    },
+    "worktree_commit": "a58e2e4053b2630069c2b9da9667c2c61ab9de5b"
+  }
+}

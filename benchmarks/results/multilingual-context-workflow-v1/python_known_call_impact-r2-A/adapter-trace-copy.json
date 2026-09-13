@@ -1,0 +1,302 @@
+{
+  "schema_version": 3,
+  "protocol": "multilingual-context-workflow-v1",
+  "identity": {
+    "task_id": "python_known_call_impact",
+    "session_id": "session-d0f90964-98f0-4afc-afb9-e145580f4d71",
+    "arm": "A",
+    "repetition": 2,
+    "snapshot": "python_impact",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1"
+  },
+  "events": [
+    {
+      "id": "session-d0f90964-98f0-4afc-afb9-e145580f4d71:1",
+      "task_id": "python_known_call_impact",
+      "session_id": "session-d0f90964-98f0-4afc-afb9-e145580f4d71",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "python_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "outline",
+      "arguments": {},
+      "search_id": null,
+      "response_json": "{\"files\":[{\"file\":\"app.py\",\"symbols\":[{\"id\":\"app.py::caller#function\",\"name\":\"caller\",\"kind\":\"function\",\"line\":3,\"end_line\":4,\"signature\":\"def caller()\",\"summary\":\"\"},{\"id\":\"app.py::__file__#file\",\"name\":\"app.py\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"app.py\",\"summary\":\"\"}]},{\"file\":\"lib.py\",\"symbols\":[{\"id\":\"lib.py::target#function\",\"name\":\"target\",\"kind\":\"function\",\"line\":1,\"end_line\":2,\"signature\":\"def target()\",\"summary\":\"\"},{\"id\":\"lib.py::__file__#file\",\"name\":\"lib.py\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"lib.py\",\"summary\":\"\"}]}],\"_evaluation\":{\"attempt_id\":\"session-d0f90964-98f0-4afc-afb9-e145580f4d71/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-d0f90964-98f0-4afc-afb9-e145580f4d71:1\"}}",
+      "serialized_bytes": 730,
+      "source_bytes": 24,
+      "elapsed_ms": 1.6690000193193555,
+      "spans": [
+        {
+          "file": "app.py",
+          "start_byte": 33,
+          "end_byte": 45,
+          "sha256": "1b3a8070739c9a75ce5d0cdb39e09a0b801ed48b5533a389435f28f15e79ecbd",
+          "text": "def caller()"
+        },
+        {
+          "file": "lib.py",
+          "start_byte": 0,
+          "end_byte": 12,
+          "sha256": "b005815ef35759ff1b989e0b066c0a4eb3982422b38ab18881e7c25406b99a61",
+          "text": "def target()"
+        }
+      ]
+    },
+    {
+      "id": "session-d0f90964-98f0-4afc-afb9-e145580f4d71:2",
+      "task_id": "python_known_call_impact",
+      "session_id": "session-d0f90964-98f0-4afc-afb9-e145580f4d71",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "python_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "lib.py::target#function",
+          "app.py::caller#function"
+        ],
+        "context": 3
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"lib.py::target#function\",\"source\":\"def target():\\n    return 1\",\"byte_offset\":0,\"byte_length\":26,\"line\":1,\"end_line\":2,\"signature\":\"def target()\",\"kind\":\"function\",\"language\":\"python\",\"context_before\":[],\"context_after\":[]},{\"id\":\"app.py::caller#function\",\"source\":\"def caller():\\n    return alias()\",\"byte_offset\":33,\"byte_length\":32,\"line\":3,\"end_line\":4,\"signature\":\"def caller()\",\"kind\":\"function\",\"language\":\"python\",\"context_before\":[\"from lib import target as alias\",\"\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-d0f90964-98f0-4afc-afb9-e145580f4d71/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-d0f90964-98f0-4afc-afb9-e145580f4d71:2\"}}",
+      "serialized_bytes": 685,
+      "source_bytes": 113,
+      "elapsed_ms": 4.12887500715442,
+      "spans": [
+        {
+          "file": "lib.py",
+          "start_byte": 0,
+          "end_byte": 26,
+          "sha256": "00b11743da085fa77d79d131971cf9de571cbf8154642e2551810d20f76a2b93",
+          "text": "def target():\n    return 1"
+        },
+        {
+          "file": "app.py",
+          "start_byte": 33,
+          "end_byte": 65,
+          "sha256": "34c3d2859273c191f506ef7ee2910adfbb61ca348536b9c881a9bdc87efb6ac7",
+          "text": "def caller():\n    return alias()"
+        },
+        {
+          "file": "app.py",
+          "start_byte": 0,
+          "end_byte": 31,
+          "sha256": "0a0b8d3da49f3716931f7df061b4a01708aa851ac476a9eb816c2e5aad8c02b2",
+          "text": "from lib import target as alias"
+        },
+        {
+          "file": "lib.py",
+          "start_byte": 0,
+          "end_byte": 12,
+          "sha256": "b005815ef35759ff1b989e0b066c0a4eb3982422b38ab18881e7c25406b99a61",
+          "text": "def target()"
+        },
+        {
+          "file": "app.py",
+          "start_byte": 33,
+          "end_byte": 45,
+          "sha256": "1b3a8070739c9a75ce5d0cdb39e09a0b801ed48b5533a389435f28f15e79ecbd",
+          "text": "def caller()"
+        }
+      ]
+    },
+    {
+      "id": "session-d0f90964-98f0-4afc-afb9-e145580f4d71:3",
+      "task_id": "python_known_call_impact",
+      "session_id": "session-d0f90964-98f0-4afc-afb9-e145580f4d71",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "python_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 50
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"invalid record pagination\"},\"_evaluation\":{\"attempt_id\":\"session-d0f90964-98f0-4afc-afb9-e145580f4d71/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-d0f90964-98f0-4afc-afb9-e145580f4d71:3\"}}",
+      "serialized_bytes": 236,
+      "source_bytes": 0,
+      "elapsed_ms": 0.14887499855831265,
+      "spans": []
+    },
+    {
+      "id": "session-d0f90964-98f0-4afc-afb9-e145580f4d71:4",
+      "task_id": "python_known_call_impact",
+      "session_id": "session-d0f90964-98f0-4afc-afb9-e145580f4d71",
+      "arm": "A",
+      "repetition": 2,
+      "snapshot": "python_impact",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "question": "What is the known direct caller of target in lib.py, including the local import name and call direction?",
+        "seed_ids": [
+          "lib.py::target#function"
+        ],
+        "edge_types": [
+          "calls",
+          "imports"
+        ]
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-ygjxl_pd/snapshot\",\"question\":\"What is the known direct caller of target in lib.py, including the local import name and call direction?\",\"selection\":\"explicit\",\"question_terms\":[],\"anchors\":[{\"node\":{\"id\":\"lib.py::target#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"python\",\"file\":\"lib.py\",\"line\":1,\"end_line\":2}},\"matched_symbol_id\":\"lib.py::target#function\",\"name\":\"target\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}}],\"routing\":{\"kind\":\"relationship\",\"reason\":\"relationship_intent\"},\"filters\":{\"namespaces\":null,\"edge_types\":[\"calls\",\"imports\"],\"resolutions\":[\"exact\",\"declared\",\"import-resolved\"],\"direction\":\"outgoing\"},\"hub_threshold\":4,\"paths\":[],\"rejected_paths\":[],\"counts\":{\"filtered_edges\":2,\"examined_nodes\":4,\"examined_paths\":1,\"returned_paths\":0,\"rejected_paths\":0,\"duplicate_paths\":0,\"omitted_rejected_paths\":0,\"omitted_nodes\":0,\"omitted_paths\":0},\"budget\":{\"max_hops\":3,\"max_nodes\":64,\"max_paths\":16,\"path_offset\":0,\"evidence_bytes\":0,\"estimated_tokens\":0,\"max_evidence_bytes\":16384,\"max_estimated_tokens\":4096,\"hop_limit_reached\":false,\"node_limit_reached\":false,\"next_path_offset\":null},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-d0f90964-98f0-4afc-afb9-e145580f4d71/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-d0f90964-98f0-4afc-afb9-e145580f4d71:4\"}}",
+      "serialized_bytes": 1458,
+      "source_bytes": 0,
+      "elapsed_ms": 2.5203330151271075,
+      "spans": []
+    }
+  ],
+  "failures": [
+    {
+      "attempt_id": "session-d0f90964-98f0-4afc-afb9-e145580f4d71/attempt/3",
+      "category": "tool_error",
+      "message": "invalid record pagination"
+    }
+  ],
+  "attempts": 4,
+  "deliveries": [
+    {
+      "attempt_id": "session-d0f90964-98f0-4afc-afb9-e145580f4d71/attempt/1",
+      "operation": "outline",
+      "arguments": {},
+      "reason": "task_context",
+      "detail": "Observed outline request.",
+      "because": null,
+      "response_json": "{\"files\":[{\"file\":\"app.py\",\"symbols\":[{\"id\":\"app.py::caller#function\",\"name\":\"caller\",\"kind\":\"function\",\"line\":3,\"end_line\":4,\"signature\":\"def caller()\",\"summary\":\"\"},{\"id\":\"app.py::__file__#file\",\"name\":\"app.py\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"app.py\",\"summary\":\"\"}]},{\"file\":\"lib.py\",\"symbols\":[{\"id\":\"lib.py::target#function\",\"name\":\"target\",\"kind\":\"function\",\"line\":1,\"end_line\":2,\"signature\":\"def target()\",\"summary\":\"\"},{\"id\":\"lib.py::__file__#file\",\"name\":\"lib.py\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"lib.py\",\"summary\":\"\"}]}],\"_evaluation\":{\"attempt_id\":\"session-d0f90964-98f0-4afc-afb9-e145580f4d71/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-d0f90964-98f0-4afc-afb9-e145580f4d71:1\"}}",
+      "serialized_bytes": 730,
+      "source_bytes": 24,
+      "elapsed_ms": 1.7912920156959444,
+      "trace_event_id": "session-d0f90964-98f0-4afc-afb9-e145580f4d71:1",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "app.py",
+          "start_byte": 33,
+          "end_byte": 45,
+          "sha256": "1b3a8070739c9a75ce5d0cdb39e09a0b801ed48b5533a389435f28f15e79ecbd",
+          "text": "def caller()"
+        },
+        {
+          "file": "lib.py",
+          "start_byte": 0,
+          "end_byte": 12,
+          "sha256": "b005815ef35759ff1b989e0b066c0a4eb3982422b38ab18881e7c25406b99a61",
+          "text": "def target()"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-d0f90964-98f0-4afc-afb9-e145580f4d71/attempt/2",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "lib.py::target#function",
+          "app.py::caller#function"
+        ],
+        "context": 3
+      },
+      "reason": "task_context",
+      "detail": "Observed get request.",
+      "because": null,
+      "response_json": "{\"symbols\":[{\"id\":\"lib.py::target#function\",\"source\":\"def target():\\n    return 1\",\"byte_offset\":0,\"byte_length\":26,\"line\":1,\"end_line\":2,\"signature\":\"def target()\",\"kind\":\"function\",\"language\":\"python\",\"context_before\":[],\"context_after\":[]},{\"id\":\"app.py::caller#function\",\"source\":\"def caller():\\n    return alias()\",\"byte_offset\":33,\"byte_length\":32,\"line\":3,\"end_line\":4,\"signature\":\"def caller()\",\"kind\":\"function\",\"language\":\"python\",\"context_before\":[\"from lib import target as alias\",\"\"],\"context_after\":[]}],\"_evaluation\":{\"attempt_id\":\"session-d0f90964-98f0-4afc-afb9-e145580f4d71/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-d0f90964-98f0-4afc-afb9-e145580f4d71:2\"}}",
+      "serialized_bytes": 685,
+      "source_bytes": 113,
+      "elapsed_ms": 4.205790988635272,
+      "trace_event_id": "session-d0f90964-98f0-4afc-afb9-e145580f4d71:2",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "lib.py",
+          "start_byte": 0,
+          "end_byte": 26,
+          "sha256": "00b11743da085fa77d79d131971cf9de571cbf8154642e2551810d20f76a2b93",
+          "text": "def target():\n    return 1"
+        },
+        {
+          "file": "app.py",
+          "start_byte": 33,
+          "end_byte": 65,
+          "sha256": "34c3d2859273c191f506ef7ee2910adfbb61ca348536b9c881a9bdc87efb6ac7",
+          "text": "def caller():\n    return alias()"
+        },
+        {
+          "file": "app.py",
+          "start_byte": 0,
+          "end_byte": 31,
+          "sha256": "0a0b8d3da49f3716931f7df061b4a01708aa851ac476a9eb816c2e5aad8c02b2",
+          "text": "from lib import target as alias"
+        },
+        {
+          "file": "lib.py",
+          "start_byte": 0,
+          "end_byte": 12,
+          "sha256": "b005815ef35759ff1b989e0b066c0a4eb3982422b38ab18881e7c25406b99a61",
+          "text": "def target()"
+        },
+        {
+          "file": "app.py",
+          "start_byte": 33,
+          "end_byte": 45,
+          "sha256": "1b3a8070739c9a75ce5d0cdb39e09a0b801ed48b5533a389435f28f15e79ecbd",
+          "text": "def caller()"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-d0f90964-98f0-4afc-afb9-e145580f4d71/attempt/3",
+      "operation": "graph_calls",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 50
+      },
+      "reason": "task_context",
+      "detail": "Observed graph_calls request.",
+      "because": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"invalid record pagination\"},\"_evaluation\":{\"attempt_id\":\"session-d0f90964-98f0-4afc-afb9-e145580f4d71/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-d0f90964-98f0-4afc-afb9-e145580f4d71:3\"}}",
+      "serialized_bytes": 236,
+      "source_bytes": 0,
+      "elapsed_ms": 0.3053339896723628,
+      "trace_event_id": "session-d0f90964-98f0-4afc-afb9-e145580f4d71:3",
+      "status": "recorded",
+      "spans": []
+    },
+    {
+      "attempt_id": "session-d0f90964-98f0-4afc-afb9-e145580f4d71/attempt/4",
+      "operation": "graph_retrieve",
+      "arguments": {
+        "question": "What is the known direct caller of target in lib.py, including the local import name and call direction?",
+        "seed_ids": [
+          "lib.py::target#function"
+        ],
+        "edge_types": [
+          "calls",
+          "imports"
+        ]
+      },
+      "reason": "task_context",
+      "detail": "Observed graph_retrieve request.",
+      "because": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-ygjxl_pd/snapshot\",\"question\":\"What is the known direct caller of target in lib.py, including the local import name and call direction?\",\"selection\":\"explicit\",\"question_terms\":[],\"anchors\":[{\"node\":{\"id\":\"lib.py::target#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"python\",\"file\":\"lib.py\",\"line\":1,\"end_line\":2}},\"matched_symbol_id\":\"lib.py::target#function\",\"name\":\"target\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}}],\"routing\":{\"kind\":\"relationship\",\"reason\":\"relationship_intent\"},\"filters\":{\"namespaces\":null,\"edge_types\":[\"calls\",\"imports\"],\"resolutions\":[\"exact\",\"declared\",\"import-resolved\"],\"direction\":\"outgoing\"},\"hub_threshold\":4,\"paths\":[],\"rejected_paths\":[],\"counts\":{\"filtered_edges\":2,\"examined_nodes\":4,\"examined_paths\":1,\"returned_paths\":0,\"rejected_paths\":0,\"duplicate_paths\":0,\"omitted_rejected_paths\":0,\"omitted_nodes\":0,\"omitted_paths\":0},\"budget\":{\"max_hops\":3,\"max_nodes\":64,\"max_paths\":16,\"path_offset\":0,\"evidence_bytes\":0,\"estimated_tokens\":0,\"max_evidence_bytes\":16384,\"max_estimated_tokens\":4096,\"hop_limit_reached\":false,\"node_limit_reached\":false,\"next_path_offset\":null},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-d0f90964-98f0-4afc-afb9-e145580f4d71/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-d0f90964-98f0-4afc-afb9-e145580f4d71:4\"}}",
+      "serialized_bytes": 1458,
+      "source_bytes": 0,
+      "elapsed_ms": 2.583333000075072,
+      "trace_event_id": "session-d0f90964-98f0-4afc-afb9-e145580f4d71:4",
+      "status": "recorded",
+      "spans": []
+    }
+  ]
+}

@@ -20,6 +20,7 @@ from loci.graph.contracts import (
     validate_graph_edges,
 )
 from loci.graph.go_modules import (
+    MAX_GO_CONTROL_BYTES,
     GoModuleProblem,
     build_go_package_index,
     load_go_module_context,
@@ -30,6 +31,7 @@ from loci.graph.javascript_modules import (
     load_javascript_module_context,
 )
 from loci.graph.rust_crates import (
+    MAX_CARGO_CONTROL_BYTES,
     RustCrateProblem,
     build_rust_crate_index,
     load_cargo_context,
@@ -41,7 +43,7 @@ from loci.graph.swift_modules import (
     build_swift_module_index,
     load_swift_module_context,
 )
-from loci.graph.profiles import required_frontmatter_fields
+from loci.graph.profiles import read_contained_file, required_frontmatter_fields
 from loci.graph.state import GraphDiagnostic, GraphIndexState
 from loci.graph.retrieval import (
     _graph_node_ref,
@@ -65,6 +67,8 @@ from loci.parser.imports import (
 from loci.parser.languages import EXTENSION_MAP, MARKDOWN_SUFFIXES
 from loci.parser.reference_models import RawLocalExport, RawSymbolReference
 from loci.parser.symbols import Symbol, make_file_symbol
+from loci.parser.type_models import RawTypeObservation
+from loci.parser.type_observations import TypeExtractionError, extract_type_observations
 from loci.query_coverage import (
     QueryCoverage,
     QueryCoverageRecorder,
@@ -87,6 +91,7 @@ from loci.storage.store_health import (
     diagnose_store,
 )
 from loci.storage.store_resolver import StoreResolution, resolve_store_base_dir
+from loci.exploration import explore_context
 
 REFRESH_LOCK_POLL_SECONDS = 0.05
 REFRESH_LOCK_RECLAIM_GRACE_SECONDS = 1.0
@@ -201,6 +206,7 @@ def _index_repo_unlocked(
     previous_exports: dict[str, list[RawLocalExport]] = defaultdict(list)
     previous_symbol_references: dict[str, list[RawSymbolReference]] = defaultdict(list)
     previous_calls: dict[str, list[RawCallSite]] = defaultdict(list)
+    previous_types: dict[str, list[RawTypeObservation]] = defaultdict(list)
     previous_extraction_diagnostics: dict[str, list[GraphDiagnostic]] = defaultdict(list)
     if previous_graph is not None:
         for record in previous_graph.imports:
@@ -213,11 +219,14 @@ def _index_repo_unlocked(
             previous_symbol_references[record.raw.source_file].append(record.raw)
         for record in previous_graph.calls:
             previous_calls[record.raw.source_file].append(record.raw)
+        for record in previous_graph.type_relations:
+            previous_types[record.raw.source_file].append(record.raw)
         for diagnostic in previous_graph.diagnostics:
             if (
                 diagnostic.code in {
                     "GRAPH_IMPORT_EXTRACTION_FAILED",
                     "GRAPH_REFERENCE_EXTRACTION_FAILED",
+                    "GRAPH_TYPE_EXTRACTION_FAILED",
                     "GRAPH_SOURCE_UNPARSED",
                 }
                 and diagnostic.source is not None
@@ -259,6 +268,7 @@ def _index_repo_unlocked(
     raw_exports: list[RawLocalExport] = []
     raw_symbol_references: list[RawSymbolReference] = []
     raw_calls: list[RawCallSite] = []
+    raw_type_observations: list[RawTypeObservation] = []
     extraction_diagnostics: list[GraphDiagnostic] = []
 
     for src_file, rel_path, file_hash in repository_scan.indexable_files:
@@ -288,6 +298,7 @@ def _index_repo_unlocked(
                 previous_symbol_references.get(rel_path, ())
             )
             raw_calls.extend(previous_calls.get(rel_path, ()))
+            raw_type_observations.extend(previous_types.get(rel_path, ()))
             extraction_diagnostics.extend(
                 previous_extraction_diagnostics.get(rel_path, ())
             )
@@ -359,6 +370,17 @@ def _index_repo_unlocked(
                 extraction_diagnostics.append(
                     _extraction_diagnostic(rel_path, exc)
                 )
+            try:
+                raw_type_observations.extend(extract_type_observations(
+                    src_file, source_file=rel_path, language=lang,
+                    source_hash=file_hash, symbols=symbols,
+                ))
+            except TypeExtractionError as exc:
+                extraction_diagnostics.append(GraphDiagnostic(
+                    code="GRAPH_TYPE_EXTRACTION_FAILED", severity="warning",
+                    message=str(exc), source=rel_path,
+                    details={"reason": exc.reason, "type_code": exc.code},
+                ))
             all_symbols.append(file_node)
 
     file_nodes = {
@@ -416,6 +438,7 @@ def _index_repo_unlocked(
         raw_exports=raw_exports,
         raw_symbol_references=raw_symbol_references,
         raw_calls=raw_calls,
+        raw_type_observations=raw_type_observations,
         go_packages=go_package_build.index,
         swift_modules=swift_module_build.index,
         javascript_modules=javascript_resolution_build.index,
@@ -474,6 +497,13 @@ def _index_repo_unlocked(
         ),
         "graph_calls_unresolved": sum(
             record.status == "unresolved" for record in graph_state.calls
+        ),
+        "graph_type_relations_indexed": len(graph_state.type_relations),
+        "graph_type_relations_resolved": sum(
+            record.status == "resolved" for record in graph_state.type_relations
+        ),
+        "graph_type_relations_unresolved": sum(
+            record.status == "unresolved" for record in graph_state.type_relations
         ),
         "graph_status": _graph_status(graph_state),
         "graph_diagnostics": [
@@ -621,6 +651,37 @@ def get_symbols(
     ]
 
 
+def get_symbols_result(
+    repo: str | Path,
+    symbol_ids: list[str],
+    context: int = 0,
+    ensure_fresh: bool = False,
+    selected_from_search_id: str | None = None,
+    include_type_context: bool = False,
+) -> dict[str, Any]:
+    """Compose exact get with optional bounded, existing type context."""
+    if type(include_type_context) is not bool:
+        raise LociError("INVALID_INPUT", "include_type_context must be a boolean", {})
+    symbols = get_symbols(
+        repo, symbol_ids, context=context, ensure_fresh=ensure_fresh,
+        selected_from_search_id=selected_from_search_id,
+    )
+    result: dict[str, Any] = {"symbols": symbols}
+    if not include_type_context:
+        return result
+
+    from .type_context import empty_type_context, expand_type_context
+
+    repo_path = Path(repo).resolve()
+    try:
+        store, indexed_nodes, graph_state = _load_graph_context(repo_path, ensure_fresh=False)
+    except LociError as exc:
+        result["type_context"] = empty_type_context(reason=exc.code, unavailable=True)
+        return result
+    result["type_context"] = expand_type_context(repo_path, store, indexed_nodes, graph_state, symbols)
+    return result
+
+
 def search_symbols(
     repo: str | Path,
     query: str,
@@ -744,18 +805,38 @@ def get_cached_file(
     store = get_store()
     if ensure_fresh:
         ensure_fresh_index(repo_path)
-    _load_required_index(store, repo_path)
+    index = _load_required_index(store, repo_path)
 
-    result = store.get_file_content(
-        repo_path,
-        file_path,
-        start_line=start_line,
-        end_line=end_line,
+    control_path = PurePosixPath(file_path)
+    is_control = (
+        bool(file_path)
+        and "\\" not in file_path
+        and not control_path.is_absolute()
+        and ".." not in control_path.parts
+        and control_path.as_posix() == file_path
+        and control_path.name in {"go.mod", "go.work", "Cargo.toml"}
     )
+    if is_control:
+        try:
+            state = store.validate_graph_state(index)
+        except GraphContractError as exc:
+            raise LociError(exc.code, exc.message, exc.details) from exc
+        result = _get_resolver_control_content(
+            repo_path, file_path, state.input_hashes.get(file_path),
+            start_line=start_line, end_line=end_line,
+        )
+    else:
+        result = store.get_file_content(
+            repo_path,
+            file_path,
+            start_line=start_line,
+            end_line=end_line,
+        )
     if result is None:
         raise LociError(
             "FILE_NOT_FOUND",
-            "File not found in cache",
+            "Resolver control is not tracked by the current index"
+            if is_control else "File not found in cache",
             {"repo": str(repo_path), "file": file_path},
         )
 
@@ -770,6 +851,57 @@ def get_cached_file(
         language=language,
     )
     return result
+
+
+def _get_resolver_control_content(
+    repo_path: Path,
+    file_path: str,
+    expected_hash: str | None,
+    *,
+    start_line: int | None,
+    end_line: int | None,
+) -> dict[str, Any] | None:
+    """Read bounded control bytes only when they match indexed resolver input."""
+    if expected_hash is None:
+        return None
+    limit = MAX_CARGO_CONTROL_BYTES if Path(file_path).name == "Cargo.toml" else MAX_GO_CONTROL_BYTES
+    details: dict[str, Any] = {"repo": str(repo_path), "file": file_path}
+    try:
+        raw, relative = read_contained_file(
+            repo_path, Path(file_path), record="resolver control", max_bytes=limit,
+        )
+    except GraphContractError as exc:
+        raise LociError(
+            "CONTROL_SOURCE_UNAVAILABLE",
+            "Indexed resolver control cannot be read safely within its byte limit",
+            {**details, "reason": "read_failed", "limit_bytes": limit, "cause": exc.message},
+        ) from exc
+    if relative != file_path or hashlib.sha256(raw).hexdigest() != expected_hash:
+        raise LociError(
+            "CONTROL_SOURCE_UNAVAILABLE",
+            "Resolver control differs from indexed input; refresh the index",
+            {**details, "reason": "indexed_hash_mismatch"},
+        )
+    try:
+        content = raw.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise LociError(
+            "CONTROL_SOURCE_UNAVAILABLE",
+            "Indexed resolver control is not UTF-8",
+            {**details, "reason": "invalid_utf8"},
+        ) from exc
+    lines = content.splitlines(keepends=True)
+    total_lines = len(lines)
+    start = max(0, min(start_line - 1 if start_line is not None else 0, total_lines))
+    end = max(start, min(end_line if end_line is not None else total_lines, total_lines))
+    return {
+        "file": file_path,
+        "content": "".join(lines[start:end]),
+        "total_lines": total_lines,
+        "start_line": start + 1,
+        "end_line": end,
+        "file_bytes": len(raw),
+    }
 
 
 def grep_repo(
@@ -1046,6 +1178,33 @@ def graph_paths(
         raise LociError(exc.code, exc.message, exc.details) from exc
 
 
+def explore(
+    repo: str | Path,
+    query: str = "",
+    *,
+    intent: str = "locate",
+    seed_ids: list[str] | None = None,
+    max_hops: int | None = None,
+    max_output_bytes: int = 16384,
+    max_evidence_bytes: int = 8192,
+    resolutions: list[str] | None = None,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    """Return compact source selected for an explicit static retrieval intent."""
+    repo_path = Path(repo).resolve()
+    store, nodes, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
+    coverage = query_coverage_from_index(_load_required_index(store, repo_path), "indexed_symbols")
+    try:
+        return explore_context(
+            repo_path, store, nodes, state, query, intent=intent, seed_ids=seed_ids,
+            max_hops=max_hops, max_output_bytes=max_output_bytes,
+            max_evidence_bytes=max_evidence_bytes, resolutions=resolutions,
+            coverage=coverage["state"],
+        )
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+
 def graph_retrieve(
     repo: str | Path,
     question: str,
@@ -1240,11 +1399,16 @@ def graph_references(
     status: Literal["all", "resolved", "unresolved"] = "all",
     offset: int = 0,
     limit: int = 100,
+    family: Literal["symbol", "type"] = "symbol",
     ensure_fresh: bool = False,
 ) -> dict[str, Any]:
     _validate_graph_record_query(file, status, offset, limit)
+    if not isinstance(family, str) or family not in {"symbol", "type"}:
+        raise LociError("INVALID_INPUT", "Reference family must be symbol or type", {"family": family})
     repo_path = Path(repo).resolve()
     _, _, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
+    if family == "type":
+        return _type_reference_page(repo_path, state, file, status, offset, limit)
     records = [
         record
         for record in state.symbol_references
@@ -1315,6 +1479,33 @@ def graph_references(
             "limit": limit,
             "next_offset": next_offset,
         },
+    }
+
+
+def _type_reference_page(
+    repo_path: Path, state: GraphIndexState, file: str | None,
+    status: str, offset: int, limit: int,
+) -> dict[str, Any]:
+    from loci.graph.type_relations import type_site_key
+
+    records = sorted(
+        (record for record in state.type_relations if file is None or record.raw.source_file == file),
+        key=lambda record: type_site_key(record.raw),
+    )
+    filtered = [record for record in records if status == "all" or record.status == status]
+    page = filtered[offset:offset + limit]
+    next_offset = offset + len(page)
+    return {
+        "schema_version": GRAPH_SCHEMA_VERSION, "repo": str(repo_path),
+        "file": file, "status": status, "family": "type",
+        "items": [{**record.to_dict(), "source_file": record.raw.source_file,
+                   "resolution": record.resolution} for record in page],
+        "counts": {"total": len(records),
+                   "resolved": sum(record.status == "resolved" for record in records),
+                   "unresolved": sum(record.status == "unresolved" for record in records),
+                   "returned": len(page)},
+        "pagination": {"offset": offset, "limit": limit,
+                       "next_offset": next_offset if next_offset < len(filtered) else None},
     }
 
 
@@ -1429,6 +1620,13 @@ def graph_health(
     for record in state.calls:
         if record.status == "resolved" and record.resolution_basis is not None:
             call_resolution_basis_counts[record.resolution_basis] += 1
+    type_basis_counts: dict[str, int] = defaultdict(int)
+    type_reason_counts: dict[str, int] = defaultdict(int)
+    for record in state.type_relations:
+        if record.resolution_basis is not None:
+            type_basis_counts[record.resolution_basis] += 1
+        if record.unresolved_reason is not None:
+            type_reason_counts[record.unresolved_reason] += 1
     return {
         "schema_version": GRAPH_SCHEMA_VERSION,
         "repo": str(repo_path),
@@ -1483,6 +1681,15 @@ def graph_health(
             "graph_calls_resolved_by_basis": dict(
                 sorted(call_resolution_basis_counts.items())
             ),
+            "graph_type_relations_indexed": len(state.type_relations),
+            "graph_type_relations_resolved": sum(
+                record.status == "resolved" for record in state.type_relations
+            ),
+            "graph_type_relations_unresolved": sum(
+                record.status == "unresolved" for record in state.type_relations
+            ),
+            "graph_type_relations_resolved_by_basis": dict(sorted(type_basis_counts.items())),
+            "graph_type_relations_unresolved_by_reason": dict(sorted(type_reason_counts.items())),
         },
         "diagnostics": diagnostic_values,
     }

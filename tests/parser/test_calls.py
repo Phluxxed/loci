@@ -282,7 +282,7 @@ def _extract_calls(
                 ("obj?.optional", "dynamic", "callable", "unsupported"),
                 ("callback", "dynamic", "callable", "unsupported"),
                 ("obj.work", "dynamic", "callable", "unsupported"),
-                ("hidden", "identifier", "unindexed", "absent"),
+                ("hidden", "identifier", "callable", "absent"),
             ],
         ),
         (
@@ -296,7 +296,7 @@ def _extract_calls(
             [
                 ("helper", "identifier", "callable", "definite"),
                 ("this.work", "static_path", "callable", "absent"),
-                ("hidden", "identifier", "unindexed", "absent"),
+                ("hidden", "identifier", "callable", "absent"),
                 ("top", "identifier", "file", "absent"),
             ],
         ),

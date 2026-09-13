@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "version": "multilingual-context-workflow-controls-v1",
+  "task_id": "task_ecbfc0ce724b713f2599830d21438a46",
+  "corpus_version": "multilingual-context-v1",
+  "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+  "baseline_engine": {
+    "repository": "https://github.com/Phluxxed/loci.git",
+    "commit": "4f2668160df59bfb114a28a2069f9a0198da469b",
+    "extractor_version": 30,
+    "graph_state_version": 14
+  },
+  "protocol": {
+    "file": "protocol.md",
+    "sha256": "f2f63e4e6ec04397d307ca7bc32b990f239197f581d250eeba810f5cd9842274"
+  },
+  "case_ids": [
+    "python_alias_annotation",
+    "python_base_and_literal_forward",
+    "python_known_call_impact",
+    "python_unproven_contracts",
+    "javascript_value_dependencies",
+    "javascript_direct_class_base",
+    "javascript_known_call_impact",
+    "javascript_unproven_dependencies",
+    "go_alias_generic_contract",
+    "go_explicit_embedding",
+    "go_known_api_impact",
+    "go_unproven_package_uses",
+    "rust_authored_trait_contract",
+    "rust_contained_optional_reexport",
+    "rust_known_call_impact",
+    "rust_unproven_contracts",
+    "tsx_props_control",
+    "markdown_section_control",
+    "python_loci_bundle_contract"
+  ],
+  "arms": {
+    "A": "exact_retrieval_and_explicit_graph",
+    "B": "same_plus_loci_explore_and_frozen_workflow_guide"
+  },
+  "agent": {
+    "route": "local_codex_exec",
+    "cli_version": "0.154.0",
+    "auth_mode": "ChatGPT",
+    "model": "gpt-5.6-luna",
+    "reasoning_effort": "high",
+    "service_tier": "default",
+    "temperature": "unset",
+    "seed": "unsupported_not_claimed",
+    "backend_snapshot": "not_exposed_not_pinned",
+    "fresh_session": true,
+    "delegation": false,
+    "web": false,
+    "repository_execution": false,
+    "ambient_context": false,
+    "gold_visible": false,
+    "request_max_retries": "builtin_cli_default_not_overridden",
+    "stream_max_retries": "builtin_cli_default_not_overridden",
+    "common_prompt": "Use the repository tools to answer the following source-comprehension task. Inspect source before answering. Search returns at most five results. Retrieve the exact selected source and any type or dependency context needed for the task. Existing graph tools and bounded file/grep fallback are available. Preserve ambiguous and unresolved relationships; a matching name alone is not proof. Use only each tool's declared parameters. Respect returned omission and budget information. Inspect narrow source ranges to stay within the span and byte limits. Use selected_from_search_id only when your get is deliberately selected from that exact search; omit it for direct or outline-driven gets. Resource helpers supply no repository context. Return only the requested JSON answer. Do not delegate, browse externally, execute repository code or consult files outside the supplied snapshot.\n\n",
+    "workflow_guide": "Compact-context workflow: use loci_explore to collect source and proven nearby relationships for the task. Choose intent=\"type_dependencies\" for an authored input/output or type contract, intent=\"dependencies\" for the dependencies of a declaration, intent=\"impact\" for known callers or explicit dependents, and intent=\"locate\" for the declaration itself. Start from a narrow task-relevant query or exact seed_ids. If a known file is needed to disambiguate, use search with file_paths and pass its exact symbol ID as a seed. Inspect the returned source, provenance, limits and omissions. Follow up with exact get, graph or narrow file/grep reads when needed to answer fully. Unknown or unsupported relationships remain unproven.\n\n",
+    "scheduled_attempt_retries": 0,
+    "transport_recovery": "Frozen Codex CLI built-in OpenAI behavior; no custom provider or outcome replacement. Local offline inspection provider alone sets zero retries."
+  },
+  "schedule": {
+    "repetitions": 3,
+    "case_order": "corpus_order",
+    "arm_orders": [
+      [
+        "A",
+        "B"
+      ],
+      [
+        "B",
+        "A"
+      ],
+      [
+        "A",
+        "B"
+      ]
+    ],
+    "pair_order": "alternating_AB_BA_across_cases_and_repetitions_start_AB",
+    "concurrency": 1,
+    "planned_runs": 114,
+    "index_state": "fresh_per_run_prebuilt_outside_retrieval_timer",
+    "correctness_retries": 0,
+    "outage_replacements": 0
+  },
+  "limits": {
+    "search_k": 5,
+    "max_anchors": 5,
+    "max_hops": 3,
+    "max_nodes": 64,
+    "max_paths": 16,
+    "max_neighbors_per_seed": 16,
+    "max_evidence_spans": 64,
+    "max_evidence_bytes": 16384,
+    "max_estimated_evidence_tokens": 4096,
+    "max_serialized_output_bytes_per_operation": 32768,
+    "max_serialized_output_bytes_per_run": 262144,
+    "max_source_bytes_per_run": 131072,
+    "max_top_level_tool_calls_per_run": 24,
+    "max_retrieval_seconds_per_operation": 10,
+    "max_end_to_end_seconds_per_run": 180,
+    "max_reported_input_tokens_per_run": 200000,
+    "max_reported_output_tokens_per_run": 8192,
+    "max_selected_items": 12,
+    "max_neighbors_per_node": 32,
+    "explore_evidence_bytes": 8192,
+    "explore_output_bytes": 16384
+  },
+  "graph_filters": {
+    "direction": "outgoing",
+    "resolutions": [
+      "exact",
+      "declared",
+      "import-resolved"
+    ],
+    "edge_types": "all_supported_by_assigned_arm",
+    "namespaces": "assigned_snapshot_only",
+    "path_offset": 0
+  },
+  "acceptance": {
+    "scope": "per_language_and_separate_controls",
+    "measurement_complete_required": true,
+    "B_full_pass_rate_required": 1.0,
+    "per_case_correctness_regression_allowed": 0,
+    "per_case_source_recall_regression_allowed": 0,
+    "unsupported_proven_relationships_allowed": 0,
+    "tool_calls_relative_reduction_min": 0.2,
+    "minimum_tasks_with_one_fewer_median_tool_call": 1,
+    "median_sum_output_bytes_ratio_max": 1.0,
+    "median_sum_gross_input_tokens_ratio_max": 1.0,
+    "p95_latency_ratio_max": 1.25,
+    "p95_method": "nearest_rank",
+    "comparison_pairs": [
+      [
+        "B",
+        "A"
+      ]
+    ],
+    "unavailable_required_measurement": "inconclusive"
+  },
+  "accounting": {
+    "primary_context_cost": "provider_reported_gross_input_tokens",
+    "cached_tokens": "separate_no_assumed_cache_control",
+    "estimated_tokens": "loci_estimate_separate_from_measured",
+    "dollars": "unavailable_chatgpt_auth_no_api_price_conversion",
+    "complete_tool_output": "UTF8 bytes of the complete model-visible result payload: compact structured JSON or every exact text content string; transport timing/framing is included in provider tokens.",
+    "source_bytes": "each_delivery_including_duplicates",
+    "resource_helpers": "Count all terminal helper/error events, completed or failed, and their exact payloads; unknown payload types make accounting inconclusive.",
+    "source_signatures": "Each exact signature occurrence is verified within its identified indexed declaration; noncontiguous/transformed metadata is not source credit.",
+    "primary_read_measure": "all_observed_top_level_tool_calls_including_errors_helpers_and_planned_work",
+    "causal_attribution": "not_collected_or_inferred",
+    "recoverable_errors": "Count exact calls/output; a later exact answer may pass if all required measurements and hard budgets are valid."
+  },
+  "environment": {
+    "python": "3.12.13 (main, May 10 2026, 19:20:41) [Clang 22.1.3 ]",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "packages": {
+      "PyJWT": "2.13.0",
+      "PyYAML": "6.0.3",
+      "Pygments": "2.19.2",
+      "annotated-types": "0.7.0",
+      "anyio": "4.14.0",
+      "attrs": "26.1.0",
+      "cffi": "2.0.0",
+      "click": "8.4.1",
+      "cryptography": "49.0.0",
+      "h11": "0.16.0",
+      "httpcore2": "2.10.0",
+      "httpx2": "2.10.0",
+      "idna": "3.18",
+      "iniconfig": "2.3.0",
+      "jsonschema": "4.26.0",
+      "jsonschema-specifications": "2025.9.1",
+      "loci": "0.2.0",
+      "mcp": "2.0.0",
+      "mcp-types": "2.0.0",
+      "opentelemetry-api": "1.44.0",
+      "packaging": "26.0",
+      "pathspec": "1.1.1",
+      "pluggy": "1.6.0",
+      "pycparser": "3.0",
+      "pydantic": "2.13.4",
+      "pydantic_core": "2.46.4",
+      "pytest": "9.0.2",
+      "python-multipart": "0.0.32",
+      "referencing": "0.37.0",
+      "rpds-py": "2026.5.1",
+      "sse-starlette": "3.4.5",
+      "starlette": "1.3.1",
+      "tree-sitter": "0.25.2",
+      "tree-sitter-language-pack": "1.15.8",
+      "truststore": "0.10.4",
+      "typing-inspection": "0.4.2",
+      "typing_extensions": "4.15.0",
+      "uvicorn": "0.49.0"
+    },
+    "pyproject_sha256": "56f91a5b3ae2593ef62bd2ec6b6012f6d67c81eadaec6f4c67f0c2a74b8a8a1d",
+    "uv_lock_sha256": "8e77b4d240f057fbcb375047a7c1dd20ef89fd16fb8632ebe7c7fd489581a1f3",
+    "codex_cli_sha256": "4f85982624b3898c8991cb80c0981b2aa71070e3537046c9a95950318a95afcc"
+  },
+  "capability_preflight": {
+    "kind": "read_only_local_catalog_and_login",
+    "provider_calls": 0,
+    "limitation": "Catalog and login do not guarantee request success or expose the backend model snapshot."
+  },
+  "measurement_status": "Preparation only; provider outcomes require a separately published validated freeze."
+}

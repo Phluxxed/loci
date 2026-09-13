@@ -1,0 +1,85 @@
+[
+  {
+    "type": "thread.started",
+    "thread_id": "01a097ef-62fc-7c60-afaa-aefbd92d791a"
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_0",
+      "type": "error",
+      "message": "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-25nnqieo/agent-runtime/config.toml."
+    }
+  },
+  {
+    "type": "turn.started"
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_1",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "consumer.py::decode#function"
+        ],
+        "context": 0
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_1",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "symbol_ids": [
+          "consumer.py::decode#function"
+        ],
+        "context": 0
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "consumer.py::decode#function",
+              "source": "def decode(value: Alias) -> list[P]:\n    return [value]",
+              "byte_offset": 109,
+              "byte_length": 55,
+              "line": 7,
+              "end_line": 8,
+              "signature": "def decode(value: Alias) -> list[P]",
+              "kind": "function",
+              "language": "python"
+            }
+          ],
+          "_evaluation": {
+            "attempt_id": "session-f692167d-496e-4332-805e-84ab03023929/attempt/1",
+            "calls_remaining": 23,
+            "event_id": "session-f692167d-496e-4332-805e-84ab03023929:1"
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "error",
+    "message": "{\"error\":{\"message\":\"offline multilingual transport complete\",\"type\":\"invalid_request_error\"}}"
+  },
+  {
+    "type": "turn.failed",
+    "error": {
+      "message": "{\"error\":{\"message\":\"offline multilingual transport complete\",\"type\":\"invalid_request_error\"}}"
+    }
+  }
+]

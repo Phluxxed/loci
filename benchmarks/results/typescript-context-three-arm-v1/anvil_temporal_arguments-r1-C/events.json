@@ -1,0 +1,501 @@
+[
+  {
+    "type": "thread.started",
+    "thread_id": "01a090b6-820e-7e82-b034-64a95a74b39a"
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_0",
+      "type": "error",
+      "message": "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-fl3r9tby/agent-runtime/config.toml."
+    }
+  },
+  {
+    "type": "turn.started"
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_1",
+      "type": "agent_message",
+      "text": "I’m tracing `temporalCliArgs` to its canonical input type, view constraints, transition fields, and execution-order argument construction."
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "search",
+      "arguments": {
+        "query": "temporalCliArgs"
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "search",
+      "arguments": {
+        "query": "temporalCliArgs"
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "src/brain-context/temporal.ts::temporalCliArgs#function",
+              "name": "temporalCliArgs",
+              "qualified_name": "temporalCliArgs",
+              "kind": "function",
+              "language": "typescript",
+              "file_path": "src/brain-context/temporal.ts",
+              "byte_offset": 8841,
+              "byte_length": 421,
+              "signature": "function temporalCliArgs(query: TemporalQuery): string[] {",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "e50e10a6b631d827593bb94bf6863b0dd8d0014be6feaa5a58c0a9af4b1f40f8",
+              "decorators": [],
+              "keywords": [
+                "args",
+                "cli",
+                "temporal"
+              ],
+              "metadata": {},
+              "line": 222,
+              "end_line": 235,
+              "score": 63.0
+            }
+          ],
+          "coverage": {
+            "schema_version": 1,
+            "state": "partial",
+            "scope": "repository",
+            "source_scope": "indexed_supported_source",
+            "indexed_files": 163,
+            "excluded_paths": 24,
+            "exclusions": [
+              {
+                "reason": "unsupported_file_type",
+                "paths": 24,
+                "samples": [
+                  "LICENSE",
+                  "package-lock.json",
+                  "package.json",
+                  "src/browser/assets/Dockerfile.corporate",
+                  "test/fixtures/brain-context/anvil-prompt-delivery-v1.json",
+                  "test/fixtures/brain-context/evaluation-baseline.json",
+                  "test/fixtures/brain-context/invalid-manifest/brain-bootstrap.json",
+                  "test/fixtures/brain-context/missing-core-page/brain-bootstrap.json",
+                  "test/fixtures/brain-context/oversized-retrieval/brain-bootstrap.json",
+                  "test/fixtures/brain-context/oversized-retrieval/compiled-context.json",
+                  "test/fixtures/brain-context/oversized-retrieval/fake-llm-wiki.json",
+                  "test/fixtures/brain-context/real-brain-bootstrap.json",
+                  "test/fixtures/brain-context/unknown-project/brain-bootstrap.json",
+                  "test/fixtures/brain-context/unknown-project/compiled-context.json",
+                  "test/fixtures/brain-context/unknown-project/fake-llm-wiki.json",
+                  "test/fixtures/brain-context/valid-known-project/brain-bootstrap.json",
+                  "test/fixtures/brain-context/valid-known-project/compiled-context.json",
+                  "test/fixtures/brain-context/valid-known-project/fake-llm-wiki.json",
+                  "test/fixtures/browser/test-root-ca.crt",
+                  "test/fixtures/manifest-brain-view.json"
+                ],
+                "omitted_samples": 4
+              }
+            ],
+            "unknown_reason": null,
+            "query_scope": "indexed_symbols"
+          },
+          "search_id": "6c0b7479-b8ed-4ca0-9d02-2a565fc1b946",
+          "_evaluation": {
+            "attempt_id": "anvil_temporal_arguments-r1-C-c3169d86-646b-4f61-bca3-45fbd95671f3/attempt/1",
+            "calls_remaining": 23
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.started",
+    "item": {
+      "id": "item_3",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "context": 5,
+        "selected_from_search_id": "6c0b7479-b8ed-4ca0-9d02-2a565fc1b946",
+        "symbol_ids": [
+          "src/brain-context/temporal.ts::temporalCliArgs#function"
+        ]
+      },
+      "result": null,
+      "error": null,
+      "status": "in_progress"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_3",
+      "type": "mcp_tool_call",
+      "server": "evaluation",
+      "tool": "get",
+      "arguments": {
+        "context": 5,
+        "selected_from_search_id": "6c0b7479-b8ed-4ca0-9d02-2a565fc1b946",
+        "symbol_ids": [
+          "src/brain-context/temporal.ts::temporalCliArgs#function"
+        ]
+      },
+      "result": {
+        "content": [],
+        "structured_content": {
+          "symbols": [
+            {
+              "id": "src/brain-context/temporal.ts::temporalCliArgs#function",
+              "source": "function temporalCliArgs(query: TemporalQuery): string[] {\n  return [\n    \"--temporal-view\",\n    query.view,\n    \"--request-time\",\n    query.request_time,\n    ...(query.world_at === undefined ? [] : [\"--world-at\", query.world_at]),\n    \"--known-at\",\n    query.known_at,\n    ...(query.transition === undefined\n      ? []\n      : [\"--transition-from\", query.transition.from, \"--transition-to\", query.transition.to]),\n  ];\n}",
+              "byte_offset": 8841,
+              "byte_length": 421,
+              "line": 222,
+              "end_line": 235,
+              "signature": "function temporalCliArgs(query: TemporalQuery): string[] {",
+              "kind": "function",
+              "language": "typescript",
+              "context_before": [
+                "",
+                "export function temporalQueriesEqual(left: TemporalQuery, right: TemporalQuery): boolean {",
+                "  return JSON.stringify(left) === JSON.stringify(right);",
+                "}",
+                ""
+              ],
+              "context_after": []
+            }
+          ],
+          "type_context": {
+            "scope": "declared_type_relations",
+            "status": "partial",
+            "symbols": [
+              {
+                "id": "src/brain-context/temporal.ts::TemporalQuery#type",
+                "source": "type TemporalQuery = Readonly<{\n  view: TemporalView;\n  request_time: string;\n  world_at?: string;\n  known_at: string;\n  transition?: TemporalTransition;\n}>;",
+                "byte_offset": 382,
+                "byte_length": 157,
+                "line": 13,
+                "end_line": 19,
+                "signature": "type TemporalQuery = Readonly<{",
+                "kind": "type",
+                "language": "typescript"
+              },
+              {
+                "id": "src/brain-context/temporal.ts::TemporalView#type",
+                "source": "type TemporalView = (typeof TEMPORAL_VIEWS)[number];",
+                "byte_offset": 163,
+                "byte_length": 52,
+                "line": 5,
+                "end_line": 5,
+                "signature": "type TemporalView = (typeof TEMPORAL_VIEWS)[number];",
+                "kind": "type",
+                "language": "typescript"
+              },
+              {
+                "id": "src/brain-context/temporal.ts::TemporalTransition#type",
+                "source": "type TemporalTransition = Readonly<{\n  from: string;\n  to: string;\n}>;",
+                "byte_offset": 224,
+                "byte_length": 70,
+                "line": 7,
+                "end_line": 10,
+                "signature": "type TemporalTransition = Readonly<{",
+                "kind": "type",
+                "language": "typescript"
+              },
+              {
+                "id": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+                "source": "TEMPORAL_VIEWS = [\"current\", \"historical\", \"transition\", \"lineage\", \"conflict\"] as const",
+                "byte_offset": 65,
+                "byte_length": 88,
+                "line": 3,
+                "end_line": 3,
+                "signature": "TEMPORAL_VIEWS = [\"current\", \"historical\", \"transition\", \"lineage\", \"conflict\"] as const",
+                "kind": "constant",
+                "language": "typescript"
+              }
+            ],
+            "references": [
+              {
+                "owner_id": "src/brain-context/temporal.ts::temporalCliArgs#function",
+                "target_id": "src/brain-context/temporal.ts::TemporalQuery#type",
+                "reference": {
+                  "file": "src/brain-context/temporal.ts",
+                  "start_byte": 8873,
+                  "end_byte": 8886
+                },
+                "edge": {
+                  "from": "src/brain-context/temporal.ts::temporalCliArgs#function",
+                  "to": "src/brain-context/temporal.ts::TemporalQuery#type",
+                  "type": "uses_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "exact",
+                  "evidence": {
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 222,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718"
+                  }
+                },
+                "support": [
+                  {
+                    "kind": "type_site",
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 222,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                    "endpoint_id": "src/brain-context/temporal.ts::temporalCliArgs#function"
+                  },
+                  {
+                    "kind": "owner",
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 222,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                    "endpoint_id": "src/brain-context/temporal.ts::temporalCliArgs#function"
+                  },
+                  {
+                    "kind": "definition",
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 13,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                    "endpoint_id": "src/brain-context/temporal.ts::TemporalQuery#type"
+                  }
+                ]
+              },
+              {
+                "owner_id": "src/brain-context/temporal.ts::TemporalQuery#type",
+                "target_id": "src/brain-context/temporal.ts::TemporalView#type",
+                "reference": {
+                  "file": "src/brain-context/temporal.ts",
+                  "start_byte": 422,
+                  "end_byte": 434
+                },
+                "edge": {
+                  "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+                  "to": "src/brain-context/temporal.ts::TemporalView#type",
+                  "type": "uses_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "exact",
+                  "evidence": {
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 14,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718"
+                  }
+                },
+                "support": [
+                  {
+                    "kind": "type_site",
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 14,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                    "endpoint_id": "src/brain-context/temporal.ts::TemporalQuery#type"
+                  },
+                  {
+                    "kind": "owner",
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 13,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                    "endpoint_id": "src/brain-context/temporal.ts::TemporalQuery#type"
+                  },
+                  {
+                    "kind": "definition",
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 5,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                    "endpoint_id": "src/brain-context/temporal.ts::TemporalView#type"
+                  }
+                ]
+              },
+              {
+                "owner_id": "src/brain-context/temporal.ts::TemporalQuery#type",
+                "target_id": "src/brain-context/temporal.ts::TemporalTransition#type",
+                "reference": {
+                  "file": "src/brain-context/temporal.ts",
+                  "start_byte": 516,
+                  "end_byte": 534
+                },
+                "edge": {
+                  "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+                  "to": "src/brain-context/temporal.ts::TemporalTransition#type",
+                  "type": "uses_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "exact",
+                  "evidence": {
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 18,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718"
+                  }
+                },
+                "support": [
+                  {
+                    "kind": "type_site",
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 18,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                    "endpoint_id": "src/brain-context/temporal.ts::TemporalQuery#type"
+                  },
+                  {
+                    "kind": "owner",
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 13,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                    "endpoint_id": "src/brain-context/temporal.ts::TemporalQuery#type"
+                  },
+                  {
+                    "kind": "definition",
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 7,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                    "endpoint_id": "src/brain-context/temporal.ts::TemporalTransition#type"
+                  }
+                ]
+              },
+              {
+                "owner_id": "src/brain-context/temporal.ts::TemporalView#type",
+                "target_id": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+                "reference": {
+                  "file": "src/brain-context/temporal.ts",
+                  "start_byte": 191,
+                  "end_byte": 205
+                },
+                "edge": {
+                  "from": "src/brain-context/temporal.ts::TemporalView#type",
+                  "to": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+                  "type": "uses_type",
+                  "directed": true,
+                  "namespace": "loci",
+                  "resolution": "exact",
+                  "evidence": {
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 5,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718"
+                  }
+                },
+                "support": [
+                  {
+                    "kind": "type_site",
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 5,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                    "endpoint_id": "src/brain-context/temporal.ts::TemporalView#type"
+                  },
+                  {
+                    "kind": "owner",
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 5,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                    "endpoint_id": "src/brain-context/temporal.ts::TemporalView#type"
+                  },
+                  {
+                    "kind": "definition",
+                    "file": "src/brain-context/temporal.ts",
+                    "line": 3,
+                    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                    "endpoint_id": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant"
+                  }
+                ]
+              }
+            ],
+            "evidence": [
+              {
+                "file": "src/brain-context/temporal.ts",
+                "start_line": 13,
+                "end_line": 13,
+                "byte_offset": 375,
+                "content": "export type TemporalQuery = Readonly<{\n",
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718"
+              },
+              {
+                "file": "src/brain-context/temporal.ts",
+                "start_line": 222,
+                "end_line": 222,
+                "byte_offset": 8834,
+                "content": "export function temporalCliArgs(query: TemporalQuery): string[] {\n",
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718"
+              },
+              {
+                "file": "src/brain-context/temporal.ts",
+                "start_line": 5,
+                "end_line": 5,
+                "byte_offset": 156,
+                "content": "export type TemporalView = (typeof TEMPORAL_VIEWS)[number];\n",
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718"
+              },
+              {
+                "file": "src/brain-context/temporal.ts",
+                "start_line": 7,
+                "end_line": 7,
+                "byte_offset": 217,
+                "content": "export type TemporalTransition = Readonly<{\n",
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718"
+              },
+              {
+                "file": "src/brain-context/temporal.ts",
+                "start_line": 3,
+                "end_line": 3,
+                "byte_offset": 52,
+                "content": "export const TEMPORAL_VIEWS = [\"current\", \"historical\", \"transition\", \"lineage\", \"conflict\"] as const;\n",
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718"
+              }
+            ],
+            "limits": {
+              "max_anchors": 5,
+              "max_hops": 3,
+              "max_nodes": 32,
+              "max_neighbors_per_owner": 16,
+              "max_references": 16,
+              "max_source_spans": 64,
+              "max_source_bytes": 16384,
+              "max_serialized_bytes": 32768
+            },
+            "omissions": {
+              "unresolved_reference": 2
+            }
+          },
+          "_evaluation": {
+            "attempt_id": "anvil_temporal_arguments-r1-C-c3169d86-646b-4f61-bca3-45fbd95671f3/attempt/2",
+            "calls_remaining": 22
+          }
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_4",
+      "type": "agent_message",
+      "text": "{\"required_fields\":[\"known_at\",\"request_time\",\"view\"],\"optional_fields\":[\"transition\",\"world_at\"],\"accepted_views\":[\"conflict\",\"current\",\"historical\",\"lineage\",\"transition\"],\"transition_fields\":[\"from\",\"to\"],\"args\":[\"--temporal-view\",\"transition\",\"--request-time\",\"2026-09-10T00:00:00Z\",\"--known-at\",\"2026-09-10\",\"--transition-from\",\"2026-09-01\",\"--transition-to\",\"2026-09-09\"]}"
+    }
+  },
+  {
+    "type": "turn.completed",
+    "usage": {
+      "input_tokens": 19000,
+      "cached_input_tokens": 12544,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 460,
+      "reasoning_output_tokens": 216
+    }
+  }
+]

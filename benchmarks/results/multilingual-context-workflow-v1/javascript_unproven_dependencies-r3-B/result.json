@@ -1,0 +1,1498 @@
+{
+  "schema_version": 4,
+  "protocol": "multilingual-context-workflow-v1",
+  "identity": {
+    "task_id": "javascript_unproven_dependencies",
+    "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+    "arm": "B",
+    "repetition": 3,
+    "snapshot": "javascript_uncertainty",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1"
+  },
+  "events": [
+    {
+      "id": "session-aa24a874-27c7-445d-8393-d3941d425788:1",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "dependencies",
+        "query": "bad.js unproven default_forwarded_by_star computed_call_exact shadowed_Thing_is_import commonjs_member_proven dynamic_import_proven computed_base_proven jsdoc_type_supported",
+        "max_output_bytes": 16000,
+        "max_evidence_bytes": 8192,
+        "max_hops": 2
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"dependencies\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_dependencies\",\"exhaustive\":false},\"items\":[{\"id\":\"bad.js::shadowed#function\",\"name\":\"shadowed\",\"kind\":\"function\",\"file\":\"bad.js\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches bad, js, shadowed, thing\",\"source_id\":1,\"complete\":true,\"path\":[]}],\"relationships\":[],\"sources\":[{\"id\":1,\"file\":\"bad.js\",\"start_byte\":204,\"end_byte\":248,\"start_line\":6,\"end_line\":6,\"content_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"content\":\"function shadowed(Thing) { return Thing(); }\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":8},{\"reason\":\"unresolved_relation\",\"count\":2}],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16000,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":1,\"evidence_bytes\":44,\"output_bytes\":1122,\"estimated_tokens\":281,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:1\"}}",
+      "serialized_bytes": 1238,
+      "source_bytes": 44,
+      "elapsed_ms": 11.857791017973796,
+      "spans": [
+        {
+          "file": "bad.js",
+          "start_byte": 204,
+          "end_byte": 248,
+          "sha256": "2c2941ecb270d8c5f2fd8eb5c8c133a0b3b2d5d5e79922fabfe4e060c8b05343",
+          "text": "function shadowed(Thing) { return Thing(); }"
+        }
+      ]
+    },
+    {
+      "id": "session-aa24a874-27c7-445d-8393-d3941d425788:2",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "unproven",
+        "file_paths": [
+          "bad.js"
+        ]
+      },
+      "search_id": "4f384e7b-392a-4143-8203-d014f81b44bb",
+      "response_json": "{\"symbols\":[{\"id\":\"bad.js::unproven#function\",\"name\":\"unproven\",\"qualified_name\":\"unproven\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"bad.js\",\"byte_offset\":138,\"byte_length\":58,\"signature\":\"function unproven() { return [Thing, Factory, External]; }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"6522ac544fc6e9dca38c175edc521c5470035abbdeb32b6a3aad7b1ad03c6450\",\"decorators\":[],\"keywords\":[\"unproven\"],\"metadata\":{},\"line\":5,\"end_line\":5,\"score\":71.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"4f384e7b-392a-4143-8203-d014f81b44bb\",\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:2\"}}",
+      "serialized_bytes": 903,
+      "source_bytes": 58,
+      "elapsed_ms": 2.789083984680474,
+      "spans": [
+        {
+          "file": "bad.js",
+          "start_byte": 138,
+          "end_byte": 196,
+          "sha256": "6522ac544fc6e9dca38c175edc521c5470035abbdeb32b6a3aad7b1ad03c6450",
+          "text": "function unproven() { return [Thing, Factory, External]; }"
+        }
+      ]
+    },
+    {
+      "id": "session-aa24a874-27c7-445d-8393-d3941d425788:3",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "bad.js",
+        "start_line": 1,
+        "end_line": 80
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"bad.js\",\"content\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\\nimport * as model from \\\"./left.js\\\";\\nimport { External } from \\\"uninstalled-package\\\";\\n\\nexport function unproven() { return [Thing, Factory, External]; }\\nexport function shadowed(Thing) { return Thing(); }\\nexport function computed(key) { return model[key](); }\\nexport function legacy() { const loaded = require(\\\"./left.js\\\"); return loaded.Thing; }\\nexport function dynamic(path) { return import(path); }\\nexport class Dynamic extends chooseBase() {}\\n/** @param {Thing} value */\\nexport function documented(value) { return value; }\\n\",\"total_lines\":12,\"start_line\":1,\"end_line\":12,\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:3\"}}",
+      "serialized_bytes": 834,
+      "source_bytes": 571,
+      "elapsed_ms": 1.980292028747499,
+      "spans": [
+        {
+          "file": "bad.js",
+          "start_byte": 0,
+          "end_byte": 571,
+          "sha256": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+          "text": "import Factory, { Thing } from \"./barrel.js\";\nimport * as model from \"./left.js\";\nimport { External } from \"uninstalled-package\";\n\nexport function unproven() { return [Thing, Factory, External]; }\nexport function shadowed(Thing) { return Thing(); }\nexport function computed(key) { return model[key](); }\nexport function legacy() { const loaded = require(\"./left.js\"); return loaded.Thing; }\nexport function dynamic(path) { return import(path); }\nexport class Dynamic extends chooseBase() {}\n/** @param {Thing} value */\nexport function documented(value) { return value; }\n"
+        }
+      ]
+    },
+    {
+      "id": "session-aa24a874-27c7-445d-8393-d3941d425788:4",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "bad.js::unproven#function"
+        ],
+        "context": 0,
+        "selected_from_search_id": "4f384e7b-392a-4143-8203-d014f81b44bb"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"bad.js::unproven#function\",\"source\":\"function unproven() { return [Thing, Factory, External]; }\",\"byte_offset\":138,\"byte_length\":58,\"line\":5,\"end_line\":5,\"signature\":\"function unproven() { return [Thing, Factory, External]; }\",\"kind\":\"function\",\"language\":\"javascript\"}],\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:4\"}}",
+      "serialized_bytes": 457,
+      "source_bytes": 116,
+      "elapsed_ms": 3.1499580072704703,
+      "spans": [
+        {
+          "file": "bad.js",
+          "start_byte": 138,
+          "end_byte": 196,
+          "sha256": "6522ac544fc6e9dca38c175edc521c5470035abbdeb32b6a3aad7b1ad03c6450",
+          "text": "function unproven() { return [Thing, Factory, External]; }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 138,
+          "end_byte": 196,
+          "sha256": "6522ac544fc6e9dca38c175edc521c5470035abbdeb32b6a3aad7b1ad03c6450",
+          "text": "function unproven() { return [Thing, Factory, External]; }"
+        }
+      ]
+    },
+    {
+      "id": "session-aa24a874-27c7-445d-8393-d3941d425788:5",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "question": "In bad.js, determine proven dependency targets for imported Thing and Factory, namespace model computed calls, shadowed Thing, require member access, dynamic import, computed class base, and JSDoc Thing type.",
+        "seed_ids": [
+          "bad.js::unproven#function"
+        ]
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-eatdm8cd/snapshot\",\"question\":\"In bad.js, determine proven dependency targets for imported Thing and Factory, namespace model computed calls, shadowed Thing, require member access, dynamic import, computed class base, and JSDoc Thing type.\",\"selection\":\"explicit\",\"question_terms\":[],\"anchors\":[{\"node\":{\"id\":\"bad.js::unproven#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"bad.js\",\"line\":5,\"end_line\":5}},\"matched_symbol_id\":\"bad.js::unproven#function\",\"name\":\"unproven\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}}],\"counts\":{\"indexed_nodes\":14,\"eligible_units\":14,\"qualified_candidates\":1,\"collapsed_symbols\":0,\"returned_anchors\":1,\"omitted_candidates\":0},\"budget\":{\"requested_max_anchors\":5,\"effective_max_anchors\":5},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:5\"}}",
+      "serialized_bytes": 1092,
+      "source_bytes": 0,
+      "elapsed_ms": 4.979874996934086,
+      "spans": []
+    },
+    {
+      "id": "session-aa24a874-27c7-445d-8393-d3941d425788:6",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "shadowed computed legacy dynamic Dynamic documented",
+        "file_paths": [
+          "bad.js"
+        ]
+      },
+      "search_id": "27de7c0a-42df-4aad-ac9c-cc279e9c5315",
+      "response_json": "{\"symbols\":[{\"id\":\"bad.js::shadowed#function\",\"name\":\"shadowed\",\"qualified_name\":\"shadowed\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"bad.js\",\"byte_offset\":204,\"byte_length\":44,\"signature\":\"function shadowed(Thing) { return Thing(); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"2c2941ecb270d8c5f2fd8eb5c8c133a0b3b2d5d5e79922fabfe4e060c8b05343\",\"decorators\":[],\"keywords\":[\"shadowed\"],\"metadata\":{},\"line\":6,\"end_line\":6,\"score\":20.0},{\"id\":\"bad.js::computed#function\",\"name\":\"computed\",\"qualified_name\":\"computed\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"bad.js\",\"byte_offset\":256,\"byte_length\":47,\"signature\":\"function computed(key) { return model[key](); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"a3655a9a9c72e59c1c4af1d6a00fce7de36149a6011d7f5d17a9af79ba4d9708\",\"decorators\":[],\"keywords\":[\"computed\"],\"metadata\":{},\"line\":7,\"end_line\":7,\"score\":20.0},{\"id\":\"bad.js::legacy#function\",\"name\":\"legacy\",\"qualified_name\":\"legacy\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"bad.js\",\"byte_offset\":311,\"byte_length\":79,\"signature\":\"function legacy() { const loaded = require(\\\"./left.js\\\"); return loaded.Thing; }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"7155d04e15a978b88333aaadfa6f0e049bbe2fcab728b7244b7008a8efdaba1f\",\"decorators\":[],\"keywords\":[\"legacy\"],\"metadata\":{},\"line\":8,\"end_line\":8,\"score\":20.0},{\"id\":\"bad.js::dynamic#function\",\"name\":\"dynamic\",\"qualified_name\":\"dynamic\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"bad.js\",\"byte_offset\":398,\"byte_length\":47,\"signature\":\"function dynamic(path) { return import(path); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"d079757c6cb4cbacb0f4ffd111e2c4b0490ebd0f902ed37d01ef3ac8c607cace\",\"decorators\":[],\"keywords\":[\"dynamic\"],\"metadata\":{},\"line\":9,\"end_line\":9,\"score\":20.0},{\"id\":\"bad.js::documented#function\",\"name\":\"documented\",\"qualified_name\":\"documented\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"bad.js\",\"byte_offset\":526,\"byte_length\":44,\"signature\":\"function documented(value) { return value; }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"db2f3eb065e8caf47992208f54e577faf40df1a8ee81f38201e8de324c664a8f\",\"decorators\":[],\"keywords\":[\"documented\"],\"metadata\":{},\"line\":12,\"end_line\":12,\"score\":20.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"27de7c0a-42df-4aad-ac9c-cc279e9c5315\",\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:6\"}}",
+      "serialized_bytes": 2678,
+      "source_bytes": 261,
+      "elapsed_ms": 2.2143340029288083,
+      "spans": [
+        {
+          "file": "bad.js",
+          "start_byte": 204,
+          "end_byte": 248,
+          "sha256": "2c2941ecb270d8c5f2fd8eb5c8c133a0b3b2d5d5e79922fabfe4e060c8b05343",
+          "text": "function shadowed(Thing) { return Thing(); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 256,
+          "end_byte": 303,
+          "sha256": "a3655a9a9c72e59c1c4af1d6a00fce7de36149a6011d7f5d17a9af79ba4d9708",
+          "text": "function computed(key) { return model[key](); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 311,
+          "end_byte": 390,
+          "sha256": "7155d04e15a978b88333aaadfa6f0e049bbe2fcab728b7244b7008a8efdaba1f",
+          "text": "function legacy() { const loaded = require(\"./left.js\"); return loaded.Thing; }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 398,
+          "end_byte": 445,
+          "sha256": "d079757c6cb4cbacb0f4ffd111e2c4b0490ebd0f902ed37d01ef3ac8c607cace",
+          "text": "function dynamic(path) { return import(path); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 526,
+          "end_byte": 570,
+          "sha256": "db2f3eb065e8caf47992208f54e577faf40df1a8ee81f38201e8de324c664a8f",
+          "text": "function documented(value) { return value; }"
+        }
+      ]
+    },
+    {
+      "id": "session-aa24a874-27c7-445d-8393-d3941d425788:7",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "Dynamic",
+        "file_paths": [
+          "bad.js"
+        ]
+      },
+      "search_id": "1d2f8a7b-870d-4b31-a248-818cddcc929d",
+      "response_json": "{\"symbols\":[{\"id\":\"bad.js::dynamic#function\",\"name\":\"dynamic\",\"qualified_name\":\"dynamic\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"bad.js\",\"byte_offset\":398,\"byte_length\":47,\"signature\":\"function dynamic(path) { return import(path); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"d079757c6cb4cbacb0f4ffd111e2c4b0490ebd0f902ed37d01ef3ac8c607cace\",\"decorators\":[],\"keywords\":[\"dynamic\"],\"metadata\":{},\"line\":9,\"end_line\":9,\"score\":71.0},{\"id\":\"bad.js::Dynamic#class\",\"name\":\"Dynamic\",\"qualified_name\":\"Dynamic\",\"kind\":\"class\",\"language\":\"javascript\",\"file_path\":\"bad.js\",\"byte_offset\":453,\"byte_length\":37,\"signature\":\"class Dynamic extends chooseBase() {}\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"6c30aa9b97acc481eb4b5014e63bf8510bc43d2274ac357763d176c093c67176\",\"decorators\":[],\"keywords\":[\"dynamic\"],\"metadata\":{},\"line\":10,\"end_line\":10,\"score\":67.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"1d2f8a7b-870d-4b31-a248-818cddcc929d\",\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:7\"}}",
+      "serialized_bytes": 1310,
+      "source_bytes": 84,
+      "elapsed_ms": 3.7376249965745956,
+      "spans": [
+        {
+          "file": "bad.js",
+          "start_byte": 398,
+          "end_byte": 445,
+          "sha256": "d079757c6cb4cbacb0f4ffd111e2c4b0490ebd0f902ed37d01ef3ac8c607cace",
+          "text": "function dynamic(path) { return import(path); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 453,
+          "end_byte": 490,
+          "sha256": "6c30aa9b97acc481eb4b5014e63bf8510bc43d2274ac357763d176c093c67176",
+          "text": "class Dynamic extends chooseBase() {}"
+        }
+      ]
+    },
+    {
+      "id": "session-aa24a874-27c7-445d-8393-d3941d425788:8",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "bad.js::shadowed#function",
+          "bad.js::computed#function",
+          "bad.js::legacy#function",
+          "bad.js::dynamic#function",
+          "bad.js::documented#function"
+        ],
+        "context": 0,
+        "selected_from_search_id": "27de7c0a-42df-4aad-ac9c-cc279e9c5315"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"bad.js::shadowed#function\",\"source\":\"function shadowed(Thing) { return Thing(); }\",\"byte_offset\":204,\"byte_length\":44,\"line\":6,\"end_line\":6,\"signature\":\"function shadowed(Thing) { return Thing(); }\",\"kind\":\"function\",\"language\":\"javascript\"},{\"id\":\"bad.js::computed#function\",\"source\":\"function computed(key) { return model[key](); }\",\"byte_offset\":256,\"byte_length\":47,\"line\":7,\"end_line\":7,\"signature\":\"function computed(key) { return model[key](); }\",\"kind\":\"function\",\"language\":\"javascript\"},{\"id\":\"bad.js::legacy#function\",\"source\":\"function legacy() { const loaded = require(\\\"./left.js\\\"); return loaded.Thing; }\",\"byte_offset\":311,\"byte_length\":79,\"line\":8,\"end_line\":8,\"signature\":\"function legacy() { const loaded = require(\\\"./left.js\\\"); return loaded.Thing; }\",\"kind\":\"function\",\"language\":\"javascript\"},{\"id\":\"bad.js::dynamic#function\",\"source\":\"function dynamic(path) { return import(path); }\",\"byte_offset\":398,\"byte_length\":47,\"line\":9,\"end_line\":9,\"signature\":\"function dynamic(path) { return import(path); }\",\"kind\":\"function\",\"language\":\"javascript\"},{\"id\":\"bad.js::documented#function\",\"source\":\"function documented(value) { return value; }\",\"byte_offset\":526,\"byte_length\":44,\"line\":12,\"end_line\":12,\"signature\":\"function documented(value) { return value; }\",\"kind\":\"function\",\"language\":\"javascript\"}],\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/8\",\"calls_remaining\":16,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:8\"}}",
+      "serialized_bytes": 1512,
+      "source_bytes": 522,
+      "elapsed_ms": 15.430291008669883,
+      "spans": [
+        {
+          "file": "bad.js",
+          "start_byte": 204,
+          "end_byte": 248,
+          "sha256": "2c2941ecb270d8c5f2fd8eb5c8c133a0b3b2d5d5e79922fabfe4e060c8b05343",
+          "text": "function shadowed(Thing) { return Thing(); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 256,
+          "end_byte": 303,
+          "sha256": "a3655a9a9c72e59c1c4af1d6a00fce7de36149a6011d7f5d17a9af79ba4d9708",
+          "text": "function computed(key) { return model[key](); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 311,
+          "end_byte": 390,
+          "sha256": "7155d04e15a978b88333aaadfa6f0e049bbe2fcab728b7244b7008a8efdaba1f",
+          "text": "function legacy() { const loaded = require(\"./left.js\"); return loaded.Thing; }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 398,
+          "end_byte": 445,
+          "sha256": "d079757c6cb4cbacb0f4ffd111e2c4b0490ebd0f902ed37d01ef3ac8c607cace",
+          "text": "function dynamic(path) { return import(path); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 526,
+          "end_byte": 570,
+          "sha256": "db2f3eb065e8caf47992208f54e577faf40df1a8ee81f38201e8de324c664a8f",
+          "text": "function documented(value) { return value; }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 204,
+          "end_byte": 248,
+          "sha256": "2c2941ecb270d8c5f2fd8eb5c8c133a0b3b2d5d5e79922fabfe4e060c8b05343",
+          "text": "function shadowed(Thing) { return Thing(); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 256,
+          "end_byte": 303,
+          "sha256": "a3655a9a9c72e59c1c4af1d6a00fce7de36149a6011d7f5d17a9af79ba4d9708",
+          "text": "function computed(key) { return model[key](); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 311,
+          "end_byte": 390,
+          "sha256": "7155d04e15a978b88333aaadfa6f0e049bbe2fcab728b7244b7008a8efdaba1f",
+          "text": "function legacy() { const loaded = require(\"./left.js\"); return loaded.Thing; }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 398,
+          "end_byte": 445,
+          "sha256": "d079757c6cb4cbacb0f4ffd111e2c4b0490ebd0f902ed37d01ef3ac8c607cace",
+          "text": "function dynamic(path) { return import(path); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 526,
+          "end_byte": 570,
+          "sha256": "db2f3eb065e8caf47992208f54e577faf40df1a8ee81f38201e8de324c664a8f",
+          "text": "function documented(value) { return value; }"
+        }
+      ]
+    },
+    {
+      "id": "session-aa24a874-27c7-445d-8393-d3941d425788:9",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "bad.js::Dynamic#class"
+        ],
+        "context": 0,
+        "selected_from_search_id": "1d2f8a7b-870d-4b31-a248-818cddcc929d"
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"bad.js::Dynamic#class\",\"source\":\"class Dynamic extends chooseBase() {}\",\"byte_offset\":453,\"byte_length\":37,\"line\":10,\"end_line\":10,\"signature\":\"class Dynamic extends chooseBase() {}\",\"kind\":\"class\",\"language\":\"javascript\"}],\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/9\",\"calls_remaining\":15,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:9\"}}",
+      "serialized_bytes": 410,
+      "source_bytes": 74,
+      "elapsed_ms": 5.8286249986849725,
+      "spans": [
+        {
+          "file": "bad.js",
+          "start_byte": 453,
+          "end_byte": 490,
+          "sha256": "6c30aa9b97acc481eb4b5014e63bf8510bc43d2274ac357763d176c093c67176",
+          "text": "class Dynamic extends chooseBase() {}"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 453,
+          "end_byte": 490,
+          "sha256": "6c30aa9b97acc481eb4b5014e63bf8510bc43d2274ac357763d176c093c67176",
+          "text": "class Dynamic extends chooseBase() {}"
+        }
+      ]
+    },
+    {
+      "id": "session-aa24a874-27c7-445d-8393-d3941d425788:10",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "outline",
+      "arguments": {},
+      "search_id": null,
+      "response_json": "{\"files\":[{\"file\":\"bad.js\",\"symbols\":[{\"id\":\"bad.js::unproven#function\",\"name\":\"unproven\",\"kind\":\"function\",\"line\":5,\"end_line\":5,\"signature\":\"function unproven() { return [Thing, Factory, External]; }\",\"summary\":\"\"},{\"id\":\"bad.js::shadowed#function\",\"name\":\"shadowed\",\"kind\":\"function\",\"line\":6,\"end_line\":6,\"signature\":\"function shadowed(Thing) { return Thing(); }\",\"summary\":\"\"},{\"id\":\"bad.js::computed#function\",\"name\":\"computed\",\"kind\":\"function\",\"line\":7,\"end_line\":7,\"signature\":\"function computed(key) { return model[key](); }\",\"summary\":\"\"},{\"id\":\"bad.js::legacy#function\",\"name\":\"legacy\",\"kind\":\"function\",\"line\":8,\"end_line\":8,\"signature\":\"function legacy() { const loaded = require(\\\"./left.js\\\"); return loaded.Thing; }\",\"summary\":\"\"},{\"id\":\"bad.js::dynamic#function\",\"name\":\"dynamic\",\"kind\":\"function\",\"line\":9,\"end_line\":9,\"signature\":\"function dynamic(path) { return import(path); }\",\"summary\":\"\"},{\"id\":\"bad.js::Dynamic#class\",\"name\":\"Dynamic\",\"kind\":\"class\",\"line\":10,\"end_line\":10,\"signature\":\"class Dynamic extends chooseBase() {}\",\"summary\":\"\"},{\"id\":\"bad.js::documented#function\",\"name\":\"documented\",\"kind\":\"function\",\"line\":12,\"end_line\":12,\"signature\":\"function documented(value) { return value; }\",\"summary\":\"\"},{\"id\":\"bad.js::__file__#file\",\"name\":\"bad.js\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"bad.js\",\"summary\":\"\"}]},{\"file\":\"barrel.js\",\"symbols\":[{\"id\":\"barrel.js::__file__#file\",\"name\":\"barrel.js\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"barrel.js\",\"summary\":\"\"}]},{\"file\":\"left.js\",\"symbols\":[{\"id\":\"left.js::Thing#class\",\"name\":\"Thing\",\"kind\":\"class\",\"line\":1,\"end_line\":1,\"signature\":\"class Thing {}\",\"summary\":\"\"},{\"id\":\"left.js::Factory#function\",\"name\":\"Factory\",\"kind\":\"function\",\"line\":2,\"end_line\":2,\"signature\":\"function Factory() {}\",\"summary\":\"\"},{\"id\":\"left.js::__file__#file\",\"name\":\"left.js\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"left.js\",\"summary\":\"\"}]},{\"file\":\"right.js\",\"symbols\":[{\"id\":\"right.js::Thing#class\",\"name\":\"Thing\",\"kind\":\"class\",\"line\":1,\"end_line\":1,\"signature\":\"class Thing {}\",\"summary\":\"\"},{\"id\":\"right.js::__file__#file\",\"name\":\"right.js\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"right.js\",\"summary\":\"\"}]}],\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/10\",\"calls_remaining\":14,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:10\"}}",
+      "serialized_bytes": 2381,
+      "source_bytes": 405,
+      "elapsed_ms": 2.1043750166427344,
+      "spans": [
+        {
+          "file": "bad.js",
+          "start_byte": 138,
+          "end_byte": 196,
+          "sha256": "6522ac544fc6e9dca38c175edc521c5470035abbdeb32b6a3aad7b1ad03c6450",
+          "text": "function unproven() { return [Thing, Factory, External]; }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 204,
+          "end_byte": 248,
+          "sha256": "2c2941ecb270d8c5f2fd8eb5c8c133a0b3b2d5d5e79922fabfe4e060c8b05343",
+          "text": "function shadowed(Thing) { return Thing(); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 256,
+          "end_byte": 303,
+          "sha256": "a3655a9a9c72e59c1c4af1d6a00fce7de36149a6011d7f5d17a9af79ba4d9708",
+          "text": "function computed(key) { return model[key](); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 311,
+          "end_byte": 390,
+          "sha256": "7155d04e15a978b88333aaadfa6f0e049bbe2fcab728b7244b7008a8efdaba1f",
+          "text": "function legacy() { const loaded = require(\"./left.js\"); return loaded.Thing; }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 398,
+          "end_byte": 445,
+          "sha256": "d079757c6cb4cbacb0f4ffd111e2c4b0490ebd0f902ed37d01ef3ac8c607cace",
+          "text": "function dynamic(path) { return import(path); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 453,
+          "end_byte": 490,
+          "sha256": "6c30aa9b97acc481eb4b5014e63bf8510bc43d2274ac357763d176c093c67176",
+          "text": "class Dynamic extends chooseBase() {}"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 526,
+          "end_byte": 570,
+          "sha256": "db2f3eb065e8caf47992208f54e577faf40df1a8ee81f38201e8de324c664a8f",
+          "text": "function documented(value) { return value; }"
+        },
+        {
+          "file": "left.js",
+          "start_byte": 7,
+          "end_byte": 21,
+          "sha256": "06e4c6b5c320516a81eee7a58dcd7a910f5ef0bcc0b5a3fd801c6cfc8e8e9a36",
+          "text": "class Thing {}"
+        },
+        {
+          "file": "left.js",
+          "start_byte": 37,
+          "end_byte": 58,
+          "sha256": "09a29ae6624f3c832b41ec74c91946fc5ed37eac743493d2e01c50ba11d3a4ff",
+          "text": "function Factory() {}"
+        },
+        {
+          "file": "right.js",
+          "start_byte": 7,
+          "end_byte": 21,
+          "sha256": "06e4c6b5c320516a81eee7a58dcd7a910f5ef0bcc0b5a3fd801c6cfc8e8e9a36",
+          "text": "class Thing {}"
+        }
+      ]
+    },
+    {
+      "id": "session-aa24a874-27c7-445d-8393-d3941d425788:11",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "barrel.js",
+        "start_line": 1,
+        "end_line": 40
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"barrel.js\",\"content\":\"export * from \\\"./left.js\\\";\\nexport * from \\\"./right.js\\\";\\n\",\"total_lines\":2,\"start_line\":1,\"end_line\":2,\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/11\",\"calls_remaining\":13,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:11\"}}",
+      "serialized_bytes": 307,
+      "source_bytes": 55,
+      "elapsed_ms": 1.7720829928293824,
+      "spans": [
+        {
+          "file": "barrel.js",
+          "start_byte": 0,
+          "end_byte": 55,
+          "sha256": "c63a9e4e681e57529e38d14442b791fc8d8a58a7066fc8328a8db6116c8a19c7",
+          "text": "export * from \"./left.js\";\nexport * from \"./right.js\";\n"
+        }
+      ]
+    },
+    {
+      "id": "session-aa24a874-27c7-445d-8393-d3941d425788:12",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "left.js",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"left.js\",\"content\":\"export class Thing {}\\nexport default function Factory() {}\\n\",\"total_lines\":2,\"start_line\":1,\"end_line\":2,\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/12\",\"calls_remaining\":12,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:12\"}}",
+      "serialized_bytes": 305,
+      "source_bytes": 59,
+      "elapsed_ms": 3.7815840041730553,
+      "spans": [
+        {
+          "file": "left.js",
+          "start_byte": 0,
+          "end_byte": 59,
+          "sha256": "db0854f581ead5e079842120c2a245bbf369f81ed596d61bbdc076905ddc387f",
+          "text": "export class Thing {}\nexport default function Factory() {}\n"
+        }
+      ]
+    },
+    {
+      "id": "session-aa24a874-27c7-445d-8393-d3941d425788:13",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 100,
+        "file": "bad.js"
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"invalid record pagination\"},\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/13\",\"calls_remaining\":11,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:13\"}}",
+      "serialized_bytes": 238,
+      "source_bytes": 0,
+      "elapsed_ms": 0.15566698857583106,
+      "spans": []
+    },
+    {
+      "id": "session-aa24a874-27c7-445d-8393-d3941d425788:14",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 50,
+        "file": "bad.js"
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"ValueError\",\"message\":\"invalid record pagination\"},\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/14\",\"calls_remaining\":10,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:14\"}}",
+      "serialized_bytes": 238,
+      "source_bytes": 0,
+      "elapsed_ms": 0.04520901711657643,
+      "spans": []
+    },
+    {
+      "id": "session-aa24a874-27c7-445d-8393-d3941d425788:15",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "dependencies",
+        "query": "",
+        "max_output_bytes": 16000,
+        "max_evidence_bytes": 8192,
+        "seed_ids": [
+          "bad.js::unproven#function",
+          "bad.js::shadowed#function",
+          "bad.js::computed#function",
+          "bad.js::legacy#function",
+          "bad.js::dynamic#function"
+        ],
+        "max_hops": 3
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"dependencies\",\"status\":\"partial\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_dependencies\",\"exhaustive\":false},\"items\":[{\"id\":\"bad.js::unproven#function\",\"name\":\"unproven\",\"kind\":\"function\",\"file\":\"bad.js\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"bad.js::shadowed#function\",\"name\":\"shadowed\",\"kind\":\"function\",\"file\":\"bad.js\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":2,\"complete\":true,\"path\":[]},{\"id\":\"bad.js::computed#function\",\"name\":\"computed\",\"kind\":\"function\",\"file\":\"bad.js\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":3,\"complete\":true,\"path\":[]},{\"id\":\"bad.js::legacy#function\",\"name\":\"legacy\",\"kind\":\"function\",\"file\":\"bad.js\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":4,\"complete\":true,\"path\":[]},{\"id\":\"bad.js::dynamic#function\",\"name\":\"dynamic\",\"kind\":\"function\",\"file\":\"bad.js\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":5,\"complete\":true,\"path\":[]}],\"relationships\":[],\"sources\":[{\"id\":1,\"file\":\"bad.js\",\"start_byte\":138,\"end_byte\":196,\"start_line\":5,\"end_line\":5,\"content_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"content\":\"function unproven() { return [Thing, Factory, External]; }\"},{\"id\":2,\"file\":\"bad.js\",\"start_byte\":204,\"end_byte\":248,\"start_line\":6,\"end_line\":6,\"content_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"content\":\"function shadowed(Thing) { return Thing(); }\"},{\"id\":3,\"file\":\"bad.js\",\"start_byte\":256,\"end_byte\":303,\"start_line\":7,\"end_line\":7,\"content_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"content\":\"function computed(key) { return model[key](); }\"},{\"id\":4,\"file\":\"bad.js\",\"start_byte\":311,\"end_byte\":390,\"start_line\":8,\"end_line\":8,\"content_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"content\":\"function legacy() { const loaded = require(\\\"./left.js\\\"); return loaded.Thing; }\"},{\"id\":5,\"file\":\"bad.js\",\"start_byte\":398,\"end_byte\":445,\"start_line\":9,\"end_line\":9,\"content_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"content\":\"function dynamic(path) { return import(path); }\"}],\"omissions\":[{\"reason\":\"unresolved_relation\",\"count\":7}],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16000,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":5,\"evidence_bytes\":275,\"output_bytes\":2744,\"estimated_tokens\":686,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/15\",\"calls_remaining\":9,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:15\"}}",
+      "serialized_bytes": 2861,
+      "source_bytes": 275,
+      "elapsed_ms": 6.149624998215586,
+      "spans": [
+        {
+          "file": "bad.js",
+          "start_byte": 138,
+          "end_byte": 196,
+          "sha256": "6522ac544fc6e9dca38c175edc521c5470035abbdeb32b6a3aad7b1ad03c6450",
+          "text": "function unproven() { return [Thing, Factory, External]; }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 204,
+          "end_byte": 248,
+          "sha256": "2c2941ecb270d8c5f2fd8eb5c8c133a0b3b2d5d5e79922fabfe4e060c8b05343",
+          "text": "function shadowed(Thing) { return Thing(); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 256,
+          "end_byte": 303,
+          "sha256": "a3655a9a9c72e59c1c4af1d6a00fce7de36149a6011d7f5d17a9af79ba4d9708",
+          "text": "function computed(key) { return model[key](); }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 311,
+          "end_byte": 390,
+          "sha256": "7155d04e15a978b88333aaadfa6f0e049bbe2fcab728b7244b7008a8efdaba1f",
+          "text": "function legacy() { const loaded = require(\"./left.js\"); return loaded.Thing; }"
+        },
+        {
+          "file": "bad.js",
+          "start_byte": 398,
+          "end_byte": 445,
+          "sha256": "d079757c6cb4cbacb0f4ffd111e2c4b0490ebd0f902ed37d01ef3ac8c607cace",
+          "text": "function dynamic(path) { return import(path); }"
+        }
+      ]
+    },
+    {
+      "id": "session-aa24a874-27c7-445d-8393-d3941d425788:16",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 20,
+        "file": "bad.js"
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-eatdm8cd/snapshot\",\"file\":\"bad.js\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":5,\"column\":38,\"start_byte\":168,\"end_byte\":173,\"text\":\"Thing\",\"path\":[\"Thing\"],\"candidate_bindings\":[{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"}],\"binding_state\":\"definite\",\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":138,\"definition_end_byte\":196,\"body_start_byte\":158,\"body_end_byte\":196}},\"binding\":{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::unproven#function\",\"source_kind\":\"function\",\"import_source_id\":\"bad.js::__file__#file\",\"import_target_id\":\"barrel.js::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"ambiguous_target\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[{\"kind\":\"import_binding\",\"file\":\"bad.js\",\"line\":1,\"content_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"endpoint_id\":\"barrel.js::__file__#file\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":5,\"column\":45,\"start_byte\":175,\"end_byte\":182,\"text\":\"Factory\",\"path\":[\"Factory\"],\"candidate_bindings\":[{\"local_name\":\"Factory\",\"imported_name\":\"default\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"}],\"binding_state\":\"definite\",\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":138,\"definition_end_byte\":196,\"body_start_byte\":158,\"body_end_byte\":196}},\"binding\":{\"local_name\":\"Factory\",\"imported_name\":\"default\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::unproven#function\",\"source_kind\":\"function\",\"import_source_id\":\"bad.js::__file__#file\",\"import_target_id\":\"barrel.js::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"target_not_indexed\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[{\"kind\":\"import_binding\",\"file\":\"bad.js\",\"line\":1,\"content_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"endpoint_id\":\"barrel.js::__file__#file\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":5,\"column\":54,\"start_byte\":184,\"end_byte\":192,\"text\":\"External\",\"path\":[\"External\"],\"candidate_bindings\":[{\"local_name\":\"External\",\"imported_name\":\"External\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":82,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":3,\"import_text\":\"import { External } from \\\"uninstalled-package\\\";\",\"import_specifier\":\"uninstalled-package\"}],\"binding_state\":\"definite\",\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":138,\"definition_end_byte\":196,\"body_start_byte\":158,\"body_end_byte\":196}},\"binding\":{\"local_name\":\"External\",\"imported_name\":\"External\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":82,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":3,\"import_text\":\"import { External } from \\\"uninstalled-package\\\";\",\"import_specifier\":\"uninstalled-package\"},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::unproven#function\",\"source_kind\":\"function\",\"import_source_id\":\"bad.js::__file__#file\",\"import_target_id\":null,\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"import_unresolved\",\"import_unresolved_reason\":\"external\",\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":6,\"column\":42,\"start_byte\":238,\"end_byte\":243,\"text\":\"Thing\",\"path\":[\"Thing\"],\"candidate_bindings\":[{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"}],\"binding_state\":\"shadowed\",\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":204,\"definition_end_byte\":248,\"body_start_byte\":229,\"body_end_byte\":248}},\"binding\":{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::shadowed#function\",\"source_kind\":\"function\",\"import_source_id\":\"bad.js::__file__#file\",\"import_target_id\":\"barrel.js::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"binding_shadowed\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":7,\"column\":40,\"start_byte\":288,\"end_byte\":298,\"text\":\"model[key]\",\"path\":[\"model\"],\"candidate_bindings\":[{\"local_name\":\"model\",\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":46,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":2,\"import_text\":\"import * as model from \\\"./left.js\\\";\",\"import_specifier\":\"./left.js\"}],\"binding_state\":\"unsupported\",\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":256,\"definition_end_byte\":303,\"body_start_byte\":279,\"body_end_byte\":303}},\"binding\":{\"local_name\":\"model\",\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":46,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":2,\"import_text\":\"import * as model from \\\"./left.js\\\";\",\"import_specifier\":\"./left.js\"},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::computed#function\",\"source_kind\":\"function\",\"import_source_id\":\"bad.js::__file__#file\",\"import_target_id\":\"left.js::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"unsupported_reference\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":5,\"resolved\":0,\"unresolved\":5,\"returned\":5},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/16\",\"calls_remaining\":8,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:16\"}}",
+      "serialized_bytes": 8106,
+      "source_bytes": 0,
+      "elapsed_ms": 4.41354198846966,
+      "spans": []
+    },
+    {
+      "id": "session-aa24a874-27c7-445d-8393-d3941d425788:17",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "status": "all",
+        "offset": 0,
+        "limit": 20,
+        "file": "bad.js"
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-eatdm8cd/snapshot\",\"file\":\"bad.js\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":6,\"column\":42,\"start_byte\":238,\"end_byte\":245,\"callee_start_byte\":238,\"callee_end_byte\":243,\"callee_text\":\"Thing\",\"callee_path\":[\"Thing\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"shadowed\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":204,\"definition_end_byte\":248,\"body_start_byte\":229,\"body_end_byte\":248},\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\"},\"caller_id\":\"bad.js::shadowed#function\",\"caller_kind\":\"function\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"local_binding_shadowed\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":7,\"column\":40,\"start_byte\":288,\"end_byte\":300,\"callee_start_byte\":288,\"callee_end_byte\":298,\"callee_text\":\"model[key]\",\"callee_path\":[],\"callee_form\":\"dynamic\",\"local_candidates\":[],\"local_binding_state\":\"unsupported\",\"member_candidates\":[],\"member_binding_state\":\"unsupported\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":256,\"definition_end_byte\":303,\"body_start_byte\":279,\"body_end_byte\":303},\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\"},\"caller_id\":null,\"caller_kind\":null,\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"unsupported_callee\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":8,\"column\":43,\"start_byte\":346,\"end_byte\":366,\"callee_start_byte\":346,\"callee_end_byte\":353,\"callee_text\":\"require\",\"callee_path\":[\"require\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":311,\"definition_end_byte\":390,\"body_start_byte\":329,\"body_end_byte\":390},\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\"},\"caller_id\":\"bad.js::legacy#function\",\"caller_kind\":\"function\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"callee_not_proven\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":9,\"column\":40,\"start_byte\":430,\"end_byte\":442,\"callee_start_byte\":430,\"callee_end_byte\":436,\"callee_text\":\"import\",\"callee_path\":[],\"callee_form\":\"dynamic\",\"local_candidates\":[],\"local_binding_state\":\"unsupported\",\"member_candidates\":[],\"member_binding_state\":\"unsupported\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":398,\"definition_end_byte\":445,\"body_start_byte\":421,\"body_end_byte\":445},\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\"},\"caller_id\":null,\"caller_kind\":null,\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"unsupported_callee\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":10,\"column\":30,\"start_byte\":475,\"end_byte\":487,\"callee_start_byte\":475,\"callee_end_byte\":485,\"callee_text\":\"chooseBase\",\"callee_path\":[\"chooseBase\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"file\",\"definition_start_byte\":null,\"definition_end_byte\":null,\"body_start_byte\":null,\"body_end_byte\":null},\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\"},\"caller_id\":\"bad.js::__file__#file\",\"caller_kind\":\"file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"callee_not_proven\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":5,\"resolved\":0,\"unresolved\":5,\"returned\":5},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/17\",\"calls_remaining\":7,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:17\"}}",
+      "serialized_bytes": 4789,
+      "source_bytes": 0,
+      "elapsed_ms": 2.2486670059151947,
+      "spans": []
+    },
+    {
+      "id": "session-aa24a874-27c7-445d-8393-d3941d425788:18",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "right.js",
+        "start_line": 1,
+        "end_line": 20
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"right.js\",\"content\":\"export class Thing {}\\n\",\"total_lines\":1,\"start_line\":1,\"end_line\":1,\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/18\",\"calls_remaining\":6,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:18\"}}",
+      "serialized_bytes": 267,
+      "source_bytes": 22,
+      "elapsed_ms": 1.9530829740688205,
+      "spans": [
+        {
+          "file": "right.js",
+          "start_byte": 0,
+          "end_byte": 22,
+          "sha256": "3636ac75818c1f4605ef9b0eded69264ce9ef6d1a07354cfda03bafa00f591e3",
+          "text": "export class Thing {}\n"
+        }
+      ]
+    },
+    {
+      "id": "session-aa24a874-27c7-445d-8393-d3941d425788:19",
+      "task_id": "javascript_unproven_dependencies",
+      "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+      "arm": "B",
+      "repetition": 3,
+      "snapshot": "javascript_uncertainty",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "graph",
+      "arguments": {
+        "question": "What proven target declarations are used by bad.js values and calls, including Thing, Factory, model[key], shadowed Thing, require loaded.Thing, import(path), chooseBase(), and JSDoc Thing?",
+        "seed_ids": [
+          "bad.js::unproven#function",
+          "bad.js::shadowed#function",
+          "bad.js::computed#function",
+          "bad.js::legacy#function",
+          "bad.js::dynamic#function"
+        ]
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-eatdm8cd/snapshot\",\"question\":\"What proven target declarations are used by bad.js values and calls, including Thing, Factory, model[key], shadowed Thing, require loaded.Thing, import(path), chooseBase(), and JSDoc Thing?\",\"selection\":\"explicit\",\"question_terms\":[],\"anchors\":[{\"node\":{\"id\":\"bad.js::unproven#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"bad.js\",\"line\":5,\"end_line\":5}},\"matched_symbol_id\":\"bad.js::unproven#function\",\"name\":\"unproven\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}},{\"node\":{\"id\":\"bad.js::shadowed#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"bad.js\",\"line\":6,\"end_line\":6}},\"matched_symbol_id\":\"bad.js::shadowed#function\",\"name\":\"shadowed\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}},{\"node\":{\"id\":\"bad.js::computed#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"bad.js\",\"line\":7,\"end_line\":7}},\"matched_symbol_id\":\"bad.js::computed#function\",\"name\":\"computed\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}},{\"node\":{\"id\":\"bad.js::legacy#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"bad.js\",\"line\":8,\"end_line\":8}},\"matched_symbol_id\":\"bad.js::legacy#function\",\"name\":\"legacy\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}},{\"node\":{\"id\":\"bad.js::dynamic#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"bad.js\",\"line\":9,\"end_line\":9}},\"matched_symbol_id\":\"bad.js::dynamic#function\",\"name\":\"dynamic\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}}],\"routing\":{\"kind\":\"relationship\",\"reason\":\"relationship_intent\"},\"filters\":{\"namespaces\":null,\"edge_types\":null,\"resolutions\":[\"exact\",\"declared\",\"import-resolved\"],\"direction\":\"outgoing\"},\"hub_threshold\":4,\"paths\":[],\"rejected_paths\":[],\"counts\":{\"filtered_edges\":4,\"examined_nodes\":5,\"examined_paths\":1,\"returned_paths\":0,\"rejected_paths\":0,\"duplicate_paths\":0,\"omitted_rejected_paths\":0,\"omitted_nodes\":0,\"omitted_paths\":0},\"budget\":{\"max_hops\":3,\"max_nodes\":64,\"max_paths\":16,\"path_offset\":0,\"evidence_bytes\":0,\"estimated_tokens\":0,\"max_evidence_bytes\":16384,\"max_estimated_tokens\":4096,\"hop_limit_reached\":false,\"node_limit_reached\":false,\"next_path_offset\":null},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/19\",\"calls_remaining\":5,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:19\"}}",
+      "serialized_bytes": 2758,
+      "source_bytes": 0,
+      "elapsed_ms": 5.482041975483298,
+      "spans": []
+    }
+  ],
+  "measurement": {
+    "task_id": "javascript_unproven_dependencies",
+    "session_id": "session-aa24a874-27c7-445d-8393-d3941d425788",
+    "arm": "B",
+    "repetition": 3,
+    "snapshot": "javascript_uncertainty",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1",
+    "schema_version": 3,
+    "measurement_method": "observed_tool_calls",
+    "intent_collection": "not_collected",
+    "outcome": "budget_exhausted",
+    "answer": {
+      "proven_targets": {
+        "unproven": [],
+        "default_forwarded_by_star": [],
+        "computed_call_exact": [],
+        "shadowed_Thing_is_import": [],
+        "commonjs_member_proven": [],
+        "dynamic_import_proven": [],
+        "computed_base_proven": [],
+        "jsdoc_type_supported": []
+      }
+    },
+    "answer_correct": false,
+    "task_correct": false,
+    "read_count": 19,
+    "validated_read_count": 19,
+    "required_context_delivered": [
+      "barrel",
+      "entry",
+      "imports",
+      "left",
+      "remaining",
+      "right"
+    ],
+    "required_context_total": 6,
+    "context_recall": 1.0,
+    "serialized_tool_output_bytes": null,
+    "source_bytes": null,
+    "estimated_source_tokens": null,
+    "tool_elapsed_ms": 80.07375200395472,
+    "provider_usage": {
+      "input_tokens": 206197,
+      "cached_input_tokens": 175104,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 4282,
+      "reasoning_output_tokens": 3292
+    },
+    "usage_semantics": "One Codex turn.completed event; gross input includes cached input subset; output includes reasoning tokens.",
+    "token_status": "measured",
+    "measurement_complete": false,
+    "full_pass": false
+  },
+  "baseline": {
+    "end_to_end_seconds": 119.55688333298895,
+    "actual_process_seconds": 119.55688333298895,
+    "exit_code": 0,
+    "provider_thread_id": "01a09820-32c6-7b31-944d-ce071ecd7f46",
+    "failures": [
+      {
+        "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/13",
+        "category": "tool_error",
+        "message": "invalid record pagination"
+      },
+      {
+        "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/14",
+        "category": "tool_error",
+        "message": "invalid record pagination"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_5",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_13",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_14",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_16",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_17",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "delivery_trace_mismatch",
+        "item": "item_19",
+        "message": "actual request differs from recorded request"
+      },
+      {
+        "category": "unmatched_recorded_delivery"
+      },
+      {
+        "category": "budget_exhausted",
+        "limit": "input_tokens",
+        "actual": 206197,
+        "maximum": 200000
+      }
+    ],
+    "tool_delivery_verified": false,
+    "output_accounting": {
+      "schema_version": 4,
+      "complete": false,
+      "tool_call_count": 19,
+      "recorded_payload_bytes": 32684,
+      "complete_payload_bytes": null,
+      "source_bytes": null,
+      "calls": [
+        {
+          "item_id": "item_1",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "dependencies",
+            "max_hops": 2,
+            "query": "bad.js unproven default_forwarded_by_star computed_call_exact shadowed_Thing_is_import commonjs_member_proven dynamic_import_proven computed_base_proven jsdoc_type_supported",
+            "max_output_bytes": 16000,
+            "max_evidence_bytes": 8192
+          },
+          "status": "completed",
+          "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/1",
+          "trace_event_id": "session-aa24a874-27c7-445d-8393-d3941d425788:1",
+          "source_bytes": 44,
+          "serialized_bytes": 1238,
+          "elapsed_ms": 11.973957996815443,
+          "payload_texts": [
+            "{\"schema_version\":1,\"intent\":\"dependencies\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_dependencies\",\"exhaustive\":false},\"items\":[{\"id\":\"bad.js::shadowed#function\",\"name\":\"shadowed\",\"kind\":\"function\",\"file\":\"bad.js\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches bad, js, shadowed, thing\",\"source_id\":1,\"complete\":true,\"path\":[]}],\"relationships\":[],\"sources\":[{\"id\":1,\"file\":\"bad.js\",\"start_byte\":204,\"end_byte\":248,\"start_line\":6,\"end_line\":6,\"content_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"content\":\"function shadowed(Thing) { return Thing(); }\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":8},{\"reason\":\"unresolved_relation\",\"count\":2}],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16000,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":1,\"evidence_bytes\":44,\"output_bytes\":1122,\"estimated_tokens\":281,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:1\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": {
+            "nodes_examined": 1,
+            "evidence_bytes": 44,
+            "output_bytes": 1122,
+            "selected_items": 1,
+            "max_nodes": 64,
+            "max_neighbors": 32
+          }
+        },
+        {
+          "item_id": "item_2",
+          "server": "evaluation",
+          "tool": "search",
+          "arguments": {
+            "file_paths": [
+              "bad.js"
+            ],
+            "query": "unproven"
+          },
+          "status": "completed",
+          "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/2",
+          "trace_event_id": "session-aa24a874-27c7-445d-8393-d3941d425788:2",
+          "source_bytes": 58,
+          "serialized_bytes": 903,
+          "elapsed_ms": 2.8744589944835752,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"bad.js::unproven#function\",\"name\":\"unproven\",\"qualified_name\":\"unproven\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"bad.js\",\"byte_offset\":138,\"byte_length\":58,\"signature\":\"function unproven() { return [Thing, Factory, External]; }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"6522ac544fc6e9dca38c175edc521c5470035abbdeb32b6a3aad7b1ad03c6450\",\"decorators\":[],\"keywords\":[\"unproven\"],\"metadata\":{},\"line\":5,\"end_line\":5,\"score\":71.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"4f384e7b-392a-4143-8203-d014f81b44bb\",\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:2\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_3",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "bad.js",
+            "start_line": 1,
+            "end_line": 80
+          },
+          "status": "completed",
+          "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/3",
+          "trace_event_id": "session-aa24a874-27c7-445d-8393-d3941d425788:3",
+          "source_bytes": 571,
+          "serialized_bytes": 834,
+          "elapsed_ms": 2.0462090033106506,
+          "payload_texts": [
+            "{\"file\":\"bad.js\",\"content\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\\nimport * as model from \\\"./left.js\\\";\\nimport { External } from \\\"uninstalled-package\\\";\\n\\nexport function unproven() { return [Thing, Factory, External]; }\\nexport function shadowed(Thing) { return Thing(); }\\nexport function computed(key) { return model[key](); }\\nexport function legacy() { const loaded = require(\\\"./left.js\\\"); return loaded.Thing; }\\nexport function dynamic(path) { return import(path); }\\nexport class Dynamic extends chooseBase() {}\\n/** @param {Thing} value */\\nexport function documented(value) { return value; }\\n\",\"total_lines\":12,\"start_line\":1,\"end_line\":12,\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:3\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_4",
+          "server": "evaluation",
+          "tool": "get",
+          "arguments": {
+            "selected_from_search_id": "4f384e7b-392a-4143-8203-d014f81b44bb",
+            "symbol_ids": [
+              "bad.js::unproven#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/4",
+          "trace_event_id": "session-aa24a874-27c7-445d-8393-d3941d425788:4",
+          "source_bytes": 116,
+          "serialized_bytes": 457,
+          "elapsed_ms": 3.212999989045784,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"bad.js::unproven#function\",\"source\":\"function unproven() { return [Thing, Factory, External]; }\",\"byte_offset\":138,\"byte_length\":58,\"line\":5,\"end_line\":5,\"signature\":\"function unproven() { return [Thing, Factory, External]; }\",\"kind\":\"function\",\"language\":\"javascript\"}],\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:4\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_5",
+          "server": "evaluation",
+          "tool": "graph_anchors",
+          "arguments": {
+            "question": "In bad.js, determine proven dependency targets for imported Thing and Factory, namespace model computed calls, shadowed Thing, require member access, dynamic import, computed class base, and JSDoc Thing type.",
+            "seed_ids": [
+              "bad.js::unproven#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/5",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 1092,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-eatdm8cd/snapshot\",\"question\":\"In bad.js, determine proven dependency targets for imported Thing and Factory, namespace model computed calls, shadowed Thing, require member access, dynamic import, computed class base, and JSDoc Thing type.\",\"selection\":\"explicit\",\"question_terms\":[],\"anchors\":[{\"node\":{\"id\":\"bad.js::unproven#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"bad.js\",\"line\":5,\"end_line\":5}},\"matched_symbol_id\":\"bad.js::unproven#function\",\"name\":\"unproven\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}}],\"counts\":{\"indexed_nodes\":14,\"eligible_units\":14,\"qualified_candidates\":1,\"collapsed_symbols\":0,\"returned_anchors\":1,\"omitted_candidates\":0},\"budget\":{\"requested_max_anchors\":5,\"effective_max_anchors\":5},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:5\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_6",
+          "server": "evaluation",
+          "tool": "search",
+          "arguments": {
+            "file_paths": [
+              "bad.js"
+            ],
+            "query": "shadowed computed legacy dynamic Dynamic documented"
+          },
+          "status": "completed",
+          "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/6",
+          "trace_event_id": "session-aa24a874-27c7-445d-8393-d3941d425788:6",
+          "source_bytes": 261,
+          "serialized_bytes": 2678,
+          "elapsed_ms": 2.3162500001490116,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"bad.js::shadowed#function\",\"name\":\"shadowed\",\"qualified_name\":\"shadowed\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"bad.js\",\"byte_offset\":204,\"byte_length\":44,\"signature\":\"function shadowed(Thing) { return Thing(); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"2c2941ecb270d8c5f2fd8eb5c8c133a0b3b2d5d5e79922fabfe4e060c8b05343\",\"decorators\":[],\"keywords\":[\"shadowed\"],\"metadata\":{},\"line\":6,\"end_line\":6,\"score\":20.0},{\"id\":\"bad.js::computed#function\",\"name\":\"computed\",\"qualified_name\":\"computed\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"bad.js\",\"byte_offset\":256,\"byte_length\":47,\"signature\":\"function computed(key) { return model[key](); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"a3655a9a9c72e59c1c4af1d6a00fce7de36149a6011d7f5d17a9af79ba4d9708\",\"decorators\":[],\"keywords\":[\"computed\"],\"metadata\":{},\"line\":7,\"end_line\":7,\"score\":20.0},{\"id\":\"bad.js::legacy#function\",\"name\":\"legacy\",\"qualified_name\":\"legacy\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"bad.js\",\"byte_offset\":311,\"byte_length\":79,\"signature\":\"function legacy() { const loaded = require(\\\"./left.js\\\"); return loaded.Thing; }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"7155d04e15a978b88333aaadfa6f0e049bbe2fcab728b7244b7008a8efdaba1f\",\"decorators\":[],\"keywords\":[\"legacy\"],\"metadata\":{},\"line\":8,\"end_line\":8,\"score\":20.0},{\"id\":\"bad.js::dynamic#function\",\"name\":\"dynamic\",\"qualified_name\":\"dynamic\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"bad.js\",\"byte_offset\":398,\"byte_length\":47,\"signature\":\"function dynamic(path) { return import(path); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"d079757c6cb4cbacb0f4ffd111e2c4b0490ebd0f902ed37d01ef3ac8c607cace\",\"decorators\":[],\"keywords\":[\"dynamic\"],\"metadata\":{},\"line\":9,\"end_line\":9,\"score\":20.0},{\"id\":\"bad.js::documented#function\",\"name\":\"documented\",\"qualified_name\":\"documented\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"bad.js\",\"byte_offset\":526,\"byte_length\":44,\"signature\":\"function documented(value) { return value; }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"db2f3eb065e8caf47992208f54e577faf40df1a8ee81f38201e8de324c664a8f\",\"decorators\":[],\"keywords\":[\"documented\"],\"metadata\":{},\"line\":12,\"end_line\":12,\"score\":20.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"27de7c0a-42df-4aad-ac9c-cc279e9c5315\",\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:6\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_7",
+          "server": "evaluation",
+          "tool": "search",
+          "arguments": {
+            "file_paths": [
+              "bad.js"
+            ],
+            "query": "Dynamic"
+          },
+          "status": "completed",
+          "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/7",
+          "trace_event_id": "session-aa24a874-27c7-445d-8393-d3941d425788:7",
+          "source_bytes": 84,
+          "serialized_bytes": 1310,
+          "elapsed_ms": 3.878499992424622,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"bad.js::dynamic#function\",\"name\":\"dynamic\",\"qualified_name\":\"dynamic\",\"kind\":\"function\",\"language\":\"javascript\",\"file_path\":\"bad.js\",\"byte_offset\":398,\"byte_length\":47,\"signature\":\"function dynamic(path) { return import(path); }\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"d079757c6cb4cbacb0f4ffd111e2c4b0490ebd0f902ed37d01ef3ac8c607cace\",\"decorators\":[],\"keywords\":[\"dynamic\"],\"metadata\":{},\"line\":9,\"end_line\":9,\"score\":71.0},{\"id\":\"bad.js::Dynamic#class\",\"name\":\"Dynamic\",\"qualified_name\":\"Dynamic\",\"kind\":\"class\",\"language\":\"javascript\",\"file_path\":\"bad.js\",\"byte_offset\":453,\"byte_length\":37,\"signature\":\"class Dynamic extends chooseBase() {}\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"6c30aa9b97acc481eb4b5014e63bf8510bc43d2274ac357763d176c093c67176\",\"decorators\":[],\"keywords\":[\"dynamic\"],\"metadata\":{},\"line\":10,\"end_line\":10,\"score\":67.0}],\"coverage\":{\"schema_version\":1,\"state\":\"complete\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":4,\"excluded_paths\":0,\"exclusions\":[],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"1d2f8a7b-870d-4b31-a248-818cddcc929d\",\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:7\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_8",
+          "server": "evaluation",
+          "tool": "get",
+          "arguments": {
+            "selected_from_search_id": "27de7c0a-42df-4aad-ac9c-cc279e9c5315",
+            "symbol_ids": [
+              "bad.js::shadowed#function",
+              "bad.js::computed#function",
+              "bad.js::legacy#function",
+              "bad.js::dynamic#function",
+              "bad.js::documented#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/8",
+          "trace_event_id": "session-aa24a874-27c7-445d-8393-d3941d425788:8",
+          "source_bytes": 522,
+          "serialized_bytes": 1512,
+          "elapsed_ms": 15.567250025924295,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"bad.js::shadowed#function\",\"source\":\"function shadowed(Thing) { return Thing(); }\",\"byte_offset\":204,\"byte_length\":44,\"line\":6,\"end_line\":6,\"signature\":\"function shadowed(Thing) { return Thing(); }\",\"kind\":\"function\",\"language\":\"javascript\"},{\"id\":\"bad.js::computed#function\",\"source\":\"function computed(key) { return model[key](); }\",\"byte_offset\":256,\"byte_length\":47,\"line\":7,\"end_line\":7,\"signature\":\"function computed(key) { return model[key](); }\",\"kind\":\"function\",\"language\":\"javascript\"},{\"id\":\"bad.js::legacy#function\",\"source\":\"function legacy() { const loaded = require(\\\"./left.js\\\"); return loaded.Thing; }\",\"byte_offset\":311,\"byte_length\":79,\"line\":8,\"end_line\":8,\"signature\":\"function legacy() { const loaded = require(\\\"./left.js\\\"); return loaded.Thing; }\",\"kind\":\"function\",\"language\":\"javascript\"},{\"id\":\"bad.js::dynamic#function\",\"source\":\"function dynamic(path) { return import(path); }\",\"byte_offset\":398,\"byte_length\":47,\"line\":9,\"end_line\":9,\"signature\":\"function dynamic(path) { return import(path); }\",\"kind\":\"function\",\"language\":\"javascript\"},{\"id\":\"bad.js::documented#function\",\"source\":\"function documented(value) { return value; }\",\"byte_offset\":526,\"byte_length\":44,\"line\":12,\"end_line\":12,\"signature\":\"function documented(value) { return value; }\",\"kind\":\"function\",\"language\":\"javascript\"}],\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/8\",\"calls_remaining\":16,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:8\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_9",
+          "server": "evaluation",
+          "tool": "get",
+          "arguments": {
+            "selected_from_search_id": "1d2f8a7b-870d-4b31-a248-818cddcc929d",
+            "symbol_ids": [
+              "bad.js::Dynamic#class"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/9",
+          "trace_event_id": "session-aa24a874-27c7-445d-8393-d3941d425788:9",
+          "source_bytes": 74,
+          "serialized_bytes": 410,
+          "elapsed_ms": 5.926624988205731,
+          "payload_texts": [
+            "{\"symbols\":[{\"id\":\"bad.js::Dynamic#class\",\"source\":\"class Dynamic extends chooseBase() {}\",\"byte_offset\":453,\"byte_length\":37,\"line\":10,\"end_line\":10,\"signature\":\"class Dynamic extends chooseBase() {}\",\"kind\":\"class\",\"language\":\"javascript\"}],\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/9\",\"calls_remaining\":15,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:9\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_10",
+          "server": "evaluation",
+          "tool": "outline",
+          "arguments": {
+            "file": null
+          },
+          "status": "completed",
+          "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/10",
+          "trace_event_id": "session-aa24a874-27c7-445d-8393-d3941d425788:10",
+          "source_bytes": 405,
+          "serialized_bytes": 2381,
+          "elapsed_ms": 2.2632080072071403,
+          "payload_texts": [
+            "{\"files\":[{\"file\":\"bad.js\",\"symbols\":[{\"id\":\"bad.js::unproven#function\",\"name\":\"unproven\",\"kind\":\"function\",\"line\":5,\"end_line\":5,\"signature\":\"function unproven() { return [Thing, Factory, External]; }\",\"summary\":\"\"},{\"id\":\"bad.js::shadowed#function\",\"name\":\"shadowed\",\"kind\":\"function\",\"line\":6,\"end_line\":6,\"signature\":\"function shadowed(Thing) { return Thing(); }\",\"summary\":\"\"},{\"id\":\"bad.js::computed#function\",\"name\":\"computed\",\"kind\":\"function\",\"line\":7,\"end_line\":7,\"signature\":\"function computed(key) { return model[key](); }\",\"summary\":\"\"},{\"id\":\"bad.js::legacy#function\",\"name\":\"legacy\",\"kind\":\"function\",\"line\":8,\"end_line\":8,\"signature\":\"function legacy() { const loaded = require(\\\"./left.js\\\"); return loaded.Thing; }\",\"summary\":\"\"},{\"id\":\"bad.js::dynamic#function\",\"name\":\"dynamic\",\"kind\":\"function\",\"line\":9,\"end_line\":9,\"signature\":\"function dynamic(path) { return import(path); }\",\"summary\":\"\"},{\"id\":\"bad.js::Dynamic#class\",\"name\":\"Dynamic\",\"kind\":\"class\",\"line\":10,\"end_line\":10,\"signature\":\"class Dynamic extends chooseBase() {}\",\"summary\":\"\"},{\"id\":\"bad.js::documented#function\",\"name\":\"documented\",\"kind\":\"function\",\"line\":12,\"end_line\":12,\"signature\":\"function documented(value) { return value; }\",\"summary\":\"\"},{\"id\":\"bad.js::__file__#file\",\"name\":\"bad.js\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"bad.js\",\"summary\":\"\"}]},{\"file\":\"barrel.js\",\"symbols\":[{\"id\":\"barrel.js::__file__#file\",\"name\":\"barrel.js\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"barrel.js\",\"summary\":\"\"}]},{\"file\":\"left.js\",\"symbols\":[{\"id\":\"left.js::Thing#class\",\"name\":\"Thing\",\"kind\":\"class\",\"line\":1,\"end_line\":1,\"signature\":\"class Thing {}\",\"summary\":\"\"},{\"id\":\"left.js::Factory#function\",\"name\":\"Factory\",\"kind\":\"function\",\"line\":2,\"end_line\":2,\"signature\":\"function Factory() {}\",\"summary\":\"\"},{\"id\":\"left.js::__file__#file\",\"name\":\"left.js\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"left.js\",\"summary\":\"\"}]},{\"file\":\"right.js\",\"symbols\":[{\"id\":\"right.js::Thing#class\",\"name\":\"Thing\",\"kind\":\"class\",\"line\":1,\"end_line\":1,\"signature\":\"class Thing {}\",\"summary\":\"\"},{\"id\":\"right.js::__file__#file\",\"name\":\"right.js\",\"kind\":\"file\",\"line\":1,\"end_line\":1,\"signature\":\"right.js\",\"summary\":\"\"}]}],\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/10\",\"calls_remaining\":14,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:10\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_11",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "barrel.js",
+            "start_line": 1,
+            "end_line": 40
+          },
+          "status": "completed",
+          "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/11",
+          "trace_event_id": "session-aa24a874-27c7-445d-8393-d3941d425788:11",
+          "source_bytes": 55,
+          "serialized_bytes": 307,
+          "elapsed_ms": 1.820000004954636,
+          "payload_texts": [
+            "{\"file\":\"barrel.js\",\"content\":\"export * from \\\"./left.js\\\";\\nexport * from \\\"./right.js\\\";\\n\",\"total_lines\":2,\"start_line\":1,\"end_line\":2,\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/11\",\"calls_remaining\":13,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:11\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_12",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "left.js",
+            "start_line": 1,
+            "end_line": 20
+          },
+          "status": "completed",
+          "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/12",
+          "trace_event_id": "session-aa24a874-27c7-445d-8393-d3941d425788:12",
+          "source_bytes": 59,
+          "serialized_bytes": 305,
+          "elapsed_ms": 3.951167018385604,
+          "payload_texts": [
+            "{\"file\":\"left.js\",\"content\":\"export class Thing {}\\nexport default function Factory() {}\\n\",\"total_lines\":2,\"start_line\":1,\"end_line\":2,\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/12\",\"calls_remaining\":12,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:12\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_13",
+          "server": "evaluation",
+          "tool": "graph_imports",
+          "arguments": {
+            "file": "bad.js",
+            "limit": 100,
+            "offset": 0,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/13",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 238,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"error\":{\"code\":\"ValueError\",\"message\":\"invalid record pagination\"},\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/13\",\"calls_remaining\":11,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:13\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_14",
+          "server": "evaluation",
+          "tool": "graph_imports",
+          "arguments": {
+            "file": "bad.js",
+            "limit": 50,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/14",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 238,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"error\":{\"code\":\"ValueError\",\"message\":\"invalid record pagination\"},\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/14\",\"calls_remaining\":10,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:14\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_15",
+          "server": "evaluation",
+          "tool": "loci_explore",
+          "arguments": {
+            "intent": "dependencies",
+            "max_hops": 3,
+            "seed_ids": [
+              "bad.js::unproven#function",
+              "bad.js::shadowed#function",
+              "bad.js::computed#function",
+              "bad.js::legacy#function",
+              "bad.js::dynamic#function"
+            ],
+            "max_output_bytes": 16000,
+            "max_evidence_bytes": 8192
+          },
+          "status": "completed",
+          "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/15",
+          "trace_event_id": "session-aa24a874-27c7-445d-8393-d3941d425788:15",
+          "source_bytes": 275,
+          "serialized_bytes": 2861,
+          "elapsed_ms": 6.265417003305629,
+          "payload_texts": [
+            "{\"schema_version\":1,\"intent\":\"dependencies\",\"status\":\"partial\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"complete\",\"relationships\":\"authored_dependencies\",\"exhaustive\":false},\"items\":[{\"id\":\"bad.js::unproven#function\",\"name\":\"unproven\",\"kind\":\"function\",\"file\":\"bad.js\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"bad.js::shadowed#function\",\"name\":\"shadowed\",\"kind\":\"function\",\"file\":\"bad.js\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":2,\"complete\":true,\"path\":[]},{\"id\":\"bad.js::computed#function\",\"name\":\"computed\",\"kind\":\"function\",\"file\":\"bad.js\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":3,\"complete\":true,\"path\":[]},{\"id\":\"bad.js::legacy#function\",\"name\":\"legacy\",\"kind\":\"function\",\"file\":\"bad.js\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":4,\"complete\":true,\"path\":[]},{\"id\":\"bad.js::dynamic#function\",\"name\":\"dynamic\",\"kind\":\"function\",\"file\":\"bad.js\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":5,\"complete\":true,\"path\":[]}],\"relationships\":[],\"sources\":[{\"id\":1,\"file\":\"bad.js\",\"start_byte\":138,\"end_byte\":196,\"start_line\":5,\"end_line\":5,\"content_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"content\":\"function unproven() { return [Thing, Factory, External]; }\"},{\"id\":2,\"file\":\"bad.js\",\"start_byte\":204,\"end_byte\":248,\"start_line\":6,\"end_line\":6,\"content_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"content\":\"function shadowed(Thing) { return Thing(); }\"},{\"id\":3,\"file\":\"bad.js\",\"start_byte\":256,\"end_byte\":303,\"start_line\":7,\"end_line\":7,\"content_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"content\":\"function computed(key) { return model[key](); }\"},{\"id\":4,\"file\":\"bad.js\",\"start_byte\":311,\"end_byte\":390,\"start_line\":8,\"end_line\":8,\"content_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"content\":\"function legacy() { const loaded = require(\\\"./left.js\\\"); return loaded.Thing; }\"},{\"id\":5,\"file\":\"bad.js\",\"start_byte\":398,\"end_byte\":445,\"start_line\":9,\"end_line\":9,\"content_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"content\":\"function dynamic(path) { return import(path); }\"}],\"omissions\":[{\"reason\":\"unresolved_relation\",\"count\":7}],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16000,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":5,\"evidence_bytes\":275,\"output_bytes\":2744,\"estimated_tokens\":686,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/15\",\"calls_remaining\":9,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:15\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": {
+            "nodes_examined": 5,
+            "evidence_bytes": 275,
+            "output_bytes": 2744,
+            "selected_items": 5,
+            "max_nodes": 64,
+            "max_neighbors": 32
+          }
+        },
+        {
+          "item_id": "item_16",
+          "server": "evaluation",
+          "tool": "graph_references",
+          "arguments": {
+            "file": "bad.js",
+            "limit": 20,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/16",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 8106,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-eatdm8cd/snapshot\",\"file\":\"bad.js\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":5,\"column\":38,\"start_byte\":168,\"end_byte\":173,\"text\":\"Thing\",\"path\":[\"Thing\"],\"candidate_bindings\":[{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"}],\"binding_state\":\"definite\",\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":138,\"definition_end_byte\":196,\"body_start_byte\":158,\"body_end_byte\":196}},\"binding\":{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::unproven#function\",\"source_kind\":\"function\",\"import_source_id\":\"bad.js::__file__#file\",\"import_target_id\":\"barrel.js::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"ambiguous_target\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[{\"kind\":\"import_binding\",\"file\":\"bad.js\",\"line\":1,\"content_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"endpoint_id\":\"barrel.js::__file__#file\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":5,\"column\":45,\"start_byte\":175,\"end_byte\":182,\"text\":\"Factory\",\"path\":[\"Factory\"],\"candidate_bindings\":[{\"local_name\":\"Factory\",\"imported_name\":\"default\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"}],\"binding_state\":\"definite\",\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":138,\"definition_end_byte\":196,\"body_start_byte\":158,\"body_end_byte\":196}},\"binding\":{\"local_name\":\"Factory\",\"imported_name\":\"default\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::unproven#function\",\"source_kind\":\"function\",\"import_source_id\":\"bad.js::__file__#file\",\"import_target_id\":\"barrel.js::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"target_not_indexed\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[{\"kind\":\"import_binding\",\"file\":\"bad.js\",\"line\":1,\"content_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"endpoint_id\":\"barrel.js::__file__#file\"}],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":5,\"column\":54,\"start_byte\":184,\"end_byte\":192,\"text\":\"External\",\"path\":[\"External\"],\"candidate_bindings\":[{\"local_name\":\"External\",\"imported_name\":\"External\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":82,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":3,\"import_text\":\"import { External } from \\\"uninstalled-package\\\";\",\"import_specifier\":\"uninstalled-package\"}],\"binding_state\":\"definite\",\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":138,\"definition_end_byte\":196,\"body_start_byte\":158,\"body_end_byte\":196}},\"binding\":{\"local_name\":\"External\",\"imported_name\":\"External\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":82,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":3,\"import_text\":\"import { External } from \\\"uninstalled-package\\\";\",\"import_specifier\":\"uninstalled-package\"},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::unproven#function\",\"source_kind\":\"function\",\"import_source_id\":\"bad.js::__file__#file\",\"import_target_id\":null,\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"import_unresolved\",\"import_unresolved_reason\":\"external\",\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":6,\"column\":42,\"start_byte\":238,\"end_byte\":243,\"text\":\"Thing\",\"path\":[\"Thing\"],\"candidate_bindings\":[{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"}],\"binding_state\":\"shadowed\",\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":204,\"definition_end_byte\":248,\"body_start_byte\":229,\"body_end_byte\":248}},\"binding\":{\"local_name\":\"Thing\",\"imported_name\":\"Thing\",\"exported_name\":null,\"kind\":\"symbol\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":0,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":1,\"import_text\":\"import Factory, { Thing } from \\\"./barrel.js\\\";\",\"import_specifier\":\"./barrel.js\"},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::shadowed#function\",\"source_kind\":\"function\",\"import_source_id\":\"bad.js::__file__#file\",\"import_target_id\":\"barrel.js::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"binding_shadowed\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":7,\"column\":40,\"start_byte\":288,\"end_byte\":298,\"text\":\"model[key]\",\"path\":[\"model\"],\"candidate_bindings\":[{\"local_name\":\"model\",\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":46,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":2,\"import_text\":\"import * as model from \\\"./left.js\\\";\",\"import_specifier\":\"./left.js\"}],\"binding_state\":\"unsupported\",\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":256,\"definition_end_byte\":303,\"body_start_byte\":279,\"body_end_byte\":303}},\"binding\":{\"local_name\":\"model\",\"imported_name\":null,\"exported_name\":null,\"kind\":\"namespace\",\"type_only\":false,\"module_level\":true,\"declaration_start_byte\":46,\"scope_start_byte\":0,\"scope_end_byte\":571,\"import_line\":2,\"import_text\":\"import * as model from \\\"./left.js\\\";\",\"import_specifier\":\"./left.js\"},\"source_file\":\"bad.js\",\"source_id\":\"bad.js::computed#function\",\"source_kind\":\"function\",\"import_source_id\":\"bad.js::__file__#file\",\"import_target_id\":\"left.js::__file__#file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"unsupported_reference\",\"import_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":5,\"resolved\":0,\"unresolved\":5,\"returned\":5},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/16\",\"calls_remaining\":8,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:16\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_17",
+          "server": "evaluation",
+          "tool": "graph_calls",
+          "arguments": {
+            "file": "bad.js",
+            "limit": 20,
+            "status": "all"
+          },
+          "status": "completed",
+          "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/17",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 4789,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-eatdm8cd/snapshot\",\"file\":\"bad.js\",\"status\":\"all\",\"items\":[{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":6,\"column\":42,\"start_byte\":238,\"end_byte\":245,\"callee_start_byte\":238,\"callee_end_byte\":243,\"callee_text\":\"Thing\",\"callee_path\":[\"Thing\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"shadowed\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":204,\"definition_end_byte\":248,\"body_start_byte\":229,\"body_end_byte\":248},\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\"},\"caller_id\":\"bad.js::shadowed#function\",\"caller_kind\":\"function\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"local_binding_shadowed\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":7,\"column\":40,\"start_byte\":288,\"end_byte\":300,\"callee_start_byte\":288,\"callee_end_byte\":298,\"callee_text\":\"model[key]\",\"callee_path\":[],\"callee_form\":\"dynamic\",\"local_candidates\":[],\"local_binding_state\":\"unsupported\",\"member_candidates\":[],\"member_binding_state\":\"unsupported\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":256,\"definition_end_byte\":303,\"body_start_byte\":279,\"body_end_byte\":303},\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\"},\"caller_id\":null,\"caller_kind\":null,\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"unsupported_callee\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":8,\"column\":43,\"start_byte\":346,\"end_byte\":366,\"callee_start_byte\":346,\"callee_end_byte\":353,\"callee_text\":\"require\",\"callee_path\":[\"require\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":311,\"definition_end_byte\":390,\"body_start_byte\":329,\"body_end_byte\":390},\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\"},\"caller_id\":\"bad.js::legacy#function\",\"caller_kind\":\"function\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"callee_not_proven\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":9,\"column\":40,\"start_byte\":430,\"end_byte\":442,\"callee_start_byte\":430,\"callee_end_byte\":436,\"callee_text\":\"import\",\"callee_path\":[],\"callee_form\":\"dynamic\",\"local_candidates\":[],\"local_binding_state\":\"unsupported\",\"member_candidates\":[],\"member_binding_state\":\"unsupported\",\"owner\":{\"kind\":\"callable\",\"definition_start_byte\":398,\"definition_end_byte\":445,\"body_start_byte\":421,\"body_end_byte\":445},\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\"},\"caller_id\":null,\"caller_kind\":null,\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"unsupported_callee\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null},{\"raw\":{\"source_file\":\"bad.js\",\"language\":\"javascript\",\"line\":10,\"column\":30,\"start_byte\":475,\"end_byte\":487,\"callee_start_byte\":475,\"callee_end_byte\":485,\"callee_text\":\"chooseBase\",\"callee_path\":[\"chooseBase\"],\"callee_form\":\"identifier\",\"local_candidates\":[],\"local_binding_state\":\"absent\",\"member_candidates\":[],\"member_binding_state\":\"absent\",\"owner\":{\"kind\":\"file\",\"definition_start_byte\":null,\"definition_end_byte\":null,\"body_start_byte\":null,\"body_end_byte\":null},\"source_hash\":\"d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42\"},\"caller_id\":\"bad.js::__file__#file\",\"caller_kind\":\"file\",\"target_file\":null,\"target_id\":null,\"target_kind\":null,\"status\":\"unresolved\",\"resolution\":null,\"unresolved_reason\":\"callee_not_proven\",\"reference_unresolved_reason\":null,\"resolution_basis\":null,\"support\":[],\"resolution_control_files\":[],\"resolution_configuration\":null}],\"counts\":{\"total\":5,\"resolved\":0,\"unresolved\":5,\"returned\":5},\"pagination\":{\"offset\":0,\"limit\":20,\"next_offset\":null},\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/17\",\"calls_remaining\":7,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:17\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_18",
+          "server": "evaluation",
+          "tool": "file",
+          "arguments": {
+            "file_path": "right.js",
+            "start_line": 1,
+            "end_line": 20
+          },
+          "status": "completed",
+          "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/18",
+          "trace_event_id": "session-aa24a874-27c7-445d-8393-d3941d425788:18",
+          "source_bytes": 22,
+          "serialized_bytes": 267,
+          "elapsed_ms": 2.019790990743786,
+          "payload_texts": [
+            "{\"file\":\"right.js\",\"content\":\"export class Thing {}\\n\",\"total_lines\":1,\"start_line\":1,\"end_line\":1,\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/18\",\"calls_remaining\":6,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:18\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        },
+        {
+          "item_id": "item_19",
+          "server": "evaluation",
+          "tool": "graph_retrieve",
+          "arguments": {
+            "question": "What proven target declarations are used by bad.js values and calls, including Thing, Factory, model[key], shadowed Thing, require loaded.Thing, import(path), chooseBase(), and JSDoc Thing?",
+            "seed_ids": [
+              "bad.js::unproven#function",
+              "bad.js::shadowed#function",
+              "bad.js::computed#function",
+              "bad.js::legacy#function",
+              "bad.js::dynamic#function"
+            ]
+          },
+          "status": "completed",
+          "attempt_id": "session-aa24a874-27c7-445d-8393-d3941d425788/attempt/19",
+          "trace_event_id": null,
+          "source_bytes": null,
+          "serialized_bytes": 2758,
+          "elapsed_ms": null,
+          "payload_texts": [
+            "{\"schema_version\":1,\"repo\":\"/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-eatdm8cd/snapshot\",\"question\":\"What proven target declarations are used by bad.js values and calls, including Thing, Factory, model[key], shadowed Thing, require loaded.Thing, import(path), chooseBase(), and JSDoc Thing?\",\"selection\":\"explicit\",\"question_terms\":[],\"anchors\":[{\"node\":{\"id\":\"bad.js::unproven#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"bad.js\",\"line\":5,\"end_line\":5}},\"matched_symbol_id\":\"bad.js::unproven#function\",\"name\":\"unproven\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}},{\"node\":{\"id\":\"bad.js::shadowed#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"bad.js\",\"line\":6,\"end_line\":6}},\"matched_symbol_id\":\"bad.js::shadowed#function\",\"name\":\"shadowed\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}},{\"node\":{\"id\":\"bad.js::computed#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"bad.js\",\"line\":7,\"end_line\":7}},\"matched_symbol_id\":\"bad.js::computed#function\",\"name\":\"computed\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}},{\"node\":{\"id\":\"bad.js::legacy#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"bad.js\",\"line\":8,\"end_line\":8}},\"matched_symbol_id\":\"bad.js::legacy#function\",\"name\":\"legacy\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}},{\"node\":{\"id\":\"bad.js::dynamic#function\",\"namespace\":\"loci\",\"kind\":\"function\",\"attributes\":{\"language\":\"javascript\",\"file\":\"bad.js\",\"line\":9,\"end_line\":9}},\"matched_symbol_id\":\"bad.js::dynamic#function\",\"name\":\"dynamic\",\"score\":null,\"reason\":{\"kind\":\"explicit_seed\",\"matched_terms\":[],\"match_scope\":[]}}],\"routing\":{\"kind\":\"relationship\",\"reason\":\"relationship_intent\"},\"filters\":{\"namespaces\":null,\"edge_types\":null,\"resolutions\":[\"exact\",\"declared\",\"import-resolved\"],\"direction\":\"outgoing\"},\"hub_threshold\":4,\"paths\":[],\"rejected_paths\":[],\"counts\":{\"filtered_edges\":4,\"examined_nodes\":5,\"examined_paths\":1,\"returned_paths\":0,\"rejected_paths\":0,\"duplicate_paths\":0,\"omitted_rejected_paths\":0,\"omitted_nodes\":0,\"omitted_paths\":0},\"budget\":{\"max_hops\":3,\"max_nodes\":64,\"max_paths\":16,\"path_offset\":0,\"evidence_bytes\":0,\"estimated_tokens\":0,\"max_evidence_bytes\":16384,\"max_estimated_tokens\":4096,\"hop_limit_reached\":false,\"node_limit_reached\":false,\"next_path_offset\":null},\"diagnostics\":[],\"_evaluation\":{\"attempt_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788/attempt/19\",\"calls_remaining\":5,\"event_id\":\"session-aa24a874-27c7-445d-8393-d3941d425788:19\"}}"
+          ],
+          "payload_format": "compact_json",
+          "native_usage": null
+        }
+      ],
+      "failures": [
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_5",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_13",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_14",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_16",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_17",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "delivery_trace_mismatch",
+          "item": "item_19",
+          "message": "actual request differs from recorded request"
+        },
+        {
+          "category": "unmatched_recorded_delivery"
+        }
+      ]
+    },
+    "adapter_elapsed_ms": 82.50525098992512,
+    "recoverable_error_events": 2,
+    "relationships": {
+      "schema_version": 3,
+      "case_id": "javascript_unproven_dependencies",
+      "language": "javascript",
+      "required_semantic_dependencies_total": 0,
+      "required_semantic_dependencies": [],
+      "available_dependency_links_total": 0,
+      "available_dependency_links": [],
+      "delivered_dependency_links_total": 0,
+      "delivered_dependency_links": [],
+      "dependency_link_recall": {
+        "label": "Exact frozen meaning joined to persisted semantic record and delivered source proof.",
+        "required": 0,
+        "available": 0,
+        "delivered": 0,
+        "available_ratio": null,
+        "delivered_ratio": null
+      },
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "source_only_endpoints": [],
+      "endpoint_issues": [],
+      "forbidden_available_relationships": 0,
+      "forbidden_delivered_relationships": 0,
+      "forbidden_proven_relationships": 0,
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_delivered_relationship_edges": [],
+      "delivery_integrity_violations": [],
+      "forbidden_scope": "Frozen multilingual negatives plus delivered edge/index and complete exploration-proof consistency."
+    },
+    "arm": "B",
+    "attempt_id": "javascript_unproven_dependencies-r3-B"
+  },
+  "attempt_id": "javascript_unproven_dependencies-r3-B",
+  "arm": "B",
+  "provenance": {
+    "attempt_id": "javascript_unproven_dependencies-r3-B",
+    "case_id": "javascript_unproven_dependencies",
+    "snapshot": "javascript_uncertainty",
+    "repetition": 3,
+    "arm": "B",
+    "adapter_module": "benchmarks.multilingual_context_tools",
+    "model": "gpt-5.6-luna",
+    "reasoning_effort": "high",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "catalog_sha256": "f1c45cceac1c3ee90fa1af1007c341713e220571390c3b1eb086c443d7781062",
+    "runner_sha256": "5756278252a74c9e86c68a898b284108288b74a864b9424f6445223b3a7ca6db",
+    "source": {
+      "freeze_commit": "c910c5ac252a7c982f784d87d61bc4c50fc0c0ec",
+      "freeze_json_sha256": "254f38dd6247215928f4cce3fae379cf9dbf3acb74e51bd2d1ac91c12f290848",
+      "source_scope": "W4 evaluator snapshot; A exact retrieval/graph, B adds current loci_explore plus frozen guide"
+    },
+    "config": {
+      "project_doc_max_bytes": 0,
+      "web_search": "disabled",
+      "skills.include_instructions": false,
+      "developer_instructions": "",
+      "model_reasoning_effort": "high",
+      "model_catalog_json": "/Users/brummerv/phluxxed/loci-exploration/benchmarks/results/multilingual-context-workflow-v1/model-catalog.json",
+      "include_collaboration_mode_instructions": false,
+      "tools.update_plan.enabled": false,
+      "tools.experimental_request_user_input.enabled": false,
+      "features.skip_host_skill_discovery": true,
+      "mcp_servers.evaluation.command": "/Users/brummerv/phluxxed/loci-exploration/.venv/bin/python",
+      "mcp_servers.evaluation.args": [
+        "-m",
+        "benchmarks.multilingual_context_tools",
+        "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-eatdm8cd/run.json"
+      ],
+      "mcp_servers.evaluation.cwd": "/Users/brummerv/phluxxed/loci-exploration",
+      "mcp_servers.evaluation.env": {
+        "LOCI_BASE_DIR": "/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-v3-compare-eatdm8cd/store",
+        "LOCI_STORE_NAMESPACE": "typescript-context-preflight"
+      },
+      "mcp_servers.evaluation.required": true,
+      "mcp_servers.evaluation.default_tools_approval_mode": "auto",
+      "mcp_servers.evaluation.tool_timeout_sec": 12,
+      "tool_output_token_limit": 32768,
+      "features.shell_tool": false,
+      "features.multi_agent": false,
+      "features.apps": false,
+      "features.plugins": false,
+      "features.hooks": false,
+      "features.memories": false,
+      "features.skill_search": false,
+      "features.skill_mcp_dependency_install": false,
+      "features.view_image": false,
+      "features.image_generation": false,
+      "features.browser_use": false,
+      "features.computer_use": false,
+      "features.in_app_browser": false,
+      "features.code_mode": false,
+      "features.code_mode_host": false,
+      "features.sleep_tool": false,
+      "features.goals": false,
+      "features.context_management": false,
+      "service_tier": "default"
+    },
+    "config_sha256": "fd51e0ff8d612303f3a3f923c29fafd80d62b225fe73edacfbf5b978054f2a51",
+    "prompt_sha256": "529cd9bd5e164bb602f3dd243eebab56f6e529d3b74ba0bf29dd036c971fefed",
+    "index_seconds": 0.026686791010433808,
+    "snapshot_files": {
+      "bad.js": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+      "barrel.js": "c63a9e4e681e57529e38d14442b791fc8d8a58a7066fc8328a8db6116c8a19c7",
+      "left.js": "db0854f581ead5e079842120c2a245bbf369f81ed596d61bbdc076905ddc387f",
+      "right.js": "3636ac75818c1f4605ef9b0eded69264ce9ef6d1a07354cfda03bafa00f591e3"
+    },
+    "extractor_version": 30,
+    "canonical_tool_schemas_sha256": "492ec2cf0a57ac05d4cb601c1ab44d0604406245f7dcdd865d7f8cbed7e8c90f"
+  }
+}

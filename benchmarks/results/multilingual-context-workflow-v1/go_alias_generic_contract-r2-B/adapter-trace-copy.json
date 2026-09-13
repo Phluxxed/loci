@@ -1,0 +1,730 @@
+{
+  "schema_version": 3,
+  "protocol": "multilingual-context-workflow-v1",
+  "identity": {
+    "task_id": "go_alias_generic_contract",
+    "session_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf",
+    "arm": "B",
+    "repetition": 2,
+    "snapshot": "go_contracts",
+    "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+    "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+    "controls_version": "multilingual-context-workflow-controls-v1"
+  },
+  "events": [
+    {
+      "id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf:1",
+      "task_id": "go_alias_generic_contract",
+      "session_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "go_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "locate",
+        "query": "Locate the declaration of function Build and report its file plus model origin, AliasID alias target, UserID underlying defined type, generic constraint terms, and page field.",
+        "max_output_bytes": 16384,
+        "max_evidence_bytes": 8192,
+        "max_hops": 1
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"locate\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"none\",\"exhaustive\":false},\"items\":[{\"id\":\"model/model.go::AliasID#type\",\"name\":\"AliasID\",\"kind\":\"type\",\"file\":\"model/model.go\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches model, aliasid, alia, userid\",\"source_id\":1,\"complete\":true,\"path\":[]}],\"relationships\":[],\"sources\":[{\"id\":1,\"file\":\"model/model.go\",\"start_byte\":38,\"end_byte\":54,\"start_line\":4,\"end_line\":4,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\",\"content\":\"AliasID = UserID\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":5}],\"limits\":{\"max_hops\":0,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":1,\"evidence_bytes\":16,\"output_bytes\":1043,\"estimated_tokens\":261,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf:1\"}}",
+      "serialized_bytes": 1159,
+      "source_bytes": 16,
+      "elapsed_ms": 18.53649999247864,
+      "spans": [
+        {
+          "file": "model/model.go",
+          "start_byte": 38,
+          "end_byte": 54,
+          "sha256": "882de16db7bd6957e2a40e1e67c528ccf39abda2a6c46e8bfbf90e7a28d231d5",
+          "text": "AliasID = UserID"
+        }
+      ]
+    },
+    {
+      "id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf:2",
+      "task_id": "go_alias_generic_contract",
+      "session_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "go_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "search",
+      "arguments": {
+        "query": "Build"
+      },
+      "search_id": "2c8b4876-8c2c-4ddc-bc15-8365062fd10e",
+      "response_json": "{\"symbols\":[{\"id\":\"app/main.go::Build#function\",\"name\":\"Build\",\"qualified_name\":\"Build\",\"kind\":\"function\",\"language\":\"go\",\"file_path\":\"app/main.go\",\"byte_offset\":47,\"byte_length\":104,\"signature\":\"func Build(id model.AliasID) model.Page[model.UserID] {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"31c9ee2ddaff199f97160184fc9d6182cb06a1287da54c4261bef9ac2b0155c3\",\"decorators\":[],\"keywords\":[\"build\"],\"metadata\":{\"loci\":{\"go_package_level\":true,\"go_type_configuration\":\"unconditional\"}},\"line\":5,\"end_line\":7,\"score\":71.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"go.mod\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"2c8b4876-8c2c-4ddc-bc15-8365062fd10e\",\"_evaluation\":{\"attempt_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf:2\"}}",
+      "serialized_bytes": 1046,
+      "source_bytes": 55,
+      "elapsed_ms": 4.982250015018508,
+      "spans": [
+        {
+          "file": "app/main.go",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "a28711195fb2446bc44f9e9c020359b215a5f21095a504227b5065e225252167",
+          "text": "func Build(id model.AliasID) model.Page[model.UserID] {"
+        }
+      ]
+    },
+    {
+      "id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf:3",
+      "task_id": "go_alias_generic_contract",
+      "session_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "go_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "dependencies",
+        "query": "Determine the dependencies and authored type context of Build, including model.Page, AliasID, UserID, and page fields.",
+        "max_output_bytes": 12000,
+        "max_evidence_bytes": 7000,
+        "seed_ids": [
+          "app/main.go::Build#function"
+        ],
+        "max_hops": 2
+      },
+      "search_id": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"dependencies\",\"status\":\"partial\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"authored_dependencies\",\"exhaustive\":false},\"items\":[{\"id\":\"app/main.go::Build#function\",\"name\":\"Build\",\"kind\":\"function\",\"file\":\"app/main.go\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"model/model.go::AliasID#type\",\"name\":\"AliasID\",\"kind\":\"type\",\"file\":\"model/model.go\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]},{\"id\":\"model/model.go::Page#type\",\"name\":\"Page\",\"kind\":\"type\",\"file\":\"model/model.go\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":8,\"complete\":true,\"path\":[2]},{\"id\":\"model/model.go::UserID#type\",\"name\":\"UserID\",\"kind\":\"type\",\"file\":\"model/model.go\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":10,\"complete\":true,\"path\":[3]},{\"id\":\"model/model.go::Number#type\",\"name\":\"Number\",\"kind\":\"type\",\"file\":\"model/model.go\",\"role\":\"dependency\",\"depth\":2,\"why\":\"Authored type or heritage continuation\",\"source_id\":12,\"complete\":true,\"path\":[2,4]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"app/main.go::Build#function\",\"to\":\"model/model.go::AliasID#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"app/main.go\",\"line\":5,\"content_hash\":\"42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3\"}},\"traversed\":\"forward\",\"source_ids\":[1,3,4,5,6,7]},{\"id\":2,\"edge\":{\"from\":\"app/main.go::Build#function\",\"to\":\"model/model.go::Page#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"app/main.go\",\"line\":5,\"content_hash\":\"42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3\"}},\"traversed\":\"forward\",\"source_ids\":[1,3,4,5,9,7]},{\"id\":3,\"edge\":{\"from\":\"app/main.go::Build#function\",\"to\":\"model/model.go::UserID#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"app/main.go\",\"line\":5,\"content_hash\":\"42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3\"}},\"traversed\":\"forward\",\"source_ids\":[1,3,4,5,11,7]},{\"id\":4,\"edge\":{\"from\":\"model/model.go::Page#type\",\"to\":\"model/model.go::Number#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"model/model.go\",\"line\":8,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\"}},\"traversed\":\"forward\",\"source_ids\":[9,5,13,7]}],\"sources\":[{\"id\":1,\"file\":\"app/main.go\",\"start_byte\":47,\"end_byte\":151,\"start_line\":5,\"end_line\":7,\"content_hash\":\"42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3\",\"content\":\"func Build(id model.AliasID) model.Page[model.UserID] {\\n    return model.Page[model.UserID]{Value: id}\\n}\"},{\"id\":2,\"file\":\"model/model.go\",\"start_byte\":38,\"end_byte\":54,\"start_line\":4,\"end_line\":4,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\",\"content\":\"AliasID = UserID\"},{\"id\":3,\"file\":\"app/main.go\",\"start_byte\":0,\"end_byte\":13,\"start_line\":1,\"end_line\":1,\"content_hash\":\"42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3\",\"content\":\"package main\\n\"},{\"id\":4,\"file\":\"app/main.go\",\"start_byte\":14,\"end_byte\":45,\"start_line\":3,\"end_line\":3,\"content_hash\":\"42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3\",\"content\":\"import \\\"example.com/acme/model\\\"\"},{\"id\":5,\"file\":\"model/model.go\",\"start_byte\":0,\"end_byte\":14,\"start_line\":1,\"end_line\":1,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\",\"content\":\"package model\\n\"},{\"id\":6,\"file\":\"model/model.go\",\"start_byte\":33,\"end_byte\":55,\"start_line\":4,\"end_line\":4,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\",\"content\":\"type AliasID = UserID\\n\"},{\"id\":7,\"file\":\"go.mod\",\"start_byte\":0,\"end_byte\":33,\"start_line\":1,\"end_line\":3,\"content_hash\":\"01cc905450c59f6d3133f5fd339444536aa4d2b32468f197ea50d39884391d4d\",\"content\":\"module example.com/acme\\n\\ngo 1.23\\n\"},{\"id\":8,\"file\":\"model/model.go\",\"start_byte\":102,\"end_byte\":135,\"start_line\":8,\"end_line\":8,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\",\"content\":\"Page[T Number] struct { Value T }\"},{\"id\":9,\"file\":\"model/model.go\",\"start_byte\":97,\"end_byte\":136,\"start_line\":8,\"end_line\":8,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\",\"content\":\"type Page[T Number] struct { Value T }\\n\"},{\"id\":10,\"file\":\"model/model.go\",\"start_byte\":20,\"end_byte\":32,\"start_line\":3,\"end_line\":3,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\",\"content\":\"UserID int64\"},{\"id\":11,\"file\":\"model/model.go\",\"start_byte\":15,\"end_byte\":33,\"start_line\":3,\"end_line\":3,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\",\"content\":\"type UserID int64\\n\"},{\"id\":12,\"file\":\"model/model.go\",\"start_byte\":61,\"end_byte\":95,\"start_line\":6,\"end_line\":6,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\",\"content\":\"Number interface { ~int | ~int64 }\"},{\"id\":13,\"file\":\"model/model.go\",\"start_byte\":56,\"end_byte\":96,\"start_line\":6,\"end_line\":6,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\",\"content\":\"type Number interface { ~int | ~int64 }\\n\"}],\"omissions\":[{\"reason\":\"alternative_path\",\"count\":1},{\"reason\":\"unresolved_relation\",\"count\":2}],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":12000,\"max_evidence_bytes\":7000},\"usage\":{\"nodes_examined\":5,\"evidence_bytes\":314,\"output_bytes\":5884,\"estimated_tokens\":1471,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf:3\"}}",
+      "serialized_bytes": 6000,
+      "source_bytes": 409,
+      "elapsed_ms": 21.523833012906834,
+      "spans": [
+        {
+          "file": "app/main.go",
+          "start_byte": 47,
+          "end_byte": 151,
+          "sha256": "31c9ee2ddaff199f97160184fc9d6182cb06a1287da54c4261bef9ac2b0155c3",
+          "text": "func Build(id model.AliasID) model.Page[model.UserID] {\n    return model.Page[model.UserID]{Value: id}\n}"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 38,
+          "end_byte": 54,
+          "sha256": "882de16db7bd6957e2a40e1e67c528ccf39abda2a6c46e8bfbf90e7a28d231d5",
+          "text": "AliasID = UserID"
+        },
+        {
+          "file": "app/main.go",
+          "start_byte": 0,
+          "end_byte": 13,
+          "sha256": "df1d036cbbf3df46e2045071e082245ece204c7f53ecf0a4e022bff9bb228f47",
+          "text": "package main\n"
+        },
+        {
+          "file": "app/main.go",
+          "start_byte": 14,
+          "end_byte": 45,
+          "sha256": "e0a6d5037c09e2d342dd0792d9fa37211df29fe5f0333f8ba5376eb6699ccba3",
+          "text": "import \"example.com/acme/model\""
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 0,
+          "end_byte": 14,
+          "sha256": "61d28c8e16b0f1913aed9c8c47c3a1e2a728ec1f9f1318ffa90ba0ecbac13e29",
+          "text": "package model\n"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 33,
+          "end_byte": 55,
+          "sha256": "cfe672f3e6f4300fb9c2d6fc3ca7cda2fd306a421f42b69723c1d4e39e53d79b",
+          "text": "type AliasID = UserID\n"
+        },
+        {
+          "file": "go.mod",
+          "start_byte": 0,
+          "end_byte": 33,
+          "sha256": "01cc905450c59f6d3133f5fd339444536aa4d2b32468f197ea50d39884391d4d",
+          "text": "module example.com/acme\n\ngo 1.23\n"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 102,
+          "end_byte": 135,
+          "sha256": "876f2540a7a42d6314ad1225a218346bae1eb6d297661404d616acc72f748d0e",
+          "text": "Page[T Number] struct { Value T }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 97,
+          "end_byte": 136,
+          "sha256": "67497a2924276dbaac013ec63944866bba328d2c3ef5e760cdf4879d5dd2bb51",
+          "text": "type Page[T Number] struct { Value T }\n"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 20,
+          "end_byte": 32,
+          "sha256": "dc82128201a52d2d54587eb58f518521d1a9cfe20b705bff22019a7b9276b8ae",
+          "text": "UserID int64"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 15,
+          "end_byte": 33,
+          "sha256": "b4d3fc99ca68ae818b5bf543cdd152ee02af8273f16e56ef8fe9c7d0d9a99d9d",
+          "text": "type UserID int64\n"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 61,
+          "end_byte": 95,
+          "sha256": "a1e91217f32bcd72d6be8afb88a4e563bdb50cfa96943bfc665a26aafc7355b2",
+          "text": "Number interface { ~int | ~int64 }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 56,
+          "end_byte": 96,
+          "sha256": "cd655874b4359d37cb11901e6493dd24d35d3cdbcbfb8e49689bac7f151dbdfc",
+          "text": "type Number interface { ~int | ~int64 }\n"
+        }
+      ]
+    },
+    {
+      "id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf:4",
+      "task_id": "go_alias_generic_contract",
+      "session_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "go_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "app/main.go::Build#function",
+          "model/model.go::AliasID#type",
+          "model/model.go::UserID#type",
+          "model/model.go::Page#type",
+          "model/model.go::Number#type"
+        ],
+        "context": 0
+      },
+      "search_id": null,
+      "response_json": "{\"symbols\":[{\"id\":\"app/main.go::Build#function\",\"source\":\"func Build(id model.AliasID) model.Page[model.UserID] {\\n    return model.Page[model.UserID]{Value: id}\\n}\",\"byte_offset\":47,\"byte_length\":104,\"line\":5,\"end_line\":7,\"signature\":\"func Build(id model.AliasID) model.Page[model.UserID] {\",\"kind\":\"function\",\"language\":\"go\"},{\"id\":\"model/model.go::AliasID#type\",\"source\":\"AliasID = UserID\",\"byte_offset\":38,\"byte_length\":16,\"line\":4,\"end_line\":4,\"signature\":\"AliasID = UserID\",\"kind\":\"type\",\"language\":\"go\"},{\"id\":\"model/model.go::UserID#type\",\"source\":\"UserID int64\",\"byte_offset\":20,\"byte_length\":12,\"line\":3,\"end_line\":3,\"signature\":\"UserID int64\",\"kind\":\"type\",\"language\":\"go\"},{\"id\":\"model/model.go::Page#type\",\"source\":\"Page[T Number] struct { Value T }\",\"byte_offset\":102,\"byte_length\":33,\"line\":8,\"end_line\":8,\"signature\":\"Page[T Number] struct { Value T }\",\"kind\":\"type\",\"language\":\"go\"},{\"id\":\"model/model.go::Number#type\",\"source\":\"Number interface { ~int | ~int64 }\",\"byte_offset\":61,\"byte_length\":34,\"line\":6,\"end_line\":6,\"signature\":\"Number interface { ~int | ~int64 }\",\"kind\":\"type\",\"language\":\"go\"}],\"_evaluation\":{\"attempt_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf:4\"}}",
+      "serialized_bytes": 1286,
+      "source_bytes": 349,
+      "elapsed_ms": 16.164875007234514,
+      "spans": [
+        {
+          "file": "app/main.go",
+          "start_byte": 47,
+          "end_byte": 151,
+          "sha256": "31c9ee2ddaff199f97160184fc9d6182cb06a1287da54c4261bef9ac2b0155c3",
+          "text": "func Build(id model.AliasID) model.Page[model.UserID] {\n    return model.Page[model.UserID]{Value: id}\n}"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 38,
+          "end_byte": 54,
+          "sha256": "882de16db7bd6957e2a40e1e67c528ccf39abda2a6c46e8bfbf90e7a28d231d5",
+          "text": "AliasID = UserID"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 20,
+          "end_byte": 32,
+          "sha256": "dc82128201a52d2d54587eb58f518521d1a9cfe20b705bff22019a7b9276b8ae",
+          "text": "UserID int64"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 102,
+          "end_byte": 135,
+          "sha256": "876f2540a7a42d6314ad1225a218346bae1eb6d297661404d616acc72f748d0e",
+          "text": "Page[T Number] struct { Value T }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 61,
+          "end_byte": 95,
+          "sha256": "a1e91217f32bcd72d6be8afb88a4e563bdb50cfa96943bfc665a26aafc7355b2",
+          "text": "Number interface { ~int | ~int64 }"
+        },
+        {
+          "file": "app/main.go",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "a28711195fb2446bc44f9e9c020359b215a5f21095a504227b5065e225252167",
+          "text": "func Build(id model.AliasID) model.Page[model.UserID] {"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 38,
+          "end_byte": 54,
+          "sha256": "882de16db7bd6957e2a40e1e67c528ccf39abda2a6c46e8bfbf90e7a28d231d5",
+          "text": "AliasID = UserID"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 20,
+          "end_byte": 32,
+          "sha256": "dc82128201a52d2d54587eb58f518521d1a9cfe20b705bff22019a7b9276b8ae",
+          "text": "UserID int64"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 102,
+          "end_byte": 135,
+          "sha256": "876f2540a7a42d6314ad1225a218346bae1eb6d297661404d616acc72f748d0e",
+          "text": "Page[T Number] struct { Value T }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 61,
+          "end_byte": 95,
+          "sha256": "a1e91217f32bcd72d6be8afb88a4e563bdb50cfa96943bfc665a26aafc7355b2",
+          "text": "Number interface { ~int | ~int64 }"
+        }
+      ]
+    },
+    {
+      "id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf:5",
+      "task_id": "go_alias_generic_contract",
+      "session_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "go_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "app/main.go",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"app/main.go\",\"content\":\"package main\\n\\nimport \\\"example.com/acme/model\\\"\\n\\nfunc Build(id model.AliasID) model.Page[model.UserID] {\\n    return model.Page[model.UserID]{Value: id}\\n}\\n\",\"total_lines\":7,\"start_line\":1,\"end_line\":7,\"_evaluation\":{\"attempt_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf:5\"}}",
+      "serialized_bytes": 407,
+      "source_bytes": 152,
+      "elapsed_ms": 2.4205410154536366,
+      "spans": [
+        {
+          "file": "app/main.go",
+          "start_byte": 0,
+          "end_byte": 152,
+          "sha256": "42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3",
+          "text": "package main\n\nimport \"example.com/acme/model\"\n\nfunc Build(id model.AliasID) model.Page[model.UserID] {\n    return model.Page[model.UserID]{Value: id}\n}\n"
+        }
+      ]
+    },
+    {
+      "id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf:6",
+      "task_id": "go_alias_generic_contract",
+      "session_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "go_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "model/model.go",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "search_id": null,
+      "response_json": "{\"file\":\"model/model.go\",\"content\":\"package model\\n\\ntype UserID int64\\ntype AliasID = UserID\\n\\ntype Number interface { ~int | ~int64 }\\n\\ntype Page[T Number] struct { Value T }\\n\",\"total_lines\":8,\"start_line\":1,\"end_line\":8,\"_evaluation\":{\"attempt_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf:6\"}}",
+      "serialized_bytes": 393,
+      "source_bytes": 136,
+      "elapsed_ms": 1.8219169869553298,
+      "spans": [
+        {
+          "file": "model/model.go",
+          "start_byte": 0,
+          "end_byte": 136,
+          "sha256": "a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5",
+          "text": "package model\n\ntype UserID int64\ntype AliasID = UserID\n\ntype Number interface { ~int | ~int64 }\n\ntype Page[T Number] struct { Value T }\n"
+        }
+      ]
+    },
+    {
+      "id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf:7",
+      "task_id": "go_alias_generic_contract",
+      "session_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf",
+      "arm": "B",
+      "repetition": 2,
+      "snapshot": "go_contracts",
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0",
+      "controls_sha256": "de7802baffd72692af1d4d0f091cd7bc10b208ad9fe8dd7a5ba91d3c3024280e",
+      "controls_version": "multilingual-context-workflow-controls-v1",
+      "operation": "file",
+      "arguments": {
+        "file_path": "go.mod",
+        "start_line": 1,
+        "end_line": 5
+      },
+      "search_id": null,
+      "response_json": "{\"error\":{\"code\":\"LociError\",\"message\":\"File not found in cache\"},\"_evaluation\":{\"attempt_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf:7\"}}",
+      "serialized_bytes": 233,
+      "source_bytes": 0,
+      "elapsed_ms": 1.707291987258941,
+      "spans": []
+    }
+  ],
+  "failures": [
+    {
+      "attempt_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/7",
+      "category": "tool_error",
+      "message": "File not found in cache"
+    }
+  ],
+  "attempts": 7,
+  "deliveries": [
+    {
+      "attempt_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/1",
+      "operation": "explore",
+      "arguments": {
+        "intent": "locate",
+        "query": "Locate the declaration of function Build and report its file plus model origin, AliasID alias target, UserID underlying defined type, generic constraint terms, and page field.",
+        "max_output_bytes": 16384,
+        "max_evidence_bytes": 8192,
+        "max_hops": 1
+      },
+      "reason": "task_context",
+      "detail": "Observed loci_explore request.",
+      "because": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"locate\",\"status\":\"partial\",\"selection\":\"inferred\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"none\",\"exhaustive\":false},\"items\":[{\"id\":\"model/model.go::AliasID#type\",\"name\":\"AliasID\",\"kind\":\"type\",\"file\":\"model/model.go\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Query matches model, aliasid, alia, userid\",\"source_id\":1,\"complete\":true,\"path\":[]}],\"relationships\":[],\"sources\":[{\"id\":1,\"file\":\"model/model.go\",\"start_byte\":38,\"end_byte\":54,\"start_line\":4,\"end_line\":4,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\",\"content\":\"AliasID = UserID\"}],\"omissions\":[{\"reason\":\"anchor_limit\",\"count\":5}],\"limits\":{\"max_hops\":0,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":1,\"evidence_bytes\":16,\"output_bytes\":1043,\"estimated_tokens\":261,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/1\",\"calls_remaining\":23,\"event_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf:1\"}}",
+      "serialized_bytes": 1159,
+      "source_bytes": 16,
+      "elapsed_ms": 18.673624988878146,
+      "trace_event_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf:1",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "model/model.go",
+          "start_byte": 38,
+          "end_byte": 54,
+          "sha256": "882de16db7bd6957e2a40e1e67c528ccf39abda2a6c46e8bfbf90e7a28d231d5",
+          "text": "AliasID = UserID"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/2",
+      "operation": "search",
+      "arguments": {
+        "query": "Build"
+      },
+      "reason": "task_context",
+      "detail": "Observed search request.",
+      "because": null,
+      "response_json": "{\"symbols\":[{\"id\":\"app/main.go::Build#function\",\"name\":\"Build\",\"qualified_name\":\"Build\",\"kind\":\"function\",\"language\":\"go\",\"file_path\":\"app/main.go\",\"byte_offset\":47,\"byte_length\":104,\"signature\":\"func Build(id model.AliasID) model.Page[model.UserID] {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"31c9ee2ddaff199f97160184fc9d6182cb06a1287da54c4261bef9ac2b0155c3\",\"decorators\":[],\"keywords\":[\"build\"],\"metadata\":{\"loci\":{\"go_package_level\":true,\"go_type_configuration\":\"unconditional\"}},\"line\":5,\"end_line\":7,\"score\":71.0}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":3,\"excluded_paths\":1,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":1,\"samples\":[\"go.mod\"],\"omitted_samples\":0}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"2c8b4876-8c2c-4ddc-bc15-8365062fd10e\",\"_evaluation\":{\"attempt_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/2\",\"calls_remaining\":22,\"event_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf:2\"}}",
+      "serialized_bytes": 1046,
+      "source_bytes": 55,
+      "elapsed_ms": 5.1694590074475855,
+      "trace_event_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf:2",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "app/main.go",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "a28711195fb2446bc44f9e9c020359b215a5f21095a504227b5065e225252167",
+          "text": "func Build(id model.AliasID) model.Page[model.UserID] {"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/3",
+      "operation": "explore",
+      "arguments": {
+        "intent": "dependencies",
+        "query": "Determine the dependencies and authored type context of Build, including model.Page, AliasID, UserID, and page fields.",
+        "max_output_bytes": 12000,
+        "max_evidence_bytes": 7000,
+        "seed_ids": [
+          "app/main.go::Build#function"
+        ],
+        "max_hops": 2
+      },
+      "reason": "task_context",
+      "detail": "Observed loci_explore request.",
+      "because": null,
+      "response_json": "{\"schema_version\":1,\"intent\":\"dependencies\",\"status\":\"partial\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"authored_dependencies\",\"exhaustive\":false},\"items\":[{\"id\":\"app/main.go::Build#function\",\"name\":\"Build\",\"kind\":\"function\",\"file\":\"app/main.go\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"model/model.go::AliasID#type\",\"name\":\"AliasID\",\"kind\":\"type\",\"file\":\"model/model.go\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]},{\"id\":\"model/model.go::Page#type\",\"name\":\"Page\",\"kind\":\"type\",\"file\":\"model/model.go\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":8,\"complete\":true,\"path\":[2]},{\"id\":\"model/model.go::UserID#type\",\"name\":\"UserID\",\"kind\":\"type\",\"file\":\"model/model.go\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":10,\"complete\":true,\"path\":[3]},{\"id\":\"model/model.go::Number#type\",\"name\":\"Number\",\"kind\":\"type\",\"file\":\"model/model.go\",\"role\":\"dependency\",\"depth\":2,\"why\":\"Authored type or heritage continuation\",\"source_id\":12,\"complete\":true,\"path\":[2,4]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"app/main.go::Build#function\",\"to\":\"model/model.go::AliasID#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"app/main.go\",\"line\":5,\"content_hash\":\"42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3\"}},\"traversed\":\"forward\",\"source_ids\":[1,3,4,5,6,7]},{\"id\":2,\"edge\":{\"from\":\"app/main.go::Build#function\",\"to\":\"model/model.go::Page#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"app/main.go\",\"line\":5,\"content_hash\":\"42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3\"}},\"traversed\":\"forward\",\"source_ids\":[1,3,4,5,9,7]},{\"id\":3,\"edge\":{\"from\":\"app/main.go::Build#function\",\"to\":\"model/model.go::UserID#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"app/main.go\",\"line\":5,\"content_hash\":\"42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3\"}},\"traversed\":\"forward\",\"source_ids\":[1,3,4,5,11,7]},{\"id\":4,\"edge\":{\"from\":\"model/model.go::Page#type\",\"to\":\"model/model.go::Number#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"model/model.go\",\"line\":8,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\"}},\"traversed\":\"forward\",\"source_ids\":[9,5,13,7]}],\"sources\":[{\"id\":1,\"file\":\"app/main.go\",\"start_byte\":47,\"end_byte\":151,\"start_line\":5,\"end_line\":7,\"content_hash\":\"42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3\",\"content\":\"func Build(id model.AliasID) model.Page[model.UserID] {\\n    return model.Page[model.UserID]{Value: id}\\n}\"},{\"id\":2,\"file\":\"model/model.go\",\"start_byte\":38,\"end_byte\":54,\"start_line\":4,\"end_line\":4,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\",\"content\":\"AliasID = UserID\"},{\"id\":3,\"file\":\"app/main.go\",\"start_byte\":0,\"end_byte\":13,\"start_line\":1,\"end_line\":1,\"content_hash\":\"42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3\",\"content\":\"package main\\n\"},{\"id\":4,\"file\":\"app/main.go\",\"start_byte\":14,\"end_byte\":45,\"start_line\":3,\"end_line\":3,\"content_hash\":\"42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3\",\"content\":\"import \\\"example.com/acme/model\\\"\"},{\"id\":5,\"file\":\"model/model.go\",\"start_byte\":0,\"end_byte\":14,\"start_line\":1,\"end_line\":1,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\",\"content\":\"package model\\n\"},{\"id\":6,\"file\":\"model/model.go\",\"start_byte\":33,\"end_byte\":55,\"start_line\":4,\"end_line\":4,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\",\"content\":\"type AliasID = UserID\\n\"},{\"id\":7,\"file\":\"go.mod\",\"start_byte\":0,\"end_byte\":33,\"start_line\":1,\"end_line\":3,\"content_hash\":\"01cc905450c59f6d3133f5fd339444536aa4d2b32468f197ea50d39884391d4d\",\"content\":\"module example.com/acme\\n\\ngo 1.23\\n\"},{\"id\":8,\"file\":\"model/model.go\",\"start_byte\":102,\"end_byte\":135,\"start_line\":8,\"end_line\":8,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\",\"content\":\"Page[T Number] struct { Value T }\"},{\"id\":9,\"file\":\"model/model.go\",\"start_byte\":97,\"end_byte\":136,\"start_line\":8,\"end_line\":8,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\",\"content\":\"type Page[T Number] struct { Value T }\\n\"},{\"id\":10,\"file\":\"model/model.go\",\"start_byte\":20,\"end_byte\":32,\"start_line\":3,\"end_line\":3,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\",\"content\":\"UserID int64\"},{\"id\":11,\"file\":\"model/model.go\",\"start_byte\":15,\"end_byte\":33,\"start_line\":3,\"end_line\":3,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\",\"content\":\"type UserID int64\\n\"},{\"id\":12,\"file\":\"model/model.go\",\"start_byte\":61,\"end_byte\":95,\"start_line\":6,\"end_line\":6,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\",\"content\":\"Number interface { ~int | ~int64 }\"},{\"id\":13,\"file\":\"model/model.go\",\"start_byte\":56,\"end_byte\":96,\"start_line\":6,\"end_line\":6,\"content_hash\":\"a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5\",\"content\":\"type Number interface { ~int | ~int64 }\\n\"}],\"omissions\":[{\"reason\":\"alternative_path\",\"count\":1},{\"reason\":\"unresolved_relation\",\"count\":2}],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":12000,\"max_evidence_bytes\":7000},\"usage\":{\"nodes_examined\":5,\"evidence_bytes\":314,\"output_bytes\":5884,\"estimated_tokens\":1471,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"},\"_evaluation\":{\"attempt_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/3\",\"calls_remaining\":21,\"event_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf:3\"}}",
+      "serialized_bytes": 6000,
+      "source_bytes": 409,
+      "elapsed_ms": 21.752041997388005,
+      "trace_event_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf:3",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "app/main.go",
+          "start_byte": 47,
+          "end_byte": 151,
+          "sha256": "31c9ee2ddaff199f97160184fc9d6182cb06a1287da54c4261bef9ac2b0155c3",
+          "text": "func Build(id model.AliasID) model.Page[model.UserID] {\n    return model.Page[model.UserID]{Value: id}\n}"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 38,
+          "end_byte": 54,
+          "sha256": "882de16db7bd6957e2a40e1e67c528ccf39abda2a6c46e8bfbf90e7a28d231d5",
+          "text": "AliasID = UserID"
+        },
+        {
+          "file": "app/main.go",
+          "start_byte": 0,
+          "end_byte": 13,
+          "sha256": "df1d036cbbf3df46e2045071e082245ece204c7f53ecf0a4e022bff9bb228f47",
+          "text": "package main\n"
+        },
+        {
+          "file": "app/main.go",
+          "start_byte": 14,
+          "end_byte": 45,
+          "sha256": "e0a6d5037c09e2d342dd0792d9fa37211df29fe5f0333f8ba5376eb6699ccba3",
+          "text": "import \"example.com/acme/model\""
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 0,
+          "end_byte": 14,
+          "sha256": "61d28c8e16b0f1913aed9c8c47c3a1e2a728ec1f9f1318ffa90ba0ecbac13e29",
+          "text": "package model\n"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 33,
+          "end_byte": 55,
+          "sha256": "cfe672f3e6f4300fb9c2d6fc3ca7cda2fd306a421f42b69723c1d4e39e53d79b",
+          "text": "type AliasID = UserID\n"
+        },
+        {
+          "file": "go.mod",
+          "start_byte": 0,
+          "end_byte": 33,
+          "sha256": "01cc905450c59f6d3133f5fd339444536aa4d2b32468f197ea50d39884391d4d",
+          "text": "module example.com/acme\n\ngo 1.23\n"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 102,
+          "end_byte": 135,
+          "sha256": "876f2540a7a42d6314ad1225a218346bae1eb6d297661404d616acc72f748d0e",
+          "text": "Page[T Number] struct { Value T }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 97,
+          "end_byte": 136,
+          "sha256": "67497a2924276dbaac013ec63944866bba328d2c3ef5e760cdf4879d5dd2bb51",
+          "text": "type Page[T Number] struct { Value T }\n"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 20,
+          "end_byte": 32,
+          "sha256": "dc82128201a52d2d54587eb58f518521d1a9cfe20b705bff22019a7b9276b8ae",
+          "text": "UserID int64"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 15,
+          "end_byte": 33,
+          "sha256": "b4d3fc99ca68ae818b5bf543cdd152ee02af8273f16e56ef8fe9c7d0d9a99d9d",
+          "text": "type UserID int64\n"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 61,
+          "end_byte": 95,
+          "sha256": "a1e91217f32bcd72d6be8afb88a4e563bdb50cfa96943bfc665a26aafc7355b2",
+          "text": "Number interface { ~int | ~int64 }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 56,
+          "end_byte": 96,
+          "sha256": "cd655874b4359d37cb11901e6493dd24d35d3cdbcbfb8e49689bac7f151dbdfc",
+          "text": "type Number interface { ~int | ~int64 }\n"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/4",
+      "operation": "get",
+      "arguments": {
+        "symbol_ids": [
+          "app/main.go::Build#function",
+          "model/model.go::AliasID#type",
+          "model/model.go::UserID#type",
+          "model/model.go::Page#type",
+          "model/model.go::Number#type"
+        ],
+        "context": 0
+      },
+      "reason": "task_context",
+      "detail": "Observed get request.",
+      "because": null,
+      "response_json": "{\"symbols\":[{\"id\":\"app/main.go::Build#function\",\"source\":\"func Build(id model.AliasID) model.Page[model.UserID] {\\n    return model.Page[model.UserID]{Value: id}\\n}\",\"byte_offset\":47,\"byte_length\":104,\"line\":5,\"end_line\":7,\"signature\":\"func Build(id model.AliasID) model.Page[model.UserID] {\",\"kind\":\"function\",\"language\":\"go\"},{\"id\":\"model/model.go::AliasID#type\",\"source\":\"AliasID = UserID\",\"byte_offset\":38,\"byte_length\":16,\"line\":4,\"end_line\":4,\"signature\":\"AliasID = UserID\",\"kind\":\"type\",\"language\":\"go\"},{\"id\":\"model/model.go::UserID#type\",\"source\":\"UserID int64\",\"byte_offset\":20,\"byte_length\":12,\"line\":3,\"end_line\":3,\"signature\":\"UserID int64\",\"kind\":\"type\",\"language\":\"go\"},{\"id\":\"model/model.go::Page#type\",\"source\":\"Page[T Number] struct { Value T }\",\"byte_offset\":102,\"byte_length\":33,\"line\":8,\"end_line\":8,\"signature\":\"Page[T Number] struct { Value T }\",\"kind\":\"type\",\"language\":\"go\"},{\"id\":\"model/model.go::Number#type\",\"source\":\"Number interface { ~int | ~int64 }\",\"byte_offset\":61,\"byte_length\":34,\"line\":6,\"end_line\":6,\"signature\":\"Number interface { ~int | ~int64 }\",\"kind\":\"type\",\"language\":\"go\"}],\"_evaluation\":{\"attempt_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/4\",\"calls_remaining\":20,\"event_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf:4\"}}",
+      "serialized_bytes": 1286,
+      "source_bytes": 349,
+      "elapsed_ms": 16.414457990322262,
+      "trace_event_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf:4",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "app/main.go",
+          "start_byte": 47,
+          "end_byte": 151,
+          "sha256": "31c9ee2ddaff199f97160184fc9d6182cb06a1287da54c4261bef9ac2b0155c3",
+          "text": "func Build(id model.AliasID) model.Page[model.UserID] {\n    return model.Page[model.UserID]{Value: id}\n}"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 38,
+          "end_byte": 54,
+          "sha256": "882de16db7bd6957e2a40e1e67c528ccf39abda2a6c46e8bfbf90e7a28d231d5",
+          "text": "AliasID = UserID"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 20,
+          "end_byte": 32,
+          "sha256": "dc82128201a52d2d54587eb58f518521d1a9cfe20b705bff22019a7b9276b8ae",
+          "text": "UserID int64"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 102,
+          "end_byte": 135,
+          "sha256": "876f2540a7a42d6314ad1225a218346bae1eb6d297661404d616acc72f748d0e",
+          "text": "Page[T Number] struct { Value T }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 61,
+          "end_byte": 95,
+          "sha256": "a1e91217f32bcd72d6be8afb88a4e563bdb50cfa96943bfc665a26aafc7355b2",
+          "text": "Number interface { ~int | ~int64 }"
+        },
+        {
+          "file": "app/main.go",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "a28711195fb2446bc44f9e9c020359b215a5f21095a504227b5065e225252167",
+          "text": "func Build(id model.AliasID) model.Page[model.UserID] {"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 38,
+          "end_byte": 54,
+          "sha256": "882de16db7bd6957e2a40e1e67c528ccf39abda2a6c46e8bfbf90e7a28d231d5",
+          "text": "AliasID = UserID"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 20,
+          "end_byte": 32,
+          "sha256": "dc82128201a52d2d54587eb58f518521d1a9cfe20b705bff22019a7b9276b8ae",
+          "text": "UserID int64"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 102,
+          "end_byte": 135,
+          "sha256": "876f2540a7a42d6314ad1225a218346bae1eb6d297661404d616acc72f748d0e",
+          "text": "Page[T Number] struct { Value T }"
+        },
+        {
+          "file": "model/model.go",
+          "start_byte": 61,
+          "end_byte": 95,
+          "sha256": "a1e91217f32bcd72d6be8afb88a4e563bdb50cfa96943bfc665a26aafc7355b2",
+          "text": "Number interface { ~int | ~int64 }"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/5",
+      "operation": "file",
+      "arguments": {
+        "file_path": "app/main.go",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "reason": "task_context",
+      "detail": "Observed file request.",
+      "because": null,
+      "response_json": "{\"file\":\"app/main.go\",\"content\":\"package main\\n\\nimport \\\"example.com/acme/model\\\"\\n\\nfunc Build(id model.AliasID) model.Page[model.UserID] {\\n    return model.Page[model.UserID]{Value: id}\\n}\\n\",\"total_lines\":7,\"start_line\":1,\"end_line\":7,\"_evaluation\":{\"attempt_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/5\",\"calls_remaining\":19,\"event_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf:5\"}}",
+      "serialized_bytes": 407,
+      "source_bytes": 152,
+      "elapsed_ms": 2.498957997886464,
+      "trace_event_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf:5",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "app/main.go",
+          "start_byte": 0,
+          "end_byte": 152,
+          "sha256": "42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3",
+          "text": "package main\n\nimport \"example.com/acme/model\"\n\nfunc Build(id model.AliasID) model.Page[model.UserID] {\n    return model.Page[model.UserID]{Value: id}\n}\n"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/6",
+      "operation": "file",
+      "arguments": {
+        "file_path": "model/model.go",
+        "start_line": 1,
+        "end_line": 10
+      },
+      "reason": "task_context",
+      "detail": "Observed file request.",
+      "because": null,
+      "response_json": "{\"file\":\"model/model.go\",\"content\":\"package model\\n\\ntype UserID int64\\ntype AliasID = UserID\\n\\ntype Number interface { ~int | ~int64 }\\n\\ntype Page[T Number] struct { Value T }\\n\",\"total_lines\":8,\"start_line\":1,\"end_line\":8,\"_evaluation\":{\"attempt_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/6\",\"calls_remaining\":18,\"event_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf:6\"}}",
+      "serialized_bytes": 393,
+      "source_bytes": 136,
+      "elapsed_ms": 1.880333002191037,
+      "trace_event_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf:6",
+      "status": "recorded",
+      "spans": [
+        {
+          "file": "model/model.go",
+          "start_byte": 0,
+          "end_byte": 136,
+          "sha256": "a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5",
+          "text": "package model\n\ntype UserID int64\ntype AliasID = UserID\n\ntype Number interface { ~int | ~int64 }\n\ntype Page[T Number] struct { Value T }\n"
+        }
+      ]
+    },
+    {
+      "attempt_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/7",
+      "operation": "file",
+      "arguments": {
+        "file_path": "go.mod",
+        "start_line": 1,
+        "end_line": 5
+      },
+      "reason": "task_context",
+      "detail": "Observed file request.",
+      "because": null,
+      "response_json": "{\"error\":{\"code\":\"LociError\",\"message\":\"File not found in cache\"},\"_evaluation\":{\"attempt_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf/attempt/7\",\"calls_remaining\":17,\"event_id\":\"session-0b540ae4-2123-44f6-bad6-ce4601550ccf:7\"}}",
+      "serialized_bytes": 233,
+      "source_bytes": 0,
+      "elapsed_ms": 1.7812080041039735,
+      "trace_event_id": "session-0b540ae4-2123-44f6-bad6-ce4601550ccf:7",
+      "status": "recorded",
+      "spans": []
+    }
+  ]
+}
