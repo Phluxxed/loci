@@ -198,6 +198,15 @@ and contribution hashes against the current repository and run a locked
 incremental refresh if needed.
 Freshness also includes Go module/workspace controls, JavaScript/TypeScript
 project/package/workspace controls, and Cargo manifests.
+`loci_file` can read tracked `go.mod`, `go.work`, and `Cargo.toml` controls
+directly without indexing them as language source. These reads require a
+contained regular file, at most 1 MiB of UTF-8 source, and bytes matching the
+indexed resolver-input hash. They preserve newlines and the existing file/line
+response envelope. Missing or untracked controls return `FILE_NOT_FOUND`;
+unsafe, oversized, non-UTF-8, or changed controls return
+`CONTROL_SOURCE_UNAVAILABLE`. Other configuration files remain unsupported by
+this route. Direct service/CLI callers that skip automatic freshness must
+refresh the index after editing a control.
 `loci_store_health` is deliberately different: it diagnoses the active store
 without repairing, refreshing, rewriting, pruning, or otherwise mutating it.
 
@@ -214,7 +223,7 @@ names.
 | `loci_search` | Search indexed symbols and return an opaque ID for explicit downstream selections |
 | `loci_get` | Return exact source, with optional bounded type context and deliberate search-selection lineage |
 | `loci_explore` | Select compact source for locating code, JavaScript dependencies, TypeScript/Python/Go/Rust contracts, or known static impact |
-| `loci_file` | Return cached file content with optional line range |
+| `loci_file` | Read indexed source or tracked Go/Cargo controls with optional line range |
 | `loci_grep` | Regex-search cached files |
 | `loci_graph_anchors` | Select a bounded, explained set of graph start nodes from a question or exact seeds |
 | `loci_graph_neighbors` | Return exact outgoing one-hop neighbours for indexed seed nodes |
@@ -337,8 +346,8 @@ loci get abc123 --repo /path/to/repo --context 5  # +5 lines surrounding context
 loci search "parse file" --repo /path/to/repo
 loci search "auth" --repo /path/to/repo --kind function --lang python
 
-# Read a non-symbol file (config, docs, etc.)
-loci file pyproject.toml --repo /path/to/repo
+# Read indexed source or a tracked resolver control
+loci file go.mod --repo /path/to/repo
 loci file src/foo.py --repo /path/to/repo --start 10 --end 40
 
 # Search file contents by regex

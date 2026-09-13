@@ -524,7 +524,7 @@ def main() -> None:
     p_get.add_argument("--context", type=int, default=0, metavar="N",
                        help="Include N lines of context before and after each symbol")
 
-    p_file = sub.add_parser("file", help="Get cached file content")
+    p_file = sub.add_parser("file", help="Get indexed source or tracked Go/Cargo controls")
     p_file.add_argument("file_path", help="Relative file path (as indexed, e.g. src/foo.py)")
     p_file.add_argument("--repo", required=True, help="Path to indexed repo")
     p_file.add_argument("--start", type=int, default=None, help="Start line (1-indexed, inclusive)")
