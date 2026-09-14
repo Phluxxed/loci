@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "phase": "after_repair",
+  "checks": [
+    {
+      "command": ".venv/bin/pytest -q tests/test_retrieval.py",
+      "exit_code": 0,
+      "result": "passed",
+      "tests_passed": 16,
+      "elapsed_seconds": 0.58,
+      "coverage": [
+        "pressure fixture options query and explicit pair",
+        "explicit anchor relationship priority before neighbor truncation",
+        "exact program file anchor member expansion",
+        "bidirectional call/type/import delivery",
+        "family interleaving",
+        "insertion-order determinism",
+        "native Go ownership/import proof",
+        "missing-proof omission"
+      ]
+    },
+    {
+      "command": ".venv/bin/pytest -q tests/test_normal_mcp.py tests/test_mcp_server.py",
+      "exit_code": 0,
+      "result": "passed",
+      "tests_passed": 47,
+      "elapsed_seconds": 38.21,
+      "coverage": [
+        "normal MCP contract",
+        "normal MCP byte accounting",
+        "server request and response validation"
+      ]
+    },
+    {
+      "command": "git diff --check -- src/loci/retrieval.py tests/test_retrieval.py",
+      "exit_code": 0,
+      "result": "passed"
+    },
+    {
+      "command": "selection-repair-replay.py against /tmp/anvil-source-tasks-20260914/t23 with a fresh /tmp store",
+      "exit_code": 0,
+      "result": "passed",
+      "receipt": "selection-repair-replay.json",
+      "deterministic_repeat_equal": true,
+      "fixed_source_unchanged": true
+    }
+  ]
+}

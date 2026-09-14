@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "scope": "Existing frozen/native ordinary-adoption evidence only; no new provider or model trial.",
+  "sources": [
+    "benchmarks/comparisons/ordinary-adoption-normal-v1/runs/run-17/observation.json",
+    "benchmarks/comparisons/ordinary-adoption-normal-v1/runs/run-20/observation.json",
+    "benchmarks/comparisons/ordinary-adoption-normal-v1/runs/run-21/observation.json"
+  ],
+  "method": {
+    "native_authority": "Each observation retains the native MCP result and enclosing outer Code Mode output from the exact first-turn interval named by metadata.json.",
+    "supplementary_check": "Split existing outer text blocks on newlines, parse each complete JSON line, and compare the parsed value exactly with the retained native result or structuredContent. This check does not alter or rescore the frozen adapter.",
+    "qualification": "A missing line match inside a truncation-marked block proves neither complete absence nor which portions the model used; only an intact exact line is promoted by this supplementary check."
+  },
+  "runs": {
+    "run-17": {
+      "batched_outer_output": {
+        "outer_request_line": 44,
+        "outer_output_line": 49,
+        "output_ref": "outer:call_GGhtL2tNh2Np7kEySDHIGNZX:line:49:block:1",
+        "outer_pragma_present": false,
+        "program_behavior": "Three parallel normal calls; print structuredContent JSON joined by newline.",
+        "joined_structured_json_bytes": 40490,
+        "retained_output_block_bytes": 40105,
+        "warning_original_token_count": 10122,
+        "warning_total_output_lines": 3,
+        "line_results": [
+          {
+            "native_mcp_line": 46,
+            "tool": "loci_retrieve",
+            "query": "bin/anvil.ts",
+            "observer_canonical_result_bytes": 14942,
+            "frozen_status": "unknown_truncated",
+            "supplementary_status": "full_exact_structured_content_line"
+          },
+          {
+            "native_mcp_line": 47,
+            "tool": "loci_retrieve",
+            "query": "runBrowserCli",
+            "observer_canonical_result_bytes": 16165,
+            "frozen_status": "unknown_truncated",
+            "supplementary_status": "clipped_middle_json_line"
+          },
+          {
+            "native_mcp_line": 48,
+            "tool": "loci_read",
+            "observer_canonical_result_bytes": 9534,
+            "frozen_status": "unknown_truncated",
+            "supplementary_status": "full_exact_structured_content_line"
+          }
+        ]
+      },
+      "malformed_followup": {
+        "native_mcp_line": 56,
+        "outer_request_line": 53,
+        "outer_output_line": 57,
+        "output_ref": "outer:call_yamVZUPeXR1PwQVyQRMkIag3:line:57:block:1",
+        "frozen_status": "unknown_truncated",
+        "supplementary_status": "full_exact_structured_error_line",
+        "returned_next_fields": {
+          "start": 0,
+          "end": 23253,
+          "offset": 8192
+        },
+        "submitted_fields": {
+          "start": 21760,
+          "end": 23253,
+          "offsett": 1760
+        },
+        "result_error": "INVALID_SOURCE_REF",
+        "attribution": "The agent rewrote the locator instead of passing next_source_ref unchanged; strict rejection is correct product behavior."
+      }
+    },
+    "run-20": {
+      "first_attempt": {
+        "native_mcp_line": 30,
+        "outer_request_line": 28,
+        "outer_output_line": 31,
+        "program_behavior": "Print r.content text blocks.",
+        "normal_result_content_blocks": 0,
+        "retained_payload_bytes": 0
+      },
+      "repeat_attempt": {
+        "native_mcp_line": 37,
+        "outer_request_line": 35,
+        "outer_output_line": 38,
+        "output_ref": "outer:call_h9Sc3xAnaUndMN48A7ogW0An:line:38:block:1",
+        "program_behavior": "Repeat the identical request; print JSON.stringify(r.structuredContent).",
+        "same_snapshot": true,
+        "same_arguments": true,
+        "same_canonical_result_sha256": "22f4befc97de1000b1fea017ad5b546f93615e50938b8dc4b4c5bcd8d9692347",
+        "canonical_result_bytes_each": 16185,
+        "frozen_status_for_both": "ambiguous_exact",
+        "attribution": "One exact emitted value is compatible with two byte-identical native invocations, and native nested events have no outer call identity."
+      }
+    },
+    "run-21": {
+      "untruncated_multivalue_outputs": [
+        {
+          "outer_request_line": 29,
+          "outer_output_line": 33,
+          "output_ref": "outer:call_qkKVLYRjrmnDX2LayOOK3OVL:line:33:block:1",
+          "retained_output_block_bytes": 30263,
+          "warning_present": false,
+          "full_exact_native_mcp_lines_by_line_parse": [32]
+        },
+        {
+          "outer_request_line": 37,
+          "outer_output_line": 41,
+          "output_ref": "outer:call_VKv7yNlsndeodUUS4v7FszAF:line:41:block:1",
+          "retained_output_block_bytes": 32492,
+          "warning_present": false,
+          "full_exact_native_mcp_lines_by_line_parse": [39, 40]
+        }
+      ],
+      "exact_read": {
+        "native_mcp_line": 47,
+        "outer_request_line": 45,
+        "outer_output_line": 48,
+        "output_ref": "outer:call_s52i6Sg78e76hDtsFpPIjq8z:line:48:block:1",
+        "canonical_result_bytes": 5362,
+        "frozen_status": "full_exact"
+      },
+      "truncated_three_result_output": {
+        "outer_request_line": 52,
+        "outer_output_line": 57,
+        "output_ref": "outer:call_c619cHNVbBvp4PA7RZxrqHnO:line:57:block:1",
+        "outer_pragma_present": false,
+        "program_behavior": "Three parallel normal retrieves; print full result JSON joined by newline.",
+        "joined_native_result_json_bytes": 49028,
+        "retained_output_block_bytes": 40106,
+        "warning_original_token_count": 12257,
+        "warning_total_output_lines": 3,
+        "line_results": [
+          {
+            "native_mcp_line": 55,
+            "query": "CaptureCommandResultOptions",
+            "frozen_status": "unknown_truncated",
+            "supplementary_status": "full_exact_result_line"
+          },
+          {
+            "native_mcp_line": 54,
+            "query": "validateBinding options.binding WorkContextBinding",
+            "frozen_status": "unknown_truncated",
+            "supplementary_status": "clipped_middle_json_line"
+          },
+          {
+            "native_mcp_line": 56,
+            "query": "WorkContextBindingView workContextBindingViewSchema",
+            "frozen_status": "unknown_truncated",
+            "supplementary_status": "full_exact_result_line"
+          }
+        ]
+      },
+      "corrected_delivery_count": {
+        "normal_retrieves": {
+          "full_exact_lines": 5,
+          "clipped_middle_lines": 1
+        },
+        "normal_reads": {
+          "full_exact_lines": 1
+        },
+        "qualification": "Supplementary delivery accounting only. Frozen statuses and acceptance scores remain unchanged."
+      }
+    }
+  }
+}

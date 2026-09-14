@@ -120,6 +120,7 @@ def retrieve_context(
     visited: set[str] = set()
     expanded: set[str] = set()
     frontier: list[_Visit] = []
+    anchor_visits: list[_Visit] = []
     for index, anchor in enumerate(anchors):
         if anchor.node_id in visited:
             packer.omit("alternative_path")
@@ -133,7 +134,28 @@ def retrieve_context(
         if missing_source:
             packer.omit("source_unavailable")
         packer.add(addition)
-        frontier.append(_Visit(anchor.node_id, index, 0, (), "Selected anchor"))
+        visit = _Visit(anchor.node_id, index, 0, (), "Selected anchor")
+        frontier.append(visit)
+        anchor_visits.append(visit)
+
+    # Selected source identities are the request's strongest relevance signal.
+    # Give their direct semantic proof one bounded pass before ownership-driven
+    # files and representative members join the traversal layer.  Anchor source,
+    # native file identity and ownership were already packed by _anchor_addition.
+    frontier.extend(_traverse_relationships(
+        anchor_visits,
+        depth=0,
+        source=source,
+        nodes=nodes,
+        adjacency=adjacency,
+        query_terms=query_terms,
+        degrees=degrees,
+        packer=packer,
+        visited=visited,
+        priority_anchor_ids=(frozenset(anchor.node_id for anchor in anchors)
+                             if seeds else frozenset()),
+    ))
+    pretraversed_anchors = {visit.node_id for visit in anchor_visits}
 
     for depth in range(LIMITS["max_hops"] + 1):
         layer = deque(visit for visit in frontier if visit.depth == depth)
@@ -176,72 +198,120 @@ def retrieve_context(
                                         (*visit.lineage, visit.node_id),
                                         "Validated ownership context"))
 
-        ordered = sorted(expanded_layer, key=lambda value: (value.anchor_index, value.node_id))
-        per_anchor: dict[int, list[tuple[_Visit, list[GraphTraversalStep]]]] = defaultdict(list)
-        for visit in ordered:
-            neighbors = list(adjacency.get(visit.node_id, ()))
-            packer.usage["eligible_edges_considered"] += len(neighbors)
-            ranked = _ranked_neighbors(neighbors, nodes, query_terms, degrees)
-            if len(ranked) > LIMITS["max_neighbors"]:
-                packer.omit("neighbor_limit", len(ranked) - LIMITS["max_neighbors"])
-                ranked = ranked[:LIMITS["max_neighbors"]]
-            if depth == LIMITS["max_hops"]:
-                packer.omit("hop_limit", len(ranked))
-                continue
-            per_anchor[visit.anchor_index].append((visit, ranked))
-
-        next_visits: list[_Visit] = []
-        scheduler: dict[int, list[deque[tuple[_Visit, GraphTraversalStep]]]] = {}
-        for anchor_index in sorted(per_anchor):
-            queues = [deque() for _ in range(8)]
-            for visit, steps in per_anchor[anchor_index]:
-                for step in steps:
-                    queues[_queue_index(step)].append((visit, step))
-            scheduler[anchor_index] = queues
-        while any(queue for queues in scheduler.values() for queue in queues):
-            for anchor_index in sorted(scheduler):
-                queues = scheduler[anchor_index]
-                for queue in queues:
-                    if not queue:
-                        continue
-                    visit, step = queue.popleft()
-                    target_id = step.to_id
-                    if target_id in (*visit.lineage, visit.node_id):
-                        packer.omit("cycle")
-                        continue
-                    already_visited = target_id in visited
-                    if not already_visited and len(visited) >= LIMITS["max_nodes"]:
-                        packer.omit("node_limit")
-                        continue
-                    packer.usage["edges_traversed"] += 1
-                    target = nodes[target_id]
-                    proof = source.proof(step.edge)
-                    if proof is None:
-                        packer.omit("proof_unavailable")
-                        if not already_visited:
-                            visited.add(target_id)
-                        continue
-                    addition, missing_source = _relation_addition(
-                        source, nodes[visit.node_id], target, step, proof, depth + 1,
-                        include_item=not already_visited,
-                    )
-                    if missing_source:
-                        packer.omit("source_unavailable")
-                    if not already_visited:
-                        visited.add(target_id)
-                    if packer.add(addition):
-                        if already_visited:
-                            packer.omit("alternative_path")
-                        else:
-                            next_visits.append(_Visit(
-                                target_id, anchor_index, depth + 1,
-                                (*visit.lineage, visit.node_id),
-                                f"{_FAMILY_TYPES[_TYPE_TO_FAMILY[step.edge.type]][0]} relationship",
-                            ))
-        frontier.extend(next_visits)
+        semantic_visits = [
+            visit for visit in expanded_layer
+            if visit.node_id not in pretraversed_anchors
+        ]
+        frontier.extend(_traverse_relationships(
+            semantic_visits,
+            depth=depth,
+            source=source,
+            nodes=nodes,
+            adjacency=adjacency,
+            query_terms=query_terms,
+            degrees=degrees,
+            packer=packer,
+            visited=visited,
+        ))
 
     packer.usage["nodes_examined"] = len(visited)
     return packer.finish()
+
+
+def _traverse_relationships(
+    visits: Sequence[_Visit],
+    *,
+    depth: int,
+    source: RetrievalSource,
+    nodes: Mapping[str, Mapping[str, Any]],
+    adjacency: Mapping[str, Sequence[GraphTraversalStep]],
+    query_terms: set[str],
+    degrees: Mapping[str, int],
+    packer: RetrievalPacker,
+    visited: set[str],
+    priority_anchor_ids: frozenset[str] = frozenset(),
+) -> list[_Visit]:
+    """Traverse one semantic layer with fixed family/direction fairness."""
+    ordered = sorted(visits, key=lambda value: (value.anchor_index, value.node_id))
+    per_anchor: dict[int, list[tuple[_Visit, list[GraphTraversalStep]]]] = defaultdict(list)
+    for visit in ordered:
+        neighbors = list(adjacency.get(visit.node_id, ()))
+        packer.usage["eligible_edges_considered"] += len(neighbors)
+        ranked = _ranked_neighbors(neighbors, nodes, query_terms, degrees)
+        if visit.node_id in priority_anchor_ids:
+            ranked = [step for step in ranked if step.to_id in priority_anchor_ids] + [
+                step for step in ranked if step.to_id not in priority_anchor_ids
+            ]
+        if len(ranked) > LIMITS["max_neighbors"]:
+            packer.omit("neighbor_limit", len(ranked) - LIMITS["max_neighbors"])
+            ranked = ranked[:LIMITS["max_neighbors"]]
+        if depth == LIMITS["max_hops"]:
+            packer.omit("hop_limit", len(ranked))
+            continue
+        per_anchor[visit.anchor_index].append((visit, ranked))
+
+    scheduler: dict[int, list[deque[tuple[_Visit, GraphTraversalStep]]]] = {}
+    prioritized: list[tuple[_Visit, GraphTraversalStep]] = []
+    for anchor_index in sorted(per_anchor):
+        queues = [deque() for _ in range(8)]
+        for visit, steps in per_anchor[anchor_index]:
+            for step in steps:
+                pair = (visit, step)
+                if (
+                    visit.node_id in priority_anchor_ids
+                    and step.to_id in priority_anchor_ids
+                ):
+                    prioritized.append(pair)
+                else:
+                    queues[_queue_index(step)].append(pair)
+        scheduler[anchor_index] = queues
+
+    next_visits: list[_Visit] = []
+
+    def traverse(visit: _Visit, step: GraphTraversalStep) -> None:
+        target_id = step.to_id
+        if target_id in (*visit.lineage, visit.node_id):
+            packer.omit("cycle")
+            return
+        already_visited = target_id in visited
+        if not already_visited and len(visited) >= LIMITS["max_nodes"]:
+            packer.omit("node_limit")
+            return
+        packer.usage["edges_traversed"] += 1
+        target = nodes[target_id]
+        proof = source.proof(step.edge)
+        if proof is None:
+            packer.omit("proof_unavailable")
+            if not already_visited:
+                visited.add(target_id)
+            return
+        addition, missing_source = _relation_addition(
+            source, nodes[visit.node_id], target, step, proof, depth + 1,
+            include_item=not already_visited,
+        )
+        if missing_source:
+            packer.omit("source_unavailable")
+        if not already_visited:
+            visited.add(target_id)
+        if packer.add(addition):
+            if already_visited:
+                packer.omit("alternative_path")
+            else:
+                next_visits.append(_Visit(
+                    target_id, visit.anchor_index, depth + 1,
+                    (*visit.lineage, visit.node_id),
+                    f"{_FAMILY_TYPES[_TYPE_TO_FAMILY[step.edge.type]][0]} relationship",
+                ))
+
+    for visit, step in prioritized:
+        traverse(visit, step)
+    while any(queue for queues in scheduler.values() for queue in queues):
+        for anchor_index in sorted(scheduler):
+            queues = scheduler[anchor_index]
+            for queue in queues:
+                if queue:
+                    traverse(*queue.popleft())
+    return next_visits
 
 
 @dataclass(frozen=True)

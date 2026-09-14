@@ -149,6 +149,29 @@ def test_markdown_exact_file_and_literal_use_real_page_root(
     assert literal["items"]
 
 
+def test_exact_program_file_anchor_retains_representative_members(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+):
+    indexed = _indexed(tmp_path, monkeypatch, {
+        "entry.ts": (
+            "export function first() { return 1; }\n"
+            "export function second() { return 2; }\n"
+            "export function third() { return 3; }\n"
+            "export function fourth() { return 4; }\n"
+        ),
+    })
+
+    result = _retrieve(indexed, "entry.ts")
+
+    assert result["scope"]["matching"] == "exact_file"
+    assert result["items"][0]["node_id"] == "entry.ts::__file__#file"
+    assert {item["node_id"] for item in result["items"][1:]} == {
+        "entry.ts::first#function",
+        "entry.ts::second#function",
+        "entry.ts::third#function",
+    }
+
+
 def test_request_validation_is_utf8_bounded_and_requires_input(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ):
@@ -222,6 +245,102 @@ def test_relation_between_two_explicit_anchors_is_still_delivered(
                and relation["edge"]["to"] == callee
                and relation["edge"]["type"] == "calls"
                for relation in result["relationships"])
+
+
+def test_explicit_anchor_relationship_precedes_neighbor_limit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+):
+    leaves = "".join(
+        f"def leaf_{index:02d}():\n    return {index}\n\n"
+        for index in range(40)
+    )
+    calls = " + ".join([*(f"leaf_{index:02d}()" for index in range(40)), "zz_target()"])
+    indexed = _indexed(tmp_path, monkeypatch, {
+        "many.py": (
+            f"{leaves}"
+            "def zz_target():\n    return 100\n\n"
+            f"def root():\n    return {calls}\n"
+        ),
+    })
+    root_id = _symbol(indexed[2], "root")
+    target_id = _symbol(indexed[2], "zz_target")
+
+    result = _retrieve(indexed, seed_ids=[root_id, target_id])
+
+    assert any(relation["edge"]["from"] == root_id
+               and relation["edge"]["to"] == target_id
+               and relation["edge"]["type"] == "calls"
+               for relation in result["relationships"])
+    assert any(item["reason"] == "neighbor_limit" for item in result["omissions"])
+
+
+def test_anchor_type_proof_precedes_incidental_owner_context_under_output_pressure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+):
+    padding = "x" * 520
+    indexed = _indexed(tmp_path, monkeypatch, {
+        "package.json": json.dumps({
+            "name": "retrieval-pressure-fixture",
+            "type": "module",
+            "description": "p" * 620,
+        }) + "\n",
+        "tsconfig.json": json.dumps({
+            "compilerOptions": {"module": "nodenext", "strict": True},
+            "include": ["*.ts"],
+            "fixturePadding": "t" * 320,
+        }) + "\n",
+        "binding.ts": (
+            f"export type BindingNoiseOne = {{ value: '{padding}' }};\n"
+            f"export type BindingNoiseTwo = {{ value: '{padding}' }};\n"
+            f"export type BindingNoiseThree = {{ value: '{padding}' }};\n"
+            "export type WorkContextBinding = { id: string; status: 'active' };\n"
+        ),
+        "public.ts": (
+            "export type {\n"
+            "  BindingNoiseOne,\n"
+            "  BindingNoiseTwo,\n"
+            "  BindingNoiseThree,\n"
+            "  WorkContextBinding,\n"
+            "} from './binding.ts';\n"
+        ),
+        "service.ts": (
+            "import type { WorkContextBinding } from './public.ts';\n"
+            f"type ServiceNoiseOne = {{ value: '{padding}' }};\n"
+            f"type ServiceNoiseTwo = {{ value: '{padding}' }};\n"
+            f"type ServiceNoiseThree = {{ value: '{padding}' }};\n"
+            "type CaptureCommandResultOptions = { binding: WorkContextBinding };\n"
+        ),
+    })
+    capture = _symbol(indexed[2], "CaptureCommandResultOptions")
+    binding = _symbol(indexed[2], "WorkContextBinding")
+
+    for result in (
+        _retrieve(indexed, "CaptureCommandResultOptions"),
+        _retrieve(indexed, "binding contract", seed_ids=[capture, binding]),
+    ):
+        relation = next(
+            item for item in result["relationships"]
+            if item["edge"]["from"] == capture
+            and item["edge"]["to"] == binding
+            and item["edge"]["type"] == "uses_type"
+        )
+        assert relation["edge"]["resolution"] == "import-resolved"
+        assert relation["proof"] == "complete"
+        proof_files = {
+            result["sources"][source_id - 1]["file"]
+            for source_id in relation["source_ids"]
+        }
+        assert proof_files == {
+            "binding.ts", "package.json", "public.ts", "service.ts", "tsconfig.json",
+        }
+        ownership = {
+            (item["owner_id"], item["member_id"], item["basis"])
+            for item in result["ownership"]
+        }
+        assert ("service.ts::__file__#file", capture, "indexed_file") in ownership
+        assert ("binding.ts::__file__#file", binding, "indexed_file") in ownership
+        assert result["usage"]["output_bytes"] <= result["limits"]["max_output_bytes"]
+        assert result["usage"]["evidence_bytes"] <= result["limits"]["max_evidence_bytes"]
 
 
 def test_family_rounds_interleave_two_high_fanout_anchors(

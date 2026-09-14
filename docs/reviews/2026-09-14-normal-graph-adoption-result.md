@@ -1,5 +1,11 @@
 # Normal graph retrieval: frozen ordinary adoption result
 
+> Subsequent diagnosis: some `unknown_truncated` classifications undercounted
+> intact JSON-line delivery. In particular, five of six run21 retrievals were
+> intact. See [the separate diagnosis](2026-09-14-normal-graph-repair-diagnosis.md).
+> The original computed scores below and frozen evidence are preserved;
+> provider-token and answer-completeness failures remain valid.
+
 The graph policy is active and ordinary agents are invoking it. The frozen value
 acceptance is **negative**: required-context delivery, complete answers and cost
 do not yet meet the agreed bar. **W1.8.3 measurement is complete; W1.8.4 and the
