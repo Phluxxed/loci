@@ -1,17 +1,20 @@
 name: One-time commit email rewrite
 
 on:
-  push:
+  pull_request:
     branches:
       - master
+    types:
+      - opened
     paths:
-      - .github/workflows/one-time-email-rewrite.yml
+      - .github/email-rewrite-trigger
 
 permissions:
   contents: write
 
 jobs:
   rewrite-history:
+    if: github.head_ref == 'one-time-email-rewrite-trigger'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +28,7 @@ jobs:
 
           git fetch origin '+refs/heads/*:refs/remotes/origin/*'
 
-          old_master="$(git rev-parse "${GITHUB_SHA}^")"
+          old_master="2bc395e7bdbf3cf40e8efbc28a7e2e1abaae3e61"
           old_evidence="$(git rev-parse origin/feat/evidence-backed-exploration)"
           old_mcp="$(git rev-parse origin/feat/mcp-python-sdk-v2)"
           old_swift="$(git rev-parse origin/swift-graph-support)"
@@ -56,7 +59,9 @@ jobs:
           done
 
           git push --force origin \
-            master:refs/heads/master \
             feat/evidence-backed-exploration:refs/heads/feat/evidence-backed-exploration \
             feat/mcp-python-sdk-v2:refs/heads/feat/mcp-python-sdk-v2 \
-            swift-graph-support:refs/heads/swift-graph-support
+            swift-graph-support:refs/heads/swift-graph-support \
+            master:refs/heads/master
+
+          git push origin --delete one-time-email-rewrite-trigger
