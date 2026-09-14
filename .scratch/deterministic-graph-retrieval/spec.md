@@ -1,6 +1,6 @@
 # Deterministic graph retrieval: delivery direction
 
-Status: selected direction; public contract and implementation remain unfinished
+Status: selected direction; public contract frozen in contract.md; implementation unfinished
 
 Date: 14 September 2026. Task authority: the existing Manifest Objective,
 “Make Loci relationship retrieval effective in ordinary agent work”. This is
@@ -20,7 +20,12 @@ invoke it instead of a shell. Installed host delivery and actual ordinary use
 therefore remain separate acceptance requirements, and skipped Loci use must
 remain visible in the outcome report.
 
-## Recommended shape to make concrete in W1.7.2.1
+## Direction resolved by W1.7.2.1
+
+The exact decisions below are now frozen in `contract.md` and
+`contract.schema.json`. Those artifacts supersede provisional choices in this
+direction document. W1.7.2.1 resolves the contract; it does not claim the engine,
+installed workflow or ordinary-task acceptance is implemented.
 
 Expose one normal context-retrieval operation. Keep maintenance and low-level
 graph diagnostics in an operator-selected compatibility/diagnostic surface,
