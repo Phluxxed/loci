@@ -128,7 +128,8 @@ and actual-host outcome verification in `/Users/brummerv/loci`. The initial
 diagnostic is complete with criterion-associated evidence. At Vik's request,
 the original eight Tasks have been recursively decomposed into 32 Task nodes:
 seven parent branches and 25 executable leaves, of which only the initial
-diagnostic is complete. The Objective remains in Planning.
+diagnostic is complete. Decomposition was reviewed while the Objective was in
+Planning; Vik subsequently authorized Implementation on 14 September 2026.
 
 The decomposition separates prior-evidence reconciliation, case truth,
 observation contracts, host/role conditions, observer preflight and the schedule
@@ -138,10 +139,17 @@ delivery work, followed by source review, actual-host checks, ordinary-task
 comparison and outcome acceptance. Permanent product telemetry and any new
 graph-engine repair remain decisions; the graph does not prescribe them.
 
-The next Planning leaf is `task_303dc49a495c13bc068b1fdb71431b10`, reconciling
-prior evidence with the adoption question. No new research or implementation
+The current card is **W1.2.1 — Reconcile prior evidence with the adoption
+question**. Vik requested card references in human-facing handoffs; stable graph
+identities remain internal to tool operations. No new research or implementation
 leaf was marked complete merely by decomposition. Readback verified parentage,
 sibling order, dependency membership and preservation of the initial completion;
 independent bounded review found no material omission. The canonical Manifest
 owns current work and status. Completing the audit alone will not complete this
 Objective.
+
+The phase is now Implementation. The actual Manifest service and frontend both
+confirm the phase and current card. Existing authorization includes the planned
+audit and necessary bounded audit tooling; findings still determine the selected
+product corrections. The legacy decomposition flag was not changed, and no
+additional task completion was claimed by the phase switch.
