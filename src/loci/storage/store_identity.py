@@ -9,6 +9,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Mapping
 
+from .repository_catalog import MUTATION_LOCK_FILE_NAME
+
 STORE_IDENTITY_FILE = ".loci-store.json"
 STORE_IDENTITY_SCHEMA_VERSION = 1
 _NAMESPACE_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}\Z")
@@ -213,13 +215,32 @@ def _validate_root_directory(root: Path) -> None:
 
 def _list_entries(root: Path) -> list[Path]:
     try:
-        return list(root.iterdir())
+        return [
+            entry for entry in root.iterdir()
+            if not _ignorable_catalog_lock(entry)
+        ]
     except OSError as exc:
         raise StoreIdentityError(
             "MCP_STORE_UNAVAILABLE",
             "Loci could not inspect the configured store contents",
             {"base_dir": str(root), "error": str(exc)},
         ) from exc
+
+
+def _ignorable_catalog_lock(path: Path) -> bool:
+    """Recognize only the empty advisory lock created by a catalog read."""
+    if path.name != MUTATION_LOCK_FILE_NAME:
+        return False
+    try:
+        info = path.lstat()
+    except OSError:
+        return False
+    return (
+        stat.S_ISREG(info.st_mode)
+        and info.st_size == 0
+        and (os.name != "posix" or info.st_uid == os.geteuid())
+        and not info.st_mode & (stat.S_IWGRP | stat.S_IWOTH)
+    )
 
 
 def _read_binding(

@@ -1,20 +1,26 @@
 # loci
 
-A local MCP server for LLM agent code navigation. loci parses your codebase into a byte-precise symbol index so an agent can fetch exactly the code it needs — no full-file reads, no grep loops.
-
-**60–90% token savings** on typical codebase navigation tasks.
+A local MCP server for source retrieval with deterministic graph context.
+Loci returns bounded source, supported static relationships and their evidence.
 
 ## How it works
 
-loci uses [tree-sitter](https://tree-sitter.github.io/tree-sitter/) to parse source files into an AST, extracts symbols (functions, classes, methods, constants) with their byte offsets, and stores them in a local index. Retrieval is a direct byte-range read — no scanning.
+loci uses [tree-sitter](https://tree-sitter.github.io/tree-sitter/) to parse source
+into exact symbol spans and resolve supported imports, references, calls and
+types. Normal retrieval selects anchors, traverses the graph under one maintained
+policy and assembles source with complete relationship proof.
 
-The MCP workflow replaces 15–20 iterative Read/Grep calls with a small tool chain:
+The normal MCP workflow is:
 
 ```text
-loci_index -> loci_outline/loci_search/loci_graph_anchors -> loci_get/loci_graph_retrieve/loci_file -> loci_verify
+loci_retrieve(repo, query) -> source and graph context
+loci_read(repo, source_ref) -> exact source expansion when needed
 ```
 
 The CLI still exists for debugging, scripts, and migration safety, but MCP is the production interface.
+Graph traversal is part of normal retrieval rather than an agent-selected mode.
+Workflow value is measured separately from graph activity; see the retained
+[ordinary-use audit](docs/reviews/2026-09-14-ordinary-graph-adoption-results.md).
 
 ## Supported languages
 
@@ -190,6 +196,35 @@ For a verified non-empty legacy root, run `loci store init` again with
 legacy Codex-aware fallback when they run outside MCP mode.
 
 ### MCP Tools
+
+The default server exposes two operations:
+
+| Tool | Purpose |
+| --- | --- |
+| `loci_retrieve(repo, query="", seed_ids=None)` | Discover source and automatically assemble supported incoming/outgoing graph context |
+| `loci_read(repo, source_ref)` | Expand a returned exact source extent, with bounded pagination and stale-reference refusal |
+
+Normal retrieval automatically creates or refreshes the index. Supply a query,
+an exact relative file path as the query, or known node IDs. Loci owns families,
+direction, ranking, hops and byte budgets. Inspect candidate ambiguity, source
+completeness, relationship proof and omissions. Zero edges never establish
+exhaustive absence. Re-anchor a returned ID for more context or follow an item's
+source reference to read its full extent.
+
+`normal-graph-v1` bounds traversal to two semantic hops, 64 examined nodes,
+12 source items, 8192 unique source bytes and a 16384-byte complete MCP result.
+Source previews leave room for graph proof. File/package/module/crate ownership
+is reported separately from native semantic edges. The same snapshot and request
+produce the same semantic selection. See the
+[normal packet guide](skills/loci/references/normal-retrieval.md).
+
+### Operator diagnostic surface
+
+The existing tools below remain available in a separate process configured with
+`LOCI_MCP_SURFACE=diagnostic`. Unset or `normal` selects the two-operation normal
+surface; other values fail startup. There is no runtime tool for changing this
+choice. Restart an existing host after updating the installation so it loads
+the new catalog. CLI and Python diagnostic interfaces remain compatible.
 
 MCP retrieval tools create missing indexes and refresh stale indexes before
 returning data. A first retrieval against a valid, readable root indexes it and
@@ -888,8 +923,8 @@ For loci to be useful, your agent needs to know it exists and how to use it. The
 The one-line version to add to any agent's instructions:
 
 ```
-Use loci for codebase navigation. Prefer MCP tools (`loci_index`,
-`loci_outline`/`loci_search`, then `loci_get`) over reading files directly.
+Use loci_retrieve for repository source discovery and graph context. Expand
+incomplete source with loci_read and the returned source_ref.
 If MCP is unavailable, configure the local stdio MCP server first. Use the
 `loci` CLI only as a temporary bridge until the agent runtime can see the MCP
 tools.
@@ -898,7 +933,7 @@ tools.
 For Claude specifically, add this to your `CLAUDE.md`:
 
 ```
-**MANDATORY**: Use the `loci` skill at the start of any non-trivial codebase task.
+Use the `loci` skill when repository work requires source retrieval or tracing.
 Prefer the local `loci` MCP server. If MCP tools are not visible, configure
 loci first with `loci store init --base-dir "$HOME/.claude/loci-index" --namespace claude`, then `claude mcp add loci -s local -e LOCI_BASE_DIR="$HOME/.claude/loci-index" LOCI_STORE_NAMESPACE=claude -- loci-mcp` and `claude mcp get loci`.
 Tell the user a fresh Claude session may be required before the new `loci_*`
@@ -921,7 +956,9 @@ This symlinks the hooks and skill files into `~/.claude/` and patches `~/.claude
 
 `loci-enforce-read.py` is registered for `Read` and `Bash`, but it denies only
 answer-equivalent operations: whole-file reads and a plain `cat FILE` after a
-fresh Loci file probe succeeds for that exact indexed path. Broader directory
+fresh normal retrieval yields an exact whole-file source reference and a source
+page can be read. The redirect uses `loci_retrieve` followed by `loci_read`
+pagination; an explicit diagnostic process retains its legacy recipe. Broader directory
 searches and shell pipelines fail open because the current MCP tools cannot
 preserve those native content scopes. Repository lookup is derived from the
 target path and never lists or parses sibling indexes.
@@ -932,7 +969,7 @@ target path and never lists or parses sibling indexes.
 |---|---|---|
 | `loci-session-start.sh` | `~/.claude/hooks/` | Reports an existing index, or runs bounded initial `loci index --incremental` when no cache exists |
 | `loci-agent-inject.sh` | `~/.claude/hooks/` | Injects the skill into subagent prompts before `Agent` tool calls |
-| `loci-enforce-read.py` | `~/.claude/hooks/` | Redirects only exact whole-file reads that a fresh Loci file call can answer equivalently |
+| `loci-enforce-read.py` | `~/.claude/hooks/` | Redirects exact whole-file reads only after verifying normal retrieval and exact source hydration |
 | `SKILL.md` | `~/.claude/skills/loci/` | The agent workflow guide Claude loads via the `loci` skill |
 
 ## Codex integration

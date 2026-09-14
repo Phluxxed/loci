@@ -2,8 +2,9 @@
 """PreToolUse hook: redirect only answer-equivalent source reads to Loci.
 
 The hook denies a whole-file Read, or a simple ``cat FILE``, only after the
-authoritative Loci policy, exact store layout, mirrored source, and fresh
-``loci file`` path all agree that Loci can answer for that same file. Native
+authoritative Loci policy, exact store layout, mirrored source, and a fresh
+normal-service retrieval/read probe all agree that Loci can answer for that same
+file. Native
 directory searches, pipelines, transformed reads, uncovered paths, and
 unreachable or stale Loci processes pass through.
 
@@ -93,6 +94,11 @@ def store_namespace(base_dir: Path) -> str | None:
         return None
 
 
+def diagnostic_surface() -> bool:
+    """Whether this host deliberately exposes the legacy diagnostic catalog."""
+    return os.environ.get("LOCI_MCP_SURFACE") == "diagnostic"
+
+
 def indexed_source_target(
     base_dir: Path,
     path: str | Path,
@@ -116,8 +122,47 @@ def indexed_source_target(
     return None
 
 
-def loci_can_answer(base_dir: Path, target: IndexedSourceTarget) -> bool:
-    """Probe the same fresh file service used by the MCP tool."""
+_NORMAL_PROBE = r"""
+import json
+import sys
+from pathlib import Path
+
+from loci import service
+
+request = json.loads(sys.argv[1])
+repo = Path(request["repo"])
+relative = request["relative_path"]
+size = (repo / relative).stat().st_size
+result = service.retrieve(repo, query=relative, ensure_fresh=True)
+for item in result.get("items", []):
+    extent = item.get("extent")
+    source_ref = item.get("source_ref")
+    if not isinstance(extent, dict) or not isinstance(source_ref, str) or not source_ref:
+        continue
+    if (
+        extent.get("file") != relative
+        or extent.get("start_byte") != 0
+        or extent.get("end_byte") != size
+    ):
+        continue
+    first = service.read(repo, source_ref, ensure_fresh=True)
+    source = first.get("source")
+    if isinstance(source, dict) and source.get("file") == relative:
+        print(json.dumps({"ok": True}))
+        raise SystemExit(0)
+print(json.dumps({"ok": False}))
+"""
+
+
+def _normal_probe_python() -> str:
+    repo_python = Path(__file__).resolve().parents[2] / ".venv" / "bin" / "python3"
+    if repo_python.is_file():
+        return str(repo_python)
+    return sys.executable
+
+
+def _diagnostic_loci_can_answer(base_dir: Path, target: IndexedSourceTarget) -> bool:
+    """Keep the legacy CLI probe for an explicitly selected diagnostic host."""
     binary = shutil.which("loci")
     if binary is None:
         return False
@@ -153,10 +198,48 @@ def loci_can_answer(base_dir: Path, target: IndexedSourceTarget) -> bool:
     return isinstance(result, dict) and isinstance(result.get("content"), str)
 
 
+def loci_can_answer(base_dir: Path, target: IndexedSourceTarget) -> bool:
+    """Prove exact whole-file retrieval through the active host surface."""
+    if diagnostic_surface():
+        return _diagnostic_loci_can_answer(base_dir, target)
+    env = dict(os.environ)
+    env["LOCI_BASE_DIR"] = str(base_dir)
+    try:
+        proc = subprocess.run(
+            [
+                _normal_probe_python(),
+                "-c",
+                _NORMAL_PROBE,
+                json.dumps({"repo": str(target.repo), "relative_path": target.relative_path}),
+            ],
+            capture_output=True,
+            text=True,
+            timeout=PROBE_TIMEOUT_S,
+            env=env,
+            cwd=target.repo,
+        )
+    except (subprocess.TimeoutExpired, OSError, ValueError):
+        return False
+    if proc.returncode != 0:
+        return False
+    try:
+        result = json.loads(proc.stdout)
+    except (json.JSONDecodeError, TypeError):
+        return False
+    return result == {"ok": True}
+
+
 def loci_recipe(target: IndexedSourceTarget) -> str:
     """Exact MCP calls whose required arguments match the live schemas."""
     repo = json.dumps(str(target.repo))
     relative = json.dumps(target.relative_path)
+    if not diagnostic_surface():
+        return (
+            f"  loci_retrieve repo={repo} query={relative}\n"
+            "      → deterministic source context with relationship proof\n"
+            "  loci_read repo=<same repo> source_ref=<returned item.source_ref>\n"
+            "      → exact source page; follow next_source_ref until null\n"
+        )
     return (
         f"  loci_file repo={repo} file_path={relative}\n"
         "      → exact indexed content for this file\n"
@@ -299,7 +382,7 @@ def handle_read(payload: dict, base_dir: Path) -> None:
         source = Path(file_path).expanduser()
         if source.is_file() and is_indexable_source_path is not None:
             repo = git_repo_root(source.resolve())
-            if repo is not None and not repo_is_indexed(base_dir, repo):
+            if repo is not None and not repo_is_indexed(base_dir, repo) and diagnostic_surface():
                 relative = source.resolve().relative_to(repo)
                 if is_indexable_source_path(PurePosixPath(relative.as_posix())):
                     deny(
@@ -368,6 +451,8 @@ def handle_bash(payload: dict, base_dir: Path) -> None:
         if found is None:
             allow()
         name, repo, is_search = found
+        if not diagnostic_surface():
+            allow()
         if not repo_is_indexed(base_dir, repo):
             deny(
                 f"Bash `{name}` blocked: it targets source in a git repository "
@@ -388,6 +473,7 @@ def handle_bash(payload: dict, base_dir: Path) -> None:
         if (
             repo is not None
             and not repo_is_indexed(base_dir, repo)
+            and diagnostic_surface()
             and is_indexable_source_path is not None
             and is_indexable_source_path(PurePosixPath(source.relative_to(repo).as_posix()))
         ):

@@ -148,6 +148,7 @@ async def _exercise_type_relationship_server(tmp_path: Path) -> dict[str, Any]:
     env = os.environ.copy()
     env["LOCI_BASE_DIR"] = str(tmp_path / "store")
     env["LOCI_STORE_NAMESPACE"] = "type-relations-mcp"
+    env["LOCI_MCP_SURFACE"] = "diagnostic"
     source_root = str(Path.cwd() / "src")
     env["PYTHONPATH"] = os.pathsep.join(
         part for part in (source_root, env.get("PYTHONPATH")) if part

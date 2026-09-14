@@ -1,5 +1,10 @@
 # Tool contracts and bounded evidence
 
+The schemas below describe the operator diagnostic surface. The default
+`loci_retrieve`/`loci_read` packet and continuation rules are in
+[normal-retrieval.md](normal-retrieval.md); inspect the loaded normal tool schemas
+for their exact fields. Diagnostic tools are not alternative normal routes.
+
 ## Contents
 
 - Core response envelopes

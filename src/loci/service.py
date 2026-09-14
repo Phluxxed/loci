@@ -1178,6 +1178,39 @@ def graph_paths(
         raise LociError(exc.code, exc.message, exc.details) from exc
 
 
+def retrieve(
+    repo: str | Path, query: str = "", *, seed_ids: list[str] | None = None,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    """Return normal source context through the fixed graph policy."""
+    from loci.retrieval import retrieve_context
+
+    repo_path = Path(repo).resolve()
+    store, nodes, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
+    coverage = query_coverage_from_index(
+        _load_required_index(store, repo_path), "indexed_symbols",
+    )
+    try:
+        return retrieve_context(repo_path, store, nodes, state, query,
+                                seed_ids=seed_ids, coverage=coverage["state"])
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+
+def read(
+    repo: str | Path, source_ref: str, *, ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    """Expand one exact hash-bound source extent without source discovery."""
+    from loci.retrieval_io import read_source
+
+    repo_path = Path(repo).resolve()
+    store, nodes, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
+    try:
+        return read_source(repo_path, store, nodes, state, source_ref)
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+
 def explore(
     repo: str | Path,
     query: str = "",

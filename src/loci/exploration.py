@@ -112,6 +112,7 @@ class _Source:
         self.definitions: dict[str, Span] = {}
         self.go_import_declarations: dict[str, tuple[_Declaration, ...]] = {}
         self.rust_declarations: dict[str, tuple[_Declaration, ...]] = {}
+        self.javascript_declarations: dict[str, tuple[_Declaration, ...]] = {}
         self.rust_configuration_attributes: dict[tuple[str, str, int, int], tuple[Span, ...]] = {}
 
     def definition(self, node: dict) -> Span:
@@ -141,10 +142,34 @@ class _Source:
             return self.go_import_declaration(support)
         if support.kind in {"import_binding", "reexport", "module_declaration"} and language == "rust":
             return self.rust_declaration(support)
+        if support.kind in {"import_binding", "reexport", "local_export"} and language in {"javascript", "typescript"}:
+            return self.javascript_declaration(support)
         value = self.cache.support(support)
         return Span(value["file"], value["byte_offset"],
                     value["byte_offset"] + len(value["content"].encode("utf-8")),
                     value["start_line"], value["end_line"], value["content_hash"], value["content"])
+
+    def javascript_declaration(self, support) -> Span:
+        """Hydrate a complete unique import/export from verified cached bytes."""
+        raw, _ = self.cache.file(support.file, support.content_hash)
+        declarations = self.javascript_declarations.get(support.file)
+        if declarations is None:
+            language = "tsx" if support.file.endswith(".tsx") else self.languages[support.file]
+            declarations = _javascript_declarations(raw, language)
+            self.javascript_declarations[support.file] = declarations
+        kind = "import_statement" if support.kind == "import_binding" else "export_statement"
+        matches = [item for item in declarations if item.kind == kind
+                   and item.start_line <= support.line <= item.end_line]
+        if len(matches) != 1:
+            raise ValueError("JavaScript/TypeScript support has no unique enclosing declaration")
+        if matches[0].start_line == matches[0].end_line:
+            # Preserve the established physical-line proof, including its exact
+            # newline, once the complete declaration has been verified unique.
+            value = self.cache.support(support)
+            return Span(value["file"], value["byte_offset"],
+                        value["byte_offset"] + len(value["content"].encode("utf-8")),
+                        value["start_line"], value["end_line"], value["content_hash"], value["content"])
+        return _span_from_declaration(raw, support, matches[0])
 
     def go_import_declaration(self, support) -> Span:
         raw, _ = self.cache.file(support.file, support.content_hash)
@@ -338,6 +363,26 @@ def _walk_tree_nodes(node):
     yield node
     for child in node.named_children:
         yield from _walk_tree_nodes(child)
+
+
+def _javascript_declarations(source: bytes, language: str) -> tuple[_Declaration, ...]:
+    try:
+        from tree_sitter import Parser
+        from tree_sitter_language_pack import get_language
+
+        root = Parser(get_language(language)).parse(source).root_node
+    except Exception as exc:
+        raise ValueError("JavaScript/TypeScript declaration source could not be parsed") from exc
+    if root.has_error:
+        raise ValueError("JavaScript/TypeScript declaration source has parse errors")
+    return tuple(
+        _Declaration(node.type, node.start_byte, node.end_byte,
+                     node.start_point.row + 1,
+                     node.end_point.row + 1 - int(node.end_point.column == 0),
+                     node.start_point.row + 1, (node.parent.start_byte, node.parent.end_byte))
+        for node in _walk_tree_nodes(root)
+        if node.type in {"import_statement", "export_statement"}
+    )
 
 
 def _go_import_declarations(source: bytes) -> tuple[_Declaration, ...]:

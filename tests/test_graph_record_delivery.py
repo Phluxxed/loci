@@ -166,7 +166,7 @@ def test_compact_type_reference_byte_pages_deliver_every_stable_site(
     }
 
     async def exercise() -> tuple[Any, ...]:
-        server = create_server()
+        server = create_server("diagnostic")
         default_items, default_pages = await _collect_pages(
             server,
             "loci_graph_references",
@@ -280,7 +280,7 @@ def test_compact_calls_preserve_call_and_callee_spans_with_utf8_accounting(
     index_repo(repo, incremental=False)
 
     async def exercise() -> tuple[CallToolResult, CallToolResult]:
-        server = create_server()
+        server = create_server("diagnostic")
         compact = await server.call_tool(
             "loci_graph_calls", {"repo": str(repo), "limit": 500}
         )
@@ -352,7 +352,7 @@ def test_compact_symbol_references_accept_swift_records(
     index_repo(repo, incremental=False)
 
     result = asyncio.run(
-        create_server().call_tool("loci_graph_references", {"repo": str(repo)})
+        create_server("diagnostic").call_tool("loci_graph_references", {"repo": str(repo)})
     )
     assert result.is_error is False
     payload = result.structured_content
@@ -383,7 +383,7 @@ def test_graph_record_tools_reject_invalid_delivery_inputs(
     tool: str,
     arguments: dict[str, Any],
 ) -> None:
-    server = create_server()
+    server = create_server("diagnostic")
     result = asyncio.run(
         server.call_tool(tool, {"repo": str(tmp_path / "missing"), **arguments})
     )
@@ -406,7 +406,7 @@ def test_oversized_record_reports_required_budget_and_exact_retry_succeeds(
         encoding="utf-8",
     )
     index_repo(repo, incremental=False)
-    server = create_server()
+    server = create_server("diagnostic")
 
     error = asyncio.run(
         server.call_tool(
@@ -442,6 +442,7 @@ def test_default_compact_page_crosses_actual_mcp_subprocess_under_16k(
     env = os.environ.copy()
     env["LOCI_BASE_DIR"] = str(tmp_path / "subprocess-store")
     env["LOCI_STORE_NAMESPACE"] = "graph-record-delivery"
+    env["LOCI_MCP_SURFACE"] = "diagnostic"
     env["PYTHONPATH"] = str(Path.cwd() / "src")
     params = StdioServerParameters(
         command=sys.executable,

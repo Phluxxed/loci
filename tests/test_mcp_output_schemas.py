@@ -56,7 +56,7 @@ EXPECTED_LOCI_TOOLS = {
 
 
 def test_loci_file_advertises_success_and_error_output_schema() -> None:
-    tools = asyncio.run(create_server().list_tools())
+    tools = asyncio.run(create_server("diagnostic").list_tools())
     schema = next(tool.output_schema for tool in tools if tool.name == "loci_file")
 
     assert schema is not None
@@ -68,7 +68,7 @@ def test_loci_file_real_success_and_error_payloads_validate(tmp_path: Path) -> N
     repo = tmp_path / "repo"
     repo.mkdir()
     (repo / "sample.py").write_text("def sample():\n    return 1\n")
-    server = create_server()
+    server = create_server("diagnostic")
 
     indexed = asyncio.run(
         server.call_tool(
@@ -111,7 +111,7 @@ def test_loci_file_real_success_and_error_payloads_validate(tmp_path: Path) -> N
 
 
 def test_loci_file_sdk_rejects_malformed_explicit_result() -> None:
-    server = create_server()
+    server = create_server("diagnostic")
     tool = server._tool_manager.get_tool("loci_file")
     assert tool is not None
 
@@ -143,7 +143,7 @@ def test_repository_tool_schemas_validate_real_success_payloads(tmp_path: Path) 
     repo = tmp_path / "repo"
     repo.mkdir()
     (repo / "sample.py").write_text("def sample():\n    return 1\n")
-    server = create_server()
+    server = create_server("diagnostic")
 
     results = {}
     results["loci_index"] = asyncio.run(
@@ -197,7 +197,7 @@ def test_repository_tool_error_branch_validates_without_wire_changes(
 ) -> None:
     repo = tmp_path / "repo"
     repo.mkdir()
-    server = create_server()
+    server = create_server("diagnostic")
     asyncio.run(
         server.call_tool(
             "loci_index",
@@ -245,7 +245,7 @@ def test_store_and_telemetry_schemas_validate_real_payloads(tmp_path: Path) -> N
     repo = tmp_path / "repo"
     repo.mkdir()
     (repo / "sample.py").write_text("def sample():\n    return 1\n")
-    server = create_server()
+    server = create_server("diagnostic")
     asyncio.run(
         server.call_tool(
             "loci_index",
@@ -280,7 +280,7 @@ def test_store_and_telemetry_schemas_validate_real_payloads(tmp_path: Path) -> N
 
 def test_store_health_structured_error_uses_the_declared_union() -> None:
     result = asyncio.run(
-        create_server().call_tool("loci_store_health", {"limit": 0})
+        create_server("diagnostic").call_tool("loci_store_health", {"limit": 0})
     )
 
     assert result.is_error is True
@@ -295,7 +295,7 @@ def test_graph_tool_schemas_validate_resolved_real_payloads(tmp_path: Path) -> N
         "from b import target\n\ndef caller():\n    return target()\n"
     )
     (repo / "b.py").write_text("def target():\n    return 1\n")
-    server = create_server()
+    server = create_server("diagnostic")
     asyncio.run(
         server.call_tool(
             "loci_index",
@@ -371,7 +371,7 @@ def test_graph_tool_schemas_validate_resolved_real_payloads(tmp_path: Path) -> N
 def test_graph_structured_error_uses_the_declared_union(tmp_path: Path) -> None:
     repo = tmp_path / "missing"
     result = asyncio.run(
-        create_server().call_tool(
+        create_server("diagnostic").call_tool(
             "loci_graph_neighbors",
             {"repo": str(repo), "seed_ids": ["missing.py::__file__#file"]},
         )
@@ -382,7 +382,7 @@ def test_graph_structured_error_uses_the_declared_union(tmp_path: Path) -> None:
 
 
 def test_every_loci_tool_advertises_an_object_root_success_or_error_schema() -> None:
-    tools = asyncio.run(create_server().list_tools())
+    tools = asyncio.run(create_server("diagnostic").list_tools())
 
     assert len(tools) == len(EXPECTED_LOCI_TOOLS)
     assert {tool.name for tool in tools} == EXPECTED_LOCI_TOOLS

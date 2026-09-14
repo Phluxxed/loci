@@ -60,6 +60,16 @@ def symlink_skills() -> None:
             dest.unlink()
         dest.symlink_to(skill_file.resolve())
         print(f"  linked: {dest} -> {skill_file.resolve()}")
+    references = CLAUDE_SKILLS / "references"
+    source = REPO_SKILLS.resolve() / "references"
+    if references.is_symlink():
+        if references.resolve(strict=False) == source:
+            return
+        references.unlink()
+    elif references.exists():
+        raise RuntimeError(f"refusing to replace existing references directory: {references}")
+    references.symlink_to(source, target_is_directory=True)
+    print(f"  linked: {references} -> {source}")
 
 
 def _hook_present(hooks: list, command_fragment: str) -> bool:

@@ -64,6 +64,8 @@ from loci.mcp_output_models import (
     LociGrepOutput,
     LociIndexOutput,
     LociListOutput,
+    LociReadOutput,
+    LociRetrieveOutput,
     LociOutlineOutput,
     LociSearchOutput,
     LociStatsOutput,
@@ -87,6 +89,34 @@ _LEGACY_PATH_PARAMETER_TOOLS = frozenset({
     "loci_outline",
     "loci_verify",
 })
+_DIAGNOSTIC_TOOL_NAMES = frozenset({
+    "loci_analyze",
+    "loci_explore",
+    "loci_file",
+    "loci_get",
+    "loci_graph_anchors",
+    "loci_graph_calls",
+    "loci_graph_health",
+    "loci_graph_imports",
+    "loci_graph_neighbors",
+    "loci_graph_paths",
+    "loci_graph_references",
+    "loci_graph_retrieve",
+    "loci_graph_traverse_neighbors",
+    "loci_grep",
+    "loci_index",
+    "loci_list",
+    "loci_outline",
+    "loci_search",
+    "loci_stats",
+    "loci_store_health",
+    "loci_verify",
+})
+_NORMAL_TOOL_NAMES = frozenset({"loci_retrieve", "loci_read"})
+_NORMAL_ARGUMENTS = {
+    "loci_retrieve": frozenset({"repo", "query", "seed_ids"}),
+    "loci_read": frozenset({"repo", "source_ref"}),
+}
 GraphDirection = Literal["incoming", "outgoing", "either"]
 _service_module: ModuleType | None = None
 
@@ -116,6 +146,12 @@ def _normalize_repository_arguments(
     tool_name: str,
     arguments: dict[str, Any],
 ) -> dict[str, Any]:
+    if tool_name in _NORMAL_ARGUMENTS:
+        unexpected = sorted(set(arguments) - _NORMAL_ARGUMENTS[tool_name])
+        if unexpected:
+            raise ToolError(
+                f"{tool_name} received unsupported arguments: {', '.join(unexpected)}"
+            )
     if tool_name not in _LEGACY_PATH_PARAMETER_TOOLS or "path" not in arguments:
         return arguments
     if "repo" in arguments:
@@ -127,10 +163,46 @@ def _normalize_repository_arguments(
     return normalized
 
 
-def create_server() -> MCPServer:
+def _configured_surface() -> Literal["normal", "diagnostic"]:
+    value = os.environ.get("LOCI_MCP_SURFACE", "normal")
+    if value in {"normal", "diagnostic"}:
+        return cast(Literal["normal", "diagnostic"], value)
+    raise ValueError(
+        "LOCI_MCP_SURFACE must be either 'normal' or 'diagnostic'"
+    )
+
+
+def _validate_normal_retrieve_request(query: str, seed_ids: list[str] | None) -> None:
+    try:
+        query_bytes = len(query.encode("utf-8"))
+    except UnicodeEncodeError as exc:
+        raise ToolError("query must be valid UTF-8") from exc
+    if query_bytes > 4096:
+        raise ToolError("query must be at most 4096 UTF-8 bytes")
+    if not query.strip() and not seed_ids:
+        raise ToolError("loci_retrieve requires a nonblank query or at least one seed_id")
+    if seed_ids is not None:
+        if len(seed_ids) > 5:
+            raise ToolError("seed_ids must contain at most five IDs")
+        if any(not seed_id for seed_id in seed_ids):
+            raise ToolError("seed_ids must contain only nonempty IDs")
+        if len(set(seed_ids)) != len(seed_ids):
+            raise ToolError("seed_ids must be unique")
+
+
+def create_server(
+    surface: Literal["normal", "diagnostic"] | None = None,
+) -> MCPServer:
+    selected_surface = _configured_surface() if surface is None else surface
+    if selected_surface not in {"normal", "diagnostic"}:
+        raise ValueError("surface must be either 'normal' or 'diagnostic'")
     mcp = LociMCP(
         "loci",
         instructions=(
+            "Retrieve deterministic bounded source context and expand exact returned "
+            "source extents from the loci cache."
+            if selected_surface == "normal"
+            else
             "Local code navigation server. Index local repositories, inspect symbol "
             "outlines, retrieve exact symbol source, select explained graph anchors, "
             "inspect exact or filtered graph neighbours, retrieve evidence-backed "
@@ -138,6 +210,61 @@ def create_server() -> MCPServer:
             "from the loci cache."
         ),
     )
+
+    @mcp.tool()
+    def loci_retrieve(
+        repo: Annotated[str, Field(strict=True, min_length=1)],
+        query: Annotated[
+            str,
+            Field(strict=True, json_schema_extra={"x-maxUtf8Bytes": 4096}),
+        ] = "",
+        seed_ids: Annotated[
+            list[Annotated[str, Field(strict=True, min_length=1)]] | None,
+            Field(
+                default=None,
+                max_length=5,
+                json_schema_extra={"uniqueItems": True},
+            ),
+        ] = None,
+    ) -> Annotated[CallToolResult, LociRetrieveOutput]:
+        """Retrieve deterministic bounded static source context.
+
+        Provide a query or up to five exact seed IDs returned earlier. An exact
+        indexed relative file path in ``query`` selects that file; other queries
+        select bounded source candidates. The repository refreshes automatically.
+        Results include source, relationship proof, ambiguity and omissions. Use
+        an incomplete item's ``source_ref`` with ``loci_read`` to hydrate its
+        exact source, or pass a returned node ID as a seed to re-anchor under the
+        same fixed policy. Relationships are static and non-exhaustive.
+        """
+        _validate_normal_retrieve_request(query, seed_ids)
+        return _handle_loci_error(
+            lambda service: service.retrieve(
+                repo,
+                query=query,
+                seed_ids=seed_ids,
+                ensure_fresh=True,
+            )
+        )
+
+    @mcp.tool()
+    def loci_read(
+        repo: Annotated[str, Field(strict=True, min_length=1)],
+        source_ref: Annotated[str, Field(strict=True, min_length=1)],
+    ) -> Annotated[CallToolResult, LociReadOutput]:
+        """Expand one exact source extent named by a returned ``source_ref``.
+
+        Follow ``next_source_ref`` until it is null to page an incomplete extent.
+        ``SOURCE_STALE`` means the indexed source changed; make a fresh
+        ``loci_retrieve`` request instead of reusing the old locator.
+        """
+        return _handle_loci_error(
+            lambda service: service.read(
+                repo,
+                source_ref,
+                ensure_fresh=True,
+            )
+        )
 
     @mcp.tool()
     def loci_index(
@@ -593,6 +720,12 @@ def create_server() -> MCPServer:
             lambda service: service.analyze_usage(repo=repo, since_days=since_days)
         )
 
+    if selected_surface == "normal":
+        for tool_name in _DIAGNOSTIC_TOOL_NAMES:
+            mcp._tool_manager.remove_tool(tool_name)
+    else:
+        for tool_name in _NORMAL_TOOL_NAMES:
+            mcp._tool_manager.remove_tool(tool_name)
     return mcp
 
 

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import fcntl
 import json
 import os
+import time
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -11,12 +13,16 @@ from loci.storage.store_layout import canonical_repository_cache_key
 
 
 CATALOG_SCHEMA_VERSION = 1
+PENDING_MUTATION_SCHEMA_VERSION = 2
 REPOSITORY_METADATA_SCHEMA_VERSION = 1
 CATALOG_FILE_NAME = ".loci-repositories.json"
 PENDING_MUTATION_FILE_NAME = ".loci-repositories.pending.json"
+MUTATION_LOCK_FILE_NAME = ".loci-repositories.lock"
 REPOSITORY_METADATA_FILE_NAME = ".loci-repository.json"
 DEFAULT_MAX_REPOSITORIES = 1024
 DEFAULT_MAX_TOTAL_INDEX_BYTES = 2 * 1024 * 1024 * 1024
+DEFAULT_LIVE_MUTATION_WAIT_SECONDS = 1.0
+LIVE_MUTATION_POLL_SECONDS = 0.01
 _MAX_METADATA_TOKEN_CHARS = 64 * 1024
 
 
@@ -86,6 +92,9 @@ class RepositoryCatalog:
         self.base_dir = base_dir
         self.catalog_path = base_dir / CATALOG_FILE_NAME
         self.pending_path = base_dir / PENDING_MUTATION_FILE_NAME
+        self.mutation_lock_path = base_dir / MUTATION_LOCK_FILE_NAME
+        self._mutation_lock_fd: int | None = None
+        self._mutation_token: str | None = None
 
     def list_entries(self) -> list[dict[str, Any]]:
         entries = self.entries_for_mutation()
@@ -94,9 +103,22 @@ class RepositoryCatalog:
             for cache_key in sorted(entries)
         ]
 
-    def entries_for_mutation(self) -> dict[str, RepositoryCatalogEntry]:
-        if self.pending_path.exists():
-            raise self._repair_required("an interrupted catalog mutation is pending")
+    def entries_for_mutation(
+        self,
+        *,
+        owner_token: str | None = None,
+    ) -> dict[str, RepositoryCatalogEntry]:
+        if owner_token is not None and owner_token == self._mutation_token:
+            return self._entries_unlocked()
+        fd = self._acquire_lock(exclusive=False)
+        try:
+            if self.pending_path.exists():
+                raise self._repair_required("an interrupted catalog mutation is pending")
+            return self._entries_unlocked()
+        finally:
+            self._release_lock(fd)
+
+    def _entries_unlocked(self) -> dict[str, RepositoryCatalogEntry]:
         if not self.catalog_path.exists():
             legacy_keys = self._repository_cache_keys()
             if legacy_keys:
@@ -114,34 +136,30 @@ class RepositoryCatalog:
                 error=str(exc),
             ) from exc
 
-    def begin_mutation(self, operation: str, cache_key: str | None = None) -> None:
+    def begin_mutation(self, operation: str, cache_key: str | None = None) -> str:
+        """Serialize a catalog mutation and return its unforgeable owner token."""
+        if operation not in {"write", "invalidate", "cleanup", "repair"}:
+            raise ValueError(f"unsupported catalog mutation operation: {operation}")
+
+        owner_token = uuid.uuid4().hex
+        self._acquire_lock(exclusive=True, owner_token=owner_token)
+        if self.pending_path.exists():
+            self._release_owned_lock(owner_token)
+            raise self._repair_required("an interrupted catalog mutation is pending")
         marker = {
-            "schema_version": CATALOG_SCHEMA_VERSION,
+            "schema_version": PENDING_MUTATION_SCHEMA_VERSION,
             "operation": operation,
+            "owner_pid": os.getpid(),
+            "owner_token": owner_token,
         }
         if cache_key is not None:
             marker["cache_key"] = cache_key
-        payload = (json.dumps(marker, sort_keys=True) + "\n").encode("utf-8")
         try:
-            fd = os.open(
-                self.pending_path,
-                os.O_CREAT | os.O_EXCL | os.O_WRONLY,
-                0o600,
-            )
-        except FileExistsError as exc:
-            raise self._repair_required(
-                "an interrupted catalog mutation is already pending"
-            ) from exc
-        try:
-            with os.fdopen(fd, "wb") as handle:
-                handle.write(payload)
-                handle.flush()
-                os.fsync(handle.fileno())
-            _fsync_directory(self.base_dir)
+            self._publish_marker(marker)
         except BaseException:
-            # A partial marker deliberately remains visible. Repair treats even a
-            # malformed marker as evidence that normal inventory is unsafe.
+            self._release_owned_lock(owner_token)
             raise
+        return owner_token
 
     def commit(
         self,
@@ -156,9 +174,28 @@ class RepositoryCatalog:
         }
         _atomic_write_json(self.catalog_path, payload)
 
-    def finish_mutation(self) -> None:
-        self.pending_path.unlink(missing_ok=True)
-        _fsync_directory(self.base_dir)
+    def finish_mutation(self, owner_token: str) -> None:
+        marker = self._pending_marker()
+        if (
+            owner_token != self._mutation_token
+            or marker is None
+            or marker["owner_token"] != owner_token
+        ):
+            raise RepositoryCatalogError(
+                "REPOSITORY_CATALOG_MUTATION_OWNER_MISMATCH",
+                "Only the owner may finish a catalog mutation",
+                {"pending": str(self.pending_path)},
+            )
+        try:
+            self.pending_path.unlink()
+            _fsync_directory(self.base_dir)
+        finally:
+            self._release_owned_lock(owner_token)
+
+    def abandon_mutation(self, owner_token: str) -> None:
+        """Leave durable crash evidence while marking this local owner inactive."""
+        if owner_token == self._mutation_token:
+            self._release_owned_lock(owner_token)
 
     def write_repository_metadata(self, entry: RepositoryCatalogEntry) -> None:
         metadata_path = (
@@ -190,10 +227,26 @@ class RepositoryCatalog:
                 },
             )
 
-        created_repair_marker = False
-        if not self.pending_path.exists():
-            self.begin_mutation("repair")
-            created_repair_marker = True
+        repair_token = uuid.uuid4().hex
+        self._acquire_lock(exclusive=True, owner_token=repair_token)
+        inherited_marker: bytes | None = None
+        owns_marker = False
+        try:
+            if self.pending_path.exists():
+                # The exclusive lock proves the marker is no longer owned by a
+                # live normal mutation. Retain it until repair commits.
+                inherited_marker = self.pending_path.read_bytes()
+            else:
+                self._publish_marker({
+                    "schema_version": PENDING_MUTATION_SCHEMA_VERSION,
+                    "operation": "repair",
+                    "owner_pid": os.getpid(),
+                    "owner_token": repair_token,
+                })
+                owns_marker = True
+        except BaseException:
+            self._release_owned_lock(repair_token)
+            raise
 
         try:
             repo_dirs = self._repository_directories()
@@ -243,18 +296,28 @@ class RepositoryCatalog:
                 metadata_entries[repo_dir.name] = entry
                 parsed_entries.append(entry)
         except BaseException:
-            if created_repair_marker:
-                self.finish_mutation()
+            if owns_marker:
+                self.finish_mutation(repair_token)
+            else:
+                self._release_owned_lock(repair_token)
             raise
 
         try:
             for entry in parsed_entries:
                 self.write_repository_metadata(entry)
             self.commit(metadata_entries)
-            self.finish_mutation()
+            if owns_marker:
+                self.finish_mutation(repair_token)
+            else:
+                self._finish_repaired_marker(inherited_marker)
+                self._release_owned_lock(repair_token)
         except BaseException:
             # Whether inherited from an interrupted mutation or created above,
             # the marker remains until a later deterministic repair succeeds.
+            if owns_marker:
+                self.abandon_mutation(repair_token)
+            else:
+                self._release_owned_lock(repair_token)
             raise
 
         return {
@@ -348,6 +411,113 @@ class RepositoryCatalog:
         if not isinstance(cache_key, str) or not cache_key:
             return None, False
         return cache_key, True
+
+    def _acquire_lock(
+        self,
+        *,
+        exclusive: bool,
+        owner_token: str | None = None,
+    ) -> int:
+        if owner_token is not None and self._mutation_lock_fd is not None:
+            raise RepositoryCatalogError(
+                "REPOSITORY_CATALOG_BUSY",
+                "A live catalog mutation is still in progress",
+                {"retry_after_seconds": LIVE_MUTATION_POLL_SECONDS},
+            )
+        fd = os.open(self.mutation_lock_path, os.O_CREAT | os.O_RDWR, 0o600)
+        operation = fcntl.LOCK_EX if exclusive else fcntl.LOCK_SH
+        deadline = time.monotonic() + DEFAULT_LIVE_MUTATION_WAIT_SECONDS
+        while True:
+            try:
+                fcntl.flock(fd, operation | fcntl.LOCK_NB)
+                break
+            except BlockingIOError:
+                if time.monotonic() >= deadline:
+                    os.close(fd)
+                    raise RepositoryCatalogError(
+                        "REPOSITORY_CATALOG_BUSY",
+                        "A live catalog mutation is still in progress",
+                        {"retry_after_seconds": LIVE_MUTATION_POLL_SECONDS},
+                    )
+                time.sleep(LIVE_MUTATION_POLL_SECONDS)
+        if owner_token is not None:
+            self._mutation_lock_fd = fd
+            self._mutation_token = owner_token
+        return fd
+
+    def _release_lock(self, fd: int) -> None:
+        try:
+            fcntl.flock(fd, fcntl.LOCK_UN)
+        finally:
+            os.close(fd)
+
+    def _release_owned_lock(self, owner_token: str) -> None:
+        if owner_token != self._mutation_token or self._mutation_lock_fd is None:
+            return
+        fd = self._mutation_lock_fd
+        self._mutation_lock_fd = None
+        self._mutation_token = None
+        self._release_lock(fd)
+
+    def _publish_marker(self, marker: Mapping[str, Any]) -> None:
+        payload = (json.dumps(marker, sort_keys=True) + "\n").encode("utf-8")
+        temporary_path = self.pending_path.with_name(
+            f"{self.pending_path.name}.{uuid.uuid4().hex}.tmp"
+        )
+        try:
+            fd = os.open(temporary_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+            with os.fdopen(fd, "wb") as handle:
+                handle.write(payload)
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.link(temporary_path, self.pending_path)
+            _fsync_directory(self.base_dir)
+        finally:
+            temporary_path.unlink(missing_ok=True)
+
+    def _pending_marker(self) -> dict[str, Any] | None:
+        try:
+            raw = json.loads(self.pending_path.read_text(encoding="utf-8"))
+        except FileNotFoundError:
+            return None
+        except (OSError, UnicodeError, json.JSONDecodeError):
+            return None
+        if not isinstance(raw, Mapping):
+            return None
+        if raw.get("schema_version") != PENDING_MUTATION_SCHEMA_VERSION:
+            return None
+        operation = raw.get("operation")
+        owner_pid = raw.get("owner_pid")
+        owner_token = raw.get("owner_token")
+        if (
+            operation not in {"write", "invalidate", "cleanup", "repair"}
+            or isinstance(owner_pid, bool)
+            or not isinstance(owner_pid, int)
+            or owner_pid <= 0
+            or not isinstance(owner_token, str)
+            or not owner_token
+        ):
+            return None
+        return {
+            "operation": operation,
+            "owner_pid": owner_pid,
+            "owner_token": owner_token,
+        }
+
+    def _finish_repaired_marker(self, inherited_marker: bytes | None) -> None:
+        if inherited_marker is None:
+            raise AssertionError("repair must retain the inherited marker")
+        try:
+            current_marker = self.pending_path.read_bytes()
+        except OSError as exc:
+            raise self._repair_required(
+                "the pending catalog marker changed during repair",
+                error=str(exc),
+            ) from exc
+        if current_marker != inherited_marker:
+            raise self._repair_required("the pending catalog marker changed during repair")
+        self.pending_path.unlink()
+        _fsync_directory(self.base_dir)
 
     def _read_legacy_index_metadata(
         self,

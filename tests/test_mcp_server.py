@@ -20,6 +20,7 @@ from loci.storage.store_identity import initialize_store
 @pytest.fixture(autouse=True)
 def _explicit_test_store_namespace(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("LOCI_STORE_NAMESPACE", "test")
+    monkeypatch.setenv("LOCI_MCP_SURFACE", "diagnostic")
 
 
 def _stderr_json_records(stderr: str) -> list[dict[str, Any]]:

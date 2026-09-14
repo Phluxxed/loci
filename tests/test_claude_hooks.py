@@ -181,6 +181,9 @@ def test_installer_registers_answer_equivalent_enforcement_for_read_and_bash(
 
     assert result.returncode == 0, result.stderr
     pre_tool_use = json.loads(settings.read_text())["hooks"]["PreToolUse"]
+    installed_skill = claude_dir / "skills" / "loci"
+    assert (installed_skill / "SKILL.md").resolve() == (REPO_ROOT / "skills" / "loci" / "SKILL.md").resolve()
+    assert (installed_skill / "references").resolve() == (REPO_ROOT / "skills" / "loci" / "references").resolve()
     by_matcher = {entry["matcher"]: entry["hooks"] for entry in pre_tool_use}
     for matcher in ("Read", "Bash"):
         enforce_hooks = [

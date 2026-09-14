@@ -75,6 +75,9 @@ or model classification is used. Stop after 32 MiB scanned bytes, 4096 files or
 256 matching locations and report unscanned work. Literal matching is a fallback
 for anchor discovery only; it never changes graph eligibility or traversal.
 Unsupported files remain outside indexed-source coverage, as today.
+Markdown uses its existing page-root section identity in place of a synthetic
+file node. The index's file hashes define indexed file eligibility in all
+languages; a missing zero-width file node does not make Markdown unavailable.
 
 Report source coverage from the index and the actual matching scope. Empty or
 bounded matching never claims repository-wide absence. Refresh failure returns

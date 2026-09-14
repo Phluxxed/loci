@@ -207,33 +207,53 @@ class IndexStore:
         return h.hexdigest()
 
     def _cleanup_missing_repositories(self) -> None:
-        try:
-            catalog_entries = self._catalog.entries_for_mutation()
-        except RepositoryCatalogError:
-            # Existing catalog recovery remains the normal explicit repair path;
-            # startup cleanup must not race or mask an interrupted mutation.
-            return
-
         removed_count = 0
         removed_bytes = 0
-        for cache_key in sorted(catalog_entries):
-            entry = catalog_entries[cache_key]
-            if Path(entry.path).exists():
-                continue
-
+        while True:
             try:
-                self._catalog.begin_mutation("cleanup", cache_key)
+                snapshot = self._catalog.entries_for_mutation()
             except RepositoryCatalogError:
-                # A concurrent writer owns the catalog mutation marker. Leave
-                # the remaining entries for the next normal store open.
+                # Existing catalog recovery remains the normal explicit repair path;
+                # startup cleanup must not race or mask an interrupted mutation.
+                return
+            stale_key = next(
+                (
+                    cache_key
+                    for cache_key in sorted(snapshot)
+                    if not Path(snapshot[cache_key].path).exists()
+                ),
+                None,
+            )
+            if stale_key is None:
                 break
-            repo_dir = self.base_dir / cache_key
-            cache_bytes = _directory_file_bytes(repo_dir)
-            if repo_dir.exists():
-                shutil.rmtree(repo_dir)
-            catalog_entries.pop(cache_key)
-            self._catalog.commit(catalog_entries)
-            self._catalog.finish_mutation()
+            try:
+                token = self._catalog.begin_mutation("cleanup", stale_key)
+            except RepositoryCatalogError:
+                # Another store acquired the marker after our read-only
+                # snapshot. Leave cleanup to its next startup pass.
+                break
+            try:
+                catalog_entries = self._catalog.entries_for_mutation(
+                    owner_token=token
+                )
+                entry = catalog_entries.get(stale_key)
+                if entry is None or Path(entry.path).exists():
+                    self._catalog.finish_mutation(token)
+                    continue
+            except BaseException:
+                self._catalog.finish_mutation(token)
+                raise
+            try:
+                repo_dir = self.base_dir / stale_key
+                cache_bytes = _directory_file_bytes(repo_dir)
+                if repo_dir.exists():
+                    shutil.rmtree(repo_dir)
+                catalog_entries.pop(stale_key)
+                self._catalog.commit(catalog_entries)
+                self._catalog.finish_mutation(token)
+            except BaseException:
+                self._catalog.abandon_mutation(token)
+                raise
             removed_count += 1
             removed_bytes += cache_bytes
 
@@ -268,58 +288,66 @@ class IndexStore:
         )
 
         cache_key = self._cache_key(repo_path)
-        catalog_entries = self._catalog.entries_for_mutation()
-        self.ensure_root_available(repo_path, catalog_entries=catalog_entries)
-        self._catalog.begin_mutation("write", cache_key)
+        token = self._catalog.begin_mutation("write", cache_key)
+        try:
+            catalog_entries = self._catalog.entries_for_mutation(owner_token=token)
+            self.ensure_root_available(repo_path, catalog_entries=catalog_entries)
+        except BaseException:
+            self._catalog.finish_mutation(token)
+            raise
 
-        repo_dir = self._repo_dir(repo_path)
-        repo_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            repo_dir = self._repo_dir(repo_path)
+            repo_dir.mkdir(parents=True, exist_ok=True)
 
-        # Mirror source files
-        sources_dir = self._sources_dir(repo_path)
-        tmp_sources_dir = sources_dir.with_name(f"{sources_dir.name}.tmp")
-        if tmp_sources_dir.exists():
-            shutil.rmtree(tmp_sources_dir)
-        tmp_sources_dir.mkdir(parents=True, exist_ok=True)
-        # Copy once per file: copy2 preserves read-only modes, so a repeated
-        # copy for another symbol would try to overwrite a read-only mirror.
-        for file_path in dict.fromkeys(sym.file_path for sym in symbols):
-            src = repo_path / file_path
-            if src.exists():
-                dest = tmp_sources_dir / file_path
-                dest.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(src, dest)
-        if sources_dir.exists():
-            shutil.rmtree(sources_dir)
-        tmp_sources_dir.replace(sources_dir)
+            # Mirror source files
+            sources_dir = self._sources_dir(repo_path)
+            tmp_sources_dir = sources_dir.with_name(f"{sources_dir.name}.tmp")
+            if tmp_sources_dir.exists():
+                shutil.rmtree(tmp_sources_dir)
+            tmp_sources_dir.mkdir(parents=True, exist_ok=True)
+            # Copy once per file: copy2 preserves read-only modes, so a repeated
+            # copy for another symbol would try to overwrite a read-only mirror.
+            for file_path in dict.fromkeys(sym.file_path for sym in symbols):
+                src = repo_path / file_path
+                if src.exists():
+                    dest = tmp_sources_dir / file_path
+                    dest.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(src, dest)
+            if sources_dir.exists():
+                shutil.rmtree(sources_dir)
+            tmp_sources_dir.replace(sources_dir)
 
-        # Atomic write: temp file + rename
-        index_data = {
-            "schema_version": INDEX_SCHEMA_VERSION,
-            "extractor_version": EXTRACTOR_VERSION,
-            "graph_resolver_version": GRAPH_RESOLVER_VERSION,
-            "symbols": [s.to_dict() for s in symbols],
-            "file_hashes": file_hashes,
-            "repo_path": str(
-                Path(self._canonical_repo(str(repo_path))).resolve()
-            ),
-            "graph": persisted_graph.to_dict(),
-        }
-        if coverage is not None:
-            index_data["coverage"] = dict(coverage)
-        index_path = self._index_path(repo_path)
-        tmp_path = index_path.with_suffix(".tmp")
-        tmp_path.write_text(json.dumps(index_data, indent=2))
-        tmp_path.replace(index_path)
-        catalog_entry = RepositoryCatalogEntry(
-            cache_key=cache_key,
-            symbols=len(symbols),
-            path=str(Path(self._canonical_repo(str(repo_path))).resolve()),
-        )
-        self._catalog.write_repository_metadata(catalog_entry)
-        catalog_entries[cache_key] = catalog_entry
-        self._catalog.commit(catalog_entries)
-        self._catalog.finish_mutation()
+            # Atomic write: temp file + rename
+            index_data = {
+                "schema_version": INDEX_SCHEMA_VERSION,
+                "extractor_version": EXTRACTOR_VERSION,
+                "graph_resolver_version": GRAPH_RESOLVER_VERSION,
+                "symbols": [s.to_dict() for s in symbols],
+                "file_hashes": file_hashes,
+                "repo_path": str(
+                    Path(self._canonical_repo(str(repo_path))).resolve()
+                ),
+                "graph": persisted_graph.to_dict(),
+            }
+            if coverage is not None:
+                index_data["coverage"] = dict(coverage)
+            index_path = self._index_path(repo_path)
+            tmp_path = index_path.with_suffix(".tmp")
+            tmp_path.write_text(json.dumps(index_data, indent=2))
+            tmp_path.replace(index_path)
+            catalog_entry = RepositoryCatalogEntry(
+                cache_key=cache_key,
+                symbols=len(symbols),
+                path=str(Path(self._canonical_repo(str(repo_path))).resolve()),
+            )
+            self._catalog.write_repository_metadata(catalog_entry)
+            catalog_entries[cache_key] = catalog_entry
+            self._catalog.commit(catalog_entries)
+            self._catalog.finish_mutation(token)
+        except BaseException:
+            self._catalog.abandon_mutation(token)
+            raise
 
     def load(self, repo_path: Path) -> Optional[dict[str, Any]]:
         index_path = self._index_path(repo_path)
@@ -773,15 +801,24 @@ class IndexStore:
     def invalidate(self, repo_path: Path) -> None:
         repo_dir = self._repo_dir(repo_path)
         cache_key = self._cache_key(repo_path)
-        catalog_entries = self._catalog.entries_for_mutation()
-        if not repo_dir.exists() and cache_key not in catalog_entries:
-            return
-        self._catalog.begin_mutation("invalidate", cache_key)
-        if repo_dir.exists():
-            shutil.rmtree(repo_dir)
-        catalog_entries.pop(cache_key, None)
-        self._catalog.commit(catalog_entries)
-        self._catalog.finish_mutation()
+        token = self._catalog.begin_mutation("invalidate", cache_key)
+        try:
+            catalog_entries = self._catalog.entries_for_mutation(owner_token=token)
+            if not repo_dir.exists() and cache_key not in catalog_entries:
+                self._catalog.finish_mutation(token)
+                return
+        except BaseException:
+            self._catalog.finish_mutation(token)
+            raise
+        try:
+            if repo_dir.exists():
+                shutil.rmtree(repo_dir)
+            catalog_entries.pop(cache_key, None)
+            self._catalog.commit(catalog_entries)
+            self._catalog.finish_mutation(token)
+        except BaseException:
+            self._catalog.abandon_mutation(token)
+            raise
 
     def verify_index(self, repo_path: Path) -> dict[str, Any]:
         """Check indexed symbol spans and synthetic-node anchor hashes.

@@ -11,8 +11,8 @@ def test_first_party_guidance_uses_canonical_repository_parameter() -> None:
     ]
     for path in skill_paths:
         text = path.read_text()
-        assert "loci_index(repo, incremental=true)" in text
-        assert "loci_outline(repo)" in text
+        assert "loci_retrieve(repo," in text
+        assert "loci_read(repo," in text
         assert "loci_index(path" not in text
         assert "loci_outline(path" not in text
 

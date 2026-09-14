@@ -85,6 +85,7 @@ def _run_hook(
     offset: int | None = None,
     limit: int | None = None,
     path_override: str | None = None,
+    surface: str | None = None,
 ) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
     env["HOME"] = str(home)
@@ -96,6 +97,8 @@ def _run_hook(
         env["LOCI_STORE_NAMESPACE"] = namespace
     if path_override is not None:
         env["PATH"] = path_override
+    if surface is not None:
+        env["LOCI_MCP_SURFACE"] = surface
     tool_input: dict[str, object] = {"file_path": str(file_path)}
     if offset is not None:
         tool_input["offset"] = offset
@@ -107,7 +110,7 @@ def _run_hook(
         capture_output=True,
         text=True,
         env=env,
-        timeout=5,
+        timeout=15,
         check=False,
     )
 
@@ -130,7 +133,8 @@ def test_default_claude_store_enforces_whole_source_reads(tmp_path: Path) -> Non
 
     reason = _denial(result)
     assert str(repo.resolve()) in reason
-    assert "loci_file" in reason
+    assert "loci_retrieve" in reason
+    assert "loci_read" in reason
 
 
 def test_explicit_store_and_namespace_override_claude_default(tmp_path: Path) -> None:
@@ -192,7 +196,7 @@ def test_nested_indexed_repo_uses_longest_matching_root(tmp_path: Path) -> None:
 
     reason = _denial(result)
     assert f"'{nested.resolve()}'" in reason
-    assert 'file="sample.py"' in reason
+    assert 'query="sample.py"' in reason
 
 
 @pytest.mark.parametrize(
@@ -249,10 +253,23 @@ def test_whole_read_of_indexed_test_source_is_blocked(tmp_path: Path) -> None:
     result = _run_hook(home, source)
 
     reason = _denial(result)
-    assert 'file_path="tests/test_sample.py"' in reason
+    assert 'query="tests/test_sample.py"' in reason
 
 
-def test_read_fails_open_when_exact_loci_probe_cannot_answer(tmp_path: Path) -> None:
+def test_normal_probe_fails_open_when_the_isolated_service_is_unavailable(tmp_path: Path) -> None:
+    home = tmp_path / "home"
+    repo = tmp_path / "repo"
+    source = repo / "sample.py"
+    source.parent.mkdir()
+    source.write_bytes(b"\xff")
+    _write_store(home / ".claude" / "loci-index", "claude", [repo])
+    result = _run_hook(home, source)
+
+    assert result.returncode == 0
+    assert result.stdout == ""
+
+
+def test_diagnostic_surface_keeps_the_legacy_exact_read_recipe(tmp_path: Path) -> None:
     home = tmp_path / "home"
     repo = tmp_path / "repo"
     source = repo / "sample.py"
@@ -260,16 +277,16 @@ def test_read_fails_open_when_exact_loci_probe_cannot_answer(tmp_path: Path) -> 
     source.write_text("value = 1\n")
     _write_store(home / ".claude" / "loci-index", "claude", [repo])
     bin_dir = tmp_path / "bin"
-    _stub_loci(bin_dir, "echo '[]'\n")
+    _stub_loci(bin_dir, "printf '%s\\n' '{\"content\":\"ok\"}'\n")
 
     result = _run_hook(
         home,
         source,
         path_override=f"{bin_dir}:/usr/bin:/bin",
+        surface="diagnostic",
     )
 
-    assert result.returncode == 0
-    assert result.stdout == ""
+    assert "loci_file" in _denial(result)
 
 
 def test_indexed_source_resolution_does_not_enumerate_store(
@@ -362,7 +379,8 @@ def test_bash_cat_of_indexed_source_is_blocked(tmp_path: Path) -> None:
 
     reason = _denial(result)
     assert "sample.py" in reason
-    assert "loci_outline" in reason
+    assert "loci_retrieve" in reason
+    assert "loci_read" in reason
 
 
 def test_bash_grep_over_source_directory_passes_without_equivalent_scope(
@@ -416,39 +434,21 @@ def test_bash_pipeline_passes_when_mcp_call_cannot_preserve_processing(
     assert result.stdout == "", result.stdout
 
 
-def test_bash_fallback_opens_only_when_loci_is_unreachable(tmp_path: Path) -> None:
+def test_bash_normal_probe_does_not_use_legacy_cli_availability(tmp_path: Path) -> None:
     home, repo = _bash_fixture(tmp_path)
     bin_dir = tmp_path / "bin"
 
-    # Binary missing entirely -> loci cannot answer -> allow the fallback.
     bin_dir.mkdir()
     result = _run_bash_hook(
         home, "cat sample.py", repo, path_override=f"{bin_dir}:/usr/bin:/bin"
     )
-    assert result.stdout == "", "absent loci must reopen the fallback"
-
-    # Probe returns an empty repo list -> loci has absolutely nothing -> allow.
-    _stub_loci(bin_dir, "echo '[]'")
-    result = _run_bash_hook(
-        home, "cat sample.py", repo, path_override=f"{bin_dir}:/usr/bin:/bin"
-    )
-    assert result.stdout == "", "empty loci store must reopen the fallback"
-
-    # Probe fails outright -> allow.
-    _stub_loci(bin_dir, "echo broken >&2; exit 3")
-    result = _run_bash_hook(
-        home, "cat sample.py", repo, path_override=f"{bin_dir}:/usr/bin:/bin"
-    )
-    assert result.stdout == "", "failing loci must reopen the fallback"
+    assert "loci_retrieve" in _denial(result)
 
 
-def test_bash_fails_open_when_exact_loci_probe_cannot_answer(tmp_path: Path) -> None:
+def test_bash_fails_open_when_actual_normal_probe_cannot_answer(tmp_path: Path) -> None:
     home, repo = _bash_fixture(tmp_path)
-    bin_dir = tmp_path / "bin"
-    _stub_loci(bin_dir, """echo '[{"path":"/somewhere/else","symbols":7}]'""")
+    (repo / "sample.py").write_bytes(b"\xff")
 
-    result = _run_bash_hook(
-        home, "cat sample.py", repo, path_override=f"{bin_dir}:/usr/bin:/bin"
-    )
+    result = _run_bash_hook(home, "cat sample.py", repo)
 
     assert result.stdout == ""

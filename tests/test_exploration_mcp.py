@@ -32,6 +32,7 @@ def _server_params(repo: Path, cache: Path) -> StdioServerParameters:
     env = os.environ.copy()
     env["LOCI_BASE_DIR"] = str(cache)
     env["LOCI_STORE_NAMESPACE"] = "test"
+    env["LOCI_MCP_SURFACE"] = "diagnostic"
     env["PYTHONPATH"] = str(Path.cwd() / "src")
     return StdioServerParameters(
         command=sys.executable,

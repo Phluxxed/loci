@@ -1,5 +1,11 @@
 # Language-specific resolution
 
+Normal `loci_retrieve` composes existing proved calls, types, values and imports
+without an agent-selected intent. The resolver limits below still apply to its
+relationships. Recipes naming `loci_explore`, `loci_graph_*` or exact legacy tools
+refer to the operator diagnostic surface; intent-specific exploration coverage
+does not restrict the new normal policy's eligible stored edge families.
+
 ## Contents
 
 - Exploration capabilities

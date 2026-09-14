@@ -15,6 +15,7 @@ def _server_params(cache_dir: Path) -> StdioServerParameters:
     env = os.environ.copy()
     env["LOCI_BASE_DIR"] = str(cache_dir)
     env["LOCI_STORE_NAMESPACE"] = "resolver-control-mcp"
+    env["LOCI_MCP_SURFACE"] = "diagnostic"
     env["PYTHONPATH"] = str(Path.cwd() / "src")
     return StdioServerParameters(
         command=sys.executable,

@@ -59,6 +59,7 @@ def test_loci_explore_wire_bytes_preserve_unicode_clipped_source() -> None:
         env.update({
             "LOCI_BASE_DIR": str(cache),
             "LOCI_STORE_NAMESPACE": "wire-test",
+            "LOCI_MCP_SURFACE": "diagnostic",
             "PYTHONPATH": str(Path(__file__).resolve().parents[1] / "src"),
         })
         process = subprocess.Popen(

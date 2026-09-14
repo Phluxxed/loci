@@ -58,7 +58,7 @@ def test_mcp_get_type_context_is_opt_in_scoped_and_fresh(
         encoding="utf-8",
     )
 
-    server = create_server()
+    server = create_server("diagnostic")
     indexed = _call(
         server,
         "loci_index",

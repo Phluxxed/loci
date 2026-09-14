@@ -7,6 +7,13 @@
 
 Prefer MCP for normal work. Configure it before relying on the CLI.
 
+The default server surface is `normal`: `loci_retrieve` and `loci_read`.
+Leave `LOCI_MCP_SURFACE` unset or set it to `normal`. An operator may run a
+separate diagnostic process with `LOCI_MCP_SURFACE=diagnostic` for the legacy
+navigation, maintenance and graph utilities below. Agents do not switch to
+that surface as a retrieval strategy. Invalid values fail startup. Updating
+source does not replace the catalog already loaded in an existing host.
+
 ## MCP host setup
 
 For Claude Code:
@@ -89,9 +96,11 @@ restart. Choose the actual repository/workspace path.
 | `loci store health [--offset N] [--limit N] [--max-catalog-bytes N] [--max-index-bytes N] [--max-probe-paths N] [--max-probe-bytes N]` | Diagnosing store health without repair, refresh, rewrite, prune, or cleanup |
 | `loci store repair-catalog [--max-repositories N] [--max-total-index-bytes N]` | Explicitly repairing legacy, corrupt, or interrupted inventory |
 
-There is no CLI import, reference, or call command. Use the graph MCP tools
+These CLI routes are compatibility tooling and do not implement the normal
+deterministic context policy. Report that limitation when using the temporary
+bridge. There is no CLI import, reference, or call command. Use diagnostic graph MCP tools
 for dependency, symbol-reference, and call traversal and diagnostics.
 
-Use the MCP utility `loci_list` to list repositories present in the active
+In the diagnostic surface, use `loci_list` to list repositories present in the active
 store; use `loci_stats` for structured retrieval/savings statistics and
 `loci_verify` for index integrity/content-drift checks.

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import PurePosixPath
-from typing import Any, Literal, get_args
+from typing import Annotated, Any, Literal, get_args
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, RootModel, model_validator
 from loci.parser.type_models import valid_type_import_path
@@ -1772,4 +1772,299 @@ class LociExploreSuccess(StrictOutputModel):
 
 
 class LociExploreOutput(RootModel[LociExploreSuccess | LociErrorOutput]):
+    model_config = ConfigDict(json_schema_extra={"type": "object"})
+
+
+# Normal retrieval is intentionally separate from the legacy exploration shapes.
+# The matching JSON Schema is .scratch/deterministic-graph-retrieval/contract.schema.json.
+
+
+class NormalExtent(StrictOutputModel):
+    file: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    start_byte: int = Field(ge=0)
+    end_byte: int = Field(ge=0)
+
+    @model_validator(mode="after")
+    def _ordered_extent(self) -> NormalExtent:
+        _require_relative_path(self.file, "file")
+        if self.end_byte < self.start_byte:
+            raise ValueError("source extent must be ordered")
+        return self
+
+
+class NormalSource(StrictOutputModel):
+    id: int = Field(ge=1)
+    file: str = Field(min_length=1)
+    start_byte: int = Field(ge=0)
+    end_byte: int = Field(ge=0)
+    start_line: int = Field(ge=1)
+    end_line: int = Field(ge=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    content: str
+    source_ref: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _ordered_source(self) -> NormalSource:
+        _require_relative_path(self.file, "file")
+        if self.end_byte < self.start_byte:
+            raise ValueError("source byte span must be ordered")
+        if self.end_line < self.start_line:
+            raise ValueError("source line span must be ordered")
+        try:
+            content_bytes = len(self.content.encode("utf-8"))
+        except UnicodeEncodeError as exc:
+            raise ValueError("source content must be valid UTF-8") from exc
+        if content_bytes != self.end_byte - self.start_byte:
+            raise ValueError("source content must match its UTF-8 byte span")
+        return self
+
+
+class NormalEvidence(StrictOutputModel):
+    file: str = Field(min_length=1)
+    line: int = Field(ge=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _relative_file(self) -> NormalEvidence:
+        _require_relative_path(self.file, "evidence.file")
+        return self
+
+
+class NormalEdge(StrictOutputModel):
+    from_: str = Field(alias="from", min_length=1)
+    to: str = Field(min_length=1)
+    type: str = Field(min_length=1)
+    directed: Literal[True]
+    namespace: Literal["loci"]
+    resolution: Literal["exact", "declared", "import-resolved"]
+    evidence: NormalEvidence
+
+
+class NormalRelationship(StrictOutputModel):
+    id: int = Field(ge=1)
+    edge: NormalEdge
+    traversed: Literal["forward", "reverse"]
+    source_ids: list[Annotated[int, Field(ge=1)]] = Field(min_length=1)
+    proof: Literal["complete"]
+    resolution_configuration: Literal["unconditional", "declared_possible"] | None
+
+    @model_validator(mode="after")
+    def _unique_source_ids(self) -> NormalRelationship:
+        if len(set(self.source_ids)) != len(self.source_ids):
+            raise ValueError("relationship source_ids must be unique")
+        return self
+
+
+class NormalNode(StrictOutputModel):
+    id: str = Field(min_length=1)
+    name: str
+    kind: str = Field(min_length=1)
+    file: str | None
+
+    @model_validator(mode="after")
+    def _relative_file(self) -> NormalNode:
+        if self.file is not None:
+            _require_relative_path(self.file, "node.file")
+        return self
+
+
+class NormalAnchor(StrictOutputModel):
+    node_id: str = Field(min_length=1)
+    score: float
+    matched_terms: list[str]
+    match_scope: list[str]
+
+
+class NormalItem(StrictOutputModel):
+    node_id: str = Field(min_length=1)
+    role: Literal["anchor", "related"]
+    depth: int = Field(ge=0)
+    why: str = Field(min_length=1)
+    source_ids: list[Annotated[int, Field(ge=1)]] = Field(min_length=1)
+    complete: bool
+    extent: NormalExtent
+    source_ref: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _unique_source_ids(self) -> NormalItem:
+        if len(set(self.source_ids)) != len(self.source_ids):
+            raise ValueError("item source_ids must be unique")
+        return self
+
+
+class NormalOwnership(StrictOutputModel):
+    owner_id: str = Field(min_length=1)
+    member_id: str = Field(min_length=1)
+    basis: Literal["indexed_file", "go_package", "rust_crate", "swift_module"]
+
+
+class NormalOmission(StrictOutputModel):
+    reason: Literal[
+        "no_anchor",
+        "anchor_limit",
+        "ambiguous_anchor",
+        "lookup_limit",
+        "node_limit",
+        "neighbor_limit",
+        "item_limit",
+        "hop_limit",
+        "cycle",
+        "alternative_path",
+        "ownership_limit",
+        "unsupported_semantics",
+        "unresolved_relation",
+        "ambiguous_relation",
+        "external_relation",
+        "inaccessible_relation",
+        "source_unavailable",
+        "source_stale",
+        "source_preview",
+        "proof_unavailable",
+        "evidence_budget",
+        "output_budget",
+    ]
+    count: int = Field(ge=1)
+
+
+class NormalLimits(StrictOutputModel):
+    max_hops: Literal[2]
+    max_nodes: Literal[64]
+    max_neighbors: Literal[32]
+    max_items: Literal[12]
+    max_anchors: Literal[3]
+    max_explicit_anchors: Literal[5]
+    max_owner_members: Literal[3]
+    max_evidence_bytes: Literal[8192]
+    max_output_bytes: Literal[16384]
+    max_anchor_source_bytes: Literal[1024]
+    max_related_source_bytes: Literal[768]
+    max_lookup_bytes: Literal[33554432]
+    max_lookup_files: Literal[4096]
+    max_literal_matches: Literal[256]
+
+
+class NormalUsage(StrictOutputModel):
+    nodes_examined: int = Field(ge=0)
+    eligible_edges_considered: int = Field(ge=0)
+    edges_traversed: int = Field(ge=0)
+    relationships_delivered: int = Field(ge=0)
+    lookup_bytes: int = Field(ge=0)
+    lookup_files: int = Field(ge=0)
+    evidence_bytes: int = Field(ge=0)
+    output_bytes: int = Field(ge=0)
+    estimated_tokens: int = Field(ge=0)
+    token_estimate_method: Literal["utf8_bytes_div_4"]
+    output_encoding: Literal["mcp_result_json_utf8"]
+
+
+class NormalSelection(StrictOutputModel):
+    mode: Literal["explicit", "inferred", "file", "literal"]
+    candidate_count: int = Field(ge=0)
+    omitted_candidates: int = Field(ge=0)
+
+
+class NormalScope(StrictOutputModel):
+    source: Literal["indexed_supported_source"]
+    coverage: Literal["complete", "partial", "unknown"]
+    matching: Literal["explicit_ids", "exact_file", "symbol_metadata", "source_literal"]
+    relationships: Literal["known_static_relationships"]
+    exhaustive: Literal[False]
+
+
+class LociRetrieveSuccess(StrictOutputModel):
+    schema_version: Literal[1]
+    policy: Literal["normal-graph-v1"]
+    snapshot: str = Field(pattern=r"^[0-9a-f]{64}$")
+    status: Literal["ok", "partial", "empty"]
+    selection: NormalSelection
+    scope: NormalScope
+    anchors: list[NormalAnchor]
+    nodes: list[NormalNode]
+    items: list[NormalItem]
+    ownership: list[NormalOwnership]
+    relationships: list[NormalRelationship]
+    sources: list[NormalSource]
+    omissions: list[NormalOmission]
+    limits: NormalLimits
+    usage: NormalUsage
+
+    @model_validator(mode="after")
+    def _validate_links_and_budgets(self) -> LociRetrieveSuccess:
+        node_ids = [node.id for node in self.nodes]
+        source_ids = [source.id for source in self.sources]
+        relationship_ids = [relationship.id for relationship in self.relationships]
+        if len(set(node_ids)) != len(node_ids):
+            raise ValueError("nodes must have unique IDs")
+        if len(set(source_ids)) != len(source_ids):
+            raise ValueError("sources must have unique IDs")
+        if len(set(relationship_ids)) != len(relationship_ids):
+            raise ValueError("relationships must have unique IDs")
+        known_nodes = set(node_ids)
+        known_sources = {source.id: source for source in self.sources}
+        if any(anchor.node_id not in known_nodes for anchor in self.anchors):
+            raise ValueError("anchors must name returned nodes")
+        for item in self.items:
+            if item.node_id not in known_nodes:
+                raise ValueError("items must name returned nodes")
+            if any(source_id not in known_sources for source_id in item.source_ids):
+                raise ValueError("items must name returned sources")
+        for ownership in self.ownership:
+            if ownership.owner_id not in known_nodes or ownership.member_id not in known_nodes:
+                raise ValueError("ownership endpoints must be returned nodes")
+        for relationship in self.relationships:
+            if relationship.edge.from_ not in known_nodes or relationship.edge.to not in known_nodes:
+                raise ValueError("relationship endpoints must be returned nodes")
+            proof_sources = [known_sources[source_id] for source_id in relationship.source_ids if source_id in known_sources]
+            if len(proof_sources) != len(relationship.source_ids):
+                raise ValueError("relationships must name returned proof sources")
+            if not any(
+                source.file == relationship.edge.evidence.file
+                and source.content_hash == relationship.edge.evidence.content_hash
+                and source.start_line <= relationship.edge.evidence.line <= source.end_line
+                for source in proof_sources
+            ):
+                raise ValueError("relationship proof must contain matching edge evidence")
+        if self.usage.relationships_delivered != len(self.relationships):
+            raise ValueError("relationships_delivered must equal returned relationships")
+        if self.usage.evidence_bytes > self.limits.max_evidence_bytes:
+            raise ValueError("evidence bytes exceed the normal retrieval budget")
+        if self.usage.output_bytes > self.limits.max_output_bytes:
+            raise ValueError("output bytes exceed the normal retrieval budget")
+        return self
+
+
+class LociRetrieveOutput(RootModel[LociRetrieveSuccess | LociErrorOutput]):
+    model_config = ConfigDict(json_schema_extra={"type": "object"})
+
+
+class NormalReadUsage(StrictOutputModel):
+    evidence_bytes: int = Field(ge=0)
+    output_bytes: int = Field(ge=0)
+    output_encoding: Literal["mcp_result_json_utf8"]
+
+
+class LociReadSuccess(StrictOutputModel):
+    schema_version: Literal[1]
+    status: Literal["ok"]
+    source: NormalSource
+    complete: bool
+    next_source_ref: Annotated[str, Field(min_length=1)] | None
+    usage: NormalReadUsage
+
+    @model_validator(mode="after")
+    def _bounded_page(self) -> LociReadSuccess:
+        page_bytes = len(self.source.content.encode("utf-8"))
+        if page_bytes > 8192:
+            raise ValueError("read source exceeds the 8192-byte page limit")
+        if self.complete != (self.next_source_ref is None):
+            raise ValueError("complete reads must have no next source reference")
+        if self.usage.evidence_bytes != page_bytes:
+            raise ValueError("read evidence bytes must equal the returned page bytes")
+        if self.usage.output_bytes > 16384:
+            raise ValueError("read output bytes exceed the complete result budget")
+        return self
+
+
+class LociReadOutput(RootModel[LociReadSuccess | LociErrorOutput]):
     model_config = ConfigDict(json_schema_extra={"type": "object"})

@@ -34,7 +34,7 @@ def _explore_arguments(repo: Path, **budgets: Any) -> dict[str, Any]:
 
 def test_loci_explore_advertises_nullable_byte_budgets() -> None:
     tool = next(
-        tool for tool in asyncio.run(create_server().list_tools()) if tool.name == "loci_explore"
+        tool for tool in asyncio.run(create_server("diagnostic").list_tools()) if tool.name == "loci_explore"
     )
 
     assert tool.input_schema["required"] == ["repo", "intent"]
@@ -59,7 +59,7 @@ def test_loci_explore_normalizes_nullable_budgets_and_forwards_integers(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     repo = _fixture_repo(tmp_path)
-    server = create_server()
+    server = create_server("diagnostic")
     forwarded: list[tuple[int, int]] = []
     service = mcp_server._service()
     explore = service.explore
@@ -118,7 +118,7 @@ def test_loci_explore_rejects_invalid_byte_budgets(
     tmp_path: Path, field: str, value: Any, expected: str
 ) -> None:
     repo = _fixture_repo(tmp_path)
-    server = create_server()
+    server = create_server("diagnostic")
 
     if expected == "tool_error":
         with pytest.raises(ToolError):

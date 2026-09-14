@@ -86,6 +86,7 @@ def _server(cache_dir: Path) -> StdioServerParameters:
     env = os.environ.copy()
     env["LOCI_BASE_DIR"] = str(cache_dir)
     env["LOCI_STORE_NAMESPACE"] = "test"
+    env["LOCI_MCP_SURFACE"] = "diagnostic"
     return StdioServerParameters(
         command=str(command),
         args=[],

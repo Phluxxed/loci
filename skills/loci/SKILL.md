@@ -3,131 +3,79 @@ name: loci
 description: Agent-owned codebase navigation infrastructure. Use when repository work needs source retrieval or relationship tracing. A named target or small edit still needs inspection. Skip redundant retrieval only when relevant source has already been retrieved, remains current, and is sufficient for the action; task or file type alone is not an exemption.
 ---
 
-# loci - Codex Workflow Guide
+# loci — codebase retrieval
 
-loci is agent-owned codebase navigation infrastructure. Run it yourself so
-that codebase work uses bounded, exact retrieval instead of broad file reads.
+Use Loci's normal MCP operation for repository source discovery and relationship
+tracing. Supply the actual repository root and the question or known identity.
+Loci selects graph context deterministically inside the operation.
 
-## Evidence before action
+## Inspect evidence before acting
 
-First identify the source evidence the action needs, then choose the retrieval
-route. A startup index summary, filename, function name, or recalled summary
-is not source inspection. Named functions, README text and configuration values
-still need their actual contents retrieved before acting on them.
+A filename, recalled summary or startup index count is not source inspection.
+Skip retrieval only when the relevant source from the target checkout is already
+observed, current and sufficient for this action. Refresh affected evidence after
+edits. Exact edits require the full affected source, including relevant callers
+when the change depends on them.
 
-Skip a redundant retrieval only when all three conditions hold:
-
-- **Observed:** relevant source from the actual target checkout has been
-  retrieved and is available in context, rather than only its name or a summary.
-- **Current:** subsequent edits or checkout changes have not invalidated that
-  evidence. Refresh affected source when freshness is uncertain.
-- **Sufficient:** the retrieved material covers what this particular action
-  depends on. A function's body alone does not establish its callers or the
-  consequences of an interface change.
-
-Use the bounded navigation routes below to obtain missing evidence. A justified
-direct read under the fallback below can also supply evidence; choosing that
-route still requires inspection. Reassess when the task or source changes.
-Task size and file type do not establish these conditions. Pure conceptual work
-without repository-source claims needs no repository retrieval.
-
-## Core workflow
-
-Prefer the local MCP server whenever its tools are available. Use the
-repository root named by the task, not the shell cwd or an arbitrary parent:
+## Normal workflow
 
 ```text
-# Explicit rebuild or large change only:
-loci_index(repo, incremental=true)
-# Normal navigation, including unindexed roots and stale cached indexes:
-loci_outline(repo) or loci_search(repo, query) -> optional search_id
-loci_get(repo, symbol_ids, selected_from_search_id=search_id) only for deliberate search selections
-# Source selected for a purpose, when loci_explore is available:
-loci_explore(repo, intent, query, seed_ids=None)
-loci_analyze(repo) when diagnostics are needed
+loci_retrieve(repo, query="the source or behavior needed")
+loci_retrieve(repo, query="src/known-file.ts")
+loci_retrieve(repo, seed_ids=[known_id], query="remaining source question")
+loci_read(repo, source_ref=returned_item.source_ref)
 ```
 
-Pass `repo` to every repository-scoped MCP tool. Do not introduce the legacy
-`path` parameter in new guidance; it is advisory compatibility only for
-`loci_index`, `loci_outline`, and `loci_verify`.
+Use `loci_retrieve` for initial discovery and further context. It creates or
+refreshes the index and runs the maintained graph policy. The response includes
+candidate identities, selected source, proved relationships, coverage and
+omissions. Read the returned source and proof before deciding it is sufficient.
+Several candidates remain alternatives; an omitted match is not disproved.
 
-MCP retrieval tools create missing indexes and refresh stale indexes before
-returning data, completing first-use indexing and retrieval in one call. This
-freshness includes repository-local graph profiles and contributions, built-in
-imports, references, and calls, Go module/workspace controls,
-JavaScript/TypeScript package, workspace, and project controls, and Cargo
-manifests. Use `loci_index` for an explicit rebuild or after large changes.
+For an incomplete source item, use its `source_ref` with `loci_read`. Follow
+`next_source_ref` until the exact source needed for the action is complete.
+A stale reference requires fresh retrieval. Re-anchor a returned node ID with
+`loci_retrieve` when further context is needed. Repeating an identical request
+against an unchanged snapshot returns the same bounded selection.
 
-If MCP is unavailable, configure it before using the CLI as a steady-state
-route. Read [setup-and-cli.md](references/setup-and-cli.md) for host setup,
-store identity, and the bounded CLI fallback. If configuration or the current
-runtime prevents MCP use, announce the temporary fallback and use the CLI
-commands there. If loci is unavailable or the task is a standalone
-documentation/config check where symbol navigation is irrelevant, say so and
-use a targeted normal read.
+Both operations take `repo`. Traversal families, direction, depth, ranking and
+budgets are owned by Loci; there are no per-request policy controls. An import's
+file/package/module endpoint remains distinct from its selected declarations.
+The `ownership` field describes indexed source membership and is not a semantic
+relationship. A zero-edge packet does not prove that no dependencies exist.
 
-## Navigate, then retrieve
+## Coverage and failures
 
-1. Use normal MCP retrieval for first use; explicitly rebuild only when the
-   task requires it. The CLI fallback still needs an initial `loci index`.
-2. Use `loci_outline` when the file is known, or `loci_search` when only a
-   symbol name or concept is known.
-3. Use `loci_get` for the exact symbol IDs returned by outline/search. When a
-   get is a deliberate selection from a non-empty search, pass that search's
-   `search_id` as `selected_from_search_id`. Omit it for direct navigation,
-   outline-driven navigation, bulk hydration, or any mixed-purpose batch; split
-   mixed batches so only genuinely selected symbols carry lineage. Do not fetch
-   an entire file when a symbol will answer the question.
-4. Use `loci_file` only for targeted non-symbol ranges after locating the
-   relevant file; use `loci_grep` for string literals, errors, or config keys.
-5. Use `context` on focused retrieval when nearby lines are required, then
-   inspect the returned source, line bounds, and signatures before reasoning.
+Preserve partial/unknown coverage and unsupported, unresolved, ambiguous,
+external, inaccessible, stale and budget omissions in conclusions. Stored edges
+prove only the supported static relationship, not runtime dispatch or exhaustive
+impact. Rust `declared_possible` configuration remains possible.
 
-For compact source discovery, dependencies, or known static dependents,
-use `loci_explore` with `locate`, `dependencies`, `type_dependencies`, or `impact`. Put the
-specific field or contract of interest in `query`; pass exact `seed_ids` when
-known. Inspect returned source, proof paths and omissions before deciding that
-the context is sufficient. If the host lacks this tool, use search/get and the
-diagnostic graph tools below. Exact edits still require the affected full source.
+Treat `structuredContent.error` as a failure with a code, message and details.
+A busy catalog or refresh lock calls for a bounded retry after the writer can
+finish; it does not authorize catalog repair. For repeated unchanged failures,
+report the limitation and use a targeted source-read fallback where necessary.
+Standalone documentation or configuration checks where symbol navigation is
+irrelevant may use a targeted direct read.
 
-For intent selection, budgets, and graph-shaped questions, follow the rules in
-[graph-navigation.md](references/graph-navigation.md). For exact response
-schemas, pagination, coverage, and store-health semantics, read
-[tool-contracts.md](references/tool-contracts.md). For language-specific
-exploration capabilities, resolver guarantees and limits, read
-[language-resolution.md](references/language-resolution.md).
+## Setup and operator diagnostics
 
-## Safety and evidence boundaries
+The normal MCP catalog contains `loci_retrieve` and `loci_read`. If they are
+missing, inspect the host's discovery surface and read
+[setup-and-cli.md](references/setup-and-cli.md) for local stdio setup, store
+identity and the temporary fallback. An old loaded catalog can require a fresh
+host session after installation. Report the actual visibility limitation.
 
-- Treat coverage on every search/grep result as part of the answer. `partial`
-  and `unknown` coverage limit absence claims; an empty result never proves
-  absence outside its stated query scope.
-- Treat structured MCP failures under `structuredContent.error` as actionable
-  errors with `code`, `message`, and `details`; do not silently reinterpret
-  them as empty results.
-- Treat unresolved, ambiguous, external, inaccessible, unsupported, or
-  stale outcomes as bounded evidence that loci did not prove a relationship.
-  Do not replace a failed resolution with repository-wide filename, package,
-  or symbol-name guesses.
-- Use `loci_analyze` when search misses, ranking is poor, or extraction quality
-  looks suspect. Treat findings as diagnostics to inspect, not orders to
-  follow blindly.
-- Prefer `loci_stats` for structured retrieval/savings evidence. Use
-  `loci stats --pretty` only for a human-readable shell or tmux view.
-- Use `loci_list` when choosing among indexed roots, `loci_verify` for index
-  integrity/content drift, `loci_store_health` for freshness/missing-root/
-  overlap diagnostics, and `loci_graph_health` for graph-extension status.
+Low-level search, outline, get, explore and graph utilities belong to an
+operator-selected diagnostic server. Changing the surface is an installation
+choice, not ordinary retrieval routing. When explicitly investigating Loci
+itself through that surface, consult
+[graph-navigation.md](references/graph-navigation.md) and
+[tool-contracts.md](references/tool-contracts.md).
 
-## References
-
-- [setup-and-cli.md](references/setup-and-cli.md) — read when configuring MCP,
-  verifying store ownership/namespace, or using the temporary CLI fallback.
-- [tool-contracts.md](references/tool-contracts.md) — read when interpreting
-  tool schemas, pagination, coverage, structured errors, graph-health output,
-  or `loci_store_health` results.
-- [graph-navigation.md](references/graph-navigation.md) — read when tracing
-  dependencies, imports, references, calls, paths, or question-shaped graph
-  evidence.
-- [language-resolution.md](references/language-resolution.md) — read when a
-  JavaScript/TypeScript, Go, or Rust import/reference resolution needs its
-  supported controls, provenance, or failure limits.
+Read [normal-retrieval.md](references/normal-retrieval.md) when interpreting the
+normal packet, exact-source continuation or work limits. Read
+[language-resolution.md](references/language-resolution.md) when a particular
+language's static resolution guarantee or omission affects the task.
+Resolve a file-symlinked `SKILL.md` to its real source path before following
+relative references.
