@@ -1,0 +1,30 @@
+{
+  "reviewer": "primary gpt-6-astra/ultra",
+  "fact_judgments": [
+    {
+      "fact_id": "null_and_present_output",
+      "judgment": "correct",
+      "answer_quote": "`renderActiveTask` returns:\n\n- No active task: `[\"Active task:\", \"- none\"]`.\n- Active task: four strings:\n  1. `\"Active task:\"`\n  2. `- [<event_id>] (recorded <recorded_at YYYY-MM-DD>) <summary>`\n  3. `- state: <state>`\n  4. `- next step: <next_step>`\n\nIt displays `event_id`, `recorded_at` (only its first 10 characters), `summary`, `state`, and `next_step`; `summary` and `next_step` pass through `truncateText`. See [src/continuity/render.ts](/tmp/anvil-source-tasks-20260914/t19/src/continuity/render.ts:67). The schema confirms these are the complete strict task fields, with `state` constrained to `active` or `waiting`: [src/continuity/schema.ts](/tmp/anvil-source-tasks-20260914/t19/src/continuity/schema.ts:38).\n\nNo material uncertainty: the function body was directly inspected; Loci reported partial graph coverage, which does not affect this exact source finding.",
+      "source_references": [
+        {
+          "file": "src/continuity/render.ts",
+          "start_line": 67,
+          "end_line": 75,
+          "sha256_of_exact_utf8_lines": "d047170c9cb5480355633d6f751889eb4600764b172e4e59feed3fe61f0b9850"
+        }
+      ]
+    }
+  ],
+  "relationship_support": [
+    {
+      "answer_quote": "`summary` and `next_step` pass through `truncateText`.",
+      "status": "supported",
+      "native_item_id": "exec-9cca30fc-1563-43b4-9826-9e4bb3cb2d15",
+      "model_output_evidence_reference": "outer:call_ffwO4uwND4oq6g7oIfayVya3:line:35:block:1"
+    }
+  ],
+  "material_unsupported_claims": [],
+  "qualifications": [
+    "Exact strings matchrender67\u201375; strict five-field schema and state enum verifiedschema38\u201350. Delivered call edge supports truncateText statement."
+  ]
+}

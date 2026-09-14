@@ -1,0 +1,7 @@
+`captureCommandResult` accepts `binding: WorkContextBinding`, not the public view:
+
+- [`src/tool-results/service.ts:23`](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:23) imports `WorkContextBinding` from the public work-context barrel; [`:53-60`](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:53) makes it the capture options’ binding contract.
+- The barrel re-exports it from [`src/work-context/index.ts:23-30`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/index.ts:23), whose defining module is [`src/work-context/binding.ts:28-45`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:28). That full contract includes `session_id` and `provenance.observed_cwd`.
+- `WorkContextBindingView` is separately exported at [`binding.ts:47-67`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:47). It intentionally omits those fields, as `workContextBindingView` shows at [`:130-139`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:130).
+
+Therefore the view type is not accepted: it is not structurally assignable to `WorkContextBinding`, and runtime validation also requires both omitted fields before accepting an active binding ([`binding.ts:141-157`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:141), [`:217-239`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:217)). No material uncertainty.

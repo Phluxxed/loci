@@ -1,0 +1,62 @@
+{
+  "reviewer": "primary gpt-6-astra/ultra",
+  "fact_judgments": [
+    {
+      "fact_id": "checkpoint_mcp_boundary",
+      "judgment": "correct",
+      "answer_quote": "MCP validates `checkpointId` and task shape, requires a trusted binding, then calls the service: `src/mcp/tools.ts:213-228`, `805-830`.",
+      "source_references": [
+        {
+          "file": "src/mcp/tools.ts",
+          "start_line": 805,
+          "end_line": 831,
+          "sha256_of_exact_utf8_lines": "eada19efa2f4b1eb962c3cb9919f972d99330179c679f3dcca0e8669a6991601"
+        }
+      ]
+    },
+    {
+      "fact_id": "retry_key_and_content_check",
+      "judgment": "correct",
+      "answer_quote": "It assigns a deterministic event ID from `(workspace key, checkpoint ID)`: `service.ts:303-305`. It appends a `next_action` event (or `correction` for clear) to `events.jsonl`, then projects the desired task into `current.json`: `service.ts:381-420`; persistence is `src/continuity/store.ts:369-391,402-419`.\n- The injected/rendered Continuity frame reads `active_task.next_step`, so that is exactly where old text surfaces: `src/continuity/render.ts:67-93`.\n\nSame key behavior:\n\n- **Identical task content:** the existing deterministic event is reused; no duplicate event is created. The desired active-task projection is still reapplied if it was missing or different; otherwise `changed` is false. This means retrying an old identical checkpoint can restore its old next step after a reset or replacement: `service.ts:362-370,391-420`. The source test explicitly covers unchanged retry (`changed === false`) and recovery after the current frame is reset (`changed === true`): `test/continuity-service.test.ts:416-423`.\n- **Changed task content:** it throws `VALIDATION_ERROR` before recording or updating the frame: `service.ts:366-371`. The equality check covers event type, summary/outcome, and generated details, which include state, next step, and optional details: `service.ts:308-324`.",
+      "source_references": [
+        {
+          "file": "src/continuity/service.ts",
+          "start_line": 303,
+          "end_line": 325,
+          "sha256_of_exact_utf8_lines": "63808d969a17676eb563ae42b6cb2acb5959f8af0b99ec77c2004ace89c115aa"
+        },
+        {
+          "file": "src/continuity/service.ts",
+          "start_line": 327,
+          "end_line": 377,
+          "sha256_of_exact_utf8_lines": "c0c15e5ae1ce50fa08a56488c7d77c60b523fa152fb9081f67fe6da17c506f8c"
+        }
+      ]
+    },
+    {
+      "fact_id": "durable_event_then_current_frame",
+      "judgment": "missing"
+    },
+    {
+      "fact_id": "clear_semantics",
+      "judgment": "missing"
+    }
+  ],
+  "relationship_support": [
+    {
+      "answer_quote": "requires a trusted binding, then calls the service",
+      "status": "ambiguous_provenance"
+    },
+    {
+      "answer_quote": "It appends a `next_action` event (or `correction` for clear) to `events.jsonl`, then projects the desired task into `current.json`",
+      "status": "ambiguous_provenance"
+    }
+  ],
+  "material_unsupported_claims": [],
+  "qualifications": [
+    "The durable-event/current-frame fact is incomplete under the strict compound-fact gate. The answer states event append, projection, and conditional reapplication, but does not state that the matching next-action projection is removed or that updateCurrent writes current.json atomically. It is marked missing rather than treating the stated clauses as false.",
+    "The clear-semantics fact is incomplete under the same gate. The answer correctly states correction, lineage, and active_task=null behavior, but omits that a first clear before Continuity exists and a clear with neither an active task nor matching prior checkpoint event are rejected. It is marked missing rather than treating the stated clauses as false.",
+    "The extra storage-layout, rendering, idempotent-retry, replacement, and historical-event claims are supported by the inspected t22 source and tests. The answer properly limits its conclusion about the reported live incident.",
+    "No relevant relationship receives supported credit. The only full_exact relationship-bearing packet proves an unrelated handleBrainSetup uses-type edge; relevant handler/service and persistence packets were unknown_truncated. Exact reads carried source but zero semantic relationships, so the two relationship claims remain ambiguous and do not establish cognition."
+  ]
+}

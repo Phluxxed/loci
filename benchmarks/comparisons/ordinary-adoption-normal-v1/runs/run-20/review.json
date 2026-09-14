@@ -1,0 +1,32 @@
+{
+  "reviewer": "primary gpt-6-astra/ultra",
+  "fact_judgments": [
+    {
+      "fact_id": "browser_cli_feature_identity",
+      "judgment": "correct",
+      "answer_quote": "Production path:\n\n- [`package.json`](/tmp/anvil-source-tasks-20260914/t20/package.json:9) maps the installed `anvil` executable to `./bin/anvil.ts`.\n- [`bin/anvil.ts`](/tmp/anvil-source-tasks-20260914/t20/bin/anvil.ts:65) resolves its own physical path as `currentFile`; [line 66](/tmp/anvil-source-tasks-20260914/t20/bin/anvil.ts:66) derives `command` from `process.argv.slice(2)`. It invokes `main()` only when this file is the direct executable target ([lines 1479\u20131487](/tmp/anvil-source-tasks-20260914/t20/bin/anvil.ts:1479)).\n- In `main`, the `browser` top-level command dispatches to `runBrowserCli(command.slice(1), \u2026)` ([lines 1462\u20131468](/tmp/anvil-source-tasks-20260914/t20/bin/anvil.ts:1462)). Thus `anvil browser doctor --json` becomes `runBrowserCli([\"doctor\", \"--json\"], \u2026)`.\n- It passes exactly:\n  - `anvilCommand: currentFile` ([line 1464](/tmp/anvil-source-tasks-20260914/t20/bin/anvil.ts:1464)), the resolved path to `bin/anvil.ts`;\n  - `anvilHome: process.env.ANVIL_HOME` only if that variable is set ([line 1465](/tmp/anvil-source-tasks-20260914/t20/bin/anvil.ts:1465)).\n- [`src/browser/index.ts`](/tmp/anvil-source-tasks-20260914/t20/src/browser/index.ts:57) re-exports `runBrowserCli` from [`src/browser/cli.ts`](/tmp/anvil-source-tasks-20260914/t20/src/browser/cli.ts:554). The CLI parses those args, defaults output to `process.stdout` and home to `~/.anvil` when not injected ([lines 554\u2013558](/tmp/anvil-source-tasks-20260914/t20/src/browser/cli.ts:554)); other optional dependencies use production defaults where called.\n\nNo material uncertainty in this direct production dispatch path.",
+      "source_references": [
+        {
+          "file": "src/browser/cli.ts",
+          "start_line": 554,
+          "end_line": 588,
+          "sha256_of_exact_utf8_lines": "086d2642887f742c51ad337230b0a19edde48817a6534b6b838f03d1a0bb15df"
+        }
+      ]
+    },
+    {
+      "fact_id": "main_browser_branch_calls_feature",
+      "judgment": "missing"
+    },
+    {
+      "fact_id": "import_reexport_path",
+      "judgment": "missing"
+    }
+  ],
+  "relationship_support": [],
+  "material_unsupported_claims": [],
+  "qualifications": [
+    "Required main branch fact is incomplete: answer omits nonzero return propagation to process.exitCode. Import path fact gives the barrel re-export but does not state the production entrypoint imports through that barrel. Both incomplete compound facts are marked missing under strict all-facts gate, not false source claims.",
+    "Both identical retrieval results are ambiguous_exact; no graph-delivery credit despite relationships in backend results. Failed git status on source copy without.git is retained."
+  ]
+}

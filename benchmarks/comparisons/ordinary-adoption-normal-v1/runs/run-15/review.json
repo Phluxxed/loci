@@ -1,0 +1,63 @@
+{
+  "fact_judgments": [
+    {
+      "fact_id": "checkpoint_mcp_boundary",
+      "judgment": "correct",
+      "answer_quote": "its handler validates the host-supplied binding then calls the service",
+      "source_references": [
+        {
+          "file": "src/mcp/tools.ts",
+          "start_line": 805,
+          "end_line": 831,
+          "sha256_of_exact_utf8_lines": "eada19efa2f4b1eb962c3cb9919f972d99330179c679f3dcca0e8669a6991601"
+        }
+      ]
+    },
+    {
+      "fact_id": "retry_key_and_content_check",
+      "judgment": "correct",
+      "answer_quote": "Same checkpoint key, identical task content:",
+      "source_references": [
+        {
+          "file": "src/continuity/service.ts",
+          "start_line": 303,
+          "end_line": 325,
+          "sha256_of_exact_utf8_lines": "63808d969a17676eb563ae42b6cb2acb5959f8af0b99ec77c2004ace89c115aa"
+        },
+        {
+          "file": "src/continuity/service.ts",
+          "start_line": 327,
+          "end_line": 377,
+          "sha256_of_exact_utf8_lines": "c0c15e5ae1ce50fa08a56488c7d77c60b523fa152fb9081f67fe6da17c506f8c"
+        }
+      ]
+    },
+    {
+      "fact_id": "durable_event_then_current_frame",
+      "judgment": "missing",
+      "reason": "Omission, not a false assertion: the answer does not state that the matching next-action projection is removed. It describes changed/no-op retry behavior, but also does not identify updateCurrent as the atomic current-frame write required by the frozen fact."
+    },
+    {
+      "fact_id": "clear_semantics",
+      "judgment": "correct",
+      "answer_quote": "a fresh clear checkpoint writes a `correction` event, resolves the prior task event, and sets `current.active_task` to `null`",
+      "source_references": [
+        {
+          "file": "src/continuity/service.ts",
+          "start_line": 351,
+          "end_line": 432,
+          "sha256_of_exact_utf8_lines": "d178b42308974371acd35b5479e3cf5b6021d70747247f85b726559789282a76"
+        }
+      ]
+    }
+  ],
+  "relationship_support": [
+    {
+      "answer_quote": "its handler validates the host-supplied binding then calls the service",
+      "status": "not_delivered",
+      "reason": "The two full-exact normal results include only a test-helper call edge and exact source hydration. The other relationship-bearing normal results were truncated at the outer delivery boundary, and none establishes the handler-to-service call for this quote."
+    }
+  ],
+  "material_unsupported_claims": [],
+  "primary_disposition": "Modified omission-based incorrect to missing for consistent distinction between incomplete coverage and false source claims. Strict failure unchanged."
+}

@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "run_id": "run-15",
+  "target_repo": "/tmp/anvil-source-tasks-20260914/t15",
+  "source_canonical_root": "/private/tmp/anvil-source-tasks-20260914/t15",
+  "status": "reviewed_no_scope_violation_observed",
+  "scope_rule": "Task-source and installed operating-instruction access only; cwd alone is not evidence of scope.",
+  "mcp_records": [
+    {
+      "line": 30,
+      "item_id": "exec-4b61002d-95e7-4b45-9db7-f89883a7c062",
+      "server": "loci",
+      "tool": "loci_retrieve",
+      "arguments": {
+        "repo": "/tmp/anvil-source-tasks-20260914/t15",
+        "query": "active task checkpoint continuity checkpointTask retry key"
+      },
+      "status": "completed",
+      "result_is_error": false
+    },
+    {
+      "line": 37,
+      "item_id": "exec-31a589e9-b17b-4c49-94e2-c6e092ec5d5f",
+      "server": "loci",
+      "tool": "loci_read",
+      "arguments": {
+        "repo": "/tmp/anvil-source-tasks-20260914/t15",
+        "source_ref": "eyJlbmQiOjE1NDQ0LCJmaWxlIjoic3JjL2NvbnRpbnVpdHkvc2VydmljZS50cyIsImhhc2giOiIxOTkxZmI3ZTljOWNlNTdhZjBlMjVjNTM3ZmE2ZDQ4ZmIyNmJlNzI0ZDJlYWJjYmEwYWY1NTc0OTJjZmI4NTkzIiwib2Zmc2V0IjoxMDcyMiwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDE1Iiwic3RhcnQiOjEwNzIyLCJ2IjoxfQ"
+      },
+      "status": "completed",
+      "result_is_error": false
+    },
+    {
+      "line": 44,
+      "item_id": "exec-541d05c7-4a66-48cb-b441-e853a6f18f68",
+      "server": "loci",
+      "tool": "loci_retrieve",
+      "arguments": {
+        "repo": "/tmp/anvil-source-tasks-20260914/t15",
+        "query": "checkpointBoundActiveTask"
+      },
+      "status": "completed",
+      "result_is_error": false
+    },
+    {
+      "line": 45,
+      "item_id": "exec-daa41d0f-0fce-49d0-80a9-6fd638a6437f",
+      "server": "loci",
+      "tool": "loci_retrieve",
+      "arguments": {
+        "repo": "/tmp/anvil-source-tasks-20260914/t15",
+        "query": "checkpointEventMatches"
+      },
+      "status": "completed",
+      "result_is_error": false
+    },
+    {
+      "line": 46,
+      "item_id": "exec-18feffee-c726-4d93-88ac-14ad9ad8559f",
+      "server": "loci",
+      "tool": "loci_retrieve",
+      "arguments": {
+        "repo": "/tmp/anvil-source-tasks-20260914/t15",
+        "query": "anvil_continuity_checkpoint_task"
+      },
+      "status": "completed",
+      "result_is_error": false
+    }
+  ],
+  "shell_records": [
+    {
+      "line": 17,
+      "item_id": "exec-b3310e47-6fba-4c02-a1bd-881eba0783b9",
+      "command": [
+        "/bin/zsh",
+        "-lc",
+        "pwd && sed -n '1,240p' /Users/brummerv/.codex/skills/loci/SKILL.md && if [ -f /tmp/anvil-source-tasks-20260914/t15/AGENTS.md ]; then sed -n '1,260p' /tmp/anvil-source-tasks-20260914/t15/AGENTS.md; fi && find /tmp/anvil-source-tasks-20260914/t15 -name AGENTS.md -print"
+      ],
+      "cwd": "file:///Users/brummerv/loci",
+      "category": "shell_opaque_or_other",
+      "graph_activity": "unknown",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "line": 53,
+      "item_id": "exec-4e6a9635-c293-4262-a343-281d3664e0b9",
+      "command": [
+        "/bin/zsh",
+        "-lc",
+        "rg -n -C 3 --glob '*.ts' 'checkpointActiveTask|checkpointEventId|checkpointEventMatches|checkpoint_task|checkpoint task|active_task' src test | head -n 600"
+      ],
+      "cwd": "file:///tmp/anvil-source-tasks-20260914/t15",
+      "category": "shell_source_retrieval",
+      "graph_activity": "none_observed",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "line": 60,
+      "item_id": "exec-f4047307-1320-44c0-b275-0b171ceb9dad",
+      "command": [
+        "/bin/zsh",
+        "-lc",
+        "sed -n '120,170p' src/continuity/service.ts\nsed -n '270,440p' src/continuity/service.ts\nsed -n '250,305p' src/mcp/server.ts\nsed -n '770,835p' src/mcp/tools.ts\nsed -n '360,465p' test/continuity-service.test.ts\nsed -n '65,105p' src/continuity/render.ts\ngit status --short"
+      ],
+      "cwd": "file:///tmp/anvil-source-tasks-20260914/t15",
+      "category": "shell_opaque_or_other",
+      "graph_activity": "unknown",
+      "status": "failed",
+      "exit_code": 128
+    },
+    {
+      "line": 67,
+      "item_id": "exec-19e16c7a-744f-4956-9024-9a37392e188a",
+      "command": [
+        "/bin/zsh",
+        "-lc",
+        "rg -n -C 3 'function resolveBoundContinuityWorkspace|resolveBoundContinuityWorkspace|async function recordEvent|export async function recordEvent|function updateCurrent|export async function updateCurrent|currentPath|eventsPath' src/continuity/service.ts src/continuity/store.ts src/continuity/paths.ts src/codex src/mcp | head -n 500\nrg -n -C 3 'renderContinuityFrame|active_task|additionalContext' src/codex test/codex-hook.test.ts | head -n 320"
+      ],
+      "cwd": "file:///tmp/anvil-source-tasks-20260914/t15",
+      "category": "shell_source_retrieval",
+      "graph_activity": "none_observed",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "line": 74,
+      "item_id": "exec-d5099313-d8c4-4048-b44e-582adc412453",
+      "command": [
+        "/bin/zsh",
+        "-lc",
+        "rg -n -C 5 'different task content|active-task-1|checkpointId.*already used|retries.*different|retry.*different|changed task' test src docs | head -n 300\nsed -n '210,240p' src/continuity/service.ts\nsed -n '343,423p' src/continuity/store.ts\nrg -n -C 3 'function runContextHook|renderContinuityFrame|readContinuity' scripts bin src | head -n 300"
+      ],
+      "cwd": "file:///tmp/anvil-source-tasks-20260914/t15",
+      "category": "shell_source_retrieval",
+      "graph_activity": "none_observed",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "line": 81,
+      "item_id": "exec-3593cc2c-341e-4813-9396-28847e838426",
+      "command": [
+        "/bin/zsh",
+        "-lc",
+        "sed -n '481,515p' bin/anvil.ts\nsed -n '630,690p' bin/anvil.ts\nsed -n '540,585p' test/codex-hook.test.ts\nnl -ba src/mcp/server.ts | sed -n '269,288p'\nnl -ba src/mcp/tools.ts | sed -n '807,832p'\nnl -ba src/continuity/service.ts | sed -n '303,430p'\nnl -ba src/continuity/store.ts | sed -n '343,420p'\nnl -ba test/continuity-service.test.ts | sed -n '368,458p'"
+      ],
+      "cwd": "file:///tmp/anvil-source-tasks-20260914/t15",
+      "category": "shell_source_retrieval",
+      "graph_activity": "none_observed",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "line": 88,
+      "item_id": "exec-22033611-c10a-4a93-9105-c31e27f6932b",
+      "command": [
+        "/bin/zsh",
+        "-lc",
+        "nl -ba bin/anvil.ts | sed -n '650,715p'\nnl -ba test/codex-hook.test.ts | sed -n '543,585p'\nnl -ba src/continuity/service.ts | sed -n '220,239p'\nnl -ba src/continuity/render.ts | sed -n '65,95p'"
+      ],
+      "cwd": "file:///tmp/anvil-source-tasks-20260914/t15",
+      "category": "shell_source_retrieval",
+      "graph_activity": "none_observed",
+      "status": "completed",
+      "exit_code": 0
+    }
+  ],
+  "manual_review": {
+    "mcp_repo_arguments": "All five calls use the scheduled t15 source root. The source_ref is an opaque exact locator bound to its canonical /private/tmp equivalent.",
+    "shell_commands": "All seven commands were read individually. Referenced paths are the t15 task source or the installed loci SKILL.md; pwd reports the session cwd without reading other repository source.",
+    "failed_or_repeated_activity": "The failed multi-command shell record at line 60 is retained. Its exit 128 follows successful source reads and a failing git status in the archive copy; no retry result was substituted.",
+    "opaque_activity": "Commands classified shell_opaque_or_other retain graph_activity=unknown. Their visible command text is in scope, but the observer cannot prove that unlogged internal activity was absent."
+  },
+  "no_out_of_scope_access_observed": true,
+  "qualification": "Native logging cannot detect silent upstream operations, and opaque shell graph activity remains unknown even after the visible command/path review."
+}

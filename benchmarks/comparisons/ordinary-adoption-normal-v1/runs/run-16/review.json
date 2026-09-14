@@ -1,0 +1,78 @@
+{
+  "fact_judgments": [
+    {
+      "fact_id": "capture_options_declares_binding_contract",
+      "judgment": "correct",
+      "answer_quote": "`captureCommandResult` accepts `binding: WorkContextBinding`",
+      "source_references": [
+        {
+          "file": "src/tool-results/service.ts",
+          "start_line": 53,
+          "end_line": 60,
+          "sha256_of_exact_utf8_lines": "c492316cc078713599c249b236bcf2cb3826f40439904ebe00e28ccc6d9feb8d"
+        },
+        {
+          "file": "src/tool-results/service.ts",
+          "start_line": 411,
+          "end_line": 411,
+          "sha256_of_exact_utf8_lines": "dd903466b03fa7dbab014e533c8479b6301b5baa3b484be6017115bcd2e82f04"
+        }
+      ]
+    },
+    {
+      "fact_id": "binding_import_traverses_public_barrel",
+      "judgment": "correct",
+      "answer_quote": "imported from `../work-context/index.ts`",
+      "source_references": [
+        {
+          "file": "src/tool-results/service.ts",
+          "start_line": 19,
+          "end_line": 23,
+          "sha256_of_exact_utf8_lines": "4fcf2c3c900821bc66ab3e341af0f3a0550b716d2909f52b62f4cc5a6d4a16fc"
+        },
+        {
+          "file": "src/work-context/index.ts",
+          "start_line": 16,
+          "end_line": 29,
+          "sha256_of_exact_utf8_lines": "c45b3a2a80027420ba2532006cc4e18d07ff0b7cf83eaf781b99022b61d09eec"
+        }
+      ]
+    },
+    {
+      "fact_id": "binding_identity_and_view_difference",
+      "judgment": "correct",
+      "answer_quote": "its projection deliberately removes `session_id` and `provenance.observed_cwd`",
+      "source_references": [
+        {
+          "file": "src/work-context/binding.ts",
+          "start_line": 28,
+          "end_line": 45,
+          "sha256_of_exact_utf8_lines": "e917a43db554775a823e3b8870b165ba4931a28b126b8141b085bdca22cae1f2"
+        },
+        {
+          "file": "src/work-context/binding.ts",
+          "start_line": 47,
+          "end_line": 67,
+          "sha256_of_exact_utf8_lines": "62c22718b455a85314f85c92031f87c09ebe9ec8fad40cd2e5f33bd2ab83154d"
+        }
+      ]
+    }
+  ],
+  "relationship_support": [
+    {
+      "answer_quote": "`captureCommandResult` accepts `binding: WorkContextBinding`",
+      "status": "supported",
+      "native_item_id": "exec-7b9a2f5b-f28c-43d1-989a-fc2dd0611ebe",
+      "model_output_evidence_reference": "outer:call_blwSZ19lX8dusNz9GlvHgXQo:line:60:block:1",
+      "reason": "The full-exact normal result contains the options declaration with binding: WorkContextBinding and the exact uses_type edge from captureCommandResult to CaptureCommandResultOptions."
+    },
+    {
+      "answer_quote": "The public barrel re-exports it from",
+      "status": "supported",
+      "native_item_id": "exec-c13535f4-b4dc-48bb-81e5-700affe7c749",
+      "model_output_evidence_reference": "outer:call_58Hbws4Nqaeg5g06CPUIm3f2:line:74:block:1",
+      "reason": "The full-exact result contains the WorkContextBinding and WorkContextBindingView export declarations and the static import relationship from the barrel file to binding.ts."
+    }
+  ],
+  "material_unsupported_claims": []
+}

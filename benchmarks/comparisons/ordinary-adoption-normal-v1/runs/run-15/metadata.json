@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "observer_metadata": {
+    "run_id": "run-15",
+    "purpose": "post_change",
+    "thread_id": "01a09f95-d8b3-7c02-be04-64a3947cc7ad",
+    "turn_id": "01a09f95-d999-7dc1-abeb-69cf78d31f5b",
+    "target_repo": "/tmp/anvil-source-tasks-20260914/t15",
+    "requested_model": "gpt-5.6-terra",
+    "requested_effort": "high",
+    "case_id": "continuity_checkpoint_retry_and_clear",
+    "condition": "post_change",
+    "repetition": 1,
+    "role": "delegate",
+    "prompt_sha256": "92af3dba39cb1ec95e81b6b27d1e3195dfac092a0733d2bff9c28b54d2849c43",
+    "source_canonical_root": "/private/tmp/anvil-source-tasks-20260914/t15",
+    "task_source_commit": "53bf29e60cece2335aa39fe301935a07e8e8d4e4",
+    "task_source_archive_sha256": "e919302908ba8dfee2ee8ee055fd4a7463a37e94a71d35d2ecda7abe95463c5e",
+    "agent_task_name": "inspection_15",
+    "expected_interval_sha256": "c26096236432ff3a4b15654d8a5a61347c6cffabbf88440de330938115952ef6"
+  },
+  "schedule": {
+    "path": "/Users/brummerv/loci/benchmarks/comparisons/ordinary-adoption-normal-v1/schedule.json",
+    "sha256": "d0e78dfd9aae200e69451f14bb111f1ade2bae2ab565f1d429a239341a0279df",
+    "status": "frozen",
+    "row": {
+      "run_id": "run-15",
+      "case_id": "continuity_checkpoint_retry_and_clear",
+      "condition": "post_change",
+      "repetition": 1,
+      "role": "delegate",
+      "purpose": "post_change",
+      "model": "gpt-5.6-terra",
+      "effort": "high",
+      "source_root": "/tmp/anvil-source-tasks-20260914/t15",
+      "agent_task_name": "inspection_15",
+      "prompt": "Investigate the repository at /tmp/anvil-source-tasks-20260914/t15 read-only.\n\nA resumed task sometimes keeps old next-step text. Trace how an active-task checkpoint reaches stored Continuity, explain what happens when the same checkpoint key is retried with identical versus changed task content, and how clearing the task changes state. Point me to the code I should inspect first.\n\nFollow the normal repository instructions. Keep this a focused source\ninvestigation: do not edit files, run tests, or launch services. Use only this\nrepository and installed operating instructions for evidence; do not inspect\nother repositories, earlier agent sessions or unrelated task artifacts. Give\na concise answer with relevant source paths and lines, and state any material\nuncertainty. Complete this assignment directly. Do not spawn other agents.",
+      "prompt_sha256": "92af3dba39cb1ec95e81b6b27d1e3195dfac092a0733d2bff9c28b54d2849c43",
+      "conditional_on_selected_correction": true,
+      "task_source_commit": "53bf29e60cece2335aa39fe301935a07e8e8d4e4",
+      "task_source_archive_sha256": "e919302908ba8dfee2ee8ee055fd4a7463a37e94a71d35d2ecda7abe95463c5e"
+    }
+  },
+  "source_preflight": {
+    "receipt_path": "/Users/brummerv/loci/benchmarks/comparisons/ordinary-adoption-normal-v1/runtime/source-copies.json",
+    "receipt_sha256": "02d87416f938bd9150e4cf0c1aaca73bab63f938faa34f67328760b8ed1ecd00",
+    "recorded_before_post_outcomes": true,
+    "archive_bytes_available": false,
+    "verification": "all638 frozen file hashes and no extra files; archive bytes were not reread",
+    "files_verified": 638,
+    "no_extra_files_verified": true
+  },
+  "native": {
+    "rollout_path": "/Users/brummerv/.codex/sessions/2026/09/14/rollout-2026-09-14T21-03-12-01a09f95-d8b3-7c02-be04-64a3947cc7ad.jsonl",
+    "whole_file_bytes": 1006683,
+    "whole_file_sha256": "839900cb94215f0f04fc3a290682f04bc30aa4574e00d4b1be0b33a533799b9e",
+    "interval_start_line": 2,
+    "interval_end_line": 99,
+    "interval_bytes": 984184,
+    "interval_sha256": "c26096236432ff3a4b15654d8a5a61347c6cffabbf88440de330938115952ef6",
+    "parent_thread_id": "01a09e19-5048-79d3-96dd-697eda8a4ac8"
+  },
+  "answer": {
+    "status": "present",
+    "file": "finalanswer.md",
+    "bytes": 3860,
+    "sha256": "f52d03f94468692d40eecd03b33d16bc0f7198fadf0dad7d86b0616cc772c736",
+    "native_content_bytes": 3908,
+    "native_content_sha256": "3ef05816651ec518797367981970d79121533272bc37f0ad170a966b4c72bc53"
+  },
+  "prompt_capture": {
+    "scheduled_prompt_bytes": 840,
+    "scheduled_prompt_sha256": "92af3dba39cb1ec95e81b6b27d1e3195dfac092a0733d2bff9c28b54d2849c43",
+    "exact_plaintext_hits": [],
+    "selected_interval_plaintext_user_messages": [
+      {
+        "line": 6,
+        "message_id": "msg_01a09f95-ed9a-7a12-aec1-ff535e5adde0",
+        "bytes": 10744,
+        "sha256": "9fac01447de165438d471141f3be411f7c91728bcbc166affaa9458681f667e4",
+        "equals_scheduled_prompt": false
+      }
+    ],
+    "status": "scheduled_assignment_not_plaintext_in_native_rollout",
+    "qualification": "NEW_TASK payload is encrypted in the child native rollout. Primary attests exact frozen schedule text submitted in the actual spawn call; independent native plaintext prompt hash is unavailable.",
+    "root_spawn_submission_attestation": {
+      "status": "reported_exact_match_by_primary",
+      "basis": "The primary reports observing its verbatim spawn submission in the parent conversation.",
+      "limitation": "This is not independent native-rollout text-hash proof; the child rollout contains no plaintext scheduled assignment."
+    },
+    "primary_exact_submission_attestation": true
+  },
+  "publication_scope": {
+    "retained_native_interval": "local_only_exclude_from_commit",
+    "publishable_artifacts": [
+      "observation.json",
+      "metadata.json",
+      "access-review.json",
+      "finalanswer.md",
+      "review.json",
+      "assessment.json"
+    ]
+  },
+  "capture_validation": {
+    "status": "condition_valid",
+    "observed_model": "gpt-5.6-terra",
+    "observed_effort": "high",
+    "condition_deviations": [],
+    "first_turn_within_wall_cap": true,
+    "duration_ms": 128324,
+    "operation_count": 12,
+    "operation_flag": 60,
+    "operation_flag_pass": true,
+    "model_visible_output_bytes": 238882,
+    "visible_output_flag_bytes": 400000,
+    "visible_output_flag_pass": true,
+    "provider_input_tokens": 710491,
+    "normal_structural_proof": {
+      "validated_call_count": 2,
+      "normal_cost": {
+        "public_invocations": 5,
+        "normal_context_retrieval_invocations": 4,
+        "exact_source_hydration_invocations": 1,
+        "source_content_bytes": 15713,
+        "source_content_bytes_status": "complete",
+        "semantic_relationship_count": 8,
+        "semantic_relationship_count_status": "complete",
+        "proof_validated_relationship_count": 8,
+        "proof_validated_relationship_count_status": "complete",
+        "actual_traversed_edge_count": 167,
+        "actual_traversed_edge_count_status": "complete",
+        "reported_delivered_relationship_count": 8,
+        "reported_delivered_relationship_count_status": "complete",
+        "ownership_association_count": 16,
+        "ownership_association_count_status": "complete",
+        "reported_evidence_bytes": 15713,
+        "actual_evidence_bytes": 15713,
+        "evidence_bytes_status": "complete",
+        "reported_output_bytes": 63608,
+        "actual_output_bytes": 63608,
+        "output_bytes_status": "complete",
+        "byte_accounting_status": "complete"
+      },
+      "legacy_complete_for_graph_use_claim": false
+    }
+  },
+  "source_postflight": {
+    "status": "valid",
+    "files_verified": 638,
+    "no_extra_files": true,
+    "checked_at": "2026-09-14T11:28:30.568686+00:00"
+  },
+  "returned_source_verification": {
+    "status": "valid",
+    "records_checked": 32,
+    "method": "Every returned source record matches contained frozen file SHA256 and exact byte slice."
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "reviewer": "primary gpt-6-astra/ultra",
+  "fact_judgments": [
+    {
+      "fact_id": "capture_options_declares_binding_contract",
+      "judgment": "correct",
+      "answer_quote": "`captureCommandResult` accepts `binding: WorkContextBinding`, not the public view:",
+      "source_references": [
+        {
+          "file": "src/tool-results/service.ts",
+          "start_line": 53,
+          "end_line": 60,
+          "sha256_of_exact_utf8_lines": "c492316cc078713599c249b236bcf2cb3826f40439904ebe00e28ccc6d9feb8d"
+        },
+        {
+          "file": "src/tool-results/service.ts",
+          "start_line": 411,
+          "end_line": 411,
+          "sha256_of_exact_utf8_lines": "dd903466b03fa7dbab014e533c8479b6301b5baa3b484be6017115bcd2e82f04"
+        }
+      ]
+    },
+    {
+      "fact_id": "binding_import_traverses_public_barrel",
+      "judgment": "correct",
+      "answer_quote": "[`src/tool-results/service.ts:23`](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:23) imports `WorkContextBinding` from the public work-context barrel; [`:53-60`](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:53) makes it the capture options’ binding contract.\n- The barrel re-exports it from [`src/work-context/index.ts:23-30`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/index.ts:23), whose defining module is [`src/work-context/binding.ts:28-45`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:28).",
+      "source_references": [
+        {
+          "file": "src/tool-results/service.ts",
+          "start_line": 19,
+          "end_line": 23,
+          "sha256_of_exact_utf8_lines": "4fcf2c3c900821bc66ab3e341af0f3a0550b716d2909f52b62f4cc5a6d4a16fc"
+        },
+        {
+          "file": "src/work-context/index.ts",
+          "start_line": 16,
+          "end_line": 29,
+          "sha256_of_exact_utf8_lines": "c45b3a2a80027420ba2532006cc4e18d07ff0b7cf83eaf781b99022b61d09eec"
+        }
+      ]
+    },
+    {
+      "fact_id": "binding_identity_and_view_difference",
+      "judgment": "correct",
+      "answer_quote": "That full contract includes `session_id` and `provenance.observed_cwd`.\n- `WorkContextBindingView` is separately exported at [`binding.ts:47-67`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:47). It intentionally omits those fields, as `workContextBindingView` shows at [`:130-139`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:130).\n\nTherefore the view type is not accepted: it is not structurally assignable to `WorkContextBinding`",
+      "source_references": [
+        {
+          "file": "src/work-context/binding.ts",
+          "start_line": 28,
+          "end_line": 45,
+          "sha256_of_exact_utf8_lines": "e917a43db554775a823e3b8870b165ba4931a28b126b8141b085bdca22cae1f2"
+        },
+        {
+          "file": "src/work-context/binding.ts",
+          "start_line": 47,
+          "end_line": 67,
+          "sha256_of_exact_utf8_lines": "62c22718b455a85314f85c92031f87c09ebe9ec8fad40cd2e5f33bd2ab83154d"
+        }
+      ]
+    }
+  ],
+  "relationship_support": [
+    {
+      "answer_quote": "imports `WorkContextBinding` from the public work-context barrel",
+      "status": "ambiguous_provenance"
+    }
+  ],
+  "material_unsupported_claims": [],
+  "qualifications": [
+    "All three required facts are present at the exact frozen declarations. The additional view-construction and runtime-validation claims are also correct in binding.ts:130-157 and 217-239; their extra line references are not needed as accepted required-fact references.",
+    "No relationship receives supported credit: every relevant relationship-bearing retrieve was unknown_truncated in model delivery, while the sole full_exact read had zero semantic relationships. Static relationship evidence therefore remains ambiguous and does not establish cognition."
+  ]
+}

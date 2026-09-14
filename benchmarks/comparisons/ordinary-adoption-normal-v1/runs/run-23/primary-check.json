@@ -1,0 +1,1951 @@
+{
+  "run_id": "run-23",
+  "schedule": {
+    "run_id": "run-23",
+    "case_id": "tool_result_capture_binding_type_identity",
+    "condition": "post_change",
+    "repetition": 1,
+    "role": "primary",
+    "purpose": "primary_check",
+    "model": "gpt-6-astra",
+    "effort": "ultra",
+    "source_root": "/tmp/anvil-source-tasks-20260914/t23",
+    "agent_task_name": null,
+    "prompt": "Investigate the repository at /tmp/anvil-source-tasks-20260914/t23 read-only.\n\nWhile changing authorization around tool-result capture, which work-context contract does captureCommandResult actually accept for binding? Trace the imported public type to its defining module, and explain whether the similarly named exported view type is accepted. Give the relevant paths and lines in a short answer.\n\nFollow the normal repository instructions. Keep this a focused source\ninvestigation: do not edit files, run tests, or launch services. Use only this\nrepository and installed operating instructions for evidence; do not inspect\nother repositories, earlier agent sessions or unrelated task artifacts. Give\na concise answer with relevant source paths and lines, and state any material\nuncertainty. Complete this assignment directly. Do not spawn other agents.",
+    "prompt_sha256": "43a346012515e32b4a508b78afb352caa409cdfb8a683785ac50ed9a7288ff6c",
+    "conditional_on_selected_correction": true,
+    "task_source_commit": "53bf29e60cece2335aa39fe301935a07e8e8d4e4",
+    "task_source_archive_sha256": "e919302908ba8dfee2ee8ee055fd4a7463a37e94a71d35d2ecda7abe95463c5e"
+  },
+  "native_rollout_path": "/Users/brummerv/.codex/sessions/2026/09/14/rollout-2026-09-14T14-07-34-01a09e19-5048-79d3-96dd-697eda8a4ac8.jsonl",
+  "thread_id": "01a09e19-5048-79d3-96dd-697eda8a4ac8",
+  "turn_id": "01a09f76-8dc6-7cc1-a0c3-4974e6a44eed",
+  "native_contexts": [
+    {
+      "line": 4378,
+      "model": "gpt-6-astra",
+      "effort": "ultra"
+    },
+    {
+      "line": 4938,
+      "model": "gpt-6-astra",
+      "effort": "ultra"
+    }
+  ],
+  "parent_observer_limitation": "The whole-turn observer rejects two turn_context records caused by compaction. These call-level receipts use its unchanged operation/correlation helpers and normal-v2 proof/byte validators on original native line numbers; no synthetic turn or per-case provider costs.",
+  "parent_prefix": {
+    "start_line": 4376,
+    "end_line": 5362,
+    "sha256": "7fafda565521ba3eaff33e598169f5c0cd0b0cbf2bbc0e7ebfc872b09455bf6d"
+  },
+  "mcp_calls": [
+    {
+      "line": 5297,
+      "event_type": "item_completed",
+      "item_id": "exec-c5de4e27-1c0d-4e7b-b3ab-b73d987b2f95",
+      "thread_id": "01a09e19-5048-79d3-96dd-697eda8a4ac8",
+      "turn_id": "01a09f76-8dc6-7cc1-a0c3-4974e6a44eed",
+      "started_at_ms": 1789384795574,
+      "completed_at_ms": 1789384804257,
+      "status": "completed",
+      "duration": {
+        "secs": 8,
+        "nanos": 682381042
+      },
+      "server": "loci",
+      "tool": "loci_retrieve",
+      "arguments": {
+        "repo": "/tmp/anvil-source-tasks-20260914/t23",
+        "query": "CaptureCommandResultOptions"
+      },
+      "target_repo": "/tmp/anvil-source-tasks-20260914/t23",
+      "result": {
+        "content": [],
+        "structuredContent": {
+          "schema_version": 1,
+          "policy": "normal-graph-v1",
+          "snapshot": "2847c26615128fc1999f97946c5f43b7317860c553fa5f835fa115f4ce3cfe50",
+          "status": "partial",
+          "selection": {
+            "mode": "inferred",
+            "candidate_count": 1,
+            "omitted_candidates": 0
+          },
+          "scope": {
+            "source": "indexed_supported_source",
+            "coverage": "partial",
+            "matching": "symbol_metadata",
+            "relationships": "known_static_relationships",
+            "exhaustive": false
+          },
+          "anchors": [
+            {
+              "node_id": "src/tool-results/service.ts::CaptureCommandResultOptions#type",
+              "score": 66.641,
+              "matched_terms": [
+                "capturecommandresultoption"
+              ],
+              "match_scope": [
+                "symbol_name",
+                "qualified_name",
+                "signature"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "id": "src/tool-results/service.ts::CaptureCommandResultOptions#type",
+              "name": "CaptureCommandResultOptions",
+              "kind": "type",
+              "file": "src/tool-results/service.ts"
+            },
+            {
+              "id": "src/tool-results/service.ts::__file__#file",
+              "name": "service.ts",
+              "kind": "file",
+              "file": "src/tool-results/service.ts"
+            },
+            {
+              "id": "src/tool-results/service.ts::MAX_ARTEFACT_BYTES#constant",
+              "name": "MAX_ARTEFACT_BYTES",
+              "kind": "constant",
+              "file": "src/tool-results/service.ts"
+            },
+            {
+              "id": "src/tool-results/service.ts::MAX_STORE_BYTES#constant",
+              "name": "MAX_STORE_BYTES",
+              "kind": "constant",
+              "file": "src/tool-results/service.ts"
+            },
+            {
+              "id": "src/tool-results/service.ts::RETENTION_MS#constant",
+              "name": "RETENTION_MS",
+              "kind": "constant",
+              "file": "src/tool-results/service.ts"
+            },
+            {
+              "id": "src/tool-results/service.ts::Clock#type",
+              "name": "Clock",
+              "kind": "type",
+              "file": "src/tool-results/service.ts"
+            },
+            {
+              "id": "src/tool-results/service.ts::captureCommandResult#function",
+              "name": "captureCommandResult",
+              "kind": "function",
+              "file": "src/tool-results/service.ts"
+            },
+            {
+              "id": "src/tool-results/service.ts::opaqueId#function",
+              "name": "opaqueId",
+              "kind": "function",
+              "file": "src/tool-results/service.ts"
+            }
+          ],
+          "items": [
+            {
+              "node_id": "src/tool-results/service.ts::CaptureCommandResultOptions#type",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Query matches capturecommandresultoption",
+              "source_ids": [
+                1
+              ],
+              "complete": true,
+              "extent": {
+                "file": "src/tool-results/service.ts",
+                "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+                "start_byte": 1380,
+                "end_byte": 1541
+              },
+              "source_ref": "eyJlbmQiOjE1NDEsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTM4MCwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjEzODAsInYiOjF9"
+            },
+            {
+              "node_id": "src/tool-results/service.ts::MAX_ARTEFACT_BYTES#constant",
+              "role": "related",
+              "depth": 0,
+              "why": "Validated ownership context",
+              "source_ids": [
+                2
+              ],
+              "complete": true,
+              "extent": {
+                "file": "src/tool-results/service.ts",
+                "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+                "start_byte": 1065,
+                "end_byte": 1102
+              },
+              "source_ref": "eyJlbmQiOjExMDIsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTA2NSwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjEwNjUsInYiOjF9"
+            },
+            {
+              "node_id": "src/tool-results/service.ts::MAX_STORE_BYTES#constant",
+              "role": "related",
+              "depth": 0,
+              "why": "Validated ownership context",
+              "source_ids": [
+                3
+              ],
+              "complete": true,
+              "extent": {
+                "file": "src/tool-results/service.ts",
+                "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+                "start_byte": 1110,
+                "end_byte": 1145
+              },
+              "source_ref": "eyJlbmQiOjExNDUsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTExMCwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjExMTAsInYiOjF9"
+            },
+            {
+              "node_id": "src/tool-results/service.ts::RETENTION_MS#constant",
+              "role": "related",
+              "depth": 0,
+              "why": "Validated ownership context",
+              "source_ids": [
+                4
+              ],
+              "complete": true,
+              "extent": {
+                "file": "src/tool-results/service.ts",
+                "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+                "start_byte": 1153,
+                "end_byte": 1188
+              },
+              "source_ref": "eyJlbmQiOjExODgsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTE1MywicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjExNTMsInYiOjF9"
+            },
+            {
+              "node_id": "src/tool-results/service.ts::Clock#type",
+              "role": "related",
+              "depth": 1,
+              "why": "Selected by uses_type",
+              "source_ids": [
+                5
+              ],
+              "complete": true,
+              "extent": {
+                "file": "src/tool-results/service.ts",
+                "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+                "start_byte": 1352,
+                "end_byte": 1378
+              },
+              "source_ref": "eyJlbmQiOjEzNzgsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTM1MiwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjEzNTIsInYiOjF9"
+            },
+            {
+              "node_id": "src/tool-results/service.ts::captureCommandResult#function",
+              "role": "related",
+              "depth": 1,
+              "why": "Selected by uses_type",
+              "source_ids": [
+                7
+              ],
+              "complete": false,
+              "extent": {
+                "file": "src/tool-results/service.ts",
+                "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+                "start_byte": 13257,
+                "end_byte": 17725
+              },
+              "source_ref": "eyJlbmQiOjE3NzI1LCJmaWxlIjoic3JjL3Rvb2wtcmVzdWx0cy9zZXJ2aWNlLnRzIiwiaGFzaCI6ImVjN2VlNDA3MWQ5YWU0ZTE4YTI3YzVlZTY0YzNhMzUxNTlkN2UyYmJmMDA2MDljNWU4ZDMyYWI3YzFiZDFhNmUiLCJvZmZzZXQiOjEzMjU3LCJyZXBvIjoiL3ByaXZhdGUvdG1wL2FudmlsLXNvdXJjZS10YXNrcy0yMDI2MDkxNC90MjMiLCJzdGFydCI6MTMyNTcsInYiOjF9"
+            },
+            {
+              "node_id": "src/tool-results/service.ts::opaqueId#function",
+              "role": "related",
+              "depth": 2,
+              "why": "Selected by calls",
+              "source_ids": [
+                9
+              ],
+              "complete": true,
+              "extent": {
+                "file": "src/tool-results/service.ts",
+                "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+                "start_byte": 2416,
+                "end_byte": 2523
+              },
+              "source_ref": "eyJlbmQiOjI1MjMsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MjQxNiwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjI0MTYsInYiOjF9"
+            }
+          ],
+          "ownership": [
+            {
+              "owner_id": "src/tool-results/service.ts::__file__#file",
+              "member_id": "src/tool-results/service.ts::CaptureCommandResultOptions#type",
+              "basis": "indexed_file"
+            },
+            {
+              "owner_id": "src/tool-results/service.ts::__file__#file",
+              "member_id": "src/tool-results/service.ts::MAX_ARTEFACT_BYTES#constant",
+              "basis": "indexed_file"
+            },
+            {
+              "owner_id": "src/tool-results/service.ts::__file__#file",
+              "member_id": "src/tool-results/service.ts::MAX_STORE_BYTES#constant",
+              "basis": "indexed_file"
+            },
+            {
+              "owner_id": "src/tool-results/service.ts::__file__#file",
+              "member_id": "src/tool-results/service.ts::RETENTION_MS#constant",
+              "basis": "indexed_file"
+            },
+            {
+              "owner_id": "src/tool-results/service.ts::__file__#file",
+              "member_id": "src/tool-results/service.ts::Clock#type",
+              "basis": "indexed_file"
+            },
+            {
+              "owner_id": "src/tool-results/service.ts::__file__#file",
+              "member_id": "src/tool-results/service.ts::captureCommandResult#function",
+              "basis": "indexed_file"
+            },
+            {
+              "owner_id": "src/tool-results/service.ts::__file__#file",
+              "member_id": "src/tool-results/service.ts::opaqueId#function",
+              "basis": "indexed_file"
+            }
+          ],
+          "relationships": [
+            {
+              "id": 1,
+              "edge": {
+                "from": "src/tool-results/service.ts::CaptureCommandResultOptions#type",
+                "to": "src/tool-results/service.ts::Clock#type",
+                "type": "uses_type",
+                "directed": true,
+                "namespace": "loci",
+                "resolution": "exact",
+                "evidence": {
+                  "file": "src/tool-results/service.ts",
+                  "line": 59,
+                  "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e"
+                }
+              },
+              "traversed": "forward",
+              "source_ids": [
+                1,
+                6
+              ],
+              "proof": "complete",
+              "resolution_configuration": null
+            },
+            {
+              "id": 2,
+              "edge": {
+                "from": "src/tool-results/service.ts::captureCommandResult#function",
+                "to": "src/tool-results/service.ts::CaptureCommandResultOptions#type",
+                "type": "uses_type",
+                "directed": true,
+                "namespace": "loci",
+                "resolution": "exact",
+                "evidence": {
+                  "file": "src/tool-results/service.ts",
+                  "line": 411,
+                  "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e"
+                }
+              },
+              "traversed": "reverse",
+              "source_ids": [
+                7,
+                8,
+                1
+              ],
+              "proof": "complete",
+              "resolution_configuration": null
+            },
+            {
+              "id": 3,
+              "edge": {
+                "from": "src/tool-results/service.ts::captureCommandResult#function",
+                "to": "src/tool-results/service.ts::opaqueId#function",
+                "type": "calls",
+                "directed": true,
+                "namespace": "loci",
+                "resolution": "exact",
+                "evidence": {
+                  "file": "src/tool-results/service.ts",
+                  "line": 427,
+                  "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e"
+                }
+              },
+              "traversed": "forward",
+              "source_ids": [
+                10,
+                11,
+                9
+              ],
+              "proof": "complete",
+              "resolution_configuration": null
+            }
+          ],
+          "sources": [
+            {
+              "id": 1,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 1380,
+              "end_byte": 1541,
+              "start_line": 53,
+              "end_line": 60,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "type CaptureCommandResultOptions = {\n  argv: string[];\n  producer: string;\n  binding: WorkContextBinding;\n  stateRoot?: string;\n  cwd?: string;\n  now?: Clock;\n};",
+              "source_ref": "eyJlbmQiOjE1NDEsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTM4MCwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjEzODAsInYiOjF9"
+            },
+            {
+              "id": 2,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 1065,
+              "end_byte": 1102,
+              "start_line": 42,
+              "end_line": 42,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "MAX_ARTEFACT_BYTES = 64 * 1024 * 1024",
+              "source_ref": "eyJlbmQiOjExMDIsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTA2NSwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjEwNjUsInYiOjF9"
+            },
+            {
+              "id": 3,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 1110,
+              "end_byte": 1145,
+              "start_line": 43,
+              "end_line": 43,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "MAX_STORE_BYTES = 512 * 1024 * 1024",
+              "source_ref": "eyJlbmQiOjExNDUsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTExMCwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjExMTAsInYiOjF9"
+            },
+            {
+              "id": 4,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 1153,
+              "end_byte": 1188,
+              "start_line": 44,
+              "end_line": 44,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "RETENTION_MS = 24 * 60 * 60 * 1_000",
+              "source_ref": "eyJlbmQiOjExODgsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTE1MywicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjExNTMsInYiOjF9"
+            },
+            {
+              "id": 5,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 1352,
+              "end_byte": 1378,
+              "start_line": 51,
+              "end_line": 51,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "type Clock = () => string;",
+              "source_ref": "eyJlbmQiOjEzNzgsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTM1MiwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjEzNTIsInYiOjF9"
+            },
+            {
+              "id": 6,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 1352,
+              "end_byte": 1379,
+              "start_line": 51,
+              "end_line": 51,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "type Clock = () => string;\n",
+              "source_ref": "eyJlbmQiOjEzNzksImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTM1MiwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjEzNTIsInYiOjF9"
+            },
+            {
+              "id": 7,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 13257,
+              "end_byte": 13988,
+              "start_line": 411,
+              "end_line": 423,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "async function captureCommandResult(options: CaptureCommandResultOptions): Promise<ToolResultReceipt> {\n  const clock = options.now ?? nowIso;\n  const binding = validateBinding(options.binding, clock);\n  const producer = validateProducer(options.producer);\n  const createdAt = clock();\n  const createdAtMs = Date.parse(createdAt);\n  if (!Number.isFinite(createdAtMs)) {\n    throw new ToolResultError(\"TOOL_RESULT_INVALID_REQUEST\", \"now must return an ISO date-time\");\n  }\n  const expiresAt = new Date(createdAtMs + RETENTION_MS).toISOString();\n  const paths = await prepareStore(options.stateRoot);\n  const temporaryDirectory = join(paths.temporary, `.capture-${randomUUID()}`);\n  await mkdir(temporaryDirectory, { mode: 0o700 });\n",
+              "source_ref": "eyJlbmQiOjEzOTg4LCJmaWxlIjoic3JjL3Rvb2wtcmVzdWx0cy9zZXJ2aWNlLnRzIiwiaGFzaCI6ImVjN2VlNDA3MWQ5YWU0ZTE4YTI3YzVlZTY0YzNhMzUxNTlkN2UyYmJmMDA2MDljNWU4ZDMyYWI3YzFiZDFhNmUiLCJvZmZzZXQiOjEzMjU3LCJyZXBvIjoiL3ByaXZhdGUvdG1wL2FudmlsLXNvdXJjZS10YXNrcy0yMDI2MDkxNC90MjMiLCJzdGFydCI6MTMyNTcsInYiOjF9"
+            },
+            {
+              "id": 8,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 13250,
+              "end_byte": 13361,
+              "start_line": 411,
+              "end_line": 411,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "export async function captureCommandResult(options: CaptureCommandResultOptions): Promise<ToolResultReceipt> {\n",
+              "source_ref": "eyJlbmQiOjEzMzYxLCJmaWxlIjoic3JjL3Rvb2wtcmVzdWx0cy9zZXJ2aWNlLnRzIiwiaGFzaCI6ImVjN2VlNDA3MWQ5YWU0ZTE4YTI3YzVlZTY0YzNhMzUxNTlkN2UyYmJmMDA2MDljNWU4ZDMyYWI3YzFiZDFhNmUiLCJvZmZzZXQiOjEzMjUwLCJyZXBvIjoiL3ByaXZhdGUvdG1wL2FudmlsLXNvdXJjZS10YXNrcy0yMDI2MDkxNC90MjMiLCJzdGFydCI6MTMyNTAsInYiOjF9"
+            },
+            {
+              "id": 9,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 2416,
+              "end_byte": 2523,
+              "start_line": 103,
+              "end_line": 105,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "function opaqueId(prefix: \"tr\" | \"ta\"): string {\n  return `${prefix}_${randomBytes(16).toString(\"hex\")}`;\n}",
+              "source_ref": "eyJlbmQiOjI1MjMsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MjQxNiwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjI0MTYsInYiOjF9"
+            },
+            {
+              "id": 10,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 14167,
+              "end_byte": 14181,
+              "start_line": 427,
+              "end_line": 427,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "opaqueId(\"tr\")",
+              "source_ref": "eyJlbmQiOjE0MTgxLCJmaWxlIjoic3JjL3Rvb2wtcmVzdWx0cy9zZXJ2aWNlLnRzIiwiaGFzaCI6ImVjN2VlNDA3MWQ5YWU0ZTE4YTI3YzVlZTY0YzNhMzUxNTlkN2UyYmJmMDA2MDljNWU4ZDMyYWI3YzFiZDFhNmUiLCJvZmZzZXQiOjE0MTY3LCJyZXBvIjoiL3ByaXZhdGUvdG1wL2FudmlsLXNvdXJjZS10YXNrcy0yMDI2MDkxNC90MjMiLCJzdGFydCI6MTQxNjcsInYiOjF9"
+            },
+            {
+              "id": 11,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 14146,
+              "end_byte": 14183,
+              "start_line": 427,
+              "end_line": 427,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "    const resultId = opaqueId(\"tr\");\n",
+              "source_ref": "eyJlbmQiOjE0MTgzLCJmaWxlIjoic3JjL3Rvb2wtcmVzdWx0cy9zZXJ2aWNlLnRzIiwiaGFzaCI6ImVjN2VlNDA3MWQ5YWU0ZTE4YTI3YzVlZTY0YzNhMzUxNTlkN2UyYmJmMDA2MDljNWU4ZDMyYWI3YzFiZDFhNmUiLCJvZmZzZXQiOjE0MTQ2LCJyZXBvIjoiL3ByaXZhdGUvdG1wL2FudmlsLXNvdXJjZS10YXNrcy0yMDI2MDkxNC90MjMiLCJzdGFydCI6MTQxNDYsInYiOjF9"
+            }
+          ],
+          "omissions": [
+            {
+              "reason": "hop_limit",
+              "count": 1
+            },
+            {
+              "reason": "cycle",
+              "count": 2
+            },
+            {
+              "reason": "unresolved_relation",
+              "count": 43
+            },
+            {
+              "reason": "ambiguous_relation",
+              "count": 4
+            },
+            {
+              "reason": "external_relation",
+              "count": 8
+            },
+            {
+              "reason": "source_preview",
+              "count": 1
+            },
+            {
+              "reason": "output_budget",
+              "count": 33
+            }
+          ],
+          "limits": {
+            "max_hops": 2,
+            "max_nodes": 64,
+            "max_neighbors": 32,
+            "max_items": 12,
+            "max_anchors": 3,
+            "max_explicit_anchors": 5,
+            "max_owner_members": 3,
+            "max_evidence_bytes": 8192,
+            "max_output_bytes": 16384,
+            "max_anchor_source_bytes": 1024,
+            "max_related_source_bytes": 768,
+            "max_lookup_bytes": 33554432,
+            "max_lookup_files": 4096,
+            "max_literal_matches": 256
+          },
+          "usage": {
+            "nodes_examined": 34,
+            "eligible_edges_considered": 39,
+            "edges_traversed": 36,
+            "relationships_delivered": 3,
+            "lookup_bytes": 0,
+            "lookup_files": 0,
+            "evidence_bytes": 1177,
+            "output_bytes": 16373,
+            "estimated_tokens": 4094,
+            "token_estimate_method": "utf8_bytes_div_4",
+            "output_encoding": "mcp_result_json_utf8"
+          }
+        },
+        "isError": false
+      },
+      "canonical_result_json_bytes": 16373,
+      "canonical_result_json_sha256": "c3d1576f93b407d7c3e92d274fc47b81a9891d4d188aff80859bcd0fa9173ef9",
+      "invocation_category": "other",
+      "relationship_delivery": {
+        "application_error": false,
+        "result_status": "partial",
+        "type_context_status": null,
+        "edge_families": {
+          "calls": 1,
+          "uses_type": 2
+        },
+        "edge_count": 3,
+        "semantic_edge_count": 3,
+        "containment_edge_count": 0,
+        "resolved_record_count": 0,
+        "unresolved_record_count": 0,
+        "unresolved_record_families": {},
+        "unknown_record_count": 0,
+        "relationship_shape_status": "complete",
+        "omissions": [
+          {
+            "reason": "hop_limit",
+            "count": 1
+          },
+          {
+            "reason": "cycle",
+            "count": 2
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 43
+          },
+          {
+            "reason": "ambiguous_relation",
+            "count": 4
+          },
+          {
+            "reason": "external_relation",
+            "count": 8
+          },
+          {
+            "reason": "source_preview",
+            "count": 1
+          },
+          {
+            "reason": "output_budget",
+            "count": 33
+          }
+        ],
+        "reported_evidence_bytes": 1177,
+        "reported_output_bytes": 16373,
+        "returned_source_text_bytes": null,
+        "source_text_bytes_status": "unknown_schema",
+        "requested_output_budget_bytes": null,
+        "requested_evidence_budget_bytes": null,
+        "returned_limits": {
+          "max_hops": 2,
+          "max_nodes": 64,
+          "max_neighbors": 32,
+          "max_items": 12,
+          "max_anchors": 3,
+          "max_explicit_anchors": 5,
+          "max_owner_members": 3,
+          "max_evidence_bytes": 8192,
+          "max_output_bytes": 16384,
+          "max_anchor_source_bytes": 1024,
+          "max_related_source_bytes": 768,
+          "max_lookup_bytes": 33554432,
+          "max_lookup_files": 4096,
+          "max_literal_matches": 256
+        }
+      },
+      "model_delivery": {
+        "status": "full_exact",
+        "matches": [
+          {
+            "call_id": "call_OUayBnB02xAl0VpyJniE67KQ",
+            "output_line": 5298,
+            "block_index": 2,
+            "output_ref": "outer:call_OUayBnB02xAl0VpyJniE67KQ:line:5298:block:2",
+            "match": "structuredContent_json_or_wrapper"
+          }
+        ]
+      }
+    },
+    {
+      "line": 5304,
+      "event_type": "item_completed",
+      "item_id": "exec-32e4de94-f93c-4657-9148-b2bd35708949",
+      "thread_id": "01a09e19-5048-79d3-96dd-697eda8a4ac8",
+      "turn_id": "01a09f76-8dc6-7cc1-a0c3-4974e6a44eed",
+      "started_at_ms": 1789384817398,
+      "completed_at_ms": 1789384821914,
+      "status": "completed",
+      "duration": {
+        "secs": 4,
+        "nanos": 516160709
+      },
+      "server": "loci",
+      "tool": "loci_retrieve",
+      "arguments": {
+        "repo": "/tmp/anvil-source-tasks-20260914/t23",
+        "query": "WorkContextBinding"
+      },
+      "target_repo": "/tmp/anvil-source-tasks-20260914/t23",
+      "result": {
+        "content": [],
+        "structuredContent": {
+          "schema_version": 1,
+          "policy": "normal-graph-v1",
+          "snapshot": "2847c26615128fc1999f97946c5f43b7317860c553fa5f835fa115f4ce3cfe50",
+          "status": "partial",
+          "selection": {
+            "mode": "inferred",
+            "candidate_count": 1,
+            "omitted_candidates": 0
+          },
+          "scope": {
+            "source": "indexed_supported_source",
+            "coverage": "partial",
+            "matching": "symbol_metadata",
+            "relationships": "known_static_relationships",
+            "exhaustive": false
+          },
+          "anchors": [
+            {
+              "node_id": "src/work-context/binding.ts::WorkContextBinding#type",
+              "score": 51.463,
+              "matched_terms": [
+                "workcontextbinding"
+              ],
+              "match_scope": [
+                "symbol_name",
+                "qualified_name",
+                "signature"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "id": "src/work-context/binding.ts::WorkContextBinding#type",
+              "name": "WorkContextBinding",
+              "kind": "type",
+              "file": "src/work-context/binding.ts"
+            },
+            {
+              "id": "src/work-context/binding.ts::__file__#file",
+              "name": "binding.ts",
+              "kind": "file",
+              "file": "src/work-context/binding.ts"
+            },
+            {
+              "id": "src/work-context/binding.ts::WorkContextErrorCode#type",
+              "name": "WorkContextErrorCode",
+              "kind": "type",
+              "file": "src/work-context/binding.ts"
+            },
+            {
+              "id": "src/work-context/binding.ts::WorkContextError#class",
+              "name": "WorkContextError",
+              "kind": "class",
+              "file": "src/work-context/binding.ts"
+            },
+            {
+              "id": "src/work-context/binding.ts::WorkContextError.constructor#method",
+              "name": "constructor",
+              "kind": "method",
+              "file": "src/work-context/binding.ts"
+            },
+            {
+              "id": "src/work-context/space.ts::WorkspaceRef#type",
+              "name": "WorkspaceRef",
+              "kind": "type",
+              "file": "src/work-context/space.ts"
+            },
+            {
+              "id": "src/work-context/space.ts::__file__#file",
+              "name": "space.ts",
+              "kind": "file",
+              "file": "src/work-context/space.ts"
+            },
+            {
+              "id": "src/work-context/rejections.ts::__file__#file",
+              "name": "rejections.ts",
+              "kind": "file",
+              "file": "src/work-context/rejections.ts"
+            }
+          ],
+          "items": [
+            {
+              "node_id": "src/work-context/binding.ts::WorkContextBinding#type",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Query matches workcontextbinding",
+              "source_ids": [
+                1
+              ],
+              "complete": true,
+              "extent": {
+                "file": "src/work-context/binding.ts",
+                "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+                "start_byte": 912,
+                "end_byte": 1316
+              },
+              "source_ref": "eyJlbmQiOjEzMTYsImZpbGUiOiJzcmMvd29yay1jb250ZXh0L2JpbmRpbmcudHMiLCJoYXNoIjoiZmNmOWNlOGZiYmVmZGZmY2ZkYmQ0NjFhNGM1YjA4ZTg0ZjdhMzYyMjBlOTlhZWU2ZGNkZDY0YWQ4Y2UzY2EzZiIsIm9mZnNldCI6OTEyLCJyZXBvIjoiL3ByaXZhdGUvdG1wL2FudmlsLXNvdXJjZS10YXNrcy0yMDI2MDkxNC90MjMiLCJzdGFydCI6OTEyLCJ2IjoxfQ"
+            },
+            {
+              "node_id": "src/work-context/binding.ts::WorkContextErrorCode#type",
+              "role": "related",
+              "depth": 0,
+              "why": "Validated ownership context",
+              "source_ids": [
+                2
+              ],
+              "complete": true,
+              "extent": {
+                "file": "src/work-context/binding.ts",
+                "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+                "start_byte": 499,
+                "end_byte": 638
+              },
+              "source_ref": "eyJlbmQiOjYzOCwiZmlsZSI6InNyYy93b3JrLWNvbnRleHQvYmluZGluZy50cyIsImhhc2giOiJmY2Y5Y2U4ZmJiZWZkZmZjZmRiZDQ2MWE0YzViMDhlODRmN2EzNjIyMGU5OWFlZTZkY2RkNjRhZDhjZTNjYTNmIiwib2Zmc2V0Ijo0OTksInJlcG8iOiIvcHJpdmF0ZS90bXAvYW52aWwtc291cmNlLXRhc2tzLTIwMjYwOTE0L3QyMyIsInN0YXJ0Ijo0OTksInYiOjF9"
+            },
+            {
+              "node_id": "src/work-context/binding.ts::WorkContextError#class",
+              "role": "related",
+              "depth": 0,
+              "why": "Validated ownership context",
+              "source_ids": [
+                3
+              ],
+              "complete": true,
+              "extent": {
+                "file": "src/work-context/binding.ts",
+                "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+                "start_byte": 647,
+                "end_byte": 903
+              },
+              "source_ref": "eyJlbmQiOjkwMywiZmlsZSI6InNyYy93b3JrLWNvbnRleHQvYmluZGluZy50cyIsImhhc2giOiJmY2Y5Y2U4ZmJiZWZkZmZjZmRiZDQ2MWE0YzViMDhlODRmN2EzNjIyMGU5OWFlZTZkY2RkNjRhZDhjZTNjYTNmIiwib2Zmc2V0Ijo2NDcsInJlcG8iOiIvcHJpdmF0ZS90bXAvYW52aWwtc291cmNlLXRhc2tzLTIwMjYwOTE0L3QyMyIsInN0YXJ0Ijo2NDcsInYiOjF9"
+            },
+            {
+              "node_id": "src/work-context/binding.ts::WorkContextError.constructor#method",
+              "role": "related",
+              "depth": 0,
+              "why": "Validated ownership context",
+              "source_ids": [
+                3
+              ],
+              "complete": true,
+              "extent": {
+                "file": "src/work-context/binding.ts",
+                "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+                "start_byte": 728,
+                "end_byte": 901
+              },
+              "source_ref": "eyJlbmQiOjkwMSwiZmlsZSI6InNyYy93b3JrLWNvbnRleHQvYmluZGluZy50cyIsImhhc2giOiJmY2Y5Y2U4ZmJiZWZkZmZjZmRiZDQ2MWE0YzViMDhlODRmN2EzNjIyMGU5OWFlZTZkY2RkNjRhZDhjZTNjYTNmIiwib2Zmc2V0Ijo3MjgsInJlcG8iOiIvcHJpdmF0ZS90bXAvYW52aWwtc291cmNlLXRhc2tzLTIwMjYwOTE0L3QyMyIsInN0YXJ0Ijo3MjgsInYiOjF9"
+            },
+            {
+              "node_id": "src/work-context/space.ts::WorkspaceRef#type",
+              "role": "related",
+              "depth": 1,
+              "why": "Selected by uses_type",
+              "source_ids": [
+                4
+              ],
+              "complete": true,
+              "extent": {
+                "file": "src/work-context/space.ts",
+                "content_hash": "99172cfad3f7d6af44c98a43e456ac805f9a29f35bedbccb9c4dd4015dd578da",
+                "start_byte": 600,
+                "end_byte": 655
+              },
+              "source_ref": "eyJlbmQiOjY1NSwiZmlsZSI6InNyYy93b3JrLWNvbnRleHQvc3BhY2UudHMiLCJoYXNoIjoiOTkxNzJjZmFkM2Y3ZDZhZjQ0Yzk4YTQzZTQ1NmFjODA1ZjlhMjlmMzViZWRiY2NiOWM0ZGQ0MDE1ZGQ1NzhkYSIsIm9mZnNldCI6NjAwLCJyZXBvIjoiL3ByaXZhdGUvdG1wL2FudmlsLXNvdXJjZS10YXNrcy0yMDI2MDkxNC90MjMiLCJzdGFydCI6NjAwLCJ2IjoxfQ"
+            }
+          ],
+          "ownership": [
+            {
+              "owner_id": "src/work-context/binding.ts::__file__#file",
+              "member_id": "src/work-context/binding.ts::WorkContextBinding#type",
+              "basis": "indexed_file"
+            },
+            {
+              "owner_id": "src/work-context/binding.ts::__file__#file",
+              "member_id": "src/work-context/binding.ts::WorkContextErrorCode#type",
+              "basis": "indexed_file"
+            },
+            {
+              "owner_id": "src/work-context/binding.ts::__file__#file",
+              "member_id": "src/work-context/binding.ts::WorkContextError#class",
+              "basis": "indexed_file"
+            },
+            {
+              "owner_id": "src/work-context/binding.ts::__file__#file",
+              "member_id": "src/work-context/binding.ts::WorkContextError.constructor#method",
+              "basis": "indexed_file"
+            },
+            {
+              "owner_id": "src/work-context/space.ts::__file__#file",
+              "member_id": "src/work-context/space.ts::WorkspaceRef#type",
+              "basis": "indexed_file"
+            }
+          ],
+          "relationships": [
+            {
+              "id": 1,
+              "edge": {
+                "from": "src/work-context/binding.ts::WorkContextBinding#type",
+                "to": "src/work-context/space.ts::WorkspaceRef#type",
+                "type": "uses_type",
+                "directed": true,
+                "namespace": "loci",
+                "resolution": "import-resolved",
+                "evidence": {
+                  "file": "src/work-context/binding.ts",
+                  "line": 37,
+                  "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f"
+                }
+              },
+              "traversed": "forward",
+              "source_ids": [
+                1,
+                5,
+                6,
+                7,
+                8,
+                9
+              ],
+              "proof": "complete",
+              "resolution_configuration": null
+            },
+            {
+              "id": 2,
+              "edge": {
+                "from": "src/work-context/binding.ts::__file__#file",
+                "to": "src/work-context/space.ts::__file__#file",
+                "type": "imports",
+                "directed": true,
+                "namespace": "loci",
+                "resolution": "import-resolved",
+                "evidence": {
+                  "file": "src/work-context/binding.ts",
+                  "line": 9,
+                  "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f"
+                }
+              },
+              "traversed": "forward",
+              "source_ids": [
+                10,
+                8,
+                9
+              ],
+              "proof": "complete",
+              "resolution_configuration": null
+            },
+            {
+              "id": 3,
+              "edge": {
+                "from": "src/work-context/rejections.ts::__file__#file",
+                "to": "src/work-context/binding.ts::__file__#file",
+                "type": "imports",
+                "directed": true,
+                "namespace": "loci",
+                "resolution": "import-resolved",
+                "evidence": {
+                  "file": "src/work-context/rejections.ts",
+                  "line": 5,
+                  "content_hash": "5414bab53d2923e34936c24413f1abb36c495bb05efe348bd33f24449b9c3603"
+                }
+              },
+              "traversed": "reverse",
+              "source_ids": [
+                11,
+                8,
+                9
+              ],
+              "proof": "complete",
+              "resolution_configuration": null
+            },
+            {
+              "id": 4,
+              "edge": {
+                "from": "src/work-context/binding.ts::__file__#file",
+                "to": "src/work-context/space.ts::__file__#file",
+                "type": "imports_type",
+                "directed": true,
+                "namespace": "loci",
+                "resolution": "import-resolved",
+                "evidence": {
+                  "file": "src/work-context/binding.ts",
+                  "line": 10,
+                  "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f"
+                }
+              },
+              "traversed": "forward",
+              "source_ids": [
+                6,
+                8,
+                9
+              ],
+              "proof": "complete",
+              "resolution_configuration": null
+            }
+          ],
+          "sources": [
+            {
+              "id": 1,
+              "file": "src/work-context/binding.ts",
+              "start_byte": 912,
+              "end_byte": 1316,
+              "start_line": 28,
+              "end_line": 45,
+              "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+              "content": "type WorkContextBinding = {\n  version: 1;\n  id: string;\n  status: \"active\" | \"superseded\";\n  host: string;\n  session_id: string;\n  bound_at: string;\n  last_seen_at: string;\n  expires_at: string;\n  collaboration_space: WorkspaceRef;\n  provenance: {\n    kind: \"host_lifecycle\" | \"operator_rebind\";\n    lifecycle: string;\n    observed_cwd: string;\n  };\n  superseded_by?: string;\n  superseded_at?: string;\n};",
+              "source_ref": "eyJlbmQiOjEzMTYsImZpbGUiOiJzcmMvd29yay1jb250ZXh0L2JpbmRpbmcudHMiLCJoYXNoIjoiZmNmOWNlOGZiYmVmZGZmY2ZkYmQ0NjFhNGM1YjA4ZTg0ZjdhMzYyMjBlOTlhZWU2ZGNkZDY0YWQ4Y2UzY2EzZiIsIm9mZnNldCI6OTEyLCJyZXBvIjoiL3ByaXZhdGUvdG1wL2FudmlsLXNvdXJjZS10YXNrcy0yMDI2MDkxNC90MjMiLCJzdGFydCI6OTEyLCJ2IjoxfQ"
+            },
+            {
+              "id": 2,
+              "file": "src/work-context/binding.ts",
+              "start_byte": 499,
+              "end_byte": 638,
+              "start_line": 12,
+              "end_line": 16,
+              "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+              "content": "type WorkContextErrorCode =\n  | \"WORK_CONTEXT_NOT_BOUND\"\n  | \"WORK_CONTEXT_STALE\"\n  | \"WORK_CONTEXT_MISMATCH\"\n  | \"WORK_CONTEXT_AMBIGUOUS\";",
+              "source_ref": "eyJlbmQiOjYzOCwiZmlsZSI6InNyYy93b3JrLWNvbnRleHQvYmluZGluZy50cyIsImhhc2giOiJmY2Y5Y2U4ZmJiZWZkZmZjZmRiZDQ2MWE0YzViMDhlODRmN2EzNjIyMGU5OWFlZTZkY2RkNjRhZDhjZTNjYTNmIiwib2Zmc2V0Ijo0OTksInJlcG8iOiIvcHJpdmF0ZS90bXAvYW52aWwtc291cmNlLXRhc2tzLTIwMjYwOTE0L3QyMyIsInN0YXJ0Ijo0OTksInYiOjF9"
+            },
+            {
+              "id": 3,
+              "file": "src/work-context/binding.ts",
+              "start_byte": 647,
+              "end_byte": 903,
+              "start_line": 18,
+              "end_line": 26,
+              "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+              "content": "class WorkContextError extends Error {\n  readonly code: WorkContextErrorCode;\n\n  constructor(code: WorkContextErrorCode, message: string, options?: ErrorOptions) {\n    super(message, options);\n    this.name = \"WorkContextError\";\n    this.code = code;\n  }\n}",
+              "source_ref": "eyJlbmQiOjkwMywiZmlsZSI6InNyYy93b3JrLWNvbnRleHQvYmluZGluZy50cyIsImhhc2giOiJmY2Y5Y2U4ZmJiZWZkZmZjZmRiZDQ2MWE0YzViMDhlODRmN2EzNjIyMGU5OWFlZTZkY2RkNjRhZDhjZTNjYTNmIiwib2Zmc2V0Ijo2NDcsInJlcG8iOiIvcHJpdmF0ZS90bXAvYW52aWwtc291cmNlLXRhc2tzLTIwMjYwOTE0L3QyMyIsInN0YXJ0Ijo2NDcsInYiOjF9"
+            },
+            {
+              "id": 4,
+              "file": "src/work-context/space.ts",
+              "start_byte": 600,
+              "end_byte": 655,
+              "start_line": 18,
+              "end_line": 18,
+              "content_hash": "99172cfad3f7d6af44c98a43e456ac805f9a29f35bedbccb9c4dd4015dd578da",
+              "content": "type WorkspaceRef = z.infer<typeof workspaceRefSchema>;",
+              "source_ref": "eyJlbmQiOjY1NSwiZmlsZSI6InNyYy93b3JrLWNvbnRleHQvc3BhY2UudHMiLCJoYXNoIjoiOTkxNzJjZmFkM2Y3ZDZhZjQ0Yzk4YTQzZTQ1NmFjODA1ZjlhMjlmMzViZWRiY2NiOWM0ZGQ0MDE1ZGQ1NzhkYSIsIm9mZnNldCI6NjAwLCJyZXBvIjoiL3ByaXZhdGUvdG1wL2FudmlsLXNvdXJjZS10YXNrcy0yMDI2MDkxNC90MjMiLCJzdGFydCI6NjAwLCJ2IjoxfQ"
+            },
+            {
+              "id": 5,
+              "file": "src/work-context/binding.ts",
+              "start_byte": 905,
+              "end_byte": 940,
+              "start_line": 28,
+              "end_line": 28,
+              "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+              "content": "export type WorkContextBinding = {\n",
+              "source_ref": "eyJlbmQiOjk0MCwiZmlsZSI6InNyYy93b3JrLWNvbnRleHQvYmluZGluZy50cyIsImhhc2giOiJmY2Y5Y2U4ZmJiZWZkZmZjZmRiZDQ2MWE0YzViMDhlODRmN2EzNjIyMGU5OWFlZTZkY2RkNjRhZDhjZTNjYTNmIiwib2Zmc2V0Ijo5MDUsInJlcG8iOiIvcHJpdmF0ZS90bXAvYW52aWwtc291cmNlLXRhc2tzLTIwMjYwOTE0L3QyMyIsInN0YXJ0Ijo5MDUsInYiOjF9"
+            },
+            {
+              "id": 6,
+              "file": "src/work-context/binding.ts",
+              "start_byte": 443,
+              "end_byte": 491,
+              "start_line": 10,
+              "end_line": 10,
+              "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+              "content": "import type { WorkspaceRef } from \"./space.ts\";\n",
+              "source_ref": "eyJlbmQiOjQ5MSwiZmlsZSI6InNyYy93b3JrLWNvbnRleHQvYmluZGluZy50cyIsImhhc2giOiJmY2Y5Y2U4ZmJiZWZkZmZjZmRiZDQ2MWE0YzViMDhlODRmN2EzNjIyMGU5OWFlZTZkY2RkNjRhZDhjZTNjYTNmIiwib2Zmc2V0Ijo0NDMsInJlcG8iOiIvcHJpdmF0ZS90bXAvYW52aWwtc291cmNlLXRhc2tzLTIwMjYwOTE0L3QyMyIsInN0YXJ0Ijo0NDMsInYiOjF9"
+            },
+            {
+              "id": 7,
+              "file": "src/work-context/space.ts",
+              "start_byte": 593,
+              "end_byte": 656,
+              "start_line": 18,
+              "end_line": 18,
+              "content_hash": "99172cfad3f7d6af44c98a43e456ac805f9a29f35bedbccb9c4dd4015dd578da",
+              "content": "export type WorkspaceRef = z.infer<typeof workspaceRefSchema>;\n",
+              "source_ref": "eyJlbmQiOjY1NiwiZmlsZSI6InNyYy93b3JrLWNvbnRleHQvc3BhY2UudHMiLCJoYXNoIjoiOTkxNzJjZmFkM2Y3ZDZhZjQ0Yzk4YTQzZTQ1NmFjODA1ZjlhMjlmMzViZWRiY2NiOWM0ZGQ0MDE1ZGQ1NzhkYSIsIm9mZnNldCI6NTkzLCJyZXBvIjoiL3ByaXZhdGUvdG1wL2FudmlsLXNvdXJjZS10YXNrcy0yMDI2MDkxNC90MjMiLCJzdGFydCI6NTkzLCJ2IjoxfQ"
+            },
+            {
+              "id": 8,
+              "file": "package.json",
+              "start_byte": 0,
+              "end_byte": 759,
+              "start_line": 1,
+              "end_line": 30,
+              "content_hash": "def1d66868a09fb9ddc183d8e110665c680a49fe14fe60a15d3d3f616ec41bd6",
+              "content": "{\n  \"name\": \"anvil-redux\",\n  \"version\": \"0.0.0\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"engines\": {\n    \"node\": \">=22.18.0\"\n  },\n  \"bin\": {\n    \"anvil\": \"./bin/anvil.ts\",\n    \"manifest\": \"./bin/manifest.ts\",\n    \"brain\": \"./bin/brain.ts\",\n    \"anvil-measurements\": \"./bin/anvil-measurements.ts\"\n  },\n  \"scripts\": {\n    \"eval:brain-context\": \"node scripts/evaluate-brain-context.ts\",\n    \"typecheck\": \"tsc --noEmit\",\n    \"test\": \"npm run typecheck && node --test --test-concurrency=1 test/*.test.ts\"\n  },\n  \"devDependencies\": {\n    \"@types/node\": \"^25.9.1\",\n    \"js-tiktoken\": \"1.0.21\",\n    \"typescript\": \"^6.0.3\"\n  },\n  \"dependencies\": {\n    \"@modelcontextprotocol/client\": \"^2.0.0\",\n    \"@modelcontextprotocol/server\": \"^2.0.0\",\n    \"zod\": \"^4.4.3\"\n  }\n}\n",
+              "source_ref": "eyJlbmQiOjc1OSwiZmlsZSI6InBhY2thZ2UuanNvbiIsImhhc2giOiJkZWYxZDY2ODY4YTA5ZmI5ZGRjMTgzZDhlMTEwNjY1YzY4MGE0OWZlMTRmZTYwYTE1ZDNkM2Y2MTZlYzQxYmQ2Iiwib2Zmc2V0IjowLCJyZXBvIjoiL3ByaXZhdGUvdG1wL2FudmlsLXNvdXJjZS10YXNrcy0yMDI2MDkxNC90MjMiLCJzdGFydCI6MCwidiI6MX0"
+            },
+            {
+              "id": 9,
+              "file": "tsconfig.json",
+              "start_byte": 0,
+              "end_byte": 415,
+              "start_line": 1,
+              "end_line": 15,
+              "content_hash": "3e7675116d9906f30a143ea8552b27c323a594da8c5c2d1984cfc76b1ff47ffe",
+              "content": "{\n  \"compilerOptions\": {\n    \"allowImportingTsExtensions\": true,\n    \"erasableSyntaxOnly\": true,\n    \"jsx\": \"react-jsx\",\n    \"lib\": [\"ESNext\", \"DOM\", \"DOM.Iterable\"],\n    \"module\": \"nodenext\",\n    \"noEmit\": true,\n    \"strict\": true,\n    \"target\": \"esnext\",\n    \"types\": [\"node\"],\n    \"verbatimModuleSyntax\": true\n  },\n  \"include\": [\"bin/**/*.ts\", \"scripts/**/*.ts\", \"src/**/*.ts\", \"src/**/*.tsx\", \"test/**/*.ts\"]\n}\n",
+              "source_ref": "eyJlbmQiOjQxNSwiZmlsZSI6InRzY29uZmlnLmpzb24iLCJoYXNoIjoiM2U3Njc1MTE2ZDk5MDZmMzBhMTQzZWE4NTUyYjI3YzMyM2E1OTRkYThjNWMyZDE5ODRjZmM3NmIxZmY0N2ZmZSIsIm9mZnNldCI6MCwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjAsInYiOjF9"
+            },
+            {
+              "id": 10,
+              "file": "src/work-context/binding.ts",
+              "start_byte": 346,
+              "end_byte": 443,
+              "start_line": 9,
+              "end_line": 9,
+              "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+              "content": "import { resolveCollaborationSpace, workspaceKeyForRoot, workspaceRefSchema } from \"./space.ts\";\n",
+              "source_ref": "eyJlbmQiOjQ0MywiZmlsZSI6InNyYy93b3JrLWNvbnRleHQvYmluZGluZy50cyIsImhhc2giOiJmY2Y5Y2U4ZmJiZWZkZmZjZmRiZDQ2MWE0YzViMDhlODRmN2EzNjIyMGU5OWFlZTZkY2RkNjRhZDhjZTNjYTNmIiwib2Zmc2V0IjozNDYsInJlcG8iOiIvcHJpdmF0ZS90bXAvYW52aWwtc291cmNlLXRhc2tzLTIwMjYwOTE0L3QyMyIsInN0YXJ0IjozNDYsInYiOjF9"
+            },
+            {
+              "id": 11,
+              "file": "src/work-context/rejections.ts",
+              "start_byte": 150,
+              "end_byte": 210,
+              "start_line": 5,
+              "end_line": 5,
+              "content_hash": "5414bab53d2923e34936c24413f1abb36c495bb05efe348bd33f24449b9c3603",
+              "content": "import { resolveWorkContextStateRoot } from \"./binding.ts\";\n",
+              "source_ref": "eyJlbmQiOjIxMCwiZmlsZSI6InNyYy93b3JrLWNvbnRleHQvcmVqZWN0aW9ucy50cyIsImhhc2giOiI1NDE0YmFiNTNkMjkyM2UzNDkzNmMyNDQxM2YxYWJiMzZjNDk1YmIwNWVmZTM0OGJkMzNmMjQ0NDliOWMzNjAzIiwib2Zmc2V0IjoxNTAsInJlcG8iOiIvcHJpdmF0ZS90bXAvYW52aWwtc291cmNlLXRhc2tzLTIwMjYwOTE0L3QyMyIsInN0YXJ0IjoxNTAsInYiOjF9"
+            }
+          ],
+          "omissions": [
+            {
+              "reason": "node_limit",
+              "count": 11
+            },
+            {
+              "reason": "neighbor_limit",
+              "count": 4
+            },
+            {
+              "reason": "cycle",
+              "count": 5
+            },
+            {
+              "reason": "alternative_path",
+              "count": 1
+            },
+            {
+              "reason": "unresolved_relation",
+              "count": 44
+            },
+            {
+              "reason": "ambiguous_relation",
+              "count": 1
+            },
+            {
+              "reason": "external_relation",
+              "count": 15
+            },
+            {
+              "reason": "output_budget",
+              "count": 93
+            }
+          ],
+          "limits": {
+            "max_hops": 2,
+            "max_nodes": 64,
+            "max_neighbors": 32,
+            "max_items": 12,
+            "max_anchors": 3,
+            "max_explicit_anchors": 5,
+            "max_owner_members": 3,
+            "max_evidence_bytes": 8192,
+            "max_output_bytes": 16384,
+            "max_anchor_source_bytes": 1024,
+            "max_related_source_bytes": 768,
+            "max_lookup_bytes": 33554432,
+            "max_lookup_files": 4096,
+            "max_literal_matches": 256
+          },
+          "usage": {
+            "nodes_examined": 64,
+            "eligible_edges_considered": 112,
+            "edges_traversed": 92,
+            "relationships_delivered": 4,
+            "lookup_bytes": 0,
+            "lookup_files": 0,
+            "evidence_bytes": 2248,
+            "output_bytes": 16237,
+            "estimated_tokens": 4060,
+            "token_estimate_method": "utf8_bytes_div_4",
+            "output_encoding": "mcp_result_json_utf8"
+          }
+        },
+        "isError": false
+      },
+      "canonical_result_json_bytes": 16237,
+      "canonical_result_json_sha256": "d60a031c368e29a475d4151c5305e2838e249c01e78374b557eadb793c28950c",
+      "invocation_category": "other",
+      "relationship_delivery": {
+        "application_error": false,
+        "result_status": "partial",
+        "type_context_status": null,
+        "edge_families": {
+          "imports": 2,
+          "imports_type": 1,
+          "uses_type": 1
+        },
+        "edge_count": 4,
+        "semantic_edge_count": 4,
+        "containment_edge_count": 0,
+        "resolved_record_count": 0,
+        "unresolved_record_count": 0,
+        "unresolved_record_families": {},
+        "unknown_record_count": 0,
+        "relationship_shape_status": "complete",
+        "omissions": [
+          {
+            "reason": "node_limit",
+            "count": 11
+          },
+          {
+            "reason": "neighbor_limit",
+            "count": 4
+          },
+          {
+            "reason": "cycle",
+            "count": 5
+          },
+          {
+            "reason": "alternative_path",
+            "count": 1
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 44
+          },
+          {
+            "reason": "ambiguous_relation",
+            "count": 1
+          },
+          {
+            "reason": "external_relation",
+            "count": 15
+          },
+          {
+            "reason": "output_budget",
+            "count": 93
+          }
+        ],
+        "reported_evidence_bytes": 2248,
+        "reported_output_bytes": 16237,
+        "returned_source_text_bytes": null,
+        "source_text_bytes_status": "unknown_schema",
+        "requested_output_budget_bytes": null,
+        "requested_evidence_budget_bytes": null,
+        "returned_limits": {
+          "max_hops": 2,
+          "max_nodes": 64,
+          "max_neighbors": 32,
+          "max_items": 12,
+          "max_anchors": 3,
+          "max_explicit_anchors": 5,
+          "max_owner_members": 3,
+          "max_evidence_bytes": 8192,
+          "max_output_bytes": 16384,
+          "max_anchor_source_bytes": 1024,
+          "max_related_source_bytes": 768,
+          "max_lookup_bytes": 33554432,
+          "max_lookup_files": 4096,
+          "max_literal_matches": 256
+        }
+      },
+      "model_delivery": {
+        "status": "full_exact",
+        "matches": [
+          {
+            "call_id": "call_O2mAM5Z2q83m6wskowRL6B4a",
+            "output_line": 5305,
+            "block_index": 1,
+            "output_ref": "outer:call_O2mAM5Z2q83m6wskowRL6B4a:line:5305:block:1",
+            "match": "structuredContent_json_or_wrapper"
+          }
+        ]
+      }
+    },
+    {
+      "line": 5311,
+      "event_type": "item_completed",
+      "item_id": "exec-2bc14136-2bcc-40df-ad0d-b8df93b47bb7",
+      "thread_id": "01a09e19-5048-79d3-96dd-697eda8a4ac8",
+      "turn_id": "01a09f76-8dc6-7cc1-a0c3-4974e6a44eed",
+      "started_at_ms": 1789384841611,
+      "completed_at_ms": 1789384846255,
+      "status": "completed",
+      "duration": {
+        "secs": 4,
+        "nanos": 644155750
+      },
+      "server": "loci",
+      "tool": "loci_retrieve",
+      "arguments": {
+        "repo": "/tmp/anvil-source-tasks-20260914/t23",
+        "seed_ids": [
+          "src/tool-results/service.ts::CaptureCommandResultOptions#type",
+          "src/work-context/binding.ts::WorkContextBinding#type"
+        ],
+        "query": "binding contract"
+      },
+      "target_repo": "/tmp/anvil-source-tasks-20260914/t23",
+      "result": {
+        "content": [],
+        "structuredContent": {
+          "schema_version": 1,
+          "policy": "normal-graph-v1",
+          "snapshot": "2847c26615128fc1999f97946c5f43b7317860c553fa5f835fa115f4ce3cfe50",
+          "status": "partial",
+          "selection": {
+            "mode": "explicit",
+            "candidate_count": 2,
+            "omitted_candidates": 0
+          },
+          "scope": {
+            "source": "indexed_supported_source",
+            "coverage": "partial",
+            "matching": "explicit_ids",
+            "relationships": "known_static_relationships",
+            "exhaustive": false
+          },
+          "anchors": [
+            {
+              "node_id": "src/tool-results/service.ts::CaptureCommandResultOptions#type",
+              "score": 0.0,
+              "matched_terms": [],
+              "match_scope": []
+            },
+            {
+              "node_id": "src/work-context/binding.ts::WorkContextBinding#type",
+              "score": 0.0,
+              "matched_terms": [],
+              "match_scope": []
+            }
+          ],
+          "nodes": [
+            {
+              "id": "src/tool-results/service.ts::CaptureCommandResultOptions#type",
+              "name": "CaptureCommandResultOptions",
+              "kind": "type",
+              "file": "src/tool-results/service.ts"
+            },
+            {
+              "id": "src/tool-results/service.ts::__file__#file",
+              "name": "service.ts",
+              "kind": "file",
+              "file": "src/tool-results/service.ts"
+            },
+            {
+              "id": "src/work-context/binding.ts::WorkContextBinding#type",
+              "name": "WorkContextBinding",
+              "kind": "type",
+              "file": "src/work-context/binding.ts"
+            },
+            {
+              "id": "src/work-context/binding.ts::__file__#file",
+              "name": "binding.ts",
+              "kind": "file",
+              "file": "src/work-context/binding.ts"
+            },
+            {
+              "id": "src/tool-results/service.ts::MAX_ARTEFACT_BYTES#constant",
+              "name": "MAX_ARTEFACT_BYTES",
+              "kind": "constant",
+              "file": "src/tool-results/service.ts"
+            },
+            {
+              "id": "src/tool-results/service.ts::MAX_STORE_BYTES#constant",
+              "name": "MAX_STORE_BYTES",
+              "kind": "constant",
+              "file": "src/tool-results/service.ts"
+            },
+            {
+              "id": "src/tool-results/service.ts::RETENTION_MS#constant",
+              "name": "RETENTION_MS",
+              "kind": "constant",
+              "file": "src/tool-results/service.ts"
+            },
+            {
+              "id": "src/work-context/binding.ts::WorkContextErrorCode#type",
+              "name": "WorkContextErrorCode",
+              "kind": "type",
+              "file": "src/work-context/binding.ts"
+            },
+            {
+              "id": "src/work-context/binding.ts::WorkContextError#class",
+              "name": "WorkContextError",
+              "kind": "class",
+              "file": "src/work-context/binding.ts"
+            },
+            {
+              "id": "src/work-context/binding.ts::WorkContextError.constructor#method",
+              "name": "constructor",
+              "kind": "method",
+              "file": "src/work-context/binding.ts"
+            },
+            {
+              "id": "src/tool-results/service.ts::Clock#type",
+              "name": "Clock",
+              "kind": "type",
+              "file": "src/tool-results/service.ts"
+            }
+          ],
+          "items": [
+            {
+              "node_id": "src/tool-results/service.ts::CaptureCommandResultOptions#type",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Explicit source identity",
+              "source_ids": [
+                1
+              ],
+              "complete": true,
+              "extent": {
+                "file": "src/tool-results/service.ts",
+                "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+                "start_byte": 1380,
+                "end_byte": 1541
+              },
+              "source_ref": "eyJlbmQiOjE1NDEsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTM4MCwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjEzODAsInYiOjF9"
+            },
+            {
+              "node_id": "src/work-context/binding.ts::WorkContextBinding#type",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Explicit source identity",
+              "source_ids": [
+                2
+              ],
+              "complete": true,
+              "extent": {
+                "file": "src/work-context/binding.ts",
+                "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+                "start_byte": 912,
+                "end_byte": 1316
+              },
+              "source_ref": "eyJlbmQiOjEzMTYsImZpbGUiOiJzcmMvd29yay1jb250ZXh0L2JpbmRpbmcudHMiLCJoYXNoIjoiZmNmOWNlOGZiYmVmZGZmY2ZkYmQ0NjFhNGM1YjA4ZTg0ZjdhMzYyMjBlOTlhZWU2ZGNkZDY0YWQ4Y2UzY2EzZiIsIm9mZnNldCI6OTEyLCJyZXBvIjoiL3ByaXZhdGUvdG1wL2FudmlsLXNvdXJjZS10YXNrcy0yMDI2MDkxNC90MjMiLCJzdGFydCI6OTEyLCJ2IjoxfQ"
+            },
+            {
+              "node_id": "src/tool-results/service.ts::MAX_ARTEFACT_BYTES#constant",
+              "role": "related",
+              "depth": 0,
+              "why": "Validated ownership context",
+              "source_ids": [
+                3
+              ],
+              "complete": true,
+              "extent": {
+                "file": "src/tool-results/service.ts",
+                "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+                "start_byte": 1065,
+                "end_byte": 1102
+              },
+              "source_ref": "eyJlbmQiOjExMDIsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTA2NSwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjEwNjUsInYiOjF9"
+            },
+            {
+              "node_id": "src/tool-results/service.ts::MAX_STORE_BYTES#constant",
+              "role": "related",
+              "depth": 0,
+              "why": "Validated ownership context",
+              "source_ids": [
+                4
+              ],
+              "complete": true,
+              "extent": {
+                "file": "src/tool-results/service.ts",
+                "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+                "start_byte": 1110,
+                "end_byte": 1145
+              },
+              "source_ref": "eyJlbmQiOjExNDUsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTExMCwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjExMTAsInYiOjF9"
+            },
+            {
+              "node_id": "src/tool-results/service.ts::RETENTION_MS#constant",
+              "role": "related",
+              "depth": 0,
+              "why": "Validated ownership context",
+              "source_ids": [
+                5
+              ],
+              "complete": true,
+              "extent": {
+                "file": "src/tool-results/service.ts",
+                "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+                "start_byte": 1153,
+                "end_byte": 1188
+              },
+              "source_ref": "eyJlbmQiOjExODgsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTE1MywicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjExNTMsInYiOjF9"
+            },
+            {
+              "node_id": "src/work-context/binding.ts::WorkContextErrorCode#type",
+              "role": "related",
+              "depth": 0,
+              "why": "Validated ownership context",
+              "source_ids": [
+                6
+              ],
+              "complete": true,
+              "extent": {
+                "file": "src/work-context/binding.ts",
+                "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+                "start_byte": 499,
+                "end_byte": 638
+              },
+              "source_ref": "eyJlbmQiOjYzOCwiZmlsZSI6InNyYy93b3JrLWNvbnRleHQvYmluZGluZy50cyIsImhhc2giOiJmY2Y5Y2U4ZmJiZWZkZmZjZmRiZDQ2MWE0YzViMDhlODRmN2EzNjIyMGU5OWFlZTZkY2RkNjRhZDhjZTNjYTNmIiwib2Zmc2V0Ijo0OTksInJlcG8iOiIvcHJpdmF0ZS90bXAvYW52aWwtc291cmNlLXRhc2tzLTIwMjYwOTE0L3QyMyIsInN0YXJ0Ijo0OTksInYiOjF9"
+            },
+            {
+              "node_id": "src/work-context/binding.ts::WorkContextError#class",
+              "role": "related",
+              "depth": 0,
+              "why": "Validated ownership context",
+              "source_ids": [
+                7
+              ],
+              "complete": true,
+              "extent": {
+                "file": "src/work-context/binding.ts",
+                "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+                "start_byte": 647,
+                "end_byte": 903
+              },
+              "source_ref": "eyJlbmQiOjkwMywiZmlsZSI6InNyYy93b3JrLWNvbnRleHQvYmluZGluZy50cyIsImhhc2giOiJmY2Y5Y2U4ZmJiZWZkZmZjZmRiZDQ2MWE0YzViMDhlODRmN2EzNjIyMGU5OWFlZTZkY2RkNjRhZDhjZTNjYTNmIiwib2Zmc2V0Ijo2NDcsInJlcG8iOiIvcHJpdmF0ZS90bXAvYW52aWwtc291cmNlLXRhc2tzLTIwMjYwOTE0L3QyMyIsInN0YXJ0Ijo2NDcsInYiOjF9"
+            },
+            {
+              "node_id": "src/work-context/binding.ts::WorkContextError.constructor#method",
+              "role": "related",
+              "depth": 0,
+              "why": "Validated ownership context",
+              "source_ids": [
+                7
+              ],
+              "complete": true,
+              "extent": {
+                "file": "src/work-context/binding.ts",
+                "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+                "start_byte": 728,
+                "end_byte": 901
+              },
+              "source_ref": "eyJlbmQiOjkwMSwiZmlsZSI6InNyYy93b3JrLWNvbnRleHQvYmluZGluZy50cyIsImhhc2giOiJmY2Y5Y2U4ZmJiZWZkZmZjZmRiZDQ2MWE0YzViMDhlODRmN2EzNjIyMGU5OWFlZTZkY2RkNjRhZDhjZTNjYTNmIiwib2Zmc2V0Ijo3MjgsInJlcG8iOiIvcHJpdmF0ZS90bXAvYW52aWwtc291cmNlLXRhc2tzLTIwMjYwOTE0L3QyMyIsInN0YXJ0Ijo3MjgsInYiOjF9"
+            },
+            {
+              "node_id": "src/tool-results/service.ts::Clock#type",
+              "role": "related",
+              "depth": 1,
+              "why": "Selected by uses_type",
+              "source_ids": [
+                8
+              ],
+              "complete": true,
+              "extent": {
+                "file": "src/tool-results/service.ts",
+                "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+                "start_byte": 1352,
+                "end_byte": 1378
+              },
+              "source_ref": "eyJlbmQiOjEzNzgsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTM1MiwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjEzNTIsInYiOjF9"
+            }
+          ],
+          "ownership": [
+            {
+              "owner_id": "src/tool-results/service.ts::__file__#file",
+              "member_id": "src/tool-results/service.ts::CaptureCommandResultOptions#type",
+              "basis": "indexed_file"
+            },
+            {
+              "owner_id": "src/work-context/binding.ts::__file__#file",
+              "member_id": "src/work-context/binding.ts::WorkContextBinding#type",
+              "basis": "indexed_file"
+            },
+            {
+              "owner_id": "src/tool-results/service.ts::__file__#file",
+              "member_id": "src/tool-results/service.ts::MAX_ARTEFACT_BYTES#constant",
+              "basis": "indexed_file"
+            },
+            {
+              "owner_id": "src/tool-results/service.ts::__file__#file",
+              "member_id": "src/tool-results/service.ts::MAX_STORE_BYTES#constant",
+              "basis": "indexed_file"
+            },
+            {
+              "owner_id": "src/tool-results/service.ts::__file__#file",
+              "member_id": "src/tool-results/service.ts::RETENTION_MS#constant",
+              "basis": "indexed_file"
+            },
+            {
+              "owner_id": "src/work-context/binding.ts::__file__#file",
+              "member_id": "src/work-context/binding.ts::WorkContextErrorCode#type",
+              "basis": "indexed_file"
+            },
+            {
+              "owner_id": "src/work-context/binding.ts::__file__#file",
+              "member_id": "src/work-context/binding.ts::WorkContextError#class",
+              "basis": "indexed_file"
+            },
+            {
+              "owner_id": "src/work-context/binding.ts::__file__#file",
+              "member_id": "src/work-context/binding.ts::WorkContextError.constructor#method",
+              "basis": "indexed_file"
+            },
+            {
+              "owner_id": "src/tool-results/service.ts::__file__#file",
+              "member_id": "src/tool-results/service.ts::Clock#type",
+              "basis": "indexed_file"
+            }
+          ],
+          "relationships": [
+            {
+              "id": 1,
+              "edge": {
+                "from": "src/tool-results/service.ts::CaptureCommandResultOptions#type",
+                "to": "src/tool-results/service.ts::Clock#type",
+                "type": "uses_type",
+                "directed": true,
+                "namespace": "loci",
+                "resolution": "exact",
+                "evidence": {
+                  "file": "src/tool-results/service.ts",
+                  "line": 59,
+                  "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e"
+                }
+              },
+              "traversed": "forward",
+              "source_ids": [
+                1,
+                9
+              ],
+              "proof": "complete",
+              "resolution_configuration": null
+            }
+          ],
+          "sources": [
+            {
+              "id": 1,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 1380,
+              "end_byte": 1541,
+              "start_line": 53,
+              "end_line": 60,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "type CaptureCommandResultOptions = {\n  argv: string[];\n  producer: string;\n  binding: WorkContextBinding;\n  stateRoot?: string;\n  cwd?: string;\n  now?: Clock;\n};",
+              "source_ref": "eyJlbmQiOjE1NDEsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTM4MCwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjEzODAsInYiOjF9"
+            },
+            {
+              "id": 2,
+              "file": "src/work-context/binding.ts",
+              "start_byte": 912,
+              "end_byte": 1316,
+              "start_line": 28,
+              "end_line": 45,
+              "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+              "content": "type WorkContextBinding = {\n  version: 1;\n  id: string;\n  status: \"active\" | \"superseded\";\n  host: string;\n  session_id: string;\n  bound_at: string;\n  last_seen_at: string;\n  expires_at: string;\n  collaboration_space: WorkspaceRef;\n  provenance: {\n    kind: \"host_lifecycle\" | \"operator_rebind\";\n    lifecycle: string;\n    observed_cwd: string;\n  };\n  superseded_by?: string;\n  superseded_at?: string;\n};",
+              "source_ref": "eyJlbmQiOjEzMTYsImZpbGUiOiJzcmMvd29yay1jb250ZXh0L2JpbmRpbmcudHMiLCJoYXNoIjoiZmNmOWNlOGZiYmVmZGZmY2ZkYmQ0NjFhNGM1YjA4ZTg0ZjdhMzYyMjBlOTlhZWU2ZGNkZDY0YWQ4Y2UzY2EzZiIsIm9mZnNldCI6OTEyLCJyZXBvIjoiL3ByaXZhdGUvdG1wL2FudmlsLXNvdXJjZS10YXNrcy0yMDI2MDkxNC90MjMiLCJzdGFydCI6OTEyLCJ2IjoxfQ"
+            },
+            {
+              "id": 3,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 1065,
+              "end_byte": 1102,
+              "start_line": 42,
+              "end_line": 42,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "MAX_ARTEFACT_BYTES = 64 * 1024 * 1024",
+              "source_ref": "eyJlbmQiOjExMDIsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTA2NSwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjEwNjUsInYiOjF9"
+            },
+            {
+              "id": 4,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 1110,
+              "end_byte": 1145,
+              "start_line": 43,
+              "end_line": 43,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "MAX_STORE_BYTES = 512 * 1024 * 1024",
+              "source_ref": "eyJlbmQiOjExNDUsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTExMCwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjExMTAsInYiOjF9"
+            },
+            {
+              "id": 5,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 1153,
+              "end_byte": 1188,
+              "start_line": 44,
+              "end_line": 44,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "RETENTION_MS = 24 * 60 * 60 * 1_000",
+              "source_ref": "eyJlbmQiOjExODgsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTE1MywicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjExNTMsInYiOjF9"
+            },
+            {
+              "id": 6,
+              "file": "src/work-context/binding.ts",
+              "start_byte": 499,
+              "end_byte": 638,
+              "start_line": 12,
+              "end_line": 16,
+              "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+              "content": "type WorkContextErrorCode =\n  | \"WORK_CONTEXT_NOT_BOUND\"\n  | \"WORK_CONTEXT_STALE\"\n  | \"WORK_CONTEXT_MISMATCH\"\n  | \"WORK_CONTEXT_AMBIGUOUS\";",
+              "source_ref": "eyJlbmQiOjYzOCwiZmlsZSI6InNyYy93b3JrLWNvbnRleHQvYmluZGluZy50cyIsImhhc2giOiJmY2Y5Y2U4ZmJiZWZkZmZjZmRiZDQ2MWE0YzViMDhlODRmN2EzNjIyMGU5OWFlZTZkY2RkNjRhZDhjZTNjYTNmIiwib2Zmc2V0Ijo0OTksInJlcG8iOiIvcHJpdmF0ZS90bXAvYW52aWwtc291cmNlLXRhc2tzLTIwMjYwOTE0L3QyMyIsInN0YXJ0Ijo0OTksInYiOjF9"
+            },
+            {
+              "id": 7,
+              "file": "src/work-context/binding.ts",
+              "start_byte": 647,
+              "end_byte": 903,
+              "start_line": 18,
+              "end_line": 26,
+              "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+              "content": "class WorkContextError extends Error {\n  readonly code: WorkContextErrorCode;\n\n  constructor(code: WorkContextErrorCode, message: string, options?: ErrorOptions) {\n    super(message, options);\n    this.name = \"WorkContextError\";\n    this.code = code;\n  }\n}",
+              "source_ref": "eyJlbmQiOjkwMywiZmlsZSI6InNyYy93b3JrLWNvbnRleHQvYmluZGluZy50cyIsImhhc2giOiJmY2Y5Y2U4ZmJiZWZkZmZjZmRiZDQ2MWE0YzViMDhlODRmN2EzNjIyMGU5OWFlZTZkY2RkNjRhZDhjZTNjYTNmIiwib2Zmc2V0Ijo2NDcsInJlcG8iOiIvcHJpdmF0ZS90bXAvYW52aWwtc291cmNlLXRhc2tzLTIwMjYwOTE0L3QyMyIsInN0YXJ0Ijo2NDcsInYiOjF9"
+            },
+            {
+              "id": 8,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 1352,
+              "end_byte": 1378,
+              "start_line": 51,
+              "end_line": 51,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "type Clock = () => string;",
+              "source_ref": "eyJlbmQiOjEzNzgsImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTM1MiwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjEzNTIsInYiOjF9"
+            },
+            {
+              "id": 9,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 1352,
+              "end_byte": 1379,
+              "start_line": 51,
+              "end_line": 51,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "type Clock = () => string;\n",
+              "source_ref": "eyJlbmQiOjEzNzksImZpbGUiOiJzcmMvdG9vbC1yZXN1bHRzL3NlcnZpY2UudHMiLCJoYXNoIjoiZWM3ZWU0MDcxZDlhZTRlMThhMjdjNWVlNjRjM2EzNTE1OWQ3ZTJiYmYwMDYwOWM1ZThkMzJhYjdjMWJkMWE2ZSIsIm9mZnNldCI6MTM1MiwicmVwbyI6Ii9wcml2YXRlL3RtcC9hbnZpbC1zb3VyY2UtdGFza3MtMjAyNjA5MTQvdDIzIiwic3RhcnQiOjEzNTIsInYiOjF9"
+            }
+          ],
+          "omissions": [
+            {
+              "reason": "node_limit",
+              "count": 3
+            },
+            {
+              "reason": "neighbor_limit",
+              "count": 4
+            },
+            {
+              "reason": "cycle",
+              "count": 1
+            },
+            {
+              "reason": "unresolved_relation",
+              "count": 37
+            },
+            {
+              "reason": "ambiguous_relation",
+              "count": 3
+            },
+            {
+              "reason": "external_relation",
+              "count": 15
+            },
+            {
+              "reason": "output_budget",
+              "count": 80
+            }
+          ],
+          "limits": {
+            "max_hops": 2,
+            "max_nodes": 64,
+            "max_neighbors": 32,
+            "max_items": 12,
+            "max_anchors": 3,
+            "max_explicit_anchors": 5,
+            "max_owner_members": 3,
+            "max_evidence_bytes": 8192,
+            "max_output_bytes": 16384,
+            "max_anchor_source_bytes": 1024,
+            "max_related_source_bytes": 768,
+            "max_lookup_bytes": 33554432,
+            "max_lookup_files": 4096,
+            "max_literal_matches": 256
+          },
+          "usage": {
+            "nodes_examined": 64,
+            "eligible_edges_considered": 89,
+            "edges_traversed": 81,
+            "relationships_delivered": 1,
+            "lookup_bytes": 0,
+            "lookup_files": 0,
+            "evidence_bytes": 1094,
+            "output_bytes": 16209,
+            "estimated_tokens": 4053,
+            "token_estimate_method": "utf8_bytes_div_4",
+            "output_encoding": "mcp_result_json_utf8"
+          }
+        },
+        "isError": false
+      },
+      "canonical_result_json_bytes": 16209,
+      "canonical_result_json_sha256": "67994c46bfc3fd31b27509f14c606c3c2af11285530cf8614f597ec529a673b0",
+      "invocation_category": "other",
+      "relationship_delivery": {
+        "application_error": false,
+        "result_status": "partial",
+        "type_context_status": null,
+        "edge_families": {
+          "uses_type": 1
+        },
+        "edge_count": 1,
+        "semantic_edge_count": 1,
+        "containment_edge_count": 0,
+        "resolved_record_count": 0,
+        "unresolved_record_count": 0,
+        "unresolved_record_families": {},
+        "unknown_record_count": 0,
+        "relationship_shape_status": "complete",
+        "omissions": [
+          {
+            "reason": "node_limit",
+            "count": 3
+          },
+          {
+            "reason": "neighbor_limit",
+            "count": 4
+          },
+          {
+            "reason": "cycle",
+            "count": 1
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 37
+          },
+          {
+            "reason": "ambiguous_relation",
+            "count": 3
+          },
+          {
+            "reason": "external_relation",
+            "count": 15
+          },
+          {
+            "reason": "output_budget",
+            "count": 80
+          }
+        ],
+        "reported_evidence_bytes": 1094,
+        "reported_output_bytes": 16209,
+        "returned_source_text_bytes": null,
+        "source_text_bytes_status": "unknown_schema",
+        "requested_output_budget_bytes": null,
+        "requested_evidence_budget_bytes": null,
+        "returned_limits": {
+          "max_hops": 2,
+          "max_nodes": 64,
+          "max_neighbors": 32,
+          "max_items": 12,
+          "max_anchors": 3,
+          "max_explicit_anchors": 5,
+          "max_owner_members": 3,
+          "max_evidence_bytes": 8192,
+          "max_output_bytes": 16384,
+          "max_anchor_source_bytes": 1024,
+          "max_related_source_bytes": 768,
+          "max_lookup_bytes": 33554432,
+          "max_lookup_files": 4096,
+          "max_literal_matches": 256
+        }
+      },
+      "model_delivery": {
+        "status": "full_exact",
+        "matches": [
+          {
+            "call_id": "call_l56jrEMMwlu3TRe3sLkztmfn",
+            "output_line": 5312,
+            "block_index": 1,
+            "output_ref": "outer:call_l56jrEMMwlu3TRe3sLkztmfn:line:5312:block:1",
+            "match": "structuredContent_json_or_wrapper"
+          }
+        ]
+      }
+    }
+  ],
+  "normal_calls": [
+    {
+      "item_id": "exec-c5de4e27-1c0d-4e7b-b3ab-b73d987b2f95",
+      "category": "normal_context_retrieval",
+      "public_invocation_count": 1,
+      "application_error": false,
+      "source": {
+        "status": "complete",
+        "source_record_count": 11,
+        "source_content_bytes": 1177
+      },
+      "relationships": {
+        "status": "complete",
+        "semantic_relationship_count": 3,
+        "proof_validated_relationship_count": 3,
+        "actual_traversed_edge_count": 36,
+        "actual_traversed_edge_count_status": "complete",
+        "delivered_relationship_count": 3,
+        "delivered_relationship_count_status": "complete"
+      },
+      "ownership": {
+        "status": "complete",
+        "ownership_association_count": 7
+      },
+      "byte_accounting": {
+        "reported_evidence_bytes": 1177,
+        "actual_evidence_bytes": 1177,
+        "evidence_bytes_status": "complete",
+        "reported_output_bytes": 16373,
+        "actual_output_bytes": 16373,
+        "output_bytes_status": "complete",
+        "status": "complete"
+      },
+      "actual_host_proof_status": "validated"
+    },
+    {
+      "item_id": "exec-32e4de94-f93c-4657-9148-b2bd35708949",
+      "category": "normal_context_retrieval",
+      "public_invocation_count": 1,
+      "application_error": false,
+      "source": {
+        "status": "complete",
+        "source_record_count": 11,
+        "source_content_bytes": 2248
+      },
+      "relationships": {
+        "status": "complete",
+        "semantic_relationship_count": 4,
+        "proof_validated_relationship_count": 4,
+        "actual_traversed_edge_count": 92,
+        "actual_traversed_edge_count_status": "complete",
+        "delivered_relationship_count": 4,
+        "delivered_relationship_count_status": "complete"
+      },
+      "ownership": {
+        "status": "complete",
+        "ownership_association_count": 5
+      },
+      "byte_accounting": {
+        "reported_evidence_bytes": 2248,
+        "actual_evidence_bytes": 2248,
+        "evidence_bytes_status": "complete",
+        "reported_output_bytes": 16237,
+        "actual_output_bytes": 16237,
+        "output_bytes_status": "complete",
+        "status": "complete"
+      },
+      "actual_host_proof_status": "validated"
+    },
+    {
+      "item_id": "exec-2bc14136-2bcc-40df-ad0d-b8df93b47bb7",
+      "category": "normal_context_retrieval",
+      "public_invocation_count": 1,
+      "application_error": false,
+      "source": {
+        "status": "complete",
+        "source_record_count": 9,
+        "source_content_bytes": 1094
+      },
+      "relationships": {
+        "status": "complete",
+        "semantic_relationship_count": 1,
+        "proof_validated_relationship_count": 1,
+        "actual_traversed_edge_count": 81,
+        "actual_traversed_edge_count_status": "complete",
+        "delivered_relationship_count": 1,
+        "delivered_relationship_count_status": "complete"
+      },
+      "ownership": {
+        "status": "complete",
+        "ownership_association_count": 9
+      },
+      "byte_accounting": {
+        "reported_evidence_bytes": 1094,
+        "actual_evidence_bytes": 1094,
+        "evidence_bytes_status": "complete",
+        "reported_output_bytes": 16209,
+        "actual_output_bytes": 16209,
+        "output_bytes_status": "complete",
+        "status": "complete"
+      },
+      "actual_host_proof_status": "validated"
+    }
+  ],
+  "all_returned_source_hashes_and_spans_valid": true,
+  "expected_relationships": [],
+  "pass": false,
+  "scope": "Known-answer primary functional check; normal query continuations retained. Not unprimed or a per-case completed provider-cost sample."
+}

@@ -329,3 +329,36 @@ adopted with two corrections: these functional packets cannot stand in for
 reserved rows23/24, and post freeze names normal-v2/native-v2 after the reviewed
 accounting repairs. Ten separate Anvil source copies now match all 638 frozen
 hashes; no reserved row has run. The host activation report links final evidence.
+
+Host/accounting delivery is published at 006923b; the separate immutable post
+freeze is published at 8ef9b4d (freeze SHA256 00f47b4eafcc7e3bbca6814c78fe0bcaded4e3a2916dbdd6e397043932e2d9dd).
+W1.6.3/W1.8.1/W1.8.2 are complete, 28/30 required leaves. W1.8.3 launches only
+the reserved eight ordinary delegates and two serial primary checks. Each
+delegate assignment is its exact frozen schedule prompt, Terra/high/fork none,
+with no source edits or child agents, two concurrent maximum and a 300-second
+cap. Owned evidence is each assigned t15–t22 root; root retains native capture,
+all failures and the fixed rubric. Before each pair, verify frozen/live inputs
+and all 638 source hashes; after each return retain source/access checks and
+the observer result. This is the authorized terminal-value measurement.
+
+First pair queued after successful input checks: inspection_15 (checkpoint)
+and inspection_16 (binding), Terra/high/fork none. No repeated or substituted
+rows are allowed. Check live capacity immediately before launching.
+
+W1.8.3 launch record: inspection_17 and inspection_18, fresh Terra/high/fork none. Exclusive source t17/t18 read-only, exact frozen prompts; required first-turn correctness/capture/cost under 300s and no nudges/replacements. Prior pair completed; capacity available. Parent owns collection and verdict.
+
+W1.8.3 bounded capture/review delegation: post_capture_15_16, Sol/high/fork none. Own new runs/run-15 and runs/run-16 records and a new reusable collector under ordinary-adoption-normal-v1 only; no frozen inputs or shared execution-ledger edits. Acceptance: actual native first intervals, exact prompt/model/capture validation, all commands access reviewed, final facts/source/evidence support reviewed with frozen helpers, all metrics and negative/unknown preserved. Root owns launch/runtime/gates. Two trial workers running, one slot available.
+
+W1.8.3 launch record: inspection_19/20, Terra/high/fork none, exact frozen prompts, exclusive t19/t20 source, read-only. Prior pair completed; capture worker remains useful. Acceptance: first-turn facts/capture/cost under fixed300s, all failures retained.
+
+W1.8.3 launch record: inspection_21/22, Terra/high/fork none, exact frozen prompts and exclusive read-only t21/t22 evidence. Six ordinary attempts completed without intervention. Preserve useful capture worker; two capacity slots available after prior pair completion. Acceptance remains original source/prompt/native/facts/cost criteria and 300s cap; no replacements.
+
+W1.8.3 primary checks23 then24: actual root Astra/ultra, known-answer directed checks on exclusive frozen t23/t24, normal host tools with complete raw output and native proof correlation. Not unprimed delegates or per-case provider cost. All eight ordinary attempts completed; no replacements/timeouts.
+
+W1.8.3 remaining semantic review delegation: post_review_21_22, Sol/high/fork none. Own only runs/run-21 and run-22 review.json, assessment.json and access-review.json after capture. Acceptance: exact frozen required facts, all extra material claims/source references and delivered relationship support; retain incomplete compound facts and uncertain attribution. Both trial turns completed without nudges; two slots available. Root owns primary evidence/aggregate/verdict.
+
+post_capture_15_16 disposition: adopted captures/access/semantic findings at runs/run-15 and run-16. Modified row15 omission-based incorrect to missing; no score change. Row16 supports two answer annotations. Native prompt payload encryption prevents independent plaintext proof; exact parent submissions attested. Collector adopted for17–22; raw intervals local-only, normalized observations/provenance published. Root17–20 judgments:17–19 strict correct;20 omits exit-code propagation and explicit importer leg.
+
+post_review_21_22 disposition: adopted. Row21 all3 facts correct, no full_exact relevant graph annotation. Row22 lacks two compound facts and enumerated sibling-copy AGENTS filenames (no sibling file contents), retained as scope deviation. Both native turns completed under300s. Result locators runs/run-21 and run-22. Primary23 missing expected binding identity proof after3 normal continuations;24 full_exact expected browser proof. Whole-primary observer duplicate turn_context from compaction is preserved; individual original call receipts reuse frozen helpers, not synthetic task intervals.
+
+W1.8.3 final disposition: negative, all10 reserved rows retained. 8/8 ordinary invoked,6/8 full_exact positive,2/4 binding/browser,4/8 supported answer,5/8 strict facts,1/2 primary expected proof,7/8 access condition. Five case/cost medians exceed1.25. W1.8.4 and Objective remain open for unresolved required context/answer/cost acceptance. Report docs/reviews/2026-09-14-normal-graph-adoption-result.md; no new provider batch or runtime change selected.
