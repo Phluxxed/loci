@@ -79,6 +79,7 @@ from loci.storage.store_health import (
     DEFAULT_MAX_PROBE_PATHS,
 )
 from loci.storage.store_resolver import activate_mcp_store
+from loci.mcp_record_pages import DEFAULT_RECORD_OUTPUT_BYTES, graph_record_page
 
 
 _LEGACY_PATH_PARAMETER_TOOLS = frozenset({
@@ -411,17 +412,38 @@ def create_server() -> MCPServer:
         offset: int = 0,
         limit: int = 100,
         family: str = "symbol",
+        detail: Annotated[
+            str, Field(json_schema_extra={"enum": ["compact", "full"]}),
+        ] = "compact",
+        max_output_bytes: Annotated[
+            SkipValidation[int],
+            Field(json_schema_extra={"minimum": 2048, "maximum": 262144}),
+        ] = DEFAULT_RECORD_OUTPUT_BYTES,
     ) -> Annotated[CallToolResult, LociGraphReferencesOutput]:
-        """Inspect bounded authored symbol or TypeScript/Python type relationships."""
+        """Inspect compact authored symbol or type reference sites.
+
+        file filters sites written inside that file, not incoming references to
+        its declarations. For incoming consumers, traverse from the exact target
+        symbol with loci_graph_traverse_neighbors(direction="incoming"), or use
+        loci_explore(intent="impact") for bounded known dependents.
+        detail="full" includes raw bindings, candidates and supporting evidence.
+        max_output_bytes bounds the complete UTF-8 JSON MCP result (2048..262144,
+        default 16384); follow pagination.next_offset even when returned < limit.
+        A record too large to fit returns OUTPUT_BUDGET_EXCEEDED with the required
+        size; increase the budget or use compact detail without skipping it.
+        """
         return _handle_loci_error(
-            lambda service: service.graph_references(
-                repo,
-                file=file,
-                status=cast(Literal["all", "resolved", "unresolved"], status),
-                offset=offset,
-                limit=limit,
-                family=cast(Literal["symbol", "type"], family),
-                ensure_fresh=True,
+            lambda service: graph_record_page(
+                lambda: service.graph_references(
+                    repo,
+                    file=file,
+                    status=cast(Literal["all", "resolved", "unresolved"], status),
+                    offset=offset,
+                    limit=limit,
+                    family=cast(Literal["symbol", "type"], family),
+                    ensure_fresh=True,
+                ),
+                kind="references", detail=detail, max_output_bytes=max_output_bytes,
             )
         )
 
@@ -432,16 +454,35 @@ def create_server() -> MCPServer:
         status: str = "all",
         offset: int = 0,
         limit: int = 100,
+        detail: Annotated[
+            str, Field(json_schema_extra={"enum": ["compact", "full"]}),
+        ] = "compact",
+        max_output_bytes: Annotated[
+            SkipValidation[int],
+            Field(json_schema_extra={"minimum": 2048, "maximum": 262144}),
+        ] = DEFAULT_RECORD_OUTPUT_BYTES,
     ) -> Annotated[CallToolResult, LociGraphCallsOutput]:
-        """Inspect bounded resolved and unresolved definite-call records."""
+        """Inspect compact resolved and unresolved definite-call sites.
+
+        file filters call sites inside that file. For incoming callers, traverse
+        from the exact callee symbol with direction="incoming" and edge_types=["calls"].
+        detail="full" includes raw call/binding spans and supporting evidence.
+        max_output_bytes bounds the complete UTF-8 JSON MCP result (2048..262144,
+        default 16384); follow pagination.next_offset even when returned < limit.
+        A record too large to fit returns OUTPUT_BUDGET_EXCEEDED with the required
+        size; increase the budget or use compact detail without skipping it.
+        """
         return _handle_loci_error(
-            lambda service: service.graph_calls(
-                repo,
-                file=file,
-                status=cast(Literal["all", "resolved", "unresolved"], status),
-                offset=offset,
-                limit=limit,
-                ensure_fresh=True,
+            lambda service: graph_record_page(
+                lambda: service.graph_calls(
+                    repo,
+                    file=file,
+                    status=cast(Literal["all", "resolved", "unresolved"], status),
+                    offset=offset,
+                    limit=limit,
+                    ensure_fresh=True,
+                ),
+                kind="calls", detail=detail, max_output_bytes=max_output_bytes,
             )
         )
 

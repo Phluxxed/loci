@@ -113,7 +113,11 @@ def test_installed_mcp_call_diagnostics_survive_fresh_process_for_each_language(
         "status",
         "offset",
         "limit",
+        "detail",
+        "max_output_bytes",
     }
+    assert result["schema"]["properties"]["detail"]["default"] == "compact"
+    assert result["schema"]["properties"]["max_output_bytes"]["default"] == 16_384
     assert result["schema"]["properties"]["file"]["default"] is None
     assert result["schema"]["properties"]["status"]["default"] == "all"
     assert result["schema"]["properties"]["offset"]["default"] == 0
@@ -161,6 +165,7 @@ def test_installed_mcp_call_diagnostics_survive_fresh_process_for_each_language(
         if name == "references_schema":
             expected_properties.add("family")
             assert existing_schema["properties"]["family"]["default"] == "symbol"
+            expected_properties.update({"detail", "max_output_bytes"})
         assert set(existing_schema["properties"]) == expected_properties
 
 
@@ -222,11 +227,19 @@ async def _call_diagnostics_after_restart(
         schemas = {tool.name: tool.input_schema for tool in listed.tools}
         calls = await session.call_tool(
             "loci_graph_calls",
-            arguments={"repo": str(repo), "file": fixture["file"]},
+            arguments={
+                "repo": str(repo),
+                "file": fixture["file"],
+                "detail": "full",
+            },
         )
         empty = await session.call_tool(
             "loci_graph_calls",
-            arguments={"repo": str(repo), "file": "not-indexed.py"},
+            arguments={
+                "repo": str(repo),
+                "file": "not-indexed.py",
+                "detail": "full",
+            },
         )
         edge_filters = {
             "repo": str(repo),
@@ -320,7 +333,7 @@ async def _call_refresh_after_change(repo: Path, cache_dir: Path) -> dict[str, A
     async with Client(stdio_client(server)) as session:
         calls = await session.call_tool(
             "loci_graph_calls",
-            arguments={"repo": str(repo)},
+            arguments={"repo": str(repo), "detail": "full"},
         )
     assert calls.structured_content is not None
     return calls.structured_content

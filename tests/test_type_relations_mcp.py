@@ -37,8 +37,12 @@ def test_type_relationships_are_available_through_the_mcp_subprocess(
         "offset",
         "limit",
         "family",
+        "detail",
+        "max_output_bytes",
     }
     assert schema["properties"]["family"]["default"] == "symbol"
+    assert schema["properties"]["detail"]["default"] == "compact"
+    assert schema["properties"]["max_output_bytes"]["default"] == 16_384
 
     symbol = result["symbol"]
     assert set(symbol) == {
@@ -49,6 +53,8 @@ def test_type_relationships_are_available_through_the_mcp_subprocess(
         "items",
         "counts",
         "pagination",
+        "detail",
+        "budget",
     }
     LociGraphReferencesOutput.model_validate(symbol)
 
@@ -172,7 +178,7 @@ async def _exercise_type_relationship_server(tmp_path: Path) -> dict[str, Any]:
 
         symbol_response = await session.call_tool(
             "loci_graph_references",
-            arguments={"repo": str(repo), "limit": 2},
+            arguments={"repo": str(repo), "limit": 2, "detail": "full"},
         )
         assert symbol_response.is_error is False
         symbol = symbol_response.structured_content
@@ -184,6 +190,7 @@ async def _exercise_type_relationship_server(tmp_path: Path) -> dict[str, Any]:
                 "repo": str(repo),
                 "family": "type",
                 "limit": 2,
+                "detail": "full",
             },
         )
         assert type_response.is_error is False
@@ -196,6 +203,7 @@ async def _exercise_type_relationship_server(tmp_path: Path) -> dict[str, Any]:
                 "repo": str(repo),
                 "family": "type",
                 "status": "unresolved",
+                "detail": "full",
             },
         )
         assert unresolved_response.is_error is False

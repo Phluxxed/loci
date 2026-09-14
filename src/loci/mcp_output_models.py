@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import PurePosixPath
-from typing import Any, Literal
+from typing import Any, Literal, get_args
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, RootModel, model_validator
 from loci.parser.type_models import valid_type_import_path
@@ -1025,6 +1025,23 @@ class RecordCounts(StrictOutputModel):
     returned: int
 
 
+class GraphRecordPageBudget(StrictOutputModel):
+    max_output_bytes: int = Field(ge=2048, le=262144)
+    output_bytes: int = Field(ge=0)
+    byte_limit_reached: bool
+
+    @model_validator(mode="after")
+    def _within_requested_limit(self) -> GraphRecordPageBudget:
+        if self.output_bytes > self.max_output_bytes:
+            raise ValueError("output_bytes cannot exceed max_output_bytes")
+        return self
+
+
+GraphRecordLanguage = Literal[
+    "typescript", "python", "javascript", "go", "rust", "swift"
+]
+
+
 class RustImportContext(StrictOutputModel):
     kind: Literal["use", "module", "extern_crate"]
     lexical_module_path: list[str]
@@ -1173,6 +1190,21 @@ ReferenceUnresolvedReason = Literal[
 ]
 
 
+TypeRelationUnresolvedReason = Literal[
+    "unsupported_syntax", "unsupported_owner", "ambiguous_owner", "type_parameter",
+    "binding_not_found", "binding_ambiguous", "binding_unindexed", "target_not_indexed",
+    "ambiguous_target", "unsupported_target", "unsupported_reference", "import_unresolved",
+    "binding_limit", "self_heritage", "type_only_value", "binding_shadowed", "unsupported_configuration", "target_inaccessible",
+]
+
+_REFERENCE_UNRESOLVED_REASON_VALUES = frozenset(
+    get_args(ReferenceUnresolvedReason)
+)
+_TYPE_RELATION_UNRESOLVED_REASON_VALUES = frozenset(
+    get_args(TypeRelationUnresolvedReason)
+)
+
+
 class ReferenceItem(StrictOutputModel):
     raw: RawSymbolReference
     binding: ImportBinding | None
@@ -1204,12 +1236,7 @@ class TypeRelationItem(StrictOutputModel):
     target_file: str | None
     target_kind: str | None
     status: Literal["resolved", "unresolved"]
-    unresolved_reason: Literal[
-        "unsupported_syntax", "unsupported_owner", "ambiguous_owner", "type_parameter",
-        "binding_not_found", "binding_ambiguous", "binding_unindexed", "target_not_indexed",
-        "ambiguous_target", "unsupported_target", "unsupported_reference", "import_unresolved",
-        "binding_limit", "self_heritage", "type_only_value", "binding_shadowed", "unsupported_configuration", "target_inaccessible",
-    ] | None
+    unresolved_reason: TypeRelationUnresolvedReason | None
     resolution_basis: Literal[
         "lexical_binding", "package_binding", "direct_binding", "qualified_member", "reexport_chain"
     ] | None
@@ -1323,25 +1350,144 @@ class TypeRelationItem(StrictOutputModel):
         return self
 
 
+class CompactGraphRecordItem(StrictOutputModel):
+    source_id: str | None
+    source_file: str = Field(min_length=1)
+    target_id: str | None
+    target_file: str | None
+    language: GraphRecordLanguage
+    line: int = Field(ge=1)
+    column: int = Field(ge=1)
+    start_byte: int = Field(ge=0)
+    end_byte: int = Field(ge=1)
+    text: str = Field(min_length=1)
+    status: Literal["resolved", "unresolved"]
+    resolution: Literal["exact", "import-resolved"] | None
+    unresolved_reason: str | None
+    resolution_configuration: Literal["unconditional", "declared_possible"] | None
+
+    @model_validator(mode="after")
+    def _valid_compact_outcome(self) -> CompactGraphRecordItem:
+        _require_relative_path(self.source_file, "source_file")
+        if self.target_file is not None:
+            _require_relative_path(self.target_file, "target_file")
+        if self.start_byte >= self.end_byte:
+            raise ValueError("compact record span must be non-empty and ordered")
+        for value, field in (
+            (self.source_id, "source_id"),
+            (self.target_id, "target_id"),
+        ):
+            if value is not None and not value:
+                raise ValueError(f"{field} must be non-empty when present")
+        has_target = self.target_id is not None or self.target_file is not None
+        if (self.target_id is None) != (self.target_file is None):
+            raise ValueError("target endpoint requires both id and file")
+        if self.status == "resolved":
+            if self.source_id is None or not has_target:
+                raise ValueError("resolved compact records require source and target endpoints")
+            if self.resolution is None or self.unresolved_reason is not None:
+                raise ValueError("resolved compact records require a resolution only")
+        else:
+            if has_target or self.resolution is not None:
+                raise ValueError("unresolved compact records cannot carry a target or resolution")
+            if self.unresolved_reason is None:
+                raise ValueError("unresolved compact records require an unresolved reason")
+            if self.resolution_configuration is not None:
+                raise ValueError("unresolved compact records cannot carry resolution configuration")
+        return self
+
+
+class CompactReferenceItem(CompactGraphRecordItem):
+    relation: Literal[
+        "references", "references_type", "uses_type", "extends", "implements",
+        "embeds", "supertrait", "impl_trait", "impl_self_type",
+    ]
+    context: Literal[
+        "annotation", "return", "property", "alias", "type_argument",
+        "constraint", "type_query", "heritage", "struct_embedding", "interface_embedding",
+        "supertrait", "impl_trait", "impl_self_type",
+    ] | None
+    unresolved_reason: ReferenceUnresolvedReason | TypeRelationUnresolvedReason | None
+    import_unresolved_reason: ImportUnresolvedReason | None
+
+    @model_validator(mode="after")
+    def _valid_compact_reference(self) -> CompactReferenceItem:
+        if len(self.text.encode("utf-8")) != self.end_byte - self.start_byte:
+            raise ValueError("compact reference text must match its UTF-8 span")
+        symbol_relation = self.relation in {"references", "references_type"}
+        if symbol_relation:
+            if self.context is not None:
+                raise ValueError("symbol compact references cannot carry a type context")
+            if (
+                self.unresolved_reason is not None
+                and self.unresolved_reason not in _REFERENCE_UNRESOLVED_REASON_VALUES
+            ):
+                raise ValueError("symbol compact references require a symbol unresolved reason")
+            if self.status == "resolved":
+                if self.resolution != "import-resolved":
+                    raise ValueError("resolved symbol compact references require import resolution")
+                if self.import_unresolved_reason is not None:
+                    raise ValueError("resolved symbol compact references cannot carry import failure")
+            elif (
+                self.import_unresolved_reason is not None
+                and self.unresolved_reason != "import_unresolved"
+            ):
+                raise ValueError("import failure requires an import_unresolved reference")
+            return self
+
+        if self.context is None:
+            raise ValueError("type compact relations require their authored context")
+        if self.import_unresolved_reason is not None:
+            raise ValueError("type compact relations cannot carry import failure")
+        if (
+            self.unresolved_reason is not None
+            and self.unresolved_reason not in _TYPE_RELATION_UNRESOLVED_REASON_VALUES
+        ):
+            raise ValueError("type compact relations require a type unresolved reason")
+        return self
+
+
 class LociGraphReferencesSuccess(StrictOutputModel):
     schema_version: Literal[1]
     repo: str
     file: str | None
     status: Literal["all", "resolved", "unresolved"]
     family: Literal["symbol", "type"] | None = _OMITTED
-    items: list[ReferenceItem | TypeRelationItem]
+    detail: Literal["compact", "full"] | None = _OMITTED
+    budget: GraphRecordPageBudget | None = _OMITTED
+    items: list[ReferenceItem | TypeRelationItem | CompactReferenceItem]
     counts: RecordCounts
     pagination: Pagination
 
     @model_validator(mode="after")
     def _family_matches_items(self) -> LociGraphReferencesSuccess:
-        if self.family == "type" and any(
-            not isinstance(item, TypeRelationItem) for item in self.items
-        ):
-            raise ValueError("type reference pages require type relation items")
-        if self.family in {None, "symbol"} and any(
-            not isinstance(item, ReferenceItem) for item in self.items
-        ):
+        if (self.detail is None) != (self.budget is None):
+            raise ValueError("detail and budget must be supplied together")
+        compact = self.detail == "compact"
+        if self.detail == "full" or self.detail is None:
+            if any(isinstance(item, CompactReferenceItem) for item in self.items):
+                raise ValueError("full reference pages require rich reference items")
+        elif any(not isinstance(item, CompactReferenceItem) for item in self.items):
+            raise ValueError("compact reference pages require compact reference items")
+
+        if self.family == "type":
+            if compact:
+                if any(
+                    item.relation in {"references", "references_type"}
+                    for item in self.items
+                    if isinstance(item, CompactReferenceItem)
+                ):
+                    raise ValueError("type reference pages require type relation items")
+            elif any(not isinstance(item, TypeRelationItem) for item in self.items):
+                raise ValueError("type reference pages require type relation items")
+        elif compact:
+            if any(
+                item.relation not in {"references", "references_type"}
+                for item in self.items
+                if isinstance(item, CompactReferenceItem)
+            ):
+                raise ValueError("symbol reference pages require symbol reference items")
+        elif any(not isinstance(item, ReferenceItem) for item in self.items):
             raise ValueError("symbol reference pages require symbol reference items")
         return self
 
@@ -1455,14 +1601,55 @@ class CallItem(StrictOutputModel):
     resolution_configuration: Literal["unconditional", "declared_possible"] | None
 
 
+class CompactCallItem(CompactGraphRecordItem):
+    relation: Literal["calls"]
+    callee_start_byte: int = Field(ge=0)
+    callee_end_byte: int = Field(ge=1)
+    unresolved_reason: CallUnresolvedReason | None
+    reference_unresolved_reason: ReferenceUnresolvedReason | None
+
+    @model_validator(mode="after")
+    def _valid_compact_call(self) -> CompactCallItem:
+        if self.callee_start_byte >= self.callee_end_byte:
+            raise ValueError("compact call callee span must be non-empty and ordered")
+        if not (
+            self.start_byte <= self.callee_start_byte
+            and self.callee_end_byte <= self.end_byte
+        ):
+            raise ValueError("compact call callee span must be contained by call span")
+        if len(self.text.encode("utf-8")) != self.callee_end_byte - self.callee_start_byte:
+            raise ValueError("compact call text must match its callee UTF-8 span")
+        if self.status == "resolved":
+            if self.reference_unresolved_reason is not None:
+                raise ValueError("resolved compact calls cannot carry a reference failure")
+        elif (
+            self.reference_unresolved_reason is None
+        ) != (self.unresolved_reason != "reference_unresolved"):
+            raise ValueError("reference failure is valid only for reference_unresolved calls")
+        return self
+
+
 class LociGraphCallsSuccess(StrictOutputModel):
     schema_version: Literal[1]
     repo: str
     file: str | None
     status: Literal["all", "resolved", "unresolved"]
-    items: list[CallItem]
+    detail: Literal["compact", "full"] | None = _OMITTED
+    budget: GraphRecordPageBudget | None = _OMITTED
+    items: list[CallItem | CompactCallItem]
     counts: RecordCounts
     pagination: Pagination
+
+    @model_validator(mode="after")
+    def _detail_matches_items(self) -> LociGraphCallsSuccess:
+        if (self.detail is None) != (self.budget is None):
+            raise ValueError("detail and budget must be supplied together")
+        if self.detail == "compact":
+            if any(not isinstance(item, CompactCallItem) for item in self.items):
+                raise ValueError("compact call pages require compact call items")
+        elif any(not isinstance(item, CallItem) for item in self.items):
+            raise ValueError("full call pages require rich call items")
+        return self
 
 
 class LociGraphCallsOutput(RootModel[LociGraphCallsSuccess | LociErrorOutput]):

@@ -48,11 +48,12 @@ explains source IDs, coverage and byte accounting.
 
 ## Authored contracts and heritage
 
-Use `loci_graph_references(repo, family="type", file=..., status="all")` to
-inspect declaration-owned observations and their exact sites, bindings,
-support/control hashes and unresolved reasons. This includes local type uses,
-aliases, supported bounds and explicit language-specific contract clauses. The default
-`family="symbol"` retains executable imported-reference ownership.
+Use `loci_graph_references(repo, family="type", file=..., status="all",
+detail="full")` to inspect declaration-owned observations and their exact
+sites, bindings, support/control hashes and unresolved reasons. This includes
+local type uses, aliases, supported bounds and explicit language-specific
+contract clauses. The default `family="symbol"` retains executable
+imported-reference ownership.
 
 Traverse the language's stored relation with `exact` or `import-resolved`:
 `uses_type`, `extends`, `implements`, Go `embeds`, or Rust `supertrait`,
@@ -129,12 +130,22 @@ bounded JSON envelope is:
 {"schema_version":1,"repo":"...","file":null,"status":"all","items":[{"raw":{"source_file":"src/a.py","language":"python","line":1,"text":"import b","specifier":"b","imported_name":null,"type_only":false,"is_reexport":false,"source_hash":"...","rust":null},"source_file":"src/a.py","source_id":"src/a.py::__file__#file","target_file":"src/b.py","target_package":null,"target_crate":null,"target_kind":"file","target_id":"src/b.py::__file__#file","specifier":"b","imported_name":null,"language":"python","line":1,"text":"import b","type_only":false,"is_reexport":false,"status":"resolved","resolution":"import-resolved","unresolved_reason":null,"resolution_basis":null,"resolution_control_files":[],"resolution_configuration":null}],"counts":{"total":1,"resolved":1,"unresolved":0,"returned":1},"pagination":{"offset":0,"limit":100,"next_offset":null}}
 ```
 
-`loci_graph_references` and `loci_graph_calls` use the same bounded envelope;
-each item retains exact raw spans, selected bindings, source ownership,
-support records, control provenance, target identity, and explicit failure
-reasons. A resolved reference item has `type="references"` (or
-`references_type` for explicit type-only TypeScript), while a resolved call
-item has `type="calls"` and carries caller/callee spans and support records.
+`loci_graph_references` and `loci_graph_calls` retain the import read's
+item/count/pagination structure but add `detail` and `budget`; they are not the
+same envelope as `loci_graph_imports`. Both default to `detail="compact"`.
+Compact items expose source/target identity and files, relation, language,
+line, column, byte offsets, text, status, resolution, unresolved reason, and
+resolution configuration. Reference items also include nullable string
+`context` (from `raw.context`) and `import_unresolved_reason`; call items also
+include call-site `start_byte`/`end_byte`, callee-expression
+`callee_start_byte`/`callee_end_byte`, and `reference_unresolved_reason`; a
+call's `source_id` identifies its caller.
+Use `detail="full"` for the former diagnostic item shape: raw syntax, selected
+bindings or candidates, support records, and control provenance. A resolved
+reference materializes an edge with `type="references"` (or
+`references_type` for explicitly type-only TypeScript); a resolved call
+materializes an edge with `type="calls"`. These are edge types, not top-level
+fields of either compact or full record item.
 
 Use `loci_graph_traverse_neighbors` for dependencies. Resolved runtime imports
 use `namespace="loci"`, `type="imports"`, and
@@ -169,14 +180,21 @@ loci_graph_references(
   status="all",
   offset=0,
   limit=100,
+  max_output_bytes=16384,
 )
 ```
 
-`file` is normalized and repository-relative. `status` is `all`, `resolved`,
-or `unresolved`; `offset` is non-negative; `limit` is 1..500. Filter by file
-and status before counts/pagination; stable order is source file/line/column/
-byte, then binding and target identity. Current reads preserve serialized hash
-and mtime.
+`file` is normalized and repository-relative, and selects the reference-site
+file: this is an outgoing authored-record read, not an incoming search for
+references to declarations in that file. `status` is `all`, `resolved`, or
+`unresolved`; `offset` is non-negative; `limit` is 1..500. File filtering
+precedes `total`, `resolved`, and `unresolved` counts; status filtering then
+precedes pagination. Stable order is source file/line/column/byte, then binding
+and target identity. Current reads preserve serialized hash and mtime. For
+incoming consumers, use `loci_graph_traverse_neighbors` with the
+exact target symbol ID, `references`/`references_type`, and
+`direction="incoming"`; use `loci_explore(intent="impact")` for bounded known
+dependents.
 
 Resolved records materialize directed `namespace="loci"`,
 `resolution="import-resolved"` edges: runtime `type="references"` and
@@ -188,10 +206,12 @@ level; they never inherit the callable being defined. The target is one exact
 indexed symbol reached through the matched definite import and supported
 export surface.
 
-Reference records retain raw syntax, the selected import binding, source and
-import endpoints, exact target, support records, control provenance, and
-failure reasons. A resolved item carries `resolution_basis` plus support
-entries for the import binding and definition.
+Compact reference records carry `source_id`, `source_file`, `target_id`,
+`target_file`, `relation`, `language`, `line`, `column`, `start_byte`,
+`end_byte`, `text`, `status`, `resolution`, `unresolved_reason`,
+`resolution_configuration`, nullable string `context`, and
+`import_unresolved_reason` where applicable. Request `detail="full"` for raw
+syntax, selected import bindings, support records, and control provenance.
 
 Traverse references with `loci_graph_traverse_neighbors` or `loci_graph_paths`
 using `references`/`references_type` and `import-resolved`, in the required
@@ -213,22 +233,41 @@ loci_graph_calls(
   status="all",
   offset=0,
   limit=100,
+  max_output_bytes=16384,
 )
 ```
 
-The file/status/page rules match `loci_graph_references`; stable ordering is
-source file/line/column/call byte/callee byte, then caller and target identity.
-Current reads preserve serialized hash and mtime. A resolved record materializes
-one directed `namespace="loci"`, `type="calls"` edge. Same-file bindings use
-`resolution="exact"`; imported calls use `resolution="import-resolved"` only
-when the callee span exactly joins one accepted symbol-reference record.
+The file/status/page rules match `loci_graph_references`. `file` selects the
+call-site file and returns outgoing authored calls, rather than incoming calls
+to a declaration in that file. For callers, use
+`loci_graph_traverse_neighbors` with the exact target symbol ID,
+`edge_types=["calls"]`, and `direction="incoming"`; use
+`loci_explore(intent="impact")` for bounded known dependents. Stable ordering
+is source file/line/column/call byte/callee byte, then caller and target
+identity. Current reads preserve serialized hash and mtime. A resolved record
+materializes one directed `namespace="loci"`, `type="calls"` edge. Same-file
+bindings use `resolution="exact"`; imported calls use
+`resolution="import-resolved"` only when the callee span exactly joins one
+accepted symbol-reference record.
 
-Call records retain the exact raw call/callee span, caller owner, local binding
-candidates, resolved target, support records, inherited reference/control
-provenance, and explicit failure reasons. A resolved item includes `caller_id`,
-`caller_kind`, `target_file`, `target_id`, `target_kind`, `resolution_basis`,
-and support entries for the call site, caller definition, and local/imported
-definition.
+Compact call records carry the common compact fields plus call-site
+`start_byte`/`end_byte`, callee-expression
+`callee_start_byte`/`callee_end_byte`, and `reference_unresolved_reason`.
+Request `detail="full"` for raw call/callee syntax, caller ownership, local
+binding candidates, resolved target support, and inherited reference/control
+provenance.
+
+For both record tools, `max_output_bytes` is a strict integer in 2,048..262,144
+and defaults to 16,384. It caps the complete UTF-8 JSON MCP result for the
+chosen detail, including `content`, `structuredContent`, and `isError`, but
+excludes the JSON-RPC wrapper. `budget` reports `max_output_bytes`,
+`output_bytes`, and `byte_limit_reached`. Counts and filtering retain their
+usual meaning, but the cap may return fewer items than `limit`; follow
+`pagination.next_offset` until null and advance only through delivered records.
+If a compact or full record cannot fit on an otherwise empty page,
+`OUTPUT_BUDGET_EXCEEDED` reports `required_output_bytes`, `offset`, and the
+current maximum. Increase the budget or choose compact detail; the tool does
+not silently skip a record.
 
 Caller ownership follows executable bodies; module-level calls belong to the
 file node, named nested callables keep their identity, and anonymous or
@@ -240,11 +279,11 @@ valid call self-edge. Traverse calls with
 ```text
 loci_graph_traverse_neighbors(
   repo="/path/to/repo",
-  seed_ids=["src/use.py::build#function"],
+  seed_ids=["src/provider.py::target#function"],
   namespaces=["loci"],
   edge_types=["calls"],
   resolutions=["exact", "import-resolved"],
-  direction="outgoing",
+  direction="incoming",
 )
 ```
 

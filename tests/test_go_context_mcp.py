@@ -83,15 +83,16 @@ def test_go_type_dependencies_cross_the_actual_mcp_boundary(tmp_path: Path) -> N
             assert not diagnostics_response.is_error
             diagnostics = diagnostics_response.structured_content
             LociGraphReferencesOutput.model_validate(diagnostics)
+            assert diagnostics["detail"] == "compact"
             assert {
-                (item["source_id"], item["target_id"], item["raw"]["relation"])
+                (item["source_id"], item["target_id"], item["relation"])
                 for item in diagnostics["items"]
             } >= {
                 ("app/main.go::Build#function", "model/model.go::AliasID#type", "uses_type"),
                 ("model/model.go::AliasID#type", "model/model.go::UserID#type", "uses_type"),
                 ("model/model.go::Page#type", "model/model.go::Number#type", "uses_type"),
             }
-            assert all(item["raw"]["language"] == "go" for item in diagnostics["items"])
+            assert all(item["language"] == "go" for item in diagnostics["items"])
 
             reduced_response = await session.call_tool(
                 "loci_explore",

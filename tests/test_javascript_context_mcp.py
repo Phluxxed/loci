@@ -43,7 +43,7 @@ def test_javascript_dependencies_cross_the_actual_mcp_boundary(tmp_path):
                     separators=(",", ":"), ensure_ascii=False,
                 ).encode())
             diagnostics = await session.call_tool("loci_graph_references", {
-                "repo": str(repo), "family": "type",
+                "repo": str(repo), "family": "type", "detail": "full",
             })
             assert not diagnostics.is_error
             data = diagnostics.structured_content

@@ -92,6 +92,39 @@ Use the tool's input schema for numeric limits. Unsupported intents return
 
 ## Graph and health envelopes
 
+`loci_graph_references` and `loci_graph_calls` default to
+`detail="compact"`; `detail="full"` preserves their prior diagnostic item
+shape, including raw syntax, bindings or candidates, support records, and
+control provenance. Compact reference items expose source/target IDs and
+files, relation, language, position and byte range, text, status/resolution,
+unresolved reason, resolution configuration, nullable string `context`, and
+`import_unresolved_reason`. Compact call items have the common fields plus
+call-site `start_byte`/`end_byte`, callee-expression
+`callee_start_byte`/`callee_end_byte`, and `reference_unresolved_reason`; the
+call `source_id` identifies its caller. `type="references"`,
+`type="references_type"`, and `type="calls"` identify materialized graph edges;
+they are not top-level fields on compact or full record items.
+
+For either record tool, `max_output_bytes` is a strict integer from 2,048 to
+262,144, defaulting to 16,384. It caps the complete UTF-8 JSON MCP result for
+the chosen detail, including `content`, `structuredContent`, and `isError`, but
+excluding the JSON-RPC wrapper. The response includes
+`budget={max_output_bytes, output_bytes, byte_limit_reached}`. Existing counts,
+filters, and pagination semantics remain intact: file filtering precedes
+`total`, `resolved`, and `unresolved` counts, and status filtering precedes the
+page. A byte cap can return fewer records than `limit`. Follow
+`pagination.next_offset` until null; it advances only through records delivered
+in the page. If one compact or full record cannot fit on an empty page, the
+tool returns `OUTPUT_BUDGET_EXCEEDED` with `required_output_bytes`, `offset`,
+and the current maximum. Increase the budget or choose compact detail; no
+record is skipped.
+
+`file` on these tools names the reference/call site file and selects outgoing
+authored records. To find consumers or callers of a declaration, use
+`loci_graph_traverse_neighbors` with that exact target symbol ID and incoming
+direction; use `loci_explore(intent="impact")` for bounded known dependents.
+`loci_graph_imports` remains a separate import-observation envelope.
+
 `loci_graph_anchors` returns inferred or explicit starts without traversal or
 answerability claims:
 
@@ -121,9 +154,9 @@ known unhealthy findings over incomplete evidence. The tool never repairs or
 refreshes the store. Page with `offset`/`limit` (limit 1..500), and raise a work
 bound only when the larger read is deliberate.
 
-Graph import, reference, and call response envelopes are documented with
-their exact raw syntax, support records, target identity, and failure reasons
-in [graph-navigation.md](graph-navigation.md).
+Graph import, reference, and call response envelopes, including compact record
+fields and full diagnostic detail, are documented in
+[graph-navigation.md](graph-navigation.md).
 
 MCP tool errors are structured under `structuredContent.error` with `code`,
 `message`, and `details`.

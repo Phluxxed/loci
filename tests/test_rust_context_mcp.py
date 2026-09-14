@@ -93,10 +93,13 @@ def test_rust_context_crosses_the_actual_mcp_boundary(tmp_path: Path) -> None:
             assert not diagnostics_response.is_error
             diagnostics = diagnostics_response.structured_content
             LociGraphReferencesOutput.model_validate(diagnostics)
+            assert diagnostics["detail"] == "compact"
             assert {
-                item["raw"]["relation"] for item in diagnostics["items"]
+                item["relation"] for item in diagnostics["items"]
             } >= {"uses_type", "supertrait", "impl_trait", "impl_self_type"}
-            assert all(item["raw"]["language"] == "rust" for item in diagnostics["items"])
+            assert all(item["language"] == "rust" for item in diagnostics["items"])
+            assert all(item["resolution_configuration"] == "unconditional"
+                       for item in diagnostics["items"])
 
             reduced_response = await session.call_tool(
                 "loci_explore",
@@ -156,5 +159,18 @@ def test_rust_context_crosses_the_actual_mcp_boundary(tmp_path: Path) -> None:
             }
             _assert_exact_sources(workspace, payload)
             _assert_wire_budget(response, payload, 16384)
+
+            diagnostics_response = await session.call_tool(
+                "loci_graph_references",
+                {"repo": str(workspace), "file": "app/src/lib.rs",
+                 "family": "type", "status": "resolved"},
+            )
+            assert not diagnostics_response.is_error
+            diagnostics = diagnostics_response.structured_content
+            LociGraphReferencesOutput.model_validate(diagnostics)
+            assert diagnostics["detail"] == "compact"
+            assert {item["resolution_configuration"] for item in diagnostics["items"]} == {
+                "declared_possible",
+            }
 
     asyncio.run(check())

@@ -237,8 +237,8 @@ names.
 | `loci_graph_paths` | Find bounded, evidence-backed paths between exact endpoint IDs |
 | `loci_graph_retrieve` | Rank question-shaped paths and expose rejected semantic or hub shortcuts |
 | `loci_graph_imports` | Inspect bounded resolved and unresolved built-in import records |
-| `loci_graph_references` | Inspect bounded resolved and unresolved imported-symbol references |
-| `loci_graph_calls` | Inspect bounded resolved and unresolved definite-call records |
+| `loci_graph_references` | Inspect bounded resolved and unresolved imported-symbol references; compact items by default |
+| `loci_graph_calls` | Inspect bounded resolved and unresolved definite-call records; compact items by default |
 | `loci_graph_health` | Report loaded graph profiles, active record counts, and diagnostics |
 | `loci_store_health` | Diagnose bounded read-only repository freshness, liveness, corruption, and overlaps |
 | `loci_verify` | Verify index integrity and content drift |
@@ -648,8 +648,8 @@ command or separate top-level import store.
 Loci can refine a proven file, package, or crate import into a directed
 symbol-level relationship when the source syntax establishes one definite
 local binding and the imported endpoint exposes one exact accessible indexed
-symbol. Runtime references use `type="references"`; explicitly type-only
-TypeScript references use `type="references_type"`. Both use
+symbol. Runtime reference edges use `type="references"`; explicitly type-only
+TypeScript reference edges use `type="references_type"`. Both use
 `namespace="loci"`, `resolution="import-resolved"`, and retain the exact source
 line and content hash as evidence.
 
@@ -667,17 +667,32 @@ loci_graph_references(
   file="src/consumer.py",
   status="all",       # all | resolved | unresolved
   offset=0,
-  limit=100,          # 1..500
+  limit=100,           # 1..500
+  max_output_bytes=16384,
 )
 ```
 
-The response reports the raw reference, selected import binding, source and
-import endpoints, exact target when resolved, support records, resolution
-basis and controls, and explicit reference/import failure reasons. `file`
-filters before counts; `status` filters the returned items after total,
-resolved, and unresolved counts are calculated; `offset` and `limit` paginate
-the stable source-position order. Current reads do not rewrite a current
-index.
+`detail="compact"` is the default. Reference items contain the record's
+source and target identity, source/target files, relation, language and source
+position, text, status/resolution, unresolved reason, resolution
+configuration, nullable string `context`, and import-unresolved reason when
+applicable.
+Pass `detail="full"` when raw syntax, selected bindings, support records, and
+control provenance are needed for diagnosis. `file` selects the reference-site
+file: it returns outgoing records authored there, not records whose target is
+declared there. File filtering precedes `total`, `resolved`, and `unresolved`
+counts; status filtering precedes pagination. The byte cap can return fewer
+items than `limit`.
+
+`max_output_bytes` is a strict integer from 2,048 through 262,144 and defaults
+to 16,384. The response `budget` reports `max_output_bytes`, `output_bytes`,
+and `byte_limit_reached`, measured over the complete UTF-8 JSON MCP result for
+the chosen detail (`content`, `structuredContent`, and `isError`), excluding
+its JSON-RPC wrapper. Follow `pagination.next_offset` until null; it advances
+only through delivered records. If one compact or full record cannot fit on an
+otherwise empty page, the tool returns `OUTPUT_BUDGET_EXCEEDED` with
+`required_output_bytes`, `offset`, and the current maximum. Increase the
+budget or use compact detail; records are never skipped silently.
 
 When a local import resolves but its bounded re-export chain ends at an
 external or otherwise unresolved import, the reference remains unresolved and
@@ -687,16 +702,17 @@ trusted reference edge is created.
 Use the generic graph tools to navigate trusted reference edges. Outgoing
 traversal answers “which imported symbols does this function name?”; incoming
 traversal answers “which indexed symbols name this definition?” without
-reversing the stored edge:
+reversing the stored edge. For consumers of one declaration, seed its exact
+target symbol ID and use incoming traversal:
 
 ```text
 loci_graph_traverse_neighbors(
   repo="/path/to/repo",
-  seed_ids=["src/consumer.py::build#function"],
+  seed_ids=["src/provider.py::target#function"],
   namespaces=["loci"],
   edge_types=["references", "references_type"],
   resolutions=["import-resolved"],
-  direction="outgoing",
+  direction="incoming",
 )
 ```
 
@@ -739,30 +755,36 @@ loci_graph_calls(
   file="src/consumer.py",
   status="all",       # all | resolved | unresolved
   offset=0,
-  limit=100,          # 1..500
+  limit=100,           # 1..500
+  max_output_bytes=16384,
 )
 ```
 
-Each item retains the exact raw call/callee bytes, line, column, text, path,
-caller ownership, source hash, local binding candidates or symbol-reference
-support, target when resolved, support records, inherited control/configuration
-provenance, and an explicit unresolved reason. `file` filters before counts;
-`status` filters before pagination; stable ordering starts with source
-file/line/column/call byte/callee byte. Current reads preserve a current
-index's serialized hash and mtime.
+`detail="compact"` is the default. Call items contain the common compact
+identity, location, text, status/resolution, and configuration fields, plus
+call-site `start_byte`/`end_byte`, callee-expression
+`callee_start_byte`/`callee_end_byte`, and any reference-unresolved reason; the
+call's `source_id` is its caller.
+Use `detail="full"` for raw call syntax, caller ownership, binding candidates,
+support records, and inherited reference/control provenance. `file` selects the
+call-site file and returns outgoing authored calls; it does not find calls into
+a declaration in that file. The byte budget, pagination, and oversized-record
+rules are the same as for `loci_graph_references`.
 
 Use the generic graph tools for call navigation. Outgoing traversal answers
 “what does this function definitely call?”; incoming traversal answers “what
-definitely calls this function?” without reversing stored edge direction:
+definitely calls this function?” without reversing stored edge direction. For
+callers of one declaration, seed its exact target symbol ID and use incoming
+traversal:
 
 ```text
 loci_graph_traverse_neighbors(
   repo="/path/to/repo",
-  seed_ids=["src/consumer.py::build#function"],
+  seed_ids=["src/provider.py::target#function"],
   namespaces=["loci"],
   edge_types=["calls"],
   resolutions=["exact", "import-resolved"],
-  direction="outgoing",
+  direction="incoming",
 )
 ```
 
@@ -789,7 +811,8 @@ their authored endpoints. Generic parameter shadowing, ambiguous exports and
 unsupported computations retain diagnostics without creating trusted edges.
 
 ```text
-loci_graph_references(repo="/path/to/repo", family="type", status="all", limit=100)
+loci_graph_references(repo="/path/to/repo", family="type", status="all", limit=100,
+                       detail="full")
 loci_graph_traverse_neighbors(
   repo="/path/to/repo",
   seed_ids=["src/consumer.ts::processOrder#function"],
@@ -800,11 +823,11 @@ loci_graph_traverse_neighbors(
 ```
 
 The paginated type family exposes exact occurrences, ownership, candidate scope
-and completeness, supporting source hashes and unresolved reasons. Default
-reference diagnostics retain the existing symbol-reference response. Generic
-paths hydrate relationship evidence; incoming traversal answers which
-declarations depend on a target. Compatibility `loci_graph_neighbors` remains
-contains-only. Graph health includes type counts and resolution-reason summaries.
+and completeness, supporting source hashes and unresolved reasons with
+`detail="full"`. Its default is the compact reference response. Generic paths
+hydrate relationship evidence; incoming traversal answers which declarations
+depend on a target. Compatibility `loci_graph_neighbors` remains contains-only.
+Graph health includes type counts and resolution-reason summaries.
 
 These relationships describe source declarations; they do not establish
 structural compatibility, inferred implementations or runtime dispatch.

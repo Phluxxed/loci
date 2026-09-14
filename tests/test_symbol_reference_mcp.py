@@ -194,8 +194,12 @@ def test_mcp_reference_diagnostics_and_traversal_survive_fresh_process(
         "offset",
         "limit",
         "family",
+        "detail",
+        "max_output_bytes",
     }
     assert schema["properties"]["family"]["default"] == "symbol"
+    assert schema["properties"]["detail"]["default"] == "compact"
+    assert schema["properties"]["max_output_bytes"]["default"] == 16_384
     assert schema["properties"]["file"]["default"] is None
     assert schema["properties"]["status"]["default"] == "all"
     assert schema["properties"]["offset"]["default"] == 0
@@ -300,11 +304,16 @@ async def _reference_mcp_after_restart(
         )
         first = await session.call_tool(
             "loci_graph_references",
-            arguments={"repo": str(repo), "limit": 1},
+            arguments={"repo": str(repo), "limit": 1, "detail": "full"},
         )
         second = await session.call_tool(
             "loci_graph_references",
-            arguments={"repo": str(repo), "offset": 1, "limit": 1},
+            arguments={
+                "repo": str(repo),
+                "offset": 1,
+                "limit": 1,
+                "detail": "full",
+            },
         )
         unresolved = await session.call_tool(
             "loci_graph_references",
@@ -312,6 +321,7 @@ async def _reference_mcp_after_restart(
                 "repo": str(repo),
                 "file": "consumer.py",
                 "status": "unresolved",
+                "detail": "full",
             },
         )
         edge_arguments = {
