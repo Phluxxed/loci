@@ -1,0 +1,8 @@
+`captureCommandResult` accepts the trusted internal `WorkContextBinding`, not the exported `WorkContextBindingView`.
+
+- Its options declare `binding: WorkContextBinding` in [`src/tool-results/service.ts:53-60`](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:53), imported through the public work-context barrel at [`service.ts:19-23`](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:19).
+- That barrel re-exports `WorkContextBinding` from [`src/work-context/index.ts:23-30`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/index.ts:23); the defining contract is [`src/work-context/binding.ts:28-45`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:28).
+- `WorkContextBindingView` is separately exported and deliberately omits `session_id` and `provenance.observed_cwd` ([`binding.ts:47-67`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:47), projection at [`binding.ts:130-138`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:130)). It is the public/read representation used by the MCP read handler ([`src/mcp/tools.ts:284`, `:635-640`](/tmp/anvil-source-tasks-20260914/t21/src/mcp/tools.ts:284)).
+- Therefore the view is not accepted: it fails the TypeScript contract, and a cast/unknown value also fails runtime validation because the validator requires both omitted fields ([`binding.ts:217-238`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:217)); capture converts that to `TOOL_RESULT_UNAUTHORIZED` ([`service.ts:124-131`](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:124)).
+
+No material uncertainty.

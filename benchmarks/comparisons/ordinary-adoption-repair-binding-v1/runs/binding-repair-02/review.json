@@ -1,0 +1,144 @@
+{
+  "reviewer": "independent gpt-5.6-sol/high",
+  "case_id": "tool_result_capture_binding_type_identity",
+  "answer_text_sha256": "27afdf6d9caa17c56b79c4ec49d8be94202efd8c76d0479fcb463bb5a438da1b",
+  "observation_final_answer_record_sha256": "f2066c0adea36ce55299cc5354e415d0b72f1d9e5f4ba8ddb2116c96e20a0318",
+  "fact_judgments": [
+    {
+      "fact_id": "capture_options_declares_binding_contract",
+      "judgment": "correct",
+      "answer_quote": "`captureCommandResult` accepts the trusted internal `WorkContextBinding`, not the exported `WorkContextBindingView`.\n\n- Its options declare `binding: WorkContextBinding` in [`src/tool-results/service.ts:53-60`](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:53)",
+      "source_references": [
+        {
+          "file": "src/tool-results/service.ts",
+          "start_line": 53,
+          "end_line": 60,
+          "sha256_of_exact_utf8_lines": "c492316cc078713599c249b236bcf2cb3826f40439904ebe00e28ccc6d9feb8d"
+        },
+        {
+          "file": "src/tool-results/service.ts",
+          "start_line": 411,
+          "end_line": 411,
+          "sha256_of_exact_utf8_lines": "dd903466b03fa7dbab014e533c8479b6301b5baa3b484be6017115bcd2e82f04"
+        }
+      ]
+    },
+    {
+      "fact_id": "binding_import_traverses_public_barrel",
+      "judgment": "missing",
+      "answer_quote": "imported through the public work-context barrel at [`service.ts:19-23`](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:19).\n- That barrel re-exports `WorkContextBinding` from [`src/work-context/index.ts:23-30`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/index.ts:23); the defining contract is [`src/work-context/binding.ts:28-45`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:28).\n- `WorkContextBindingView` is separately exported",
+      "reason": "The answer correctly states the public-barrel import and that the barrel re-exports WorkContextBinding. The following phrase that WorkContextBindingView is 'separately exported' cites its defining declaration in binding.ts and never states that the public barrel also re-exports that view. The second half of the original compound fact is therefore missing, not contradicted.",
+      "source_references": [
+        {
+          "file": "src/tool-results/service.ts",
+          "start_line": 19,
+          "end_line": 23,
+          "sha256_of_exact_utf8_lines": "4fcf2c3c900821bc66ab3e341af0f3a0550b716d2909f52b62f4cc5a6d4a16fc"
+        },
+        {
+          "file": "src/work-context/index.ts",
+          "start_line": 16,
+          "end_line": 29,
+          "sha256_of_exact_utf8_lines": "c45b3a2a80027420ba2532006cc4e18d07ff0b7cf83eaf781b99022b61d09eec"
+        }
+      ]
+    },
+    {
+      "fact_id": "binding_identity_and_view_difference",
+      "judgment": "correct",
+      "answer_quote": "`WorkContextBindingView` is separately exported and deliberately omits `session_id` and `provenance.observed_cwd` ([`binding.ts:47-67`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:47), projection at [`binding.ts:130-138`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:130)). It is the public/read representation used by the MCP read handler ([`src/mcp/tools.ts:284`, `:635-640`](/tmp/anvil-source-tasks-20260914/t21/src/mcp/tools.ts:284)).\n- Therefore the view is not accepted",
+      "source_references": [
+        {
+          "file": "src/work-context/binding.ts",
+          "start_line": 28,
+          "end_line": 45,
+          "sha256_of_exact_utf8_lines": "e917a43db554775a823e3b8870b165ba4931a28b126b8141b085bdca22cae1f2"
+        },
+        {
+          "file": "src/work-context/binding.ts",
+          "start_line": 47,
+          "end_line": 67,
+          "sha256_of_exact_utf8_lines": "62c22718b455a85314f85c92031f87c09ebe9ec8fad40cd2e5f33bd2ab83154d"
+        }
+      ]
+    }
+  ],
+  "required_fact_summary": {
+    "correct": 2,
+    "incorrect": 0,
+    "missing": 1,
+    "uncertain": 0,
+    "all_required_facts_complete": false
+  },
+  "extra_material_claims": [
+    {
+      "answer_quote": "`WorkContextBindingView` is separately exported and deliberately omits `session_id` and `provenance.observed_cwd`",
+      "judgment": "correct",
+      "reason": "The view schema omits both fields and workContextBindingView removes them from the returned projection.",
+      "source_references": [
+        {
+          "file": "src/work-context/binding.ts",
+          "start_line": 130,
+          "end_line": 138,
+          "sha256_of_exact_utf8_lines": "9147c5d0693d31a46ff5c59c15e8d30bb42eaec28caad190ec5c8890a1df1ee2"
+        }
+      ]
+    },
+    {
+      "answer_quote": "It is the public/read representation used by the MCP read handler",
+      "judgment": "correct",
+      "reason": "The read-output schema requires WorkContextBindingView and handleWorkContextRead returns workContextBindingView(binding).",
+      "source_references": [
+        {
+          "file": "src/mcp/tools.ts",
+          "start_line": 284,
+          "end_line": 284,
+          "sha256_of_exact_utf8_lines": "e9b3a1d5c59241da75bf8f17433a1fb4711e1aaaeb2350903ad2027612d068f5"
+        },
+        {
+          "file": "src/mcp/tools.ts",
+          "start_line": 630,
+          "end_line": 640,
+          "sha256_of_exact_utf8_lines": "07a523e23b6b5c2bc5f04e8f951fbb3f5aae2bcdb8157299665cc57a9c4a5328"
+        }
+      ]
+    },
+    {
+      "answer_quote": "a cast/unknown value also fails runtime validation because the validator requires both omitted fields ([`binding.ts:217-238`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:217)); capture converts that to `TOOL_RESULT_UNAUTHORIZED` ([`service.ts:124-131`](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:124)",
+      "judgment": "correct",
+      "reason": "The runtime guard checks session_id and provenance.observed_cwd independently of static typing, and validateBinding maps guard failures to TOOL_RESULT_UNAUTHORIZED.",
+      "source_references": [
+        {
+          "file": "src/work-context/binding.ts",
+          "start_line": 217,
+          "end_line": 238,
+          "sha256_of_exact_utf8_lines": "ea3f8546dbb2092358dcc43ff6607c8f3473928e1b6b4fe581af12ba836f3e60"
+        },
+        {
+          "file": "src/tool-results/service.ts",
+          "start_line": 124,
+          "end_line": 131,
+          "sha256_of_exact_utf8_lines": "13eb2e9fff66c5210c2c7b31144925ed5a19c28d354a38269a28b349f5b5487d"
+        }
+      ]
+    }
+  ],
+  "material_unsupported_claims": [],
+  "source_access_review": {
+    "target_repo": "/tmp/anvil-source-tasks-20260914/t21",
+    "canonical_target_repo": "/private/tmp/anvil-source-tasks-20260914/t21",
+    "fixed_source_commit": "53bf29e60cece2335aa39fe301935a07e8e8d4e4",
+    "fixed_source_files_verified_by_collector": 638,
+    "shell_call_count": 11,
+    "mcp_call_count": 0,
+    "mcp_tools": [],
+    "source_access": "All repository source searches and reads stayed within t21. The only outside-target read was the installed Loci operating-instruction file. No source write, test, or service command was recorded.",
+    "write_test_or_service_activity": false,
+    "scope_passed": true
+  },
+  "qualifications": [
+    "The answer is strict-incomplete because required fact 2 is compound and the public-barrel re-export of WorkContextBindingView is unstated. The present clauses are source-correct.",
+    "The fixed declarations establish the accepted type and bare-view field mismatch; they do not prove that any particular runtime caller supplied either value.",
+    "This review judges answer semantics and source access only. Graph-delivery scoring, cognition, causal benefit, and provider cost are outside its scope."
+  ]
+}
