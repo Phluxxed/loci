@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "inventory": "W1.3.1 installed-and-delivered Loci surface",
+  "date": "2026-09-14",
+  "status": "pre-scored-pair inventory; no engine or probe call was made for this inventory",
+  "installed_loci": {
+    "mcp_config": {
+      "source": "/Users/brummerv/.codex/config.toml:331-339",
+      "file_sha256": "ab138e2833222fcb05f51f8137865f114455f6966da6d03830ef6164a6e9e057",
+      "command": "/Users/brummerv/.local/bin/loci-mcp",
+      "startup_timeout_sec": 60.0,
+      "default_tools_approval_mode": "approve",
+      "environment": {
+        "LOCI_BASE_DIR": "/Users/brummerv/.codex/loci-index",
+        "LOCI_MCP_STARTUP_TRACE": "/Users/brummerv/.codex/loci-index/mcp-startup.jsonl",
+        "LOCI_STORE_NAMESPACE": "codex"
+      }
+    },
+    "launcher": {
+      "runtime_path": "/Users/brummerv/.local/bin/loci-mcp",
+      "kind": "symlink",
+      "target": "/Users/brummerv/loci/.shared/loci-mcp-wrapper.sh",
+      "target_sha256": "4d849faa1e1e23bf65b627b68466754f51d89d0ce5db8752927366a0b92d0db7",
+      "source": "/Users/brummerv/loci/.shared/loci-mcp-wrapper.sh:1-31",
+      "observed_behavior": "resolves the launcher path and execs the repository virtualenv loci-mcp entry point; the wrapper relies on the client to supply LOCI_BASE_DIR and LOCI_STORE_NAMESPACE"
+    },
+    "skill": {
+      "runtime_path": "/Users/brummerv/.codex/skills/loci",
+      "kind": "symlink",
+      "target": "/Users/brummerv/loci/skills/loci",
+      "skill_file": "/Users/brummerv/loci/skills/loci/SKILL.md",
+      "skill_sha256": "563dea59ab4702484585f0376e7480903eb403262fdf56d23eb1e68dbeada9cf",
+      "reference_file": "/Users/brummerv/loci/skills/loci/references/graph-navigation.md",
+      "reference_sha256": "a29adcbbcc92c56353c3b5cac06b717c8cdfeaf5c8a09469b709ab054929f180",
+      "ownership": "The tracked installer defines the source and refuses to replace an existing non-symlink skill path. The installed skill is concurrent user work and was not changed."
+    }
+  },
+  "hooks": {
+    "registration": {
+      "source": "/Users/brummerv/.codex/hooks.json",
+      "file_sha256": "0ff784f203d6fb3ff3c3cec2c8b7e0a6c96d02f3826adc5be1a06de921266aa5",
+      "session_start_matcher": "startup|resume|clear|compact",
+      "configured_order": [
+        "session-savings-bind.py",
+        "loci-session-start.sh",
+        "ambient-mcp-session-start.sh",
+        "anvil-session-start.sh",
+        "scoreboard hook"
+      ],
+      "loci": {
+        "timeout_seconds": 30,
+        "status_message": "indexing repo with loci"
+      },
+      "anvil": {
+        "timeout_seconds": 30,
+        "additional_context_limit": 8192,
+        "status_message": "loading Anvil context",
+        "also_registered_for": "UserPromptSubmit"
+      }
+    },
+    "loci_session_start": {
+      "runtime_path": "/Users/brummerv/.codex/hooks/loci-session-start.sh",
+      "kind": "symlink",
+      "target": "/Users/brummerv/loci/.codex/hooks/loci-session-start.sh",
+      "target_sha256": "7762dfe57ac0f75f99d2924db5605fae03e6729f4a74f192da44ec741264d0f8",
+      "source": "/Users/brummerv/loci/.codex/hooks/loci-session-start.sh:24-54",
+      "shared_core": "/Users/brummerv/loci/.shared/loci-session-start-core.sh",
+      "shared_core_sha256": "515634ae399076e71a04bb8e4e2c81e6b018cd070189ee0d566eda31cad32359",
+      "core_source": "/Users/brummerv/loci/.shared/loci-session-start-core.sh:23-85",
+      "observed_behavior": "The wrapper emits the core message as Codex SessionStart additionalContext. The core bails if loci is unavailable or cwd is outside a Git repository; otherwise it reports an existing or newly indexed symbol count and tells the host to use the skill and prefer MCP tools."
+    },
+    "installer_ownership": {
+      "source": "/Users/brummerv/loci/.codex/install-hooks.py:17-30,34-70,83-108",
+      "sha256": "c6a9aa77da087583442440270f7215d87546a5eca1f4e34ac0273cf4d697692e",
+      "observed_behavior": "Defines the repository hook and skill sources, symlinks them into CODEX_HOME, and appends the Loci SessionStart registration when absent."
+    },
+    "anvil_boundary": {
+      "runtime_path": "/Users/brummerv/.codex/hooks/anvil-session-start.sh",
+      "kind": "regular executable file",
+      "sha256": "0f2748d459b29843333a1872afe232a7a9d9e9f291d386f7a48562dfbfad6423",
+      "bounded_observation": "Sets the Codex Anvil identity/state variables then execs /Users/brummerv/phluxxed/anvil_redux/bin/anvil.ts codex context-hook.",
+      "scope_boundary": "This establishes the owning executable only; no Anvil-context behavior was audited."
+    }
+  },
+  "as_delivered_and_observed_surfaces": {
+    "primary": {
+      "session": "01a09e19-5048-79d3-96dd-697eda8a4ac8",
+      "session_record": "/Users/brummerv/.codex/sessions/2026/09/14/rollout-2026-09-14T14-07-34-01a09e19-5048-79d3-96dd-697eda8a4ac8.jsonl",
+      "delivery_evidence": [
+        "The recorded SessionStart additionalContext says 7295 symbols were indexed for /Users/brummerv/loci and supplies the MCP/skill hint.",
+        "The following recorded developer message requires the ALL_TOOLS two-pass discovery procedure and names Loci code-navigation tools."
+      ],
+      "tool_catalog": {
+        "source": "benchmarks/comparisons/ordinary-adoption-v1/runtime/primary-surface.json",
+        "file_sha256": "a2ccb835f521cdc57be229e7cf7af74ebf603c42d06513ea3768f67eaf04fae5",
+        "declared_purpose": "capability_probe",
+        "loci_tool_count": 21,
+        "canonical_catalog_sha256_recorded_in_runtime_provenance": "980fcda6956804ea9e73aa27af76a43a9e39beef9097f3c8722abc55947aa4bb"
+      }
+    },
+    "fresh_delegate_preflight": {
+      "session": "01a09e1a-b83e-7fa2-91b4-117f9d2fdb2e",
+      "source": "benchmarks/comparisons/ordinary-adoption-v1/runtime/delegate-surface.json",
+      "file_sha256": "60279092729098dcfd14026dafafd60b4683a468dd2b2c25fe882ab219da5057",
+      "loci_tool_count": 21,
+      "recorded_result": "The preflight establishes a reachable ALL_TOOLS surface, installed skill, and no previous task answer for that fresh delegate host.",
+      "important_limit": "It is a capability and instruction-surface preflight, not an ordinary-adoption result. Exact inherited bootstrap delivery for a fresh delegate was not independently captured."
+    },
+    "provenance": {
+      "source": "benchmarks/comparisons/ordinary-adoption-v1/runtime/runtime-provenance.json",
+      "file_sha256": "c34d192cc6b1847fc1295b69a7defb91fdad281daa2063c3bdef90a3e944703b",
+      "recorded_primary_delegate_catalog_match": true,
+      "correction": "Its configured_loci.env snapshot lists LOCI_BASE_DIR but omits the installed LOCI_STORE_NAMESPACE=codex. The live config above is the authoritative observation for this inventory; runtime-provenance.json was not changed."
+    }
+  },
+  "interpretation_boundaries": [
+    "Installed configuration, hook registration, skill linkage, and an enumerated catalog establish availability; they do not establish that an ordinary task voluntarily discovered or invoked Loci.",
+    "The primary session has direct recorded delivery of the Loci index/MCP hint and ALL_TOOLS discovery instruction. It is therefore not an unprimed delegate surface.",
+    "The delegate record is a deliberate post-host capability probe. It cannot be used as evidence that an ordinary delegate found the tools unaided, and posttask inspection must not be counted as task-time discovery.",
+    "hooks.json registration and order prove configuration only. This inventory does not prove invocation timing, successful output delivery for every session, Loci engine use, Anvil behavior, or any scored-task answer, cost, or outcome."
+  ]
+}

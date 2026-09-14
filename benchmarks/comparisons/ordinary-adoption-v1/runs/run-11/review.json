@@ -1,0 +1,32 @@
+{
+  "fact_judgments": [
+    {
+      "fact_id": "browser_cli_feature_identity",
+      "judgment": "correct",
+      "answer_quote": "`runBrowserCli` uses its imported production defaults for omitted dependencies",
+      "source_references": [
+        { "file": "src/browser/cli.ts", "start_line": 554, "end_line": 588, "sha256_of_exact_utf8_lines": "086d2642887f742c51ad337230b0a19edde48817a6534b6b838f03d1a0bb15df" }
+      ]
+    },
+    {
+      "fact_id": "main_browser_branch_calls_feature",
+      "judgment": "incorrect",
+      "answer_quote": "dispatches `anvil browser …` to `runBrowserCli(command.slice(1), …)`",
+      "source_references": [
+        { "file": "bin/anvil.ts", "start_line": 1461, "end_line": 1470, "sha256_of_exact_utf8_lines": "68cefb819308e7a5d5b2bbdecd9cfbfef345123d580d0b46e29840d40109ff0a" }
+      ],
+      "reason": "Omission, not false assertion: the answer states sliced arguments, currentFile, and optional ANVIL_HOME but omits assigning a nonzero returned exit code to process.exitCode."
+    },
+    {
+      "fact_id": "import_reexport_path",
+      "judgment": "correct",
+      "answer_quote": "imported through",
+      "source_references": [
+        { "file": "bin/anvil.ts", "start_line": 48, "end_line": 48, "sha256_of_exact_utf8_lines": "36c38ea53d8856e8b0bbfe76b83beed50e2f60eb6677c51e633331a118dfbd31" },
+        { "file": "src/browser/index.ts", "start_line": 57, "end_line": 58, "sha256_of_exact_utf8_lines": "6ebb62c547f8b92036a18d66b11f2818d22caff5f0c31aca433539da50499e38" }
+      ]
+    }
+  ],
+  "material_unsupported_claims": [],
+  "relationship_support": []
+}

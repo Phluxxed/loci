@@ -1,0 +1,797 @@
+{
+  "schema_version": 1,
+  "run": {
+    "run_id": "run-13",
+    "case_id": "tool_result_capture_binding_type_identity",
+    "condition": "primary_baseline",
+    "repetition": 1,
+    "role": "primary",
+    "purpose": "primary_check",
+    "model": "gpt-6-astra",
+    "effort": "ultra",
+    "source_root": "/tmp/anvil-source-tasks-20260914/t13",
+    "agent_task_name": null,
+    "prompt": "Investigate the repository at /tmp/anvil-source-tasks-20260914/t13 read-only.\n\nWhile changing authorization around tool-result capture, which work-context contract does captureCommandResult actually accept for binding? Trace the imported public type to its defining module, and explain whether the similarly named exported view type is accepted. Give the relevant paths and lines in a short answer.\n\nFollow the normal repository instructions. Keep this a focused source\ninvestigation: do not edit files, run tests, or launch services. Use only this\nrepository and installed operating instructions for evidence; do not inspect\nother repositories, earlier agent sessions or unrelated task artifacts. Give\na concise answer with relevant source paths and lines, and state any material\nuncertainty. Complete this assignment directly. Do not spawn other agents.",
+    "prompt_sha256": "d71e3c5bfc4cd19496da9affee824479e4f8a25d53fe60560c27e53a25c54a34",
+    "conditional_on_selected_correction": false,
+    "task_source_commit": "53bf29e60cece2335aa39fe301935a07e8e8d4e4",
+    "task_source_archive_sha256": "e919302908ba8dfee2ee8ee055fd4a7463a37e94a71d35d2ecda7abe95463c5e",
+    "source_canonical_root": "/private/tmp/anvil-source-tasks-20260914/t13"
+  },
+  "purpose": "primary_check",
+  "known_answer": true,
+  "native_identity": {
+    "thread_id": "01a09e19-5048-79d3-96dd-697eda8a4ac8",
+    "turn_id": "01a09e4c-6bcb-77c2-ac63-25a9464a6c9d",
+    "target_repo": "/tmp/anvil-source-tasks-20260914/t13",
+    "model": "gpt-6-astra",
+    "effort": "ultra"
+  },
+  "window": {
+    "kind": "coordinator_declared_functional_call_window_not_task_turn",
+    "local_rollout": "/Users/brummerv/.codex/sessions/2026/09/14/rollout-2026-09-14T14-07-34-01a09e19-5048-79d3-96dd-697eda8a4ac8.jsonl",
+    "start_line": 2246,
+    "end_line": 2257,
+    "sha256": "c06fe7d04f1d5132ee93ad940f81afb18d08e84f4c27309d5ec7ba513bd2cb90"
+  },
+  "mcp_calls": [
+    {
+      "line": 2248,
+      "event_type": "item_completed",
+      "item_id": "exec-ecc4ed6a-4672-4e79-870c-5425bbefd92b",
+      "thread_id": "01a09e19-5048-79d3-96dd-697eda8a4ac8",
+      "turn_id": "01a09e4c-6bcb-77c2-ac63-25a9464a6c9d",
+      "started_at_ms": 1789367352321,
+      "completed_at_ms": 1789367359697,
+      "status": "completed",
+      "duration": {
+        "secs": 7,
+        "nanos": 375234292
+      },
+      "server": "loci",
+      "tool": "loci_search",
+      "arguments": {
+        "repo": "/tmp/anvil-source-tasks-20260914/t13",
+        "query": "CaptureCommandResultOptions",
+        "limit": 2
+      },
+      "target_repo": "/tmp/anvil-source-tasks-20260914/t13",
+      "result": {
+        "content": [],
+        "structuredContent": {
+          "symbols": [
+            {
+              "id": "src/tool-results/service.ts::CaptureCommandResultOptions#type",
+              "name": "CaptureCommandResultOptions",
+              "qualified_name": "CaptureCommandResultOptions",
+              "kind": "type",
+              "language": "typescript",
+              "file_path": "src/tool-results/service.ts",
+              "byte_offset": 1380,
+              "byte_length": 161,
+              "signature": "type CaptureCommandResultOptions = {",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "6d1bff33d22b063c000e5fc43c10e1a9d326fcdc5cc727937c1879fae3c40ac6",
+              "decorators": [],
+              "keywords": [
+                "capture",
+                "command",
+                "options",
+                "result"
+              ],
+              "metadata": {},
+              "line": 53,
+              "end_line": 60,
+              "score": 61.0
+            },
+            {
+              "id": "src/tool-results/service.ts::captureCommandResult#function",
+              "name": "captureCommandResult",
+              "qualified_name": "captureCommandResult",
+              "kind": "function",
+              "language": "typescript",
+              "file_path": "src/tool-results/service.ts",
+              "byte_offset": 13257,
+              "byte_length": 4468,
+              "signature": "async function captureCommandResult(options: CaptureCommandResultOptions): Promise<ToolResultReceipt> {",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "44b6d4a3fe2335a8e5519b139087b2835415262a1a793f1ef951bb6cd921807c",
+              "decorators": [],
+              "keywords": [
+                "capture",
+                "command",
+                "result"
+              ],
+              "metadata": {},
+              "line": 411,
+              "end_line": 522,
+              "score": 18.0
+            }
+          ],
+          "coverage": {
+            "schema_version": 1,
+            "state": "partial",
+            "scope": "repository",
+            "source_scope": "indexed_supported_source",
+            "indexed_files": 415,
+            "excluded_paths": 223,
+            "exclusions": [
+              {
+                "reason": "unsupported_file_type",
+                "paths": 223,
+                "samples": [
+                  ".agents/skills/spark-shape/agents/openai.yaml",
+                  ".codex/config.toml",
+                  ".codex/hooks.json",
+                  ".gitignore",
+                  ".manifest/objectives/obj_19095dfe9e769a3d5af35b2e23bf7026.json",
+                  ".manifest/objectives/obj_6d616e6966657374763264656c697665.json",
+                  ".manifest/objectives/obj_7ac1ff09fa2bd474f9f7eb9dca176592.json",
+                  ".manifest/objectives/obj_9aa7f9724486f1d3aa9752742c9c0e3d.json",
+                  "LICENSE",
+                  "docs/brain-usage-dashboard.html",
+                  "docs/manifest-objective.html",
+                  "docs/manifest-rings/manifest-ring.html",
+                  "docs/plans/evidence/authority-envelopes.json",
+                  "docs/plans/evidence/brain-envelope-allocation-q01-2026-09-06.json",
+                  "docs/plans/evidence/brain-evidence-selection-repair/context-capture.json",
+                  "docs/plans/evidence/brain-sufficiency-walkthrough/context-capture.json",
+                  "docs/plans/evidence/brain-w21-baseline/anvil-route.json",
+                  "docs/plans/evidence/brain-w21-baseline/question-cases.json",
+                  "docs/plans/evidence/brain-w21-baseline/questions-cli-unconfigured.json",
+                  "docs/plans/evidence/brain-w21-baseline/questions-cli.json"
+                ],
+                "omitted_samples": 203
+              }
+            ],
+            "unknown_reason": null,
+            "query_scope": "indexed_symbols"
+          },
+          "search_id": "2bddd54e-e00a-4e81-bba2-08b91c96e34c"
+        },
+        "isError": false
+      },
+      "canonical_result_json_bytes": 2564,
+      "canonical_result_json_sha256": "abeeb74767c5b6c1bc7268f16c25dae07cd0d01eecce3d1328bbb214904a2f2a",
+      "invocation_category": "exact_retrieval",
+      "relationship_delivery": {
+        "application_error": false,
+        "result_status": "unknown",
+        "type_context_status": null,
+        "edge_families": {},
+        "edge_count": 0,
+        "semantic_edge_count": 0,
+        "containment_edge_count": 0,
+        "resolved_record_count": 0,
+        "unresolved_record_count": 0,
+        "unresolved_record_families": {},
+        "unknown_record_count": 0,
+        "relationship_shape_status": "complete",
+        "omissions": null,
+        "reported_evidence_bytes": null,
+        "reported_output_bytes": null,
+        "returned_source_text_bytes": 0,
+        "source_text_bytes_status": "complete",
+        "requested_output_budget_bytes": null,
+        "requested_evidence_budget_bytes": null,
+        "returned_limits": null
+      },
+      "model_delivery": {
+        "status": "full_exact",
+        "matches": [
+          {
+            "call_id": "call_dQOE5T5DXhqDimU9xpIeronQ",
+            "output_line": 2249,
+            "block_index": 1,
+            "output_ref": "outer:call_dQOE5T5DXhqDimU9xpIeronQ:line:2249:block:1",
+            "match": "structuredContent_json_or_wrapper"
+          }
+        ]
+      }
+    },
+    {
+      "line": 2253,
+      "event_type": "item_completed",
+      "item_id": "exec-1c09a595-27e9-466b-b943-57f9de3bf772",
+      "thread_id": "01a09e19-5048-79d3-96dd-697eda8a4ac8",
+      "turn_id": "01a09e4c-6bcb-77c2-ac63-25a9464a6c9d",
+      "started_at_ms": 1789367369471,
+      "completed_at_ms": 1789367371799,
+      "status": "completed",
+      "duration": {
+        "secs": 2,
+        "nanos": 327330459
+      },
+      "server": "loci",
+      "tool": "loci_file",
+      "arguments": {
+        "repo": "/tmp/anvil-source-tasks-20260914/t13",
+        "file_path": "src/work-context/binding.ts",
+        "start_line": 47,
+        "end_line": 67
+      },
+      "target_repo": "/tmp/anvil-source-tasks-20260914/t13",
+      "result": {
+        "content": [],
+        "structuredContent": {
+          "file": "src/work-context/binding.ts",
+          "content": "export const workContextBindingViewSchema = z\n  .object({\n    version: z.literal(1),\n    id: z.string().regex(/^wctx_[a-f0-9]{32}$/),\n    status: z.enum([\"active\", \"superseded\"]),\n    host: z.string().min(1),\n    bound_at: z.iso.datetime(),\n    last_seen_at: z.iso.datetime(),\n    expires_at: z.iso.datetime(),\n    collaboration_space: workspaceRefSchema,\n    provenance: z\n      .object({\n        kind: z.enum([\"host_lifecycle\", \"operator_rebind\"]),\n        lifecycle: z.string().min(1),\n      })\n      .strict(),\n    superseded_by: z.string().regex(/^wctx_[a-f0-9]{32}$/).optional(),\n    superseded_at: z.iso.datetime().optional(),\n  })\n  .strict();\nexport type WorkContextBindingView = z.infer<typeof workContextBindingViewSchema>;\n",
+          "total_lines": 402,
+          "start_line": 47,
+          "end_line": 67
+        },
+        "isError": false
+      },
+      "canonical_result_json_bytes": 914,
+      "canonical_result_json_sha256": "d2fc11e7b5420195f6212727057d9331f229109639d9d96de2bcff452e16445a",
+      "invocation_category": "exact_retrieval",
+      "relationship_delivery": {
+        "application_error": false,
+        "result_status": "unknown",
+        "type_context_status": null,
+        "edge_families": {},
+        "edge_count": 0,
+        "semantic_edge_count": 0,
+        "containment_edge_count": 0,
+        "resolved_record_count": 0,
+        "unresolved_record_count": 0,
+        "unresolved_record_families": {},
+        "unknown_record_count": 0,
+        "relationship_shape_status": "complete",
+        "omissions": null,
+        "reported_evidence_bytes": null,
+        "reported_output_bytes": null,
+        "returned_source_text_bytes": 735,
+        "source_text_bytes_status": "complete",
+        "requested_output_budget_bytes": null,
+        "requested_evidence_budget_bytes": null,
+        "returned_limits": null
+      },
+      "model_delivery": {
+        "status": "full_exact",
+        "matches": [
+          {
+            "call_id": "call_jxKiWUPA4qyMBoguMV2yaY3t",
+            "output_line": 2257,
+            "block_index": 3,
+            "output_ref": "outer:call_jxKiWUPA4qyMBoguMV2yaY3t:line:2257:block:3",
+            "match": "structuredContent_json_or_wrapper"
+          }
+        ]
+      }
+    },
+    {
+      "line": 2254,
+      "event_type": "item_completed",
+      "item_id": "exec-72a1f6aa-07b2-45ad-8274-a805c1a0e79c",
+      "thread_id": "01a09e19-5048-79d3-96dd-697eda8a4ac8",
+      "turn_id": "01a09e4c-6bcb-77c2-ac63-25a9464a6c9d",
+      "started_at_ms": 1789367371975,
+      "completed_at_ms": 1789367376175,
+      "status": "completed",
+      "duration": {
+        "secs": 4,
+        "nanos": 200295958
+      },
+      "server": "loci",
+      "tool": "loci_explore",
+      "arguments": {
+        "repo": "/tmp/anvil-source-tasks-20260914/t13",
+        "intent": "type_dependencies",
+        "seed_ids": [
+          "src/tool-results/service.ts::CaptureCommandResultOptions#type"
+        ],
+        "query": "binding WorkContextBinding"
+      },
+      "target_repo": "/tmp/anvil-source-tasks-20260914/t13",
+      "result": {
+        "content": [],
+        "structuredContent": {
+          "schema_version": 1,
+          "intent": "type_dependencies",
+          "status": "ok",
+          "selection": "explicit",
+          "scope": {
+            "source": "indexed_supported_source",
+            "coverage": "partial",
+            "relationships": "authored_types",
+            "exhaustive": false
+          },
+          "items": [
+            {
+              "id": "src/tool-results/service.ts::CaptureCommandResultOptions#type",
+              "name": "CaptureCommandResultOptions",
+              "kind": "type",
+              "file": "src/tool-results/service.ts",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Explicitly requested",
+              "source_id": 1,
+              "complete": true,
+              "path": []
+            },
+            {
+              "id": "src/tool-results/service.ts::Clock#type",
+              "name": "Clock",
+              "kind": "type",
+              "file": "src/tool-results/service.ts",
+              "role": "dependency",
+              "depth": 1,
+              "why": "Direct declared type",
+              "source_id": 2,
+              "complete": true,
+              "path": [
+                1
+              ]
+            },
+            {
+              "id": "src/work-context/binding.ts::WorkContextBinding#type",
+              "name": "WorkContextBinding",
+              "kind": "type",
+              "file": "src/work-context/binding.ts",
+              "role": "dependency",
+              "depth": 1,
+              "why": "Direct declared type",
+              "source_id": 4,
+              "complete": true,
+              "path": [
+                2
+              ]
+            }
+          ],
+          "relationships": [
+            {
+              "id": 1,
+              "edge": {
+                "from": "src/tool-results/service.ts::CaptureCommandResultOptions#type",
+                "to": "src/tool-results/service.ts::Clock#type",
+                "type": "uses_type",
+                "directed": true,
+                "namespace": "loci",
+                "resolution": "exact",
+                "evidence": {
+                  "file": "src/tool-results/service.ts",
+                  "line": 59,
+                  "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e"
+                }
+              },
+              "traversed": "forward",
+              "source_ids": [
+                1,
+                3
+              ]
+            },
+            {
+              "id": 2,
+              "edge": {
+                "from": "src/tool-results/service.ts::CaptureCommandResultOptions#type",
+                "to": "src/work-context/binding.ts::WorkContextBinding#type",
+                "type": "uses_type",
+                "directed": true,
+                "namespace": "loci",
+                "resolution": "import-resolved",
+                "evidence": {
+                  "file": "src/tool-results/service.ts",
+                  "line": 56,
+                  "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e"
+                }
+              },
+              "traversed": "forward",
+              "source_ids": [
+                1,
+                5,
+                6,
+                7
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "id": 1,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 1380,
+              "end_byte": 1541,
+              "start_line": 53,
+              "end_line": 60,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "type CaptureCommandResultOptions = {\n  argv: string[];\n  producer: string;\n  binding: WorkContextBinding;\n  stateRoot?: string;\n  cwd?: string;\n  now?: Clock;\n};"
+            },
+            {
+              "id": 2,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 1352,
+              "end_byte": 1378,
+              "start_line": 51,
+              "end_line": 51,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "type Clock = () => string;"
+            },
+            {
+              "id": 3,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 1352,
+              "end_byte": 1379,
+              "start_line": 51,
+              "end_line": 51,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "type Clock = () => string;\n"
+            },
+            {
+              "id": 4,
+              "file": "src/work-context/binding.ts",
+              "start_byte": 912,
+              "end_byte": 1316,
+              "start_line": 28,
+              "end_line": 45,
+              "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+              "content": "type WorkContextBinding = {\n  version: 1;\n  id: string;\n  status: \"active\" | \"superseded\";\n  host: string;\n  session_id: string;\n  bound_at: string;\n  last_seen_at: string;\n  expires_at: string;\n  collaboration_space: WorkspaceRef;\n  provenance: {\n    kind: \"host_lifecycle\" | \"operator_rebind\";\n    lifecycle: string;\n    observed_cwd: string;\n  };\n  superseded_by?: string;\n  superseded_at?: string;\n};"
+            },
+            {
+              "id": 5,
+              "file": "src/tool-results/service.ts",
+              "start_byte": 557,
+              "end_byte": 625,
+              "start_line": 23,
+              "end_line": 23,
+              "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+              "content": "import type { WorkContextBinding } from \"../work-context/index.ts\";\n"
+            },
+            {
+              "id": 6,
+              "file": "src/work-context/index.ts",
+              "start_byte": 587,
+              "end_byte": 601,
+              "start_line": 23,
+              "end_line": 23,
+              "content_hash": "126125cebca0701b86547926296ff1e46b07fcb826b2a0fc75755b95d57ca6b7",
+              "content": "export type {\n"
+            },
+            {
+              "id": 7,
+              "file": "src/work-context/binding.ts",
+              "start_byte": 905,
+              "end_byte": 940,
+              "start_line": 28,
+              "end_line": 28,
+              "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+              "content": "export type WorkContextBinding = {\n"
+            }
+          ],
+          "omissions": [
+            {
+              "reason": "not_selected",
+              "count": 1
+            }
+          ],
+          "limits": {
+            "max_hops": 3,
+            "max_nodes": 64,
+            "max_items": 12,
+            "max_neighbors": 32,
+            "max_output_bytes": 16384,
+            "max_evidence_bytes": 8192
+          },
+          "usage": {
+            "nodes_examined": 3,
+            "evidence_bytes": 681,
+            "output_bytes": 4372,
+            "estimated_tokens": 1093,
+            "token_estimate_method": "utf8_bytes_div_4",
+            "output_encoding": "mcp_result_json_utf8"
+          }
+        },
+        "isError": false
+      },
+      "canonical_result_json_bytes": 4372,
+      "canonical_result_json_sha256": "32f6caea6c9d989d5ebbe15b317ed22b687e9e08a20ea1bc824daac9f4e8d56b",
+      "invocation_category": "explore_relationship",
+      "relationship_delivery": {
+        "application_error": false,
+        "result_status": "ok",
+        "type_context_status": null,
+        "edge_families": {
+          "uses_type": 2
+        },
+        "edge_count": 2,
+        "semantic_edge_count": 2,
+        "containment_edge_count": 0,
+        "resolved_record_count": 0,
+        "unresolved_record_count": 0,
+        "unresolved_record_families": {},
+        "unknown_record_count": 0,
+        "relationship_shape_status": "complete",
+        "omissions": [
+          {
+            "reason": "not_selected",
+            "count": 1
+          }
+        ],
+        "reported_evidence_bytes": 681,
+        "reported_output_bytes": 4372,
+        "returned_source_text_bytes": 735,
+        "source_text_bytes_status": "complete",
+        "requested_output_budget_bytes": null,
+        "requested_evidence_budget_bytes": null,
+        "returned_limits": {
+          "max_hops": 3,
+          "max_nodes": 64,
+          "max_items": 12,
+          "max_neighbors": 32,
+          "max_output_bytes": 16384,
+          "max_evidence_bytes": 8192
+        }
+      },
+      "model_delivery": {
+        "status": "full_exact",
+        "matches": [
+          {
+            "call_id": "call_jxKiWUPA4qyMBoguMV2yaY3t",
+            "output_line": 2257,
+            "block_index": 1,
+            "output_ref": "outer:call_jxKiWUPA4qyMBoguMV2yaY3t:line:2257:block:1",
+            "match": "structuredContent_json_or_wrapper"
+          }
+        ]
+      }
+    },
+    {
+      "line": 2255,
+      "event_type": "item_completed",
+      "item_id": "exec-1cca9fb7-8279-4bab-b412-cf1337a641b5",
+      "thread_id": "01a09e19-5048-79d3-96dd-697eda8a4ac8",
+      "turn_id": "01a09e4c-6bcb-77c2-ac63-25a9464a6c9d",
+      "started_at_ms": 1789367376391,
+      "completed_at_ms": 1789367378709,
+      "status": "completed",
+      "duration": {
+        "secs": 2,
+        "nanos": 318593250
+      },
+      "server": "loci",
+      "tool": "loci_file",
+      "arguments": {
+        "repo": "/tmp/anvil-source-tasks-20260914/t13",
+        "file_path": "src/work-context/index.ts",
+        "start_line": 16,
+        "end_line": 31
+      },
+      "target_repo": "/tmp/anvil-source-tasks-20260914/t13",
+      "result": {
+        "content": [],
+        "structuredContent": {
+          "file": "src/work-context/index.ts",
+          "content": "  readStoredWorkContextBinding,\n  resolveWorkContextStateRoot,\n  supersedeWorkContextBinding,\n  workContextBindingViewSchema,\n  workContextBindingView,\n  WorkContextError,\n} from \"./binding.ts\";\nexport type {\n  BindWorkContextOptions,\n  RequireWorkContextBindingOptions,\n  SupersedeWorkContextBindingOptions,\n  WorkContextBinding,\n  WorkContextBindingView,\n  WorkContextErrorCode,\n} from \"./binding.ts\";\nexport * from \"./doctor.ts\";\n",
+          "total_lines": 41,
+          "start_line": 16,
+          "end_line": 31
+        },
+        "isError": false
+      },
+      "canonical_result_json_bytes": 602,
+      "canonical_result_json_sha256": "44d6a944088a560d5b44a585365e0eb9215379e73a07b3456bcdd68764ccef28",
+      "invocation_category": "exact_retrieval",
+      "relationship_delivery": {
+        "application_error": false,
+        "result_status": "unknown",
+        "type_context_status": null,
+        "edge_families": {},
+        "edge_count": 0,
+        "semantic_edge_count": 0,
+        "containment_edge_count": 0,
+        "resolved_record_count": 0,
+        "unresolved_record_count": 0,
+        "unresolved_record_families": {},
+        "unknown_record_count": 0,
+        "relationship_shape_status": "complete",
+        "omissions": null,
+        "reported_evidence_bytes": null,
+        "reported_output_bytes": null,
+        "returned_source_text_bytes": 433,
+        "source_text_bytes_status": "complete",
+        "requested_output_budget_bytes": null,
+        "requested_evidence_budget_bytes": null,
+        "returned_limits": null
+      },
+      "model_delivery": {
+        "status": "full_exact",
+        "matches": [
+          {
+            "call_id": "call_jxKiWUPA4qyMBoguMV2yaY3t",
+            "output_line": 2257,
+            "block_index": 2,
+            "output_ref": "outer:call_jxKiWUPA4qyMBoguMV2yaY3t:line:2257:block:2",
+            "match": "structuredContent_json_or_wrapper"
+          }
+        ]
+      }
+    },
+    {
+      "line": 2256,
+      "event_type": "item_completed",
+      "item_id": "exec-9e3c0bec-1a50-4506-a170-8fa45a6b46de",
+      "thread_id": "01a09e19-5048-79d3-96dd-697eda8a4ac8",
+      "turn_id": "01a09e4c-6bcb-77c2-ac63-25a9464a6c9d",
+      "started_at_ms": 1789367379012,
+      "completed_at_ms": 1789367381204,
+      "status": "completed",
+      "duration": {
+        "secs": 2,
+        "nanos": 192140500
+      },
+      "server": "loci",
+      "tool": "loci_file",
+      "arguments": {
+        "repo": "/tmp/anvil-source-tasks-20260914/t13",
+        "file_path": "src/tool-results/service.ts",
+        "start_line": 411,
+        "end_line": 418
+      },
+      "target_repo": "/tmp/anvil-source-tasks-20260914/t13",
+      "result": {
+        "content": [],
+        "structuredContent": {
+          "file": "src/tool-results/service.ts",
+          "content": "export async function captureCommandResult(options: CaptureCommandResultOptions): Promise<ToolResultReceipt> {\n  const clock = options.now ?? nowIso;\n  const binding = validateBinding(options.binding, clock);\n  const producer = validateProducer(options.producer);\n  const createdAt = clock();\n  const createdAtMs = Date.parse(createdAt);\n  if (!Number.isFinite(createdAtMs)) {\n    throw new ToolResultError(\"TOOL_RESULT_INVALID_REQUEST\", \"now must return an ISO date-time\");\n",
+          "total_lines": 753,
+          "start_line": 411,
+          "end_line": 418
+        },
+        "isError": false
+      },
+      "canonical_result_json_bytes": 639,
+      "canonical_result_json_sha256": "91fa78efdb1d82e7144a427273819e68aa2ade1800b9e3901a805692c9376ad5",
+      "invocation_category": "exact_retrieval",
+      "relationship_delivery": {
+        "application_error": false,
+        "result_status": "unknown",
+        "type_context_status": null,
+        "edge_families": {},
+        "edge_count": 0,
+        "semantic_edge_count": 0,
+        "containment_edge_count": 0,
+        "resolved_record_count": 0,
+        "unresolved_record_count": 0,
+        "unresolved_record_families": {},
+        "unknown_record_count": 0,
+        "relationship_shape_status": "complete",
+        "omissions": null,
+        "reported_evidence_bytes": null,
+        "reported_output_bytes": null,
+        "returned_source_text_bytes": 475,
+        "source_text_bytes_status": "complete",
+        "requested_output_budget_bytes": null,
+        "requested_evidence_budget_bytes": null,
+        "returned_limits": null
+      },
+      "model_delivery": {
+        "status": "full_exact",
+        "matches": [
+          {
+            "call_id": "call_jxKiWUPA4qyMBoguMV2yaY3t",
+            "output_line": 2257,
+            "block_index": 4,
+            "output_ref": "outer:call_jxKiWUPA4qyMBoguMV2yaY3t:line:2257:block:4",
+            "match": "structuredContent_json_or_wrapper"
+          }
+        ]
+      }
+    }
+  ],
+  "model_output_blocks": [
+    {
+      "call_id": "call_dQOE5T5DXhqDimU9xpIeronQ",
+      "output_line": 2249,
+      "block_index": 0,
+      "output_ref": "outer:call_dQOE5T5DXhqDimU9xpIeronQ:line:2249:block:0",
+      "text": "Script completed\nWall time 7.6 seconds\nOutput:\n",
+      "bytes": 47,
+      "sha256": "ff32914d6f06bf95c244faa503100aa0b9d409ad51e6a77d5cc6583fcf282a1b",
+      "truncated": false
+    },
+    {
+      "call_id": "call_dQOE5T5DXhqDimU9xpIeronQ",
+      "output_line": 2249,
+      "block_index": 1,
+      "output_ref": "outer:call_dQOE5T5DXhqDimU9xpIeronQ:line:2249:block:1",
+      "text": "{\"content\":[],\"structuredContent\":{\"symbols\":[{\"id\":\"src/tool-results/service.ts::CaptureCommandResultOptions#type\",\"name\":\"CaptureCommandResultOptions\",\"qualified_name\":\"CaptureCommandResultOptions\",\"kind\":\"type\",\"language\":\"typescript\",\"file_path\":\"src/tool-results/service.ts\",\"byte_offset\":1380,\"byte_length\":161,\"signature\":\"type CaptureCommandResultOptions = {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"6d1bff33d22b063c000e5fc43c10e1a9d326fcdc5cc727937c1879fae3c40ac6\",\"decorators\":[],\"keywords\":[\"capture\",\"command\",\"options\",\"result\"],\"metadata\":{},\"line\":53,\"end_line\":60,\"score\":61},{\"id\":\"src/tool-results/service.ts::captureCommandResult#function\",\"name\":\"captureCommandResult\",\"qualified_name\":\"captureCommandResult\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"src/tool-results/service.ts\",\"byte_offset\":13257,\"byte_length\":4468,\"signature\":\"async function captureCommandResult(options: CaptureCommandResultOptions): Promise<ToolResultReceipt> {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"44b6d4a3fe2335a8e5519b139087b2835415262a1a793f1ef951bb6cd921807c\",\"decorators\":[],\"keywords\":[\"capture\",\"command\",\"result\"],\"metadata\":{},\"line\":411,\"end_line\":522,\"score\":18}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":415,\"excluded_paths\":223,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":223,\"samples\":[\".agents/skills/spark-shape/agents/openai.yaml\",\".codex/config.toml\",\".codex/hooks.json\",\".gitignore\",\".manifest/objectives/obj_19095dfe9e769a3d5af35b2e23bf7026.json\",\".manifest/objectives/obj_6d616e6966657374763264656c697665.json\",\".manifest/objectives/obj_7ac1ff09fa2bd474f9f7eb9dca176592.json\",\".manifest/objectives/obj_9aa7f9724486f1d3aa9752742c9c0e3d.json\",\"LICENSE\",\"docs/brain-usage-dashboard.html\",\"docs/manifest-objective.html\",\"docs/manifest-rings/manifest-ring.html\",\"docs/plans/evidence/authority-envelopes.json\",\"docs/plans/evidence/brain-envelope-allocation-q01-2026-09-06.json\",\"docs/plans/evidence/brain-evidence-selection-repair/context-capture.json\",\"docs/plans/evidence/brain-sufficiency-walkthrough/context-capture.json\",\"docs/plans/evidence/brain-w21-baseline/anvil-route.json\",\"docs/plans/evidence/brain-w21-baseline/question-cases.json\",\"docs/plans/evidence/brain-w21-baseline/questions-cli-unconfigured.json\",\"docs/plans/evidence/brain-w21-baseline/questions-cli.json\"],\"omitted_samples\":203}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"2bddd54e-e00a-4e81-bba2-08b91c96e34c\"},\"isError\":false}",
+      "bytes": 2560,
+      "sha256": "dd3fc9682dca89eb57360c6aed62517083112d3c6c4432f8b3b91d27b086e17b",
+      "truncated": false
+    },
+    {
+      "call_id": "call_jxKiWUPA4qyMBoguMV2yaY3t",
+      "output_line": 2257,
+      "block_index": 0,
+      "output_ref": "outer:call_jxKiWUPA4qyMBoguMV2yaY3t:line:2257:block:0",
+      "text": "Script completed\nWall time 11.9 seconds\nOutput:\n",
+      "bytes": 48,
+      "sha256": "2301cefc0fa78e683da44d0204a8976df6dbba88db6dcac78856ab3767103c66",
+      "truncated": false
+    },
+    {
+      "call_id": "call_jxKiWUPA4qyMBoguMV2yaY3t",
+      "output_line": 2257,
+      "block_index": 1,
+      "output_ref": "outer:call_jxKiWUPA4qyMBoguMV2yaY3t:line:2257:block:1",
+      "text": "{\"status\":\"fulfilled\",\"value\":{\"content\":[],\"structuredContent\":{\"schema_version\":1,\"intent\":\"type_dependencies\",\"status\":\"ok\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"authored_types\",\"exhaustive\":false},\"items\":[{\"id\":\"src/tool-results/service.ts::CaptureCommandResultOptions#type\",\"name\":\"CaptureCommandResultOptions\",\"kind\":\"type\",\"file\":\"src/tool-results/service.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"src/tool-results/service.ts::Clock#type\",\"name\":\"Clock\",\"kind\":\"type\",\"file\":\"src/tool-results/service.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":2,\"complete\":true,\"path\":[1]},{\"id\":\"src/work-context/binding.ts::WorkContextBinding#type\",\"name\":\"WorkContextBinding\",\"kind\":\"type\",\"file\":\"src/work-context/binding.ts\",\"role\":\"dependency\",\"depth\":1,\"why\":\"Direct declared type\",\"source_id\":4,\"complete\":true,\"path\":[2]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"src/tool-results/service.ts::CaptureCommandResultOptions#type\",\"to\":\"src/tool-results/service.ts::Clock#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"src/tool-results/service.ts\",\"line\":59,\"content_hash\":\"ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e\"}},\"traversed\":\"forward\",\"source_ids\":[1,3]},{\"id\":2,\"edge\":{\"from\":\"src/tool-results/service.ts::CaptureCommandResultOptions#type\",\"to\":\"src/work-context/binding.ts::WorkContextBinding#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"src/tool-results/service.ts\",\"line\":56,\"content_hash\":\"ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e\"}},\"traversed\":\"forward\",\"source_ids\":[1,5,6,7]}],\"sources\":[{\"id\":1,\"file\":\"src/tool-results/service.ts\",\"start_byte\":1380,\"end_byte\":1541,\"start_line\":53,\"end_line\":60,\"content_hash\":\"ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e\",\"content\":\"type CaptureCommandResultOptions = {\\n  argv: string[];\\n  producer: string;\\n  binding: WorkContextBinding;\\n  stateRoot?: string;\\n  cwd?: string;\\n  now?: Clock;\\n};\"},{\"id\":2,\"file\":\"src/tool-results/service.ts\",\"start_byte\":1352,\"end_byte\":1378,\"start_line\":51,\"end_line\":51,\"content_hash\":\"ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e\",\"content\":\"type Clock = () => string;\"},{\"id\":3,\"file\":\"src/tool-results/service.ts\",\"start_byte\":1352,\"end_byte\":1379,\"start_line\":51,\"end_line\":51,\"content_hash\":\"ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e\",\"content\":\"type Clock = () => string;\\n\"},{\"id\":4,\"file\":\"src/work-context/binding.ts\",\"start_byte\":912,\"end_byte\":1316,\"start_line\":28,\"end_line\":45,\"content_hash\":\"fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f\",\"content\":\"type WorkContextBinding = {\\n  version: 1;\\n  id: string;\\n  status: \\\"active\\\" | \\\"superseded\\\";\\n  host: string;\\n  session_id: string;\\n  bound_at: string;\\n  last_seen_at: string;\\n  expires_at: string;\\n  collaboration_space: WorkspaceRef;\\n  provenance: {\\n    kind: \\\"host_lifecycle\\\" | \\\"operator_rebind\\\";\\n    lifecycle: string;\\n    observed_cwd: string;\\n  };\\n  superseded_by?: string;\\n  superseded_at?: string;\\n};\"},{\"id\":5,\"file\":\"src/tool-results/service.ts\",\"start_byte\":557,\"end_byte\":625,\"start_line\":23,\"end_line\":23,\"content_hash\":\"ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e\",\"content\":\"import type { WorkContextBinding } from \\\"../work-context/index.ts\\\";\\n\"},{\"id\":6,\"file\":\"src/work-context/index.ts\",\"start_byte\":587,\"end_byte\":601,\"start_line\":23,\"end_line\":23,\"content_hash\":\"126125cebca0701b86547926296ff1e46b07fcb826b2a0fc75755b95d57ca6b7\",\"content\":\"export type {\\n\"},{\"id\":7,\"file\":\"src/work-context/binding.ts\",\"start_byte\":905,\"end_byte\":940,\"start_line\":28,\"end_line\":28,\"content_hash\":\"fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f\",\"content\":\"export type WorkContextBinding = {\\n\"}],\"omissions\":[{\"reason\":\"not_selected\",\"count\":1}],\"limits\":{\"max_hops\":3,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":3,\"evidence_bytes\":681,\"output_bytes\":4372,\"estimated_tokens\":1093,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"}},\"isError\":false}}",
+      "bytes": 4403,
+      "sha256": "98bb1528f734d2c4ca93842fb1312458aee9cfffd0cbc807f4cfad84995dd1ad",
+      "truncated": false
+    },
+    {
+      "call_id": "call_jxKiWUPA4qyMBoguMV2yaY3t",
+      "output_line": 2257,
+      "block_index": 2,
+      "output_ref": "outer:call_jxKiWUPA4qyMBoguMV2yaY3t:line:2257:block:2",
+      "text": "{\"status\":\"fulfilled\",\"value\":{\"content\":[],\"structuredContent\":{\"file\":\"src/work-context/index.ts\",\"content\":\"  readStoredWorkContextBinding,\\n  resolveWorkContextStateRoot,\\n  supersedeWorkContextBinding,\\n  workContextBindingViewSchema,\\n  workContextBindingView,\\n  WorkContextError,\\n} from \\\"./binding.ts\\\";\\nexport type {\\n  BindWorkContextOptions,\\n  RequireWorkContextBindingOptions,\\n  SupersedeWorkContextBindingOptions,\\n  WorkContextBinding,\\n  WorkContextBindingView,\\n  WorkContextErrorCode,\\n} from \\\"./binding.ts\\\";\\nexport * from \\\"./doctor.ts\\\";\\n\",\"total_lines\":41,\"start_line\":16,\"end_line\":31},\"isError\":false}}",
+      "bytes": 633,
+      "sha256": "42aaa1d3e338507b222ed83f85001cc532235ff24bcc3d04dc2ea4c392c2f3af",
+      "truncated": false
+    },
+    {
+      "call_id": "call_jxKiWUPA4qyMBoguMV2yaY3t",
+      "output_line": 2257,
+      "block_index": 3,
+      "output_ref": "outer:call_jxKiWUPA4qyMBoguMV2yaY3t:line:2257:block:3",
+      "text": "{\"status\":\"fulfilled\",\"value\":{\"content\":[],\"structuredContent\":{\"file\":\"src/work-context/binding.ts\",\"content\":\"export const workContextBindingViewSchema = z\\n  .object({\\n    version: z.literal(1),\\n    id: z.string().regex(/^wctx_[a-f0-9]{32}$/),\\n    status: z.enum([\\\"active\\\", \\\"superseded\\\"]),\\n    host: z.string().min(1),\\n    bound_at: z.iso.datetime(),\\n    last_seen_at: z.iso.datetime(),\\n    expires_at: z.iso.datetime(),\\n    collaboration_space: workspaceRefSchema,\\n    provenance: z\\n      .object({\\n        kind: z.enum([\\\"host_lifecycle\\\", \\\"operator_rebind\\\"]),\\n        lifecycle: z.string().min(1),\\n      })\\n      .strict(),\\n    superseded_by: z.string().regex(/^wctx_[a-f0-9]{32}$/).optional(),\\n    superseded_at: z.iso.datetime().optional(),\\n  })\\n  .strict();\\nexport type WorkContextBindingView = z.infer<typeof workContextBindingViewSchema>;\\n\",\"total_lines\":402,\"start_line\":47,\"end_line\":67},\"isError\":false}}",
+      "bytes": 945,
+      "sha256": "8ab80e4ec87bf40e3f35612498065008e0bd255011a22abf6d9c5cc6944573ab",
+      "truncated": false
+    },
+    {
+      "call_id": "call_jxKiWUPA4qyMBoguMV2yaY3t",
+      "output_line": 2257,
+      "block_index": 4,
+      "output_ref": "outer:call_jxKiWUPA4qyMBoguMV2yaY3t:line:2257:block:4",
+      "text": "{\"status\":\"fulfilled\",\"value\":{\"content\":[],\"structuredContent\":{\"file\":\"src/tool-results/service.ts\",\"content\":\"export async function captureCommandResult(options: CaptureCommandResultOptions): Promise<ToolResultReceipt> {\\n  const clock = options.now ?? nowIso;\\n  const binding = validateBinding(options.binding, clock);\\n  const producer = validateProducer(options.producer);\\n  const createdAt = clock();\\n  const createdAtMs = Date.parse(createdAt);\\n  if (!Number.isFinite(createdAtMs)) {\\n    throw new ToolResultError(\\\"TOOL_RESULT_INVALID_REQUEST\\\", \\\"now must return an ISO date-time\\\");\\n\",\"total_lines\":753,\"start_line\":411,\"end_line\":418},\"isError\":false}}",
+      "bytes": 670,
+      "sha256": "587f6d5f9be2587a56568bf7938e8f96aee9b64069194a27908d5cc4162442cf",
+      "truncated": false
+    }
+  ],
+  "evidence_registry": {
+    "exec-ecc4ed6a-4672-4e79-870c-5425bbefd92b": {
+      "semantic_relationship_count": 0,
+      "model_output_refs": [
+        "outer:call_dQOE5T5DXhqDimU9xpIeronQ:line:2249:block:1"
+      ]
+    },
+    "exec-1c09a595-27e9-466b-b943-57f9de3bf772": {
+      "semantic_relationship_count": 0,
+      "model_output_refs": [
+        "outer:call_jxKiWUPA4qyMBoguMV2yaY3t:line:2257:block:3"
+      ]
+    },
+    "exec-72a1f6aa-07b2-45ad-8274-a805c1a0e79c": {
+      "semantic_relationship_count": 2,
+      "model_output_refs": [
+        "outer:call_jxKiWUPA4qyMBoguMV2yaY3t:line:2257:block:1"
+      ]
+    },
+    "exec-1cca9fb7-8279-4bab-b412-cf1337a641b5": {
+      "semantic_relationship_count": 0,
+      "model_output_refs": [
+        "outer:call_jxKiWUPA4qyMBoguMV2yaY3t:line:2257:block:2"
+      ]
+    },
+    "exec-9e3c0bec-1a50-4506-a170-8fa45a6b46de": {
+      "semantic_relationship_count": 0,
+      "model_output_refs": [
+        "outer:call_jxKiWUPA4qyMBoguMV2yaY3t:line:2257:block:4"
+      ]
+    }
+  },
+  "verification": {
+    "all_native_calls_completed": true,
+    "all_native_results_model_visible_full_exact": true,
+    "all_explore_source_hashes_and_spans_match": true
+  },
+  "unknown": [
+    "unprimed_primary_selection",
+    "per_case_provider_cost",
+    "causal_answer_benefit"
+  ],
+  "source_note": "Case answer assertions retained in answer.md; primary source/check windows do not invent a task completion boundary."
+}

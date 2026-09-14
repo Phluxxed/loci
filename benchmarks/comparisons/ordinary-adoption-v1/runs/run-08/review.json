@@ -1,0 +1,78 @@
+{
+  "fact_judgments": [
+    {
+      "fact_id": "checkpoint_mcp_boundary",
+      "judgment": "correct",
+      "answer_quote": "The MCP tool validates a host-supplied work-context binding and passes the checkpoint unchanged into the service",
+      "source_references": [
+        {
+          "file": "src/mcp/tools.ts",
+          "start_line": 805,
+          "end_line": 831,
+          "sha256_of_exact_utf8_lines": "eada19efa2f4b1eb962c3cb9919f972d99330179c679f3dcca0e8669a6991601"
+        }
+      ]
+    },
+    {
+      "fact_id": "retry_key_and_content_check",
+      "judgment": "correct",
+      "answer_quote": "Same key + changed task content, including a new `nextStep`: fails with `VALIDATION_ERROR` before any write",
+      "source_references": [
+        {
+          "file": "src/continuity/service.ts",
+          "start_line": 303,
+          "end_line": 325,
+          "sha256_of_exact_utf8_lines": "63808d969a17676eb563ae42b6cb2acb5959f8af0b99ec77c2004ace89c115aa"
+        },
+        {
+          "file": "src/continuity/service.ts",
+          "start_line": 327,
+          "end_line": 377,
+          "sha256_of_exact_utf8_lines": "c0c15e5ae1ce50fa08a56488c7d77c60b523fa152fb9081f67fe6da17c506f8c"
+        }
+      ]
+    },
+    {
+      "fact_id": "durable_event_then_current_frame",
+      "judgment": "incorrect",
+      "answer_quote": "Under the workspace lock, it appends that event once and projects the corresponding `active_task` into `current.json`",
+      "source_references": [
+        {
+          "file": "src/continuity/service.ts",
+          "start_line": 378,
+          "end_line": 432,
+          "sha256_of_exact_utf8_lines": "ec23caf031ff833d93dfdfa0dceffba61eb49264e247fe37f76482fc09b62e7a"
+        },
+        {
+          "file": "src/continuity/store.ts",
+          "start_line": 343,
+          "end_line": 392,
+          "sha256_of_exact_utf8_lines": "e166f66c2f8ab873e05d7be8aad8b175df0a57c4ba3460089d3b72e65a612d36"
+        },
+        {
+          "file": "src/continuity/store.ts",
+          "start_line": 394,
+          "end_line": 420,
+          "sha256_of_exact_utf8_lines": "994be76dcb7b90d9b6f4405303a26ec6e7e06890288e0fe91f3847bb4336f9e8"
+        }
+      ],
+      "reason": "Omission, not false assertion: the answer leaves out removal of the matching next-action projection and that updateCurrent writes only when the resulting state changed."
+    },
+    {
+      "fact_id": "clear_semantics",
+      "judgment": "incorrect",
+      "answer_quote": "Clearing requires a new key and `{ state: \"clear\", outcome }`.",
+      "source_references": [
+        {
+          "file": "src/continuity/service.ts",
+          "start_line": 351,
+          "end_line": 432,
+          "sha256_of_exact_utf8_lines": "d178b42308974371acd35b5479e3cf5b6021d70747247f85b726559789282a76"
+        }
+      ],
+      "reason": "Omission, not false assertion: the answer does not state rejection of a first clear before Continuity exists, or rejection when there is no active task and no matching prior clear event."
+    }
+  ],
+  "material_unsupported_claims": [],
+  "relationship_support": []
+}

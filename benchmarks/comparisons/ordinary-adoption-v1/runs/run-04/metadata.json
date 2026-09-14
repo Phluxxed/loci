@@ -1,0 +1,164 @@
+{
+  "access_ledger_review": {
+    "manual_checks_required": [
+      "Review every MCP repo argument and source identity against the scheduled source root.",
+      "Review every shell command, cwd, and referenced path; cwd alone does not establish access scope.",
+      "Review any opaque shell operation without treating its unobserved internals as zero activity."
+    ],
+    "mcp_records": [],
+    "no_access_violations_claimed": false,
+    "shell_records": [
+      {
+        "category": "shell_opaque_or_other",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "pwd && rg --files -g 'AGENTS.md' -g 'SKILL.md' -g '*renderActiveTask*' -g '*.ts' -g '*.tsx' -g '*.js' -g '*.jsx' /tmp/anvil-source-tasks-20260914/t04 2>/dev/null | head -n 200"
+        ],
+        "cwd": "file:///Users/brummerv/loci",
+        "item_id": "exec-777cc341-d114-4f5e-9b67-9c765f2c31d3",
+        "line": 17
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "sed -n '1,240p' /Users/brummerv/loci/AGENTS.md"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t04",
+        "item_id": "exec-b9846fd8-5189-4d28-a784-3b98d830d527",
+        "line": 24
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "sed -n '1,260p' /Users/brummerv/.codex/skills/loci/SKILL.md"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t04",
+        "item_id": "exec-58772275-5732-484f-9a00-8b3fa95bede3",
+        "line": 25
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "rg -n -C 5 \"renderActiveTask\" ."
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t04",
+        "item_id": "exec-207fe224-96f7-4393-8d2f-9d1418b96dac",
+        "line": 26
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "sed -n '1,240p' /Users/brummerv/.codex/skills/loci/references/setup-and-cli.md && nl -ba src/continuity/render.ts | sed -n '55,92p' && rg -n -C 3 \"interface ActiveTask|type ActiveTask|ActiveTask\" src/continuity test bin | head -n 160"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t04",
+        "item_id": "exec-9dd43962-b58a-43fd-a0e6-1853b00ba871",
+        "line": 33
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "rg -n -C 7 \"activeTaskSchema|const activeTaskSchema|ActiveTask\" src/continuity/schema.ts test/continuity.test.ts test/continuity-service.test.ts"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t04",
+        "item_id": "exec-3e29ac45-a3e8-4734-be93-38f81395ab6f",
+        "line": 40
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "nl -ba src/continuity/render.ts | sed -n '1,78p'"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t04",
+        "item_id": "exec-82ebc0db-634d-4a5b-ae97-04a08b8b3fe0",
+        "line": 41
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "rg -n -C 4 \"Active task:|recorded .*next step:|renderActiveTask\" test src bin"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t04",
+        "item_id": "exec-3ec04db7-0e56-40b2-8327-4749d0778dd0",
+        "line": 42
+      }
+    ],
+    "status": "pending_manual_review",
+    "target_repo": "/tmp/anvil-source-tasks-20260914/t04"
+  },
+  "answer": {
+    "bytes": 992,
+    "sha256": "f1cefd872f9f4ad725e9a7b7823f8b9aab6c5e06b33c56bf8c4c2e224e3ac909",
+    "status": "present"
+  },
+  "capture_validation": {
+    "effort": {
+      "expected": "high",
+      "matches": true,
+      "observed": "high"
+    },
+    "model": {
+      "expected": "gpt-5.6-terra",
+      "matches": true,
+      "observed": "gpt-5.6-terra"
+    },
+    "observer_condition_deviations": [],
+    "provider": {
+      "expected": "openai",
+      "matches": true,
+      "observed": "openai"
+    },
+    "schedule_frozen": true,
+    "status": "condition_valid"
+  },
+  "native": {
+    "first_turn_id": "01a09e8e-4229-75c2-a90c-ab01c5c5e437",
+    "interval_bytes": 363140,
+    "interval_end_line": 51,
+    "interval_sha256": "8906cfd58da4e12f57707092dd5be60800090edf028496fb2d06d16e5d0918f7",
+    "interval_start_line": 2,
+    "local_uri": "file:///Users/brummerv/.codex/sessions/2026/09/14/rollout-2026-09-14T16-15-18-01a09e8e-40d0-79b2-9cd1-9a402c42ac40.jsonl",
+    "whole_file_bytes": 385641,
+    "whole_file_sha256": "9d02690ef8585b43a80feafcd73101e658204dfa4cc37bf91ac75527b7b16f7f"
+  },
+  "observer_metadata": {
+    "agent_task_name": "inspection_04",
+    "case_id": "continuity_render_active_task",
+    "condition": "ordinary",
+    "expected_interval_sha256": "8906cfd58da4e12f57707092dd5be60800090edf028496fb2d06d16e5d0918f7",
+    "prompt_sha256": "a18d04e251e99012c889fdd12a0859ff85bcb61e38136afef8c107e5b351b8f8",
+    "purpose": "ordinary",
+    "repetition": 1,
+    "requested_effort": "high",
+    "requested_model": "gpt-5.6-terra",
+    "role": "delegate",
+    "run_id": "run-04",
+    "source_canonical_root": "/private/tmp/anvil-source-tasks-20260914/t04",
+    "target_repo": "/tmp/anvil-source-tasks-20260914/t04",
+    "task_source_archive_sha256": "e919302908ba8dfee2ee8ee055fd4a7463a37e94a71d35d2ecda7abe95463c5e",
+    "task_source_commit": "53bf29e60cece2335aa39fe301935a07e8e8d4e4",
+    "thread_id": "01a09e8e-40d0-79b2-9cd1-9a402c42ac40",
+    "turn_id": "01a09e8e-4229-75c2-a90c-ab01c5c5e437"
+  },
+  "schedule": {
+    "path": "/Users/brummerv/loci/benchmarks/comparisons/ordinary-adoption-v1/schedule.json",
+    "run_id": "run-04",
+    "sha256": "64663be2ff720ce9e15a722eb67a56412dc2cd99ec4a73608e9ff40cef4f0c00",
+    "status": "frozen"
+  },
+  "schema_version": 1
+}

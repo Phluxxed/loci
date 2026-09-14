@@ -1,0 +1,116 @@
+{
+  "purpose": "capability_probe",
+  "request": {
+    "repo": "/tmp/loci-adoption-audit-20260914/anvil-source",
+    "seed_ids": [
+      "src/continuity/service.ts::checkpointActiveTask#function"
+    ],
+    "direction": "outgoing",
+    "edge_types": [
+      "calls"
+    ],
+    "max_neighbors": 32
+  },
+  "result": {
+    "content": [],
+    "structuredContent": {
+      "schema_version": 1,
+      "repo": "/private/tmp/loci-adoption-audit-20260914/anvil-source",
+      "filters": {
+        "namespaces": null,
+        "edge_types": [
+          "calls"
+        ],
+        "resolutions": [
+          "exact",
+          "declared",
+          "import-resolved"
+        ],
+        "direction": "outgoing"
+      },
+      "results": [
+        {
+          "seed": {
+            "id": "src/continuity/service.ts::checkpointActiveTask#function",
+            "namespace": "loci",
+            "kind": "function",
+            "attributes": {
+              "language": "typescript",
+              "file": "src/continuity/service.ts",
+              "line": 327,
+              "end_line": 432
+            }
+          },
+          "neighbors": [
+            {
+              "node": {
+                "id": "src/continuity/service.ts::resolveBoundContinuityWorkspace#function",
+                "namespace": "loci",
+                "kind": "function",
+                "attributes": {
+                  "language": "typescript",
+                  "file": "src/continuity/service.ts",
+                  "line": 228,
+                  "end_line": 234
+                }
+              },
+              "traversed": "forward",
+              "edge": {
+                "from": "src/continuity/service.ts::checkpointActiveTask#function",
+                "to": "src/continuity/service.ts::resolveBoundContinuityWorkspace#function",
+                "type": "calls",
+                "directed": true,
+                "namespace": "loci",
+                "resolution": "exact",
+                "evidence": {
+                  "file": "src/continuity/service.ts",
+                  "line": 357,
+                  "content_hash": "1991fb7e9c9ce57af0e25c537fa6d48fb26be724d2eabcba0af557492cfb8593"
+                }
+              }
+            },
+            {
+              "node": {
+                "id": "src/continuity/store.ts::withWorkspaceMutationLock#function",
+                "namespace": "loci",
+                "kind": "function",
+                "attributes": {
+                  "language": "typescript",
+                  "file": "src/continuity/store.ts",
+                  "line": 71,
+                  "end_line": 130
+                }
+              },
+              "traversed": "forward",
+              "edge": {
+                "from": "src/continuity/service.ts::checkpointActiveTask#function",
+                "to": "src/continuity/store.ts::withWorkspaceMutationLock#function",
+                "type": "calls",
+                "directed": true,
+                "namespace": "loci",
+                "resolution": "import-resolved",
+                "evidence": {
+                  "file": "src/continuity/service.ts",
+                  "line": 358,
+                  "content_hash": "1991fb7e9c9ce57af0e25c537fa6d48fb26be724d2eabcba0af557492cfb8593"
+                }
+              }
+            }
+          ],
+          "returned": 2,
+          "omitted": 0
+        }
+      ],
+      "counts": {
+        "filtered_edges": 1805,
+        "returned_neighbors": 2,
+        "omitted_neighbors": 0
+      },
+      "budget": {
+        "max_neighbors_per_seed": 32
+      },
+      "diagnostics": []
+    },
+    "isError": false
+  }
+}

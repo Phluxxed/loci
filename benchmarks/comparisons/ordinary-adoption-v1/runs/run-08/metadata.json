@@ -1,0 +1,331 @@
+{
+  "access_ledger_review": {
+    "manual_checks_required": [
+      "Review every MCP repo argument and source identity against the scheduled source root.",
+      "Review every shell command, cwd, and referenced path; cwd alone does not establish access scope.",
+      "Review any opaque shell operation without treating its unobserved internals as zero activity."
+    ],
+    "mcp_records": [
+      {
+        "item_id": "exec-694b7404-c7cf-4e98-b1d4-622d718d5af5",
+        "line": 31,
+        "repo": "/tmp/anvil-source-tasks-20260914/t08",
+        "tool": "loci_search"
+      },
+      {
+        "item_id": "exec-068cebe5-ad88-4fb9-988c-f8ffcd3f79cf",
+        "line": 32,
+        "repo": "/tmp/anvil-source-tasks-20260914/t08",
+        "tool": "loci_grep"
+      }
+    ],
+    "no_access_violations_claimed": false,
+    "shell_records": [
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "rg --files -g 'AGENTS.md' -g 'SKILL.md' -g '!node_modules'"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-633b7ae6-6af2-4457-86f4-81e844845cd3",
+        "line": 17
+      },
+      {
+        "category": "shell_opaque_or_other",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "pwd && sed -n '1,240p' AGENTS.md && sed -n '1,260p' /Users/brummerv/.codex/skills/loci/SKILL.md"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-f8cde782-dce5-42f1-86e3-da67a3ae691b",
+        "line": 18
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "sed -n '1,260p' /Users/brummerv/.codex/skills/loci/references/setup-and-cli.md"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-99b9bb63-4cb3-4674-8c65-03b2334d5a35",
+        "line": 41
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "rg --files src test bin | rg -i 'continuity|checkpoint|task'"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-b222e57e-8bb7-4d13-a790-b24e591d7e02",
+        "line": 48
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "rg -n -i -g '!node_modules' -g '!dist' 'checkpoint.?task|checkpoint.*task|active.?task|clear.*task|clear.*continuity|Continuity' src test bin docs package.json"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-a95765d4-e9f4-4040-9e7e-512d10d43568",
+        "line": 49
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "rg -n -C 4 'handleContinuityCheckpointTask|continuityCheckpointTask' src test/mcp-tools.test.ts test/codex-hook.test.ts"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-5128f128-af2c-46fb-a82d-308d370447f3",
+        "line": 56
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "rg -n -C 5 'checkpointActiveTask|checkpointId|active_task|clear' src/continuity src/mcp test/continuity-service.test.ts test/continuity.test.ts test/mcp-tools.test.ts"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-36ce11a3-4373-4101-96f5-00e5004d3914",
+        "line": 57
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "rg -n -C 4 'renderActiveTask|active_task' src/continuity/render.ts bin/anvil.ts test/codex-hook.test.ts"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-14410a0a-873e-4c44-ae61-b474f393103b",
+        "line": 58
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "sed -n '1,220p' src/continuity/schema.ts && sed -n '1,240p' src/continuity/store.ts"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-afa671e2-1f62-447e-9c1e-5e8be8248adf",
+        "line": 65
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "sed -n '368,465p' test/continuity-service.test.ts && sed -n '535,590p' test/codex-hook.test.ts"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-d42dbccf-ee3e-4f94-8f38-3f5b0aa41bf5",
+        "line": 66
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "sed -n '1,470p' src/continuity/service.ts"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-8ac161dd-37e2-42bc-91bb-f003d803f8bc",
+        "line": 67
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "sed -n '200,310p' src/mcp/tools.ts && sed -n '450,510p' src/mcp/tools.ts && sed -n '790,840p' src/mcp/tools.ts && sed -n '60,105p' src/continuity/render.ts && sed -n '640,705p' bin/anvil.ts"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-924739f0-1c40-4c76-9f10-9cfbe3bfe854",
+        "line": 68
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "nl -ba test/continuity-service.test.ts | sed -n '368,465p' && nl -ba test/codex-hook.test.ts | sed -n '543,585p'"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-445a3068-79ba-4165-a1a7-7c8f96471f3f",
+        "line": 75
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "nl -ba src/continuity/store.ts | sed -n '150,460p'"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-46c52a01-0efc-4638-9958-13cdc756f773",
+        "line": 76
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "nl -ba src/continuity/service.ts | sed -n '210,440p'"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-f7c7ce05-db5e-41b5-82ad-f4f63541e7a1",
+        "line": 77
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "nl -ba src/mcp/tools.ts | sed -n '205,250p;470,500p;800,838p' && nl -ba src/mcp/server.ts | sed -n '268,286p' && nl -ba src/continuity/render.ts | sed -n '67,95p' && nl -ba bin/anvil.ts | sed -n '645,705p'"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-f4e40c7f-98d0-4083-b018-b532cebf0bf3",
+        "line": 78
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "rg -n -C 5 'withWorkspaceMutationLock|mutation lock|lockPath' src/continuity/store.ts && nl -ba src/continuity/store.ts | sed -n '420,560p'"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-6d51509b-aaeb-4f8c-8a1b-f0ba4efbf564",
+        "line": 85
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "rg -n -C 3 'function requireMutationBinding|requireMutationBinding' src/mcp/tools.ts"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-33e47958-3967-453d-b3ca-6a4b77eee1d8",
+        "line": 86
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "rg -n -C 3 'different task content|same checkpoint|checkpointId.*already' test src"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-74782c67-8f33-4b38-9cd5-7e588284e796",
+        "line": 87
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "nl -ba src/mcp/tools.ts | sed -n '748,785p'"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-dba2d832-700a-48b6-963d-f3d771778249",
+        "line": 94
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "nl -ba src/continuity/store.ts | sed -n '1,135p'"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-efa8856f-f5ac-440e-932c-1cb14d6a8860",
+        "line": 95
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "nl -ba src/continuity/workspace.ts | sed -n '1,160p' && rg -n -C 3 'workspaceMutationKey' src/continuity src/work-context"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t08",
+        "item_id": "exec-9916146f-15d6-427b-955a-a04496127973",
+        "line": 96
+      }
+    ],
+    "status": "pending_manual_review",
+    "target_repo": "/tmp/anvil-source-tasks-20260914/t08"
+  },
+  "answer": {
+    "bytes": 3784,
+    "sha256": "90adc8f007f78b5a26fd54c642d6a8d91d350db3d07ed9456249ce732b082f06",
+    "status": "present"
+  },
+  "capture_validation": {
+    "effort": {
+      "expected": "high",
+      "matches": true,
+      "observed": "high"
+    },
+    "model": {
+      "expected": "gpt-5.6-terra",
+      "matches": true,
+      "observed": "gpt-5.6-terra"
+    },
+    "observer_condition_deviations": [],
+    "provider": {
+      "expected": "openai",
+      "matches": true,
+      "observed": "openai"
+    },
+    "schedule_frozen": true,
+    "status": "condition_valid"
+  },
+  "native": {
+    "first_turn_id": "01a09e91-34a1-7562-9e53-eddea4c20441",
+    "interval_bytes": 3210789,
+    "interval_end_line": 105,
+    "interval_sha256": "66c39498e1ccb005f8aec6d04147f38a93c67b08003dbc7d2c9095ce96e3b202",
+    "interval_start_line": 2,
+    "local_uri": "file:///Users/brummerv/.codex/sessions/2026/09/14/rollout-2026-09-14T16-18-31-01a09e91-3377-7733-8c89-c907ae4380e1.jsonl",
+    "whole_file_bytes": 3233296,
+    "whole_file_sha256": "6f34cec2eacbdc83f64a84ca795e5b5b8c7085b16513474ad5a7315b3dfd5c55"
+  },
+  "observer_metadata": {
+    "agent_task_name": "inspection_08",
+    "case_id": "continuity_checkpoint_retry_and_clear",
+    "condition": "ordinary",
+    "expected_interval_sha256": "66c39498e1ccb005f8aec6d04147f38a93c67b08003dbc7d2c9095ce96e3b202",
+    "prompt_sha256": "1e680f8b531d63fa1ca69e436b320c5a680f5c3fc0966c90fa4654e006aad048",
+    "purpose": "ordinary",
+    "repetition": 2,
+    "requested_effort": "high",
+    "requested_model": "gpt-5.6-terra",
+    "role": "delegate",
+    "run_id": "run-08",
+    "source_canonical_root": "/private/tmp/anvil-source-tasks-20260914/t08",
+    "target_repo": "/tmp/anvil-source-tasks-20260914/t08",
+    "task_source_archive_sha256": "e919302908ba8dfee2ee8ee055fd4a7463a37e94a71d35d2ecda7abe95463c5e",
+    "task_source_commit": "53bf29e60cece2335aa39fe301935a07e8e8d4e4",
+    "thread_id": "01a09e91-3377-7733-8c89-c907ae4380e1",
+    "turn_id": "01a09e91-34a1-7562-9e53-eddea4c20441"
+  },
+  "schedule": {
+    "path": "/Users/brummerv/loci/benchmarks/comparisons/ordinary-adoption-v1/schedule.json",
+    "run_id": "run-08",
+    "sha256": "64663be2ff720ce9e15a722eb67a56412dc2cd99ec4a73608e9ff40cef4f0c00",
+    "status": "frozen"
+  },
+  "schema_version": 1
+}

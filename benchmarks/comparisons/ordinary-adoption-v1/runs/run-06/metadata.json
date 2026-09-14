@@ -1,0 +1,230 @@
+{
+  "access_ledger_review": {
+    "manual_checks_required": [
+      "Review every MCP repo argument and source identity against the scheduled source root.",
+      "Review every shell command, cwd, and referenced path; cwd alone does not establish access scope.",
+      "Review any opaque shell operation without treating its unobserved internals as zero activity."
+    ],
+    "mcp_records": [],
+    "no_access_violations_claimed": false,
+    "shell_records": [
+      {
+        "category": "shell_opaque_or_other",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "pwd && rg --files -g 'AGENTS.md' -g 'SKILL.md' -g 'package.json' -g 'pyproject.toml' -g 'Cargo.toml' -g 'go.mod' -g 'Makefile' /tmp/anvil-source-tasks-20260914/t06 2>/dev/null | head -100"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t06",
+        "item_id": "exec-3d6b10a0-b1f2-45a2-a1a5-8f283de82ec2",
+        "line": 17
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "sed -n '1,240p' AGENTS.md"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t06",
+        "item_id": "exec-989c6a39-16be-427f-a199-d302ef4eb9d5",
+        "line": 24
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "sed -n '1,260p' /Users/brummerv/.codex/skills/loci/SKILL.md"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t06",
+        "item_id": "exec-09a590e4-0e9f-4cb6-b815-d21fccead19b",
+        "line": 25
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "rg --files | head -200"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t06",
+        "item_id": "exec-5678ee8f-8ca1-4075-b6ec-027763889e4b",
+        "line": 26
+      },
+      {
+        "category": "shell_opaque_or_other",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "rg -n --glob '!node_modules/**' \"browser.*cli|from ['\\\"]\\.?/?src/browser/cli|browser/cli|runBrowser|browserCli|browser.*command|browser\" bin src/bootstrap src/config src/browser package.json"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t06",
+        "item_id": "exec-93c1e2f9-f89d-40d0-bb2e-d13a85d64009",
+        "line": 33
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "sed -n '1,240p' package.json && sed -n '1,280p' bin/anvil.ts"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t06",
+        "item_id": "exec-6655fcdd-b7f1-4866-800b-7dc7b34bfb56",
+        "line": 34
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "sed -n '1,260p' /Users/brummerv/.codex/skills/loci/references/setup-and-cli.md"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t06",
+        "item_id": "exec-ba55dd65-e50e-440b-9660-1c44d1fe058a",
+        "line": 35
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "nl -ba src/browser/index.ts | sed -n '1,80p' && nl -ba package.json | sed -n '1,40p'"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t06",
+        "item_id": "exec-a79bd688-8ce1-471d-b974-49e992f995f4",
+        "line": 42
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "nl -ba bin/anvil.ts | sed -n '1430,1490p'"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t06",
+        "item_id": "exec-f1b8fa8f-94de-4c1d-8db4-728161c3ba61",
+        "line": 43
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "nl -ba src/browser/cli.ts | sed -n '1,120p;540,605p'"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t06",
+        "item_id": "exec-2306e36a-90a8-431e-91d7-95c24611b8d2",
+        "line": 44
+      },
+      {
+        "category": "shell_opaque_or_other",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "rg -n --glob '!node_modules/**' \"bin/anvil\\.ts|runBrowserCli\\(\" .codex .github .agents docs bin src package.json 2>/dev/null"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t06",
+        "item_id": "exec-2767c7a5-860b-4c8d-bd49-1aee1374c2f8",
+        "line": 45
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "nl -ba bin/anvil.ts | sed -n '42,66p;1360,1415p;1458,1489p'"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t06",
+        "item_id": "exec-86e05c6a-f2b1-41db-bbf1-8e741d92f272",
+        "line": 52
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "nl -ba src/browser/cli.ts | sed -n '208,245p;286,306p;326,346p;380,410p;424,440p;520,552p'"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t06",
+        "item_id": "exec-88cb4b91-4692-4837-b0d1-335b425f8ebf",
+        "line": 53
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "nl -ba src/browser/codex.ts | sed -n '28,65p;150,180p;210,240p'"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t06",
+        "item_id": "exec-85332c4a-95e6-4b9b-9cfd-386e0ae1d71e",
+        "line": 60
+      }
+    ],
+    "status": "pending_manual_review",
+    "target_repo": "/tmp/anvil-source-tasks-20260914/t06"
+  },
+  "answer": {
+    "bytes": 1641,
+    "sha256": "1e1986d39716d88eb8ea1d112c23d51ea836479dd0afb80810ce6aeacfb59f68",
+    "status": "present"
+  },
+  "capture_validation": {
+    "effort": {
+      "expected": "high",
+      "matches": true,
+      "observed": "high"
+    },
+    "model": {
+      "expected": "gpt-5.6-terra",
+      "matches": true,
+      "observed": "gpt-5.6-terra"
+    },
+    "observer_condition_deviations": [],
+    "provider": {
+      "expected": "openai",
+      "matches": true,
+      "observed": "openai"
+    },
+    "schedule_frozen": true,
+    "status": "condition_valid"
+  },
+  "native": {
+    "first_turn_id": "01a09e8f-8846-7c52-95cd-4c62a6578f35",
+    "interval_bytes": 743635,
+    "interval_end_line": 69,
+    "interval_sha256": "263a04a1744fd013a5292483c42a07dc60c0123600f63025ba1796ef6fd17d82",
+    "interval_start_line": 2,
+    "local_uri": "file:///Users/brummerv/.codex/sessions/2026/09/14/rollout-2026-09-14T16-16-41-01a09e8f-873a-73b3-90db-e73f9a7cd278.jsonl",
+    "whole_file_bytes": 766136,
+    "whole_file_sha256": "3a57fd0488eaada547cea16db459bf9684828d55ff369dc8be0d4c17adc02aa5"
+  },
+  "observer_metadata": {
+    "agent_task_name": "inspection_06",
+    "case_id": "browser_cli_immediate_production_entrypoint",
+    "condition": "ordinary",
+    "expected_interval_sha256": "263a04a1744fd013a5292483c42a07dc60c0123600f63025ba1796ef6fd17d82",
+    "prompt_sha256": "11ace576a3cbc142ce3c723e3b6c88839c65251a0f78112965809d3693acbc1e",
+    "purpose": "ordinary",
+    "repetition": 2,
+    "requested_effort": "high",
+    "requested_model": "gpt-5.6-terra",
+    "role": "delegate",
+    "run_id": "run-06",
+    "source_canonical_root": "/private/tmp/anvil-source-tasks-20260914/t06",
+    "target_repo": "/tmp/anvil-source-tasks-20260914/t06",
+    "task_source_archive_sha256": "e919302908ba8dfee2ee8ee055fd4a7463a37e94a71d35d2ecda7abe95463c5e",
+    "task_source_commit": "53bf29e60cece2335aa39fe301935a07e8e8d4e4",
+    "thread_id": "01a09e8f-873a-73b3-90db-e73f9a7cd278",
+    "turn_id": "01a09e8f-8846-7c52-95cd-4c62a6578f35"
+  },
+  "schedule": {
+    "path": "/Users/brummerv/loci/benchmarks/comparisons/ordinary-adoption-v1/schedule.json",
+    "run_id": "run-06",
+    "sha256": "64663be2ff720ce9e15a722eb67a56412dc2cd99ec4a73608e9ff40cef4f0c00",
+    "status": "frozen"
+  },
+  "schema_version": 1
+}

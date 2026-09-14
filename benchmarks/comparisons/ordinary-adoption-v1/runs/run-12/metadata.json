@@ -1,0 +1,116 @@
+{
+  "access_ledger_review": {
+    "manual_checks_required": [
+      "Review every MCP repo argument and source identity against the scheduled source root.",
+      "Review every shell command, cwd, and referenced path; cwd alone does not establish access scope.",
+      "Review any opaque shell operation without treating its unobserved internals as zero activity."
+    ],
+    "mcp_records": [
+      {
+        "item_id": "exec-c0d6ee06-f175-4b8a-a296-0ed5ed22c92a",
+        "line": 38,
+        "repo": "/tmp/anvil-source-tasks-20260914/t12",
+        "tool": "loci_explore"
+      }
+    ],
+    "no_access_violations_claimed": false,
+    "shell_records": [
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "sed -n '1,240p' /Users/brummerv/.codex/skills/loci/SKILL.md"
+        ],
+        "cwd": "file:///Users/brummerv/loci",
+        "item_id": "exec-b655aefa-9934-4a82-947a-c8a6136c093f",
+        "line": 29
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "rg --files -g AGENTS.md -g '!node_modules' /tmp/anvil-source-tasks-20260914/t12"
+        ],
+        "cwd": "file:///Users/brummerv/loci",
+        "item_id": "exec-d82ec3d7-d070-481f-b944-bd76f6f8485b",
+        "line": 30
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "sed -n '1,240p' AGENTS.md"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t12",
+        "item_id": "exec-770fd5f2-a7af-4022-82b5-a606b612aa11",
+        "line": 37
+      }
+    ],
+    "status": "pending_manual_review",
+    "target_repo": "/tmp/anvil-source-tasks-20260914/t12"
+  },
+  "answer": {
+    "bytes": 414,
+    "sha256": "c1298b920bb901b4ecf6777e807c39d02bc64189e3c1bc2c5c3c4a82c5b34825",
+    "status": "present"
+  },
+  "capture_validation": {
+    "effort": {
+      "expected": "high",
+      "matches": true,
+      "observed": "high"
+    },
+    "model": {
+      "expected": "gpt-5.6-terra",
+      "matches": true,
+      "observed": "gpt-5.6-terra"
+    },
+    "observer_condition_deviations": [],
+    "provider": {
+      "expected": "openai",
+      "matches": true,
+      "observed": "openai"
+    },
+    "schedule_frozen": true,
+    "status": "condition_valid"
+  },
+  "native": {
+    "first_turn_id": "01a09e97-9735-79f0-833b-323fc2627f74",
+    "interval_bytes": 278089,
+    "interval_end_line": 47,
+    "interval_sha256": "8bb9c806d16115378c5f18298aaa9792159b0301e4a7fe9355c9eb5121732add",
+    "interval_start_line": 2,
+    "local_uri": "file:///Users/brummerv/.codex/sessions/2026/09/14/rollout-2026-09-14T16-25-29-01a09e97-95f6-77f2-94fd-8a86773038d4.jsonl",
+    "whole_file_bytes": 300588,
+    "whole_file_sha256": "48c267624328e0d5697957906ca7d6d607f4a7949e2098a03610049511602544"
+  },
+  "observer_metadata": {
+    "agent_task_name": "inspection_12",
+    "case_id": "continuity_render_active_task",
+    "condition": "visibility_diagnostic",
+    "expected_interval_sha256": "8bb9c806d16115378c5f18298aaa9792159b0301e4a7fe9355c9eb5121732add",
+    "prompt_sha256": "771515b5cf41caa36c8ae96fb36fef6969d327bfdf7f4e05c990b26ef5c96d7b",
+    "purpose": "visibility_diagnostic",
+    "repetition": 1,
+    "requested_effort": "high",
+    "requested_model": "gpt-5.6-terra",
+    "role": "delegate",
+    "run_id": "run-12",
+    "source_canonical_root": "/private/tmp/anvil-source-tasks-20260914/t12",
+    "target_repo": "/tmp/anvil-source-tasks-20260914/t12",
+    "task_source_archive_sha256": "e919302908ba8dfee2ee8ee055fd4a7463a37e94a71d35d2ecda7abe95463c5e",
+    "task_source_commit": "53bf29e60cece2335aa39fe301935a07e8e8d4e4",
+    "thread_id": "01a09e97-95f6-77f2-94fd-8a86773038d4",
+    "turn_id": "01a09e97-9735-79f0-833b-323fc2627f74"
+  },
+  "schedule": {
+    "path": "/Users/brummerv/loci/benchmarks/comparisons/ordinary-adoption-v1/schedule.json",
+    "run_id": "run-12",
+    "sha256": "64663be2ff720ce9e15a722eb67a56412dc2cd99ec4a73608e9ff40cef4f0c00",
+    "status": "frozen"
+  },
+  "schema_version": 1
+}

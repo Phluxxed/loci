@@ -1,0 +1,134 @@
+{
+  "access_ledger_review": {
+    "manual_checks_required": [
+      "Review every MCP repo argument and source identity against the scheduled source root.",
+      "Review every shell command, cwd, and referenced path; cwd alone does not establish access scope.",
+      "Review any opaque shell operation without treating its unobserved internals as zero activity."
+    ],
+    "mcp_records": [
+      {
+        "item_id": "exec-5dc4ee3a-4915-4589-a0cf-56e05890d1c2",
+        "line": 40,
+        "repo": "/tmp/anvil-source-tasks-20260914/t05",
+        "tool": "loci_search"
+      },
+      {
+        "item_id": "exec-1a9c78dd-f514-4750-8d19-4bf5876f07a2",
+        "line": 47,
+        "repo": "/tmp/anvil-source-tasks-20260914/t05",
+        "tool": "loci_grep"
+      },
+      {
+        "item_id": "exec-8e868f8a-1133-44bc-aa6a-6e8c6d445c23",
+        "line": 54,
+        "repo": "/tmp/anvil-source-tasks-20260914/t05",
+        "tool": "loci_outline"
+      },
+      {
+        "item_id": "exec-9dc3a606-da66-441e-b0dd-82aedd9f1997",
+        "line": 59,
+        "repo": "/tmp/anvil-source-tasks-20260914/t05",
+        "tool": "loci_get"
+      }
+    ],
+    "no_access_violations_claimed": false,
+    "shell_records": [
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "sed -n '1,240p' /Users/brummerv/.codex/skills/loci/SKILL.md"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t05",
+        "item_id": "exec-db7033bd-c994-4332-b891-7c647df3055e",
+        "line": 17
+      },
+      {
+        "category": "shell_loci_cli",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "pwd && rg --files -g 'AGENTS.md' -g 'SKILL.md' /tmp/anvil-source-tasks-20260914/t05 /Users/brummerv/.codex/skills/loci 2>/dev/null"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t05",
+        "item_id": "exec-f6bd5088-011d-46fc-af31-265fe9596888",
+        "line": 18
+      },
+      {
+        "category": "shell_source_retrieval",
+        "command": [
+          "/bin/zsh",
+          "-lc",
+          "sed -n '1,240p' AGENTS.md"
+        ],
+        "cwd": "file:///tmp/anvil-source-tasks-20260914/t05",
+        "item_id": "exec-1bf50946-5038-448c-82a6-55bb258c3c27",
+        "line": 33
+      }
+    ],
+    "status": "pending_manual_review",
+    "target_repo": "/tmp/anvil-source-tasks-20260914/t05"
+  },
+  "answer": {
+    "bytes": 555,
+    "sha256": "595457d5e064f96efa441411df516526be352373e822448cf30e9ae085b03991",
+    "status": "present"
+  },
+  "capture_validation": {
+    "effort": {
+      "expected": "high",
+      "matches": true,
+      "observed": "high"
+    },
+    "model": {
+      "expected": "gpt-5.6-terra",
+      "matches": true,
+      "observed": "gpt-5.6-terra"
+    },
+    "observer_condition_deviations": [],
+    "provider": {
+      "expected": "openai",
+      "matches": true,
+      "observed": "openai"
+    },
+    "schedule_frozen": true,
+    "status": "condition_valid"
+  },
+  "native": {
+    "first_turn_id": "01a09e8f-6505-7372-a3a7-21e8b6f8d9dc",
+    "interval_bytes": 267497,
+    "interval_end_line": 68,
+    "interval_sha256": "755f54b376d791767e6704507da600b4d6dce01035e1cfda9d079a7bcf7b698e",
+    "interval_start_line": 2,
+    "local_uri": "file:///Users/brummerv/.codex/sessions/2026/09/14/rollout-2026-09-14T16-16-32-01a09e8f-63e3-79e3-8bb7-ee1962a49f97.jsonl",
+    "whole_file_bytes": 290000,
+    "whole_file_sha256": "d7703374ab4fefa693e9360f7873e37ed82bb946c6e1765739e341fd015dfd2c"
+  },
+  "observer_metadata": {
+    "agent_task_name": "inspection_05",
+    "case_id": "continuity_render_active_task",
+    "condition": "ordinary",
+    "expected_interval_sha256": "755f54b376d791767e6704507da600b4d6dce01035e1cfda9d079a7bcf7b698e",
+    "prompt_sha256": "14cf79e25983cee759388017e7c8681c60087b663cdf09794379050385259fba",
+    "purpose": "ordinary",
+    "repetition": 2,
+    "requested_effort": "high",
+    "requested_model": "gpt-5.6-terra",
+    "role": "delegate",
+    "run_id": "run-05",
+    "source_canonical_root": "/private/tmp/anvil-source-tasks-20260914/t05",
+    "target_repo": "/tmp/anvil-source-tasks-20260914/t05",
+    "task_source_archive_sha256": "e919302908ba8dfee2ee8ee055fd4a7463a37e94a71d35d2ecda7abe95463c5e",
+    "task_source_commit": "53bf29e60cece2335aa39fe301935a07e8e8d4e4",
+    "thread_id": "01a09e8f-63e3-79e3-8bb7-ee1962a49f97",
+    "turn_id": "01a09e8f-6505-7372-a3a7-21e8b6f8d9dc"
+  },
+  "schedule": {
+    "path": "/Users/brummerv/loci/benchmarks/comparisons/ordinary-adoption-v1/schedule.json",
+    "run_id": "run-05",
+    "sha256": "64663be2ff720ce9e15a722eb67a56412dc2cd99ec4a73608e9ff40cef4f0c00",
+    "status": "frozen"
+  },
+  "schema_version": 1
+}

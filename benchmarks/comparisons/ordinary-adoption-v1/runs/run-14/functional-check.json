@@ -1,0 +1,463 @@
+{
+  "schema_version": 1,
+  "run": {
+    "run_id": "run-14",
+    "case_id": "browser_cli_immediate_production_entrypoint",
+    "condition": "primary_baseline",
+    "repetition": 1,
+    "role": "primary",
+    "purpose": "primary_check",
+    "model": "gpt-6-astra",
+    "effort": "ultra",
+    "source_root": "/tmp/anvil-source-tasks-20260914/t14",
+    "agent_task_name": null,
+    "prompt": "Investigate the repository at /tmp/anvil-source-tasks-20260914/t14 read-only.\n\nBefore changing the browser CLI\u2019s command behavior, identify the immediate production entrypoint that invokes it. Show how the top-level command reaches the browser CLI and what arguments/dependencies it passes. Give paths and lines in a short answer.\n\nFollow the normal repository instructions. Keep this a focused source\ninvestigation: do not edit files, run tests, or launch services. Use only this\nrepository and installed operating instructions for evidence; do not inspect\nother repositories, earlier agent sessions or unrelated task artifacts. Give\na concise answer with relevant source paths and lines, and state any material\nuncertainty. Complete this assignment directly. Do not spawn other agents.",
+    "prompt_sha256": "0dbc0c140ac7b291ee2d9639675efc42ea8e2139eb83f73196c4d83b00644667",
+    "conditional_on_selected_correction": false,
+    "task_source_commit": "53bf29e60cece2335aa39fe301935a07e8e8d4e4",
+    "task_source_archive_sha256": "e919302908ba8dfee2ee8ee055fd4a7463a37e94a71d35d2ecda7abe95463c5e",
+    "source_canonical_root": "/private/tmp/anvil-source-tasks-20260914/t14"
+  },
+  "purpose": "primary_check",
+  "known_answer": true,
+  "native_identity": {
+    "thread_id": "01a09e19-5048-79d3-96dd-697eda8a4ac8",
+    "turn_id": "01a09e4c-6bcb-77c2-ac63-25a9464a6c9d",
+    "target_repo": "/tmp/anvil-source-tasks-20260914/t14",
+    "model": "gpt-6-astra",
+    "effort": "ultra"
+  },
+  "window": {
+    "kind": "coordinator_declared_functional_call_window_not_task_turn",
+    "local_rollout": "/Users/brummerv/.codex/sessions/2026/09/14/rollout-2026-09-14T14-07-34-01a09e19-5048-79d3-96dd-697eda8a4ac8.jsonl",
+    "start_line": 2261,
+    "end_line": 2270,
+    "sha256": "6766b6b622db400213d870a36485a99fefc18dbdf6a699c03de7d98560cc9732"
+  },
+  "mcp_calls": [
+    {
+      "line": 2263,
+      "event_type": "item_completed",
+      "item_id": "exec-90155ed7-bb99-4ce0-af9a-bdedfe7403bb",
+      "thread_id": "01a09e19-5048-79d3-96dd-697eda8a4ac8",
+      "turn_id": "01a09e4c-6bcb-77c2-ac63-25a9464a6c9d",
+      "started_at_ms": 1789367391355,
+      "completed_at_ms": 1789367398329,
+      "status": "completed",
+      "duration": {
+        "secs": 6,
+        "nanos": 974084625
+      },
+      "server": "loci",
+      "tool": "loci_search",
+      "arguments": {
+        "repo": "/tmp/anvil-source-tasks-20260914/t14",
+        "query": "runBrowserCli",
+        "limit": 2
+      },
+      "target_repo": "/tmp/anvil-source-tasks-20260914/t14",
+      "result": {
+        "content": [],
+        "structuredContent": {
+          "symbols": [
+            {
+              "id": "src/browser/cli.ts::runBrowserCli#function",
+              "name": "runBrowserCli",
+              "qualified_name": "runBrowserCli",
+              "kind": "function",
+              "language": "typescript",
+              "file_path": "src/browser/cli.ts",
+              "byte_offset": 21760,
+              "byte_length": 1492,
+              "signature": "async function runBrowserCli(args: string[], dependencies: BrowserCliDependencies): Promise<number> {",
+              "docstring": "",
+              "summary": "",
+              "content_hash": "620e71ad083f5da2d42e03bec94db9b14c1190551fc106c26bca3de8f28fda46",
+              "decorators": [],
+              "keywords": [
+                "browser",
+                "cli",
+                "run"
+              ],
+              "metadata": {},
+              "line": 554,
+              "end_line": 588,
+              "score": 63.0
+            }
+          ],
+          "coverage": {
+            "schema_version": 1,
+            "state": "partial",
+            "scope": "repository",
+            "source_scope": "indexed_supported_source",
+            "indexed_files": 415,
+            "excluded_paths": 223,
+            "exclusions": [
+              {
+                "reason": "unsupported_file_type",
+                "paths": 223,
+                "samples": [
+                  ".agents/skills/spark-shape/agents/openai.yaml",
+                  ".codex/config.toml",
+                  ".codex/hooks.json",
+                  ".gitignore",
+                  ".manifest/objectives/obj_19095dfe9e769a3d5af35b2e23bf7026.json",
+                  ".manifest/objectives/obj_6d616e6966657374763264656c697665.json",
+                  ".manifest/objectives/obj_7ac1ff09fa2bd474f9f7eb9dca176592.json",
+                  ".manifest/objectives/obj_9aa7f9724486f1d3aa9752742c9c0e3d.json",
+                  "LICENSE",
+                  "docs/brain-usage-dashboard.html",
+                  "docs/manifest-objective.html",
+                  "docs/manifest-rings/manifest-ring.html",
+                  "docs/plans/evidence/authority-envelopes.json",
+                  "docs/plans/evidence/brain-envelope-allocation-q01-2026-09-06.json",
+                  "docs/plans/evidence/brain-evidence-selection-repair/context-capture.json",
+                  "docs/plans/evidence/brain-sufficiency-walkthrough/context-capture.json",
+                  "docs/plans/evidence/brain-w21-baseline/anvil-route.json",
+                  "docs/plans/evidence/brain-w21-baseline/question-cases.json",
+                  "docs/plans/evidence/brain-w21-baseline/questions-cli-unconfigured.json",
+                  "docs/plans/evidence/brain-w21-baseline/questions-cli.json"
+                ],
+                "omitted_samples": 203
+              }
+            ],
+            "unknown_reason": null,
+            "query_scope": "indexed_symbols"
+          },
+          "search_id": "88534170-bdf3-49e8-a67a-e8efa742fa63"
+        },
+        "isError": false
+      },
+      "canonical_result_json_bytes": 1964,
+      "canonical_result_json_sha256": "793f6d359778b79535419e9c3ef3a69a284d98c4b0c3b41b47ffda2d83e0d7b1",
+      "invocation_category": "exact_retrieval",
+      "relationship_delivery": {
+        "application_error": false,
+        "result_status": "unknown",
+        "type_context_status": null,
+        "edge_families": {},
+        "edge_count": 0,
+        "semantic_edge_count": 0,
+        "containment_edge_count": 0,
+        "resolved_record_count": 0,
+        "unresolved_record_count": 0,
+        "unresolved_record_families": {},
+        "unknown_record_count": 0,
+        "relationship_shape_status": "complete",
+        "omissions": null,
+        "reported_evidence_bytes": null,
+        "reported_output_bytes": null,
+        "returned_source_text_bytes": 0,
+        "source_text_bytes_status": "complete",
+        "requested_output_budget_bytes": null,
+        "requested_evidence_budget_bytes": null,
+        "returned_limits": null
+      },
+      "model_delivery": {
+        "status": "full_exact",
+        "matches": [
+          {
+            "call_id": "call_RVhi2MOpKYXjNik4iJNtTshr",
+            "output_line": 2264,
+            "block_index": 1,
+            "output_ref": "outer:call_RVhi2MOpKYXjNik4iJNtTshr:line:2264:block:1",
+            "match": "structuredContent_json_or_wrapper"
+          }
+        ]
+      }
+    },
+    {
+      "line": 2269,
+      "event_type": "item_completed",
+      "item_id": "exec-d26a2c54-7fd6-4231-b2e3-48b320003fdc",
+      "thread_id": "01a09e19-5048-79d3-96dd-697eda8a4ac8",
+      "turn_id": "01a09e4c-6bcb-77c2-ac63-25a9464a6c9d",
+      "started_at_ms": 1789367403256,
+      "completed_at_ms": 1789367407436,
+      "status": "completed",
+      "duration": {
+        "secs": 4,
+        "nanos": 180194459
+      },
+      "server": "loci",
+      "tool": "loci_explore",
+      "arguments": {
+        "repo": "/tmp/anvil-source-tasks-20260914/t14",
+        "intent": "impact",
+        "seed_ids": [
+          "src/browser/cli.ts::runBrowserCli#function"
+        ]
+      },
+      "target_repo": "/tmp/anvil-source-tasks-20260914/t14",
+      "result": {
+        "content": [],
+        "structuredContent": {
+          "schema_version": 1,
+          "intent": "impact",
+          "status": "partial",
+          "selection": "explicit",
+          "scope": {
+            "source": "indexed_supported_source",
+            "coverage": "partial",
+            "relationships": "known_static_dependents",
+            "exhaustive": false
+          },
+          "items": [
+            {
+              "id": "src/browser/cli.ts::runBrowserCli#function",
+              "name": "runBrowserCli",
+              "kind": "function",
+              "file": "src/browser/cli.ts",
+              "role": "anchor",
+              "depth": 0,
+              "why": "Explicitly requested",
+              "source_id": 1,
+              "complete": true,
+              "path": []
+            },
+            {
+              "id": "bin/anvil.ts::main#function",
+              "name": "main",
+              "kind": "function",
+              "file": "bin/anvil.ts",
+              "role": "dependent",
+              "depth": 1,
+              "why": "Known static dependent",
+              "source_id": 2,
+              "complete": true,
+              "path": [
+                1
+              ]
+            }
+          ],
+          "relationships": [
+            {
+              "id": 1,
+              "edge": {
+                "from": "bin/anvil.ts::main#function",
+                "to": "src/browser/cli.ts::runBrowserCli#function",
+                "type": "calls",
+                "directed": true,
+                "namespace": "loci",
+                "resolution": "import-resolved",
+                "evidence": {
+                  "file": "bin/anvil.ts",
+                  "line": 1463,
+                  "content_hash": "055371e87a490edd78d9c1c46aec3202a249372022d63cb1f252bc60f91991dc"
+                }
+              },
+              "traversed": "reverse",
+              "source_ids": [
+                2,
+                3,
+                4,
+                5
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "id": 1,
+              "file": "src/browser/cli.ts",
+              "start_byte": 21760,
+              "end_byte": 23252,
+              "start_line": 554,
+              "end_line": 588,
+              "content_hash": "94a76d110298b93ffcd808210d1b7700bf463ed764436615bbecd2fd1db6eb4d",
+              "content": "async function runBrowserCli(args: string[], dependencies: BrowserCliDependencies): Promise<number> {\n  const flags = parseBrowserFlags(args);\n  const write = dependencies.stdout ?? ((value: string) => process.stdout.write(value));\n  const anvilHome = resolve(dependencies.anvilHome ?? join(dependencies.homeDir ?? homedir(), \".anvil\"));\n  const command = flags._[0];\n  if (!command || command === \"help\") {\n    write(`${browserCliUsage()}\\n`);\n    return 0;\n  }\n  if (command === \"install\") {\n    output(await installCommand(flags, dependencies, anvilHome), flags.json, write);\n    return 0;\n  }\n  if (command === \"status\" && flags._.length === 1) {\n    output(await readCapabilityStatus(anvilHome, dependencies.anvilCommand, dependencies), flags.json, write);\n    return 0;\n  }\n  if (command === \"doctor\" && flags._.length === 1) {\n    const result = await doctorCommand(dependencies, anvilHome);\n    output(result, flags.json, write);\n    return (result as { ok: boolean }).ok ? 0 : 1;\n  }\n  if (command === \"mcp\" && flags._[1] === \"serve\" && flags._.length === 2) {\n    return (dependencies.serveMcp ?? serveBrowserMcp)({ mode: browserMode(flags.networkMode), anvilHome });\n  }\n  if (command === \"upgrade\") {\n    output(await upgradeCommand(flags, dependencies, anvilHome), flags.json, write);\n    return 0;\n  }\n  if (command === \"uninstall\") {\n    output(await uninstallCommand(flags, dependencies, anvilHome), flags.json, write);\n    return 0;\n  }\n  throw cliError(browserCliUsage());\n}"
+            },
+            {
+              "id": 2,
+              "file": "bin/anvil.ts",
+              "start_byte": 52866,
+              "end_byte": 55529,
+              "start_line": 1372,
+              "end_line": 1477,
+              "content_hash": "055371e87a490edd78d9c1c46aec3202a249372022d63cb1f252bc60f91991dc",
+              "content": "async function main(): Promise<void> {\n  if (command.length === 0 || command[0] === \"--help\" || command[0] === \"help\") {\n    process.stdout.write(`${usage()}\\n`);\n    return;\n  }\n\n  if (command[0] === \"manifest\") {\n    const { runManifestCli } = await import(\"./manifest.ts\");\n    await runManifestCli(command.slice(1));\n    return;\n  }\n\n  if (\n    command[0] === \"codex\" &&\n    (command[1] === \"context-hook\" || command[1] === \"session-start-hook\")\n  ) {\n    await runContextHook();\n    return;\n  }\n\n  if (command[0] === \"continuity\" && command[1] === \"read\") {\n    await continuityRead(command.slice(2));\n    return;\n  }\n\n  if (command[0] === \"work-context\" && command[1] === \"read\") {\n    await workContextRead(command.slice(2));\n    return;\n  }\n\n  if (command[0] === \"work-context\" && command[1] === \"doctor\") {\n    await workContextDoctor(command.slice(2));\n    return;\n  }\n\n  if (command[0] === \"continuity\" && command[1] === \"doctor\") {\n    await continuityDoctor(command.slice(2));\n    return;\n  }\n\n  if (command[0] === \"continuity\" && command[1] === \"routing-audit\") {\n    await continuityRoutingAudit(command.slice(2));\n    return;\n  }\n\n  if (command[0] === \"continuity\" && command[1] === \"init-default\") {\n    await continuityInitDefault(command.slice(2));\n    return;\n  }\n\n  if (command[0] === \"brain\" && command[1] === \"log\") {\n    await brainLog(command.slice(2));\n    return;\n  }\n\n  if (command[0] === \"brain\" && command[1] === \"usage\") {\n    await brainUsage(command.slice(2));\n    return;\n  }\n\n  if (command[0] === \"brain\" && command[1] === \"metrics\") {\n    await brainMetrics(command.slice(2));\n    return;\n  }\n\n  if (command[0] === \"brain\" && command[1] === \"dashboard\") {\n    await brainDashboard(command.slice(2));\n    return;\n  }\n\n  if (command[0] === \"skills\" && command[1] === \"log\") {\n    await skillsLog(command.slice(2));\n    return;\n  }\n\n  if (command[0] === \"skills\" && command[1] === \"invocations\") {\n    await skillsInvocations(command.slice(2));\n    return;\n  }\n\n  if (command[0] === \"skills\" && command[1] === \"audit-sample\") {\n    await skillsAuditSample(command.slice(2));\n    return;\n  }\n\n  if (command[0] === \"tool-result\" && command[1] === \"capture\") {\n    await captureToolResult(command.slice(2));\n    return;\n  }\n\n  if (command[0] === \"browser\") {\n    const exitCode = await runBrowserCli(command.slice(1), {\n      anvilCommand: currentFile,\n      ...(process.env.ANVIL_HOME ? { anvilHome: process.env.ANVIL_HOME } : {}),\n    });\n    if (exitCode !== 0) process.exitCode = exitCode;\n    return;\n  }\n\n  if (command[0] === \"mcp\" && command[1] === \"serve\") {\n    await runAnvilMcpServer();\n    return;\n  }\n\n  fail(usage());\n}"
+            },
+            {
+              "id": 3,
+              "file": "bin/anvil.ts",
+              "start_byte": 2039,
+              "end_byte": 2096,
+              "start_line": 48,
+              "end_line": 48,
+              "content_hash": "055371e87a490edd78d9c1c46aec3202a249372022d63cb1f252bc60f91991dc",
+              "content": "import { runBrowserCli } from \"../src/browser/index.ts\";\n"
+            },
+            {
+              "id": 4,
+              "file": "src/browser/index.ts",
+              "start_byte": 1652,
+              "end_byte": 1711,
+              "start_line": 57,
+              "end_line": 57,
+              "content_hash": "4113c8944516a457af7bd3ee34e3509e2c0f3c3f86decb75eb864a8a2ada284c",
+              "content": "export { browserCliUsage, runBrowserCli } from \"./cli.ts\";\n"
+            },
+            {
+              "id": 5,
+              "file": "src/browser/cli.ts",
+              "start_byte": 21753,
+              "end_byte": 21862,
+              "start_line": 554,
+              "end_line": 554,
+              "content_hash": "94a76d110298b93ffcd808210d1b7700bf463ed764436615bbecd2fd1db6eb4d",
+              "content": "export async function runBrowserCli(args: string[], dependencies: BrowserCliDependencies): Promise<number> {\n"
+            }
+          ],
+          "omissions": [
+            {
+              "reason": "alternative_path",
+              "count": 1
+            },
+            {
+              "reason": "hop_limit",
+              "count": 1
+            }
+          ],
+          "limits": {
+            "max_hops": 1,
+            "max_nodes": 64,
+            "max_items": 12,
+            "max_neighbors": 32,
+            "max_output_bytes": 16384,
+            "max_evidence_bytes": 8192
+          },
+          "usage": {
+            "nodes_examined": 2,
+            "evidence_bytes": 4278,
+            "output_bytes": 7063,
+            "estimated_tokens": 1766,
+            "token_estimate_method": "utf8_bytes_div_4",
+            "output_encoding": "mcp_result_json_utf8"
+          }
+        },
+        "isError": false
+      },
+      "canonical_result_json_bytes": 7063,
+      "canonical_result_json_sha256": "78df803c76d319b672dcba80c36f05c137b62e4c35402577c5a530a3522e99a7",
+      "invocation_category": "explore_relationship",
+      "relationship_delivery": {
+        "application_error": false,
+        "result_status": "partial",
+        "type_context_status": null,
+        "edge_families": {
+          "calls": 1
+        },
+        "edge_count": 1,
+        "semantic_edge_count": 1,
+        "containment_edge_count": 0,
+        "resolved_record_count": 0,
+        "unresolved_record_count": 0,
+        "unresolved_record_families": {},
+        "unknown_record_count": 0,
+        "relationship_shape_status": "complete",
+        "omissions": [
+          {
+            "reason": "alternative_path",
+            "count": 1
+          },
+          {
+            "reason": "hop_limit",
+            "count": 1
+          }
+        ],
+        "reported_evidence_bytes": 4278,
+        "reported_output_bytes": 7063,
+        "returned_source_text_bytes": 4380,
+        "source_text_bytes_status": "complete",
+        "requested_output_budget_bytes": null,
+        "requested_evidence_budget_bytes": null,
+        "returned_limits": {
+          "max_hops": 1,
+          "max_nodes": 64,
+          "max_items": 12,
+          "max_neighbors": 32,
+          "max_output_bytes": 16384,
+          "max_evidence_bytes": 8192
+        }
+      },
+      "model_delivery": {
+        "status": "full_exact",
+        "matches": [
+          {
+            "call_id": "call_zm4vZK7vATVSDJw0hjP14QR6",
+            "output_line": 2270,
+            "block_index": 1,
+            "output_ref": "outer:call_zm4vZK7vATVSDJw0hjP14QR6:line:2270:block:1",
+            "match": "structuredContent_json_or_wrapper"
+          }
+        ]
+      }
+    }
+  ],
+  "model_output_blocks": [
+    {
+      "call_id": "call_RVhi2MOpKYXjNik4iJNtTshr",
+      "output_line": 2264,
+      "block_index": 0,
+      "output_ref": "outer:call_RVhi2MOpKYXjNik4iJNtTshr:line:2264:block:0",
+      "text": "Script completed\nWall time 7.2 seconds\nOutput:\n",
+      "bytes": 47,
+      "sha256": "4cc639d275c3222af8bec59988f51b8239f38b934ea37f3b39b30e40c7c2b208",
+      "truncated": false
+    },
+    {
+      "call_id": "call_RVhi2MOpKYXjNik4iJNtTshr",
+      "output_line": 2264,
+      "block_index": 1,
+      "output_ref": "outer:call_RVhi2MOpKYXjNik4iJNtTshr:line:2264:block:1",
+      "text": "{\"content\":[],\"structuredContent\":{\"symbols\":[{\"id\":\"src/browser/cli.ts::runBrowserCli#function\",\"name\":\"runBrowserCli\",\"qualified_name\":\"runBrowserCli\",\"kind\":\"function\",\"language\":\"typescript\",\"file_path\":\"src/browser/cli.ts\",\"byte_offset\":21760,\"byte_length\":1492,\"signature\":\"async function runBrowserCli(args: string[], dependencies: BrowserCliDependencies): Promise<number> {\",\"docstring\":\"\",\"summary\":\"\",\"content_hash\":\"620e71ad083f5da2d42e03bec94db9b14c1190551fc106c26bca3de8f28fda46\",\"decorators\":[],\"keywords\":[\"browser\",\"cli\",\"run\"],\"metadata\":{},\"line\":554,\"end_line\":588,\"score\":63}],\"coverage\":{\"schema_version\":1,\"state\":\"partial\",\"scope\":\"repository\",\"source_scope\":\"indexed_supported_source\",\"indexed_files\":415,\"excluded_paths\":223,\"exclusions\":[{\"reason\":\"unsupported_file_type\",\"paths\":223,\"samples\":[\".agents/skills/spark-shape/agents/openai.yaml\",\".codex/config.toml\",\".codex/hooks.json\",\".gitignore\",\".manifest/objectives/obj_19095dfe9e769a3d5af35b2e23bf7026.json\",\".manifest/objectives/obj_6d616e6966657374763264656c697665.json\",\".manifest/objectives/obj_7ac1ff09fa2bd474f9f7eb9dca176592.json\",\".manifest/objectives/obj_9aa7f9724486f1d3aa9752742c9c0e3d.json\",\"LICENSE\",\"docs/brain-usage-dashboard.html\",\"docs/manifest-objective.html\",\"docs/manifest-rings/manifest-ring.html\",\"docs/plans/evidence/authority-envelopes.json\",\"docs/plans/evidence/brain-envelope-allocation-q01-2026-09-06.json\",\"docs/plans/evidence/brain-evidence-selection-repair/context-capture.json\",\"docs/plans/evidence/brain-sufficiency-walkthrough/context-capture.json\",\"docs/plans/evidence/brain-w21-baseline/anvil-route.json\",\"docs/plans/evidence/brain-w21-baseline/question-cases.json\",\"docs/plans/evidence/brain-w21-baseline/questions-cli-unconfigured.json\",\"docs/plans/evidence/brain-w21-baseline/questions-cli.json\"],\"omitted_samples\":203}],\"unknown_reason\":null,\"query_scope\":\"indexed_symbols\"},\"search_id\":\"88534170-bdf3-49e8-a67a-e8efa742fa63\"},\"isError\":false}",
+      "bytes": 1962,
+      "sha256": "c0ee32b34841460a9e3930d237bd09dff132bdbaff1c57c146520fc6c42e1381",
+      "truncated": false
+    },
+    {
+      "call_id": "call_zm4vZK7vATVSDJw0hjP14QR6",
+      "output_line": 2270,
+      "block_index": 0,
+      "output_ref": "outer:call_zm4vZK7vATVSDJw0hjP14QR6:line:2270:block:0",
+      "text": "Script completed\nWall time 4.4 seconds\nOutput:\n",
+      "bytes": 47,
+      "sha256": "9249718dbefd3fbc65dc7eab5f7d147ab18219904d1091fa70c98167a01f718f",
+      "truncated": false
+    },
+    {
+      "call_id": "call_zm4vZK7vATVSDJw0hjP14QR6",
+      "output_line": 2270,
+      "block_index": 1,
+      "output_ref": "outer:call_zm4vZK7vATVSDJw0hjP14QR6:line:2270:block:1",
+      "text": "{\"content\":[],\"structuredContent\":{\"schema_version\":1,\"intent\":\"impact\",\"status\":\"partial\",\"selection\":\"explicit\",\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"relationships\":\"known_static_dependents\",\"exhaustive\":false},\"items\":[{\"id\":\"src/browser/cli.ts::runBrowserCli#function\",\"name\":\"runBrowserCli\",\"kind\":\"function\",\"file\":\"src/browser/cli.ts\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicitly requested\",\"source_id\":1,\"complete\":true,\"path\":[]},{\"id\":\"bin/anvil.ts::main#function\",\"name\":\"main\",\"kind\":\"function\",\"file\":\"bin/anvil.ts\",\"role\":\"dependent\",\"depth\":1,\"why\":\"Known static dependent\",\"source_id\":2,\"complete\":true,\"path\":[1]}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"bin/anvil.ts::main#function\",\"to\":\"src/browser/cli.ts::runBrowserCli#function\",\"type\":\"calls\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"bin/anvil.ts\",\"line\":1463,\"content_hash\":\"055371e87a490edd78d9c1c46aec3202a249372022d63cb1f252bc60f91991dc\"}},\"traversed\":\"reverse\",\"source_ids\":[2,3,4,5]}],\"sources\":[{\"id\":1,\"file\":\"src/browser/cli.ts\",\"start_byte\":21760,\"end_byte\":23252,\"start_line\":554,\"end_line\":588,\"content_hash\":\"94a76d110298b93ffcd808210d1b7700bf463ed764436615bbecd2fd1db6eb4d\",\"content\":\"async function runBrowserCli(args: string[], dependencies: BrowserCliDependencies): Promise<number> {\\n  const flags = parseBrowserFlags(args);\\n  const write = dependencies.stdout ?? ((value: string) => process.stdout.write(value));\\n  const anvilHome = resolve(dependencies.anvilHome ?? join(dependencies.homeDir ?? homedir(), \\\".anvil\\\"));\\n  const command = flags._[0];\\n  if (!command || command === \\\"help\\\") {\\n    write(`${browserCliUsage()}\\\\n`);\\n    return 0;\\n  }\\n  if (command === \\\"install\\\") {\\n    output(await installCommand(flags, dependencies, anvilHome), flags.json, write);\\n    return 0;\\n  }\\n  if (command === \\\"status\\\" && flags._.length === 1) {\\n    output(await readCapabilityStatus(anvilHome, dependencies.anvilCommand, dependencies), flags.json, write);\\n    return 0;\\n  }\\n  if (command === \\\"doctor\\\" && flags._.length === 1) {\\n    const result = await doctorCommand(dependencies, anvilHome);\\n    output(result, flags.json, write);\\n    return (result as { ok: boolean }).ok ? 0 : 1;\\n  }\\n  if (command === \\\"mcp\\\" && flags._[1] === \\\"serve\\\" && flags._.length === 2) {\\n    return (dependencies.serveMcp ?? serveBrowserMcp)({ mode: browserMode(flags.networkMode), anvilHome });\\n  }\\n  if (command === \\\"upgrade\\\") {\\n    output(await upgradeCommand(flags, dependencies, anvilHome), flags.json, write);\\n    return 0;\\n  }\\n  if (command === \\\"uninstall\\\") {\\n    output(await uninstallCommand(flags, dependencies, anvilHome), flags.json, write);\\n    return 0;\\n  }\\n  throw cliError(browserCliUsage());\\n}\"},{\"id\":2,\"file\":\"bin/anvil.ts\",\"start_byte\":52866,\"end_byte\":55529,\"start_line\":1372,\"end_line\":1477,\"content_hash\":\"055371e87a490edd78d9c1c46aec3202a249372022d63cb1f252bc60f91991dc\",\"content\":\"async function main(): Promise<void> {\\n  if (command.length === 0 || command[0] === \\\"--help\\\" || command[0] === \\\"help\\\") {\\n    process.stdout.write(`${usage()}\\\\n`);\\n    return;\\n  }\\n\\n  if (command[0] === \\\"manifest\\\") {\\n    const { runManifestCli } = await import(\\\"./manifest.ts\\\");\\n    await runManifestCli(command.slice(1));\\n    return;\\n  }\\n\\n  if (\\n    command[0] === \\\"codex\\\" &&\\n    (command[1] === \\\"context-hook\\\" || command[1] === \\\"session-start-hook\\\")\\n  ) {\\n    await runContextHook();\\n    return;\\n  }\\n\\n  if (command[0] === \\\"continuity\\\" && command[1] === \\\"read\\\") {\\n    await continuityRead(command.slice(2));\\n    return;\\n  }\\n\\n  if (command[0] === \\\"work-context\\\" && command[1] === \\\"read\\\") {\\n    await workContextRead(command.slice(2));\\n    return;\\n  }\\n\\n  if (command[0] === \\\"work-context\\\" && command[1] === \\\"doctor\\\") {\\n    await workContextDoctor(command.slice(2));\\n    return;\\n  }\\n\\n  if (command[0] === \\\"continuity\\\" && command[1] === \\\"doctor\\\") {\\n    await continuityDoctor(command.slice(2));\\n    return;\\n  }\\n\\n  if (command[0] === \\\"continuity\\\" && command[1] === \\\"routing-audit\\\") {\\n    await continuityRoutingAudit(command.slice(2));\\n    return;\\n  }\\n\\n  if (command[0] === \\\"continuity\\\" && command[1] === \\\"init-default\\\") {\\n    await continuityInitDefault(command.slice(2));\\n    return;\\n  }\\n\\n  if (command[0] === \\\"brain\\\" && command[1] === \\\"log\\\") {\\n    await brainLog(command.slice(2));\\n    return;\\n  }\\n\\n  if (command[0] === \\\"brain\\\" && command[1] === \\\"usage\\\") {\\n    await brainUsage(command.slice(2));\\n    return;\\n  }\\n\\n  if (command[0] === \\\"brain\\\" && command[1] === \\\"metrics\\\") {\\n    await brainMetrics(command.slice(2));\\n    return;\\n  }\\n\\n  if (command[0] === \\\"brain\\\" && command[1] === \\\"dashboard\\\") {\\n    await brainDashboard(command.slice(2));\\n    return;\\n  }\\n\\n  if (command[0] === \\\"skills\\\" && command[1] === \\\"log\\\") {\\n    await skillsLog(command.slice(2));\\n    return;\\n  }\\n\\n  if (command[0] === \\\"skills\\\" && command[1] === \\\"invocations\\\") {\\n    await skillsInvocations(command.slice(2));\\n    return;\\n  }\\n\\n  if (command[0] === \\\"skills\\\" && command[1] === \\\"audit-sample\\\") {\\n    await skillsAuditSample(command.slice(2));\\n    return;\\n  }\\n\\n  if (command[0] === \\\"tool-result\\\" && command[1] === \\\"capture\\\") {\\n    await captureToolResult(command.slice(2));\\n    return;\\n  }\\n\\n  if (command[0] === \\\"browser\\\") {\\n    const exitCode = await runBrowserCli(command.slice(1), {\\n      anvilCommand: currentFile,\\n      ...(process.env.ANVIL_HOME ? { anvilHome: process.env.ANVIL_HOME } : {}),\\n    });\\n    if (exitCode !== 0) process.exitCode = exitCode;\\n    return;\\n  }\\n\\n  if (command[0] === \\\"mcp\\\" && command[1] === \\\"serve\\\") {\\n    await runAnvilMcpServer();\\n    return;\\n  }\\n\\n  fail(usage());\\n}\"},{\"id\":3,\"file\":\"bin/anvil.ts\",\"start_byte\":2039,\"end_byte\":2096,\"start_line\":48,\"end_line\":48,\"content_hash\":\"055371e87a490edd78d9c1c46aec3202a249372022d63cb1f252bc60f91991dc\",\"content\":\"import { runBrowserCli } from \\\"../src/browser/index.ts\\\";\\n\"},{\"id\":4,\"file\":\"src/browser/index.ts\",\"start_byte\":1652,\"end_byte\":1711,\"start_line\":57,\"end_line\":57,\"content_hash\":\"4113c8944516a457af7bd3ee34e3509e2c0f3c3f86decb75eb864a8a2ada284c\",\"content\":\"export { browserCliUsage, runBrowserCli } from \\\"./cli.ts\\\";\\n\"},{\"id\":5,\"file\":\"src/browser/cli.ts\",\"start_byte\":21753,\"end_byte\":21862,\"start_line\":554,\"end_line\":554,\"content_hash\":\"94a76d110298b93ffcd808210d1b7700bf463ed764436615bbecd2fd1db6eb4d\",\"content\":\"export async function runBrowserCli(args: string[], dependencies: BrowserCliDependencies): Promise<number> {\\n\"}],\"omissions\":[{\"reason\":\"alternative_path\",\"count\":1},{\"reason\":\"hop_limit\",\"count\":1}],\"limits\":{\"max_hops\":1,\"max_nodes\":64,\"max_items\":12,\"max_neighbors\":32,\"max_output_bytes\":16384,\"max_evidence_bytes\":8192},\"usage\":{\"nodes_examined\":2,\"evidence_bytes\":4278,\"output_bytes\":7063,\"estimated_tokens\":1766,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"}},\"isError\":false}",
+      "bytes": 7063,
+      "sha256": "379174465ba09ed9625877258ccbfc8b3fc1c52499b30216ff88fee4ca540e9e",
+      "truncated": false
+    }
+  ],
+  "evidence_registry": {
+    "exec-90155ed7-bb99-4ce0-af9a-bdedfe7403bb": {
+      "semantic_relationship_count": 0,
+      "model_output_refs": [
+        "outer:call_RVhi2MOpKYXjNik4iJNtTshr:line:2264:block:1"
+      ]
+    },
+    "exec-d26a2c54-7fd6-4231-b2e3-48b320003fdc": {
+      "semantic_relationship_count": 1,
+      "model_output_refs": [
+        "outer:call_zm4vZK7vATVSDJw0hjP14QR6:line:2270:block:1"
+      ]
+    }
+  },
+  "verification": {
+    "all_native_calls_completed": true,
+    "all_native_results_model_visible_full_exact": true,
+    "all_explore_source_hashes_and_spans_match": true
+  },
+  "unknown": [
+    "unprimed_primary_selection",
+    "per_case_provider_cost",
+    "causal_answer_benefit"
+  ],
+  "source_note": "Case answer assertions retained in answer.md; primary source/check windows do not invent a task completion boundary."
+}

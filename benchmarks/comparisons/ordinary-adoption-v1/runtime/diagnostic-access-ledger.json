@@ -1,0 +1,1552 @@
+{
+  "schema_version": 1,
+  "purpose": "Manual access and retrieval accounting for visibility diagnostics run-09 through run-12. This is not answer grading, cost accounting, or a claim of model cognition.",
+  "evidence_scope": {
+    "runs": [
+      "run-09",
+      "run-10",
+      "run-11",
+      "run-12"
+    ],
+    "source_and_instruction_scope": "Scheduled task source root plus permitted installed operating instructions and normal project/root guidance, as allowed by protocol.md lines 65-80.",
+    "excluded_from_this_ledger": [
+      "other repositories",
+      "case gold/rubric analysis beyond identities",
+      "earlier agent sessions",
+      "provider attempts",
+      "new Loci calls"
+    ],
+    "retention_limit": "The ledger copies exact recorded command text and MCP arguments needed for access review; it copies no task-prompt plaintext or tool result bodies."
+  },
+  "visibility_diagnostic_instruction": {
+    "exact_text": "Before choosing a retrieval route, discover the relevant configured tools through this host's deferred tool surface.",
+    "source": "conditions.md:10",
+    "interpretation_limit": "It requests deferred-tool discovery but does not prescribe Loci or graph usage."
+  },
+  "manual_method": {
+    "checks": [
+      "Compared every retained MCP repo argument and target_repo with its scheduled target root.",
+      "Read every retained shell command, CWD, category, and terminal status.",
+      "Separated observer graph-use completeness from manual recorded-command qualification.",
+      "Recorded discovery request lines and instruction-read surfaces without treating a truncated listing as complete contract inspection."
+    ],
+    "terminal_stream_limit": "Native terminal records are complete only relative to the retained host stream; upstream omission detection is unsupported for every row (protocol.md:115-119)."
+  },
+  "runs": [
+    {
+      "run_id": "run-09",
+      "case_id": "continuity_checkpoint_retry_and_clear",
+      "condition": "visibility_diagnostic",
+      "target_repo": "/tmp/anvil-source-tasks-20260914/t09",
+      "source_identity": {
+        "task_source_commit": "53bf29e60cece2335aa39fe301935a07e8e8d4e4",
+        "task_source_archive_sha256": "e919302908ba8dfee2ee8ee055fd4a7463a37e94a71d35d2ecda7abe95463c5e",
+        "expected_interval_sha256": "43e56f20d86de70c4cbfed18f5fc49182474b53894bb1bcb5a1a5f35ae4a467e"
+      },
+      "native_prompt_identity": {
+        "prompt_sha256": "4f48d09631b6b9eca79db24c194b26d46b4a68d1a7317f851e817850e623c2fe",
+        "plaintext_in_ledger": false,
+        "plaintext_exposure_limit": "No task-prompt plaintext is copied into this ledger; only its frozen SHA-256 is retained here.",
+        "encryption_status": "Not observable from the retained native records; this ledger makes no encryption-at-rest or in-transit claim."
+      },
+      "observed_instruction_read_surface": [
+        {
+          "request_line": 23,
+          "surface": "/Users/brummerv/.codex/skills/loci/SKILL.md",
+          "kind": "installed_operating_instruction"
+        },
+        {
+          "request_line": 30,
+          "surface": "AGENTS.md in scheduled task source root",
+          "kind": "project_guidance"
+        },
+        {
+          "request_line": 30,
+          "surface": "/Users/brummerv/.codex/skills/loci/references/graph-navigation.md",
+          "kind": "installed_operating_instruction"
+        }
+      ],
+      "observed_deferred_discovery_requests": [
+        {
+          "request_line": 15,
+          "request": "const matching = ALL_TOOLS.filter(x => /tool search|search.*tool|deferred/i.test(x.name + \" \" + x.description)); text(matching);",
+          "qualification": "Observed deferred-surface filter. Its recorded output is broad/truncated and does not itself establish complete Loci catalog or contract inspection."
+        }
+      ],
+      "shell_commands": [
+        {
+          "item_id": "exec-fd573b93-5ce4-4ca6-b5ed-610c92aa3a6a",
+          "line": 25,
+          "invocation_category": "shell_source_retrieval",
+          "cwd": "file:///Users/brummerv/loci",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "sed -n '1,240p' /Users/brummerv/.codex/skills/loci/SKILL.md && find /tmp/anvil-source-tasks-20260914/t09 -name AGENTS.md -print"
+          ],
+          "status": "completed",
+          "exit_code": 0,
+          "stderr_bytes": 0,
+          "stdout_bytes": 47
+        },
+        {
+          "item_id": "exec-4bb27207-fb0b-450b-90ee-e789e0d87dad",
+          "line": 32,
+          "invocation_category": "shell_source_retrieval",
+          "cwd": "file:///tmp/anvil-source-tasks-20260914/t09",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "sed -n '1,260p' AGENTS.md && sed -n '1,260p' /Users/brummerv/.codex/skills/loci/references/graph-navigation.md"
+          ],
+          "status": "completed",
+          "exit_code": 0,
+          "stderr_bytes": 0,
+          "stdout_bytes": 27227
+        },
+        {
+          "item_id": "exec-0e6cbdd8-07e6-466c-9204-cf3ab1644da8",
+          "line": 71,
+          "invocation_category": "shell_source_retrieval",
+          "cwd": "file:///tmp/anvil-source-tasks-20260914/t09",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "rg -n -C 3 \"checkpoint|active task|different task|clear\" test/continuity-service.test.ts test/mcp-tools.test.ts src/continuity/service.ts"
+          ],
+          "status": "completed",
+          "exit_code": 0,
+          "stderr_bytes": 0,
+          "stdout_bytes": 18649
+        },
+        {
+          "item_id": "exec-c2a6c8e4-3150-470a-bc41-c786e7937eb1",
+          "line": 78,
+          "invocation_category": "shell_source_retrieval",
+          "cwd": "file:///tmp/anvil-source-tasks-20260914/t09",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "sed -n '368,462p' test/continuity-service.test.ts && sed -n '235,278p' test/mcp-tools.test.ts && sed -n '420,432p' src/continuity/service.ts"
+          ],
+          "status": "completed",
+          "exit_code": 0,
+          "stderr_bytes": 0,
+          "stdout_bytes": 6416
+        },
+        {
+          "item_id": "exec-6d65288d-47d5-40d9-aeb8-5a8ede9f9275",
+          "line": 85,
+          "invocation_category": "shell_source_retrieval",
+          "cwd": "file:///tmp/anvil-source-tasks-20260914/t09",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "rg -n -C 4 \"different task content|already used|active-task-1|checkpointId\" test"
+          ],
+          "status": "completed",
+          "exit_code": 0,
+          "stderr_bytes": 0,
+          "stdout_bytes": 5211
+        },
+        {
+          "item_id": "exec-56dfb339-23c3-49d9-a6a9-669c0283b58c",
+          "line": 99,
+          "invocation_category": "shell_source_retrieval",
+          "cwd": "file:///tmp/anvil-source-tasks-20260914/t09",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "rg -n -C 3 \"SessionStart|renderContinuityFrame|readContinuity\\(\" src bin test/codex-hook.test.ts"
+          ],
+          "status": "completed",
+          "exit_code": 0,
+          "stderr_bytes": 0,
+          "stdout_bytes": 22620
+        },
+        {
+          "item_id": "exec-62242d68-ad29-46cd-ad17-5d129b9dd18b",
+          "line": 124,
+          "invocation_category": "shell_source_retrieval",
+          "cwd": "file:///tmp/anvil-source-tasks-20260914/t09",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "nl -ba src/continuity/service.ts | sed -n '303,432p'\nnl -ba src/continuity/store.ts | sed -n '259,265p;355,420p'\nnl -ba src/continuity/workspace.ts | sed -n '30,46p'\nnl -ba src/mcp/tools.ts | sed -n '805,831p'\nnl -ba bin/anvil.ts | sed -n '640,724p'\nnl -ba test/continuity-service.test.ts | sed -n '409,458p'"
+          ],
+          "status": "completed",
+          "exit_code": 0,
+          "stderr_bytes": 0,
+          "stdout_bytes": 18222
+        }
+      ],
+      "mcp_calls": [
+        {
+          "item_id": "exec-c9f1864d-e819-444b-8f7a-771030be5dc2",
+          "line": 39,
+          "tool": "loci_search",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t09",
+          "arguments": {
+            "limit": 20,
+            "query": "checkpoint task active continuity",
+            "repo": "/tmp/anvil-source-tasks-20260914/t09"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-c3ffbd7e-f789-420f-8a6d-0bbd676bd876",
+          "line": 46,
+          "tool": "loci_get",
+          "server": "loci",
+          "invocation_category": "type_context_get",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t09",
+          "arguments": {
+            "context": 12,
+            "include_type_context": true,
+            "repo": "/tmp/anvil-source-tasks-20260914/t09",
+            "selected_from_search_id": "c648eb25-1a42-4560-a756-a1118c321355",
+            "symbol_ids": [
+              "src/continuity/service.ts::checkpointActiveTask#function",
+              "src/mcp/tools.ts::handleContinuityCheckpointTask#function",
+              "src/mcp/tools.ts::checkpointTaskOutput#function",
+              "src/continuity/service.ts::checkpointDetails#function",
+              "src/continuity/service.ts::CheckpointActiveTaskInput#type",
+              "src/continuity/service.ts::CheckpointActiveTaskOutput#type"
+            ]
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": "partial"
+          }
+        },
+        {
+          "item_id": "exec-2c5ba364-49d3-4b05-b444-a18824e2864b",
+          "line": 53,
+          "tool": "loci_search",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t09",
+          "arguments": {
+            "limit": 30,
+            "query": "continuity current json state root",
+            "repo": "/tmp/anvil-source-tasks-20260914/t09"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-02970126-d764-46d9-9786-e2e68fc8b918",
+          "line": 54,
+          "tool": "loci_search",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t09",
+          "arguments": {
+            "limit": 30,
+            "query": "recordEvent currentFrame updateCurrent readCurrent",
+            "repo": "/tmp/anvil-source-tasks-20260914/t09"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-162a318c-5b7c-4d1a-94e0-69ae3fce6b9e",
+          "line": 55,
+          "tool": "loci_search",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t09",
+          "arguments": {
+            "limit": 30,
+            "query": "checkpointId idempotent different task content clear active task",
+            "repo": "/tmp/anvil-source-tasks-20260914/t09"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-e2b13fe8-b036-441f-8e81-8d7eae13e823",
+          "line": 62,
+          "tool": "loci_get",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t09",
+          "arguments": {
+            "context": 8,
+            "repo": "/tmp/anvil-source-tasks-20260914/t09",
+            "selected_from_search_id": "be1b69e9-0e86-4a42-8d6d-c58309551670",
+            "symbol_ids": [
+              "src/continuity/workspace.ts::deriveContinuityPaths#function",
+              "src/continuity/render.ts::renderActiveTask#function",
+              "src/continuity/render.ts::renderContinuityFrame#function"
+            ]
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-f90bf801-8ffa-4c43-b9f2-e14b6dcb79a1",
+          "line": 63,
+          "tool": "loci_get",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t09",
+          "arguments": {
+            "context": 8,
+            "repo": "/tmp/anvil-source-tasks-20260914/t09",
+            "selected_from_search_id": "e0571894-8e71-498e-9930-65f426e77a3a",
+            "symbol_ids": [
+              "src/continuity/store.ts::readCurrent#function",
+              "src/continuity/store.ts::recordEventUnlocked#function",
+              "src/continuity/store.ts::updateCurrentUnlocked#function",
+              "src/continuity/store.ts::updateCurrent#function",
+              "src/continuity/service.ts::currentFrameInput#function"
+            ]
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-cb2ba3b8-2573-402b-837e-aafeb3aad769",
+          "line": 64,
+          "tool": "loci_search",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t09",
+          "arguments": {
+            "file_paths": [
+              "test/continuity-service.test.ts"
+            ],
+            "limit": 30,
+            "query": "idempotently checkpoints the active task",
+            "repo": "/tmp/anvil-source-tasks-20260914/t09"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-001e856f-b254-41f0-87d8-6b2bd158fee0",
+          "line": 92,
+          "tool": "loci_search",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t09",
+          "arguments": {
+            "limit": 30,
+            "query": "active_task SessionStart Continuity current",
+            "repo": "/tmp/anvil-source-tasks-20260914/t09"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-a1ad0cc0-d707-47ca-b30c-de46851dea53",
+          "line": 106,
+          "tool": "loci_search",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t09",
+          "arguments": {
+            "file_paths": [
+              "bin/anvil.ts"
+            ],
+            "limit": 20,
+            "query": "context hook SessionStart binding additional context",
+            "repo": "/tmp/anvil-source-tasks-20260914/t09"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-9aa8a17c-ca4e-45eb-962b-ec6ed3cb4397",
+          "line": 113,
+          "tool": "loci_get",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t09",
+          "arguments": {
+            "context": 4,
+            "repo": "/tmp/anvil-source-tasks-20260914/t09",
+            "selected_from_search_id": "7f0a29aa-1aaf-4f8d-ac76-2a9766b63fac",
+            "symbol_ids": [
+              "bin/anvil.ts::runContextHook#function"
+            ]
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        }
+      ],
+      "mcp_accounting": {
+        "call_count": 11,
+        "terminal_noncompleted_count": 0,
+        "result_is_error_count": 0,
+        "relationship_delivery_application_error_count": 0,
+        "semantic_edge_count_total": 0,
+        "qualification": "Counts are observer-recorded terminal outcomes. They do not establish that a graph result was useful to the model or answer."
+      },
+      "observer_graph_use_integrity": {
+        "complete_for_graph_use_claim": true,
+        "native_lifecycle": "terminal_only",
+        "missing_outer_outputs": [],
+        "upstream_omission_detection": "unsupported",
+        "preservation_note": "This observer value is retained unchanged. Manual command review below does not upgrade it or establish hidden host activity."
+      },
+      "manual_read_only_qualification": {
+        "status": "qualified_for_recorded_command_text_and_mcp_targets",
+        "mcp_repo_argument_mismatches": [],
+        "shell_opaque_or_other_item_ids": [],
+        "finding": "Every recorded MCP repo argument equals the scheduled source root. Recorded shell command text is read/list/search-only and names only the scheduled source root or permitted installed Loci instructions. No recorded command edits files, runs tests, or launches a service.",
+        "limit": "This reviews retained command text, CWD, target arguments, and terminal records only. It does not prove that unrecorded upstream activity did not occur; the run-11 opaque category remains an observer limitation rather than being reclassified by this ledger."
+      }
+    },
+    {
+      "run_id": "run-10",
+      "case_id": "tool_result_capture_binding_type_identity",
+      "condition": "visibility_diagnostic",
+      "target_repo": "/tmp/anvil-source-tasks-20260914/t10",
+      "source_identity": {
+        "task_source_commit": "53bf29e60cece2335aa39fe301935a07e8e8d4e4",
+        "task_source_archive_sha256": "e919302908ba8dfee2ee8ee055fd4a7463a37e94a71d35d2ecda7abe95463c5e",
+        "expected_interval_sha256": "7bfbce1be35995ee45e02b47e80090b16bda15d29cba047189bfd62a18882b59"
+      },
+      "native_prompt_identity": {
+        "prompt_sha256": "9bb39ab8b10717d99d7018ab921e007f827fca512f372d4cd98f4ae3d2fbfb3b",
+        "plaintext_in_ledger": false,
+        "plaintext_exposure_limit": "No task-prompt plaintext is copied into this ledger; only its frozen SHA-256 is retained here.",
+        "encryption_status": "Not observable from the retained native records; this ledger makes no encryption-at-rest or in-transit claim."
+      },
+      "observed_instruction_read_surface": [
+        {
+          "request_line": 23,
+          "surface": "/Users/brummerv/.codex/skills/loci/SKILL.md",
+          "kind": "installed_operating_instruction"
+        }
+      ],
+      "observed_deferred_discovery_requests": [
+        {
+          "request_line": 15,
+          "request": "const matches = ALL_TOOLS.filter(x => /tool search|deferred|loci|source retrieval|codebase/i.test(x.name+\" \"+x.description)); text(matches);",
+          "qualification": "Observed deferred-surface filter; result capture is truncated, so completeness of the inspected catalog/contract is not asserted."
+        },
+        {
+          "request_line": 30,
+          "request": "const names = ALL_TOOLS.filter(x => x.name.startsWith(\"mcp__loci__\")).map(x => x.name); text(names);",
+          "qualification": "Observed Loci-name enumeration. It does not inspect full tool descriptions."
+        }
+      ],
+      "shell_commands": [
+        {
+          "item_id": "exec-80c9229c-467e-4bad-9932-6d01802f7c6c",
+          "line": 25,
+          "invocation_category": "shell_source_retrieval",
+          "cwd": "file:///Users/brummerv/loci",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "sed -n '1,240p' /Users/brummerv/.codex/skills/loci/SKILL.md"
+          ],
+          "status": "completed",
+          "exit_code": 0,
+          "stderr_bytes": 0,
+          "stdout_bytes": 7489
+        }
+      ],
+      "mcp_calls": [
+        {
+          "item_id": "exec-4ce6bef1-7363-42cc-a7ed-7cc07dc0b9d9",
+          "line": 38,
+          "tool": "loci_search",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t10",
+          "arguments": {
+            "limit": 20,
+            "query": "captureCommandResult",
+            "repo": "/tmp/anvil-source-tasks-20260914/t10"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-581ebd94-75fc-4479-a6d6-a21e4f154736",
+          "line": 45,
+          "tool": "loci_get",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t10",
+          "arguments": {
+            "context": 20,
+            "repo": "/tmp/anvil-source-tasks-20260914/t10",
+            "selected_from_search_id": "d52330a2-fe57-4257-a7aa-b2aa181bbcf4",
+            "symbol_ids": [
+              "src/tool-results/service.ts::captureCommandResult#function",
+              "src/tool-results/service.ts::CaptureCommandResultOptions#type"
+            ]
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-d885c490-636e-4ec2-b0d0-43297cd3f2b8",
+          "line": 52,
+          "tool": "loci_search",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t10",
+          "arguments": {
+            "limit": 50,
+            "query": "WorkContextBinding",
+            "repo": "/tmp/anvil-source-tasks-20260914/t10"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-abce28dc-b728-4b8a-af3f-b7eaede467ca",
+          "line": 59,
+          "tool": "loci_get",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t10",
+          "arguments": {
+            "context": 14,
+            "repo": "/tmp/anvil-source-tasks-20260914/t10",
+            "selected_from_search_id": "7bc87668-f258-44bd-83bb-fbf774703acc",
+            "symbol_ids": [
+              "src/work-context/binding.ts::WorkContextBinding#type",
+              "src/work-context/binding.ts::WorkContextBindingView#type",
+              "src/work-context/binding.ts::workContextBindingView#function",
+              "src/tool-results/service.ts::validateBinding#function"
+            ]
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-bb14463a-2753-484f-b2ca-98570e719f70",
+          "line": 66,
+          "tool": "loci_file",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t10",
+          "arguments": {
+            "file_path": "src/tool-results/service.ts",
+            "line_end": 70,
+            "line_start": 1,
+            "repo": "/tmp/anvil-source-tasks-20260914/t10"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-b275233d-8aac-40b9-bafe-f8806fab5112",
+          "line": 67,
+          "tool": "loci_file",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t10",
+          "arguments": {
+            "file_path": "src/work-context/binding.ts",
+            "line_end": 75,
+            "line_start": 1,
+            "repo": "/tmp/anvil-source-tasks-20260914/t10"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-5ea78989-aace-46f3-a3cb-7372816f707d",
+          "line": 68,
+          "tool": "loci_file",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t10",
+          "arguments": {
+            "file_path": "src/work-context/binding.ts",
+            "line_end": 160,
+            "line_start": 124,
+            "repo": "/tmp/anvil-source-tasks-20260914/t10"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-bf1da683-1c38-488b-bad9-5b91bdd74d12",
+          "line": 75,
+          "tool": "loci_file",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t10",
+          "arguments": {
+            "file_path": "src/work-context/index.ts",
+            "line_end": 80,
+            "line_start": 1,
+            "repo": "/tmp/anvil-source-tasks-20260914/t10"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        }
+      ],
+      "mcp_accounting": {
+        "call_count": 8,
+        "terminal_noncompleted_count": 0,
+        "result_is_error_count": 0,
+        "relationship_delivery_application_error_count": 0,
+        "semantic_edge_count_total": 0,
+        "qualification": "Counts are observer-recorded terminal outcomes. They do not establish that a graph result was useful to the model or answer."
+      },
+      "observer_graph_use_integrity": {
+        "complete_for_graph_use_claim": true,
+        "native_lifecycle": "terminal_only",
+        "missing_outer_outputs": [],
+        "upstream_omission_detection": "unsupported",
+        "preservation_note": "This observer value is retained unchanged. Manual command review below does not upgrade it or establish hidden host activity."
+      },
+      "manual_read_only_qualification": {
+        "status": "qualified_for_recorded_command_text_and_mcp_targets",
+        "mcp_repo_argument_mismatches": [],
+        "shell_opaque_or_other_item_ids": [],
+        "finding": "Every recorded MCP repo argument equals the scheduled source root. Recorded shell command text is read/list/search-only and names only the scheduled source root or permitted installed Loci instructions. No recorded command edits files, runs tests, or launches a service.",
+        "limit": "This reviews retained command text, CWD, target arguments, and terminal records only. It does not prove that unrecorded upstream activity did not occur; the run-11 opaque category remains an observer limitation rather than being reclassified by this ledger."
+      }
+    },
+    {
+      "run_id": "run-11",
+      "case_id": "browser_cli_immediate_production_entrypoint",
+      "condition": "visibility_diagnostic",
+      "target_repo": "/tmp/anvil-source-tasks-20260914/t11",
+      "source_identity": {
+        "task_source_commit": "53bf29e60cece2335aa39fe301935a07e8e8d4e4",
+        "task_source_archive_sha256": "e919302908ba8dfee2ee8ee055fd4a7463a37e94a71d35d2ecda7abe95463c5e",
+        "expected_interval_sha256": "03befbb74d9f9bfd2db4a64d83d667005d0a4dd0a3cda0dd88340eb4466ce7c5"
+      },
+      "native_prompt_identity": {
+        "prompt_sha256": "8effd4be3d958efbe6f712a870e997dd1276f6a49b402fe72aaf6f4fa9d393ca",
+        "plaintext_in_ledger": false,
+        "plaintext_exposure_limit": "No task-prompt plaintext is copied into this ledger; only its frozen SHA-256 is retained here.",
+        "encryption_status": "Not observable from the retained native records; this ledger makes no encryption-at-rest or in-transit claim."
+      },
+      "observed_instruction_read_surface": [
+        {
+          "request_line": 22,
+          "surface": "AGENTS.md in scheduled task source root",
+          "kind": "project_guidance"
+        },
+        {
+          "request_line": 22,
+          "surface": "/Users/brummerv/.codex/skills/loci/SKILL.md",
+          "kind": "installed_operating_instruction"
+        }
+      ],
+      "observed_deferred_discovery_requests": [
+        {
+          "request_line": 30,
+          "request": "const matches = ALL_TOOLS.filter(x => /loci|tool.search|deferred|searchable/i.test(x.name+\" \"+x.description)); text(JSON.stringify(matches));",
+          "qualification": "Observed deferred-surface filter; output alone is not treated as complete catalog inspection."
+        },
+        {
+          "request_line": 36,
+          "request": "const items = ALL_TOOLS.filter(x => /loci|tool.?search|deferred/i.test(x.name+\" \"+x.description)).map(x=>({name:x.name,description:x.description.slice(0,180)})); text(JSON.stringify(items));",
+          "qualification": "Observed Loci tool list with descriptions truncated to 180 characters."
+        },
+        {
+          "request_line": 101,
+          "request": "const x=ALL_TOOLS.find(x=>x.name===\"mcp__loci__loci_file\"); text(x?.description||\"missing\");",
+          "qualification": "Observed full description request for loci_file only."
+        }
+      ],
+      "shell_commands": [
+        {
+          "item_id": "exec-8da7fdbc-4867-441b-864d-ce2eeaa2affa",
+          "line": 17,
+          "invocation_category": "shell_opaque_or_other",
+          "cwd": "file:///tmp/anvil-source-tasks-20260914/t11",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "pwd && rg --files -g 'AGENTS.md' -g 'SKILL.md' -g 'package.json' -g 'pyproject.toml' -g 'Cargo.toml' -g 'go.mod' -g 'README*' -g '!node_modules' /tmp/anvil-source-tasks-20260914/t11 | sed -n '1,180p'"
+          ],
+          "status": "completed",
+          "exit_code": 0,
+          "stderr_bytes": 0,
+          "stdout_bytes": 1452
+        },
+        {
+          "item_id": "exec-9028c845-8e23-4568-85f7-c4950383cbd4",
+          "line": 24,
+          "invocation_category": "shell_source_retrieval",
+          "cwd": "file:///tmp/anvil-source-tasks-20260914/t11",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "sed -n '1,240p' AGENTS.md"
+          ],
+          "status": "completed",
+          "exit_code": 0,
+          "stderr_bytes": 0,
+          "stdout_bytes": 13955
+        },
+        {
+          "item_id": "exec-eaa1232b-7dd4-4cef-b665-00b0a4e2f713",
+          "line": 25,
+          "invocation_category": "shell_source_retrieval",
+          "cwd": "file:///tmp/anvil-source-tasks-20260914/t11",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "sed -n '1,260p' /Users/brummerv/.codex/skills/loci/SKILL.md"
+          ],
+          "status": "completed",
+          "exit_code": 0,
+          "stderr_bytes": 0,
+          "stdout_bytes": 7489
+        },
+        {
+          "item_id": "exec-b39ba114-3b9a-4f10-8637-5d79cfc1576e",
+          "line": 81,
+          "invocation_category": "shell_source_retrieval",
+          "cwd": "file:///tmp/anvil-source-tasks-20260914/t11",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "rg --files src bin | sed -n '1,240p'"
+          ],
+          "status": "completed",
+          "exit_code": 0,
+          "stderr_bytes": 0,
+          "stdout_bytes": 1870
+        },
+        {
+          "item_id": "exec-216b6562-ef07-4164-afde-8cd6e84f367f",
+          "line": 125,
+          "invocation_category": "shell_source_retrieval",
+          "cwd": "file:///tmp/anvil-source-tasks-20260914/t11",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "nl -ba package.json | sed -n '1,80p'"
+          ],
+          "status": "completed",
+          "exit_code": 0,
+          "stderr_bytes": 0,
+          "stdout_bytes": 969
+        }
+      ],
+      "mcp_calls": [
+        {
+          "item_id": "exec-f7ae669d-edcc-4e52-b4ca-6a50f1bb2261",
+          "line": 44,
+          "tool": "loci_search",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t11",
+          "arguments": {
+            "limit": 80,
+            "query": "browser",
+            "repo": "/tmp/anvil-source-tasks-20260914/t11"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-3202ad3a-8c98-45f0-a058-e858f6e8d73c",
+          "line": 51,
+          "tool": "loci_search",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t11",
+          "arguments": {
+            "limit": 20,
+            "query": "runBrowserCli",
+            "repo": "/tmp/anvil-source-tasks-20260914/t11"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-df593431-baf7-4d3b-ba3c-21f896cb6cfc",
+          "line": 58,
+          "tool": "loci_get",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t11",
+          "arguments": {
+            "context": 2,
+            "repo": "/tmp/anvil-source-tasks-20260914/t11",
+            "selected_from_search_id": "ae01d9ce-9561-4b48-9d47-4e9263439da1",
+            "symbol_ids": [
+              "src/browser/cli.ts::runBrowserCli#function"
+            ]
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-5763593e-e311-4134-b506-c8dccf80a7a0",
+          "line": 65,
+          "tool": "loci_get",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t11",
+          "arguments": {
+            "context": 3,
+            "repo": "/tmp/anvil-source-tasks-20260914/t11",
+            "symbol_ids": [
+              "src/browser/cli.ts::BrowserCliDependencies#type"
+            ]
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-fc224129-4ae3-4b83-87cc-8aea63634426",
+          "line": 72,
+          "tool": "loci_search",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t11",
+          "arguments": {
+            "file_paths": [
+              "src/cli.ts",
+              "bin/anvil.ts",
+              "src/index.ts"
+            ],
+            "limit": 80,
+            "query": "browser",
+            "repo": "/tmp/anvil-source-tasks-20260914/t11"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-b3a8885c-3867-4daf-bb5e-cf0e021329ba",
+          "line": 73,
+          "tool": "loci_search",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t11",
+          "arguments": {
+            "file_paths": [
+              "src/cli.ts",
+              "bin/anvil.ts",
+              "src/index.ts"
+            ],
+            "limit": 20,
+            "query": "runBrowserCli",
+            "repo": "/tmp/anvil-source-tasks-20260914/t11"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-5558c65d-3cbe-4550-9ead-99048f99731b",
+          "line": 74,
+          "tool": "loci_outline",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t11",
+          "arguments": {
+            "file": "src/cli.ts",
+            "repo": "/tmp/anvil-source-tasks-20260914/t11"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-1480873f-ee5a-4d5a-a58b-b3547642f217",
+          "line": 88,
+          "tool": "loci_outline",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t11",
+          "arguments": {
+            "file": "bin/anvil.ts",
+            "repo": "/tmp/anvil-source-tasks-20260914/t11"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-d0cc3fa7-f484-4cb0-9a7f-4745f4d96355",
+          "line": 89,
+          "tool": "loci_grep",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t11",
+          "arguments": {
+            "context": 4,
+            "path": "bin/anvil.ts",
+            "pattern": "runBrowserCli",
+            "repo": "/tmp/anvil-source-tasks-20260914/t11"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-f0cc9dda-2545-4cbd-b9e0-6489cb88da0c",
+          "line": 96,
+          "tool": "loci_get",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t11",
+          "arguments": {
+            "context": 4,
+            "repo": "/tmp/anvil-source-tasks-20260914/t11",
+            "symbol_ids": [
+              "bin/anvil.ts::main#function"
+            ]
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-26a7a16b-6fb1-4093-b323-b4022d5501bb",
+          "line": 109,
+          "tool": "loci_file",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t11",
+          "arguments": {
+            "end_line": 70,
+            "file_path": "bin/anvil.ts",
+            "repo": "/tmp/anvil-source-tasks-20260914/t11",
+            "start_line": 1
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-8404909f-a47c-413c-826a-0bb9f6a9a99c",
+          "line": 110,
+          "tool": "loci_file",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t11",
+          "arguments": {
+            "end_line": 1495,
+            "file_path": "bin/anvil.ts",
+            "repo": "/tmp/anvil-source-tasks-20260914/t11",
+            "start_line": 1455
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-8b1cd61a-1a58-4b96-8094-092597bc366e",
+          "line": 111,
+          "tool": "loci_file",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t11",
+          "arguments": {
+            "end_line": 64,
+            "file_path": "src/browser/index.ts",
+            "repo": "/tmp/anvil-source-tasks-20260914/t11",
+            "start_line": 45
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-042c25fa-70f3-4905-a7e4-2df034a7411b",
+          "line": 118,
+          "tool": "loci_file",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t11",
+          "arguments": {
+            "end_line": 110,
+            "file_path": "src/browser/cli.ts",
+            "repo": "/tmp/anvil-source-tasks-20260914/t11",
+            "start_line": 1
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        },
+        {
+          "item_id": "exec-c335b9e3-9c8f-4ef5-bb3a-ab4742a78740",
+          "line": 136,
+          "tool": "loci_grep",
+          "server": "loci",
+          "invocation_category": "exact_retrieval",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t11",
+          "arguments": {
+            "context": 1,
+            "path": "src/browser/cli.ts",
+            "pattern": "dependencies.",
+            "repo": "/tmp/anvil-source-tasks-20260914/t11"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "unknown",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": null,
+            "type_context_status": null
+          }
+        }
+      ],
+      "mcp_accounting": {
+        "call_count": 15,
+        "terminal_noncompleted_count": 0,
+        "result_is_error_count": 0,
+        "relationship_delivery_application_error_count": 0,
+        "semantic_edge_count_total": 0,
+        "qualification": "Counts are observer-recorded terminal outcomes. They do not establish that a graph result was useful to the model or answer."
+      },
+      "observer_graph_use_integrity": {
+        "complete_for_graph_use_claim": false,
+        "native_lifecycle": "terminal_only",
+        "missing_outer_outputs": [],
+        "upstream_omission_detection": "unsupported",
+        "preservation_note": "This observer value is retained unchanged. Manual command review below does not upgrade it or establish hidden host activity."
+      },
+      "manual_read_only_qualification": {
+        "status": "qualified_for_recorded_command_text_and_mcp_targets",
+        "mcp_repo_argument_mismatches": [],
+        "shell_opaque_or_other_item_ids": [
+          "exec-8da7fdbc-4867-441b-864d-ce2eeaa2affa"
+        ],
+        "finding": "Every recorded MCP repo argument equals the scheduled source root. Recorded shell command text is read/list/search-only and names only the scheduled source root or permitted installed Loci instructions. No recorded command edits files, runs tests, or launches a service.",
+        "limit": "This reviews retained command text, CWD, target arguments, and terminal records only. It does not prove that unrecorded upstream activity did not occur; the run-11 opaque category remains an observer limitation rather than being reclassified by this ledger."
+      }
+    },
+    {
+      "run_id": "run-12",
+      "case_id": "continuity_render_active_task",
+      "condition": "visibility_diagnostic",
+      "target_repo": "/tmp/anvil-source-tasks-20260914/t12",
+      "source_identity": {
+        "task_source_commit": "53bf29e60cece2335aa39fe301935a07e8e8d4e4",
+        "task_source_archive_sha256": "e919302908ba8dfee2ee8ee055fd4a7463a37e94a71d35d2ecda7abe95463c5e",
+        "expected_interval_sha256": "8bb9c806d16115378c5f18298aaa9792159b0301e4a7fe9355c9eb5121732add"
+      },
+      "native_prompt_identity": {
+        "prompt_sha256": "771515b5cf41caa36c8ae96fb36fef6969d327bfdf7f4e05c990b26ef5c96d7b",
+        "plaintext_in_ledger": false,
+        "plaintext_exposure_limit": "No task-prompt plaintext is copied into this ledger; only its frozen SHA-256 is retained here.",
+        "encryption_status": "Not observable from the retained native records; this ledger makes no encryption-at-rest or in-transit claim."
+      },
+      "observed_instruction_read_surface": [
+        {
+          "request_line": 27,
+          "surface": "/Users/brummerv/.codex/skills/loci/SKILL.md",
+          "kind": "installed_operating_instruction"
+        },
+        {
+          "request_line": 35,
+          "surface": "AGENTS.md in scheduled task source root",
+          "kind": "project_guidance"
+        }
+      ],
+      "observed_deferred_discovery_requests": [
+        {
+          "request_line": 15,
+          "request": "const relevant = ALL_TOOLS.filter(x => /loci|search|retrieve|source|repository/i.test(x.name + \" \" + x.description)); text(JSON.stringify(relevant));",
+          "qualification": "Observed deferred-surface filter; output is truncated."
+        },
+        {
+          "request_line": 21,
+          "request": "text(JSON.stringify(ALL_TOOLS.filter(x => /loci/i.test(x.name)).map(x => ({name:x.name, description:x.description.slice(0,400)}))));",
+          "qualification": "Observed Loci-name enumeration with descriptions truncated to 400 characters."
+        }
+      ],
+      "shell_commands": [
+        {
+          "item_id": "exec-b655aefa-9934-4a82-947a-c8a6136c093f",
+          "line": 29,
+          "invocation_category": "shell_source_retrieval",
+          "cwd": "file:///Users/brummerv/loci",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "sed -n '1,240p' /Users/brummerv/.codex/skills/loci/SKILL.md"
+          ],
+          "status": "completed",
+          "exit_code": 0,
+          "stderr_bytes": 0,
+          "stdout_bytes": 7489
+        },
+        {
+          "item_id": "exec-d82ec3d7-d070-481f-b944-bd76f6f8485b",
+          "line": 30,
+          "invocation_category": "shell_source_retrieval",
+          "cwd": "file:///Users/brummerv/loci",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "rg --files -g AGENTS.md -g '!node_modules' /tmp/anvil-source-tasks-20260914/t12"
+          ],
+          "status": "completed",
+          "exit_code": 0,
+          "stderr_bytes": 0,
+          "stdout_bytes": 47
+        },
+        {
+          "item_id": "exec-770fd5f2-a7af-4022-82b5-a606b612aa11",
+          "line": 37,
+          "invocation_category": "shell_source_retrieval",
+          "cwd": "file:///tmp/anvil-source-tasks-20260914/t12",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "sed -n '1,240p' AGENTS.md"
+          ],
+          "status": "completed",
+          "exit_code": 0,
+          "stderr_bytes": 0,
+          "stdout_bytes": 13955
+        }
+      ],
+      "mcp_calls": [
+        {
+          "item_id": "exec-c0d6ee06-f175-4b8a-a296-0ed5ed22c92a",
+          "line": 38,
+          "tool": "loci_explore",
+          "server": "loci",
+          "invocation_category": "explore_locate",
+          "target_repo": "/tmp/anvil-source-tasks-20260914/t12",
+          "arguments": {
+            "intent": "locate",
+            "query": "Find the renderActiveTask function and return its exact source location.",
+            "repo": "/tmp/anvil-source-tasks-20260914/t12"
+          },
+          "terminal_status": "completed",
+          "result_is_error": false,
+          "relationship_delivery": {
+            "application_error": false,
+            "result_status": "partial",
+            "relationship_shape_status": "complete",
+            "semantic_edge_count": 0,
+            "edge_count": 0,
+            "containment_edge_count": 0,
+            "edge_families": {},
+            "omissions": [
+              {
+                "count": 17,
+                "reason": "anchor_limit"
+              },
+              {
+                "count": 1,
+                "reason": "source_clipped"
+              }
+            ],
+            "type_context_status": null
+          }
+        }
+      ],
+      "mcp_accounting": {
+        "call_count": 1,
+        "terminal_noncompleted_count": 0,
+        "result_is_error_count": 0,
+        "relationship_delivery_application_error_count": 0,
+        "semantic_edge_count_total": 0,
+        "qualification": "Counts are observer-recorded terminal outcomes. They do not establish that a graph result was useful to the model or answer."
+      },
+      "observer_graph_use_integrity": {
+        "complete_for_graph_use_claim": true,
+        "native_lifecycle": "terminal_only",
+        "missing_outer_outputs": [],
+        "upstream_omission_detection": "unsupported",
+        "preservation_note": "This observer value is retained unchanged. Manual command review below does not upgrade it or establish hidden host activity."
+      },
+      "manual_read_only_qualification": {
+        "status": "qualified_for_recorded_command_text_and_mcp_targets",
+        "mcp_repo_argument_mismatches": [],
+        "shell_opaque_or_other_item_ids": [],
+        "finding": "Every recorded MCP repo argument equals the scheduled source root. Recorded shell command text is read/list/search-only and names only the scheduled source root or permitted installed Loci instructions. No recorded command edits files, runs tests, or launches a service.",
+        "limit": "This reviews retained command text, CWD, target arguments, and terminal records only. It does not prove that unrecorded upstream activity did not occur; the run-11 opaque category remains an observer limitation rather than being reclassified by this ledger."
+      },
+      "explore_interpretation": {
+        "tool": "loci_explore",
+        "intent": "locate",
+        "semantic_edge_count": 0,
+        "qualification": "The observed locate result supplied anchors with zero semantic edges. It is source-location retrieval, not relationship delivery."
+      }
+    }
+  ],
+  "aggregate": {
+    "run_count": 4,
+    "mcp_call_count": 35,
+    "mcp_terminal_noncompleted_count": 0,
+    "mcp_result_is_error_count": 0,
+    "mcp_relationship_delivery_application_error_count": 0,
+    "semantic_edge_count_total": 0,
+    "observer_complete_for_graph_use_claim_values": {
+      "run-09": true,
+      "run-10": true,
+      "run-11": false,
+      "run-12": true
+    },
+    "qualification": "Zero semantic edges across these diagnostics means no observed semantic relationship delivery. It is not evidence that Loci was unavailable, that source retrieval failed, or that an answer was incorrect."
+  }
+}

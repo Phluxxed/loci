@@ -1,0 +1,7 @@
+`captureCommandResult` accepts `WorkContextBinding`, not `WorkContextBindingView`.
+
+- [`src/tool-results/service.ts:53`](/tmp/anvil-source-tasks-20260914/t02/src/tool-results/service.ts:53) defines `binding: WorkContextBinding`; the function validates it before capture at [`:411-413`](/tmp/anvil-source-tasks-20260914/t02/src/tool-results/service.ts:411).
+- The type imports from the public barrel at [`src/tool-results/service.ts:23`](/tmp/anvil-source-tasks-20260914/t02/src/tool-results/service.ts:23), which re-exports it from [`src/work-context/index.ts:23-30`](/tmp/anvil-source-tasks-20260914/t02/src/work-context/index.ts:23).
+- Its defining module is [`src/work-context/binding.ts:28-45`](/tmp/anvil-source-tasks-20260914/t02/src/work-context/binding.ts:28): it includes `session_id` and `provenance.observed_cwd`.
+
+`WorkContextBindingView` is not accepted. It is a public/redacted schema-derived type at [`binding.ts:47-67`](/tmp/anvil-source-tasks-20260914/t02/src/work-context/binding.ts:47), and `workContextBindingView` removes `session_id` and `observed_cwd` at [`:130-139`](/tmp/anvil-source-tasks-20260914/t02/src/work-context/binding.ts:130). That makes it incompatible at compile time; if forced through, runtime validation rejects it because `assertActiveWorkContextBinding` calls a guard requiring both fields ([`:141-159`](/tmp/anvil-source-tasks-20260914/t02/src/work-context/binding.ts:141), [`:217-239`](/tmp/anvil-source-tasks-20260914/t02/src/work-context/binding.ts:217)). No material uncertainty.
