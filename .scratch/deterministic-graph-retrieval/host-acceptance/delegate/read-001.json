@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-09-14T10:34:31.555Z",
+  "tool": "mcp__loci__loci_read",
+  "request": {
+    "repo": "/Users/brummerv/loci",
+    "source_ref": "eyJlbmQiOjI3MjY5LCJmaWxlIjoidGVzdHMvdGVzdF9tY3Bfc2VydmVyLnB5IiwiaGFzaCI6ImI5NmM0ZGJmNWEzMjc3NDZlYjQwOGI3YzI4MDI2ZjJiM2Y4NmY3YmM3ZmExNzlkZGFhMWVjZDM0MDFmNWMwZGEiLCJvZmZzZXQiOjI1NTQ2LCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L2xvY2kiLCJzdGFydCI6MjU1NDYsInYiOjF9"
+  },
+  "raw_result": {
+    "content": [],
+    "structuredContent": {
+      "schema_version": 1,
+      "status": "ok",
+      "source": {
+        "id": 1,
+        "file": "tests/test_mcp_server.py",
+        "start_byte": 25546,
+        "end_byte": 27269,
+        "start_line": 756,
+        "end_line": 808,
+        "content_hash": "b96c4dbf5a327746eb408b7c28026f2b3f86f7bc7fa179ddaa1ecd3401f5c0da",
+        "content": "@pytest.mark.parametrize(\"entrypoint\", [\"outline\", \"file\", \"grep\", \"graph_health\"])\ndef test_mcp_retrieval_entrypoints_cold_start_on_empty_stores(\n    tmp_path: Path,\n    entrypoint: str,\n):\n    repo = tmp_path / \"repo\"\n    repo.mkdir()\n    (repo / \"fixture.py\").write_text(\n        \"def cold_entrypoint_fixture():\\n    return 1\\n\",\n        encoding=\"utf-8\",\n    )\n    cache_dir = tmp_path / \".codeindex\"\n\n    call_arguments: dict[str, Any]\n    if entrypoint == \"outline\":\n        tool = \"loci_outline\"\n        call_arguments = {\"repo\": str(repo)}\n    elif entrypoint == \"file\":\n        tool = \"loci_file\"\n        call_arguments = {\n            \"repo\": str(repo),\n            \"file_path\": \"fixture.py\",\n            \"start_line\": 1,\n            \"end_line\": 2,\n        }\n    elif entrypoint == \"grep\":\n        tool = \"loci_grep\"\n        call_arguments = {\"repo\": str(repo), \"pattern\": \"cold_entrypoint_fixture\"}\n    else:\n        tool = \"loci_graph_health\"\n        call_arguments = {\"repo\": str(repo)}\n\n    result = asyncio.run(\n        _cold_mcp_call(repo, cache_dir, tool, call_arguments)\n    )\n\n    assert result[\"is_error\"] is False\n    output = result[\"result\"]\n    if entrypoint == \"outline\":\n        assert output[\"files\"][0][\"file\"] == \"fixture.py\"\n    elif entrypoint == \"file\":\n        assert output[\"file\"] == \"fixture.py\"\n        assert \"cold_entrypoint_fixture\" in output[\"content\"]\n    elif entrypoint == \"grep\":\n        assert output[\"matches\"][0][\"file\"] == \"fixture.py\"\n    else:\n        assert output[\"status\"] == \"healthy\"\n\n    persisted = IndexStore(cache_dir).load(repo)\n    assert persisted is not None\n    assert any(\n        symbol[\"file_path\"] == \"fixture.py\" for symbol in persisted[\"symbols\"]\n    )",
+        "source_ref": "eyJlbmQiOjI3MjY5LCJmaWxlIjoidGVzdHMvdGVzdF9tY3Bfc2VydmVyLnB5IiwiaGFzaCI6ImI5NmM0ZGJmNWEzMjc3NDZlYjQwOGI3YzI4MDI2ZjJiM2Y4NmY3YmM3ZmExNzlkZGFhMWVjZDM0MDFmNWMwZGEiLCJvZmZzZXQiOjI1NTQ2LCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L2xvY2kiLCJzdGFydCI6MjU1NDYsInYiOjF9"
+      },
+      "complete": true,
+      "next_source_ref": null,
+      "usage": {
+        "evidence_bytes": 1723,
+        "output_bytes": 2567,
+        "output_encoding": "mcp_result_json_utf8"
+      }
+    },
+    "isError": false
+  }
+}

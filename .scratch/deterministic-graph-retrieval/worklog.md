@@ -229,3 +229,103 @@ the explicit fresh-session blocker; all its implementation prerequisites are
 complete. The five remaining leaves are real capture/readout reconciliation,
 final review, actual-host acceptance, reserved post observations and verdict.
 W1.8.2 terminology now follows the frozen retrieve/read normal interface.
+
+## Restarted-host acceptance — 14 September 2026
+
+Vik restarted Codex. The first resumed discovery exposes exactly loci_retrieve
+and loci_read. The primary's actual normal request for retrieve_context returned
+two source-backed relationships, reported 84 traversals and explicit partial
+coverage/omissions. A following actual read returned the full selected function.
+These raw host results are being retained and reconciled at W1.6.3; they are
+functional host acceptance, not reserved ordinary-task outcomes.
+
+Independent assignments (fresh tree inspected: three worker slots free):
+
+- host_normal_acceptance: Terra/high/fork none. Owned scope: actual fresh
+  delegate discovery and one normal retrieve/read functional case, with raw
+  receipts only under host-acceptance/delegate/. Contribution W1.8.2: verify
+  delegate delivery independently of the primary. Acceptance: exactly normal
+  tools, valid exact source and at least one supported relationship if present,
+  full raw results emitted to the model and saved with honest provenance. No
+  alternate client, product edits, audit post rows or invented graph success.
+- normal_delivery_review: Sol/high/fork none. Owned scope: one read-only review
+  of the final normal contract, selection/proof/packing, default MCP and adapter
+  validation against implemented source and the primary host packet. Contribution
+  W1.8.1: identify any required correctness/contract gap. Acceptance: findings
+  have a concrete reproducer or source evidence; negative/inconclusive results
+  and supported-subset limits are valid. Return a bounded review artifact; no
+  broad new experiments, code edits or frozen artifact changes.
+- post_protocol_preflight: Terra/high/fork none. Owned scope: read-only inspection
+  of the retained ordinary-adoption protocol, post template and existing capture
+  route. Contribution W1.8.3 preparation: identify exact reserved rows, prompts,
+  roles, models, control/freeze fields and launch/readout procedure needed to run
+  only the authorized ten rows. Acceptance: concrete execution recipe and any
+  unresolved pre-run field; no launches, edits to frozen evidence or new criteria.
+
+All workers complete directly without spawning agents. Primary owns raw
+capture/readout reconciliation, runtime freeze, actual post launch decisions,
+Manifest, Brain, commits and final judgment.
+
+The independent reviewer returned one required accounting defect: the new
+normal adapter accepts false declared evidence/output bytes as complete and can
+mark their full_exact delivery validated. The actual primary packets have exact
+declared/observed byte equality (16224 retrieve, 8962 read; 7979 read source).
+Reuse normal_delivery_review, Sol/high with retained contract/adapter context,
+for the bounded correction in benchmarks/ordinary_adoption_normal.py and its
+tests only. Acceptance: recompute full native response bytes and unique selected
+source bytes according to the frozen normal contract; missing/mismatched values
+remain unknown/mismatch and cannot certify host proof. Correct real packets
+must remain valid, including overlapping source spans. Preserve frozen observer,
+review and baseline artifacts. Root owns final diff judgment and native capture.
+
+Delegate functional acceptance has both normal tools and valid exact read
+source, but zero delivered relationships. Its worker repeated the same pair
+once to retain raw packets; all four native calls must remain visible in the
+acceptance provenance. This is not a reserved trial or a positive graph-delivery
+claim. The original brief requested one pair; the additional pair is retained
+as a scope deviation, not removed from accounting.
+
+Primary native readout found a second concrete compatibility gap: the current
+anvil_manifest_inquire terminal result at native line 4472 validly omits the
+optional isError field; the frozen observer rejects that envelope before it can
+account for the normal calls. Do not rewrite the frozen observer or fabricate a
+completed primary interval. Reuse post_protocol_preflight (Terra/high, retained
+native protocol/source context) for a separate versioned native adapter module
+and focused tests. Scope: compose frozen parsing/interval/correlation helpers,
+accept only absent optional isError as false for validation, retain the original
+captured result shape for byte accounting and model-output correlation. Explicit
+invalid flag values still reject. No shared monkeypatch or modified raw rollout.
+Acceptance: actual omitted-flag shape parses with exact raw result bytes and
+full_exact correlation; legacy valid captures remain equivalent; corruption and
+missing boundaries retain their existing limits. Root alone integrates the new
+entry point into the normal adapter after both exclusive worker scopes return.
+
+Both accounting corrections are adopted after primary diff/source review.
+The integrated normal-v2/native-v2/frozen observer/review checks pass 58/58.
+Primary native reconciliation now proves both selected normal calls full_exact,
+with current source hashes/spans and exact byte equality. The ongoing primary
+turn remains boundary missing; it is not a per-case completed cost sample.
+
+The first delegate's actual four-call trace is retained in delegate-native-check:
+the repeated retrieval payloads are ambiguous_exact under the fixed correlator;
+only its first preview read is full_exact and its second read is unknown. Thus
+the missing required W1.8.2 evidence is uniquely attributable normal delivery in
+a fresh delegate. This is an acceptance-instrumentation failure, not a scored
+ordinary row. New bounded assignment host_normal_once (Terra/high/fork none),
+after inspecting idle capacity, changes the intervention: exactly one fixed
+retrieve_context request, immediately store and emit its entire result, then
+exactly one returned-item read with the same recording procedure. No reissue for
+persistence. Owned scope is host-acceptance/delegate-once only. Acceptance:
+actual native retrieve/read results each correlate full_exact; retain any failure
+without a trial loop. Primary does native reconciliation; no model task trials
+or source changes are included.
+
+host_normal_once returned its two raw records and catalog. Primary independently
+reconciled the original native first turn: exactly one retrieve and one read,
+both full_exact and byte-accounting validated, with two delivered relationships
+and all source hashes/spans matching. Disposition: adopted. The first delegate's
+four-call attribution failure stays retained. The source preparation recipe is
+adopted with two corrections: these functional packets cannot stand in for
+reserved rows23/24, and post freeze names normal-v2/native-v2 after the reviewed
+accounting repairs. Ten separate Anvil source copies now match all 638 frozen
+hashes; no reserved row has run. The host activation report links final evidence.

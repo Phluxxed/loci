@@ -1,22 +1,24 @@
 """Versioned normal-surface readout for ordinary-adoption native captures.
 
-This adapter deliberately layers on :mod:`ordinary_adoption_observed`.  The
-frozen observer remains the authority for native terminal operations and exact
-outer-output correlation; this module only interprets the two public normal
+This adapter layers on the versioned native-envelope compatibility reader.
+Frozen helpers retain interval and exact outer-output correlation semantics;
+this module interprets the two public normal
 operations introduced by ``normal-graph-v1``.  In particular, it does not use
 the older observer's source aggregates for normal calls: source content and
 proof linkage are recomputed from each retained normal result.
 """
 from __future__ import annotations
 
+import json
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from benchmarks.ordinary_adoption_observed import ObservationError, observe_rollout
+from benchmarks.ordinary_adoption_native_v2 import NATIVE_ADAPTER_VERSION, observe_rollout
+from benchmarks.ordinary_adoption_observed import ObservationError
 
 
-NORMAL_ADAPTER_VERSION = "ordinary-adoption-normal-v1"
+NORMAL_ADAPTER_VERSION = "ordinary-adoption-normal-v2"
 _NORMAL_TOOLS = {
     "loci_retrieve": "normal_context_retrieval",
     "loci_read": "exact_source_hydration",
@@ -92,11 +94,35 @@ def _source_record(value: Any) -> tuple[dict[str, Any] | None, str]:
     return {
         "id": source_id,
         "file": file_name,
+        "start_byte": start_byte,
+        "end_byte": end_byte,
         "start_line": start_line,
         "end_line": end_line,
         "content_hash": content_hash,
         "content_bytes": len(content.encode("utf-8")),
     }, "complete"
+
+
+def _unique_extent_bytes(sources: Sequence[Mapping[str, Any]]) -> int:
+    intervals: dict[tuple[str, str], list[tuple[int, int]]] = {}
+    for source in sources:
+        intervals.setdefault(
+            (str(source["file"]), str(source["content_hash"])), []
+        ).append((int(source["start_byte"]), int(source["end_byte"])))
+    total = 0
+    for ranges in intervals.values():
+        start = end = -1
+        for current_start, current_end in sorted(ranges):
+            if start < 0:
+                start, end = current_start, current_end
+            elif current_start <= end:
+                end = max(end, current_end)
+            else:
+                total += end - start
+                start, end = current_start, current_end
+        if start >= 0:
+            total += end - start
+    return total
 
 
 def _sources(value: Any, *, singular: bool) -> dict[str, Any]:
@@ -122,7 +148,7 @@ def _sources(value: Any, *, singular: bool) -> dict[str, Any]:
     return {
         "status": "complete",
         "source_record_count": len(normalized),
-        "source_content_bytes": sum(source["content_bytes"] for source in normalized.values()),
+        "source_content_bytes": _unique_extent_bytes(list(normalized.values())),
         "by_id": normalized,
     }
 
@@ -243,16 +269,81 @@ def _usage(value: Any, key: str) -> tuple[int | None, str]:
     return (count, "complete") if count is not None else (None, "unknown_schema")
 
 
-def _error_readout(category: str) -> dict[str, Any]:
+def _compact_result_bytes(value: Any) -> int | None:
+    if not isinstance(value, Mapping):
+        return None
+    try:
+        return len(
+            json.dumps(
+                value,
+                ensure_ascii=False,
+                allow_nan=False,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        )
+    except (TypeError, ValueError, UnicodeError):
+        return None
+
+
+def _byte_status(reported: int | None, actual: int | None) -> str:
+    if reported is None or actual is None:
+        return "unknown"
+    return "complete" if reported == actual else "mismatch"
+
+
+def _byte_accounting(
+    result: Any,
+    structured: Any,
+    source: Mapping[str, Any],
+) -> dict[str, Any]:
+    usage = structured.get("usage") if isinstance(structured, Mapping) else None
+    reported_evidence = (
+        _nonnegative_int(usage.get("evidence_bytes"))
+        if isinstance(usage, Mapping)
+        else None
+    )
+    reported_output = (
+        _nonnegative_int(usage.get("output_bytes"))
+        if isinstance(usage, Mapping)
+        else None
+    )
+    actual_evidence = (
+        _nonnegative_int(source.get("source_content_bytes"))
+        if source.get("status") in {"complete", "known_source_free_error"}
+        else None
+    )
+    actual_output = _compact_result_bytes(result)
+    evidence_status = _byte_status(reported_evidence, actual_evidence)
+    output_status = _byte_status(reported_output, actual_output)
+    status = (
+        "mismatch"
+        if "mismatch" in {evidence_status, output_status}
+        else "complete"
+        if evidence_status == output_status == "complete"
+        else "unknown"
+    )
+    return {
+        "reported_evidence_bytes": reported_evidence,
+        "actual_evidence_bytes": actual_evidence,
+        "evidence_bytes_status": evidence_status,
+        "reported_output_bytes": reported_output,
+        "actual_output_bytes": actual_output,
+        "output_bytes_status": output_status,
+        "status": status,
+    }
+
+
+def _error_readout(category: str, result: Any) -> dict[str, Any]:
+    source = {
+        "status": "known_source_free_error",
+        "source_record_count": 0,
+        "source_content_bytes": 0,
+    }
     return {
         "category": category,
         "public_invocation_count": 1,
         "application_error": True,
-        "source": {
-            "status": "known_source_free_error",
-            "source_record_count": 0,
-            "source_content_bytes": 0,
-        },
+        "source": source,
         "relationships": {
             "status": "known_source_free_error",
             "semantic_relationship_count": 0,
@@ -263,6 +354,7 @@ def _error_readout(category: str) -> dict[str, Any]:
             "delivered_relationship_count_status": "known_source_free_error",
         },
         "ownership": {"status": "known_source_free_error", "ownership_association_count": 0},
+        "byte_accounting": _byte_accounting(result, None, source),
         "actual_host_proof_status": "not_model_delivered",
     }
 
@@ -275,9 +367,9 @@ def _retrieve_readout(call: Mapping[str, Any]) -> dict[str, Any]:
         and (result.get("isError") is True or (isinstance(structured, Mapping) and "error" in structured))
     )
     if error:
-        return _error_readout("normal_context_retrieval")
+        return _error_readout("normal_context_retrieval", result)
     if not isinstance(structured, Mapping):
-        return _unknown_readout("normal_context_retrieval")
+        return _unknown_readout("normal_context_retrieval", result)
     source = _sources(structured.get("sources"), singular=False)
     relationships = _relationships(
         structured.get("relationships"), source["by_id"], _node_ids(structured.get("nodes"))
@@ -304,6 +396,7 @@ def _retrieve_readout(call: Mapping[str, Any]) -> dict[str, Any]:
             "delivered_relationship_count_status": delivered_status,
         },
         "ownership": ownership,
+        "byte_accounting": _byte_accounting(result, structured, source),
         "actual_host_proof_status": "pending_model_delivery",
     }
 
@@ -316,12 +409,10 @@ def _read_readout(call: Mapping[str, Any]) -> dict[str, Any]:
         and (result.get("isError") is True or (isinstance(structured, Mapping) and "error" in structured))
     )
     if error:
-        return _error_readout("exact_source_hydration")
+        return _error_readout("exact_source_hydration", result)
     if not isinstance(structured, Mapping):
-        return _unknown_readout("exact_source_hydration")
+        return _unknown_readout("exact_source_hydration", result)
     source = _sources(structured.get("source"), singular=True)
-    evidence_bytes, evidence_status = _usage(structured.get("usage"), "evidence_bytes")
-    output_bytes, output_status = _usage(structured.get("usage"), "output_bytes")
     return {
         "category": "exact_source_hydration",
         "public_invocation_count": 1,
@@ -337,22 +428,18 @@ def _read_readout(call: Mapping[str, Any]) -> dict[str, Any]:
             "delivered_relationship_count_status": "not_applicable",
         },
         "ownership": {"status": "not_applicable", "ownership_association_count": 0},
-        "read_usage": {
-            "reported_evidence_bytes": evidence_bytes,
-            "reported_evidence_bytes_status": evidence_status,
-            "reported_output_bytes": output_bytes,
-            "reported_output_bytes_status": output_status,
-        },
+        "byte_accounting": _byte_accounting(result, structured, source),
         "actual_host_proof_status": "pending_model_delivery",
     }
 
 
-def _unknown_readout(category: str) -> dict[str, Any]:
+def _unknown_readout(category: str, result: Any) -> dict[str, Any]:
+    source = {"status": "unknown_schema", "source_record_count": None, "source_content_bytes": None}
     return {
         "category": category,
         "public_invocation_count": 1,
         "application_error": False,
-        "source": {"status": "unknown_schema", "source_record_count": None, "source_content_bytes": None},
+        "source": source,
         "relationships": {
             "status": "unknown_schema",
             "semantic_relationship_count": None,
@@ -361,6 +448,7 @@ def _unknown_readout(category: str) -> dict[str, Any]:
             "delivered_relationship_count": None,
         },
         "ownership": {"status": "unknown_schema", "ownership_association_count": None},
+        "byte_accounting": _byte_accounting(result, None, source),
         "actual_host_proof_status": "pending_model_delivery",
     }
 
@@ -371,6 +459,7 @@ def _set_host_proof(readout: dict[str, Any], model_delivery: Any) -> None:
         return
     relationships = readout["relationships"]
     source = readout["source"]
+    byte_accounting = readout["byte_accounting"]
     if readout["application_error"]:
         readout["actual_host_proof_status"] = "source_free_error"
     elif (
@@ -380,6 +469,7 @@ def _set_host_proof(readout: dict[str, Any], model_delivery: Any) -> None:
         in {"complete", "not_applicable"}
         and relationships.get("delivered_relationship_count_status", "complete")
         in {"complete", "not_applicable"}
+        and byte_accounting["status"] == "complete"
     ):
         readout["actual_host_proof_status"] = "validated"
     else:
@@ -407,6 +497,15 @@ def _total(
     if any(status not in {"complete", "known_source_free_error", "not_applicable"} for status in statuses):
         return total, "unknown"
     return total, "complete"
+
+
+def _combined_status(entries: Sequence[Mapping[str, Any]], key: str) -> str:
+    statuses = [entry["byte_accounting"].get(key) for entry in entries]
+    if any(status == "mismatch" for status in statuses):
+        return "mismatch"
+    if all(status == "complete" for status in statuses):
+        return "complete"
+    return "unknown"
 
 
 def observe_normal_rollout(rollout: str | Path, run_metadata: Mapping[str, Any]) -> dict[str, Any]:
@@ -450,6 +549,18 @@ def observe_normal_rollout(rollout: str | Path, run_metadata: Mapping[str, Any])
     ownership, ownership_status = _total(
         normal_calls, "ownership", "ownership_association_count"
     )
+    reported_evidence, _ = _total(
+        normal_calls, "byte_accounting", "reported_evidence_bytes"
+    )
+    actual_evidence, _ = _total(
+        normal_calls, "byte_accounting", "actual_evidence_bytes"
+    )
+    reported_output, _ = _total(
+        normal_calls, "byte_accounting", "reported_output_bytes"
+    )
+    actual_output, _ = _total(
+        normal_calls, "byte_accounting", "actual_output_bytes"
+    )
     normal_cost = {
         "public_invocations": len(normal_calls),
         "normal_context_retrieval_invocations": sum(
@@ -470,9 +581,17 @@ def observe_normal_rollout(rollout: str | Path, run_metadata: Mapping[str, Any])
         "reported_delivered_relationship_count_status": delivered_status,
         "ownership_association_count": ownership,
         "ownership_association_count_status": ownership_status,
+        "reported_evidence_bytes": reported_evidence,
+        "actual_evidence_bytes": actual_evidence,
+        "evidence_bytes_status": _combined_status(normal_calls, "evidence_bytes_status"),
+        "reported_output_bytes": reported_output,
+        "actual_output_bytes": actual_output,
+        "output_bytes_status": _combined_status(normal_calls, "output_bytes_status"),
+        "byte_accounting_status": _combined_status(normal_calls, "status"),
     }
     return {
         "adapter_version": NORMAL_ADAPTER_VERSION,
+        "native_adapter_version": NATIVE_ADAPTER_VERSION,
         "observation": observed,
         "normal_calls": normal_calls,
         "normal_cost": normal_cost,
