@@ -1,0 +1,62 @@
+name: One-time commit email rewrite
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/one-time-email-rewrite.yml
+
+permissions:
+  contents: write
+
+jobs:
+  rewrite-history:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Rewrite corporate commit email
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git fetch origin '+refs/heads/*:refs/remotes/origin/*'
+
+          old_master="$(git rev-parse "${GITHUB_SHA}^")"
+          old_evidence="$(git rev-parse origin/feat/evidence-backed-exploration)"
+          old_mcp="$(git rev-parse origin/feat/mcp-python-sdk-v2)"
+          old_swift="$(git rev-parse origin/swift-graph-support)"
+
+          git branch -f master "$old_master"
+          git branch -f feat/evidence-backed-exploration "$old_evidence"
+          git branch -f feat/mcp-python-sdk-v2 "$old_mcp"
+          git branch -f swift-graph-support "$old_swift"
+
+          FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch -f --env-filter '
+          case "$GIT_AUTHOR_EMAIL" in
+            *@thelotterycorporation.com) GIT_AUTHOR_EMAIL="tempest13@gmail.com" ;;
+          esac
+          case "$GIT_COMMITTER_EMAIL" in
+            *@thelotterycorporation.com) GIT_COMMITTER_EMAIL="tempest13@gmail.com" ;;
+          esac
+          export GIT_AUTHOR_EMAIL GIT_COMMITTER_EMAIL
+          ' -- master feat/evidence-backed-exploration feat/mcp-python-sdk-v2 swift-graph-support
+
+          git diff --quiet "$old_master" master
+          git diff --quiet "$old_evidence" feat/evidence-backed-exploration
+          git diff --quiet "$old_mcp" feat/mcp-python-sdk-v2
+          git diff --quiet "$old_swift" swift-graph-support
+
+          for branch in master feat/evidence-backed-exploration feat/mcp-python-sdk-v2 swift-graph-support; do
+            corporate_fields="$(git log "$branch" --format='%ae%n%ce' | awk '/@thelotterycorporation[.]com$/ { count++ } END { print count + 0 }')"
+            test "$corporate_fields" -eq 0
+          done
+
+          git push --force origin \
+            master:refs/heads/master \
+            feat/evidence-backed-exploration:refs/heads/feat/evidence-backed-exploration \
+            feat/mcp-python-sdk-v2:refs/heads/feat/mcp-python-sdk-v2 \
+            swift-graph-support:refs/heads/swift-graph-support
