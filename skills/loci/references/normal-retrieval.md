@@ -6,9 +6,18 @@ relative path selects that file. Otherwise symbol metadata is ranked, with
 bounded literal-source matching when metadata yields no anchor. Several
 candidates are alternatives, not unique resolution.
 
+A case-sensitive camel/Pascal-case or underscore identifier in a question gives
+an identically named code declaration priority over prose matches. Duplicate
+declarations remain alternatives. Plain-language document questions keep the
+metadata ranking; this is not arbitrary-name or runtime symbol resolution.
+
 The `normal-graph-v1` policy always inspects supported calls, types, value
 references and imports in both directions. It traverses up to two semantic
 hops, interleaves relationship families and returns source with proved edges.
+Direct relationships of selected anchors precede ownership expansion. Shared
+declarations connected to two selected anchors by supported type edges receive
+priority over incidental calls; only those type edges get this priority.
+Every delivered edge still requires its complete static proof.
 The same snapshot and request produce the same selection. The live schema
 publishes the fixed work, source and complete-result limits.
 

@@ -19,6 +19,25 @@ when the change depends on them.
 
 ## Normal workflow
 
+First locate the normal entrypoints by their exact operation names. With
+`tool_search`, search for `loci_retrieve` and `loci_read`. In Code Mode, use
+this names-only discovery pass:
+
+```javascript
+const matches = ALL_TOOLS.filter(t => /(?:^|__)loci_(?:retrieve|read)$/.test(t.name));
+store("loci.normal.tools", matches);
+text({
+  status: matches.length ? "found" : "no_match",
+  count: matches.length,
+  names: matches.slice(0, 8).map(t => t.name)
+});
+```
+
+Then exact-match the selected name and read its complete live description and
+input declaration before invoking it. Discovery returns names only; full
+descriptions belong to that second, single-tool pass. A zero-match result
+requires the setup check below; it does not establish missing configuration.
+
 ```text
 loci_retrieve(repo, query="the source or behavior needed")
 loci_retrieve(repo, query="src/known-file.ts")
@@ -60,8 +79,8 @@ irrelevant may use a targeted direct read.
 
 ## Setup and operator diagnostics
 
-The normal MCP catalog contains `loci_retrieve` and `loci_read`. If they are
-missing, inspect the host's discovery surface and read
+The normal MCP catalog contains `loci_retrieve` and `loci_read`. If focused
+discovery cannot find them, read
 [setup-and-cli.md](references/setup-and-cli.md) for local stdio setup, store
 identity and the temporary fallback. An old loaded catalog can require a fresh
 host session after installation. Report the actual visibility limitation.

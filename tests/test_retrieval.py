@@ -8,8 +8,9 @@ import pytest
 import jsonschema
 
 from loci import service
-from loci.graph.contracts import GraphContractError
-from loci.retrieval import retrieve_context
+from loci.graph.contracts import GraphContractError, GraphEdge, GraphEvidence
+from loci.graph.traversal import GraphTraversalStep
+from loci.retrieval import _is_type_bridge_step, retrieve_context
 
 
 def _indexed(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, files: dict[str, str]):
@@ -245,6 +246,59 @@ def test_relation_between_two_explicit_anchors_is_still_delivered(
                and relation["edge"]["to"] == callee
                and relation["edge"]["type"] == "calls"
                for relation in result["relationships"])
+
+
+def test_selected_anchors_stage_shared_type_bridge_before_body_calls(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+):
+    indexed = _indexed(tmp_path, monkeypatch, {
+        "service.ts": (
+            "export type WorkBinding = { id: string };\n"
+            "type CommandOptions = { binding: WorkBinding };\n"
+            "function bodyCall() { return 1; }\n"
+            "export function capture(options: CommandOptions) {\n"
+            "  bodyCall();\n"
+            "  return options.binding;\n"
+            "}\n"
+        ),
+    })
+    capture = _symbol(indexed[2], "capture")
+    options = _symbol(indexed[2], "CommandOptions")
+    binding = _symbol(indexed[2], "WorkBinding")
+
+    result = _retrieve(indexed, seed_ids=[capture, binding])
+    first_edges = [
+        (relation["edge"]["from"], relation["edge"]["type"], relation["edge"]["to"])
+        for relation in result["relationships"][:2]
+    ]
+
+    assert first_edges == [
+        (capture, "uses_type", options),
+        (options, "uses_type", binding),
+    ]
+    assert all(
+        relation["proof"] == "complete" and relation["source_ids"]
+        for relation in result["relationships"][:2]
+    )
+
+
+def test_shared_bridge_target_does_not_promote_a_call_to_that_target():
+    evidence = GraphEvidence("service.ts", 1, "a" * 64)
+    type_step = GraphTraversalStep(
+        "anchor",
+        "shared",
+        GraphEdge("anchor", "shared", "uses_type", True, "loci", "exact", evidence),
+        "forward",
+    )
+    call_step = GraphTraversalStep(
+        "anchor",
+        "shared",
+        GraphEdge("anchor", "shared", "calls", True, "loci", "exact", evidence),
+        "forward",
+    )
+
+    assert _is_type_bridge_step(type_step, {"shared": 0}) is True
+    assert _is_type_bridge_step(call_step, {"shared": 0}) is False
 
 
 def test_explicit_anchor_relationship_precedes_neighbor_limit(

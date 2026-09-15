@@ -16,6 +16,13 @@ source does not replace the catalog already loaded in an existing host.
 
 ## MCP host setup
 
+Check the current host's discovery surface using the exact-name lookup in
+`SKILL.md` before changing configuration. A missing search result, an absent
+discovery surface and an unconfigured server are distinct conditions. Inspect
+the registration with the host's `mcp get` command below; configure only a
+missing or incorrect registration. A correct registration with no visible
+normal tools may require a fresh host session.
+
 For Claude Code:
 
 ```bash
@@ -69,7 +76,7 @@ client configuration.
 After adding MCP, tell the user that a fresh agent session may be required
 before new `loci_*` tools become visible.
 
-When MCP tools are not visible, announce once:
+When inspection confirms that the server is not configured, announce once:
 
 ```text
 loci MCP is not configured in this session; I am adding it as a local stdio MCP server with command `loci-mcp`. A fresh agent session may be required before the `loci_*` tools are visible.

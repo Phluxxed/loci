@@ -925,26 +925,27 @@ The one-line version to add to any agent's instructions:
 ```
 Use loci_retrieve for repository source discovery and graph context. Expand
 incomplete source with loci_read and the returned source_ref.
-If MCP is unavailable, configure the local stdio MCP server first. Use the
-`loci` CLI only as a temporary bridge until the agent runtime can see the MCP
-tools.
+Locate those exact operation names with the skill's bounded host-discovery
+procedure. If discovery finds no match, check the MCP registration before
+configuring it or requesting a fresh session. Use the CLI only as a temporary
+bridge.
 ```
 
 For Claude specifically, add this to your `CLAUDE.md`:
 
 ```
 Use the `loci` skill when repository work requires source retrieval or tracing.
-Prefer the local `loci` MCP server. If MCP tools are not visible, configure
-loci first with `loci store init --base-dir "$HOME/.claude/loci-index" --namespace claude`, then `claude mcp add loci -s local -e LOCI_BASE_DIR="$HOME/.claude/loci-index" LOCI_STORE_NAMESPACE=claude -- loci-mcp` and `claude mcp get loci`.
-Tell the user a fresh Claude session may be required before the new `loci_*`
-tools are visible. Use `loci` CLI fallback only as a temporary bridge.
+Use its exact-name discovery procedure for `loci_retrieve` and `loci_read`.
+If neither is found, inspect `claude mcp get loci`; the skill's setup reference
+covers missing registration and stale loaded catalogs. Use CLI fallback only
+as a temporary bridge.
 ```
 
 ## Claude Code integration
 
 loci is most useful inside Claude Code when the MCP server is available. The SessionStart hook can seed an uncached repo and inject context, but MCP read tools are the freshness guarantee. The hooks live in `.claude/`; the reusable skill lives in `skills/loci/` and is symlinked into Claude.
 
-The Claude hooks do not silently mutate Claude MCP config during session start. They keep CLI bridge tooling available, and they instruct Claude to configure MCP first when the `loci_*` tools are not visible.
+The Claude hooks do not silently mutate Claude MCP config during session start. They identify the normal entrypoints and direct the agent to focused discovery and registration checks.
 
 **Install**
 

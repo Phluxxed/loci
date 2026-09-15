@@ -15,6 +15,8 @@ MAX_GRAPH_ANCHORS = 32
 _MAX_MATCH_SCOPES = 32
 _MAX_SCORED_TERMS = 4
 _TOKEN_RE = re.compile(r"[a-z0-9]+")
+_QUERY_WORD_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+_CAMEL_CASE_BOUNDARY_RE = re.compile(r"[a-z0-9][A-Z]")
 _STOP_WORDS = frozenset(
     {
         "a",
@@ -153,6 +155,7 @@ def select_graph_anchors(
         return _select_explicit(indexed, unique_seeds, max_anchors)
 
     question_terms = _question_terms(question)
+    explicit_identifiers = _explicit_identifiers(question)
     units, eligible_symbols = _anchor_units(symbols)
     collapsed_symbols = max(0, eligible_symbols - len(units))
     effective_max = min(max_anchors, _corpus_anchor_cap(len(units)))
@@ -180,6 +183,7 @@ def select_graph_anchors(
             unit,
             question_terms,
             document_frequency,
+            explicit_identifiers,
             corpus_size=len(units),
         )
         if scored is None:
@@ -312,6 +316,14 @@ def _question_terms(question: str) -> tuple[str, ...]:
     return tuple(terms)
 
 
+def _explicit_identifiers(question: str) -> frozenset[str]:
+    return frozenset(
+        word
+        for word in _QUERY_WORD_RE.findall(question)
+        if "_" in word or _CAMEL_CASE_BOUNDARY_RE.search(word)
+    )
+
+
 def _anchor_units(
     symbols: Sequence[Mapping[str, Any]],
 ) -> tuple[list[_AnchorUnit], int]:
@@ -344,6 +356,7 @@ def _score_unit(
     unit: _AnchorUnit,
     question_terms: tuple[str, ...],
     document_frequency: Mapping[str, int],
+    explicit_identifiers: frozenset[str],
     *,
     corpus_size: int,
 ) -> _ScoredSymbol | None:
@@ -353,6 +366,7 @@ def _score_unit(
             symbol,
             question_terms,
             document_frequency,
+            explicit_identifiers,
             corpus_size=corpus_size,
         )
         if scored is None:
@@ -366,6 +380,7 @@ def _score_symbol(
     symbol: Mapping[str, Any],
     question_terms: tuple[str, ...],
     document_frequency: Mapping[str, int],
+    explicit_identifiers: frozenset[str],
     *,
     corpus_size: int,
 ) -> _ScoredSymbol | None:
@@ -412,6 +427,11 @@ def _score_symbol(
     coverage = min(len(matched_terms), _MAX_SCORED_TERMS) / len(question_terms)
     strongest_terms = sorted(contributions.values(), reverse=True)[:_MAX_SCORED_TERMS]
     score = (sum(strongest_terms) + phrase_bonus) * (1.0 + 0.25 * coverage)
+    if (
+        symbol.get("language") != "markdown"
+        and symbol.get("name") in explicit_identifiers
+    ):
+        score += _explicit_identifier_bonus(corpus_size)
     return _ScoredSymbol(
         symbol=symbol,
         score=score,
@@ -547,6 +567,17 @@ def _string_values(value: Any) -> list[str]:
 
 def _specificity(document_frequency: int, corpus_size: int) -> float:
     return 1.0 + math.log((corpus_size + 1) / (document_frequency + 1))
+
+
+def _explicit_identifier_bonus(corpus_size: int) -> float:
+    # A regular candidate has at most four contributions at weight 8, one
+    # weight-16 phrase bonus, and the 1.25 coverage multiplier.  One bonus
+    # therefore places an exact identifier above every regular candidate.
+    max_specificity = _specificity(1, corpus_size)
+    max_ordinary_score = (
+        (_MAX_SCORED_TERMS * 8.0 * max_specificity) + 16.0
+    ) * 1.25
+    return max_ordinary_score + 1.0
 
 
 def _corpus_anchor_cap(eligible_units: int) -> int:

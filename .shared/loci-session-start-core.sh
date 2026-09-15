@@ -48,7 +48,7 @@ loci_session_compute() {
     fi
     LOCI_SESSION_REPO_ROOT="$repo_root"
     local mcp_hint
-    mcp_hint=' When the skill applies, prefer loci MCP tools; if they are missing, configure loci as a local stdio MCP server first with command `loci-mcp` and a host-specific LOCI_BASE_DIR; a fresh session may be required before the tools are visible. Use CLI only as a temporary bridge.'
+    mcp_hint=' Normal MCP entrypoints: `loci_retrieve` and `loci_read`. The loci skill gives the exact-name discovery procedure: in Code Mode return matching names first, then read only the selected live tool contract. If discovery finds no match, check the host registration before configuring `loci-mcp` or requesting a fresh session.'
 
     # SessionStart is latency-sensitive. If the repo is already indexed, do
     # not run an incremental index synchronously; large generated trees can

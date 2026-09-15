@@ -138,6 +138,11 @@ def retrieve_context(
         frontier.append(visit)
         anchor_visits.append(visit)
 
+    anchor_bridge_targets = _selected_anchor_type_bridges(
+        anchor_visits,
+        adjacency,
+        nodes,
+    )
     # Selected source identities are the request's strongest relevance signal.
     # Give their direct semantic proof one bounded pass before ownership-driven
     # files and representative members join the traversal layer.  Anchor source,
@@ -154,6 +159,7 @@ def retrieve_context(
         visited=visited,
         priority_anchor_ids=(frozenset(anchor.node_id for anchor in anchors)
                              if seeds else frozenset()),
+        priority_target_ids=anchor_bridge_targets,
     ))
     pretraversed_anchors = {visit.node_id for visit in anchor_visits}
 
@@ -230,18 +236,30 @@ def _traverse_relationships(
     packer: RetrievalPacker,
     visited: set[str],
     priority_anchor_ids: frozenset[str] = frozenset(),
+    priority_target_ids: tuple[str, ...] = (),
 ) -> list[_Visit]:
     """Traverse one semantic layer with fixed family/direction fairness."""
+    priority_target_rank = {
+        target_id: index for index, target_id in enumerate(priority_target_ids)
+    }
     ordered = sorted(visits, key=lambda value: (value.anchor_index, value.node_id))
     per_anchor: dict[int, list[tuple[_Visit, list[GraphTraversalStep]]]] = defaultdict(list)
     for visit in ordered:
         neighbors = list(adjacency.get(visit.node_id, ()))
         packer.usage["eligible_edges_considered"] += len(neighbors)
         ranked = _ranked_neighbors(neighbors, nodes, query_terms, degrees)
-        if visit.node_id in priority_anchor_ids:
-            ranked = [step for step in ranked if step.to_id in priority_anchor_ids] + [
-                step for step in ranked if step.to_id not in priority_anchor_ids
-            ]
+        if visit.node_id in priority_anchor_ids or priority_target_rank:
+            ranked = sorted(
+                ranked,
+                key=lambda step: (
+                    0 if step.to_id in priority_anchor_ids else 1,
+                    (
+                        priority_target_rank[step.to_id]
+                        if _is_type_bridge_step(step, priority_target_rank)
+                        else len(priority_target_rank)
+                    ),
+                ),
+            )
         if len(ranked) > LIMITS["max_neighbors"]:
             packer.omit("neighbor_limit", len(ranked) - LIMITS["max_neighbors"])
             ranked = ranked[:LIMITS["max_neighbors"]]
@@ -251,7 +269,7 @@ def _traverse_relationships(
         per_anchor[visit.anchor_index].append((visit, ranked))
 
     scheduler: dict[int, list[deque[tuple[_Visit, GraphTraversalStep]]]] = {}
-    prioritized: list[tuple[_Visit, GraphTraversalStep]] = []
+    prioritized: list[tuple[int, int, int, _Visit, GraphTraversalStep]] = []
     for anchor_index in sorted(per_anchor):
         queues = [deque() for _ in range(8)]
         for visit, steps in per_anchor[anchor_index]:
@@ -261,7 +279,15 @@ def _traverse_relationships(
                     visit.node_id in priority_anchor_ids
                     and step.to_id in priority_anchor_ids
                 ):
-                    prioritized.append(pair)
+                    prioritized.append((0, 0, visit.anchor_index, visit, step))
+                elif _is_type_bridge_step(step, priority_target_rank):
+                    prioritized.append((
+                        1,
+                        priority_target_rank[step.to_id],
+                        visit.anchor_index,
+                        visit,
+                        step,
+                    ))
                 else:
                     queues[_queue_index(step)].append(pair)
         scheduler[anchor_index] = queues
@@ -303,7 +329,12 @@ def _traverse_relationships(
                     f"{_FAMILY_TYPES[_TYPE_TO_FAMILY[step.edge.type]][0]} relationship",
                 ))
 
-    for visit, step in prioritized:
+    for _kind, _target_rank, _anchor_index, visit, step in sorted(
+        prioritized,
+        key=lambda item: (
+            item[0], item[1], item[2], _queue_index(item[4]), item[4].to_id,
+        ),
+    ):
         traverse(visit, step)
     while any(queue for queues in scheduler.values() for queue in queues):
         for anchor_index in sorted(scheduler):
@@ -312,6 +343,41 @@ def _traverse_relationships(
                 if queue:
                     traverse(*queue.popleft())
     return next_visits
+
+
+def _is_type_bridge_step(
+    step: GraphTraversalStep,
+    priority_target_rank: Mapping[str, int],
+) -> bool:
+    return (
+        step.to_id in priority_target_rank
+        and _TYPE_TO_FAMILY[step.edge.type] == 1
+    )
+
+
+def _selected_anchor_type_bridges(
+    visits: Sequence[_Visit],
+    adjacency: Mapping[str, Sequence[GraphTraversalStep]],
+    nodes: Mapping[str, Mapping[str, Any]],
+) -> tuple[str, ...]:
+    """Find declaration nodes joined to at least two selected anchors by types."""
+    anchors_by_target: dict[str, set[int]] = defaultdict(set)
+    for visit in visits:
+        for step in adjacency.get(visit.node_id, ()):
+            target = nodes[step.to_id]
+            if (
+                _TYPE_TO_FAMILY[step.edge.type] == 1
+                and target.get("kind") not in _NATIVE_KINDS
+            ):
+                anchors_by_target[step.to_id].add(visit.anchor_index)
+    return tuple(
+        target_id
+        for target_id, anchor_indexes in sorted(
+            anchors_by_target.items(),
+            key=lambda item: (tuple(sorted(item[1])), item[0]),
+        )
+        if len(anchor_indexes) >= 2
+    )
 
 
 @dataclass(frozen=True)

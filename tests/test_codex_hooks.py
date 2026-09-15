@@ -63,6 +63,9 @@ exit 1
     assert "loci: repo indexed at" in message
     assert str(repo) in message
     assert "(42 symbols)" in message
+    assert "`loci_retrieve`" in message
+    assert "`loci_read`" in message
+    assert "matching names first" in message
 
 
 def test_codex_session_start_hook_sets_codex_base_dir(tmp_path: Path):
@@ -155,6 +158,8 @@ exit 1
     assert set(payload) == {"hookSpecificOutput"}
     assert "123 symbols already indexed" in message
     assert str(repo) in message
+    assert "`loci_retrieve`" in message
+    assert "`loci_read`" in message
 
 
 def test_codex_session_start_hook_emits_valid_json_when_index_times_out(tmp_path: Path):

@@ -298,6 +298,65 @@ def test_question_intent_words_do_not_make_evidence_artifact_beat_subject_page()
     assert selection.anchors[0].node_id == subject["id"]
 
 
+def test_explicit_code_identifier_outranks_prose_with_ambiguous_declarations():
+    named_declarations = [
+        _symbol(
+            "src/legacy/capture.ts::captureCommandResult#function",
+            name="captureCommandResult",
+            file_path="src/legacy/capture.ts",
+            language="typescript",
+        ),
+        _symbol(
+            "src/tool-results/service.ts::captureCommandResult#function",
+            name="captureCommandResult",
+            file_path="src/tool-results/service.ts",
+            language="typescript",
+        ),
+    ]
+    binding = _symbol(
+        "src/work-context/binding.ts::WorkContextBinding#type",
+        name="WorkContextBinding",
+        file_path="src/work-context/binding.ts",
+        language="typescript",
+        keywords=["work", "context", "binding", "type"],
+    )
+    binding_view = _symbol(
+        "src/work-context/binding.ts::WorkContextBindingView#type",
+        name="WorkContextBindingView",
+        file_path="src/work-context/binding.ts",
+        language="typescript",
+        keywords=["work", "context", "binding", "type"],
+    )
+    plan = _symbol(
+        "docs/plans/work-context.md::Work Context Binding Contract#section",
+        name="Work Context Binding Contract",
+        file_path="docs/plans/work-context.md",
+        summary="Accepted public contract for imported work context binding types.",
+    )
+    fillers = [
+        _symbol(
+            f"notes/filler-{index}.md::Filler {index}#section",
+            name=f"Filler {index}",
+            file_path=f"notes/filler-{index}.md",
+        )
+        for index in range(30)
+    ]
+
+    selection = select_graph_anchors(
+        [plan, binding, binding_view, *named_declarations, *fillers],
+        "captureCommandResult work context binding accepted type imported public contract",
+        [],
+        max_anchors=3,
+    )
+
+    assert [anchor.node_id for anchor in selection.anchors[:2]] == [
+        declaration["id"] for declaration in named_declarations
+    ]
+    assert all(
+        "symbol_name" in anchor.match_scope for anchor in selection.anchors[:2]
+    )
+
+
 def test_inferred_selection_diversifies_redundant_query_aspects():
     recall = _symbol(
         "ideas/recall-efficient-traversal.md::Recall Efficient Traversal#section",
