@@ -15,6 +15,13 @@ an identically named code declaration priority over prose matches. Duplicate
 declarations remain alternatives. Plain-language document questions keep the
 metadata ranking; this is not arbitrary-name or runtime symbol resolution.
 
+The native TypeScript/TSX parser also indexes simple, initialized top-level
+`const` identifiers regardless of case, including exported declarations. Their
+exact declaration spans use the existing constant kind and file ownership.
+This adds no inferred runtime schema meaning. The process-only parser fallback
+retains its prior uppercase-name filter; lower-case mutable, nested,
+destructured and malformed declarations receive no new constant identity.
+
 The `normal-graph-v1` policy always inspects supported calls, types, value
 references and imports in both directions. It traverses up to two semantic
 hops, interleaves relationship families and returns source with proved edges.

@@ -1,0 +1,24 @@
+[
+  {
+    "schema_version": 1,
+    "status": "ok",
+    "source": {
+      "id": 1,
+      "file": "src/work-context/binding.ts",
+      "start_byte": 1331,
+      "end_byte": 1968,
+      "start_line": 47,
+      "end_line": 66,
+      "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+      "content": "workContextBindingViewSchema = z\n  .object({\n    version: z.literal(1),\n    id: z.string().regex(/^wctx_[a-f0-9]{32}$/),\n    status: z.enum([\"active\", \"superseded\"]),\n    host: z.string().min(1),\n    bound_at: z.iso.datetime(),\n    last_seen_at: z.iso.datetime(),\n    expires_at: z.iso.datetime(),\n    collaboration_space: workspaceRefSchema,\n    provenance: z\n      .object({\n        kind: z.enum([\"host_lifecycle\", \"operator_rebind\"]),\n        lifecycle: z.string().min(1),\n      })\n      .strict(),\n    superseded_by: z.string().regex(/^wctx_[a-f0-9]{32}$/).optional(),\n    superseded_at: z.iso.datetime().optional(),\n  })\n  .strict()",
+      "source_ref": "sr1_dzz7rvpsjdxouo2cmpqmabcr44"
+    },
+    "complete": true,
+    "next_source_ref": null,
+    "usage": {
+      "evidence_bytes": 637,
+      "output_bytes": 1140,
+      "output_encoding": "mcp_result_json_utf8"
+    }
+  }
+]

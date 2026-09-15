@@ -208,6 +208,71 @@ def test_parse_typescript_no_duplicate_ids(sample_ts: Path):
     assert len(ids) == len(set(ids))
 
 
+@pytest.mark.parametrize("suffix", [".ts", ".tsx"])
+def test_parse_typescript_indexes_only_native_top_level_lowercase_consts(
+    tmp_path: Path,
+    suffix: str,
+):
+    declaration = "workContextBindingViewSchema = z.object({}).strict()"
+    source = (
+        f"export const {declaration};\n"
+        "const UPPERCASE = 1;\n"
+        "export const arrowSchema = () => 1;\n"
+        "let lowerLet = 1;\n"
+        "var lowerVar = 1;\n"
+        "const { destructured } = source;\n"
+        "function outer() { const nested = 1; }\n"
+        "if (enabled) { const blockScoped = 1; }\n"
+        "namespace InsideNamespace { export const nestedNamespace = 1; }\n"
+        "class InsideClass { field = (() => { const nestedClass = 1; return 0; })(); }\n"
+        "const uninitialized;\n"
+        "const malformed = ;\n"
+    )
+    path = tmp_path / f"schema{suffix}"
+    path.write_text(source, encoding="utf-8")
+
+    symbols = parse_file(path)
+    by_name = {symbol.name: symbol for symbol in symbols}
+
+    schema = by_name["workContextBindingViewSchema"]
+    assert schema.kind == "constant"
+    assert schema.qualified_name == "workContextBindingViewSchema"
+    assert source[schema.byte_offset:schema.byte_offset + schema.byte_length] == declaration
+    assert by_name["UPPERCASE"].kind == "constant"
+    assert by_name["arrowSchema"].kind == "function"
+    assert [symbol for symbol in symbols if symbol.name == "arrowSchema" and symbol.kind == "constant"] == []
+    assert {
+        "lowerLet",
+        "lowerVar",
+        "destructured",
+        "nested",
+        "blockScoped",
+        "nestedNamespace",
+        "nestedClass",
+        "uninitialized",
+        "malformed",
+    }.isdisjoint(by_name)
+
+
+def test_typescript_process_fallback_retains_lowercase_const_limitation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    import tree_sitter_language_pack
+
+    path = tmp_path / "schema.ts"
+    path.write_text("export const workContextBindingViewSchema = 1;\n", encoding="utf-8")
+
+    def fail_get_parser(_language):
+        raise RuntimeError("force process fallback")
+
+    monkeypatch.setattr(tree_sitter_language_pack, "get_parser", fail_get_parser)
+
+    assert "workContextBindingViewSchema" not in {
+        symbol.name for symbol in parse_file(path)
+    }
+
+
 def test_parse_tsx_extracts_jsx_bearing_function_with_typescript_identity(tmp_path: Path):
     source = (
         'import type { Props } from "./props";\n'

@@ -29,4 +29,42 @@ correction and W1.8.4.4.9.4 for one-call presentation/recovery verification.
 The structured-only envelope and fixed result budget stay in place. This is
 documented caller behavior, not enforcement of arbitrary agent-authored code.
 
+W1.8.4.4.9.2 disposition: adopted Terra's retained case distinction and preferred
+declaration correction in [schema-lookup-diagnosis.md](schema-lookup-diagnosis.md).
+The exact-token query did reach literal fallback: its defect is candidate order
+plus file-start hydration, not the fallback gate. The compound queries separately
+encounter metadata precedence. Primary inspection confirms the uppercase-only
+constant filter in `parser/extractor.py` and `parser/languages.py`, with extractor
+version 30 in `storage/index_store.py`. Current installed TypeScript parser has
+the native AST `parse` method; process fallback support must be qualified.
+
+Created W1.8.4.4.9.5 for conservative top-level TypeScript const extraction and
+W1.8.4.4.9.6 for retained schema-query/control verification before implementation.
+The existing constant identity/kind and normal policy suffice; no new persistent
+format, language family or graph-edge semantics are part of this repair.
+
+Predelegation: schema implementation uses a fresh Terra/high/fork-none worker.
+Own `src/loci/parser/extractor.py`, extractor version in
+`src/loci/storage/index_store.py`, and focused tests under `tests/parser/` and
+`tests/test_retrieval.py` (or a dedicated const retrieval test). Acceptance is
+the two new cards' exact declaration/negative/refresh/retrieval criteria.
+Bound: at most 2 implementation files and 300 non-test added lines; return any
+broader blocker before expanding. No Manifest, Brain, skills, frozen or host
+configuration writes. Primary owns fixed-snapshot integration and activation.
+
+schema_const_repair result: primary adopted the narrow AST change after requiring
+missing-initializer and malformed-declaration guards plus block-scope negatives.
+Final changes are confined to the two implementation files and existing parser
+test file. The worker reports 122 focused tests passing; primary's six retained
+requests, exact schema reads, 638 source hashes and 45/28/46/54 frozen input
+checks pass. Result locator:
+[schema-const-check/result.json](schema-const-check/result.json).
+No independent post-completion review or provider trial was added.
+
+W1.8.4.4.9.7 was created before actual-host verification. Its first result still
+uses literal candidates and the old normal description, so the card is blocked
+on restart, not complete. W1.8.4.4.10 separately retains the original negative
+ordinary-value disposition and explicit final Objective acceptance requirement;
+completed repairs cannot close that requirement through derived graph rollup.
+
 > **TL;DR:** Diagnose the two observed sources of extra retrieval independently, then record each warranted repair and check as a child before execution.

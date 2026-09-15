@@ -776,9 +776,14 @@ def _extract_symbol(
     if parent_is_container and kind == "function":
         kind = "method"
 
-    # For constants, apply the name pattern filter if the spec defines one
+    # TypeScript/TSX native ASTs can prove a simple top-level `const` declaration.
+    # The process() fallback cannot prove that lexical context, so it deliberately
+    # retains the existing constant-name filter rather than guessing from text.
     if kind == "constant" and spec.constant_name_pattern:
-        if not re.fullmatch(spec.constant_name_pattern, name):
+        if (
+            not re.fullmatch(spec.constant_name_pattern, name)
+            and not _is_top_level_typescript_const(node, language)
+        ):
             return
 
     qualified_name = f"{parent_name}.{name}" if parent_name else name
@@ -837,6 +842,30 @@ def _extract_symbol(
         line=line,
         end_line=end_line,
     ))
+
+
+def _is_top_level_typescript_const(node, language: str) -> bool:
+    """Whether a native AST node is a simple top-level TS/TSX const declarator."""
+    if language not in {"typescript", "tsx"} or node.type != "variable_declarator":
+        return False
+    name = node.child_by_field_name("name")
+    if name is None or name.type != "identifier":
+        return False
+    if node.child_by_field_name("value") is None or node.has_error:
+        return False
+
+    declaration = node.parent
+    if declaration is None or declaration.type != "lexical_declaration":
+        return False
+    if declaration.has_error:
+        return False
+    if not any(child.type == "const" for child in declaration.children):
+        return False
+
+    scope = declaration.parent
+    if scope is not None and scope.type == "export_statement":
+        scope = scope.parent
+    return scope is not None and scope.type == "program"
 
 
 def _go_package_level(node) -> bool:

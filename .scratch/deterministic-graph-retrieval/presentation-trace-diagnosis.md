@@ -131,4 +131,3 @@ must equal its `structuredContent`, and the captured trace must contain exactly
 one matching native request. This is a local presentation check, not a provider
 trial. Keep the v3 artifacts frozen and do not infer provider-token savings
 from either check.
-
