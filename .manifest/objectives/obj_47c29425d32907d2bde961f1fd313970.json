@@ -2106,8 +2106,8 @@
                               "id": "task_93073a2d117a5f564184d230e5cf596d",
                               "title": "Implement matched graph comparison and episode accounting",
                               "outcome": "Run equivalent agent workflows with graph enrichment as the controlled difference and capture the complete cost and outcome of each episode.",
-                              "details": "Implement the fixed design at benchmarks/complete-work/design-v1/protocol.md and episodes.json; source-level decomposition remains necessary before implementation. Build the matched fixed graph-on/off control without changing agent discovery or direct-source quality, same native thread across three fixed prompts, isolated writable source/stores per episode, counterbalanced one-at-a-time schedule, pinned navigation implementation outside target edits. Current collector is turn-scoped and rereads final source files: add a versioned episode adapter that links exact native turns without summing cumulative usage repeatedly and validates per-retrieval source versions after edits. Preserve old observers/results. Prepare pinned dependencies and independent behavioral fixtures for the Anvil creation-evidence and Loci incremental-exclusion cases; Anvil retained copy has no node_modules or original Git history, and its tests need isolated temporary Git/loopback fixtures. Oracle must reject unchanged behavior, cover negative invariants, and remain inaccessible to trial agents. Capture quality/rework, later reads, outer rounds, cache-separated usage/time and source/delivery provenance; cost rates remain unverified so normalized sensitivity is not billed dollars. No trial launches until .10.2.3 verifies and publishes freeze.",
-                              "decompositionComplete": false,
+                              "details": "Implementation is split into graph control, primary-owned native controller/accounting, independent Anvil/Loci environment-oracle children, and integration acceptance. The design remains benchmarks/complete-work/design-v1. Fixed graph-on/off through all three native turns, source/target isolation, hidden behavioral checks and complete source-version/usage accounting are required. Actual measured campaign remains gated by the separate pre-outcome freeze. Product defaults and all historical observers/results remain unchanged. Installed app-server read-only model/list verifies Terra/high availability; native configuration/transport still must be integrated and tested.",
+                              "decompositionComplete": true,
                               "completionCriteria": [
                                 "The arms start from identical isolated repository state and differ only in declared graph enrichment, with matched source/prompt/runtime/instruction/discovery and cache/context policies or explicit deviations.",
                                 "Whole-episode accounting retains per-phase calls, rounds, cache-separated usage, elapsed time, correctness/rework and graph-delivery provenance; representative controls verify context continuation and complete failure accounting.",
@@ -2119,22 +2119,235 @@
                               "externalBlocker": null,
                               "completion": null,
                               "discontinued": null,
-                              "tasks": []
+                              "tasks": [
+                                {
+                                  "id": "task_2de632a65c72feea40a6cfb0bd687033",
+                                  "title": "Implement an isolated graph comparison control",
+                                  "outcome": "Expose matched graph-on/off source navigation with exact repository scope and auditable source versions.",
+                                  "details": "Benchmark-only server/adapter reuses maintained anchor selection/source paging/packing. Arm is fixed at process or experiment configuration, never a tool argument; normal product defaults unchanged. Match tool descriptors between arms and verify no graph traversal/related enrichment for off, unchanged anchor quality/continuation/freshness/errors. Save each raw response and content-addressed source bytes while current, including after target edits. Deny any repo outside the fixed isolated target. Owned benchmark control module/tests; minimal internal reusable product seam only if required and covered by existing behavior checks.",
+                                  "decompositionComplete": true,
+                                  "completionCriteria": [
+                                    "Real local MCP requests prove matched anchors/read extents and descriptors, on-only graph enrichment and zero off traversal, without cross-repo access or a public graph toggle.",
+                                    "Source-version receipts validate returned bytes before/after a target edit and keep original observers/results unchanged."
+                                  ],
+                                  "dependencies": [],
+                                  "externalBlocker": null,
+                                  "completion": {
+                                    "evidence": [
+                                      {
+                                        "criterion": "Real local MCP requests prove matched anchors/read extents and descriptors, on-only graph enrichment and zero off traversal, without cross-repo access or a public graph toggle.",
+                                        "summary": "39 focused tests passed, including real MCP on/off descriptor equality, anchors/paging, zero off edges, graph-on enrichment and strict cross-root rejection; only an internal shared selection seam changes production code.",
+                                        "references": [
+                                          "benchmarks/complete_work/control.py",
+                                          "tests/test_complete_work_control.py",
+                                          ".scratch/deterministic-graph-retrieval/episode-implementation-execution.md"
+                                        ]
+                                      },
+                                      {
+                                        "criterion": "Source-version receipts validate returned bytes before/after a target edit and keep original observers/results unchanged.",
+                                        "summary": "The same real MCP checks preserve exact source content before/after edits and detect stale/invalid source receipts; versioned benchmark receipts leave historical collectors/results unchanged.",
+                                        "references": [
+                                          "benchmarks/complete_work/control.py",
+                                          "tests/test_complete_work_control.py",
+                                          ".scratch/deterministic-graph-retrieval/episode-implementation-execution.md"
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  "discontinued": null,
+                                  "tasks": []
+                                },
+                                {
+                                  "id": "task_269f9f229fcdac85e5ce0a94312ca88c",
+                                  "title": "Implement the three-turn controller and accounting",
+                                  "outcome": "Run fixed native turns with preserved context, deterministic caps and complete nonduplicated episode accounting.",
+                                  "details": "Primary owns runner/native app-server transport, controller state, allowed workspace/hidden artifacts, usage totals and per-correct normalized analysis. Installed codex app-server model/list exposes gpt-5.6-terra/high; no generation in capability probe. Generate local protocol schemas and use current official app-server documentation. Reuse per-turn observer when sufficient, version new event/source boundary logic. Stop on timeout/abort and retain later not_reached; reject resume/replacement into completed episode. Retain all events/errors, prompt/turn IDs and handoff times; count cumulative usage only once. No measured cases before freeze.",
+                                  "decompositionComplete": true,
+                                  "completionCriteria": [
+                                    "Scripted multi-turn/process controls verify same-thread continuation, exact next prompts, deadlines/interrupts, failures/not_reached and no outcome-based replacements.",
+                                    "Episode accounting retains all outcomes, per-stage/total cached/uncached/output usage, latency/calls/source-delivery attribution and validates nonduplicated usage with unknowns explicit."
+                                  ],
+                                  "dependencies": [],
+                                  "externalBlocker": null,
+                                  "completion": {
+                                    "evidence": [
+                                      {
+                                        "criterion": "Scripted multi-turn/process controls verify same-thread continuation, exact next prompts, deadlines/interrupts, failures/not_reached and no outcome-based replacements.",
+                                        "summary": "Scripted controller/stdio checks pass same-thread exact prompts, profiles, late-completion deadlines, single interrupts and retained failures/not_reached; no replacement or measured generation. A campaign lock and exclusive output guard prevent concurrency/reuse.",
+                                        "references": [
+                                          "benchmarks/complete_work/controller.py",
+                                          "benchmarks/complete_work/accounting.py",
+                                          "benchmarks/complete_work/evidence.py",
+                                          "tests/test_complete_work_accounting.py",
+                                          ".scratch/deterministic-graph-retrieval/episode-implementation-execution.md"
+                                        ]
+                                      },
+                                      {
+                                        "criterion": "Episode accounting retains all outcomes, per-stage/total cached/uncached/output usage, latency/calls/source-delivery attribution and validates nonduplicated usage with unknowns explicit.",
+                                        "summary": "Eight accounting tests pass cumulative differencing, duplicates, interrupted partial-usage unknowns, downstream split and complete scheduled-row guards. Real MCP integration plus seven delivery checks validate native result/default normalization, exact one-to-one source-version joins and explicit missing/ambiguous telemetry.",
+                                        "references": [
+                                          "benchmarks/complete_work/controller.py",
+                                          "benchmarks/complete_work/accounting.py",
+                                          "benchmarks/complete_work/evidence.py",
+                                          "tests/test_complete_work_accounting.py",
+                                          ".scratch/deterministic-graph-retrieval/episode-implementation-execution.md"
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  "discontinued": null,
+                                  "tasks": []
+                                },
+                                {
+                                  "id": "task_287f2af1bffd6d1a59e09ac162a6c8ca",
+                                  "title": "Prepare isolated targets and independent behavioral checks",
+                                  "outcome": "Make both designed task environments and independent acceptance oracles runnable before campaign freeze.",
+                                  "details": "Two children own Anvil and Loci independently. Do not change original source snapshots or benchmark tasks in the main checkout. Pin dependency provenance and make isolated copies. Independent hidden oracle rejects unchanged and deliberately faulty implementations, and passes a small held-out reference implementation only in disposable evaluator copies. Actual evaluator data remains outside trial-readable roots. An oracle control patch is evaluator validation, never a measured outcome or product change.",
+                                  "decompositionComplete": true,
+                                  "completionCriteria": [
+                                    "Both source-pinned environments and independent behavioral oracles are runnable, detect missing/incorrect behavior and preserve frozen invariants."
+                                  ],
+                                  "dependencies": [],
+                                  "externalBlocker": null,
+                                  "completion": null,
+                                  "discontinued": null,
+                                  "tasks": [
+                                    {
+                                      "id": "task_7e7a0a78f21b5ca061030682f0ee8c31",
+                                      "title": "Prepare the Anvil environment and creation-evidence oracle",
+                                      "outcome": "Independently evaluate advisory creation evidence and API/embedded-page parity on the fixed Anvil source.",
+                                      "details": "Use episodes.json Anvil contract, retained t21 638-file map. Own benchmarks/complete_work/oracles/anvil* and tests/test_complete_work_anvil* plus disposable /tmp environment for dependency setup. Prepare pinned Node dependencies from lockfile using reproducible install; create temporary Git fixtures for marker/history/unproven/ambiguous/conflicting cases, recursive/reparent behavior, no graph derivation changes and safe public field. Run positive/negative controls and selected existing regressions. No editing t21 or production Anvil, no measured agent runs.",
+                                      "decompositionComplete": true,
+                                      "completionCriteria": [
+                                        "Pinned environment runs the original relevant checks; oracle rejects unchanged/malformed outputs and independently verifies all designed positive/negative behavioral and preservation cases.",
+                                        "Oracle passes a disposable reference change, detects targeted faulty changes and leaves original source hashes intact."
+                                      ],
+                                      "dependencies": [],
+                                      "externalBlocker": null,
+                                      "completion": {
+                                        "evidence": [
+                                          {
+                                            "criterion": "Pinned environment runs the original relevant checks; oracle rejects unchanged/malformed outputs and independently verifies all designed positive/negative behavioral and preservation cases.",
+                                            "summary": "Pinned retained export plus npm lockfile/Node environment ran 37 original focused regressions. Evaluator rejects unchanged and bad category/control outputs; independent fixture checks precedence, history/unknown/recursive and safe API/page parity.",
+                                            "references": [
+                                              "benchmarks/complete_work/oracles/anvil.py",
+                                              "tests/test_complete_work_anvil.py",
+                                              ".scratch/deterministic-graph-retrieval/episode-anvil-oracle/receipt.md"
+                                            ]
+                                          },
+                                          {
+                                            "criterion": "Oracle passes a disposable reference change, detects targeted faulty changes and leaves original source hashes intact.",
+                                            "summary": "Disposable reference passes all eight hidden checks; targeted bad labeling fails. Five oracle tests and exact 638-file identity passed; original t21 remains unchanged. Prose/review claims remain outside automated oracle.",
+                                            "references": [
+                                              "benchmarks/complete_work/oracles/anvil.py",
+                                              "tests/test_complete_work_anvil.py",
+                                              ".scratch/deterministic-graph-retrieval/episode-anvil-oracle/receipt.md"
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      "discontinued": null,
+                                      "tasks": []
+                                    },
+                                    {
+                                      "id": "task_53dce674c0eeea4a47261dffe5dc4099",
+                                      "title": "Prepare the Loci environment and incremental-exclusion oracle",
+                                      "outcome": "Independently evaluate exact .direnv policy and real incremental removal while preserving siblings and path safety.",
+                                      "details": "Use episodes.json Loci contract and clean f3d9134 source export. Own benchmarks/complete_work/oracles/loci* and tests/test_complete_work_loci* plus disposable /tmp environment. Pin Python/parser dependencies and target source separately from serving Loci. Oracle tests nested exact directory names across supported languages, lookalikes/maintained sources, gitignore/uv-cache and path safety, then indexes two symbols, moves one under nested .direnv, reindexes incrementally and checks source/hash/symbol disappearance with sibling survival. No production policy edit; reference patch only in evaluator copy.",
+                                      "decompositionComplete": true,
+                                      "completionCriteria": [
+                                        "Pinned environment runs the focused original regressions; independent oracle rejects unchanged behavior and exercises the actual incremental storage/search boundary.",
+                                        "Oracle passes a disposable localized reference change and rejects broad-name/stale-state/unsafe faulty variants while keeping main source unchanged."
+                                      ],
+                                      "dependencies": [],
+                                      "externalBlocker": null,
+                                      "completion": {
+                                        "evidence": [
+                                          {
+                                            "criterion": "Pinned environment runs the focused original regressions; independent oracle rejects unchanged behavior and exercises the actual incremental storage/search boundary.",
+                                            "summary": "Pinned target and parser/Python dependencies validate target-source import. Independent real incremental source/hash/symbol checks reject unchanged policy and preserve sibling/path controls; selected regressions pass on the reference.",
+                                            "references": [
+                                              "benchmarks/complete_work/oracles/loci.py",
+                                              "tests/test_complete_work_loci.py",
+                                              ".scratch/deterministic-graph-retrieval/episode-loci-oracle/receipt.md"
+                                            ]
+                                          },
+                                          {
+                                            "criterion": "Oracle passes a disposable localized reference change and rejects broad-name/stale-state/unsafe faulty variants while keeping main source unchanged.",
+                                            "summary": "Five oracle tests pass (70.98s): localized disposable reference passes; broad-name, unsafe path and stale-state variants fail. Main .direnv policy is unchanged. Orientation/final prose and semantic test intent remain explicit manual review.",
+                                            "references": [
+                                              "benchmarks/complete_work/oracles/loci.py",
+                                              "tests/test_complete_work_loci.py",
+                                              ".scratch/deterministic-graph-retrieval/episode-loci-oracle/receipt.md"
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      "discontinued": null,
+                                      "tasks": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "id": "task_daa7659d738d009307490fde70ec38ec",
+                                  "title": "Verify the integrated comparison implementation",
+                                  "outcome": "Deliver a tested runnable harness ready for actual-host preflight and campaign freeze.",
+                                  "details": "Wire the fixed control, controller/source history and both prepared evaluator environments. Check deterministic dry controls, real local MCP transport/descriptor comparison, actual Codex initialize/model-list/configuration where available, isolation/hidden-evaluator boundaries, staged source snapshots and failure accounting. No frozen measured episode launch. Separate what local integration proves from actual-host provider preflight still owned by .10.2.3. Document CLI/how-to and preserve existing frozen evidence/product behavior.",
+                                  "decompositionComplete": true,
+                                  "completionCriteria": [
+                                    "The smallest relevant integrated checks pass across both arms, three turns, source edits, failures and both independent oracles; exact limitations are recorded.",
+                                    "Manifest records each child with evidence and the next freeze Task receives the concrete runnable inputs, commands and remaining host preflight checks."
+                                  ],
+                                  "dependencies": [
+                                    "task_2de632a65c72feea40a6cfb0bd687033",
+                                    "task_269f9f229fcdac85e5ce0a94312ca88c",
+                                    "task_7e7a0a78f21b5ca061030682f0ee8c31",
+                                    "task_53dce674c0eeea4a47261dffe5dc4099"
+                                  ],
+                                  "externalBlocker": null,
+                                  "completion": {
+                                    "evidence": [
+                                      {
+                                        "criterion": "The smallest relevant integrated checks pass across both arms, three turns, source edits, failures and both independent oracles; exact limitations are recorded.",
+                                        "summary": "Real subprocess MCP on/off integration passes all three scripted native turns, source edits, usage/delivery joins and evaluator snapshot restoration. Controller failure checks and both oracle true/faulty controls pass. Actual host initialize/model catalog succeeds; native thread setup fails with sandbox exit71 before any model turn, explicitly left to actual-host preflight.",
+                                        "references": [
+                                          "tests/test_complete_work_integration.py",
+                                          "benchmarks/complete_work/README.md",
+                                          ".scratch/deterministic-graph-retrieval/episode-runtime-capability/controller-preflight.json",
+                                          ".scratch/deterministic-graph-retrieval/episode-implementation-execution.md"
+                                        ]
+                                      },
+                                      {
+                                        "criterion": "Manifest records each child with evidence and the next freeze Task receives the concrete runnable inputs, commands and remaining host preflight checks.",
+                                        "summary": "All five implementation leaves have criterion evidence. README supplies concrete preparation/preflight/freeze/run/evaluate commands and a prepared 396-file Loci config. Next .10.2.3 carries native isolation/provider telemetry/instruction/dependency/freeze gates; no campaign or final acceptance claimed.",
+                                        "references": [
+                                          "tests/test_complete_work_integration.py",
+                                          "benchmarks/complete_work/README.md",
+                                          ".scratch/deterministic-graph-retrieval/episode-runtime-capability/controller-preflight.json",
+                                          ".scratch/deterministic-graph-retrieval/episode-implementation-execution.md"
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  "discontinued": null,
+                                  "tasks": []
+                                }
+                              ]
                             },
                             {
                               "id": "task_b2e687456b4d9935bb559c12e0fb2f19",
                               "title": "Validate and freeze the first complete-work campaign",
                               "outcome": "Publish a validated comparison contract before either arm's measured outcomes.",
-                              "details": "Validate actual configured host availability and arm behavior, same source/control evidence, context continuity, cost capture and source/output provenance. Use bounded control fixtures rather than desired provider outcomes to establish measurement validity. Prepublish exact episodes/prompts/rubrics/schedule, source snapshots, model/effort, runtime/tool/instruction inputs, cache policy, observer versions, cost method, stop rules and analysis thresholds. Mark execution decomposition complete only once the actual schedule and allowed substitutions are concretely reviewable. Specify the graph-off behavior precisely and verify absence of graph-enriched delivery while preserving the matched source-retrieval path. Freeze continuation branches and verify isolated initial repository identities.",
+                              "details": "Validate actual configured host availability and arm behavior, same source/control evidence, context continuity, cost capture and source/output provenance. Use bounded control fixtures rather than desired provider outcomes to establish measurement validity. Prepublish exact episodes/prompts/rubrics/schedule, source snapshots, model/effort, runtime/tool/instruction inputs, cache policy, observer versions, cost method, stop rules and analysis thresholds. Mark execution decomposition complete only once the actual schedule and allowed substitutions are concretely reviewable. Specify the graph-off behavior precisely and verify absence of graph-enriched delivery while preserving the matched source-retrieval path. Freeze continuation branches and verify isolated initial repository identities.\n\nImplementation handoff: benchmarks/complete_work/README.md and .scratch/deterministic-graph-retrieval/episode-implementation-execution.md. Real prepared Loci config: /private/tmp/complete-work-loci-prepared-success.n10Owv/run/observer/run.json. Its existing output-preflight is an immutable failed diagnostic, not measured output. Local graph control, scripted three-turn native accounting/source replay and both independent oracles pass. A new host/preflight must prove permission enforcement, actual provider continuation/partial usage/outer-call visibility and matched effective instructions/dependencies before publishing a freeze. Do not weaken sandbox permissions, rerun the same unchanged failed host probe, or infer model entitlement from catalog presence.",
                               "decompositionComplete": true,
                               "completionCriteria": [
                                 "Bounded controls establish the intended graph contrast, matched workflow, context retention and complete accounting without leaking arm evidence or adapting to measured outcomes.",
                                 "The exact schedule, inputs, evaluators and decision rules are published and verified before measured execution; the execution task reflects the frozen schedule."
                               ],
                               "dependencies": [
-                                "task_93073a2d117a5f564184d230e5cf596d"
+                                "task_daa7659d738d009307490fde70ec38ec"
                               ],
-                              "externalBlocker": null,
+                              "externalBlocker": "Current native host cannot apply required filesystem sandbox: command/exec own-canary probes and integrated thread/start fail exit71 sandbox_apply: Operation not permitted, including an approved tool retry. No model turns submitted. A host capable of enforcing the configured isolation is required for actual-host preflight; implementation is complete, campaign is not frozen or launched.",
                               "completion": null,
                               "discontinued": null,
                               "tasks": []

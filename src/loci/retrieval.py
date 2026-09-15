@@ -70,6 +70,16 @@ class _Visit:
     why: str
 
 
+@dataclass(frozen=True)
+class _PreparedRetrieval:
+    """Shared deterministic anchor selection before graph enrichment."""
+
+    source: RetrievalSource
+    anchors: tuple[_SelectedAnchor, ...]
+    packer: RetrievalPacker
+    seeds: tuple[str, ...]
+
+
 def retrieve_context(
     repo: Path,
     store: IndexStore,
@@ -81,38 +91,13 @@ def retrieve_context(
     coverage: str = "unknown",
 ) -> dict:
     """Return normal-graph-v1 context without caller-selected graph controls."""
-    seeds = _validate_request(query, seed_ids)
-    source = RetrievalSource(repo, store, nodes, state)
-    anchors, selection, matching, lookup, selection_omissions = _select_anchors(
-        nodes, source, query, seeds,
+    prepared = _prepare_context(
+        repo, store, nodes, state, query, seed_ids=seed_ids, coverage=coverage,
     )
-    anchor_values = [
-        {
-            "node_id": anchor.node_id,
-            "score": anchor.score,
-            "matched_terms": list(anchor.matched_terms),
-            "match_scope": list(anchor.match_scope),
-        }
-        for anchor in anchors
-    ]
-    packer = RetrievalPacker(
-        repo,
-        store=store,
-        snapshot=snapshot_id(state, source.file_hashes),
-        selection=selection,
-        scope={
-            "source": "indexed_supported_source",
-            "coverage": coverage if coverage in {"complete", "partial", "unknown"} else "unknown",
-            "matching": matching,
-            "relationships": "known_static_relationships",
-            "exhaustive": False,
-        },
-        anchors=anchor_values,
-    )
-    packer.usage["lookup_bytes"] = lookup["bytes"]
-    packer.usage["lookup_files"] = lookup["files"]
-    for reason, count in selection_omissions.items():
-        packer.omit(reason, count)
+    source = prepared.source
+    anchors = prepared.anchors
+    packer = prepared.packer
+    seeds = prepared.seeds
     if not anchors:
         packer.omit("no_anchor")
         return packer.finish()
@@ -241,6 +226,52 @@ def retrieve_context(
 
     packer.usage["nodes_examined"] = len(visited)
     return packer.finish()
+
+
+def _prepare_context(
+    repo: Path,
+    store: IndexStore,
+    nodes: dict[str, dict],
+    state: GraphIndexState,
+    query: str = "",
+    *,
+    seed_ids: list[str] | None = None,
+    coverage: str = "unknown",
+) -> _PreparedRetrieval:
+    """Select anchors and initialize direct-source packing without traversal."""
+    seeds = _validate_request(query, seed_ids)
+    source = RetrievalSource(repo, store, nodes, state)
+    anchors, selection, matching, lookup, selection_omissions = _select_anchors(
+        nodes, source, query, seeds,
+    )
+    anchor_values = [
+        {
+            "node_id": anchor.node_id,
+            "score": anchor.score,
+            "matched_terms": list(anchor.matched_terms),
+            "match_scope": list(anchor.match_scope),
+        }
+        for anchor in anchors
+    ]
+    packer = RetrievalPacker(
+        repo,
+        store=store,
+        snapshot=snapshot_id(state, source.file_hashes),
+        selection=selection,
+        scope={
+            "source": "indexed_supported_source",
+            "coverage": coverage if coverage in {"complete", "partial", "unknown"} else "unknown",
+            "matching": matching,
+            "relationships": "known_static_relationships",
+            "exhaustive": False,
+        },
+        anchors=anchor_values,
+    )
+    packer.usage["lookup_bytes"] = lookup["bytes"]
+    packer.usage["lookup_files"] = lookup["files"]
+    for reason, count in selection_omissions.items():
+        packer.omit(reason, count)
+    return _PreparedRetrieval(source, anchors, packer, seeds)
 
 
 def _traverse_relationships(

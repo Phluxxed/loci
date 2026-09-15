@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "episode_id": "loci-direnv-exclusion",
+  "target_commit": "f3d9134aece5156bec1dcc302d4330522d1d96e5",
+  "python": {
+    "requires": ">=3.10",
+    "contract": "Use the caller-supplied interpreter, or the evaluator interpreter. The target checkout's src directory is prepended to PYTHONPATH; an editable install of another checkout is not accepted."
+  },
+  "dependencies": {
+    "tree-sitter-language-pack": "1.15.8",
+    "pathspec": "1.1.1",
+    "mcp": "2.0.0",
+    "PyYAML": "6.0.3",
+    "pytest": "9.0.2"
+  },
+  "serving_navigation": {
+    "contract": "The normal navigation server is supplied outside the writable target checkout. This evaluator imports only the target checkout's src tree and does not start, alter, or depend on that server."
+  }
+}

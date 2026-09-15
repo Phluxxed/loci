@@ -1,0 +1,285 @@
+{
+  "checks": [
+    {
+      "details": {
+        "expected_source": "/private/tmp/loci-episode-patched.JKFqGl/src",
+        "loci_file": "/private/tmp/loci-episode-patched.JKFqGl/src/loci/__init__.py"
+      },
+      "id": "target_source_import",
+      "passed": true
+    },
+    {
+      "details": {
+        "expected": {
+          "PyYAML": "6.0.3",
+          "mcp": "2.0.0",
+          "pathspec": "1.1.1",
+          "pytest": "9.0.2",
+          "tree-sitter-language-pack": "1.15.8"
+        },
+        "observed": {
+          "PyYAML": "6.0.3",
+          "mcp": "2.0.0",
+          "pathspec": "1.1.1",
+          "pytest": "9.0.2",
+          "tree-sitter-language-pack": "1.15.8"
+        }
+      },
+      "id": "pinned_target_environment",
+      "passed": true
+    },
+    {
+      "details": {
+        ".direnv/node_modules/pkg/index.js": {
+          "excluded": true,
+          "indexable": false,
+          "reason": "policy_excluded",
+          "root": ".direnv"
+        },
+        "deep/tools/.direnv/lib/component.ts": {
+          "excluded": true,
+          "indexable": false,
+          "reason": "policy_excluded",
+          "root": "deep/tools/.direnv"
+        },
+        "tools/.direnv/lib/site.py": {
+          "excluded": true,
+          "indexable": false,
+          "reason": "policy_excluded",
+          "root": "tools/.direnv"
+        }
+      },
+      "id": "nested_exclusion",
+      "passed": true
+    },
+    {
+      "details": {
+        "src/loci/indexability.py": {
+          "excluded": false,
+          "indexable": true,
+          "reason": null
+        },
+        "tests/fixtures/sample.rs": {
+          "excluded": false,
+          "indexable": true,
+          "reason": null
+        },
+        "tools/.direnv-tools/site.py": {
+          "excluded": false,
+          "indexable": true,
+          "reason": null
+        },
+        "tools/.uv-cache/probe.py": {
+          "excluded": true,
+          "indexable": false,
+          "reason": "policy_excluded"
+        }
+      },
+      "id": "negative_policy_controls",
+      "passed": true
+    },
+    {
+      "details": {
+        "../outside.py": "ValueError",
+        "/tmp/outside.py": "ValueError"
+      },
+      "id": "path_safety",
+      "passed": true
+    },
+    {
+      "details": {
+        "files": [
+          "kept.py"
+        ],
+        "symbols": [
+          "kept.py",
+          "scan_kept_symbol"
+        ]
+      },
+      "id": "gitignore_uv_cache",
+      "passed": true
+    },
+    {
+      "details": {
+        "after_files": [
+          "sibling.py"
+        ],
+        "after_symbols": [
+          {
+            "file": "sibling.py",
+            "name": "episode_sibling_symbol"
+          },
+          {
+            "file": "sibling.py",
+            "name": "sibling.py"
+          }
+        ],
+        "before_files": [
+          "move_me.py",
+          "sibling.py"
+        ],
+        "incremental": {
+          "coverage": {
+            "excluded_paths": 1,
+            "exclusions": [
+              {
+                "omitted_samples": 0,
+                "paths": 1,
+                "reason": "policy_excluded",
+                "samples": [
+                  "tools/.direnv"
+                ]
+              }
+            ],
+            "indexed_files": 1,
+            "schema_version": 1,
+            "scope": "repository",
+            "source_scope": "indexed_supported_source",
+            "state": "partial",
+            "unknown_reason": null
+          },
+          "files_skipped": 1,
+          "graph_calls_indexed": 0,
+          "graph_calls_resolved": 0,
+          "graph_calls_unresolved": 0,
+          "graph_contributions_loaded": 0,
+          "graph_contributions_reused": 0,
+          "graph_diagnostics": [],
+          "graph_edges_indexed": 0,
+          "graph_file_nodes_indexed": 1,
+          "graph_go_packages_indexed": 0,
+          "graph_imports_indexed": 0,
+          "graph_imports_resolved": 0,
+          "graph_imports_unresolved": 0,
+          "graph_node_overlays_indexed": 0,
+          "graph_profiles_loaded": 0,
+          "graph_rust_crates_indexed": 0,
+          "graph_status": "healthy",
+          "graph_swift_modules_indexed": 0,
+          "graph_symbol_references_indexed": 0,
+          "graph_symbol_references_resolved": 0,
+          "graph_symbol_references_unresolved": 0,
+          "graph_type_relations_indexed": 0,
+          "graph_type_relations_resolved": 0,
+          "graph_type_relations_unresolved": 0,
+          "languages": {
+            "python": 1
+          },
+          "path": "/private/tmp/loci-episode-patched-work-v3/loci-oracle-fixtures/incremental-repo",
+          "symbols_indexed": 2
+        },
+        "moved_search": [
+          {
+            "file": "sibling.py",
+            "name": "episode_sibling_symbol"
+          }
+        ],
+        "sibling_search": [
+          {
+            "file": "sibling.py",
+            "name": "episode_sibling_symbol"
+          },
+          {
+            "file": "sibling.py",
+            "name": "sibling.py"
+          }
+        ]
+      },
+      "id": "incremental_terminal_state",
+      "passed": true
+    },
+    {
+      "details": {
+        "integration": {
+          "direnv": true,
+          "incremental": true,
+          "index": true,
+          "search_or_stored_symbols": true
+        },
+        "policy": {
+          "both_policy_functions": true,
+          "direnv": true,
+          "lookalike": true,
+          "path_safety": true
+        }
+      },
+      "id": "regression_deliverable",
+      "passed": true
+    },
+    {
+      "details": {
+        "commands": [
+          {
+            "command": [
+              "pytest",
+              "-q",
+              "tests/test_indexability.py"
+            ],
+            "passed": true,
+            "stderr": "",
+            "stdout": "..................                                                       [100%]\n18 passed in 0.02s\n"
+          },
+          {
+            "command": [
+              "pytest",
+              "-q",
+              "tests/test_cli.py",
+              "-k",
+              "gitignore or uv_cache or direnv"
+            ],
+            "passed": true,
+            "stderr": "",
+            "stdout": "..                                                                       [100%]\n2 passed, 76 deselected in 0.73s\n"
+          },
+          {
+            "command": [
+              "pytest",
+              "-q",
+              "tests/test_service.py",
+              "-k",
+              "direnv or incremental"
+            ],
+            "passed": true,
+            "stderr": "",
+            "stdout": "............                                                             [100%]\n12 passed, 115 deselected in 0.56s\n"
+          }
+        ]
+      },
+      "id": "focused_target_tests",
+      "passed": true
+    }
+  ],
+  "episode_id": "loci-direnv-exclusion",
+  "errors": [],
+  "limitations": [
+    "The evaluator scores terminal behavior and regression shape; it does not score the read-only orientation explanation or an agent's prose summary.",
+    "Regression-deliverable inspection confirms focused policy and integration evidence exists and the target tests execute, while independent fixture probes remain the behavior oracle."
+  ],
+  "provenance": {
+    "environment_asset": "/Users/brummerv/loci/benchmarks/complete_work/oracles/loci_environment.json",
+    "environment_asset_sha256": "5a6e91c1016aa1010c0ef631cb7028e29a16234fb5c66b27a042c514a2acddb7",
+    "evaluated_file_hashes": {
+      "src/loci/indexability.py": "4089ff913b2b4b0470140a445e224d1439c33ac159c95082b0cfb551570dac68",
+      "tests/test_indexability.py": "c3dc0f1c45089a4c4130a39a2bba6ebdeb22135c325f53fb29eeb53a639ace39",
+      "tests/test_service.py": "b22acb4f08fd842ceb4c303b0d05ba994542e21dc94a3ddb53fc182840eb4ce1"
+    },
+    "target_commit": "f3d9134aece5156bec1dcc302d4330522d1d96e5",
+    "target_repo": "/private/tmp/loci-episode-patched.JKFqGl",
+    "target_source_contract": "child process PYTHONPATH begins with <repo>/src"
+  },
+  "runtime": {
+    "dependencies": {
+      "PyYAML": "6.0.3",
+      "mcp": "2.0.0",
+      "pathspec": "1.1.1",
+      "pytest": "9.0.2",
+      "tree-sitter-language-pack": "1.15.8"
+    },
+    "elapsed_seconds": 20.418,
+    "executable": "/Users/brummerv/loci/.venv/bin/python3",
+    "loci_file": "/private/tmp/loci-episode-patched.JKFqGl/src/loci/__init__.py",
+    "python_executable": "/Users/brummerv/loci/.venv/bin/python3"
+  },
+  "schema_version": 1,
+  "status": "passed"
+}
