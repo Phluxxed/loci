@@ -67,4 +67,11 @@ on restart, not complete. W1.8.4.4.10 separately retains the original negative
 ordinary-value disposition and explicit final Objective acceptance requirement;
 completed repairs cannot close that requirement through derived graph rollup.
 
+Publication: presentation `1592f0a`, schema/local acceptance `19ebf34`, both
+remotely verified. Main Steward adopted two Brain revisions from one read-only
+proposal using the existing canonical temporal maintenance helper; full proposed
+histories, lint and render pass. Brain `dc25ced` is remotely verified. One manual
+coverage event records the completed maintenance. No runtime restart or new
+provider comparison was performed.
+
 > **TL;DR:** Diagnose the two observed sources of extra retrieval independently, then record each warranted repair and check as a child before execution.
