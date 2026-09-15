@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "status": "design_complete_not_campaign_frozen",
+  "manifest_card": "W1.8.4.4.10.2.1",
+  "common_initial_prompt_template": "Work in the supplied isolated repository {repo}. Use repository source and installed operating instructions. Keep source and test changes in this working copy; use only its designated temporary test area and store. Do not access other task copies, benchmark/evaluator artifacts or prior answers. Do not publish, change live services, update Manifest/Brain, or spawn agents. Dependencies are prepared; do not install or download packages. Local ephemeral test fixtures are allowed.\n\n",
+  "common_initial_prompt_template_sha256": "7cd76c8068bee1d664b3d949d068ac2b9251d15c4c1559ab8395fa4a2261a9e2",
+  "continuation_policy": "Append only the next fixed stage prompt in the same native thread after normal completion; no evaluator feedback. On timeout/abort/unrecoverable harness failure, end episode and mark later stages not_reached.",
+  "evaluation": "Terminal behavior and preserved invariants determine success; corrected early errors are retained as stage/rework observations. Independent fixtures and source hashes must be implemented and frozen before launch.",
+  "episodes": [
+    {
+      "id": "anvil-creation-evidence",
+      "repository": "anvil",
+      "source": {
+        "kind": "retained_file_manifest",
+        "historical_commit": "53bf29e60cece2335aa39fe301935a07e8e8d4e4",
+        "readable_root": "/tmp/anvil-source-tasks-20260914/t21",
+        "manifest": "benchmarks/comparisons/ordinary-adoption-v1/cases.json",
+        "file_count": 638,
+        "original_archive_available": false
+      },
+      "grounding": "candidates/anvil.md",
+      "stages": [
+        {
+          "id": "orient",
+          "cap_seconds": 120,
+          "prompt": "Before I change the Manifest card's task-creation explanation, explain how the view decides that a task was added during Implementation. Identify the inputs, the fallbacks when history is missing or ambiguous, and the boundary between display metadata and graph state. Do not change files.",
+          "observed_acceptance": [
+            "Explains standalone marker precedence, committed-history inference and deliberately unknown origins.",
+            "Correctly keeps creation evidence advisory and separate from graph execution state.",
+            "No source edits. Incidental private symbol names are not required."
+          ],
+          "prompt_sha256": "8cb3aac5c895488825c538ff6edecfd1487974acd7df00da12cc5ffeb8340e20"
+        },
+        {
+          "id": "implement",
+          "cap_seconds": 360,
+          "prompt": "Improve the Manifest task detail so a reviewer can tell whether its creation-phase label came from an explicit task-details marker, committed Git history, or neither. Expose a Creation evidence field using Task details, Git history, or Unproven. Keep this advisory only: do not change graph JSON, scheduling or availability, completion, or the existing Added during Implementation card marker. Add focused tests.",
+          "observed_acceptance": [
+            "The public task-detail Creation evidence field distinguishes the three specified sources.",
+            "Marker precedence, deliberately unknown cases and existing phase/graph behavior remain correct.",
+            "Focused tests exercise positive and negative behavior."
+          ],
+          "prompt_sha256": "eca4718fff0c980407bb1d09582f65f0869de997b8038e4de1b237274fb45274"
+        },
+        {
+          "id": "continue",
+          "cap_seconds": 240,
+          "prompt": "Extend the same creation-evidence explanation to the HTTP API and the embedded page data, and prove they agree for an explicit marker, a Git-derived task, and an unknown task. Keep the Creation evidence field free of repository paths, commit hashes, and raw Git errors. Summarise the final behavior and tests, correcting any earlier explanation that proved wrong.",
+          "observed_acceptance": [
+            "The API and embedded manifest-human-view JSON have matching Creation phase and Creation evidence for all three fixture categories.",
+            "No sensitive/internal Git provenance appears in the public field.",
+            "Required previous behavior remains; final summary is supported."
+          ],
+          "prompt_sha256": "946b96cf8dcddce670a169aba6fb5835d18adbfa57947b30b2db8b3395e30ff0"
+        }
+      ],
+      "terminal_acceptance": [
+        {
+          "id": "evidence_categories",
+          "check": "Independent fixtures read task detail and observe exactly Task details, Git history or Unproven under the requested Creation evidence field; valid explicit marker precedence remains."
+        },
+        {
+          "id": "unknown_and_marker_controls",
+          "check": "Absent/unavailable/ambiguous/malformed/conflicting evidence stays Unproven; fenced/quoted examples are not counted as standalone explicit markers; existing phase behavior agrees with frozen pre-change expectations."
+        },
+        {
+          "id": "history_and_recursive_controls",
+          "check": "Temporary Git fixtures cover a later Implementation addition, transition-commit ambiguity, recursive tasks and rename/reparent cases; evidence follows the task identity without changing phase derivation."
+        },
+        {
+          "id": "advisory_only",
+          "check": "Serialized graph schema/data, progress, completion, blockers, current/next/available work, edges and existing Added during Implementation marker remain unchanged for identical graph input. A material violation is severe."
+        },
+        {
+          "id": "api_page_parity",
+          "check": "Independent ephemeral-loopback API and HTML-embedded JSON checks agree on the public fields for marker/history/unproven cases. Accept equivalent private helpers/types; do not mandate implementation shape."
+        },
+        {
+          "id": "safe_public_output",
+          "check": "Public evidence contains only the specified category and no absolute repository path, commit hash or raw command/error output."
+        },
+        {
+          "id": "tests_and_final_claims",
+          "check": "Requested focused tests exercise actual behavior, frozen relevant regressions pass, and the final explanation contains no unresolved material error. Earlier corrected errors remain stage/rework observations."
+        }
+      ],
+      "baseline_check_commands": [
+        "npm run typecheck",
+        "node --test --test-concurrency=1 test/manifest-task-creation.test.ts test/manifest-view.test.ts"
+      ],
+      "setup_limits": [
+        "Retained export has no Git history; evaluator fixtures create fresh temporary repos with pinned local Git identity.",
+        "Node>=22.18 and exact dependency lock/runtime must be prepared before measurement; this design has not installed or run them.",
+        "Loopback test server permitted inside isolated evaluator/test fixture, not as a live product deployment."
+      ],
+      "grounding_sha256": "bcc8d03e9676a6a3e46ed3bced64bbc3dcb0685d58eaa7ed1550beea0e8cb6c9"
+    },
+    {
+      "id": "loci-direnv-exclusion",
+      "repository": "loci",
+      "source": {
+        "kind": "git_export",
+        "commit": "f3d9134aece5156bec1dcc302d4330522d1d96e5",
+        "repository": "/Users/brummerv/loci",
+        "unrelated_dirty_files_excluded": true
+      },
+      "grounding": "candidates/loci.md",
+      "stages": [
+        {
+          "id": "orient",
+          "cap_seconds": 120,
+          "prompt": "A support report says our index includes Python installed under project-local .direnv environments. Before changing anything, trace how a repository-relative path is excluded during indexing and say whether adding .direnv to the disposable-directory policy would also remove an already-indexed file after an incremental reindex. Give the relevant code and test locations, the current behavior, and the smallest safe change. Do not edit files.",
+          "observed_acceptance": [
+            "Identifies the missing directory policy and exact-component semantics.",
+            "Connects policy to scan and incremental replacement without claiming a policy edit alone changes a stored index.",
+            "No source edits; source-backed test boundary identified."
+          ],
+          "prompt_sha256": "c393a244c750725cbd5680f116c92421b7c2f03357d4966e1afbea4dc16b1ef1"
+        },
+        {
+          "id": "implement",
+          "cap_seconds": 360,
+          "prompt": "Implement the smallest safe fix for that support case: treat any repository directory named .direnv as disposable, so source below it is not indexed. Add focused coverage at the policy boundary. Keep maintained sources and the path-safety behavior intact.",
+          "observed_acceptance": [
+            "Nested exact .direnv paths are excluded for supported source, including non-Python source.",
+            "Lookalikes and maintained siblings remain indexable; absolute/parent traversal rejection remains.",
+            "Localized policy change with meaningful positive and negative tests."
+          ],
+          "prompt_sha256": "e7dd88584ed6cbb6d772b5eab2b3b2fd9b3baacea72717aa139a71d96984c8d3"
+        },
+        {
+          "id": "continue",
+          "cap_seconds": 240,
+          "prompt": "Follow-up: add a regression at the indexing boundary for an already-indexed repository that moves a Python source file under a .direnv subtree before an incremental reindex. Its symbol must disappear from the index while a normal sibling source stays searchable. Keep the new policy confined to the exact directory name. Summarise the final behavior and tests, correcting any earlier explanation that proved wrong.",
+          "observed_acceptance": [
+            "Real temporary-store integration indexes two symbols, moves one under nested .direnv, incrementally reindexes and observes only the maintained symbol.",
+            "No stale moved-path symbol/hash remains; exact-name negative case still passes.",
+            "Final behavior/tests are accurately reported."
+          ],
+          "prompt_sha256": "a3aeab760972f416a3385fef10535e9b31c0d727a9f05eebec7d12a56f1c6464"
+        }
+      ],
+      "terminal_acceptance": [
+        {
+          "id": "nested_exclusion",
+          "check": "Independent calls through public indexability/scan boundaries exclude source below a directory component exactly .direnv at top level and nested depth, for Python and another supported language."
+        },
+        {
+          "id": "negative_policy_controls",
+          "check": "Maintained src/tests/fixtures, .direnv-tools lookalikes, existing gitignore and uv-cache behavior remain correct; no broad dot-directory or substring exclusion."
+        },
+        {
+          "id": "path_safety",
+          "check": "Existing absolute and parent-traversal rejection stays a ValueError. A material weakening is severe."
+        },
+        {
+          "id": "incremental_terminal_state",
+          "check": "In an independent fresh LOCI_BASE_DIR fixture, index two unique Python symbols, move one file under tools/.direnv/lib, incrementally reindex, and verify moved symbol/path/hash gone while normal sibling remains searchable."
+        },
+        {
+          "id": "regression_deliverable",
+          "check": "The agent adds an indexing-boundary regression with pre/post indexing and search assertions, plus focused policy coverage; pure helper assertions alone do not satisfy continuation."
+        },
+        {
+          "id": "localized_change_and_claims",
+          "check": "No change to navigation server, retrieval/graph policy, unrelated CLI behavior or evaluation controls; requested focused tests and frozen relevant regressions pass, with no unresolved material final claim. Equivalent localized policy implementations are accepted."
+        }
+      ],
+      "baseline_check_commands": [
+        "python -m pytest -q tests/test_indexability.py",
+        "python -m pytest -q tests/test_cli.py -k \"gitignore or uv_cache or direnv\"",
+        "python -m pytest -q tests/test_service.py -k \"direnv or incremental\""
+      ],
+      "setup_limits": [
+        "Use an isolated clean export; existing skill and scratch dirt is not source input.",
+        "Pin a prepared Python environment and parser dependencies for target tests; no installations inside measured episodes.",
+        "Pin serving Loci implementation outside the writable benchmark target so target edits cannot modify the experimental tool."
+      ],
+      "grounding_sha256": "44ed63ea227bb3d3f0592bf97aa5fd8f8279829623ba7c390f20e23f48fee791"
+    }
+  ]
+}
