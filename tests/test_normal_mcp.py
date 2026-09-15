@@ -273,12 +273,23 @@ def test_normal_stdio_retrieves_and_reads_returned_source_ref(tmp_path: Path) ->
             assert isinstance(payload, dict)
             LociRetrieveOutput.model_validate(payload)
             assert payload["sources"]
+            reference = payload["sources"][0]["source_ref"]
+            assert reference.startswith("sr1_") and len(reference) == 30
             read = await session.call_tool(
                 "loci_read",
-                arguments={"repo": str(repo), "source_ref": payload["sources"][0]["source_ref"]},
+                arguments={"repo": str(repo), "source_ref": reference},
             )
             assert read.is_error is False
             assert isinstance(read.structured_content, dict)
             LociReadOutput.model_validate(read.structured_content)
+            original_source = read.structured_content["source"]
+
+        # A fresh server resolves the same reference from its configured store.
+        async with Client(stdio_client(params)) as restarted:
+            read = await restarted.call_tool(
+                "loci_read", arguments={"repo": str(repo), "source_ref": reference},
+            )
+            assert read.is_error is False
+            assert read.structured_content["source"] == original_source
 
     asyncio.run(check())

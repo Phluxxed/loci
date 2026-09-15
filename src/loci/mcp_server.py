@@ -233,7 +233,7 @@ def create_server(
         indexed relative file path in ``query`` selects that file; other queries
         select bounded source candidates. The repository refreshes automatically.
         Results include source, relationship proof, ambiguity and omissions. Use
-        an incomplete item's ``source_ref`` with ``loci_read`` to hydrate its
+        an incomplete item's short ``source_ref`` with ``loci_read`` to hydrate its
         exact source, or pass a returned node ID as a seed to re-anchor under the
         same fixed policy. Relationships are static and non-exhaustive.
         """
@@ -254,7 +254,9 @@ def create_server(
     ) -> Annotated[CallToolResult, LociReadOutput]:
         """Expand one exact source extent named by a returned ``source_ref``.
 
-        Follow ``next_source_ref`` until it is null to page an incomplete extent.
+        Pass the returned short handle unchanged. Follow ``next_source_ref``
+        until it is null to page an incomplete extent. An unknown or expired
+        handle requires fresh ``loci_retrieve`` context in the same repository.
         ``SOURCE_STALE`` means the indexed source changed; make a fresh
         ``loci_retrieve`` request instead of reusing the old locator.
         """

@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "target": "/tmp/anvil-source-tasks-20260914/t16",
+  "query": "captureCommandResult",
+  "isolation": "fresh temporary LOCI_BASE_DIR for each replay",
+  "retained_before": {
+    "source": "benchmarks/comparisons/ordinary-adoption-repair-binding-v2/runs/binding-repair-v2-01/observation.json",
+    "relationships": [
+      "captureCommandResult calls opaqueId",
+      "capture calls captureCommandResult",
+      "captureCommandResult uses_type ToolResultReceipt"
+    ],
+    "missing": [
+      "captureCommandResult uses_type CaptureCommandResultOptions",
+      "CaptureCommandResultOptions uses_type WorkContextBinding"
+    ],
+    "output_bytes": 15932
+  },
+  "legacy_long_reference_after": {
+    "phase": "preliminary all-branches priority proof retained before representative-path narrowing",
+    "relationships_first": [
+      "captureCommandResult uses_type CaptureCommandResultOptions",
+      "CaptureCommandResultOptions uses_type WorkContextBinding",
+      "CaptureCommandResultOptions uses_type Clock"
+    ],
+    "required_relationship_proof": "complete",
+    "required_relationship_proof_files": [
+      "package.json",
+      "src/tool-results/service.ts",
+      "src/work-context/binding.ts",
+      "src/work-context/index.ts",
+      "tsconfig.json"
+    ],
+    "evidence_bytes": 3051,
+    "output_bytes": 16356,
+    "max_output_bytes": 16384,
+    "max_hops": 2
+  },
+  "short_reference_after": {
+    "phase": "final representative-path scheduler",
+    "deterministic_repeat": true,
+    "relationships_first": [
+      "captureCommandResult uses_type CaptureCommandResultOptions",
+      "CaptureCommandResultOptions uses_type WorkContextBinding",
+      "captureCommandResult calls opaqueId",
+      "capture calls captureCommandResult"
+    ],
+    "required_relationship_proof": "complete",
+    "evidence_bytes": 3783,
+    "output_bytes": 16268,
+    "max_output_bytes": 16384,
+    "max_hops": 2
+  },
+  "verification": {
+    "command": ".venv/bin/pytest -q tests/test_retrieval_signature_path.py tests/test_retrieval.py tests/test_retrieval_io.py",
+    "result": "32 passed in 0.96s",
+    "integration_command": ".venv/bin/pytest -q tests/test_normal_retrieval_acceptance.py tests/test_normal_mcp.py",
+    "integration_result": "20 passed in 3.10s",
+    "diff_check": "passed",
+    "retrieval_sha256": "2cbbb7e8f690bf655490898098da7b503861cda7feca31bbe620289efcb55177",
+    "test_sha256": "8b262f8bf1d9bdd006bf6629a380b272315eb6b5c341d8c31f8b70a4f8e169bd"
+  },
+  "review_regressions": {
+    "single_neighbor_admission": "The priority and later ordinary stages reuse one admitted neighborhood per node; a max_neighbors=1 fixture admits Binding and never later admits Clock.",
+    "failed_transition": "A stale first-edge proof does not mark the transition successful and the downstream Options-to-Binding edge is absent.",
+    "typescript_role": "A bounded stored signature is parsed once per selected callable. Structural parameter-field spans include ActualInput while excluding a same-context generic ConstraintPayload and a function-body local annotation.",
+    "representative_path": "Each callable promotes one deterministic authored input/dependency path. The pressure fixture then delivers both forward body-call and reverse caller controls before remaining ordinary type branches."
+  },
+  "coverage_limit": "The current index proves direct parameter types with context=annotation. TypeScript declarations whose bounded first-line stored signature cannot structurally prove the parameter field, and nested generic type_argument records that do not encode parameter-versus-return ownership, remain ordinary edges."
+}

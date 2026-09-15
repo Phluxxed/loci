@@ -43,6 +43,14 @@ _TYPE_TO_FAMILY = {
 }
 _ALLOWED_RESOLUTIONS = frozenset({"exact", "declared", "import-resolved"})
 _NATIVE_KINDS = frozenset({"file", "package", "crate", "module"})
+_SIGNATURE_OWNER_KINDS = frozenset({"function", "method"})
+_CONTRACT_OWNER_KINDS = frozenset({
+    "class", "interface", "type", "struct", "enum", "trait",
+})
+_CONTRACT_TYPE_CONTEXTS = frozenset({
+    "property", "alias", "type_argument", "constraint", "heritage",
+    "struct_embedding", "interface_embedding", "supertrait",
+})
 
 
 @dataclass(frozen=True)
@@ -89,6 +97,7 @@ def retrieve_context(
     ]
     packer = RetrievalPacker(
         repo,
+        store=store,
         snapshot=snapshot_id(state, source.file_hashes),
         selection=selection,
         scope={
@@ -143,6 +152,11 @@ def retrieve_context(
         adjacency,
         nodes,
     )
+    signature_type_paths = _selected_signature_type_paths(
+        tuple(visit.node_id for visit in anchor_visits), state, nodes,
+    )
+    admitted_neighbors: dict[str, tuple[GraphTraversalStep, ...]] = {}
+    successful_steps: set[tuple[str, str, str, str]] = set()
     # Selected source identities are the request's strongest relevance signal.
     # Give their direct semantic proof one bounded pass before ownership-driven
     # files and representative members join the traversal layer.  Anchor source,
@@ -160,6 +174,9 @@ def retrieve_context(
         priority_anchor_ids=(frozenset(anchor.node_id for anchor in anchors)
                              if seeds else frozenset()),
         priority_target_ids=anchor_bridge_targets,
+        priority_type_paths=signature_type_paths,
+        admitted_neighbors=admitted_neighbors,
+        successful_steps=successful_steps,
     ))
     pretraversed_anchors = {visit.node_id for visit in anchor_visits}
 
@@ -218,6 +235,8 @@ def retrieve_context(
             degrees=degrees,
             packer=packer,
             visited=visited,
+            admitted_neighbors=admitted_neighbors,
+            successful_steps=successful_steps,
         ))
 
     packer.usage["nodes_examined"] = len(visited)
@@ -237,32 +256,61 @@ def _traverse_relationships(
     visited: set[str],
     priority_anchor_ids: frozenset[str] = frozenset(),
     priority_target_ids: tuple[str, ...] = (),
+    priority_type_paths: tuple[tuple[str, ...], ...] = (),
+    admitted_neighbors: dict[str, tuple[GraphTraversalStep, ...]] | None = None,
+    successful_steps: set[tuple[str, str, str, str]] | None = None,
 ) -> list[_Visit]:
     """Traverse one semantic layer with fixed family/direction fairness."""
     priority_target_rank = {
         target_id: index for index, target_id in enumerate(priority_target_ids)
     }
+    priority_path_target_rank: dict[str, dict[str, int]] = defaultdict(dict)
+    for path in priority_type_paths:
+        for source_id, target_id in zip(path, path[1:]):
+            ranks = priority_path_target_rank[source_id]
+            ranks.setdefault(target_id, len(ranks))
     ordered = sorted(visits, key=lambda value: (value.anchor_index, value.node_id))
     per_anchor: dict[int, list[tuple[_Visit, list[GraphTraversalStep]]]] = defaultdict(list)
+    priority_path_steps: dict[str, dict[str, GraphTraversalStep]] = {}
+    admitted = admitted_neighbors if admitted_neighbors is not None else {}
+    accepted = successful_steps if successful_steps is not None else set()
     for visit in ordered:
-        neighbors = list(adjacency.get(visit.node_id, ()))
-        packer.usage["eligible_edges_considered"] += len(neighbors)
-        ranked = _ranked_neighbors(neighbors, nodes, query_terms, degrees)
-        if visit.node_id in priority_anchor_ids or priority_target_rank:
-            ranked = sorted(
-                ranked,
-                key=lambda step: (
-                    0 if step.to_id in priority_anchor_ids else 1,
-                    (
-                        priority_target_rank[step.to_id]
-                        if _is_type_bridge_step(step, priority_target_rank)
-                        else len(priority_target_rank)
+        cached = admitted.get(visit.node_id)
+        if cached is None:
+            neighbors = list(adjacency.get(visit.node_id, ()))
+            packer.usage["eligible_edges_considered"] += len(neighbors)
+            ranked = _ranked_neighbors(neighbors, nodes, query_terms, degrees)
+            path_target_rank = priority_path_target_rank.get(visit.node_id, {})
+            if visit.node_id in priority_anchor_ids or priority_target_rank or path_target_rank:
+                ranked = sorted(
+                    ranked,
+                    key=lambda step: (
+                        0 if step.to_id in priority_anchor_ids else 1,
+                        (
+                            path_target_rank[step.to_id]
+                            if _is_type_bridge_step(step, path_target_rank)
+                            else len(path_target_rank)
+                        ),
+                        (
+                            priority_target_rank[step.to_id]
+                            if _is_type_bridge_step(step, priority_target_rank)
+                            else len(priority_target_rank)
+                        ),
                     ),
-                ),
-            )
-        if len(ranked) > LIMITS["max_neighbors"]:
-            packer.omit("neighbor_limit", len(ranked) - LIMITS["max_neighbors"])
-            ranked = ranked[:LIMITS["max_neighbors"]]
+                )
+            if len(ranked) > LIMITS["max_neighbors"]:
+                packer.omit("neighbor_limit", len(ranked) - LIMITS["max_neighbors"])
+                ranked = ranked[:LIMITS["max_neighbors"]]
+            admitted[visit.node_id] = tuple(ranked)
+        else:
+            ranked = list(cached)
+        path_target_rank = priority_path_target_rank.get(visit.node_id, {})
+        if path_target_rank:
+            priority_path_steps[visit.node_id] = {
+                step.to_id: step for step in ranked
+                if _is_type_bridge_step(step, path_target_rank)
+                and step.traversed == "forward"
+            }
         if depth == LIMITS["max_hops"]:
             packer.omit("hop_limit", len(ranked))
             continue
@@ -270,16 +318,29 @@ def _traverse_relationships(
 
     scheduler: dict[int, list[deque[tuple[_Visit, GraphTraversalStep]]]] = {}
     prioritized: list[tuple[int, int, int, _Visit, GraphTraversalStep]] = []
+    priority_path_pairs = {
+        (source_id, target_id)
+        for path in priority_type_paths
+        for source_id, target_id in zip(path, path[1:])
+    }
     for anchor_index in sorted(per_anchor):
         queues = [deque() for _ in range(8)]
         for visit, steps in per_anchor[anchor_index]:
             for step in steps:
                 pair = (visit, step)
+                if _step_key(visit, step) in accepted:
+                    continue
                 if (
                     visit.node_id in priority_anchor_ids
                     and step.to_id in priority_anchor_ids
                 ):
                     prioritized.append((0, 0, visit.anchor_index, visit, step))
+                elif (
+                    (visit.node_id, step.to_id) in priority_path_pairs
+                    and _TYPE_TO_FAMILY[step.edge.type] == 1
+                    and priority_path_steps.get(visit.node_id, {}).get(step.to_id) == step
+                ):
+                    continue
                 elif _is_type_bridge_step(step, priority_target_rank):
                     prioritized.append((
                         1,
@@ -294,15 +355,15 @@ def _traverse_relationships(
 
     next_visits: list[_Visit] = []
 
-    def traverse(visit: _Visit, step: GraphTraversalStep) -> None:
+    def traverse(visit: _Visit, step: GraphTraversalStep) -> _Visit | None:
         target_id = step.to_id
         if target_id in (*visit.lineage, visit.node_id):
             packer.omit("cycle")
-            return
+            return None
         already_visited = target_id in visited
         if not already_visited and len(visited) >= LIMITS["max_nodes"]:
             packer.omit("node_limit")
-            return
+            return None
         packer.usage["edges_traversed"] += 1
         target = nodes[target_id]
         proof = source.proof(step.edge)
@@ -310,9 +371,9 @@ def _traverse_relationships(
             packer.omit("proof_unavailable")
             if not already_visited:
                 visited.add(target_id)
-            return
+            return None
         addition, missing_source = _relation_addition(
-            source, nodes[visit.node_id], target, step, proof, depth + 1,
+            source, nodes[visit.node_id], target, step, proof, visit.depth + 1,
             include_item=not already_visited,
         )
         if missing_source:
@@ -320,22 +381,89 @@ def _traverse_relationships(
         if not already_visited:
             visited.add(target_id)
         if packer.add(addition):
+            accepted.add(_step_key(visit, step))
+            next_visit = _Visit(
+                target_id, visit.anchor_index, visit.depth + 1,
+                (*visit.lineage, visit.node_id),
+                f"{_FAMILY_TYPES[_TYPE_TO_FAMILY[step.edge.type]][0]} relationship",
+            )
             if already_visited:
                 packer.omit("alternative_path")
             else:
-                next_visits.append(_Visit(
-                    target_id, visit.anchor_index, depth + 1,
-                    (*visit.lineage, visit.node_id),
-                    f"{_FAMILY_TYPES[_TYPE_TO_FAMILY[step.edge.type]][0]} relationship",
-                ))
+                next_visits.append(next_visit)
+            return next_visit
+        return None
 
-    for _kind, _target_rank, _anchor_index, visit, step in sorted(
+    ordered_priorities = sorted(
         prioritized,
         key=lambda item: (
             item[0], item[1], item[2], _queue_index(item[4]), item[4].to_id,
         ),
-    ):
-        traverse(visit, step)
+    )
+    for kind, _target_rank, _anchor_index, visit, step in ordered_priorities:
+        if kind == 0:
+            traverse(visit, step)
+
+    if priority_type_paths:
+        visits_by_id = {visit.node_id: visit for visit in visits}
+        for path in priority_type_paths:
+            current = visits_by_id.get(path[0])
+            if current is None:
+                continue
+            for target_id in path[1:]:
+                if current.depth >= LIMITS["max_hops"]:
+                    packer.omit("hop_limit")
+                    break
+                if current.node_id not in priority_path_steps:
+                    target_rank = priority_path_target_rank.get(current.node_id, {})
+                    cached = admitted.get(current.node_id)
+                    if cached is None:
+                        neighbors = list(adjacency.get(current.node_id, ()))
+                        packer.usage["eligible_edges_considered"] += len(neighbors)
+                        ranked = _ranked_neighbors(neighbors, nodes, query_terms, degrees)
+                        ranked = sorted(
+                            ranked,
+                            key=lambda value: (
+                                target_rank[value.to_id]
+                                if _is_type_bridge_step(value, target_rank)
+                                and value.traversed == "forward"
+                                else len(target_rank),
+                            ),
+                        )
+                        if len(ranked) > LIMITS["max_neighbors"]:
+                            packer.omit(
+                                "neighbor_limit", len(ranked) - LIMITS["max_neighbors"],
+                            )
+                            ranked = ranked[:LIMITS["max_neighbors"]]
+                        admitted[current.node_id] = tuple(ranked)
+                    else:
+                        ranked = list(cached)
+                    priority_path_steps[current.node_id] = {
+                        value.to_id: value for value in ranked
+                        if _is_type_bridge_step(value, target_rank)
+                        and value.traversed == "forward"
+                    }
+                step = priority_path_steps[current.node_id].get(target_id)
+                if step is None:
+                    break
+                pair = (current.node_id, target_id, step.edge.type, step.traversed)
+                if pair in accepted:
+                    next_visit = _Visit(
+                        target_id, current.anchor_index, current.depth + 1,
+                        (*current.lineage, current.node_id), "types relationship",
+                    )
+                else:
+                    next_visit = traverse(current, step)
+                    if next_visit is None:
+                        break
+                visits_by_id[target_id] = next_visit
+                current = next_visit
+
+    for kind, _target_rank, _anchor_index, visit, step in ordered_priorities:
+        if kind != 0 and (
+            visit.node_id, step.to_id, step.edge.type, step.traversed
+        ) not in accepted:
+            traverse(visit, step)
     while any(queue for queues in scheduler.values() for queue in queues):
         for anchor_index in sorted(scheduler):
             queues = scheduler[anchor_index]
@@ -343,6 +471,13 @@ def _traverse_relationships(
                 if queue:
                     traverse(*queue.popleft())
     return next_visits
+
+
+def _step_key(
+    visit: _Visit,
+    step: GraphTraversalStep,
+) -> tuple[str, str, str, str]:
+    return visit.node_id, step.to_id, step.edge.type, step.traversed
 
 
 def _is_type_bridge_step(
@@ -353,6 +488,151 @@ def _is_type_bridge_step(
         step.to_id in priority_target_rank
         and _TYPE_TO_FAMILY[step.edge.type] == 1
     )
+
+
+def _selected_signature_type_paths(
+    anchor_ids: Sequence[str],
+    state: GraphIndexState,
+    nodes: Mapping[str, Mapping[str, Any]],
+) -> tuple[tuple[str, ...], ...]:
+    """Return proven input-type paths from selected callable declarations."""
+    anchor_rank = {node_id: index for index, node_id in enumerate(anchor_ids)}
+    typescript_parameter_spans = {
+        node_id: _typescript_parameter_span(nodes[node_id])
+        for node_id in anchor_ids
+        if node_id in nodes and nodes[node_id].get("language") == "typescript"
+    }
+    type_edges = {
+        (edge.from_id, edge.to_id, edge.type)
+        for edge in state.edges
+        if edge.namespace == "loci"
+        and edge.type in _TYPE_TO_FAMILY
+        and _TYPE_TO_FAMILY[edge.type] == 1
+        and edge.resolution in _ALLOWED_RESOLUTIONS
+    }
+
+    def resolved_record(record: Any) -> bool:
+        return (
+            record.status == "resolved"
+            and record.source_id in nodes
+            and record.target_id in nodes
+            and (record.source_id, record.target_id, record.raw.relation) in type_edges
+            and nodes[record.target_id].get("kind") not in _NATIVE_KINDS
+        )
+
+    inputs = sorted(
+        (
+            record for record in state.type_relations
+            if resolved_record(record)
+            and record.source_id in anchor_rank
+            and record.source_kind in _SIGNATURE_OWNER_KINDS
+            and record.raw.owner.kind in _SIGNATURE_OWNER_KINDS
+            and _proven_input_type_record(
+                record,
+                nodes[record.source_id],
+                typescript_parameter_span=typescript_parameter_spans.get(record.source_id),
+            )
+        ),
+        key=lambda record: (
+            anchor_rank[record.source_id], record.raw.line, record.raw.column,
+            record.target_id,
+        ),
+    )
+    dependencies: dict[str, list[Any]] = defaultdict(list)
+    for record in state.type_relations:
+        if (
+            resolved_record(record)
+            and record.source_kind in _CONTRACT_OWNER_KINDS
+            and record.raw.owner.kind in _CONTRACT_OWNER_KINDS
+            and record.raw.context in _CONTRACT_TYPE_CONTEXTS
+        ):
+            dependencies[record.source_id].append(record)
+
+    paths: list[tuple[str, ...]] = []
+    for anchor_id in anchor_ids:
+        authored_inputs = [record for record in inputs if record.source_id == anchor_id]
+        fallback = None
+        for record in authored_inputs:
+            direct = (record.source_id, record.target_id)
+            if fallback is None:
+                fallback = direct
+            downstream = sorted(
+                dependencies.get(record.target_id, ()),
+                key=lambda value: (value.raw.line, value.raw.column, value.target_id),
+            )
+            if downstream:
+                paths.append((*direct, downstream[0].target_id))
+                break
+        else:
+            if fallback is not None:
+                paths.append(fallback)
+    return tuple(paths)
+
+
+def _proven_input_type_record(
+    record: Any,
+    source_node: Mapping[str, Any],
+    *,
+    typescript_parameter_span: tuple[int, int] | None = None,
+) -> bool:
+    """Accept only annotations whose indexed evidence proves an input position."""
+    raw = record.raw
+    if raw.context != "annotation":
+        return False
+    if raw.language in {"python", "go", "rust"}:
+        # These extractors assign ``annotation`` only while visiting callable
+        # parameters (and Go receivers); returns and declaration fields receive
+        # separate controlled contexts.
+        return True
+    if raw.language != "typescript":
+        return False
+
+    # The shared TypeScript observer also uses ``annotation`` for local variable
+    # declarations and for annotations nested in generic constraints.  Parse the
+    # bounded stored signature and require the exact site to fall in the outer
+    # callable declaration's structural parameter field.  Decorated or multiline
+    # declarations whose first-line signature cannot prove that position remain
+    # ordinary edges.
+    start = source_node.get("byte_offset")
+    if typescript_parameter_span is None or type(start) is not int:
+        return False
+    relative_start = raw.start_byte - start
+    relative_end = raw.end_byte - start
+    parameter_start, parameter_end = typescript_parameter_span
+    return parameter_start <= relative_start and relative_end <= parameter_end
+
+
+def _typescript_parameter_span(
+    source_node: Mapping[str, Any],
+) -> tuple[int, int] | None:
+    """Parse one bounded stored signature and locate its outer parameters."""
+    signature = source_node.get("signature")
+    if not isinstance(signature, str):
+        return None
+    encoded = signature.encode("utf-8")
+    if len(encoded) > 16_384:
+        return None
+    try:
+        from tree_sitter import Parser
+        from tree_sitter_language_pack import get_language
+
+        grammar = "tsx" if str(source_node.get("file_path", "")).endswith(".tsx") \
+            else "typescript"
+        root = Parser(get_language(grammar)).parse(encoded).root_node
+    except Exception:
+        return None
+
+    pending = [root]
+    while pending:
+        node = pending.pop()
+        if node.type in {
+            "function_declaration", "function_expression", "method_definition",
+        }:
+            parameters = node.child_by_field_name("parameters")
+            if parameters is not None:
+                return parameters.start_byte, parameters.end_byte
+        pending.extend(reversed(node.named_children))
+    return None
 
 
 def _selected_anchor_type_bridges(

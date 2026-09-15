@@ -1,0 +1,72 @@
+{
+  "scope": "One actual host loci_retrieve response retained by the primary in this turn; bounded diagnostic output, not a completed provider interval or a full outer-delivery claim",
+  "request": {
+    "repo": "/tmp/anvil-source-tasks-20260914/t16",
+    "query": "captureCommandResult"
+  },
+  "status": "restart_required",
+  "activation_passed": false,
+  "same_full_result_as_retained_v2_first_call": true,
+  "canonical_result_sha256": "3165b7c95e7862f71e91336bbf5f42967791acd6adc438cc364cabb7bebf5263",
+  "legacy_reference_lengths": [
+    284,
+    280,
+    291,
+    280
+  ],
+  "edges": [
+    {
+      "from": "src/tool-results/service.ts::captureCommandResult#function",
+      "to": "src/tool-results/service.ts::opaqueId#function",
+      "type": "calls",
+      "directed": true,
+      "namespace": "loci",
+      "resolution": "exact",
+      "evidence": {
+        "file": "src/tool-results/service.ts",
+        "line": 427,
+        "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e"
+      }
+    },
+    {
+      "from": "test/tool-results-lifecycle.test.ts::capture#function",
+      "to": "src/tool-results/service.ts::captureCommandResult#function",
+      "type": "calls",
+      "directed": true,
+      "namespace": "loci",
+      "resolution": "import-resolved",
+      "evidence": {
+        "file": "test/tool-results-lifecycle.test.ts",
+        "line": 34,
+        "content_hash": "f9a8282233adc814924e661f997058579bc5a3189cbf08ae74f86e6dca530835"
+      }
+    },
+    {
+      "from": "src/tool-results/service.ts::captureCommandResult#function",
+      "to": "src/tool-results/schemas.ts::ToolResultReceipt#type",
+      "type": "uses_type",
+      "directed": true,
+      "namespace": "loci",
+      "resolution": "import-resolved",
+      "evidence": {
+        "file": "src/tool-results/service.ts",
+        "line": 411,
+        "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e"
+      }
+    }
+  ],
+  "usage": {
+    "nodes_examined": 20,
+    "eligible_edges_considered": 25,
+    "edges_traversed": 21,
+    "relationships_delivered": 3,
+    "lookup_bytes": 0,
+    "lookup_files": 0,
+    "evidence_bytes": 3034,
+    "output_bytes": 15932,
+    "estimated_tokens": 3983,
+    "token_estimate_method": "utf8_bytes_div_4",
+    "output_encoding": "mcp_result_json_utf8"
+  },
+  "next": "Restart Codex and verify actual short-handle and signature-path behavior on W1.8.4.4 before considering another provider campaign."
+}

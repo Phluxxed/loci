@@ -10,6 +10,8 @@ from typing import Any, Mapping, Sequence
 from ._exploration_output import Span, _evidence_bytes, _validate_span
 from .graph.contracts import GraphContractError, GraphEdge
 from .retrieval_io import finalize_response, serialize_source, source_ref
+from .storage.index_store import IndexStore
+from .storage.source_refs import SourceRefStore
 
 
 LIMITS = {
@@ -87,8 +89,10 @@ class RetrievalPacker:
         selection: dict[str, Any],
         scope: dict[str, Any],
         anchors: list[dict[str, Any]],
+        store: IndexStore | None = None,
     ) -> None:
         self.repo = repo
+        self.references = SourceRefStore(repo, store) if store is not None else None
         self.snapshot = snapshot
         self.selection = selection
         self.scope = scope
@@ -154,6 +158,11 @@ class RetrievalPacker:
                         "Normal retrieval anchor identities cannot fit the fixed output budget",
                         {},
                     )
+                if self.references is not None:
+                    self.references.flush(
+                        item["source_ref"]
+                        for item in (*response["items"], *response["sources"])
+                    )
                 return response
             if not self.snapshots:
                 raise GraphContractError(
@@ -188,7 +197,7 @@ class RetrievalPacker:
                     "start_byte": item.full_span.start_byte,
                     "end_byte": item.full_span.end_byte,
                 },
-                "source_ref": source_ref(self.repo, item.full_span),
+                "source_ref": source_ref(self.repo, item.full_span, references=self.references),
             }
             if not any(current["node_id"] == value["node_id"] for current in state.items):
                 state.items.append(value)
@@ -267,7 +276,7 @@ class RetrievalPacker:
             "ownership": copy.deepcopy(state.ownership),
             "relationships": copy.deepcopy(state.relationships),
             "sources": [
-                serialize_source(self.repo, span, index)
+                serialize_source(self.repo, span, index, references=self.references)
                 for index, span in enumerate(state.spans, 1)
             ],
             "omissions": [

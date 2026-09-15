@@ -51,10 +51,10 @@ candidate identities, selected source, proved relationships, coverage and
 omissions. Read the returned source and proof before deciding it is sufficient.
 Several candidates remain alternatives; an omitted match is not disproved.
 
-For an incomplete source item, use its `source_ref` with `loci_read`. Follow
-`next_source_ref` until the exact source needed for the action is complete.
-A stale reference requires fresh retrieval. Re-anchor a returned node ID with
-`loci_retrieve` when further context is needed. Repeating an identical request
+For an incomplete source item, pass its short `source_ref` unchanged to
+`loci_read`. Follow `next_source_ref` until the exact source needed is complete.
+A stale or unavailable reference requires fresh retrieval. Re-anchor a returned
+node ID with `loci_retrieve` when further context is needed. Repeating an identical request
 against an unchanged snapshot returns the same bounded selection.
 
 Both operations take `repo`. Traversal families, direction, depth, ranking and

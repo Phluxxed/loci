@@ -14,6 +14,7 @@ from .graph.contracts import GraphContractError
 from .graph.profiles import read_contained_file
 from .graph.state import GraphIndexState
 from .storage.index_store import IndexStore
+from .storage.source_refs import SourceRefStore
 
 
 READ_SOURCE_BYTES = 8192
@@ -31,18 +32,21 @@ def _encode(value: Mapping[str, Any]) -> str:
     return base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
 
 
-def source_ref(repo: Path, span: Span) -> str:
+def source_ref(repo: Path, span: Span, *, references: SourceRefStore | None = None) -> str:
     """Locate an exact owning extent; this is not an issuance credential."""
-    return _encode({"v": 1, "repo": str(repo.resolve()), "file": span.file,
-                    "hash": span.content_hash, "start": span.start_byte,
-                    "end": span.end_byte, "offset": span.start_byte})
+    value = {"v": 1, "repo": str(repo.resolve()), "file": span.file,
+             "hash": span.content_hash, "start": span.start_byte,
+             "end": span.end_byte, "offset": span.start_byte}
+    return references.stage(value) if references is not None else _encode(value)
 
 
-def serialize_source(repo: Path, span: Span, source_id: int) -> dict[str, Any]:
+def serialize_source(repo: Path, span: Span, source_id: int, *,
+                     references: SourceRefStore | None = None) -> dict[str, Any]:
     return {"id": source_id, "file": span.file, "start_byte": span.start_byte,
             "end_byte": span.end_byte, "start_line": span.start_line,
             "end_line": span.end_line, "content_hash": span.content_hash,
-            "content": span.content, "source_ref": source_ref(repo, span)}
+            "content": span.content,
+            "source_ref": source_ref(repo, span, references=references)}
 
 
 def finalize_response(payload: dict[str, Any], evidence_bytes: int) -> dict[str, Any]:
@@ -64,15 +68,22 @@ def finalize_response(payload: dict[str, Any], evidence_bytes: int) -> dict[str,
     raise ValueError("normal retrieval output accounting did not converge")
 
 
-def _decode(repo: Path, reference: str) -> dict[str, Any]:
+def _decode(repo: Path, reference: str, *,
+            references: SourceRefStore | None = None) -> dict[str, Any]:
     if not isinstance(reference, str) or not reference or len(reference) > 16384:
-        raise _invalid("Source reference must be a bounded encoded locator")
-    try:
-        raw = base64.b64decode(reference + "=" * (-len(reference) % 4),
-                               altchars=b"-_", validate=True)
-        value = json.loads(raw)
-    except (ValueError, UnicodeError) as exc:
-        raise _invalid("Source reference is not valid encoded JSON") from exc
+        raise _invalid("Source reference must be a bounded source locator")
+    short = reference.startswith("sr1_")
+    if short:
+        if references is None:
+            raise _invalid("Source reference store is unavailable; retrieve fresh context")
+        value = references.resolve(reference)
+    else:
+        try:
+            raw = base64.b64decode(reference + "=" * (-len(reference) % 4),
+                                   altchars=b"-_", validate=True)
+            value = json.loads(raw)
+        except (ValueError, UnicodeError) as exc:
+            raise _invalid("Source reference is not valid encoded JSON") from exc
     if not isinstance(value, dict) or set(value) != _REF_KEYS:
         raise _invalid("Source reference fields are invalid")
     if type(value["v"]) is not int or value["v"] != 1:
@@ -90,7 +101,7 @@ def _decode(repo: Path, reference: str) -> dict[str, Any]:
         raise _invalid("Source reference offsets must be integers")
     if not 0 <= value["start"] <= value["offset"] <= value["end"]:
         raise _invalid("Source reference extent is invalid")
-    if _encode(value) != reference:
+    if not short and _encode(value) != reference:
         raise _invalid("Source reference is not canonically encoded")
     return value
 
@@ -107,7 +118,8 @@ def _control_files(state: GraphIndexState) -> set[str]:
 def read_source(repo: Path, store: IndexStore, nodes: Mapping[str, dict],
                 state: GraphIndexState, reference: str) -> dict[str, Any]:
     """Read a fixed page from a current, contained, indexed source extent."""
-    value = _decode(repo, reference)
+    references = SourceRefStore(repo, store)
+    value = _decode(repo, reference, references=references)
     file = value["file"]
     # Markdown has a page-root section rather than a zero-width file node.
     # The index's file hashes define source eligibility for every language.
@@ -147,8 +159,9 @@ def read_source(repo: Path, store: IndexStore, nodes: Mapping[str, dict],
                     value["hash"], content)
         complete = end_byte == value["end"]
         result = {"schema_version": 1, "status": "ok",
-                  "source": serialize_source(repo, span, 1), "complete": complete,
-                  "next_source_ref": None if complete else _encode({**value, "offset": end_byte}),
+                  "source": serialize_source(repo, span, 1, references=references),
+                  "complete": complete,
+                  "next_source_ref": None if complete else references.stage({**value, "offset": end_byte}),
                   "usage": {"evidence_bytes": 0, "output_bytes": 0,
                             "output_encoding": "mcp_result_json_utf8"}}
         return finalize_response(result, end_byte - start)
@@ -165,4 +178,7 @@ def read_source(repo: Path, store: IndexStore, nodes: Mapping[str, dict],
         result = page(end)
     if result["usage"]["output_bytes"] > READ_OUTPUT_BYTES or (end == start and start < value["end"]):
         raise GraphContractError("OUTPUT_BUDGET_EXCEEDED", "Source page cannot fit the fixed output budget", {})
+    references.flush([result["source"]["source_ref"]] + (
+        [result["next_source_ref"]] if result["next_source_ref"] is not None else []
+    ))
     return result

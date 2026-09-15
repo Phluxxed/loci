@@ -190,6 +190,10 @@ class IndexStore:
     def _repo_dir(self, repo_path: Path) -> Path:
         return self.base_dir / self._cache_key(repo_path)
 
+    def source_reference_path(self, repo_path: Path) -> Path:
+        """Return the repository-local source reference cache path without creating it."""
+        return self._repo_dir(repo_path) / "source-refs.sqlite3"
+
     def _index_path(self, repo_path: Path) -> Path:
         return self._repo_dir(repo_path) / "index.json"
 

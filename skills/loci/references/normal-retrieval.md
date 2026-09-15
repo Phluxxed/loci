@@ -17,6 +17,12 @@ hops, interleaves relationship families and returns source with proved edges.
 Direct relationships of selected anchors precede ownership expansion. Shared
 declarations connected to two selected anchors by supported type edges receive
 priority over incidental calls; only those type edges get this priority.
+For each selected callable, indexed parameter annotations prioritize one
+representative input-type path, including a supported contract dependency within
+the two-hop limit. Other branches retain normal family interleaving.
+Return types and body calls do not establish parameter roles. A nested generic
+type argument whose input/return role is absent from the index receives no
+inferred input priority.
 Every delivered edge still requires its complete static proof.
 The same snapshot and request produce the same selection. The live schema
 publishes the fixed work, source and complete-result limits.
@@ -38,11 +44,15 @@ Read these fields together:
 - `usage` distinguishes examined nodes, considered/traversed edges, delivered
   relationships, unique source bytes and the complete MCP-result bytes.
 
-`loci_read(repo, source_ref)` pages one hash-bound source extent. Its returned
-`next_source_ref` continues that extent; `complete=true` ends it. It discovers
-no other source. References are exact locators, not credentials or proof of
-prior issuance. Changed source returns `SOURCE_STALE` instead of applying old
-offsets to the new file.
+`loci_read(repo, source_ref)` pages one hash-bound source extent. Pass the short
+returned handle unchanged; `next_source_ref` continues that extent and
+`complete=true` ends it. Loci retains the exact repository, path, content hash
+and byte extent in the configured per-repository cache. Handles survive server
+restarts while that bounded cache retains them. An unknown or evicted handle
+requires fresh retrieval; changed source returns `SOURCE_STALE` instead of
+applying old offsets. Legacy encoded locators remain readable for compatibility.
+References locate source; they are not authorization credentials or proof that
+an earlier caller received the source. A read discovers no other source.
 
 Re-anchor a returned identity to request further graph context under the same
 policy. This is a new bounded retrieval, not a guarantee to enumerate omitted

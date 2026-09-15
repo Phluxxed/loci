@@ -17,6 +17,11 @@ loci_retrieve(repo, query) -> source and graph context
 loci_read(repo, source_ref) -> exact source expansion when needed
 ```
 
+Normal results use short source handles. Loci retains their exact repository,
+content hash and byte extent, so agents can continue a read without copying a
+long encoded locator. Handles survive server restarts while retained in the
+bounded repository cache; stale or unavailable references require fresh retrieval.
+
 The CLI still exists for debugging, scripts, and migration safety, but MCP is the production interface.
 Graph traversal is part of normal retrieval rather than an agent-selected mode.
 Workflow value is measured separately from graph activity; see the retained
