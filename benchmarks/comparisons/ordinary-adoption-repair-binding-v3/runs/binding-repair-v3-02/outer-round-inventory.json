@@ -1,0 +1,282 @@
+{
+  "run_id": "binding-repair-v3-02",
+  "outer_rounds": 10,
+  "qualification": "Temporal nesting is recorded for inspection, not substituted for frozen per-call delivery attribution.",
+  "rounds": [
+    {
+      "request_line": 15,
+      "output_line": 19,
+      "call_id": "call_4u6RclphW7iQbEV4Joi5q5tr",
+      "request": "const r = await Promise.allSettled([\n  tools.exec_command({\"cmd\":\"pwd && rg --files -g 'AGENTS.md' -g 'SKILL.md' /tmp/anvil-source-tasks-20260914/t21 /Users/brummerv/.codex/skills/loci\",\"workdir\":\"/tmp/anvil-source-tasks-20260914/t21\",\"yield_time_ms\":10000,\"max_output_tokens\":20000}),\n  tools.exec_command({\"cmd\":\"sed -n '1,240p' /Users/brummerv/.codex/skills/loci/SKILL.md\",\"workdir\":\"/tmp/anvil-source-tasks-20260914/t21\",\"yield_time_ms\":10000,\"max_output_tokens\":20000})\n]);\ntext(r.map((x,i)=>`#${i}\\n${x.status===\"fulfilled\"?x.value.output:String(x.reason)}`).join(\"\\n\"));",
+      "native_lines_in_outer_interval": [],
+      "output_blocks": [
+        {
+          "bytes": 47,
+          "sha256": "acca4205edb492a93404f6c3083e605902a9a33c6f2cfcad2ca3e203d31984f0",
+          "json_type": "not_single_json_value",
+          "short_text": "Script completed\nWall time 0.5 seconds\nOutput:\n"
+        },
+        {
+          "bytes": 5277,
+          "sha256": "d9a6180183e618c30152b7a81befc8a2e006dd6b8544c6ae7fae6b8668e9c988",
+          "json_type": "not_single_json_value"
+        }
+      ]
+    },
+    {
+      "request_line": 23,
+      "output_line": 27,
+      "call_id": "call_siIIHPheAOa08ZjwSToOKPl3",
+      "request": "const r = await Promise.allSettled([\n  tools.exec_command({\"cmd\":\"sed -n '1,260p' AGENTS.md\",\"workdir\":\"/tmp/anvil-source-tasks-20260914/t21\",\"yield_time_ms\":10000,\"max_output_tokens\":20000}),\n  tools.exec_command({\"cmd\":\"sed -n '1,260p' /Users/brummerv/.codex/skills/loci/references/normal-retrieval.md\",\"workdir\":\"/tmp/anvil-source-tasks-20260914/t21\",\"yield_time_ms\":10000,\"max_output_tokens\":20000})\n]);\ntext(r.map((x,i)=>`#${i}\\n${x.status===\"fulfilled\"?x.value.output:String(x.reason)}`).join(\"\\n\"));",
+      "native_lines_in_outer_interval": [],
+      "output_blocks": [
+        {
+          "bytes": 47,
+          "sha256": "84098dff1cf4fc1b68f879fb9401f79f8bc5b793a7aa6326c9f13d4c7117f439",
+          "json_type": "not_single_json_value",
+          "short_text": "Script completed\nWall time 0.4 seconds\nOutput:\n"
+        },
+        {
+          "bytes": 17707,
+          "sha256": "06c53cffbd2d1c4f9057221e511aae3caf0d99df9d9314af318c1c92f80b134e",
+          "json_type": "not_single_json_value"
+        }
+      ]
+    },
+    {
+      "request_line": 31,
+      "output_line": 33,
+      "call_id": "call_T5la98KCTa2XdA1i32hsY1UI",
+      "request": "const matches = ALL_TOOLS.filter(t => /(?:^|__)loci_(?:retrieve|read)$/.test(t.name));\nstore(\"loci.normal.tools\", matches);\ntext(JSON.stringify({status: matches.length ? \"found\" : \"no_match\", count: matches.length, names: matches.slice(0, 8).map(t => t.name)}));",
+      "native_lines_in_outer_interval": [],
+      "output_blocks": [
+        {
+          "bytes": 47,
+          "sha256": "b5f7a7aa304b9f47f3043a3ce24ece3433e73e45531c2fde5131b981ec94b9ab",
+          "json_type": "not_single_json_value",
+          "short_text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+        },
+        {
+          "bytes": 88,
+          "sha256": "74ac6c5152dbdddef931ba2ae9585502cd9dc09fd0d9c7a944ad922ceffcc341",
+          "json_type": "dict",
+          "keys": [
+            "status",
+            "count",
+            "names"
+          ],
+          "short_text": "{\"status\":\"found\",\"count\":2,\"names\":[\"mcp__loci__loci_read\",\"mcp__loci__loci_retrieve\"]}"
+        }
+      ]
+    },
+    {
+      "request_line": 37,
+      "output_line": 39,
+      "call_id": "call_CPQZ9o96KwR8y5CR5Q4lb6MF",
+      "request": "const matches = ALL_TOOLS.filter(t => t.name === \"mcp__loci__loci_retrieve\" || t.name === \"mcp__loci__loci_read\");\ntext(JSON.stringify(matches));",
+      "native_lines_in_outer_interval": [],
+      "output_blocks": [
+        {
+          "bytes": 47,
+          "sha256": "b5f7a7aa304b9f47f3043a3ce24ece3433e73e45531c2fde5131b981ec94b9ab",
+          "json_type": "not_single_json_value",
+          "short_text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+        },
+        {
+          "bytes": 5039,
+          "sha256": "44ceca81660f93aa699ac46940259c1b66f1f29973e4f3c3868e08ebd1b0de30",
+          "json_type": "list",
+          "length": 2,
+          "item_keys": [
+            [
+              "name",
+              "description"
+            ],
+            [
+              "name",
+              "description"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "request_line": 43,
+      "output_line": 46,
+      "call_id": "call_ZRVyUfjsLpNZikXvJVnVSQxH",
+      "request": "const r = await tools.mcp__loci__loci_retrieve({repo:\"/tmp/anvil-source-tasks-20260914/t21\",query:\"captureCommandResult\"});\ntext(r.content.map(x=>x.text||\"\").join(\"\\n\"));",
+      "native_lines_in_outer_interval": [
+        45
+      ],
+      "output_blocks": [
+        {
+          "bytes": 47,
+          "sha256": "adbf11da67e6df88daec7516baf03184db72d450c108ed042dba5388282126c5",
+          "json_type": "not_single_json_value",
+          "short_text": "Script completed\nWall time 5.7 seconds\nOutput:\n"
+        },
+        {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "json_type": "not_single_json_value",
+          "short_text": ""
+        }
+      ]
+    },
+    {
+      "request_line": 50,
+      "output_line": 53,
+      "call_id": "call_ez9wmYErBFE9acAlhgwOxziu",
+      "request": "const r = await tools.mcp__loci__loci_retrieve({repo:\"/tmp/anvil-source-tasks-20260914/t21\",query:\"captureCommandResult\"});\ntext(JSON.stringify(r.structuredContent ?? r));",
+      "native_lines_in_outer_interval": [
+        52
+      ],
+      "output_blocks": [
+        {
+          "bytes": 47,
+          "sha256": "3de20131ffa305cc925fe26cae9fb66c9bea58109b09273c2ca9974e65ea28f2",
+          "json_type": "not_single_json_value",
+          "short_text": "Script completed\nWall time 4.9 seconds\nOutput:\n"
+        },
+        {
+          "bytes": 16217,
+          "sha256": "5b3b4d470fac706b491dd22378bf8606a3166b39d9754d35f01cc85e55ce98dc",
+          "json_type": "dict",
+          "keys": [
+            "schema_version",
+            "policy",
+            "snapshot",
+            "status",
+            "selection",
+            "scope",
+            "anchors",
+            "nodes",
+            "items",
+            "ownership",
+            "relationships",
+            "sources",
+            "omissions",
+            "limits",
+            "usage"
+          ]
+        }
+      ]
+    },
+    {
+      "request_line": 57,
+      "output_line": 60,
+      "call_id": "call_LYIW83lhYtDGEXuJ9nkqXA6R",
+      "request": "const r = await tools.mcp__loci__loci_read({repo:\"/tmp/anvil-source-tasks-20260914/t21\",source_ref:\"sr1_m2isfdgauqzs7rb4xbiwouqoyu\"});\ntext(JSON.stringify(r.structuredContent ?? r));",
+      "native_lines_in_outer_interval": [
+        59
+      ],
+      "output_blocks": [
+        {
+          "bytes": 47,
+          "sha256": "fc2fa1948c51d8b747d00f0e5d679fd24f518b7e75b72f79358aa179f50bed90",
+          "json_type": "not_single_json_value",
+          "short_text": "Script completed\nWall time 4.1 seconds\nOutput:\n"
+        },
+        {
+          "bytes": 5057,
+          "sha256": "042c031bffabefd90e741d15f57cf1a9c20c36f609187753b052ad277d5ed7f2",
+          "json_type": "dict",
+          "keys": [
+            "schema_version",
+            "status",
+            "source",
+            "complete",
+            "next_source_ref",
+            "usage"
+          ]
+        }
+      ]
+    },
+    {
+      "request_line": 64,
+      "output_line": 68,
+      "call_id": "call_VmmouQ2YTpLF0M8J7vWc8RsM",
+      "request": "const [view, validator] = await Promise.all([\n  tools.mcp__loci__loci_retrieve({repo:\"/tmp/anvil-source-tasks-20260914/t21\",query:\"WorkContextBindingView\"}),\n  tools.mcp__loci__loci_retrieve({repo:\"/tmp/anvil-source-tasks-20260914/t21\",query:\"validateBinding\"})\n]);\ntext(JSON.stringify({\n  view:view.structuredContent ?? view,\n  validator:validator.structuredContent ?? validator\n}));",
+      "native_lines_in_outer_interval": [
+        66,
+        67
+      ],
+      "output_blocks": [
+        {
+          "bytes": 48,
+          "sha256": "036d5b617f0f9a0f8da2eb7deb200ba6e647f5666f8738a3cf033f028ce57d4d",
+          "json_type": "not_single_json_value",
+          "short_text": "Script completed\nWall time 10.0 seconds\nOutput:\n"
+        },
+        {
+          "bytes": 32352,
+          "sha256": "03d7991671bd6b21de670f78262eade225b1dfb9dce3858a4b6450114af10343",
+          "json_type": "dict",
+          "keys": [
+            "view",
+            "validator"
+          ]
+        }
+      ]
+    },
+    {
+      "request_line": 72,
+      "output_line": 75,
+      "call_id": "call_jqaicsjZeTF0R7ptB7n2xvVj",
+      "request": "const r = await tools.mcp__loci__loci_retrieve({repo:\"/tmp/anvil-source-tasks-20260914/t21\",query:\"workContextBindingViewSchema\"});\ntext(JSON.stringify(r.structuredContent ?? r));",
+      "native_lines_in_outer_interval": [
+        74
+      ],
+      "output_blocks": [
+        {
+          "bytes": 47,
+          "sha256": "23c890218f9fe0c54e0bfede884770be5f0cb1437ce57329089226d0fb5fd443",
+          "json_type": "not_single_json_value",
+          "short_text": "Script completed\nWall time 5.0 seconds\nOutput:\n"
+        },
+        {
+          "bytes": 16303,
+          "sha256": "b4bc6286a7a3231d16a91b617a9087ac8211b88b8df2f46529c1d585c2b84e8d",
+          "json_type": "dict",
+          "keys": [
+            "schema_version",
+            "policy",
+            "snapshot",
+            "status",
+            "selection",
+            "scope",
+            "anchors",
+            "nodes",
+            "items",
+            "ownership",
+            "relationships",
+            "sources",
+            "omissions",
+            "limits",
+            "usage"
+          ]
+        }
+      ]
+    },
+    {
+      "request_line": 79,
+      "output_line": 84,
+      "call_id": "call_VdY0MqJezFs3lx6uzGdnNBic",
+      "request": "const r = await Promise.allSettled([\n  tools.exec_command({\"cmd\":\"nl -ba src/tool-results/service.ts | sed -n '15,135p;400,432p'\",\"workdir\":\"/tmp/anvil-source-tasks-20260914/t21\",\"yield_time_ms\":10000,\"max_output_tokens\":12000}),\n  tools.exec_command({\"cmd\":\"nl -ba src/work-context/binding.ts | sed -n '20,150p'\",\"workdir\":\"/tmp/anvil-source-tasks-20260914/t21\",\"yield_time_ms\":10000,\"max_output_tokens\":16000}),\n  tools.exec_command({\"cmd\":\"nl -ba src/work-context/index.ts | sed -n '18,34p'\",\"workdir\":\"/tmp/anvil-source-tasks-20260914/t21\",\"yield_time_ms\":10000,\"max_output_tokens\":4000})\n]);\ntext(r.map((x,i)=>`#${i}\\n${x.status===\"fulfilled\"?x.value.output:String(x.reason)}`).join(\"\\n\"));",
+      "native_lines_in_outer_interval": [],
+      "output_blocks": [
+        {
+          "bytes": 47,
+          "sha256": "acca4205edb492a93404f6c3083e605902a9a33c6f2cfcad2ca3e203d31984f0",
+          "json_type": "not_single_json_value",
+          "short_text": "Script completed\nWall time 0.5 seconds\nOutput:\n"
+        },
+        {
+          "bytes": 11332,
+          "sha256": "87df0708fae62a7e345e84da9b4bcaa981aab717dcc09624e2c7c11d0248ea96",
+          "json_type": "not_single_json_value"
+        }
+      ]
+    }
+  ]
+}

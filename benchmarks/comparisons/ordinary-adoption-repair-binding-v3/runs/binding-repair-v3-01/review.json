@@ -1,0 +1,138 @@
+{
+  "reviewer": "independent gpt-5.6-sol/high (fork none)",
+  "case_id": "tool_result_capture_binding_type_identity",
+  "answer_text_sha256": "0e04a834fb09faf0828a781e2b76a3e4c0a227f3ef9dca31a8838e90c9b35d66",
+  "observation_final_answer_content_sha256": "84dc3434ff54c650e44ef3871d82cae5a139053c4c565eda960ad568d1ed8562",
+  "fact_judgments": [
+    {
+      "fact_id": "capture_options_declares_binding_contract",
+      "verdict": "partial",
+      "answer_excerpt": "Its options declare `binding: WorkContextBinding` at `src/tool-results/service.ts:53-60`; the function validates it before capture at `:411-414`.",
+      "reason": "The answer states the binding field's WorkContextBinding type and identifies captureCommandResult's validation path, but it never states that captureCommandResult accepts the named CaptureCommandResultOptions type. The cited declarations contain that name, but the frozen rubric does not permit an unstated clause to be inferred from a citation alone.",
+      "source_refs": [
+        {
+          "file": "src/tool-results/service.ts",
+          "lines": "53-60",
+          "sha256_of_exact_utf8_lines": "c492316cc078713599c249b236bcf2cb3826f40439904ebe00e28ccc6d9feb8d"
+        },
+        {
+          "file": "src/tool-results/service.ts",
+          "lines": "411",
+          "sha256_of_exact_utf8_lines": "dd903466b03fa7dbab014e533c8479b6301b5baa3b484be6017115bcd2e82f04"
+        }
+      ]
+    },
+    {
+      "fact_id": "binding_import_traverses_public_barrel",
+      "verdict": "supported",
+      "answer_excerpt": "That type is imported from the public barrel at `src/tool-results/service.ts:23`, re-exported by `src/work-context/index.ts:23-30`, and defined in `src/work-context/binding.ts:28-45`. `WorkContextBindingView` is also exported (`index.ts:28`)",
+      "reason": "In ordinary prose the two adjacent statements identify service.ts's public-barrel import, the barrel's WorkContextBinding re-export from binding.ts, and the similarly named WorkContextBindingView in the same binding.ts export block.",
+      "source_refs": [
+        {
+          "file": "src/tool-results/service.ts",
+          "lines": "19-23",
+          "sha256_of_exact_utf8_lines": "4fcf2c3c900821bc66ab3e341af0f3a0550b716d2909f52b62f4cc5a6d4a16fc"
+        },
+        {
+          "file": "src/work-context/index.ts",
+          "lines": "16-29",
+          "sha256_of_exact_utf8_lines": "c45b3a2a80027420ba2532006cc4e18d07ff0b7cf83eaf781b99022b61d09eec"
+        }
+      ]
+    },
+    {
+      "fact_id": "binding_identity_and_view_difference",
+      "verdict": "supported",
+      "answer_excerpt": "Its schema omits `session_id` and `provenance.observed_cwd` (`binding.ts:47-67`) ... Consequently it fails both static compatibility and runtime authorization",
+      "reason": "The answer locates WorkContextBinding's definition, identifies both required fields, distinguishes the separately schema-inferred WorkContextBindingView, and correctly concludes that an unadapted bare view lacks the declared capture input's required fields.",
+      "source_refs": [
+        {
+          "file": "src/work-context/binding.ts",
+          "lines": "28-45",
+          "sha256_of_exact_utf8_lines": "e917a43db554775a823e3b8870b165ba4931a28b126b8141b085bdca22cae1f2"
+        },
+        {
+          "file": "src/work-context/binding.ts",
+          "lines": "47-67",
+          "sha256_of_exact_utf8_lines": "62c22718b455a85314f85c92031f87c09ebe9ec8fad40cd2e5f33bd2ab83154d"
+        }
+      ]
+    }
+  ],
+  "extra_material_claims": [
+    {
+      "answer_excerpt": "the function validates it before capture at `:411-414`",
+      "verdict": "supported",
+      "reason": "captureCommandResult calls validateBinding at line 413 before command capture begins later in the function.",
+      "source_refs": [
+        {
+          "file": "src/tool-results/service.ts",
+          "lines": "411-414"
+        }
+      ]
+    },
+    {
+      "answer_excerpt": "`workContextBindingView` deliberately removes both (`:130-139`)",
+      "verdict": "supported",
+      "reason": "The view projector destructures session_id away and reconstructs provenance without observed_cwd.",
+      "source_refs": [
+        {
+          "file": "src/work-context/binding.ts",
+          "lines": "130-139",
+          "sha256_of_exact_utf8_lines": "f531314ce8c08c6382a65fe4d72e5d22dcc1f9a5a10559a3a7b513d5f38d42aa"
+        }
+      ]
+    },
+    {
+      "answer_excerpt": "it fails both static compatibility and runtime authorization: capture calls `assertActiveWorkContextBinding` through `validateBinding` ... whose guard requires `session_id` and `provenance.observed_cwd`",
+      "verdict": "supported_with_bare_view_scope",
+      "reason": "A bare WorkContextBindingView is not structurally assignable to WorkContextBinding because it lacks the two required fields. If such a bare value reaches the runtime guard, isWorkContextBinding rejects it and validateBinding maps the failure to TOOL_RESULT_UNAUTHORIZED. This does not cover a caller that constructs or adapts another value before capture.",
+      "source_refs": [
+        {
+          "file": "src/work-context/binding.ts",
+          "lines": "217-238",
+          "sha256_of_exact_utf8_lines": "ea3f8546dbb2092358dcc43ff6607c8f3473928e1b6b4fe581af12ba836f3e60"
+        },
+        {
+          "file": "src/tool-results/service.ts",
+          "lines": "124-131",
+          "sha256_of_exact_utf8_lines": "13eb2e9fff66c5210c2c7b31144925ed5a19c28d354a38269a28b349f5b5487d"
+        }
+      ]
+    },
+    {
+      "answer_excerpt": "the full `WorkContextBinding`, not the public view",
+      "verdict": "supported",
+      "reason": "The source exports the view through the public barrel, while the full binding contains the two fields intentionally removed by the view projector. The wording does not claim that WorkContextBinding itself is private."
+    },
+    {
+      "answer_excerpt": "No material uncertainty: the import/re-export chain and runtime guard directly establish the contract.",
+      "verdict": "supported_for_stated_scope",
+      "reason": "The direct declarations and guard establish the answer's contract and bare-view claims. They do not establish any particular caller's runtime value or rule out caller-side adaptation, neither of which the answer asserts."
+    }
+  ],
+  "unsupported_or_overbroad_claims": [],
+  "source_access_review": {
+    "verdict": "within_scope",
+    "target_repo": "/tmp/anvil-source-tasks-20260914/t16",
+    "canonical_target_repo": "/private/tmp/anvil-source-tasks-20260914/t16",
+    "fixed_source_commit": "53bf29e60cece2335aa39fe301935a07e8e8d4e4",
+    "shell_call_count": 5,
+    "mcp_call_count": 6,
+    "mcp_errors": [],
+    "evidence": "All source-bearing repository reads and all Loci calls stayed within t16. The only external file read was the installed Loci SKILL.md, which the measurement prompt allowed as an installed operating instruction. The initial rg --files command enumerated TypeScript paths broadly inside t16, and Loci packets surfaced some additional related in-repository records, but neither crossed the fixed source root or inspected another task artifact. No writes, tests, or services were recorded.",
+    "material_scope_uncertainty": "The retained observation cannot detect upstream omissions, but it records the complete terminal interval and reports no condition deviations or source-validation errors."
+  },
+  "material_uncertainties": [
+    "The fixed declarations do not establish that any particular caller supplied a WorkContextBinding or WorkContextBindingView value at runtime.",
+    "A caller could construct or adapt a different value before invoking capture; the static and runtime conclusions here apply to an unadapted bare WorkContextBindingView.",
+    "The first compound fact is incomplete because the answer does not name CaptureCommandResultOptions."
+  ],
+  "final": {
+    "supported_required_fact_count": 2,
+    "partial_required_fact_count": 1,
+    "missing_required_fact_count": 0,
+    "all_facts_correct": false,
+    "all_material_claims_supported": true
+  }
+}

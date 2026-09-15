@@ -1,0 +1,9 @@
+`captureCommandResult` accepts the private `WorkContextBinding` contract, not the public view:
+
+- [`src/tool-results/service.ts`](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:53) declares `binding: WorkContextBinding`; the function validates it before capture at [line 411](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:411).
+- It imports that public type from `../work-context/index.ts` at [line 23](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:23). The barrel re-exports it at [`src/work-context/index.ts:23`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/index.ts:23), and its defining contract is [`src/work-context/binding.ts:28`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:28).
+- Validation calls `assertActiveWorkContextBinding` and converts failure to `TOOL_RESULT_UNAUTHORIZED` at [`service.ts:124`](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:124).
+
+`WorkContextBindingView` is also publicly exported, but is not accepted. Its schema/type at [`binding.ts:47`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:47) omits `session_id` and `provenance.observed_cwd`; the view builder intentionally removes them at [line 130](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:130). Therefore it does not satisfy `WorkContextBinding`, and the runtime assertion rejects it as malformed ([`binding.ts:141`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:141)).
+
+No material uncertainty: the direct import, barrel re-export, definitions, and validation path were inspected.
