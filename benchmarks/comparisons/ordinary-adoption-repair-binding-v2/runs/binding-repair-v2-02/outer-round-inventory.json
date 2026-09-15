@@ -1,0 +1,71 @@
+{
+  "scope": "Observed outer requests and bytes; no causal attribution",
+  "rows": [
+    {
+      "request_line": 15,
+      "output_line": 18,
+      "visible_bytes": 240,
+      "request": "const r = await tools.exec_command({\"cmd\":\"pwd && rg --files -g 'AGENTS.md' -g 'SKILL.md' -g 'package.json' -g 'tsconfig*.json' /tmp/anvil-source-tasks-20260914/t21 | sed -n '1,160p'\",\"workdir\":\"/tmp/anvil-source-tasks-20260914/t21\",\"yield_time_ms\":10000,\"max_output_tokens\":20000});\ntext(r.output);\n"
+    },
+    {
+      "request_line": 22,
+      "output_line": 25,
+      "visible_bytes": 19121,
+      "request": "const r = await tools.exec_command({\"cmd\":\"sed -n '1,240p' AGENTS.md && sed -n '1,260p' /Users/brummerv/.codex/skills/loci/SKILL.md\",\"workdir\":\"/tmp/anvil-source-tasks-20260914/t21\",\"yield_time_ms\":10000,\"max_output_tokens\":30000});\ntext(r.output);\n"
+    },
+    {
+      "request_line": 31,
+      "output_line": 33,
+      "visible_bytes": 135,
+      "request": "const matches = ALL_TOOLS.filter(t => /(?:^|__)loci_(?:retrieve|read)$/.test(t.name));\nstore(\"loci.normal.tools\", matches);\ntext(JSON.stringify({status: matches.length ? \"found\" : \"no_match\", count: matches.length, names: matches.slice(0, 8).map(t => t.name)}));\n"
+    },
+    {
+      "request_line": 37,
+      "output_line": 39,
+      "visible_bytes": 4942,
+      "request": "const m = ALL_TOOLS.filter(t => t.name === \"mcp__loci__loci_retrieve\" || t.name === \"mcp__loci__loci_read\");\ntext(JSON.stringify(m));\n"
+    },
+    {
+      "request_line": 43,
+      "output_line": 46,
+      "visible_bytes": 15929,
+      "request": "const r = await tools.mcp__loci__loci_retrieve({repo:\"/tmp/anvil-source-tasks-20260914/t21\",query:\"captureCommandResult\"});\ntext(JSON.stringify(r.structuredContent ?? r.content));\n"
+    },
+    {
+      "request_line": 50,
+      "output_line": 53,
+      "visible_bytes": 5358,
+      "request": "const r = await tools.mcp__loci__loci_read({repo:\"/tmp/anvil-source-tasks-20260914/t21\",source_ref:\"eyJlbmQiOjE3NzI1LCJmaWxlIjoic3JjL3Rvb2wtcmVzdWx0cy9zZXJ2aWNlLnRzIiwiaGFzaCI6ImVjN2VlNDA3MWQ5YWU0ZTE4YTI3YzVlZTY0YzNhMzUxNTlkN2UyYmJmMDA2MDljNWU4ZDMyYWI3YzFiZDFhNmUiLCJvZmZzZXQiOjEzMjU3LCJyZXBvIjoiL3ByaXZhdGUvdG1wL2FudmlsLXNvdXJjZS10YXNrcy0yMDI2MDkxNC90MjEiLCJzdGFydCI6MTMyNTcsInYiOjF9\"});\ntext(JSON.stringify(r.structuredContent ?? r.content));\n"
+    },
+    {
+      "request_line": 57,
+      "output_line": 60,
+      "visible_bytes": 16088,
+      "request": "const r = await tools.mcp__loci__loci_retrieve({repo:\"/tmp/anvil-source-tasks-20260914/t21\",query:\"CaptureCommandResultOptions\"});\ntext(JSON.stringify(r.structuredContent ?? r.content));\n"
+    },
+    {
+      "request_line": 64,
+      "output_line": 67,
+      "visible_bytes": 15492,
+      "request": "const r = await tools.mcp__loci__loci_retrieve({repo:\"/tmp/anvil-source-tasks-20260914/t21\",query:\"src/work-context/binding.ts\"});\ntext(JSON.stringify(r.structuredContent ?? r.content));\n"
+    },
+    {
+      "request_line": 71,
+      "output_line": 74,
+      "visible_bytes": 158,
+      "request": "const r = await tools.mcp__loci__loci_read({repo:\"/tmp/anvil-source-tasks-20260914/t21\",source_ref:\"eyJlbmQiOjE0MDgyLCJmaWxlIjoic3JjL3dvcmstY29udGV4dC9iaW5kaW5nLnRzIiwiaGFzaCI6ImZjZjljZThmYmJlZmRmZmNmZGJkNDYxYTRjNWIwOGU4NGY3YTM2MjIwZTk5YWVlNmRjZGQ2NGFkOGNlM2NhM2YiLCJvZmZzZXQiOjAsInJlcG8iOiIvcHJpdmF0ZS90bXAvYW52aWwtc291cmNlLXRhc2tzLTIwMjYiLCJzdGFydCI6MCwidiI6MX0\"});\ntext(JSON.stringify(r.structuredContent ?? r.content));\n"
+    },
+    {
+      "request_line": 78,
+      "output_line": 81,
+      "visible_bytes": 26507,
+      "request": "const r = await tools.exec_command({\"cmd\":\"rg -n -C 8 'WorkContextBindingView|workContextBindingView|function validateBinding|const validateBinding|binding: WorkContextBinding|WorkContextBinding' src/work-context/binding.ts src/work-context/index.ts src/tool-results/service.ts\",\"workdir\":\"/tmp/anvil-source-tasks-20260914/t21\",\"yield_time_ms\":10000,\"max_output_tokens\":20000});\ntext(r.output);\n"
+    },
+    {
+      "request_line": 85,
+      "output_line": 88,
+      "visible_bytes": 7508,
+      "request": "const r = await tools.exec_command({\"cmd\":\"nl -ba src/tool-results/service.ts | sed -n '19,64p;120,133p;407,416p'\\nnl -ba src/work-context/index.ts | sed -n '11,31p'\\nnl -ba src/work-context/binding.ts | sed -n '28,68p;130,163p;217,240p'\",\"workdir\":\"/tmp/anvil-source-tasks-20260914/t21\",\"yield_time_ms\":10000,\"max_output_tokens\":20000});\ntext(r.output);\n"
+    }
+  ]
+}

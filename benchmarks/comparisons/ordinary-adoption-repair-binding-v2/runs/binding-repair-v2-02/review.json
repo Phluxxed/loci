@@ -1,0 +1,167 @@
+{
+  "reviewer": "independent gpt-5.6-sol/high",
+  "case_id": "tool_result_capture_binding_type_identity",
+  "answer_text_sha256": "4a54b09894b6c68f094a20f340ed32676d11da3447a6ab541e874d8ca54c54fa",
+  "observation_final_answer_record_sha256": "7da5923de88408f72365e99138875cb7aa5ac97b85cc0aad7e36eb233f91a884",
+  "fact_judgments": [
+    {
+      "fact_id": "capture_options_declares_binding_contract",
+      "judgment": "missing",
+      "answer_quote": "`captureCommandResult` accepts `binding: WorkContextBinding`, not the public view [...] its options require that type at [line 56]",
+      "reason": "The answer correctly states and cites the binding field's WorkContextBinding type, and later cites the capture function, but it never states the original fact's explicit named-type clause that captureCommandResult accepts CaptureCommandResultOptions. This is a strict completeness omission rather than a false core conclusion.",
+      "source_references": [
+        {
+          "file": "src/tool-results/service.ts",
+          "start_line": 53,
+          "end_line": 60,
+          "sha256_of_exact_utf8_lines": "c492316cc078713599c249b236bcf2cb3826f40439904ebe00e28ccc6d9feb8d"
+        },
+        {
+          "file": "src/tool-results/service.ts",
+          "start_line": 411,
+          "end_line": 411,
+          "sha256_of_exact_utf8_lines": "dd903466b03fa7dbab014e533c8479b6301b5baa3b484be6017115bcd2e82f04"
+        }
+      ]
+    },
+    {
+      "fact_id": "binding_import_traverses_public_barrel",
+      "judgment": "missing",
+      "answer_quote": "imports `WorkContextBinding` from the public `work-context` barrel [...] The barrel re-exports it from [`src/work-context/binding.ts`] [...] `WorkContextBindingView` is exported too",
+      "reason": "The answer states the service import through the public barrel and the barrel's WorkContextBinding re-export. It says WorkContextBindingView is 'exported too' but does not identify the exporting module or cite index.ts for that view. Treating 'too' as an assertion that the public barrel re-exports the view would require inferring the original compound clause. The answer therefore omits that clause rather than contradicting it.",
+      "source_references": [
+        {
+          "file": "src/tool-results/service.ts",
+          "start_line": 19,
+          "end_line": 23,
+          "sha256_of_exact_utf8_lines": "4fcf2c3c900821bc66ab3e341af0f3a0550b716d2909f52b62f4cc5a6d4a16fc"
+        },
+        {
+          "file": "src/work-context/index.ts",
+          "start_line": 16,
+          "end_line": 29,
+          "sha256_of_exact_utf8_lines": "c45b3a2a80027420ba2532006cc4e18d07ff0b7cf83eaf781b99022b61d09eec"
+        }
+      ]
+    },
+    {
+      "fact_id": "binding_identity_and_view_difference",
+      "judgment": "correct",
+      "answer_quote": "the defining full contract includes `session_id` and `provenance.observed_cwd` [...] `WorkContextBindingView` [...] is not accepted: its schema omits `session_id` and `provenance.observed_cwd`",
+      "reason": "The answer locates the WorkContextBinding definition, identifies both required fields, distinguishes the separate schema-derived view, says that the view lacks those fields, and correctly concludes that the bare view is not the declared capture binding contract.",
+      "source_references": [
+        {
+          "file": "src/work-context/binding.ts",
+          "start_line": 28,
+          "end_line": 45,
+          "sha256_of_exact_utf8_lines": "e917a43db554775a823e3b8870b165ba4931a28b126b8141b085bdca22cae1f2"
+        },
+        {
+          "file": "src/work-context/binding.ts",
+          "start_line": 47,
+          "end_line": 67,
+          "sha256_of_exact_utf8_lines": "62c22718b455a85314f85c92031f87c09ebe9ec8fad40cd2e5f33bd2ab83154d"
+        }
+      ]
+    }
+  ],
+  "required_fact_summary": {
+    "correct": 1,
+    "incorrect": 0,
+    "missing": 2,
+    "uncertain": 0,
+    "all_required_facts_complete": false
+  },
+  "extra_material_claims": [
+    {
+      "answer_quote": "Capture immediately validates it with `assertActiveWorkContextBinding` at [`service.ts:124–130`] and [`411–413`]",
+      "judgment": "correct",
+      "reason": "captureCommandResult chooses the clock and immediately passes options.binding to validateBinding, which calls assertActiveWorkContextBinding and maps a failure to TOOL_RESULT_UNAUTHORIZED.",
+      "source_references": [
+        {
+          "file": "src/tool-results/service.ts",
+          "start_line": 124,
+          "end_line": 131,
+          "sha256_of_exact_utf8_lines": "13eb2e9fff66c5210c2c7b31144925ed5a19c28d354a38269a28b349f5b5487d"
+        },
+        {
+          "file": "src/tool-results/service.ts",
+          "start_line": 411,
+          "end_line": 413,
+          "sha256_of_exact_utf8_lines": "d7c788e66fc06fc728432cbaea9fab620f8ce5560942e45962b012de12fd1a63"
+        }
+      ]
+    },
+    {
+      "answer_quote": "its projector deliberately removes them",
+      "judgment": "correct",
+      "reason": "workContextBindingView destructures session_id away and reconstructs provenance without observed_cwd.",
+      "source_references": [
+        {
+          "file": "src/work-context/binding.ts",
+          "start_line": 130,
+          "end_line": 138,
+          "sha256_of_exact_utf8_lines": "9147c5d0693d31a46ff5c59c15e8d30bb42eaec28caad190ec5c8890a1df1ee2"
+        }
+      ]
+    },
+    {
+      "answer_quote": "It fails both static assignment to `WorkContextBinding` and the runtime `isWorkContextBinding` guard, which requires both fields",
+      "judgment": "correct_with_bare_view_scope",
+      "reason": "A bare WorkContextBindingView lacks the two required properties and is not structurally assignable to WorkContextBinding; the runtime guard also requires both properties. This does not establish what a separate caller could construct or adapt before capture.",
+      "source_references": [
+        {
+          "file": "src/work-context/binding.ts",
+          "start_line": 28,
+          "end_line": 45,
+          "sha256_of_exact_utf8_lines": "e917a43db554775a823e3b8870b165ba4931a28b126b8141b085bdca22cae1f2"
+        },
+        {
+          "file": "src/work-context/binding.ts",
+          "start_line": 47,
+          "end_line": 67,
+          "sha256_of_exact_utf8_lines": "62c22718b455a85314f85c92031f87c09ebe9ec8fad40cd2e5f33bd2ab83154d"
+        },
+        {
+          "file": "src/work-context/binding.ts",
+          "start_line": 217,
+          "end_line": 238,
+          "sha256_of_exact_utf8_lines": "ea3f8546dbb2092358dcc43ff6607c8f3473928e1b6b4fe581af12ba836f3e60"
+        }
+      ]
+    },
+    {
+      "answer_quote": "No material uncertainty.",
+      "judgment": "requires_qualification",
+      "reason": "There is no material uncertainty in the narrow declaration and bare-view conclusions. The fixed source still does not establish an actual caller's runtime value or exclude a separate caller constructing an adapted full binding, so the sentence should not be read beyond the answer's narrow subject.",
+      "source_references": []
+    }
+  ],
+  "material_unsupported_claims": [],
+  "source_access_review": {
+    "target_repo": "/tmp/anvil-source-tasks-20260914/t21",
+    "canonical_target_repo": "/private/tmp/anvil-source-tasks-20260914/t21",
+    "fixed_source_commit": "53bf29e60cece2335aa39fe301935a07e8e8d4e4",
+    "fixed_source_files_verified_by_collector": 638,
+    "shell_call_count": 4,
+    "mcp_call_count": 5,
+    "mcp_tools": [
+      "loci_retrieve",
+      "loci_read",
+      "loci_retrieve",
+      "loci_retrieve",
+      "loci_read"
+    ],
+    "mcp_errors": [
+      "The final loci_read failed with INVALID_SOURCE_REF because its supplied source reference belonged to another repository; the call returned no source."
+    ],
+    "source_access": "All successful retained repository searches and source reads stayed within t21. The only file read outside the assigned source was the installed Loci SKILL.md allowed by the task instructions. The rejected cross-repository source reference returned no source and therefore did not produce outside-scope source access. No source write, test, or service command was recorded.",
+    "write_test_or_service_activity": false,
+    "scope_passed": true
+  },
+  "uncertainties": [
+    "The fixed declarations establish the accepted parameter contract and the bare-view field mismatch; they do not establish that any particular caller supplied either value at runtime.",
+    "A separate caller could construct or adapt a different value before invoking capture; the answer's static and runtime rejection claims are correct only for the bare WorkContextBindingView value it discusses.",
+    "The answer is strict-incomplete because it omits the named CaptureCommandResultOptions clause and does not explicitly attribute WorkContextBindingView's re-export to the public barrel. Its core WorkContextBinding conclusion and the stated source claims are otherwise correct."
+  ]
+}

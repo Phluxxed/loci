@@ -1,0 +1,7 @@
+`captureCommandResult` accepts `binding: WorkContextBinding`, not the public view.
+
+- [`src/tool-results/service.ts`](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:23) imports `WorkContextBinding` from the public `work-context` barrel; its options require that type at [line 56](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:56).
+- The barrel re-exports it from [`src/work-context/binding.ts`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/index.ts:23), where the defining full contract includes `session_id` and `provenance.observed_cwd` at [lines 28–45](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:28).
+- Capture immediately validates it with `assertActiveWorkContextBinding` at [`service.ts:124–130`](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:124) and [`411–413`](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:411).
+
+`WorkContextBindingView` is exported too, but is not accepted: its schema omits `session_id` and `provenance.observed_cwd` ([`binding.ts:47–67`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:47)), and its projector deliberately removes them ([`binding.ts:130–138`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:130)). It fails both static assignment to `WorkContextBinding` and the runtime `isWorkContextBinding` guard, which requires both fields ([`binding.ts:217–238`](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:217)). No material uncertainty.

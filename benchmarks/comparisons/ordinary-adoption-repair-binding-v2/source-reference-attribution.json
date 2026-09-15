@@ -1,0 +1,338 @@
+{
+  "schema_version": 1,
+  "kind": "retained_source_reference_attribution",
+  "frozen_records_unchanged": true,
+  "scope": {
+    "runs": [
+      "binding-repair-v2-01",
+      "binding-repair-v2-02"
+    ],
+    "requests": [
+      "binding-repair-v2-01:native:58",
+      "binding-repair-v2-02:native:52",
+      "binding-repair-v2-02:native:73"
+    ],
+    "comparison": "Each requested source_ref was compared by exact UTF-8 string equality with every source_ref and non-null next_source_ref in earlier native MCP results from the same run.",
+    "candidate_set_digest": "SHA-256 of the lexicographically sorted unique prior reference strings, each followed by LF.",
+    "exclusions": "No new retrieval, source inspection, provider call, replay, or product mutation was performed. Null next_source_ref fields are not issued reference tokens."
+  },
+  "evidence_sources": {
+    "binding-repair-v2-01": {
+      "observation_json_sha256": "2fce236472e327389475691c1714b785446e08dd6a1e9a5e6be474498a62368b",
+      "delivery_supplement_json_sha256": "4164091b891bd54e1677ea83f29263ff658ca3b94ad5e462dba60449287aa443",
+      "metadata_json_sha256": "7b05f802d5e37412a9a4876ba3ad70c70dece3510231b6567680218381a6a1e2",
+      "source_validation_errors": []
+    },
+    "binding-repair-v2-02": {
+      "observation_json_sha256": "ad07f478cbfec4ebbb550342258ba78fa83f4ed4f6692a6de0c5b07cd2fcb449",
+      "delivery_supplement_json_sha256": "b2f6eea1ce8dfaf66c590e6eb22e91add2797026c3ff91e993be5ca8839b63e8",
+      "metadata_json_sha256": "f0cb1d95ff795f6e497db3a2bfee074d7bcfefcb7cd2f9f5576c608b346cb102",
+      "source_validation_errors": []
+    }
+  },
+  "cases": [
+    {
+      "case_id": "run01-invalid-hash",
+      "run_id": "binding-repair-v2-01",
+      "request": {
+        "native_line": 58,
+        "native_item_id": "exec-eef8a7c6-776a-4b78-ab56-8a6b0eb22d29",
+        "tool": "loci_read",
+        "argument_json_path": "observation.mcp_calls[1].arguments.source_ref",
+        "repo_argument": "/tmp/anvil-source-tasks-20260914/t16",
+        "source_ref_utf8_bytes": 272,
+        "source_ref_sha256": "c33c48dd544d26df3172eef5aa9ffb87f4601ead900e1cba3dfd9ef07c1d7ada",
+        "decoded": {
+          "end": 17725,
+          "file": "src/tool-results/service.ts",
+          "hash": "ec7ee4071d9ae4e18a27c5ee64c3ae4f00609c5e8d32ab7c1bd1a6e",
+          "offset": 13257,
+          "repo": "/private/tmp/anvil-source-tasks-20260914/t16",
+          "start": 13257,
+          "v": 1
+        },
+        "native_status": "failed",
+        "result_error_code": "INVALID_SOURCE_REF",
+        "result_error_message": "Source reference hash is invalid",
+        "result_delivery": {
+          "status": "full_exact",
+          "output_ref": "outer:call_BTqlkSSLVcAcyoDli4zgaiDK:line:59:block:1",
+          "start_byte": 0,
+          "end_byte": 97,
+          "match": "structuredContent_json_line"
+        }
+      },
+      "prior_reference_inventory": {
+        "native_lines": {
+          "45": {
+            "source_ref_occurrences": 15,
+            "non_null_next_source_ref_occurrences": 0
+          }
+        },
+        "total_occurrences": 15,
+        "unique_tokens": 12,
+        "candidate_set_sha256": "2ba07c181553803c450fedddf36a2a2128ce3ed7dbd818f52c6472e4c0e1a415",
+        "exact_requested_token_matches": []
+      },
+      "corresponding_issued_candidate": {
+        "issuer_native_line": 45,
+        "issuer_native_item_id": "exec-fa71aa73-38de-4db4-b590-b0308a5deb47",
+        "issuer_tool": "loci_retrieve",
+        "candidate_id": "src/tool-results/service.ts::captureCommandResult#function",
+        "candidate_source_ids": [
+          1
+        ],
+        "candidate_json_paths": [
+          "observation.mcp_calls[0].result.structuredContent.items[0].source_ref"
+        ],
+        "source_ref_utf8_bytes": 284,
+        "source_ref_sha256": "fae5b2b155fc4ddee135dc6ef94951ac69f58d75f3c50471391d12a86505e3d5",
+        "decoded": {
+          "end": 17725,
+          "file": "src/tool-results/service.ts",
+          "hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+          "offset": 13257,
+          "repo": "/private/tmp/anvil-source-tasks-20260914/t16",
+          "start": 13257,
+          "v": 1
+        },
+        "consistent_with_item_extent": true,
+        "issuer_delivery": {
+          "status": "full_exact",
+          "output_ref": "outer:call_QcxtiHyI4j3nC3BxKwXOTGo3:line:46:block:1",
+          "start_byte": 0,
+          "end_byte": 15881,
+          "match": "structuredContent_json_line",
+          "exact_issued_token_reached_model": true
+        }
+      },
+      "difference": {
+        "token_exact_equal": false,
+        "first_token_character_difference": 116,
+        "decoded_fields_different": [
+          "hash"
+        ],
+        "decoded_hash": {
+          "requested_length": 55,
+          "issued_length": 64,
+          "common_prefix": "ec7ee4071d9ae4e18a27c5ee64c3a",
+          "requested_middle": "e4f",
+          "issued_middle": "35159d7e2bb",
+          "common_suffix": "f00609c5e8d32ab7c1bd1a6e"
+        }
+      },
+      "classification": {
+        "kind": "valid_issued_reference_corrupted_in_model_transcription",
+        "product_issued_invalid_reference": false,
+        "delivery_clipping_supported": false,
+        "basis": "No prior issued token equals the request. The uniquely corresponding issued item has the same version, repository, file, start, offset, and end, and its 64-character hash equals the item extent content_hash. That exact issued structure was fully delivered. The request substituted a 55-character hash, and loci_read rejected that submitted hash."
+      }
+    },
+    {
+      "case_id": "run02-successful-control",
+      "run_id": "binding-repair-v2-02",
+      "request": {
+        "native_line": 52,
+        "native_item_id": "exec-233fb767-38cb-4ad7-901f-56b6f490f55f",
+        "tool": "loci_read",
+        "argument_json_path": "observation.mcp_calls[1].arguments.source_ref",
+        "repo_argument": "/tmp/anvil-source-tasks-20260914/t21",
+        "source_ref_utf8_bytes": 284,
+        "source_ref_sha256": "b508dbd2702c581e9919e1b879b1ead1473ed9ddbafa105dfcd63ecb9eb2d59c",
+        "decoded": {
+          "end": 17725,
+          "file": "src/tool-results/service.ts",
+          "hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+          "offset": 13257,
+          "repo": "/private/tmp/anvil-source-tasks-20260914/t21",
+          "start": 13257,
+          "v": 1
+        },
+        "native_status": "completed",
+        "result_status": "ok",
+        "result_complete": true,
+        "result_next_source_ref": null,
+        "result_delivery": {
+          "status": "full_exact",
+          "output_ref": "outer:call_WaQARtHZjZk4ONL1XTwUjfjY:line:53:block:1",
+          "start_byte": 0,
+          "end_byte": 5311,
+          "match": "structuredContent_json_line"
+        }
+      },
+      "prior_reference_inventory": {
+        "native_lines": {
+          "45": {
+            "source_ref_occurrences": 15,
+            "non_null_next_source_ref_occurrences": 0
+          }
+        },
+        "total_occurrences": 15,
+        "unique_tokens": 12,
+        "candidate_set_sha256": "0e93a220056de589beb0f49813e9bb0efc823954a66ffee47f1239ce01386c03",
+        "exact_requested_token_matches": [
+          {
+            "issuer_native_line": 45,
+            "issuer_native_item_id": "exec-9546bc0e-c8ba-4889-851d-e2750665e37a",
+            "candidate_id": "src/tool-results/service.ts::captureCommandResult#function",
+            "candidate_source_ids": [
+              1
+            ],
+            "candidate_json_path": "observation.mcp_calls[0].result.structuredContent.items[0].source_ref"
+          }
+        ]
+      },
+      "corresponding_issued_candidate": {
+        "issuer_native_line": 45,
+        "issuer_native_item_id": "exec-9546bc0e-c8ba-4889-851d-e2750665e37a",
+        "issuer_tool": "loci_retrieve",
+        "candidate_id": "src/tool-results/service.ts::captureCommandResult#function",
+        "candidate_source_ids": [
+          1
+        ],
+        "candidate_json_paths": [
+          "observation.mcp_calls[0].result.structuredContent.items[0].source_ref"
+        ],
+        "source_ref_utf8_bytes": 284,
+        "source_ref_sha256": "b508dbd2702c581e9919e1b879b1ead1473ed9ddbafa105dfcd63ecb9eb2d59c",
+        "decoded_equal_to_request": true,
+        "consistent_with_item_extent": true,
+        "issuer_delivery": {
+          "status": "full_exact",
+          "output_ref": "outer:call_AwwG2RB2vdLJSS5VQ3UPHg6x:line:46:block:1",
+          "start_byte": 0,
+          "end_byte": 15881,
+          "match": "structuredContent_json_line",
+          "exact_issued_token_reached_model": true
+        }
+      },
+      "difference": {
+        "token_exact_equal": true,
+        "first_token_character_difference": null,
+        "decoded_fields_different": []
+      },
+      "classification": {
+        "kind": "exact_issued_reference_reused_successfully",
+        "product_issued_invalid_reference": false,
+        "delivery_clipping_supported": false,
+        "basis": "The request exactly equals an earlier issued item source_ref whose containing structuredContent was fully delivered; loci_read completed and returned the requested source."
+      }
+    },
+    {
+      "case_id": "run02-different-repository",
+      "run_id": "binding-repair-v2-02",
+      "request": {
+        "native_line": 73,
+        "native_item_id": "exec-d366dc90-d947-4721-be3a-3967452465b3",
+        "tool": "loci_read",
+        "argument_json_path": "observation.mcp_calls[4].arguments.source_ref",
+        "repo_argument": "/tmp/anvil-source-tasks-20260914/t21",
+        "source_ref_utf8_bytes": 263,
+        "source_ref_sha256": "f5312ab3dfaba41e12c653ebae1076f50bb678b1fa2b285af563680c34f2baff",
+        "decoded": {
+          "end": 14082,
+          "file": "src/work-context/binding.ts",
+          "hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+          "offset": 0,
+          "repo": "/private/tmp/anvil-source-tasks-2026",
+          "start": 0,
+          "v": 1
+        },
+        "native_status": "failed",
+        "result_error_code": "INVALID_SOURCE_REF",
+        "result_error_message": "Source reference belongs to another repository",
+        "result_delivery": {
+          "status": "full_exact",
+          "output_ref": "outer:call_FqBmr2GTaWyeUr77NI1o5Ubf:line:74:block:1",
+          "start_byte": 0,
+          "end_byte": 111,
+          "match": "structuredContent_json_line"
+        }
+      },
+      "prior_reference_inventory": {
+        "native_lines": {
+          "45": {
+            "source_ref_occurrences": 15,
+            "non_null_next_source_ref_occurrences": 0
+          },
+          "52": {
+            "source_ref_occurrences": 1,
+            "non_null_next_source_ref_occurrences": 0
+          },
+          "59": {
+            "source_ref_occurrences": 15,
+            "non_null_next_source_ref_occurrences": 0
+          },
+          "66": {
+            "source_ref_occurrences": 13,
+            "non_null_next_source_ref_occurrences": 0
+          }
+        },
+        "total_occurrences": 44,
+        "unique_tokens": 30,
+        "candidate_set_sha256": "736b4eac724bf49aa65ca46e0185d174893d2b94e306215410d77911866e88f3",
+        "exact_requested_token_matches": []
+      },
+      "corresponding_issued_candidate": {
+        "issuer_native_line": 66,
+        "issuer_native_item_id": "exec-cf2f4e54-1912-42dc-94dc-22f97e54d334",
+        "issuer_tool": "loci_retrieve",
+        "candidate_id": "src/work-context/binding.ts::__file__#file",
+        "candidate_source_ids": [
+          1
+        ],
+        "candidate_json_paths": [
+          "observation.mcp_calls[3].result.structuredContent.items[0].source_ref"
+        ],
+        "source_ref_utf8_bytes": 274,
+        "source_ref_sha256": "50466d962ede195131facede39f3014cd6b3e4abdff54329a084035fd08e1a69",
+        "decoded": {
+          "end": 14082,
+          "file": "src/work-context/binding.ts",
+          "hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+          "offset": 0,
+          "repo": "/private/tmp/anvil-source-tasks-20260914/t21",
+          "start": 0,
+          "v": 1
+        },
+        "consistent_with_item_extent": true,
+        "issuer_delivery": {
+          "status": "full_exact",
+          "output_ref": "outer:call_t9OJ2051wXQaSt05W3gjsIlz:line:67:block:1",
+          "start_byte": 0,
+          "end_byte": 15445,
+          "match": "structuredContent_json_line",
+          "exact_issued_token_reached_model": true
+        }
+      },
+      "difference": {
+        "token_exact_equal": false,
+        "first_token_character_difference": 239,
+        "decoded_fields_different": [
+          "repo"
+        ],
+        "decoded_repo": {
+          "requested": "/private/tmp/anvil-source-tasks-2026",
+          "issued": "/private/tmp/anvil-source-tasks-20260914/t21",
+          "requested_missing_issued_suffix": "0914/t21"
+        }
+      },
+      "classification": {
+        "kind": "valid_issued_reference_corrupted_in_model_transcription",
+        "product_issued_invalid_reference": false,
+        "delivery_clipping_supported": false,
+        "basis": "No prior issued token equals the request. The uniquely corresponding issued item has the same version, file, hash, start, offset, and end and differs only by the complete repository path. That exact issued structure was fully delivered. The request omitted the repository suffix 0914/t21, and loci_read rejected the submitted locator as belonging to another repository."
+      }
+    }
+  ],
+  "causal_boundary": {
+    "supported": "Both failures occurred after full delivery of valid, internally consistent issued source_ref values and after the outgoing request changed those values. The same-run successful control reused its issued source_ref exactly and loci_read completed.",
+    "not_supported": [
+      "loci_retrieve issued either failed request token",
+      "host clipping removed or changed the issued source_ref before it reached the model",
+      "loci_read rejected an unchanged source_ref that had been issued for the same repository"
+    ],
+    "next_action": "Treat the two failures as exact-token preservation failures at model transcription. Preserve and reuse the returned source_ref string verbatim; this retained evidence does not support a Loci product fix.",
+    "uncertainty": "The retained records establish the boundary between fully delivered issued results and the later native request arguments. They do not expose the model's internal token-selection mechanism or identify why each transcription changed."
+  }
+}
