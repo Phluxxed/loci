@@ -81,13 +81,23 @@ and [replay receipt](../../.scratch/deterministic-graph-retrieval/diagnosis/anch
 
 ## Disposition and next action
 
-The selected local discovery and semantic-selection repair passes. The new
-engine code still needs verification in the actual restarted host. Discovery
-instructions are installed through the existing symlinks; their local success
-does not prove that a fresh ordinary agent follows them.
+Vik restarted Codex. The first actual normal MCP request with the exact retained
+query now returns the repaired function/Binding/View anchors and both required
+type relationships. Its complete result equals the accepted local packet:
+16,251 bytes, 3,099 evidence bytes and three relationships, with the same
+snapshot and explicit omissions. The native log contains one matching retrieval
+and one complete outer delivery; no repeat request was used for this check.
 
-**Next: W1.8.4.4 — restart Codex, then run the same retained query through the
-actual normal MCP tool and verify complete delivered proof before selecting
-another token comparison.** Ordinary adoption and the 1.4328x input result
-remain unaccepted; this code change is not a measured token saving. The
-separately versioned nested-wrapper accounting follow-up remains recorded.
+See the [actual result](../../.scratch/deterministic-graph-retrieval/anchor-host-acceptance-20260915/raw-call.json),
+[primary proof review](../../.scratch/deterministic-graph-retrieval/anchor-host-acceptance-20260915/primary-semantic-read.json)
+and [native validation receipt](../../.scratch/deterministic-graph-retrieval/anchor-host-acceptance-20260915/receipt.json).
+
+The restart boundary is resolved for this repair. This directed host check does
+not establish that a fresh ordinary agent follows the discovery procedure or
+uses the evidence correctly. The previous 1.4328x input result and negative
+ordinary acceptance remain unchanged; no additional provider trial ran.
+
+**Next: W1.8.4.4 — select and freeze a fresh two-binding comparison against the
+unchanged baseline and 1.25x thresholds.** Include separately versioned exact
+wrapper accounting before launch. This is the recommended next measurement;
+the completed two-attempt campaign is not reopened or rescored.
