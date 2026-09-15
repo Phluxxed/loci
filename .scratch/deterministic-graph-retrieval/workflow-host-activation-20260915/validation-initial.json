@@ -1,0 +1,639 @@
+{
+  "schema_version": 1,
+  "task": "W1.8.4.4",
+  "status": "failed",
+  "passed": false,
+  "scope": "Offline validation of primary-saved actual-host full MCP result objects; no Loci invocation and no token/provider benchmark.",
+  "validator": {
+    "model": "GPT-5.6 Sol",
+    "reasoning_effort": "high",
+    "fork_turns": "none",
+    "independent_from_call_execution": true
+  },
+  "canonical_source": {
+    "root": "/tmp/anvil-source-tasks-20260914/t16",
+    "source_commit": "53bf29e60cece2335aa39fe301935a07e8e8d4e4",
+    "expected_hashes": 638,
+    "before": {
+      "expected_files": 638,
+      "actual_files": 638,
+      "hashes_exact": true,
+      "extra_files": [],
+      "missing_files": [],
+      "hash_mismatches": [],
+      "symlinks": [],
+      "no_extras_or_symlinks": true
+    },
+    "after": {
+      "expected_files": 638,
+      "actual_files": 638,
+      "hashes_exact": true,
+      "extra_files": [],
+      "missing_files": [],
+      "hash_mismatches": [],
+      "symlinks": [],
+      "no_extras_or_symlinks": true
+    }
+  },
+  "call_set": {
+    "expected": 9,
+    "observed": 9,
+    "matched": 9,
+    "missing": [],
+    "records": [
+      {
+        "label": "binding-file",
+        "kind": "retrieve",
+        "raw_record": "raw-call-05-binding-file.json",
+        "raw_record_sha256": "4ed0a75ddaa53fe63b143cc039fc0e6f2f6bc0cd3abbd3487a4aa0040364a3ec",
+        "complete_envelope_equal_to_local_oracle": true,
+        "result_sha256": "16792bed4a2bedf0265dae4e99e419a7940a289624c4f61f7419355674e93704",
+        "status": "partial",
+        "coverage": "partial",
+        "exhaustive": false,
+        "omissions": [
+          {
+            "reason": "neighbor_limit",
+            "count": 11
+          },
+          {
+            "reason": "cycle",
+            "count": 11
+          },
+          {
+            "reason": "alternative_path",
+            "count": 5
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 42
+          },
+          {
+            "reason": "ambiguous_relation",
+            "count": 1
+          },
+          {
+            "reason": "external_relation",
+            "count": 16
+          },
+          {
+            "reason": "source_preview",
+            "count": 1
+          },
+          {
+            "reason": "output_budget",
+            "count": 95
+          }
+        ],
+        "items": 3,
+        "sources": 14,
+        "relationships": 11,
+        "usage": {
+          "nodes_examined": 51,
+          "eligible_edges_considered": 116,
+          "edges_traversed": 94,
+          "relationships_delivered": 11,
+          "lookup_bytes": 0,
+          "lookup_files": 0,
+          "evidence_bytes": 3280,
+          "output_bytes": 16162,
+          "estimated_tokens": 4041,
+          "token_estimate_method": "utf8_bytes_div_4",
+          "output_encoding": "mcp_result_json_utf8"
+        }
+      },
+      {
+        "label": "binding-file-read-1",
+        "kind": "read",
+        "raw_record": "raw-call-08-binding-read-page1.json",
+        "raw_record_sha256": "e080e187b5b7e4a42db44c348e7fb74d2efc6861e53e3890ec448ec9c21980fe",
+        "complete_envelope_equal_to_local_oracle": true,
+        "result_sha256": "667420c2cda3e2d1e6d9fa2bd8da96e9d89faaf5b349dc577a91b1c021742265",
+        "status": "ok",
+        "complete": false,
+        "next_source_ref": "sr1_2r3evzjq6pzlcob2xfxwlg3ncu",
+        "source": {
+          "file": "src/work-context/binding.ts",
+          "start_byte": 0,
+          "end_byte": 8192,
+          "source_ref": "sr1_6lbtvtcdqrtuczaq7mywghlfpi"
+        },
+        "usage": {
+          "evidence_bytes": 8192,
+          "output_bytes": 9078,
+          "output_encoding": "mcp_result_json_utf8"
+        }
+      },
+      {
+        "label": "binding-file-read-2",
+        "kind": "read",
+        "raw_record": "raw-call-09-binding-read-page2.json",
+        "raw_record_sha256": "a4fbd85deb26a847d5dd660c86291baf46f56bf34a3866fc7fe5b692ea2a9389",
+        "complete_envelope_equal_to_local_oracle": true,
+        "result_sha256": "ec2676ad2bc066eab71af371a5fbeb5b628e836c7b0bde56152de546668b792c",
+        "status": "ok",
+        "complete": true,
+        "next_source_ref": null,
+        "source": {
+          "file": "src/work-context/binding.ts",
+          "start_byte": 8192,
+          "end_byte": 14082,
+          "source_ref": "sr1_vkwuz57oxeauend5u4eujipzba"
+        },
+        "usage": {
+          "evidence_bytes": 5890,
+          "output_bytes": 6575,
+          "output_encoding": "mcp_result_json_utf8"
+        }
+      },
+      {
+        "label": "browser",
+        "kind": "retrieve",
+        "raw_record": "raw-call-06-browser.json",
+        "raw_record_sha256": "54fb9f5a48966c02fd94674fa6329ad28c06c5ed54496ff1b602bc0225053708",
+        "complete_envelope_equal_to_local_oracle": true,
+        "result_sha256": "9783f7a25ae581cc8e7c9a7381d3f8b7ae87750ac8e8b49bbad3c8a428bc89c6",
+        "status": "partial",
+        "coverage": "partial",
+        "exhaustive": false,
+        "omissions": [
+          {
+            "reason": "node_limit",
+            "count": 23
+          },
+          {
+            "reason": "neighbor_limit",
+            "count": 8
+          },
+          {
+            "reason": "hop_limit",
+            "count": 32
+          },
+          {
+            "reason": "cycle",
+            "count": 5
+          },
+          {
+            "reason": "alternative_path",
+            "count": 1
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 44
+          },
+          {
+            "reason": "ambiguous_relation",
+            "count": 3
+          },
+          {
+            "reason": "external_relation",
+            "count": 11
+          },
+          {
+            "reason": "source_preview",
+            "count": 3
+          },
+          {
+            "reason": "evidence_budget",
+            "count": 1
+          },
+          {
+            "reason": "output_budget",
+            "count": 79
+          }
+        ],
+        "items": 5,
+        "sources": 15,
+        "relationships": 5,
+        "usage": {
+          "nodes_examined": 64,
+          "eligible_edges_considered": 150,
+          "edges_traversed": 82,
+          "relationships_delivered": 5,
+          "lookup_bytes": 0,
+          "lookup_files": 0,
+          "evidence_bytes": 4873,
+          "output_bytes": 16245,
+          "estimated_tokens": 4062,
+          "token_estimate_method": "utf8_bytes_div_4",
+          "output_encoding": "mcp_result_json_utf8"
+        }
+      },
+      {
+        "label": "explicit-pair",
+        "kind": "retrieve",
+        "raw_record": "raw-call-04-explicit-pair.json",
+        "raw_record_sha256": "6a3df12570c9c1bc93779d1e4b528014999f5cf728b2d19efd4777e8b17e665b",
+        "complete_envelope_equal_to_local_oracle": true,
+        "result_sha256": "0ab55034c419ebb0ffc21966decc2b20dd40cbeaab4aa3f0e4ad822d12fdf9bd",
+        "status": "partial",
+        "coverage": "partial",
+        "exhaustive": false,
+        "omissions": [
+          {
+            "reason": "node_limit",
+            "count": 25
+          },
+          {
+            "reason": "neighbor_limit",
+            "count": 4
+          },
+          {
+            "reason": "cycle",
+            "count": 5
+          },
+          {
+            "reason": "alternative_path",
+            "count": 2
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 141
+          },
+          {
+            "reason": "ambiguous_relation",
+            "count": 52
+          },
+          {
+            "reason": "external_relation",
+            "count": 10
+          },
+          {
+            "reason": "source_preview",
+            "count": 1
+          },
+          {
+            "reason": "output_budget",
+            "count": 88
+          }
+        ],
+        "items": 6,
+        "sources": 16,
+        "relationships": 5,
+        "usage": {
+          "nodes_examined": 64,
+          "eligible_edges_considered": 122,
+          "edges_traversed": 88,
+          "relationships_delivered": 5,
+          "lookup_bytes": 0,
+          "lookup_files": 0,
+          "evidence_bytes": 3285,
+          "output_bytes": 16161,
+          "estimated_tokens": 4041,
+          "token_estimate_method": "utf8_bytes_div_4",
+          "output_encoding": "mcp_result_json_utf8"
+        }
+      },
+      {
+        "label": "function",
+        "kind": "retrieve",
+        "raw_record": "raw-call-01-function.json",
+        "raw_record_sha256": "61c5efca53d1777204fc5fe90d8648102a0939029eec107202e5cd9fdd5c7ce2",
+        "complete_envelope_equal_to_local_oracle": true,
+        "result_sha256": "e56cbcfe33f6907011621a2dc7f960d85abc567660e255e320ef906dffe8e984",
+        "status": "partial",
+        "coverage": "partial",
+        "exhaustive": false,
+        "omissions": [
+          {
+            "reason": "neighbor_limit",
+            "count": 4
+          },
+          {
+            "reason": "hop_limit",
+            "count": 43
+          },
+          {
+            "reason": "cycle",
+            "count": 4
+          },
+          {
+            "reason": "alternative_path",
+            "count": 2
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 134
+          },
+          {
+            "reason": "ambiguous_relation",
+            "count": 27
+          },
+          {
+            "reason": "external_relation",
+            "count": 20
+          },
+          {
+            "reason": "source_preview",
+            "count": 1
+          },
+          {
+            "reason": "output_budget",
+            "count": 32
+          }
+        ],
+        "items": 5,
+        "sources": 15,
+        "relationships": 6,
+        "usage": {
+          "nodes_examined": 31,
+          "eligible_edges_considered": 86,
+          "edges_traversed": 35,
+          "relationships_delivered": 6,
+          "lookup_bytes": 0,
+          "lookup_files": 0,
+          "evidence_bytes": 3783,
+          "output_bytes": 16268,
+          "estimated_tokens": 4067,
+          "token_estimate_method": "utf8_bytes_div_4",
+          "output_encoding": "mcp_result_json_utf8"
+        }
+      },
+      {
+        "label": "function-read-1",
+        "kind": "read",
+        "raw_record": "raw-call-02-function-read.json",
+        "raw_record_sha256": "e5c0ce1fdb0bbe6c746966aa7f91288f3549cb4c67a272d3986c69dacde63713",
+        "complete_envelope_equal_to_local_oracle": true,
+        "result_sha256": "2dfcd733de3ebf641ba61d3ab16b78f4e39eb4c6ec00d495b5f5d139c598e6e1",
+        "status": "ok",
+        "complete": true,
+        "next_source_ref": null,
+        "source": {
+          "file": "src/tool-results/service.ts",
+          "start_byte": 13257,
+          "end_byte": 17725,
+          "source_ref": "sr1_l5uxndai3zzfospxvtlq6monzu"
+        },
+        "usage": {
+          "evidence_bytes": 4468,
+          "output_bytes": 5108,
+          "output_encoding": "mcp_result_json_utf8"
+        }
+      },
+      {
+        "label": "renderer",
+        "kind": "retrieve",
+        "raw_record": "raw-call-07-renderer.json",
+        "raw_record_sha256": "e9dd2fc6d4fdb4c9c7095866a35d343c3314dad3b90055b31507b91146b2eacb",
+        "complete_envelope_equal_to_local_oracle": true,
+        "result_sha256": "d8b7fbc0dcd7882a63d685754176e252854d41b6c1be4257b6e1afc86a966e56",
+        "status": "partial",
+        "coverage": "partial",
+        "exhaustive": false,
+        "omissions": [
+          {
+            "reason": "neighbor_limit",
+            "count": 13
+          },
+          {
+            "reason": "cycle",
+            "count": 6
+          },
+          {
+            "reason": "alternative_path",
+            "count": 2
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 45
+          },
+          {
+            "reason": "source_preview",
+            "count": 2
+          },
+          {
+            "reason": "evidence_budget",
+            "count": 1
+          },
+          {
+            "reason": "output_budget",
+            "count": 68
+          }
+        ],
+        "items": 5,
+        "sources": 15,
+        "relationships": 6,
+        "usage": {
+          "nodes_examined": 54,
+          "eligible_edges_considered": 90,
+          "edges_traversed": 71,
+          "relationships_delivered": 6,
+          "lookup_bytes": 0,
+          "lookup_files": 0,
+          "evidence_bytes": 3753,
+          "output_bytes": 15523,
+          "estimated_tokens": 3881,
+          "token_estimate_method": "utf8_bytes_div_4",
+          "output_encoding": "mcp_result_json_utf8"
+        }
+      },
+      {
+        "label": "rich-query",
+        "kind": "retrieve",
+        "raw_record": "raw-call-03-rich-query.json",
+        "raw_record_sha256": "a88e113b417c44f23635366ebcf8da7bdaff2c9c58a8439a551426d7c871a9fd",
+        "complete_envelope_equal_to_local_oracle": true,
+        "result_sha256": "d06ef4a048ae9c42d92c4fc9fff287fd9fa5d474d6ad5183b93b0218c4ba3d05",
+        "status": "partial",
+        "coverage": "partial",
+        "exhaustive": false,
+        "omissions": [
+          {
+            "reason": "anchor_limit",
+            "count": 325
+          },
+          {
+            "reason": "ambiguous_anchor",
+            "count": 327
+          },
+          {
+            "reason": "neighbor_limit",
+            "count": 4
+          },
+          {
+            "reason": "cycle",
+            "count": 2
+          },
+          {
+            "reason": "alternative_path",
+            "count": 4
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 35
+          },
+          {
+            "reason": "ambiguous_relation",
+            "count": 2
+          },
+          {
+            "reason": "source_preview",
+            "count": 1
+          },
+          {
+            "reason": "output_budget",
+            "count": 74
+          }
+        ],
+        "items": 5,
+        "sources": 13,
+        "relationships": 4,
+        "usage": {
+          "nodes_examined": 64,
+          "eligible_edges_considered": 82,
+          "edges_traversed": 76,
+          "relationships_delivered": 4,
+          "lookup_bytes": 0,
+          "lookup_files": 0,
+          "evidence_bytes": 3409,
+          "output_bytes": 14846,
+          "estimated_tokens": 3712,
+          "token_estimate_method": "utf8_bytes_div_4",
+          "output_encoding": "mcp_result_json_utf8"
+        }
+      }
+    ]
+  },
+  "graph_acceptance": {
+    "function_to_options_to_binding": {
+      "function": true,
+      "rich-query": true,
+      "explicit-pair": true
+    },
+    "browser_renderer_controls": {
+      "browser_forward_call": true,
+      "browser_reverse_call": true,
+      "renderer_forward_call": true,
+      "renderer_reverse_call": true
+    },
+    "relationship_rule": "Every delivered relationship must have proof=complete and a linked, byte-validated source spanning its evidence line."
+  },
+  "owning_extent_reads": {
+    "function": {
+      "anchor_node_id": "src/tool-results/service.ts::captureCommandResult#function",
+      "extent": {
+        "file": "src/tool-results/service.ts",
+        "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+        "start_byte": 13257,
+        "end_byte": 17725
+      },
+      "pages": [
+        {
+          "label": "function-read-1",
+          "request_source_ref": "sr1_l5uxndai3zzfospxvtlq6monzu",
+          "returned_source_ref": "sr1_l5uxndai3zzfospxvtlq6monzu",
+          "start_byte": 13257,
+          "end_byte": 17725,
+          "complete": true,
+          "next_source_ref": null
+        }
+      ],
+      "reconstructed_bytes": 4468,
+      "exact_owning_extent": true,
+      "contiguous": true
+    },
+    "binding-file": {
+      "anchor_node_id": "src/work-context/binding.ts::__file__#file",
+      "extent": {
+        "file": "src/work-context/binding.ts",
+        "content_hash": "fcf9ce8fbbefdffcfdbd461a4c5b08e84f7a36220e99aee6dcdd64ad8ce3ca3f",
+        "start_byte": 0,
+        "end_byte": 14082
+      },
+      "pages": [
+        {
+          "label": "binding-file-read-1",
+          "request_source_ref": "sr1_uc4yaw6m4xsvsvnvrelezygyxe",
+          "returned_source_ref": "sr1_6lbtvtcdqrtuczaq7mywghlfpi",
+          "start_byte": 0,
+          "end_byte": 8192,
+          "complete": false,
+          "next_source_ref": "sr1_2r3evzjq6pzlcob2xfxwlg3ncu"
+        },
+        {
+          "label": "binding-file-read-2",
+          "request_source_ref": "sr1_2r3evzjq6pzlcob2xfxwlg3ncu",
+          "returned_source_ref": "sr1_vkwuz57oxeauend5u4eujipzba",
+          "start_byte": 8192,
+          "end_byte": 14082,
+          "complete": true,
+          "next_source_ref": null
+        }
+      ],
+      "reconstructed_bytes": 14082,
+      "exact_owning_extent": true,
+      "contiguous": true
+    }
+  },
+  "preserved_semantics": {
+    "retrieval_status": "partial",
+    "coverage": "partial",
+    "exhaustive": false,
+    "omissions_are_retained_per_record": true,
+    "unsupported_or_omitted_relationships_are_not_treated_as_absent": true
+  },
+  "provenance": {
+    "basis": "Saved raw-call records containing operation, exact request, and the full MCP result object.",
+    "raw_record_hashes_recorded": true,
+    "independent_host_transport_observation": false,
+    "completed_provider_interval": null,
+    "full_outer_model_visible_delivery": "not established by these raw result objects"
+  },
+  "failures": [
+    {
+      "code": "evidence_byte_accounting_mismatch",
+      "context": "function",
+      "declared": 3783,
+      "actual": 3915
+    },
+    {
+      "code": "evidence_byte_accounting_mismatch",
+      "context": "rich-query",
+      "declared": 3409,
+      "actual": 3703
+    },
+    {
+      "code": "output_byte_accounting_mismatch",
+      "context": "explicit-pair",
+      "declared": 16161,
+      "actual": 16157
+    },
+    {
+      "code": "evidence_byte_accounting_mismatch",
+      "context": "explicit-pair",
+      "declared": 3285,
+      "actual": 3498
+    },
+    {
+      "code": "output_byte_accounting_mismatch",
+      "context": "binding-file",
+      "declared": 16162,
+      "actual": 16160
+    },
+    {
+      "code": "evidence_byte_accounting_mismatch",
+      "context": "binding-file",
+      "declared": 3280,
+      "actual": 3335
+    },
+    {
+      "code": "evidence_byte_accounting_mismatch",
+      "context": "browser",
+      "declared": 4873,
+      "actual": 5071
+    },
+    {
+      "code": "evidence_byte_accounting_mismatch",
+      "context": "renderer",
+      "declared": 3753,
+      "actual": 3932
+    }
+  ],
+  "limitations": [
+    "The validator did not execute or observe the host calls; actual-host attribution comes from the primary-owned raw-call capture process.",
+    "The saved full MCP result objects establish the native response contents, but do not establish a completed provider interval.",
+    "Reduced UI or model-visible displays do not establish that the complete native response was delivered through the outer model context.",
+    "Partial coverage and recorded omissions remain limitations; unsupported or omitted semantics are not negative evidence."
+  ]
+}

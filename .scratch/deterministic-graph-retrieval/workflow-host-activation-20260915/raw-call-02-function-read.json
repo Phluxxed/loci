@@ -1,0 +1,33 @@
+{
+  "operation": "loci_read",
+  "request": {
+    "repo": "/tmp/anvil-source-tasks-20260914/t16",
+    "source_ref": "sr1_l5uxndai3zzfospxvtlq6monzu"
+  },
+  "result": {
+    "content": [],
+    "structuredContent": {
+      "schema_version": 1,
+      "status": "ok",
+      "source": {
+        "id": 1,
+        "file": "src/tool-results/service.ts",
+        "start_byte": 13257,
+        "end_byte": 17725,
+        "start_line": 411,
+        "end_line": 522,
+        "content_hash": "ec7ee4071d9ae4e18a27c5ee64c3a35159d7e2bbf00609c5e8d32ab7c1bd1a6e",
+        "content": "async function captureCommandResult(options: CaptureCommandResultOptions): Promise<ToolResultReceipt> {\n  const clock = options.now ?? nowIso;\n  const binding = validateBinding(options.binding, clock);\n  const producer = validateProducer(options.producer);\n  const createdAt = clock();\n  const createdAtMs = Date.parse(createdAt);\n  if (!Number.isFinite(createdAtMs)) {\n    throw new ToolResultError(\"TOOL_RESULT_INVALID_REQUEST\", \"now must return an ISO date-time\");\n  }\n  const expiresAt = new Date(createdAtMs + RETENTION_MS).toISOString();\n  const paths = await prepareStore(options.stateRoot);\n  const temporaryDirectory = join(paths.temporary, `.capture-${randomUUID()}`);\n  await mkdir(temporaryDirectory, { mode: 0o700 });\n  const payloadPath = join(temporaryDirectory, \"payload.txt\");\n  try {\n    const captured = await captureChildOutput(options.argv, options.cwd, payloadPath);\n    const resultId = opaqueId(\"tr\");\n    const status = captured.exitCode === 0 ? \"succeeded\" : \"failed\";\n    if (captured.byteCount <= TOOL_RESULT_MAX_INLINE_BYTES) {\n      const inlineReceipt = toolResultReceiptSchema.parse({\n        schema_version: 1,\n        result_id: resultId,\n        status,\n        completeness: \"complete_inline\",\n        summary: { exit_code: captured.exitCode, producer },\n        inline: {\n          content_type: \"text/plain; charset=utf-8\",\n          byte_count: captured.byteCount,\n          sha256: captured.sha256,\n          text: await readFile(payloadPath, \"utf8\"),\n        },\n      });\n      if (Buffer.byteLength(`${JSON.stringify(inlineReceipt)}\\n`, \"utf8\") <= TOOL_RESULT_MAX_INLINE_BYTES) {\n        await rm(temporaryDirectory, { recursive: true, force: true });\n        return inlineReceipt;\n      }\n    }\n\n    const artefactId = opaqueId(\"ta\");\n    const manifest: StoredManifest = storedManifestSchema.parse({\n      schema_version: 1,\n      result_id: resultId,\n      status,\n      completeness: \"complete_artefact_backed\",\n      producer,\n      operation: \"command\",\n      created_at: createdAt,\n      expires_at: expiresAt,\n      exit_code: captured.exitCode,\n      exit_signal: captured.exitSignal,\n      artefact: {\n        artefact_id: artefactId,\n        content_type: \"text/plain; charset=utf-8\",\n        byte_count: captured.byteCount,\n        sha256: captured.sha256,\n      },\n      provenance: {\n        binding_id: binding.id,\n        host: binding.host,\n        workspace_key: binding.collaboration_space.key,\n      },\n      owner: { session_id: binding.session_id },\n    });\n    await validatePayload(payloadPath, manifest);\n    await writePrivateJson(join(temporaryDirectory, \"manifest.json\"), manifest);\n\n    const release = await acquireStoreLock(paths);\n    try {\n      const cleanup = await cleanupExpired(paths, createdAtMs);\n      const usedBytes = cleanup.entries.reduce(\n        (total, entry) => total + (entry.manifest?.artefact.byte_count ?? 0),\n        0,\n      );\n      if (usedBytes + captured.byteCount > MAX_STORE_BYTES) {\n        throw new ToolResultError(\n          \"TOOL_RESULT_CAPACITY_EXCEEDED\",\n          `Tool-result store cannot accept ${captured.byteCount} bytes without evicting unexpired evidence`,\n        );\n      }\n      const workspacePath = workspaceDirectory(paths, binding);\n      await ensurePrivateDirectory(workspacePath);\n      const publishedDirectory = join(workspacePath, resultId);\n      await rename(temporaryDirectory, publishedDirectory);\n      await syncDirectory(workspacePath);\n    } finally {\n      await release();\n    }\n\n    const receipt = toolResultReceiptSchema.parse({\n      schema_version: 1,\n      result_id: resultId,\n      status,\n      completeness: \"complete_artefact_backed\",\n      summary: { exit_code: captured.exitCode, producer },\n      artefact: {\n        artefact_id: artefactId,\n        content_type: \"text/plain; charset=utf-8\",\n        byte_count: captured.byteCount,\n        sha256: captured.sha256,\n        expires_at: expiresAt,\n      },\n    });\n    if (Buffer.byteLength(`${JSON.stringify(receipt)}\\n`, \"utf8\") > TOOL_RESULT_MAX_INLINE_BYTES) {\n      throw new ToolResultError(\"TOOL_RESULT_CAPTURE_FAILED\", \"Tool-result receipt exceeded the 4 KiB contract\");\n    }\n    return receipt;\n  } catch (error) {\n    await rm(temporaryDirectory, { recursive: true, force: true });\n    if (error instanceof ToolResultError) throw error;\n    throw new ToolResultError(\"TOOL_RESULT_CAPTURE_FAILED\", \"Command result capture failed\", { cause: error });\n  }\n}",
+        "source_ref": "sr1_l5uxndai3zzfospxvtlq6monzu"
+      },
+      "complete": true,
+      "next_source_ref": null,
+      "usage": {
+        "evidence_bytes": 4468,
+        "output_bytes": 5108,
+        "output_encoding": "mcp_result_json_utf8"
+      }
+    },
+    "isError": false
+  }
+}
