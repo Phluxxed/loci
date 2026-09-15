@@ -45,6 +45,20 @@ loci_retrieve(repo, seed_ids=[known_id], query="remaining source question")
 loci_read(repo, source_ref=returned_item.source_ref)
 ```
 
+In Code Mode, save each raw result under a distinct key before displaying its
+`structuredContent`. Successful `content` is empty. Use this procedure for
+both normal operations:
+
+```javascript
+const result = await tools.mcp__loci__loci_retrieve({repo, query});
+store("loci.retrieve.1", result);
+text(result.structuredContent ?? result);
+```
+
+Recover a display mistake with `load("loci.retrieve.1")` and the same projection;
+the saved result already contains the source and graph proof. Inspect returned
+errors before consuming success fields. Present each bounded packet separately.
+
 Use `loci_retrieve` for initial discovery and further context. It creates or
 refreshes the index and runs the maintained graph policy. The response includes
 candidate identities, selected source, proved relationships, coverage and

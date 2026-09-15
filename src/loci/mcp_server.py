@@ -200,7 +200,10 @@ def create_server(
         "loci",
         instructions=(
             "Retrieve deterministic bounded source context and expand exact returned "
-            "source extents from the loci cache."
+            "source extents from the loci cache. Successful results are in "
+            "structuredContent; content is empty. In Code Mode, store the raw "
+            "result under a unique key before displaying result.structuredContent "
+            "?? result. Recover a display mistake from that saved result."
             if selected_surface == "normal"
             else
             "Local code navigation server. Index local repositories, inspect symbol "

@@ -1,5 +1,9 @@
 # Normal retrieval results
 
+The MCP result's `structuredContent` holds the packet described below. Successful
+`content` is empty. Follow the skill's Code Mode save-and-display procedure so
+the raw result remains available if presentation needs correcting.
+
 `loci_retrieve(repo, query="", seed_ids=None)` is the normal source operation.
 At least one query or exact node ID is required. A query equal to an indexed
 relative path selects that file. Otherwise symbol metadata is ranked, with
