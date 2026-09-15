@@ -1,0 +1,8 @@
+`captureCommandResult` accepts the full `WorkContextBinding` contract, not the public/redacted view.
+
+- Its options require `binding: WorkContextBinding`: [src/tool-results/service.ts](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:53). The public type is imported from the work-context barrel at [service.ts](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:23).
+- That barrel re-exports `WorkContextBinding` (and separately `WorkContextBindingView`) from [src/work-context/index.ts](/tmp/anvil-source-tasks-20260914/t21/src/work-context/index.ts:23).
+- The defining full contract is [src/work-context/binding.ts](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:28): it includes `session_id` and `provenance.observed_cwd`.
+- Capture validates it as an active trusted binding before use: [service.ts](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:411), via [service.ts](/tmp/anvil-source-tasks-20260914/t21/src/tool-results/service.ts:124).
+
+`WorkContextBindingView` is not accepted. Its schema/type omits `session_id` and `provenance.observed_cwd` ([binding.ts](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:47), [binding.ts](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:67)); the view-producing function explicitly removes both ([binding.ts](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:130)). It is therefore TypeScript-incompatible with the required binding, and a forced/cast value also fails the runtime binding guard, which requires those fields ([binding.ts](/tmp/anvil-source-tasks-20260914/t21/src/work-context/binding.ts:217)). No material uncertainty.

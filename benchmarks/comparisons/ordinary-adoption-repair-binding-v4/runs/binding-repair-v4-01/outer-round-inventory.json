@@ -1,0 +1,207 @@
+{
+  "run_id": "binding-repair-v4-01",
+  "outer_rounds": 10,
+  "qualification": "Temporal nesting is inspection evidence, not substituted for frozen per-call attribution.",
+  "rounds": [
+    {
+      "request_line": 15,
+      "output_line": 18,
+      "call_id": "call_oaOYChwmbI5n0es7M3EFjOZ7",
+      "request": "const r = await tools.exec_command({\"cmd\":\"pwd && rg --files -g 'AGENTS.md' -g 'SKILL.md' -g 'captureCommandResult*' -g '*.ts' /tmp/anvil-source-tasks-20260914/t16 | head -n 80\",\"workdir\":\"/Users/brummerv/loci\",\"yield_time_ms\":10000,\"max_output_tokens\":12000});\ntext(r.output);\n",
+      "native_lines_in_outer_interval": [],
+      "output_blocks": [
+        {
+          "bytes": 47,
+          "sha256": "84098dff1cf4fc1b68f879fb9401f79f8bc5b793a7aa6326c9f13d4c7117f439",
+          "truncated": false
+        },
+        {
+          "bytes": 5090,
+          "sha256": "0bc47e1b3c4a7a296506c5ecccd4d30b4c76c2681641ea14bdc57d251b5ccdcb",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "request_line": 22,
+      "output_line": 25,
+      "call_id": "call_8scR72UZ4riLOgGVAB3WDguL",
+      "request": "const r = await tools.exec_command({\"cmd\":\"sed -n '1,240p' /Users/brummerv/.codex/skills/loci/SKILL.md && sed -n '1,240p' AGENTS.md\",\"workdir\":\"/tmp/anvil-source-tasks-20260914/t16\",\"yield_time_ms\":10000,\"max_output_tokens\":30000});\ntext(r.output);\n",
+      "native_lines_in_outer_interval": [],
+      "output_blocks": [
+        {
+          "bytes": 47,
+          "sha256": "84098dff1cf4fc1b68f879fb9401f79f8bc5b793a7aa6326c9f13d4c7117f439",
+          "truncated": false
+        },
+        {
+          "bytes": 19672,
+          "sha256": "6e4d370a26d875d97a5199d1ad177ab32097bc59618f9c2a7ce876561f068e48",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "request_line": 29,
+      "output_line": 31,
+      "call_id": "call_V7I1VHKrTWcc6Md26haYETuC",
+      "request": "const matches = ALL_TOOLS.filter(t => /(?:^|__)loci_(?:retrieve|read)$/.test(t.name));\nstore(\"loci.normal.tools\", matches);\ntext({status: matches.length ? \"found\" : \"no_match\", count: matches.length, names: matches.slice(0,8).map(t=>t.name)});\n",
+      "native_lines_in_outer_interval": [],
+      "output_blocks": [
+        {
+          "bytes": 47,
+          "sha256": "b5f7a7aa304b9f47f3043a3ce24ece3433e73e45531c2fde5131b981ec94b9ab",
+          "truncated": false
+        },
+        {
+          "bytes": 88,
+          "sha256": "74ac6c5152dbdddef931ba2ae9585502cd9dc09fd0d9c7a944ad922ceffcc341",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "request_line": 35,
+      "output_line": 37,
+      "call_id": "call_okCuj2g7KaMGhqgEGGB3FVKa",
+      "request": "const match = ALL_TOOLS.find(t => t.name === \"mcp__loci__loci_retrieve\");\ntext(match ?? \"not found\");\n",
+      "native_lines_in_outer_interval": [],
+      "output_blocks": [
+        {
+          "bytes": 47,
+          "sha256": "b5f7a7aa304b9f47f3043a3ce24ece3433e73e45531c2fde5131b981ec94b9ab",
+          "truncated": false
+        },
+        {
+          "bytes": 4077,
+          "sha256": "29e5cafd2338deb24b65cc1f2894410e430fe02c1addea03496eb00c44ca8885",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "request_line": 41,
+      "output_line": 44,
+      "call_id": "call_JRlX4c82FLdpRbMS4Umkui6z",
+      "request": "const repo = \"/tmp/anvil-source-tasks-20260914/t16\";\nconst result = await tools.mcp__loci__loci_retrieve({repo, query:\"captureCommandResult\"});\nstore(\"loci.retrieve.captureCommandResult\", result);\ntext(result.structuredContent ?? result);\n",
+      "native_lines_in_outer_interval": [
+        43
+      ],
+      "output_blocks": [
+        {
+          "bytes": 48,
+          "sha256": "e73cc035fccfe17814d5a2f872cc7fa941dbf0a613c632792e143a3e5406059e",
+          "truncated": false
+        },
+        {
+          "bytes": 16218,
+          "sha256": "89009dc961b0e1a6a36e954452a9a6992aa560335f5a3b68554f4341f57bcdda",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "request_line": 48,
+      "output_line": 51,
+      "call_id": "call_cMKAq6cIJNrzUSIorv8CE5Gp",
+      "request": "const repo = \"/tmp/anvil-source-tasks-20260914/t16\";\nconst result = await tools.mcp__loci__loci_retrieve({repo, query:\"WorkContextBindingView\"});\nstore(\"loci.retrieve.view\", result);\ntext(result.structuredContent ?? result);\n",
+      "native_lines_in_outer_interval": [
+        50
+      ],
+      "output_blocks": [
+        {
+          "bytes": 47,
+          "sha256": "3ac0ccee78c6c680e92b74d0d45370c274739c7cd8e6ad6f8ae84f063a348981",
+          "truncated": false
+        },
+        {
+          "bytes": 16035,
+          "sha256": "d423c7dc18a364f0ecf9d8fb0fd041fb481ee5a0e1388e59c97a8164899033f4",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "request_line": 55,
+      "output_line": 57,
+      "call_id": "call_ruXbvWus4gJqMEnyzX0eceD4",
+      "request": "const match = ALL_TOOLS.find(t => t.name === \"mcp__loci__loci_read\");\ntext(match ?? \"not found\");\n",
+      "native_lines_in_outer_interval": [],
+      "output_blocks": [
+        {
+          "bytes": 47,
+          "sha256": "b5f7a7aa304b9f47f3043a3ce24ece3433e73e45531c2fde5131b981ec94b9ab",
+          "truncated": false
+        },
+        {
+          "bytes": 1401,
+          "sha256": "662dae6f53b2a1db8de6f0a1caac7b47ee5f48726fb28e5ef1b083227e2482e6",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "request_line": 61,
+      "output_line": 64,
+      "call_id": "call_2HlQo4tvNoWUcziTuwtvvphD",
+      "request": "const repo = \"/tmp/anvil-source-tasks-20260914/t16\";\nconst result = await tools.mcp__loci__loci_read({repo, source_ref:\"sr1_l5uxndai3zzfospxvtlq6monzu\"});\nstore(\"loci.read.capture.1\", result);\ntext(result.structuredContent ?? result);\n",
+      "native_lines_in_outer_interval": [
+        63
+      ],
+      "output_blocks": [
+        {
+          "bytes": 47,
+          "sha256": "c9c9d6a694c4a6b74541d3516da02de2384bf5bcde5d3aeaa4a60c52098e56d1",
+          "truncated": false
+        },
+        {
+          "bytes": 5057,
+          "sha256": "3ddf1307394d5f59fe95515a34796cb779310a817c83816d13e0ac0c9f8ee45e",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "request_line": 68,
+      "output_line": 71,
+      "call_id": "call_vs7s06lCsonVJghwhSfhzyV6",
+      "request": "const repo = \"/tmp/anvil-source-tasks-20260914/t16\";\nconst result = await tools.mcp__loci__loci_retrieve({repo, query:\"validateBinding tool-results service\"});\nstore(\"loci.retrieve.validateBinding\", result);\ntext(result.structuredContent ?? result);\n",
+      "native_lines_in_outer_interval": [
+        70
+      ],
+      "output_blocks": [
+        {
+          "bytes": 47,
+          "sha256": "c9c9d6a694c4a6b74541d3516da02de2384bf5bcde5d3aeaa4a60c52098e56d1",
+          "truncated": false
+        },
+        {
+          "bytes": 15944,
+          "sha256": "bf863dba49566ce9678440cb970bce82f5609dfcbba88791ec146cda694d5a18",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "request_line": 75,
+      "output_line": 78,
+      "call_id": "call_V8QIdJ3692soARFCmMTwIkSW",
+      "request": "const repo = \"/tmp/anvil-source-tasks-20260914/t16\";\nconst result = await tools.mcp__loci__loci_retrieve({repo, query:\"assertActiveWorkContextBinding\"});\nstore(\"loci.retrieve.assertActive\", result);\ntext(result.structuredContent ?? result);\n",
+      "native_lines_in_outer_interval": [
+        77
+      ],
+      "output_blocks": [
+        {
+          "bytes": 47,
+          "sha256": "23c890218f9fe0c54e0bfede884770be5f0cb1437ce57329089226d0fb5fd443",
+          "truncated": false
+        },
+        {
+          "bytes": 16329,
+          "sha256": "eeeb0a05cfd2cff92410daea6fe51161af8af3118a84dbd7869d2a2621bd2a95",
+          "truncated": false
+        }
+      ]
+    }
+  ]
+}

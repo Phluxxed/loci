@@ -1,0 +1,128 @@
+{
+  "reviewer": "independent gpt-5.6-sol/high (fork none)",
+  "case_id": "tool_result_capture_binding_type_identity",
+  "answer_text_sha256": "3e3b3c9a9cd025745ed77586c08cccd2b072e6dfc292e6731d6c05730aa64f65",
+  "fact_judgments": [
+    {
+      "fact_id": "capture_options_declares_binding_contract",
+      "verdict": "partial",
+      "answer_excerpt": "its options require `binding: WorkContextBinding`",
+      "reason": "The answer correctly states the binding field's declared type and identifies captureCommandResult as the accepting function, but it never names CaptureCommandResultOptions as the function's parameter type. That compound clause is present only in the cited source, so it is not credited as stated answer content.",
+      "source_refs": [
+        {
+          "file": "src/tool-results/service.ts",
+          "lines": "53-60",
+          "rubric_sha256": "c492316cc078713599c249b236bcf2cb3826f40439904ebe00e28ccc6d9feb8d",
+          "observed_sha256": "c492316cc078713599c249b236bcf2cb3826f40439904ebe00e28ccc6d9feb8d"
+        },
+        {
+          "file": "src/tool-results/service.ts",
+          "lines": "411",
+          "rubric_sha256": "dd903466b03fa7dbab014e533c8479b6301b5baa3b484be6017115bcd2e82f04",
+          "observed_sha256": "dd903466b03fa7dbab014e533c8479b6301b5baa3b484be6017115bcd2e82f04"
+        }
+      ]
+    },
+    {
+      "fact_id": "binding_import_traverses_public_barrel",
+      "verdict": "partial",
+      "answer_excerpt": "imports `WorkContextBinding` from the public barrel ... The barrel re-exports that type",
+      "reason": "The import of WorkContextBinding from the work-context barrel and that type's re-export/definition path are stated. The answer does not state the remaining compound clause that the barrel also re-exports WorkContextBindingView from binding.ts; calling the view a separate exported type at binding.ts does not establish that barrel re-export.",
+      "source_refs": [
+        {
+          "file": "src/tool-results/service.ts",
+          "lines": "19-23",
+          "rubric_sha256": "4fcf2c3c900821bc66ab3e341af0f3a0550b716d2909f52b62f4cc5a6d4a16fc",
+          "observed_sha256": "4fcf2c3c900821bc66ab3e341af0f3a0550b716d2909f52b62f4cc5a6d4a16fc"
+        },
+        {
+          "file": "src/work-context/index.ts",
+          "lines": "16-29",
+          "rubric_sha256": "c45b3a2a80027420ba2532006cc4e18d07ff0b7cf83eaf781b99022b61d09eec",
+          "observed_sha256": "c45b3a2a80027420ba2532006cc4e18d07ff0b7cf83eaf781b99022b61d09eec"
+        }
+      ]
+    },
+    {
+      "fact_id": "binding_identity_and_view_difference",
+      "verdict": "supported",
+      "answer_excerpt": "`WorkContextBindingView` is **not accepted** ... its schema omits `session_id` and `provenance.observed_cwd`",
+      "reason": "The answer states that the accepted WorkContextBinding is defined in binding.ts, that it requires session_id and provenance.observed_cwd, and that the separate schema-backed WorkContextBindingView omits those fields. It therefore supports the rubric's declared-contract and bare-view incompatibility claim.",
+      "source_refs": [
+        {
+          "file": "src/work-context/binding.ts",
+          "lines": "28-45",
+          "rubric_sha256": "e917a43db554775a823e3b8870b165ba4931a28b126b8141b085bdca22cae1f2",
+          "observed_sha256": "e917a43db554775a823e3b8870b165ba4931a28b126b8141b085bdca22cae1f2"
+        },
+        {
+          "file": "src/work-context/binding.ts",
+          "lines": "47-67",
+          "rubric_sha256": "62c22718b455a85314f85c92031f87c09ebe9ec8fad40cd2e5f33bd2ab83154d",
+          "observed_sha256": "62c22718b455a85314f85c92031f87c09ebe9ec8fad40cd2e5f33bd2ab83154d"
+        }
+      ]
+    }
+  ],
+  "extra_material_claims": [
+    {
+      "claim": "captureCommandResult validates the supplied binding through assertActiveWorkContextBinding.",
+      "verdict": "supported",
+      "reason": "captureCommandResult passes options.binding to validateBinding at service.ts:413, and validateBinding calls assertActiveWorkContextBinding at service.ts:124-126.",
+      "source_refs": [
+        "src/tool-results/service.ts:124-130",
+        "src/tool-results/service.ts:411-414"
+      ]
+    },
+    {
+      "claim": "WorkContextBindingView is a redacted view.",
+      "verdict": "supported",
+      "reason": "The exported view schema omits session_id and provenance.observed_cwd, and workContextBindingView removes those fields from the full binding.",
+      "source_refs": [
+        "src/work-context/binding.ts:47-67",
+        "src/work-context/binding.ts:130-139"
+      ]
+    },
+    {
+      "claim": "a view fails both TypeScript assignment and authorization validation",
+      "verdict": "partial",
+      "reason": "This is supported for an unadapted bare WorkContextBindingView value, which lacks required fields, but the wording is unqualified. A runtime object may retain or be adapted to add the full binding fields even if a caller has treated it as a view type; the shown source does not prove that every runtime value or caller adaptation fails.",
+      "source_refs": [
+        "src/work-context/binding.ts:28-67",
+        "src/work-context/binding.ts:130-147",
+        "src/work-context/binding.ts:217-238"
+      ]
+    }
+  ],
+  "unsupported_or_overbroad_claims": [
+    {
+      "claim": "a view fails both TypeScript assignment and authorization validation",
+      "reason": "The authorization-validation portion needs to be limited to an unadapted bare view value. The declaration and guard do not establish failure for every possible underlying runtime object or caller adaptation."
+    },
+    {
+      "claim": "No material uncertainty in this trace.",
+      "reason": "The declared type trace is certain, but the answer's unqualified runtime-validation statement leaves material value/adaptation scope unstated."
+    }
+  ],
+  "source_access_review": {
+    "verdict": "compliant",
+    "target_repo": "/tmp/anvil-source-tasks-20260914/t16",
+    "evidence": [
+      "All five recorded MCP calls target /tmp/anvil-source-tasks-20260914/t16.",
+      "The initial shell command only reported the working directory and enumerated files under the target repository.",
+      "The remaining shell command read the installed loci SKILL.md and the target repository's AGENTS.md.",
+      "No recorded shell or MCP source access reaches another source repository, prior campaign artifact, or prohibited path."
+    ],
+    "material_scope_uncertainty": null
+  },
+  "material_uncertainties": [
+    "The source proves the declared input contract and that an unadapted schema-conforming or helper-produced bare view lacks required fields; runtime acceptance still depends on the actual value supplied after any caller adaptation."
+  ],
+  "final": {
+    "supported_required_fact_count": 1,
+    "partial_required_fact_count": 2,
+    "missing_required_fact_count": 0,
+    "all_facts_correct": false,
+    "all_material_claims_supported": false
+  }
+}

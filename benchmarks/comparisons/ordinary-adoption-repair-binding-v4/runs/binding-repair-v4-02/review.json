@@ -1,0 +1,125 @@
+{
+  "reviewer": "independent gpt-5.6-sol/high (fork none)",
+  "case_id": "tool_result_capture_binding_type_identity",
+  "answer_text_sha256": "ff14d186d5ff74fff9149b5101edd8f78c7368b87553c259cc136adfd3ed3ab9",
+  "fact_judgments": [
+    {
+      "fact_id": "capture_options_declares_binding_contract",
+      "verdict": "partial",
+      "answer_excerpt": "Its options require `binding: WorkContextBinding`",
+      "reason": "The answer correctly states the binding field's declared type and identifies captureCommandResult as the accepting function, but it never names CaptureCommandResultOptions as the function's parameter type. That compound clause is present only in the cited source, so it is not credited as stated answer content.",
+      "source_refs": [
+        {
+          "file": "src/tool-results/service.ts",
+          "lines": "53-60",
+          "rubric_sha256": "c492316cc078713599c249b236bcf2cb3826f40439904ebe00e28ccc6d9feb8d",
+          "observed_sha256": "c492316cc078713599c249b236bcf2cb3826f40439904ebe00e28ccc6d9feb8d"
+        },
+        {
+          "file": "src/tool-results/service.ts",
+          "lines": "411",
+          "rubric_sha256": "dd903466b03fa7dbab014e533c8479b6301b5baa3b484be6017115bcd2e82f04",
+          "observed_sha256": "dd903466b03fa7dbab014e533c8479b6301b5baa3b484be6017115bcd2e82f04"
+        }
+      ]
+    },
+    {
+      "fact_id": "binding_import_traverses_public_barrel",
+      "verdict": "supported",
+      "answer_excerpt": "The public type is imported from the work-context barrel ... That barrel re-exports `WorkContextBinding` (and separately `WorkContextBindingView`) ... The defining full contract is ... `binding.ts`",
+      "reason": "Across the adjacent statements, the answer identifies the service import from the public barrel, names both types as barrel re-exports, and locates their declarations/schema in binding.ts. This supplies the full trace in prose rather than relying on the citation alone.",
+      "source_refs": [
+        {
+          "file": "src/tool-results/service.ts",
+          "lines": "19-23",
+          "rubric_sha256": "4fcf2c3c900821bc66ab3e341af0f3a0550b716d2909f52b62f4cc5a6d4a16fc",
+          "observed_sha256": "4fcf2c3c900821bc66ab3e341af0f3a0550b716d2909f52b62f4cc5a6d4a16fc"
+        },
+        {
+          "file": "src/work-context/index.ts",
+          "lines": "16-29",
+          "rubric_sha256": "c45b3a2a80027420ba2532006cc4e18d07ff0b7cf83eaf781b99022b61d09eec",
+          "observed_sha256": "c45b3a2a80027420ba2532006cc4e18d07ff0b7cf83eaf781b99022b61d09eec"
+        }
+      ]
+    },
+    {
+      "fact_id": "binding_identity_and_view_difference",
+      "verdict": "supported",
+      "answer_excerpt": "The defining full contract ... includes `session_id` and `provenance.observed_cwd` ... `WorkContextBindingView` is not accepted. Its schema/type omits [them]",
+      "reason": "The answer explicitly identifies the accepted WorkContextBinding definition and its required fields, identifies WorkContextBindingView as the separate schema-backed type without those fields, and concludes that the bare view is not the declared capture input contract.",
+      "source_refs": [
+        {
+          "file": "src/work-context/binding.ts",
+          "lines": "28-45",
+          "rubric_sha256": "e917a43db554775a823e3b8870b165ba4931a28b126b8141b085bdca22cae1f2",
+          "observed_sha256": "e917a43db554775a823e3b8870b165ba4931a28b126b8141b085bdca22cae1f2"
+        },
+        {
+          "file": "src/work-context/binding.ts",
+          "lines": "47-67",
+          "rubric_sha256": "62c22718b455a85314f85c92031f87c09ebe9ec8fad40cd2e5f33bd2ab83154d",
+          "observed_sha256": "62c22718b455a85314f85c92031f87c09ebe9ec8fad40cd2e5f33bd2ab83154d"
+        }
+      ]
+    }
+  ],
+  "extra_material_claims": [
+    {
+      "claim": "Capture validates the supplied value as an active trusted binding before use.",
+      "verdict": "supported",
+      "reason": "captureCommandResult calls validateBinding before capture, and validateBinding delegates to assertActiveWorkContextBinding while mapping failure to TOOL_RESULT_UNAUTHORIZED.",
+      "source_refs": [
+        "src/tool-results/service.ts:124-130",
+        "src/tool-results/service.ts:411-414"
+      ]
+    },
+    {
+      "claim": "workContextBindingView explicitly removes session_id and provenance.observed_cwd.",
+      "verdict": "supported",
+      "reason": "The helper destructures session_id away and reconstructs provenance without observed_cwd.",
+      "source_refs": [
+        "src/work-context/binding.ts:130-139"
+      ]
+    },
+    {
+      "claim": "a forced/cast value also fails the runtime binding guard",
+      "verdict": "partial",
+      "reason": "A direct cast of the unadapted helper-produced bare view still lacks the required runtime fields and fails the guard. A cast itself does not change runtime properties, however, and an arbitrary value statically treated as WorkContextBindingView may retain or be adapted to add the full fields; the unqualified wording is therefore broader than the source proves.",
+      "source_refs": [
+        "src/work-context/binding.ts:130-147",
+        "src/work-context/binding.ts:217-238"
+      ]
+    }
+  ],
+  "unsupported_or_overbroad_claims": [
+    {
+      "claim": "a forced/cast value also fails the runtime binding guard",
+      "reason": "This is supportable only when 'value' means the unchanged bare view/helper output. Runtime success depends on the underlying properties, and the source does not establish failure for every cast or caller adaptation."
+    },
+    {
+      "claim": "No material uncertainty.",
+      "reason": "The declared type trace is certain, but the forced/cast runtime statement needs a bare-value qualification and does not resolve arbitrary caller adaptation."
+    }
+  ],
+  "source_access_review": {
+    "verdict": "compliant",
+    "target_repo": "/tmp/anvil-source-tasks-20260914/t21",
+    "evidence": [
+      "All three recorded MCP calls target /tmp/anvil-source-tasks-20260914/t21.",
+      "The seven recorded shell calls only enumerate or read the target repository and installed loci instructions; all source retrieval after setup is executed with the target repository as cwd.",
+      "No recorded shell or MCP source access reaches another source repository, prior campaign artifact, or prohibited path."
+    ],
+    "material_scope_uncertainty": null
+  },
+  "material_uncertainties": [
+    "The source proves the declared input contract and that an unadapted schema-conforming or helper-produced bare view lacks required fields; runtime acceptance still depends on the actual value supplied after any caller adaptation."
+  ],
+  "final": {
+    "supported_required_fact_count": 2,
+    "partial_required_fact_count": 1,
+    "missing_required_fact_count": 0,
+    "all_facts_correct": false,
+    "all_material_claims_supported": false
+  }
+}
