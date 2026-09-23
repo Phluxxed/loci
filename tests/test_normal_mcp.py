@@ -183,6 +183,13 @@ def test_normal_retrieve_rejects_agent_selected_graph_control(control: str) -> N
         ))
 
 
+def test_normal_output_rejects_execution_state_in_relationship_scope() -> None:
+    payload = _retrieve_payload()
+    payload["scope"]["relationships"] = "disabled"
+    with pytest.raises(ValidationError):
+        LociRetrieveOutput.model_validate(payload)
+
+
 def test_normal_output_rejects_unlinked_or_unproven_relationships() -> None:
     payload = _retrieve_payload()
     payload["relationships"][0]["source_ids"] = [99]

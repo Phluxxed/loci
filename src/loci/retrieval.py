@@ -107,7 +107,6 @@ def retrieve_context(
     seeds = prepared.seeds
     anchor_visits = _pack_anchor_sources(prepared, nodes)
     if not graph_enrichment:
-        packer.scope["relationships"] = "disabled"
         packer.usage["nodes_examined"] = len(anchor_visits)
         return packer.finish()
     if not anchors:
@@ -288,6 +287,7 @@ def _prepare_context(
             "source": "indexed_supported_source",
             "coverage": coverage if coverage in {"complete", "partial", "unknown"} else "unknown",
             "matching": matching,
+            # Evidence domain of any returned relationships, not execution state.
             "relationships": "known_static_relationships",
             "exhaustive": False,
         },

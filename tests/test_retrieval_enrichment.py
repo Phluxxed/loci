@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import asyncio
 import copy
+from dataclasses import FrozenInstanceError
 import hashlib
 import json
 from pathlib import Path
 import subprocess
 import sys
+from types import SimpleNamespace
 from unittest.mock import Mock
 
 import pytest
@@ -120,7 +123,7 @@ def test_modes_share_preparation_and_identical_baseline(
     assert disabled.keys() == default.keys()
     for key in ("anchors", "selection", "snapshot", "limits", "policy", "schema_version"):
         assert disabled[key] == default[key]
-    assert disabled["scope"] == {**default["scope"], "relationships": "disabled"}
+    assert disabled["scope"] == default["scope"]
     assert default["scope"]["relationships"] == "known_static_relationships"
     assert disabled["items"] == [item for item in default["items"] if item["role"] == "anchor"]
     assert disabled["sources"] == default["sources"][:len(disabled["sources"])]
@@ -135,6 +138,90 @@ def test_modes_share_preparation_and_identical_baseline(
     ).encode("utf-8"))
     LociRetrieveOutput.model_validate(default)
     LociRetrieveOutput.model_validate(disabled)
+
+
+@pytest.mark.parametrize("enabled", [True, False])
+def test_runtime_retains_trusted_configuration_and_delegates(
+    indexed: Path, monkeypatch: pytest.MonkeyPatch, enabled: bool,
+):
+    runtime = service.RetrievalRuntime(graph_enrichment=enabled)
+    assert service.RetrievalRuntime().graph_enrichment is True
+    assert runtime.graph_enrichment is enabled
+    with pytest.raises(FrozenInstanceError):
+        runtime.graph_enrichment = not enabled
+    delegate = Mock(wraps=service.retrieve)
+    monkeypatch.setattr(service, "retrieve", delegate)
+    seeds = ["worker.py::root#function"]
+    result = runtime.retrieve(indexed, "root", seed_ids=seeds, ensure_fresh=True)
+    delegate.assert_called_once_with(
+        indexed, "root", seed_ids=seeds, ensure_fresh=True, graph_enrichment=enabled,
+    )
+    assert "graph_enrichment" not in result
+    with pytest.raises(TypeError, match="graph_enrichment"):
+        runtime.retrieve(indexed, "root", graph_enrichment=not enabled)
+
+
+def test_internal_state_is_distinct_even_when_visible_packets_are_identical(indexed: Path):
+    enabled = service.RetrievalRuntime()
+    disabled = service.RetrievalRuntime(graph_enrichment=False)
+    # No anchors: enabled does not traverse either. Counts cannot identify the
+    # configured arm, and the complete model-visible packets must be identical.
+    query = "no-matching-source-§§§"
+    on = enabled.retrieve(indexed, query)
+    off = disabled.retrieve(indexed, query)
+    assert on == off
+    assert on["relationships"] == []
+    assert on["scope"]["relationships"] == "known_static_relationships"
+    assert on["scope"]["exhaustive"] is False
+    assert enabled.graph_enrichment is True
+    assert disabled.graph_enrichment is False
+
+
+@pytest.mark.parametrize("enabled", [True, False])
+@pytest.mark.parametrize("query", ["root", "no-matching-source-§§§"])
+def test_exact_mcp_envelope_contains_only_packet_not_runtime_state(
+    indexed: Path, monkeypatch: pytest.MonkeyPatch, enabled: bool, query: str,
+):
+    from loci import mcp_server
+
+    runtime = service.RetrievalRuntime(graph_enrichment=enabled)
+    packets = []
+
+    def bound_retrieve(*args, **kwargs):
+        packet = runtime.retrieve(*args, **kwargs)
+        packets.append(copy.deepcopy(packet))
+        return packet
+
+    # Trusted adapter binds the runtime; no request field selects the arm.
+    monkeypatch.setattr(mcp_server, "_service_module", SimpleNamespace(
+        retrieve=bound_retrieve, LociError=service.LociError,
+    ))
+    server = mcp_server.create_server("normal")
+    tools = asyncio.run(server.list_tools())
+    tool = next(tool for tool in tools if tool.name == "loci_retrieve")
+    assert set(tool.input_schema["properties"]) == {"repo", "query", "seed_ids"}
+    result = asyncio.run(server.call_tool(
+        "loci_retrieve", {"repo": str(indexed), "query": query},
+    ))
+    assert len(packets) == 1
+    packet = packets[0]
+    envelope = result.model_dump(by_alias=True, exclude_none=True)
+    packet_envelope = {"content": [], "structuredContent": packet, "isError": False}
+    assert envelope == {"resultType": "complete", **packet_envelope}
+    wire = json.dumps(envelope, ensure_ascii=False, separators=(",", ":"))
+    for marker in ("disabled", "graph_enrichment", "graph_off", "graph_on",
+                   '"arm"', '"runtime"', '"receipt"'):
+        assert marker not in wire.lower()
+    assert runtime.graph_enrichment is enabled
+    assert packet["scope"]["relationships"] == "known_static_relationships"
+    # Preserve the packer's existing accounting envelope (the SDK transport
+    # discriminator is not part of that production budget contract).
+    accounted = json.dumps(packet_envelope, ensure_ascii=False, separators=(",", ":"))
+    assert packet["usage"]["output_bytes"] == len(accounted.encode("utf-8"))
+    assert packet["usage"]["output_bytes"] <= packet["limits"]["max_output_bytes"]
+    if query == "root":
+        assert bool(packet["relationships"]) is enabled
+    LociRetrieveOutput.model_validate(packet)
 
 
 def test_graph_off_never_enters_enrichment(
@@ -189,7 +276,9 @@ sys.meta_path.insert(0, NoBenchmarks())
 from loci import service
 
 for enabled in (True, False):
-    result = service.retrieve(sys.argv[1], 'root', graph_enrichment=enabled)
+    runtime = service.RetrievalRuntime(graph_enrichment=enabled)
+    result = runtime.retrieve(sys.argv[1], 'root')
+    assert runtime.graph_enrichment is enabled
     assert result['anchors']
     assert bool(result['relationships']) is enabled
 """

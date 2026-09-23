@@ -1178,6 +1178,28 @@ def graph_paths(
         raise LociError(exc.code, exc.message, exc.details) from exc
 
 
+@dataclass(frozen=True)
+class RetrievalRuntime:
+    """Trusted process-bound configuration, never part of a retrieval packet.
+
+    Evaluation code records ``graph_enrichment`` from this binding, not from
+    packet contents or relationship counts. The bound method exposes no graph
+    override; the public MCP input contract remains unchanged.
+    """
+
+    graph_enrichment: bool = True
+
+    def retrieve(
+        self,
+        repo: str | Path, query: str = "", *, seed_ids: list[str] | None = None,
+        ensure_fresh: bool = False,
+    ) -> dict[str, Any]:
+        return retrieve(
+            repo, query, seed_ids=seed_ids, ensure_fresh=ensure_fresh,
+            graph_enrichment=self.graph_enrichment,
+        )
+
+
 def retrieve(
     repo: str | Path, query: str = "", *, seed_ids: list[str] | None = None,
     ensure_fresh: bool = False,
@@ -1187,6 +1209,8 @@ def retrieve(
 
     ``graph_enrichment`` is an internal, process-bound control, not a public MCP
     argument. Disabling it stops after the shared anchor/source packing stage.
+    Execution state is not included in the model-visible packet; trusted callers
+    can retain it in a ``RetrievalRuntime`` binding for evaluation/receipt metadata.
     """
     from loci.retrieval import retrieve_context
 

@@ -1968,7 +1968,13 @@ class NormalScope(StrictOutputModel):
     source: Literal["indexed_supported_source"]
     coverage: Literal["complete", "partial", "unknown"]
     matching: Literal["explicit_ids", "exact_file", "symbol_metadata", "source_literal"]
-    relationships: Literal["known_static_relationships", "disabled"]
+    relationships: Literal["known_static_relationships"] = Field(
+        description=(
+            "Evidence domain of any returned relationships: known static source "
+            "relationships. Not an execution-stage report or a guarantee that "
+            "relationships were searched for or selected."
+        ),
+    )
     exhaustive: Literal[False]
 
 
