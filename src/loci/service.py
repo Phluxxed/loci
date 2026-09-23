@@ -1181,8 +1181,13 @@ def graph_paths(
 def retrieve(
     repo: str | Path, query: str = "", *, seed_ids: list[str] | None = None,
     ensure_fresh: bool = False,
+    graph_enrichment: bool = True,
 ) -> dict[str, Any]:
-    """Return normal source context through the fixed graph policy."""
+    """Return fixed-policy context with default-on graph enrichment.
+
+    ``graph_enrichment`` is an internal, process-bound control, not a public MCP
+    argument. Disabling it stops after the shared anchor/source packing stage.
+    """
     from loci.retrieval import retrieve_context
 
     repo_path = Path(repo).resolve()
@@ -1192,7 +1197,8 @@ def retrieve(
     )
     try:
         return retrieve_context(repo_path, store, nodes, state, query,
-                                seed_ids=seed_ids, coverage=coverage["state"])
+                                seed_ids=seed_ids, coverage=coverage["state"],
+                                graph_enrichment=graph_enrichment)
     except GraphContractError as exc:
         raise LociError(exc.code, exc.message, exc.details) from exc
 

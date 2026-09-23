@@ -89,8 +89,15 @@ def retrieve_context(
     *,
     seed_ids: list[str] | None = None,
     coverage: str = "unknown",
+    graph_enrichment: bool = True,
 ) -> dict:
-    """Return normal-graph-v1 context without caller-selected graph controls."""
+    """Return fixed-policy context; enrichment is bound by trusted process code.
+
+    Both modes pack the same anchor sources and indexed-file ownership first.
+    Disabling enrichment skips relationships and ownership/member expansion,
+    not index loading, anchor selection, or baseline source packing. This option
+    is deliberately absent from the public MCP tool arguments.
+    """
     prepared = _prepare_context(
         repo, store, nodes, state, query, seed_ids=seed_ids, coverage=coverage,
     )
@@ -98,8 +105,12 @@ def retrieve_context(
     anchors = prepared.anchors
     packer = prepared.packer
     seeds = prepared.seeds
+    anchor_visits = _pack_anchor_sources(prepared, nodes)
+    if not graph_enrichment:
+        packer.scope["relationships"] = "disabled"
+        packer.usage["nodes_examined"] = len(anchor_visits)
+        return packer.finish()
     if not anchors:
-        packer.omit("no_anchor")
         return packer.finish()
 
     query_terms = set(graph_text_terms(query))
@@ -111,26 +122,9 @@ def retrieve_context(
         if edge.to_id != edge.from_id:
             degrees[edge.to_id] += 1
 
-    visited: set[str] = set()
+    visited = {visit.node_id for visit in anchor_visits}
     expanded: set[str] = set()
-    frontier: list[_Visit] = []
-    anchor_visits: list[_Visit] = []
-    for index, anchor in enumerate(anchors):
-        if anchor.node_id in visited:
-            packer.omit("alternative_path")
-            continue
-        node = nodes[anchor.node_id]
-        if len(visited) >= LIMITS["max_nodes"]:
-            packer.omit("node_limit")
-            break
-        visited.add(anchor.node_id)
-        addition, missing_source = _anchor_addition(source, node, index, anchor)
-        if missing_source:
-            packer.omit("source_unavailable")
-        packer.add(addition)
-        visit = _Visit(anchor.node_id, index, 0, (), "Selected anchor")
-        frontier.append(visit)
-        anchor_visits.append(visit)
+    frontier = list(anchor_visits)
 
     anchor_bridge_targets = _selected_anchor_type_bridges(
         anchor_visits,
@@ -226,6 +220,38 @@ def retrieve_context(
 
     packer.usage["nodes_examined"] = len(visited)
     return packer.finish()
+
+
+def _pack_anchor_sources(
+    prepared: _PreparedRetrieval,
+    nodes: Mapping[str, Mapping[str, Any]],
+) -> list[_Visit]:
+    """Pack the common baseline, including indexed-file ownership identities.
+
+    File owners are identity/ownership only here. Representative members and
+    other ownership-driven context belong to the later enrichment stage.
+    """
+    source, anchors, packer = prepared.source, prepared.anchors, prepared.packer
+    if not anchors:
+        packer.omit("no_anchor")
+        return []
+    visited: set[str] = set()
+    anchor_visits: list[_Visit] = []
+    for index, anchor in enumerate(anchors):
+        if anchor.node_id in visited:
+            packer.omit("alternative_path")
+            continue
+        node = nodes[anchor.node_id]
+        if len(visited) >= LIMITS["max_nodes"]:
+            packer.omit("node_limit")
+            break
+        visited.add(anchor.node_id)
+        addition, missing_source = _anchor_addition(source, node, index, anchor)
+        if missing_source:
+            packer.omit("source_unavailable")
+        packer.add(addition)
+        anchor_visits.append(_Visit(anchor.node_id, index, 0, (), "Selected anchor"))
+    return anchor_visits
 
 
 def _prepare_context(

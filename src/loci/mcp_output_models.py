@@ -1968,7 +1968,7 @@ class NormalScope(StrictOutputModel):
     source: Literal["indexed_supported_source"]
     coverage: Literal["complete", "partial", "unknown"]
     matching: Literal["explicit_ids", "exact_file", "symbol_metadata", "source_literal"]
-    relationships: Literal["known_static_relationships"]
+    relationships: Literal["known_static_relationships", "disabled"]
     exhaustive: Literal[False]
 
 

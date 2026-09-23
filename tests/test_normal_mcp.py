@@ -168,9 +168,19 @@ def test_normal_retrieve_rejects_empty_extra_and_over_utf8_byte_inputs() -> None
 def test_normal_input_schema_advertises_fixed_surface_and_utf8_limit() -> None:
     tools = asyncio.run(mcp_server.create_server("normal").list_tools())
     retrieve = next(tool for tool in tools if tool.name == "loci_retrieve")
+    assert set(retrieve.input_schema["properties"]) == {"repo", "query", "seed_ids"}
     assert retrieve.input_schema["properties"]["query"]["x-maxUtf8Bytes"] == 4096
     assert retrieve.input_schema["properties"]["seed_ids"]["anyOf"][0]["maxItems"] == 5
     assert retrieve.input_schema["properties"]["seed_ids"]["uniqueItems"] is True
+
+
+@pytest.mark.parametrize("control", ["graph", "graph_enrichment"])
+def test_normal_retrieve_rejects_agent_selected_graph_control(control: str) -> None:
+    server = mcp_server.create_server("normal")
+    with pytest.raises(ToolError, match="unsupported arguments"):
+        asyncio.run(server.call_tool(
+            "loci_retrieve", {"repo": "/repo", "query": "a", control: False},
+        ))
 
 
 def test_normal_output_rejects_unlinked_or_unproven_relationships() -> None:
@@ -273,6 +283,9 @@ def test_normal_stdio_retrieves_and_reads_returned_source_ref(tmp_path: Path) ->
             assert isinstance(payload, dict)
             LociRetrieveOutput.model_validate(payload)
             assert payload["sources"]
+            assert payload["scope"]["relationships"] == "known_static_relationships"
+            assert payload["usage"]["edges_traversed"] > 0
+            assert payload["relationships"]
             reference = payload["sources"][0]["source_ref"]
             assert reference.startswith("sr1_") and len(reference) == 30
             read = await session.call_tool(
