@@ -1,6 +1,6 @@
 ---
 name: loci
-description: Agent-owned codebase navigation infrastructure. Use when repository work needs source retrieval or relationship tracing. A named target or small edit still needs inspection. Skip redundant retrieval only when relevant source has already been retrieved, remains current, and is sufficient for the action; task or file type alone is not an exemption.
+description: Agent-owned codebase navigation infrastructure. Use when repository work needs source retrieval or relationship tracing. For standalone documentation or configuration checks where symbol navigation is irrelevant, use a targeted direct read. Skip retrieval only when relevant source from the target checkout is already observed, current, and sufficient.
 ---
 
 # loci — codebase retrieval
@@ -45,19 +45,39 @@ loci_retrieve(repo, seed_ids=[known_id], query="remaining source question")
 loci_read(repo, source_ref=returned_item.source_ref)
 ```
 
-In Code Mode, save each raw result under a distinct key before displaying its
-`structuredContent`. Successful `content` is empty. Use this procedure for
-both normal operations:
+In Code Mode, save each raw result under a distinct key. Display a compact
+receipt first; a full multi-source packet can exceed trace output capture.
+Successful `content` is empty. For retrieval:
 
 ```javascript
 const result = await tools.mcp__loci__loci_retrieve({repo, query});
 store("loci.retrieve.1", result);
-text(result.structuredContent ?? result);
+const packet = result.structuredContent ?? result;
+if (packet.error) { text(JSON.stringify({error: packet.error})); exit(); }
+text(JSON.stringify({
+  status: packet.status,
+  scope: packet.scope,
+  selection: packet.selection,
+  anchors: packet.anchors,
+  items: packet.items?.map(({node_id, role, source_ref, complete, extent}) =>
+    ({node_id, role, source_ref, complete, extent})),
+  sources: packet.sources?.map(({id, file, source_ref, content_hash, start_line, end_line}) =>
+    ({id, file, source_ref, content_hash, start_line, end_line})),
+  relationship_count: packet.relationships?.length,
+  omissions: packet.omissions,
+  usage: packet.usage,
+  recovery_key: "loci.retrieve.1"
+}));
 ```
 
-Recover a display mistake with `load("loci.retrieve.1")` and the same projection;
-the saved result already contains the source and graph proof. Inspect returned
-errors before consuming success fields. Present each bounded packet separately.
+Use `load("loci.retrieve.1")` to inspect the selected full source and its
+relationships in separate bounded outputs; the saved result contains both.
+For `loci_read`, save the raw result, display status, source metadata,
+`complete`, and `next_source_ref`, then display the source content in bounded
+pieces. Follow the next reference when needed. Do not drop coverage or
+omissions from the conclusion merely because the first receipt is compact.
+Recover a display mistake from the saved result. Inspect returned errors before
+consuming success fields.
 
 Use `loci_retrieve` for initial discovery and further context. It creates or
 refreshes the index and runs the maintained graph policy. The response includes
@@ -85,6 +105,9 @@ prove only the supported static relationship, not runtime dispatch or exhaustive
 impact. Rust `declared_possible` configuration remains possible.
 
 Treat `structuredContent.error` as a failure with a code, message and details.
+For `REPOSITORY_ROOT_OVERLAP` with `relationship=requested_descendant`, retry
+with `details.existing_root` as `repo`; prefix a known file query with the
+requested root's path relative to that ancestor.
 A busy catalog or refresh lock calls for a bounded retry after the writer can
 finish; it does not authorize catalog repair. For repeated unchanged failures,
 report the limitation and use a targeted source-read fallback where necessary.
