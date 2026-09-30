@@ -2,7 +2,14 @@
 
 ## Current result
 
-**Blocked before model generation. No comparison results yet.**
+**No valid comparison yet. The corrected runner awaits a terminal launch.**
+
+The latest attempted pilot started all three model turns but was interrupted by
+controller and cache-placement defects. Its partial measurements are preserved
+below; they cannot establish a winner. Corrections and focused verification are
+complete.
+
+### Earlier preflight attempts
 
 Codex CLI `0.159.2` initialized successfully and advertised
 `gpt-6.1-sol` with high reasoning. Its strict filesystem command canary failed
@@ -40,6 +47,30 @@ installation. Four focused checks pass, including a check that unrestricted
 read/write access is rejected by the probe. No model turn started in that run;
 the corrected preflight still needs an ordinary-terminal launch.
 
+The next terminal run, `loci-navigation-pilot-20260930-132156`, passed every
+preflight and started all three trials. It is an **invalid interrupted pilot**,
+preserved in [interrupted-run.json](interrupted-run.json). The controller treated
+a child thread's completion as the requested root's completion and stopped each
+root prematurely. The older multi-agent feature toggle had not disabled this
+model's V2 delegation. Root-only usage omitted child usage; the interrupted
+answers and timing cannot establish a condition winner.
+
+Both Loci stores were also inside their indexed source snapshots. Recursive
+self-indexing contaminated both indexes; the new version reached a filename
+length error and left a pending catalog mutation. Original artifacts remain
+untouched. The runner now puts stores beside their source snapshots, sets
+`agents.enabled=false` and `features.multi_agent_v2=false`, explicitly requests
+solo work, waits only for the requested root completion, and rejects unexpected
+delegation. Commentary is no longer reported as a final answer. The question,
+oracle, model, product commits, and time cap are unchanged; the updated case hash
+records the solo-work instruction before another trial.
+
+Five focused checks passed. A [model-free storage check](store-validation.json)
+made four retrievals per pinned Loci version using outside stores: each index
+contained 66 source paths, zero store paths, and no pending mutation. All packets
+were partial, with their original coverage preserved in the raw validation
+directory. Corrected measured runs still require an ordinary-terminal launch.
+
 ## Frozen comparison
 
 | Condition | Navigation available | Loci commit |
@@ -64,10 +95,12 @@ status and chat context, and refusal of stale-ready Work. It crosses five
 implementation owners. The prompt contains no file locations or helper names.
 The [frozen case](case.json) contains six source-backed scoring facts and the
 required source list. It is observer material and must not be visible to trial
-agents. Its SHA-256 was recorded before any trial output:
+agents. The question and oracle were frozen before the first trial. The current
+hash records the explicit solo-work instruction before the corrected trial;
+freeze history remains in `host-blocker.json`:
 
 ```text
-a22c11fb0561051c8975163254101b3d9480f0a4f9c3d34f5acd5c0a6ef939de
+4ef626b50fe3eba3f0aa2d9b950112d50b8d2500855172b4ace5913cba23bd6e
 ```
 
 Each condition receives a separate Git archive, rather than a Git worktree:

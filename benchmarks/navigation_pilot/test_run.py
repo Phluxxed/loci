@@ -8,10 +8,40 @@ import subprocess
 import tempfile
 import unittest
 
-from benchmarks.navigation_pilot.run import arm_overrides, canary, summarize_wire, target_guard
+from benchmarks.navigation_pilot.run import arm_overrides, canary, run_turn, summarize_wire, target_guard
 
 
 class PilotRunTests(unittest.TestCase):
+    def test_turn_waits_for_requested_completion_and_rejects_delegation(self) -> None:
+        class Client:
+            def __init__(self, events):
+                self.events = iter(events)
+
+            def call(self, method, params, *, timeout):
+                return {"turn": {"id": "root-turn"}}
+
+            def next_event(self, timeout):
+                return next(self.events)
+
+        completed = {"method": "turn/completed", "params": {
+            "threadId": "root", "turn": {"id": "root-turn", "status": "completed"}}}
+        foreign = {"method": "turn/completed", "params": {
+            "threadId": "child", "turn": {"id": "child-turn", "status": "completed"}}}
+        other_turn = {"method": "turn/completed", "params": {
+            "threadId": "root", "turn": {"id": "other-turn", "status": "completed"}}}
+        row = run_turn(Client([foreign, other_turn, completed]), {
+            "time_cap_seconds": 300, "prompt": "question", "model": "model",
+            "reasoning_effort": "high"}, Path.cwd(), "root")
+        self.assertEqual(row["status"], "completed")
+        activity = {"method": "item/started", "params": {
+            "threadId": "root", "turnId": "root-turn", "item": {
+                "type": "subAgentActivity", "kind": "started", "id": "spawn"}}}
+        row = run_turn(Client([activity, completed]), {
+            "time_cap_seconds": 300, "prompt": "question", "model": "model",
+            "reasoning_effort": "high"}, Path.cwd(), "root")
+        self.assertTrue(row["isolation_failure"])
+        self.assertEqual(row["status"], "runtime_failed")
+
     def test_canary_uses_native_shell_and_rejects_unrestricted_access(self) -> None:
         class LocalClient:
             def call(self, method, params, *, timeout):
@@ -102,9 +132,15 @@ class PilotRunTests(unittest.TestCase):
         self.assertNotIn("mcp_servers.loci", vanilla)
         self.assertFalse(vanilla["mcp_servers.loci.enabled"])
         self.assertFalse(vanilla["mcp_servers.other.enabled"])
+        self.assertFalse(vanilla["agents.enabled"])
+        self.assertFalse(vanilla["features.multi_agent_v2"])
+        self.assertFalse(loci["agents.enabled"])
         self.assertEqual(vanilla["project_doc_max_bytes"], 0)
         self.assertTrue(loci["mcp_servers.loci"]["enabled"])
         self.assertEqual(loci["mcp_servers.loci"]["env"]["LOCI_STORE_NAMESPACE"], "test")
+        self.assertEqual(Path(loci["mcp_servers.loci"]["env"]["LOCI_BASE_DIR"]), root / "loci-store")
+        self.assertNotIn("LOCI_BASE_DIR", vanilla["shell_environment_policy.set"])
+        self.assertNotIn(".episode-store", vanilla["permissions.loci_episode_read"]["filesystem"][":workspace_roots"])
 
     def test_guard_rejects_other_repo_before_dispatch_and_keeps_same_target(self) -> None:
         class Denied(Exception):

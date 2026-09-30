@@ -110,6 +110,13 @@ def arm_overrides(workspace: Path, arm: str, serving: Path | None, namespace: st
                   *, user_config: Path = USER_CONFIG) -> dict:
     overrides = build_overrides(workspace, [], str(PYTHON), [], {}, user_config=user_config)
     overrides["project_doc_max_bytes"] = 0
+    overrides["agents.enabled"] = False
+    overrides["features.multi_agent_v2"] = False
+    # Stores belong to the server, outside the source and the agent's shell access.
+    overrides["shell_environment_policy.set"].pop("LOCI_BASE_DIR", None)
+    overrides[f"permissions.{READ_PROFILE}"]["filesystem"][":workspace_roots"].pop(
+        ".episode-store", None
+    )
     if arm == "vanilla":
         # The ambient Loci entry is explicitly disabled, with no replacement.
         del overrides["mcp_servers.loci"]
@@ -122,7 +129,7 @@ def arm_overrides(workspace: Path, arm: str, serving: Path | None, namespace: st
             "env": {
                 "PYTHONPATH": os.pathsep.join((str(HARNESS), str(serving / "src"))),
                 "PYTHONDONTWRITEBYTECODE": "1", "PYTHONNOUSERSITE": "1",
-                "LOCI_MCP_SURFACE": "normal", "LOCI_BASE_DIR": str(workspace / ".episode-store"),
+                "LOCI_MCP_SURFACE": "normal", "LOCI_BASE_DIR": str(workspace.parent / "loci-store"),
                 "LOCI_STORE_NAMESPACE": namespace,
             },
             "startup_timeout_sec": 60, "tool_timeout_sec": 60,
@@ -312,6 +319,8 @@ def summarize_wire(path: Path, thread_id: str, turn_id: str | None,
             elif kind == "agentMessage":
                 entry["text"] = item.get("text")
                 entry["phase"] = item.get("phase")
+            elif kind == "subAgentActivity":
+                entry.update(kind=item.get("kind"), agent_thread_id=item.get("agentThreadId"))
             elif kind in {"contextCompaction", "fileChange"}:
                 entry["changes"] = item.get("changes") if kind == "fileChange" else None
             else:
@@ -333,8 +342,10 @@ def summarize_wire(path: Path, thread_id: str, turn_id: str | None,
     shell = [x for x in trace if x["type"] == "commandExecution"]
     answers = [x for x in trace if x["type"] == "agentMessage" and isinstance(x.get("text"), str)]
     final = [x for x in answers if x.get("phase") == "final"]
-    selected = (final or answers)[-1] if answers else None
-    known = completed and usage is not None and not usage_errors
+    subagent_starts = sum(x["type"] == "subAgentActivity" and x.get("kind") == "started"
+                         for x in trace)
+    selected = final[-1] if final else None
+    known = completed and usage is not None and not usage_errors and not subagent_starts
     return {"usage_status": "known" if known else "unknown",
             "usage": usage if known else None, "observed_usage_lower_bound": usage,
             "usage_updates": updates,
@@ -343,6 +354,9 @@ def summarize_wire(path: Path, thread_id: str, turn_id: str | None,
             "completed_response_count_lower_bound": len(raw_responses),
             "outer_tool_calls": list(raw_calls.values()), "navigation_trace": trace,
             "final_answer": selected["text"] if selected else None,
+            "last_agent_message": answers[-1]["text"] if answers else None,
+            "subagent_starts": subagent_starts,
+            "usage_scope": "requested_root_thread_only",
             "mcp_calls": len(mcp), "mcp_failures": sum(
                 x.get("status") == "failed" or bool(x.get("error"))
                 or (isinstance(x.get("result"), dict) and (
@@ -377,14 +391,23 @@ def run_turn(client: AppServer, case: dict, workspace: Path, thread_id: str) -> 
             event = client.next_event(remaining)
             if time.monotonic() > deadline:
                 raise TimeoutError("300-second turn cap")
+            params = event.get("params", {})
+            if params.get("threadId") not in (None, thread_id):
+                continue
+            if params.get("turnId") not in (None, row["turn_id"]):
+                continue
+            item = params.get("item", {})
+            if (event.get("method") in {"item/started", "item/completed"}
+                    and item.get("type") == "subAgentActivity" and item.get("kind") == "started"):
+                row["isolation_failure"] = True
+                raise RuntimeFailure("trial delegated despite disabled agents; root-only usage is incomplete")
             if event.get("method") in {"model/rerouted", "model/verification"}:
                 row["identity_failure"] = True
                 raise RuntimeFailure("model identity changed or requires verification")
             if event.get("method") == "turn/completed":
-                params = event.get("params", {})
                 actual = params.get("turn", {})
                 if params.get("threadId") != thread_id or actual.get("id") != row["turn_id"]:
-                    raise RuntimeFailure("turn completion identity mismatch")
+                    continue
                 row["status"] = actual.get("status", "unknown")
                 row["error"] = actual.get("error")
                 break
@@ -428,7 +451,6 @@ def execute(output: Path, *, preflight_only: bool = False) -> dict:
             workspace = directory / "workspace"
             result["arms"][arm]["target"] = archive(source, case["source_commit"], workspace)
             (workspace / ".episode-tmp").mkdir()
-            (workspace / ".episode-store").mkdir()
             serving = None
             commit = case["conditions"][arm]
             if commit is not None:
@@ -450,6 +472,8 @@ def execute(output: Path, *, preflight_only: bool = False) -> dict:
                 "profile": READ_PROFILE, "project_doc_max_bytes": 0,
                 "loci_enabled": arm != "vanilla", "namespace": namespace if arm != "vanilla" else None,
                 "serving": str(serving) if serving else None,
+                "store": str(workspace.parent / "loci-store") if serving else None,
+                "agents_enabled": False,
                 "instructions": instruction_meta}
             journal = Journal(directory / "wire.jsonl")
             client = None
@@ -491,7 +515,7 @@ def execute(output: Path, *, preflight_only: bool = False) -> dict:
                 result["arms"][arm]["episode"] = row
                 write_json(output / "result.json", result)
                 active_arm = None
-                if row.get("identity_failure"):
+                if row.get("identity_failure") or row.get("isolation_failure"):
                     break
             result["status"] = "completed" if all(
                 isinstance(result["arms"][arm]["episode"], dict)
