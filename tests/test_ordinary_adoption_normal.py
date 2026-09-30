@@ -197,6 +197,21 @@ def _relationship(*, line: int = 11, source_ids: list[int] | None = None) -> dic
     }
 
 
+def test_source_context_packet_keeps_source_accounting_without_graph_proof(tmp_path: Path) -> None:
+    packet = _retrieve(relationships=[])
+    packet["policy"] = "source-context-v1"
+    packet["usage"]["edges_traversed"] = 0
+    packet["usage"]["relationships_delivered"] = 0
+    _finalize_output_bytes(packet)
+    body = [_mcp("source-1", "loci_retrieve", packet), *_outer("source-outer", packet)]
+    observed = observe_normal_rollout(_write(tmp_path, body), _metadata())
+    cost = observed["normal_cost"]
+    assert cost["source_content_bytes"] == len(packet["sources"][0]["content"].encode())
+    assert cost["source_content_bytes_status"] == "complete"
+    assert cost["semantic_relationship_count"] == cost["actual_traversed_edge_count"] == 0
+    assert cost["evidence_bytes_status"] == cost["output_bytes_status"] == "complete"
+
+
 def test_normal_adapter_counts_normal_public_calls_and_validates_real_shaped_proof(tmp_path: Path) -> None:
     retrieve = _retrieve()
     read = _read()

@@ -1820,42 +1820,6 @@ class NormalSource(StrictOutputModel):
         return self
 
 
-class NormalEvidence(StrictOutputModel):
-    file: str = Field(min_length=1)
-    line: int = Field(ge=1)
-    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
-
-    @model_validator(mode="after")
-    def _relative_file(self) -> NormalEvidence:
-        _require_relative_path(self.file, "evidence.file")
-        return self
-
-
-class NormalEdge(StrictOutputModel):
-    from_: str = Field(alias="from", min_length=1)
-    to: str = Field(min_length=1)
-    type: str = Field(min_length=1)
-    directed: Literal[True]
-    namespace: Literal["loci"]
-    resolution: Literal["exact", "declared", "import-resolved"]
-    evidence: NormalEvidence
-
-
-class NormalRelationship(StrictOutputModel):
-    id: int = Field(ge=1)
-    edge: NormalEdge
-    traversed: Literal["forward", "reverse"]
-    source_ids: list[Annotated[int, Field(ge=1)]] = Field(min_length=1)
-    proof: Literal["complete"]
-    resolution_configuration: Literal["unconditional", "declared_possible"] | None
-
-    @model_validator(mode="after")
-    def _unique_source_ids(self) -> NormalRelationship:
-        if len(set(self.source_ids)) != len(self.source_ids):
-            raise ValueError("relationship source_ids must be unique")
-        return self
-
-
 class NormalNode(StrictOutputModel):
     id: str = Field(min_length=1)
     name: str
@@ -1878,8 +1842,8 @@ class NormalAnchor(StrictOutputModel):
 
 class NormalItem(StrictOutputModel):
     node_id: str = Field(min_length=1)
-    role: Literal["anchor", "related"]
-    depth: int = Field(ge=0)
+    role: Literal["anchor"]
+    depth: Literal[0]
     why: str = Field(min_length=1)
     source_ids: list[Annotated[int, Field(ge=1)]] = Field(min_length=1)
     complete: bool
@@ -1896,7 +1860,7 @@ class NormalItem(StrictOutputModel):
 class NormalOwnership(StrictOutputModel):
     owner_id: str = Field(min_length=1)
     member_id: str = Field(min_length=1)
-    basis: Literal["indexed_file", "go_package", "rust_crate", "swift_module"]
+    basis: Literal["indexed_file"]
 
 
 class NormalOmission(StrictOutputModel):
@@ -1906,21 +1870,11 @@ class NormalOmission(StrictOutputModel):
         "ambiguous_anchor",
         "lookup_limit",
         "node_limit",
-        "neighbor_limit",
         "item_limit",
-        "hop_limit",
-        "cycle",
         "alternative_path",
-        "ownership_limit",
-        "unsupported_semantics",
-        "unresolved_relation",
-        "ambiguous_relation",
-        "external_relation",
-        "inaccessible_relation",
         "source_unavailable",
         "source_stale",
         "source_preview",
-        "proof_unavailable",
         "evidence_budget",
         "output_budget",
     ]
@@ -1928,17 +1882,12 @@ class NormalOmission(StrictOutputModel):
 
 
 class NormalLimits(StrictOutputModel):
-    max_hops: Literal[2]
     max_nodes: Literal[64]
-    max_neighbors: Literal[32]
     max_items: Literal[12]
     max_anchors: Literal[3]
     max_explicit_anchors: Literal[5]
-    max_owner_members: Literal[3]
     max_evidence_bytes: Literal[8192]
     max_output_bytes: Literal[16384]
-    max_anchor_source_bytes: Literal[1024]
-    max_related_source_bytes: Literal[768]
     max_lookup_bytes: Literal[33554432]
     max_lookup_files: Literal[4096]
     max_literal_matches: Literal[256]
@@ -1946,9 +1895,9 @@ class NormalLimits(StrictOutputModel):
 
 class NormalUsage(StrictOutputModel):
     nodes_examined: int = Field(ge=0)
-    eligible_edges_considered: int = Field(ge=0)
-    edges_traversed: int = Field(ge=0)
-    relationships_delivered: int = Field(ge=0)
+    eligible_edges_considered: Literal[0]
+    edges_traversed: Literal[0]
+    relationships_delivered: Literal[0]
     lookup_bytes: int = Field(ge=0)
     lookup_files: int = Field(ge=0)
     evidence_bytes: int = Field(ge=0)
@@ -1968,19 +1917,13 @@ class NormalScope(StrictOutputModel):
     source: Literal["indexed_supported_source"]
     coverage: Literal["complete", "partial", "unknown"]
     matching: Literal["explicit_ids", "exact_file", "symbol_metadata", "source_literal"]
-    relationships: Literal["known_static_relationships"] = Field(
-        description=(
-            "Evidence domain of any returned relationships: known static source "
-            "relationships. Not an execution-stage report or a guarantee that "
-            "relationships were searched for or selected."
-        ),
-    )
+    relationships: Literal["not_selected"]
     exhaustive: Literal[False]
 
 
 class LociRetrieveSuccess(StrictOutputModel):
     schema_version: Literal[1]
-    policy: Literal["normal-graph-v1"]
+    policy: Literal["source-context-v1"]
     snapshot: str = Field(pattern=r"^[0-9a-f]{64}$")
     status: Literal["ok", "partial", "empty"]
     selection: NormalSelection
@@ -1989,7 +1932,7 @@ class LociRetrieveSuccess(StrictOutputModel):
     nodes: list[NormalNode]
     items: list[NormalItem]
     ownership: list[NormalOwnership]
-    relationships: list[NormalRelationship]
+    relationships: list[Any] = Field(max_length=0)
     sources: list[NormalSource]
     omissions: list[NormalOmission]
     limits: NormalLimits
@@ -1999,13 +1942,10 @@ class LociRetrieveSuccess(StrictOutputModel):
     def _validate_links_and_budgets(self) -> LociRetrieveSuccess:
         node_ids = [node.id for node in self.nodes]
         source_ids = [source.id for source in self.sources]
-        relationship_ids = [relationship.id for relationship in self.relationships]
         if len(set(node_ids)) != len(node_ids):
             raise ValueError("nodes must have unique IDs")
         if len(set(source_ids)) != len(source_ids):
             raise ValueError("sources must have unique IDs")
-        if len(set(relationship_ids)) != len(relationship_ids):
-            raise ValueError("relationships must have unique IDs")
         known_nodes = set(node_ids)
         known_sources = {source.id: source for source in self.sources}
         if any(anchor.node_id not in known_nodes for anchor in self.anchors):
@@ -2018,19 +1958,6 @@ class LociRetrieveSuccess(StrictOutputModel):
         for ownership in self.ownership:
             if ownership.owner_id not in known_nodes or ownership.member_id not in known_nodes:
                 raise ValueError("ownership endpoints must be returned nodes")
-        for relationship in self.relationships:
-            if relationship.edge.from_ not in known_nodes or relationship.edge.to not in known_nodes:
-                raise ValueError("relationship endpoints must be returned nodes")
-            proof_sources = [known_sources[source_id] for source_id in relationship.source_ids if source_id in known_sources]
-            if len(proof_sources) != len(relationship.source_ids):
-                raise ValueError("relationships must name returned proof sources")
-            if not any(
-                source.file == relationship.edge.evidence.file
-                and source.content_hash == relationship.edge.evidence.content_hash
-                and source.start_line <= relationship.edge.evidence.line <= source.end_line
-                for source in proof_sources
-            ):
-                raise ValueError("relationship proof must contain matching edge evidence")
         if self.usage.relationships_delivered != len(self.relationships):
             raise ValueError("relationships_delivered must equal returned relationships")
         if self.usage.evidence_bytes > self.limits.max_evidence_bytes:

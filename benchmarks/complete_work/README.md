@@ -1,3 +1,9 @@
+> Graph-on/off execution is retired in the `source-context-v1` serving code.
+> Run the historical experiment from its pinned legacy checkout. Current control
+> startup and preparation reject those arms rather than labeling source retrieval
+> as graph-on. Existing receipts, accounting, evaluation and frozen outcomes remain
+> usable as historical evidence.
+
 # Complete-work comparison implementation
 
 This is the implementation for **W1.8.4.4.10.2.2**. The fixed question, prompts,

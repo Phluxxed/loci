@@ -17,6 +17,7 @@ from mcp.server.mcpserver.exceptions import ToolError
 from pydantic import ValidationError
 
 from loci import mcp_server
+from loci._retrieval_output import LIMITS
 from loci.mcp_output_models import LociReadOutput, LociRetrieveOutput
 
 
@@ -26,7 +27,7 @@ _HASH = "a" * 64
 def _retrieve_payload() -> dict[str, Any]:
     return {
         "schema_version": 1,
-        "policy": "normal-graph-v1",
+        "policy": "source-context-v1",
         "snapshot": _HASH,
         "status": "ok",
         "selection": {"mode": "inferred", "candidate_count": 1, "omitted_candidates": 0},
@@ -34,7 +35,7 @@ def _retrieve_payload() -> dict[str, Any]:
             "source": "indexed_supported_source",
             "coverage": "complete",
             "matching": "symbol_metadata",
-            "relationships": "known_static_relationships",
+            "relationships": "not_selected",
             "exhaustive": False,
         },
         "anchors": [{"node_id": "a", "score": 1.0, "matched_terms": ["a"], "match_scope": ["name"]}],
@@ -49,33 +50,17 @@ def _retrieve_payload() -> dict[str, Any]:
             "source_ref": "ref-a",
         }],
         "ownership": [],
-        "relationships": [{
-            "id": 1,
-            "edge": {
-                "from": "a", "to": "b", "type": "calls", "directed": True,
-                "namespace": "loci", "resolution": "exact",
-                "evidence": {"file": "sample.py", "line": 1, "content_hash": _HASH},
-            },
-            "traversed": "forward", "source_ids": [1], "proof": "complete",
-            "resolution_configuration": None,
-        }],
+        "relationships": [],
         "sources": [{
             "id": 1, "file": "sample.py", "start_byte": 0, "end_byte": 9,
             "start_line": 1, "end_line": 1, "content_hash": _HASH,
             "content": "def a():\n", "source_ref": "ref-a",
         }],
         "omissions": [],
-        "limits": {
-            "max_hops": 2, "max_nodes": 64, "max_neighbors": 32, "max_items": 12,
-            "max_anchors": 3, "max_explicit_anchors": 5, "max_owner_members": 3,
-            "max_evidence_bytes": 8192, "max_output_bytes": 16384,
-            "max_anchor_source_bytes": 1024, "max_related_source_bytes": 768,
-            "max_lookup_bytes": 33554432, "max_lookup_files": 4096,
-            "max_literal_matches": 256,
-        },
+        "limits": dict(LIMITS),
         "usage": {
-            "nodes_examined": 2, "eligible_edges_considered": 1, "edges_traversed": 1,
-            "relationships_delivered": 1, "lookup_bytes": 0, "lookup_files": 0,
+            "nodes_examined": 2, "eligible_edges_considered": 0, "edges_traversed": 0,
+            "relationships_delivered": 0, "lookup_bytes": 0, "lookup_files": 0,
             "evidence_bytes": 9, "output_bytes": 1000, "estimated_tokens": 250,
             "token_estimate_method": "utf8_bytes_div_4", "output_encoding": "mcp_result_json_utf8",
         },
@@ -99,10 +84,8 @@ def _read_payload() -> dict[str, Any]:
 
 
 def _contract_validator(definition: str) -> Draft202012Validator:
-    schema_path = Path(__file__).parents[1] / ".scratch" / "deterministic-graph-retrieval" / "contract.schema.json"
-    schema = json.loads(schema_path.read_text(encoding="utf-8"))
-    schema["$ref"] = f"#/$defs/{definition}"
-    return Draft202012Validator(schema)
+    model = LociRetrieveOutput if definition == "retrieve_response" else LociReadOutput
+    return Draft202012Validator(model.model_json_schema())
 
 
 def test_normal_catalog_only_exposes_frozen_operations() -> None:
@@ -192,7 +175,7 @@ def test_normal_output_rejects_execution_state_in_relationship_scope() -> None:
 
 def test_normal_output_rejects_unlinked_or_unproven_relationships() -> None:
     payload = _retrieve_payload()
-    payload["relationships"][0]["source_ids"] = [99]
+    payload["relationships"] = [{"source_ids": [99]}]
     with pytest.raises(ValidationError):
         LociRetrieveOutput.model_validate(payload)
 
@@ -216,7 +199,7 @@ def test_normal_output_rejects_missing_node_name_corrupt_source_and_invalid_sour
         LociRetrieveOutput.model_validate(corrupt_source)
 
     invalid_source_id = _retrieve_payload()
-    invalid_source_id["relationships"][0]["source_ids"] = [0]
+    invalid_source_id["items"][0]["source_ids"] = [0]
     with pytest.raises(ValidationError):
         LociRetrieveOutput.model_validate(invalid_source_id)
 
@@ -290,9 +273,9 @@ def test_normal_stdio_retrieves_and_reads_returned_source_ref(tmp_path: Path) ->
             assert isinstance(payload, dict)
             LociRetrieveOutput.model_validate(payload)
             assert payload["sources"]
-            assert payload["scope"]["relationships"] == "known_static_relationships"
-            assert payload["usage"]["edges_traversed"] > 0
-            assert payload["relationships"]
+            assert payload["scope"]["relationships"] == "not_selected"
+            assert payload["usage"]["edges_traversed"] == 0
+            assert payload["relationships"] == []
             reference = payload["sources"][0]["source_ref"]
             assert reference.startswith("sr1_") and len(reference) == 30
             read = await session.call_tool(

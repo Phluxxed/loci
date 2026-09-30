@@ -1,19 +1,19 @@
 # loci
 
-A local MCP server for source retrieval with deterministic graph context.
-Loci returns bounded source, supported static relationships and their evidence.
+A local MCP server for bounded repository source retrieval. Loci returns exact
+indexed source spans and short handles for reading the rest of a selected extent.
 
 ## How it works
 
-loci uses [tree-sitter](https://tree-sitter.github.io/tree-sitter/) to parse source
-into exact symbol spans and resolve supported imports, references, calls and
-types. Normal retrieval selects anchors, traverses the graph under one maintained
-policy and assembles source with complete relationship proof.
+loci uses [tree-sitter](https://tree-sitter.github.io/tree-sitter/) to index
+declaration spans and file identities. Normal retrieval selects bounded source
+anchors under `source-context-v1`. An operator-selected diagnostic surface
+provides separate relationship and graph inspection.
 
 The normal MCP workflow is:
 
 ```text
-loci_retrieve(repo, query) -> source and graph context
+loci_retrieve(repo, query="", seed_ids=None) -> selected source context
 loci_read(repo, source_ref) -> exact source expansion when needed
 ```
 
@@ -22,10 +22,10 @@ content hash and byte extent, so agents can continue a read without copying a
 long encoded locator. Handles survive server restarts while retained in the
 bounded repository cache; stale or unavailable references require fresh retrieval.
 
-The CLI still exists for debugging, scripts, and migration safety, but MCP is the production interface.
-Graph traversal is part of normal retrieval rather than an agent-selected mode.
-Workflow value is measured separately from graph activity; see the retained
-[ordinary-use audit](docs/reviews/2026-09-14-ordinary-graph-adoption-results.md).
+The CLI still exists for debugging, scripts, and migration safety, but MCP is
+the production interface. The prior graph-on/off workflow experiment is retained
+in the [ordinary-use audit](docs/reviews/2026-09-14-ordinary-graph-adoption-results.md);
+it does not describe the current normal policy.
 
 ## Supported languages
 
@@ -206,21 +206,23 @@ The default server exposes two operations:
 
 | Tool | Purpose |
 | --- | --- |
-| `loci_retrieve(repo, query="", seed_ids=None)` | Discover source and automatically assemble supported incoming/outgoing graph context |
+| `loci_retrieve(repo, query="", seed_ids=None)` | Select bounded declaration or file source from a question, exact path, or known IDs |
 | `loci_read(repo, source_ref)` | Expand a returned exact source extent, with bounded pagination and stale-reference refusal |
 
-Normal retrieval automatically creates or refreshes the index. Supply a query,
-an exact relative file path as the query, or known node IDs. Loci owns families,
-direction, ranking, hops and byte budgets. Inspect candidate ambiguity, source
-completeness, relationship proof and omissions. Zero edges never establish
-exhaustive absence. Re-anchor a returned ID for more context or follow an item's
-source reference to read its full extent.
-
-`normal-graph-v1` bounds traversal to two semantic hops, 64 examined nodes,
-12 source items, 8192 unique source bytes and a 16384-byte complete MCP result.
-Source previews leave room for graph proof. File/package/module/crate ownership
-is reported separately from native semantic edges. The same snapshot and request
-produce the same semantic selection. See the
+Normal retrieval creates or refreshes a source index of declarations and file
+inventory as needed. Supply a question, an exact indexed relative path, or known
+node IDs. Matching source literals can outrank weak metadata matches; exact IDs
+and paths select directly. Inspect candidate ambiguity, source completeness and
+omissions. A selected definition is returned whole when it fits the 8192-byte
+evidence and 16384-byte complete-result budgets. Otherwise the excerpt includes
+the match when possible, and its short `source_ref` names the exact owning extent
+for `loci_read` continuation. Retrieval selects no callers, tests, types or
+other relationship expansion. `relationships` is empty and
+`scope.relationships="not_selected"`; this says nothing about independence.
+Indexed file ownership identities remain distinct from declaration identities.
+The fixed limits also include three inferred anchors, five exact seeds, twelve
+source items, 64 examined nodes, 256 literal matches, and bounded lookup of
+4096 files or 32 MiB. See the
 [normal packet guide](skills/loci/references/normal-retrieval.md).
 
 ### Operator diagnostic surface
@@ -231,19 +233,14 @@ surface; other values fail startup. There is no runtime tool for changing this
 choice. Restart an existing host after updating the installation so it loads
 the new catalog. CLI and Python diagnostic interfaces remain compatible.
 
-MCP retrieval tools create missing indexes and refresh stale indexes before
-returning data. A first retrieval against a valid, readable root indexes it and
-completes the request in the same call, without a separate pre-index step.
-`loci_index`
-still performs explicit indexing, while `loci_outline`, `loci_search`,
-`loci_get`, `loci_explore`, `loci_file`, `loci_grep`, `loci_graph_anchors`,
-`loci_graph_neighbors`, `loci_graph_traverse_neighbors`, `loci_graph_paths`,
-`loci_graph_retrieve`, `loci_graph_imports`, `loci_graph_references`, and
-`loci_graph_calls`, and `loci_graph_health` first check indexed source, profile,
-and contribution hashes against the current repository and run a locked
-incremental refresh if needed.
-Freshness also includes Go module/workspace controls, JavaScript/TypeScript
-project/package/workspace controls, and Cargo manifests.
+Normal source retrieval and reads refresh source independently of graph
+validation or materialization. A first retrieval against a valid, readable root
+indexes declarations and file inventory in the same call. The index file may
+still be read as a whole; this is a source freshness boundary, not a promise
+of zero graph storage I/O. After source changes, older graph data is unavailable
+until an operator explicitly refreshes the diagnostic graph. Diagnostic graph
+tools and resolver controls use their separate graph freshness path.
+`loci_index` remains an explicit indexing tool.
 `loci_file` can read tracked `go.mod`, `go.work`, and `Cargo.toml` controls
 directly without indexing them as language source. These reads require a
 contained regular file, at most 1 MiB of UTF-8 source, and bytes matching the
@@ -928,7 +925,7 @@ For loci to be useful, your agent needs to know it exists and how to use it. The
 The one-line version to add to any agent's instructions:
 
 ```
-Use loci_retrieve for repository source discovery and graph context. Expand
+Use loci_retrieve for repository source discovery. Expand
 incomplete source with loci_read and the returned source_ref.
 Locate those exact operation names with the skill's bounded host-discovery
 procedure. If discovery finds no match, check the MCP registration before
@@ -939,7 +936,7 @@ bridge.
 For Claude specifically, add this to your `CLAUDE.md`:
 
 ```
-Use the `loci` skill when repository work requires source retrieval or tracing.
+Use the `loci` skill when repository work requires indexed source retrieval.
 Use its exact-name discovery procedure for `loci_retrieve` and `loci_read`.
 If neither is found, inspect `claude mcp get loci`; the skill's setup reference
 covers missing registration and stale loaded catalogs. Use CLI fallback only

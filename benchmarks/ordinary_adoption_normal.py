@@ -6,6 +6,10 @@ this module interprets the two public normal
 operations introduced by ``normal-graph-v1``.  In particular, it does not use
 the older observer's source aggregates for normal calls: source content and
 proof linkage are recomputed from each retained normal result.
+
+The source-context-v1 packet retains these source/ownership records and reports
+empty relationships with zero traversal counters. This reader also preserves
+legacy graph packets; historical captures keep their original policy meaning.
 """
 from __future__ import annotations
 

@@ -3,29 +3,24 @@ from __future__ import annotations
 
 from collections import Counter
 import copy
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping
 
 from ._exploration_output import Span, _evidence_bytes, _validate_span
-from .graph.contracts import GraphContractError, GraphEdge
+from .graph.contracts import GraphContractError
 from .retrieval_io import finalize_response, serialize_source, source_ref
 from .storage.index_store import IndexStore
 from .storage.source_refs import SourceRefStore
 
 
 LIMITS = {
-    "max_hops": 2,
     "max_nodes": 64,
-    "max_neighbors": 32,
     "max_items": 12,
     "max_anchors": 3,
     "max_explicit_anchors": 5,
-    "max_owner_members": 3,
     "max_evidence_bytes": 8192,
     "max_output_bytes": 16384,
-    "max_anchor_source_bytes": 1024,
-    "max_related_source_bytes": 768,
     "max_lookup_bytes": 33_554_432,
     "max_lookup_files": 4096,
     "max_literal_matches": 256,
@@ -33,11 +28,8 @@ LIMITS = {
 
 _OMISSION_ORDER = (
     "no_anchor", "anchor_limit", "ambiguous_anchor", "lookup_limit",
-    "node_limit", "neighbor_limit", "item_limit", "hop_limit", "cycle",
-    "alternative_path", "ownership_limit", "unsupported_semantics",
-    "unresolved_relation", "ambiguous_relation", "external_relation",
-    "inaccessible_relation", "source_unavailable", "source_stale",
-    "source_preview", "proof_unavailable", "evidence_budget", "output_budget",
+    "node_limit", "item_limit", "alternative_path", "source_unavailable",
+    "source_stale", "source_preview", "evidence_budget", "output_budget",
 )
 
 
@@ -50,14 +42,8 @@ class ItemInput:
     full_span: Span
     preview_span: Span
     complete: bool
-
-
-@dataclass(frozen=True)
-class RelationInput:
-    edge: GraphEdge
-    traversed: str
-    proof: tuple[Span, ...]
-    resolution_configuration: str | None
+    focus: tuple[int, int] | None = None
+    preview_budget: int = 0
 
 
 @dataclass(frozen=True)
@@ -65,7 +51,6 @@ class Addition:
     nodes: tuple[Mapping[str, Any], ...] = ()
     items: tuple[ItemInput, ...] = ()
     ownership: tuple[tuple[str, str, str], ...] = ()
-    relation: RelationInput | None = None
 
 
 @dataclass
@@ -74,10 +59,38 @@ class _State:
     nodes: dict[str, dict[str, Any]] = field(default_factory=dict)
     items: list[dict[str, Any]] = field(default_factory=list)
     ownership: list[dict[str, str]] = field(default_factory=list)
-    relationships: list[dict[str, Any]] = field(default_factory=list)
-    relationship_keys: set[tuple[Any, ...]] = field(default_factory=set)
     spans: list[Span] = field(default_factory=list)
     span_ids: dict[tuple[Any, ...], int] = field(default_factory=dict)
+
+
+def _anchor_excerpt(full: Span, max_bytes: int,
+                    focus: tuple[int, int] | None) -> Span:
+    raw = full.content.encode("utf-8")
+    if focus is None:
+        start = 0
+    else:
+        match_start = focus[0] - full.start_byte
+        match_end = focus[1] - full.start_byte
+        if not 0 <= match_start < match_end <= len(raw):
+            raise ValueError("literal match is outside its indexed source extent")
+        if match_end - match_start > max_bytes:
+            raise ValueError("literal match exceeds source preview")
+        start = min(max(0, match_start - (max_bytes - match_end + match_start) // 2),
+                    len(raw) - max_bytes)
+    while start < len(raw) and raw[start] & 0xC0 == 0x80:
+        start += 1
+    end = min(len(raw), start + max_bytes)
+    while end > start and end < len(raw) and raw[end] & 0xC0 == 0x80:
+        end -= 1
+    if end <= start or (focus is not None and end < match_end):
+        raise ValueError("source preview cannot include the literal match")
+    content = raw[start:end].decode("utf-8")
+    start_line = full.start_line + raw[:start].count(b"\n")
+    return Span(full.file, full.start_byte + start, full.start_byte + end,
+                start_line,
+                max(start_line, start_line + content.count("\n")
+                    - int(content.endswith("\n"))),
+                full.content_hash, content)
 
 
 class RetrievalPacker:
@@ -125,24 +138,61 @@ class RetrievalPacker:
         if len(self.state.items) + len(addition.items) > LIMITS["max_items"]:
             self.omit("item_limit", len(addition.items))
             return False
-        candidate = copy.deepcopy(self.state)
+        def trial(value: Addition) -> tuple[_State, int, int]:
+            candidate = copy.deepcopy(self.state)
+            self._apply(candidate, value)
+            previews = sum(not item.complete for item in value.items)
+            self.omissions["source_preview"] += previews
+            try:
+                response = self._render(candidate)
+                evidence = _evidence_bytes(candidate.spans)
+                finalize_response(response, evidence)
+            finally:
+                self.omissions["source_preview"] -= previews
+            return candidate, evidence, response["usage"]["output_bytes"]
+
+        def fits(result: tuple[_State, int, int]) -> bool:
+            return (result[1] <= LIMITS["max_evidence_bytes"]
+                    and result[2] <= LIMITS["max_output_bytes"])
+
         try:
-            self._apply(candidate, addition)
+            result = trial(addition)
+            selected = addition
+            if addition.items and not fits(result):
+                low = 0
+                high = max(item.preview_budget for item in addition.items)
+                best: tuple[_State, int, int] | None = None
+                while low <= high:
+                    cap = (low + high) // 2
+                    excerpts = []
+                    for item in addition.items:
+                        full_bytes = len(item.full_span.content.encode("utf-8"))
+                        minimum = (item.focus[1] - item.focus[0] if item.focus
+                                   else len(item.full_span.content[0].encode("utf-8")))
+                        budget = min(full_bytes, max(minimum, min(item.preview_budget, cap)))
+                        excerpt = _anchor_excerpt(item.full_span, budget, item.focus)
+                        excerpts.append(replace(item, preview_span=excerpt,
+                                                complete=budget == full_bytes))
+                    candidate_addition = replace(addition, items=tuple(excerpts))
+                    candidate_result = trial(candidate_addition)
+                    if fits(candidate_result):
+                        best = candidate_result
+                        selected = candidate_addition
+                        low = cap + 1
+                    else:
+                        high = cap - 1
+                if best is not None:
+                    result = best
+            if not fits(result):
+                self.omit("evidence_budget" if result[1] > LIMITS["max_evidence_bytes"]
+                          else "output_budget")
+                return False
         except (KeyError, UnicodeError, ValueError):
             self.omit("source_unavailable")
             return False
-        response = self._render(candidate)
-        evidence = _evidence_bytes(candidate.spans)
-        finalize_response(response, evidence)
-        if evidence > LIMITS["max_evidence_bytes"]:
-            self.omit("evidence_budget")
-            return False
-        if response["usage"]["output_bytes"] > LIMITS["max_output_bytes"]:
-            self.omit("output_budget")
-            return False
         self.snapshots.append(copy.deepcopy(self.state))
-        self.state = candidate
-        previews = sum(not item.complete for item in addition.items)
+        self.state = result[0]
+        previews = sum(not item.complete for item in selected.items)
         if previews:
             self.omit("source_preview", previews)
         return True
@@ -201,31 +251,6 @@ class RetrievalPacker:
             }
             if not any(current["node_id"] == value["node_id"] for current in state.items):
                 state.items.append(value)
-        relation = addition.relation
-        if relation is not None:
-            if relation.traversed not in {"forward", "reverse"} or not relation.proof:
-                raise ValueError("relationship requires complete proof")
-            for span in relation.proof:
-                _validate_span(span)
-            edge = relation.edge.to_dict()
-            key = (
-                edge["namespace"], edge["type"], edge["from"], edge["to"],
-                edge["directed"], edge["resolution"], edge["evidence"]["file"],
-                edge["evidence"]["line"], edge["evidence"]["content_hash"],
-            )
-            if key not in state.relationship_keys:
-                source_ids = list(dict.fromkeys(
-                    self._source_id(state, span) for span in relation.proof
-                ))
-                state.relationship_keys.add(key)
-                state.relationships.append({
-                    "id": len(state.relationships) + 1,
-                    "edge": edge,
-                    "traversed": relation.traversed,
-                    "source_ids": source_ids,
-                    "proof": "complete",
-                    "resolution_configuration": relation.resolution_configuration,
-                })
 
     def _add_node(self, state: _State, node: Mapping[str, Any]) -> None:
         node_id = str(node["id"])
@@ -259,13 +284,12 @@ class RetrievalPacker:
 
     def _render(self, state: _State) -> dict[str, Any]:
         usage = copy.deepcopy(self.usage)
-        usage["relationships_delivered"] = len(state.relationships)
-        status = "empty" if not state.items and not state.relationships else "ok"
+        status = "empty" if not state.items else "ok"
         if self.omissions or any(not item["complete"] for item in state.items):
             status = "partial" if status != "empty" else "empty"
         return {
             "schema_version": 1,
-            "policy": "normal-graph-v1",
+            "policy": "source-context-v1",
             "snapshot": self.snapshot,
             "status": status,
             "selection": copy.deepcopy(self.selection),
@@ -274,7 +298,7 @@ class RetrievalPacker:
             "nodes": [copy.deepcopy(state.nodes[node_id]) for node_id in state.node_order],
             "items": copy.deepcopy(state.items),
             "ownership": copy.deepcopy(state.ownership),
-            "relationships": copy.deepcopy(state.relationships),
+            "relationships": [],
             "sources": [
                 serialize_source(self.repo, span, index, references=self.references)
                 for index, span in enumerate(state.spans, 1)

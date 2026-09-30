@@ -1,5 +1,10 @@
 # Internal production graph-enrichment seam
 
+> Superseded by `source-context-v1` on the source-context reduction branch.
+> Normal retrieval now selects source without this graph-enrichment seam or
+> `RetrievalRuntime`. This document preserves the prior design; current behavior
+> is described in [normal-retrieval.md](../../skills/loci/references/normal-retrieval.md).
+
 `service.retrieve(..., graph_enrichment=True)` forwards its keyword-only control
 through `retrieve_context(..., graph_enrichment=True)`. Both default to enabled.
 Trusted process code can bind either value; the normal `loci_retrieve` MCP input

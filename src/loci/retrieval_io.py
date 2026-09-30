@@ -115,21 +115,25 @@ def _control_files(state: GraphIndexState) -> set[str]:
     return paths
 
 
-def read_source(repo: Path, store: IndexStore, nodes: Mapping[str, dict],
-                state: GraphIndexState, reference: str) -> dict[str, Any]:
+def read_source(repo: Path, store: IndexStore, index: Mapping[str, Any],
+                reference: str) -> dict[str, Any]:
     """Read a fixed page from a current, contained, indexed source extent."""
     references = SourceRefStore(repo, store)
     value = _decode(repo, reference, references=references)
     file = value["file"]
     # Markdown has a page-root section rather than a zero-width file node.
     # The index's file hashes define source eligibility for every language.
-    index = store.load(repo)
-    hashes = dict(index.get("file_hashes", {})) if index is not None else {}
-    if file in _control_files(state):
-        hashes.setdefault(file, state.input_hashes.get(file))
-    if file not in hashes:
+    hashes = index["file_hashes"]
+    indexed_hash = hashes.get(file)
+    if file not in hashes and isinstance(index.get("graph"), Mapping):
+        # Diagnostic proof handles can name resolver controls. Only this route
+        # requires validated semantic state; ordinary indexed source does not.
+        state = store.validate_graph_state(index)
+        if file in _control_files(state):
+            indexed_hash = state.input_hashes.get(file)
+    if indexed_hash is None:
         raise _invalid("Source reference is not indexed source or a resolver control")
-    if hashes[file] != value["hash"]:
+    if indexed_hash != value["hash"]:
         raise GraphContractError("SOURCE_STALE", "Source reference differs from the current index", {"file": file})
     try:
         # Read current bytes as well as checking the index: changes after refresh

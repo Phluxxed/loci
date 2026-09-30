@@ -76,7 +76,9 @@ from loci.query_coverage import (
     query_coverage_from_index,
     stored_query_coverage,
 )
-from loci.storage.index_store import IndexStore, index_versions_current
+from loci.storage.index_store import (
+    EXTRACTOR_VERSION, INDEX_SCHEMA_VERSION, IndexStore, index_versions_current,
+)
 from loci.storage.repository_catalog import RepositoryCatalogError
 from loci.storage.store_health import (
     DEFAULT_HEALTH_LIMIT,
@@ -307,23 +309,7 @@ def _index_repo_unlocked(
             language_counts[lang] += 1
             continue
 
-        if profile_fields and src_file.suffix.lower() in MARKDOWN_SUFFIXES:
-            symbols = parse_file(
-                src_file,
-                markdown_frontmatter_fields=profile_fields,
-            )
-        else:
-            symbols = parse_file(src_file)
-        id_map: dict[str, str] = {}
-        for sym in symbols:
-            old_id = sym.id
-            sym.file_path = rel_path
-            suffix_match = re.search(r"~\d+$", old_id)
-            suffix = suffix_match.group(0) if suffix_match else ""
-            sym.id = f"{rel_path}::{sym.qualified_name}#{sym.kind}{suffix}"
-            id_map[old_id] = sym.id
-        for sym in symbols:
-            _remap_markdown_hierarchy_ids(sym, id_map)
+        symbols = _parse_indexed_file(src_file, rel_path, profile_fields)
         all_symbols.extend(symbols)
         lang = EXTENSION_MAP.get(src_file.suffix, "unknown")
         if symbols:
@@ -516,6 +502,108 @@ def _index_repo_unlocked(
     if zero_symbol_warnings:
         output["warnings"] = zero_symbol_warnings
     return output
+
+
+def _parse_indexed_file(
+    src_file: Path, rel_path: str, profile_fields: frozenset[str] = frozenset(),
+) -> list[Symbol]:
+    if profile_fields and src_file.suffix.lower() in MARKDOWN_SUFFIXES:
+        symbols = parse_file(src_file, markdown_frontmatter_fields=profile_fields)
+    else:
+        symbols = parse_file(src_file)
+    id_map: dict[str, str] = {}
+    for symbol in symbols:
+        old_id = symbol.id
+        symbol.file_path = rel_path
+        suffix_match = re.search(r"~\d+$", old_id)
+        suffix = suffix_match.group(0) if suffix_match else ""
+        symbol.id = f"{rel_path}::{symbol.qualified_name}#{symbol.kind}{suffix}"
+        id_map[old_id] = symbol.id
+    for symbol in symbols:
+        _remap_markdown_hierarchy_ids(symbol, id_map)
+    return symbols
+
+
+def _source_index_is_stale(
+    repo_path: Path, store: IndexStore, index: dict[str, Any] | None,
+) -> bool:
+    if index is None or (index.get("schema_version"), index.get("extractor_version")) != (
+        INDEX_SCHEMA_VERSION, EXTRACTOR_VERSION,
+    ):
+        return True
+    scan = _scan_repository_files(repo_path, store)
+    hashes = {relative: digest for _, relative, digest in scan.indexable_files}
+    return hashes != index.get("file_hashes") or scan.coverage != stored_query_coverage(index)
+
+
+def _index_source_unlocked(repo_path: Path, store: IndexStore) -> None:
+    """Refresh declarations and source inventory without relationship extraction."""
+    existing = store.load(repo_path)
+    previous: dict[str, list[Symbol]] = defaultdict(list)
+    hashes: dict[str, str] = {}
+    if existing is not None:
+        # Malformed source metadata is an error, never trusted incremental input.
+        store.validate_source_index(existing)
+        if (existing.get("schema_version"), existing.get("extractor_version")) == (
+            INDEX_SCHEMA_VERSION, EXTRACTOR_VERSION,
+        ):
+            hashes = existing["file_hashes"]
+            for value in existing["symbols"]:
+                if value["kind"] not in {"file", "package", "crate", "module"}:
+                    previous[value["file_path"]].append(Symbol.from_dict(value))
+    scan = _scan_repository_files(repo_path, store)
+    symbols: list[Symbol] = []
+    new_hashes: dict[str, str] = {}
+    for src_file, relative, digest in scan.indexable_files:
+        new_hashes[relative] = digest
+        if hashes.get(relative) == digest:
+            symbols.extend(previous.get(relative, ()))
+        else:
+            symbols.extend(_parse_indexed_file(src_file, relative))
+        if src_file.suffix.lower() not in MARKDOWN_SUFFIXES:
+            symbols.append(make_file_symbol(relative,
+                                           language=EXTENSION_MAP.get(src_file.suffix, "unknown"),
+                                           content_hash=digest))
+    store.write(repo_path, symbols, new_hashes, coverage=scan.coverage, source_only=True)
+
+
+def _load_source_context(
+    repo_path: Path, *, ensure_fresh: bool,
+) -> tuple[IndexStore, dict[str, dict[str, Any]], dict[str, Any]]:
+    if ensure_fresh:
+        _validate_repo_path(repo_path)
+    store = get_store()
+    index = store.load(repo_path)
+    if index is not None and not isinstance(index, dict):
+        raise LociError("INVALID_SOURCE_INDEX", "Source index must be an object", {})
+    if ensure_fresh:
+        if _source_index_is_stale(repo_path, store, index):
+            lock_path = store.refresh_lock_path(repo_path)
+            timeout = float(os.environ.get("LOCI_REFRESH_LOCK_TIMEOUT", "10"))
+            _acquire_refresh_lock(lock_path, timeout=timeout)
+            try:
+                index = store.load(repo_path)
+                if _source_index_is_stale(repo_path, store, index):
+                    _index_source_unlocked(repo_path, store)
+                    index = _load_required_index(store, repo_path)
+            except (GraphContractError, RepositoryCatalogError) as exc:
+                raise LociError(exc.code, exc.message, exc.details) from exc
+            except LociError:
+                raise
+            except Exception as exc:
+                raise LociError(
+                    "INDEX_CREATION_FAILED" if index is None else "STALE_INDEX_REFRESH_FAILED",
+                    "Failed to refresh source index", {"repo": str(repo_path), "error": str(exc)},
+                ) from exc
+            finally:
+                lock_path.unlink(missing_ok=True)
+    if index is None:
+        raise LociError("REPO_NOT_INDEXED", "Repository is not indexed", {"repo": str(repo_path)})
+    try:
+        nodes = store.validate_source_index(index)
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+    return store, nodes, index
 
 
 def ensure_fresh_index(repo: str | Path) -> dict[str, Any]:
@@ -1178,51 +1266,19 @@ def graph_paths(
         raise LociError(exc.code, exc.message, exc.details) from exc
 
 
-@dataclass(frozen=True)
-class RetrievalRuntime:
-    """Trusted process-bound configuration, never part of a retrieval packet.
-
-    Evaluation code records ``graph_enrichment`` from this binding, not from
-    packet contents or relationship counts. The bound method exposes no graph
-    override; the public MCP input contract remains unchanged.
-    """
-
-    graph_enrichment: bool = True
-
-    def retrieve(
-        self,
-        repo: str | Path, query: str = "", *, seed_ids: list[str] | None = None,
-        ensure_fresh: bool = False,
-    ) -> dict[str, Any]:
-        return retrieve(
-            repo, query, seed_ids=seed_ids, ensure_fresh=ensure_fresh,
-            graph_enrichment=self.graph_enrichment,
-        )
-
-
 def retrieve(
     repo: str | Path, query: str = "", *, seed_ids: list[str] | None = None,
     ensure_fresh: bool = False,
-    graph_enrichment: bool = True,
 ) -> dict[str, Any]:
-    """Return fixed-policy context with default-on graph enrichment.
-
-    ``graph_enrichment`` is an internal, process-bound control, not a public MCP
-    argument. Disabling it stops after the shared anchor/source packing stage.
-    Execution state is not included in the model-visible packet; trusted callers
-    can retain it in a ``RetrievalRuntime`` binding for evaluation/receipt metadata.
-    """
+    """Return bounded selected source without automatic relationship expansion."""
     from loci.retrieval import retrieve_context
 
     repo_path = Path(repo).resolve()
-    store, nodes, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
-    coverage = query_coverage_from_index(
-        _load_required_index(store, repo_path), "indexed_symbols",
-    )
+    store, nodes, index = _load_source_context(repo_path, ensure_fresh=ensure_fresh)
+    coverage = query_coverage_from_index(index, "indexed_symbols")
     try:
-        return retrieve_context(repo_path, store, nodes, state, query,
-                                seed_ids=seed_ids, coverage=coverage["state"],
-                                graph_enrichment=graph_enrichment)
+        return retrieve_context(repo_path, store, nodes, index["file_hashes"], query,
+                                seed_ids=seed_ids, coverage=coverage["state"])
     except GraphContractError as exc:
         raise LociError(exc.code, exc.message, exc.details) from exc
 
@@ -1234,9 +1290,9 @@ def read(
     from loci.retrieval_io import read_source
 
     repo_path = Path(repo).resolve()
-    store, nodes, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
+    store, _, index = _load_source_context(repo_path, ensure_fresh=ensure_fresh)
     try:
-        return read_source(repo_path, store, nodes, state, source_ref)
+        return read_source(repo_path, store, index, source_ref)
     except GraphContractError as exc:
         raise LociError(exc.code, exc.message, exc.details) from exc
 

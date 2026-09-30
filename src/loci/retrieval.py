@@ -1,56 +1,16 @@
-"""Fixed deterministic graph-backed context retrieval."""
+"""Deterministic bounded target-source retrieval."""
 from __future__ import annotations
 
-from collections import Counter, defaultdict, deque
+from collections import Counter, defaultdict
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping
 
-from ._retrieval_output import (
-    Addition,
-    ItemInput,
-    LIMITS,
-    RelationInput,
-    RetrievalPacker,
-)
-from ._retrieval_source import (
-    RetrievalSource,
-    _source_node,
-    edge_identity,
-    preview_span,
-    snapshot_id,
-)
+from ._retrieval_output import Addition, ItemInput, LIMITS, RetrievalPacker
+from ._retrieval_source import RetrievalSource, _source_node, snapshot_id
 from .graph.anchors import GraphAnchor, select_graph_anchors
-from .graph.contracts import GraphContractError, GraphEdge
-from .graph.state import GraphIndexState
-from .graph.traversal import GraphTraversalStep, graph_adjacency, graph_text_terms
+from .graph.contracts import GraphContractError
 from .storage.index_store import IndexStore
-
-
-_FAMILY_TYPES = (
-    ("calls", frozenset({"calls"})),
-    ("types", frozenset({
-        "uses_type", "extends", "implements", "embeds", "supertrait",
-        "impl_trait", "impl_self_type", "references_type",
-    })),
-    ("values", frozenset({"references"})),
-    ("imports", frozenset({"imports", "imports_type"})),
-)
-_TYPE_TO_FAMILY = {
-    edge_type: index
-    for index, (_, edge_types) in enumerate(_FAMILY_TYPES)
-    for edge_type in edge_types
-}
-_ALLOWED_RESOLUTIONS = frozenset({"exact", "declared", "import-resolved"})
-_NATIVE_KINDS = frozenset({"file", "package", "crate", "module"})
-_SIGNATURE_OWNER_KINDS = frozenset({"function", "method"})
-_CONTRACT_OWNER_KINDS = frozenset({
-    "class", "interface", "type", "struct", "enum", "trait",
-})
-_CONTRACT_TYPE_CONTEXTS = frozenset({
-    "property", "alias", "type_argument", "constraint", "heritage",
-    "struct_embedding", "interface_embedding", "supertrait",
-})
 
 
 @dataclass(frozen=True)
@@ -59,205 +19,91 @@ class _SelectedAnchor:
     score: float
     matched_terms: tuple[str, ...]
     match_scope: tuple[str, ...]
-
-
-@dataclass(frozen=True)
-class _Visit:
-    node_id: str
-    anchor_index: int
-    depth: int
-    lineage: tuple[str, ...]
-    why: str
+    literal_match: tuple[int, int] | None = None
 
 
 @dataclass(frozen=True)
 class _PreparedRetrieval:
-    """Shared deterministic anchor selection before graph enrichment."""
+    """Selected source and its bounded output packer."""
 
     source: RetrievalSource
     anchors: tuple[_SelectedAnchor, ...]
     packer: RetrievalPacker
-    seeds: tuple[str, ...]
 
 
 def retrieve_context(
-    repo: Path,
-    store: IndexStore,
-    nodes: dict[str, dict],
-    state: GraphIndexState,
-    query: str = "",
-    *,
-    seed_ids: list[str] | None = None,
-    coverage: str = "unknown",
-    graph_enrichment: bool = True,
+    repo: Path, store: IndexStore, nodes: dict[str, dict],
+    file_hashes: Mapping[str, str], query: str = "", *,
+    seed_ids: list[str] | None = None, coverage: str = "unknown",
 ) -> dict:
-    """Return fixed-policy context; enrichment is bound by trusted process code.
-
-    Both modes pack the same anchor sources and indexed-file ownership first.
-    Disabling enrichment skips relationships and ownership/member expansion,
-    not index loading, anchor selection, or baseline source packing. This option
-    is deliberately absent from the public MCP tool arguments.
-    """
-    prepared = _prepare_context(
-        repo, store, nodes, state, query, seed_ids=seed_ids, coverage=coverage,
-    )
-    source = prepared.source
-    anchors = prepared.anchors
-    packer = prepared.packer
-    seeds = prepared.seeds
-    anchor_visits = _pack_anchor_sources(prepared, nodes)
-    if not graph_enrichment:
-        packer.usage["nodes_examined"] = len(anchor_visits)
-        return packer.finish()
-    if not anchors:
-        return packer.finish()
-
-    query_terms = set(graph_text_terms(query))
-    eligible_edges = _eligible_edges(state.edges, nodes)
-    adjacency = graph_adjacency(eligible_edges, direction="either")
-    degrees = Counter()
-    for edge in eligible_edges:
-        degrees[edge.from_id] += 1
-        if edge.to_id != edge.from_id:
-            degrees[edge.to_id] += 1
-
-    visited = {visit.node_id for visit in anchor_visits}
-    expanded: set[str] = set()
-    frontier = list(anchor_visits)
-
-    anchor_bridge_targets = _selected_anchor_type_bridges(
-        anchor_visits,
-        adjacency,
-        nodes,
-    )
-    signature_type_paths = _selected_signature_type_paths(
-        tuple(visit.node_id for visit in anchor_visits), state, nodes,
-    )
-    admitted_neighbors: dict[str, tuple[GraphTraversalStep, ...]] = {}
-    successful_steps: set[tuple[str, str, str, str]] = set()
-    # Selected source identities are the request's strongest relevance signal.
-    # Give their direct semantic proof one bounded pass before ownership-driven
-    # files and representative members join the traversal layer.  Anchor source,
-    # native file identity and ownership were already packed by _anchor_addition.
-    frontier.extend(_traverse_relationships(
-        anchor_visits,
-        depth=0,
-        source=source,
-        nodes=nodes,
-        adjacency=adjacency,
-        query_terms=query_terms,
-        degrees=degrees,
-        packer=packer,
-        visited=visited,
-        priority_anchor_ids=(frozenset(anchor.node_id for anchor in anchors)
-                             if seeds else frozenset()),
-        priority_target_ids=anchor_bridge_targets,
-        priority_type_paths=signature_type_paths,
-        admitted_neighbors=admitted_neighbors,
-        successful_steps=successful_steps,
-    ))
-    pretraversed_anchors = {visit.node_id for visit in anchor_visits}
-
-    for depth in range(LIMITS["max_hops"] + 1):
-        layer = deque(visit for visit in frontier if visit.depth == depth)
-        frontier = [visit for visit in frontier if visit.depth != depth]
-        expanded_layer: list[_Visit] = []
-        while layer:
-            visit = layer.popleft()
-            if visit.node_id in expanded:
-                continue
-            expanded.add(visit.node_id)
-            expanded_layer.append(visit)
-            node = nodes[visit.node_id]
-            _count_unresolved(packer, state, visit.node_id)
-            for lifted in _ownership_lifts(source, node, query_terms):
-                target = lifted.node
-                target_id = str(target["id"])
-                ownership = (
-                    (target_id, str(node["id"]), lifted.basis)
-                    if target.get("kind") == "file" and node.get("kind") not in _NATIVE_KINDS
-                    else (str(node["id"]), target_id, lifted.basis)
-                )
-                if target_id in visited:
-                    if ownership not in {
-                        (item["owner_id"], item["member_id"], item["basis"])
-                        for item in packer.state.ownership
-                    }:
-                        packer.add(Addition(nodes=(node, target), ownership=(ownership,)))
-                    continue
-                if len(visited) >= LIMITS["max_nodes"]:
-                    packer.omit("node_limit")
-                    continue
-                addition, missing_source = _lift_addition(
-                    source, node, target, lifted.basis, depth,
-                )
-                if missing_source:
-                    packer.omit("source_unavailable")
-                if packer.add(addition):
-                    visited.add(target_id)
-                    layer.append(_Visit(target_id, visit.anchor_index, depth,
-                                        (*visit.lineage, visit.node_id),
-                                        "Validated ownership context"))
-
-        semantic_visits = [
-            visit for visit in expanded_layer
-            if visit.node_id not in pretraversed_anchors
-        ]
-        frontier.extend(_traverse_relationships(
-            semantic_visits,
-            depth=depth,
-            source=source,
-            nodes=nodes,
-            adjacency=adjacency,
-            query_terms=query_terms,
-            degrees=degrees,
-            packer=packer,
-            visited=visited,
-            admitted_neighbors=admitted_neighbors,
-            successful_steps=successful_steps,
-        ))
-
-    packer.usage["nodes_examined"] = len(visited)
-    return packer.finish()
+    """Locate source and pack selected definitions under fixed total budgets."""
+    prepared = _prepare_context(repo, store, nodes, file_hashes, query,
+                                seed_ids=seed_ids, coverage=coverage)
+    visits = _pack_anchor_sources(prepared, nodes)
+    prepared.packer.usage["nodes_examined"] = len(visits)
+    return prepared.packer.finish()
 
 
 def _pack_anchor_sources(
     prepared: _PreparedRetrieval,
     nodes: Mapping[str, Mapping[str, Any]],
-) -> list[_Visit]:
-    """Pack the common baseline, including indexed-file ownership identities.
-
-    File owners are identity/ownership only here. Representative members and
-    other ownership-driven context belong to the later enrichment stage.
-    """
+) -> list[str]:
+    """Reserve identities, then pack selected sources against their joint budget."""
     source, anchors, packer = prepared.source, prepared.anchors, prepared.packer
     if not anchors:
         packer.omit("no_anchor")
         return []
-    visited: set[str] = set()
-    anchor_visits: list[_Visit] = []
-    for index, anchor in enumerate(anchors):
-        if anchor.node_id in visited:
-            packer.omit("alternative_path")
-            continue
-        node = nodes[anchor.node_id]
-        if len(visited) >= LIMITS["max_nodes"]:
-            packer.omit("node_limit")
-            break
-        visited.add(anchor.node_id)
-        addition, missing_source = _anchor_addition(source, node, index, anchor)
-        if missing_source:
+    lengths = []
+    for anchor in anchors:
+        try:
+            lengths.append(len(source.definition(nodes[anchor.node_id]).content.encode("utf-8")))
+        except (KeyError, UnicodeError, ValueError):
+            lengths.append(0)
+    budgets = _anchor_source_budgets(lengths)
+    additions = []
+    for anchor, budget in zip(anchors, budgets):
+        addition, missing = _anchor_addition(source, nodes[anchor.node_id], anchor, budget)
+        additions.append(addition)
+        if missing:
             packer.omit("source_unavailable")
-        packer.add(addition)
-        anchor_visits.append(_Visit(anchor.node_id, index, 0, (), "Selected anchor"))
-    return anchor_visits
+    identities = Addition(
+        nodes=tuple(node for addition in additions for node in addition.nodes),
+        ownership=tuple(value for addition in additions for value in addition.ownership),
+    )
+    if packer.add(identities):
+        items = tuple(item for addition in additions for item in addition.items)
+        if items and not packer.add(Addition(items=items)):
+            # When even minimal excerpts cannot all fit, retain a useful subset
+            # and the identities/omissions needed to re-anchor excluded source.
+            for item in items:
+                packer.add(Addition(items=(item,)))
+    return [anchor.node_id for anchor in anchors]
+
+
+def _anchor_source_budgets(lengths: list[int]) -> list[int]:
+    """Share the fixed evidence budget while giving short anchors their full extent."""
+    budgets = [0] * len(lengths)
+    pending = {index for index, length in enumerate(lengths) if length}
+    remaining = LIMITS["max_evidence_bytes"]
+    while pending:
+        share = remaining // len(pending)
+        short = {index for index in pending if lengths[index] <= share}
+        if not short:
+            for index in sorted(pending):
+                budgets[index] = share
+            break
+        for index in sorted(short):
+            budgets[index] = lengths[index]
+            remaining -= lengths[index]
+        pending -= short
+    return budgets
 
 
 def _prepare_context(
     repo: Path,
     store: IndexStore,
     nodes: dict[str, dict],
-    state: GraphIndexState,
+    file_hashes: Mapping[str, str],
     query: str = "",
     *,
     seed_ids: list[str] | None = None,
@@ -265,7 +111,7 @@ def _prepare_context(
 ) -> _PreparedRetrieval:
     """Select anchors and initialize direct-source packing without traversal."""
     seeds = _validate_request(query, seed_ids)
-    source = RetrievalSource(repo, store, nodes, state)
+    source = RetrievalSource(repo, store, nodes, file_hashes)
     anchors, selection, matching, lookup, selection_omissions = _select_anchors(
         nodes, source, query, seeds,
     )
@@ -281,14 +127,13 @@ def _prepare_context(
     packer = RetrievalPacker(
         repo,
         store=store,
-        snapshot=snapshot_id(state, source.file_hashes),
+        snapshot=snapshot_id(source.file_hashes),
         selection=selection,
         scope={
             "source": "indexed_supported_source",
             "coverage": coverage if coverage in {"complete", "partial", "unknown"} else "unknown",
             "matching": matching,
-            # Evidence domain of any returned relationships, not execution state.
-            "relationships": "known_static_relationships",
+            "relationships": "not_selected",
             "exhaustive": False,
         },
         anchors=anchor_values,
@@ -297,471 +142,26 @@ def _prepare_context(
     packer.usage["lookup_files"] = lookup["files"]
     for reason, count in selection_omissions.items():
         packer.omit(reason, count)
-    return _PreparedRetrieval(source, anchors, packer, seeds)
-
-
-def _traverse_relationships(
-    visits: Sequence[_Visit],
-    *,
-    depth: int,
-    source: RetrievalSource,
-    nodes: Mapping[str, Mapping[str, Any]],
-    adjacency: Mapping[str, Sequence[GraphTraversalStep]],
-    query_terms: set[str],
-    degrees: Mapping[str, int],
-    packer: RetrievalPacker,
-    visited: set[str],
-    priority_anchor_ids: frozenset[str] = frozenset(),
-    priority_target_ids: tuple[str, ...] = (),
-    priority_type_paths: tuple[tuple[str, ...], ...] = (),
-    admitted_neighbors: dict[str, tuple[GraphTraversalStep, ...]] | None = None,
-    successful_steps: set[tuple[str, str, str, str]] | None = None,
-) -> list[_Visit]:
-    """Traverse one semantic layer with fixed family/direction fairness."""
-    priority_target_rank = {
-        target_id: index for index, target_id in enumerate(priority_target_ids)
-    }
-    priority_path_target_rank: dict[str, dict[str, int]] = defaultdict(dict)
-    for path in priority_type_paths:
-        for source_id, target_id in zip(path, path[1:]):
-            ranks = priority_path_target_rank[source_id]
-            ranks.setdefault(target_id, len(ranks))
-    ordered = sorted(visits, key=lambda value: (value.anchor_index, value.node_id))
-    per_anchor: dict[int, list[tuple[_Visit, list[GraphTraversalStep]]]] = defaultdict(list)
-    priority_path_steps: dict[str, dict[str, GraphTraversalStep]] = {}
-    admitted = admitted_neighbors if admitted_neighbors is not None else {}
-    accepted = successful_steps if successful_steps is not None else set()
-    for visit in ordered:
-        cached = admitted.get(visit.node_id)
-        if cached is None:
-            neighbors = list(adjacency.get(visit.node_id, ()))
-            packer.usage["eligible_edges_considered"] += len(neighbors)
-            ranked = _ranked_neighbors(neighbors, nodes, query_terms, degrees)
-            path_target_rank = priority_path_target_rank.get(visit.node_id, {})
-            if visit.node_id in priority_anchor_ids or priority_target_rank or path_target_rank:
-                ranked = sorted(
-                    ranked,
-                    key=lambda step: (
-                        0 if step.to_id in priority_anchor_ids else 1,
-                        (
-                            path_target_rank[step.to_id]
-                            if _is_type_bridge_step(step, path_target_rank)
-                            else len(path_target_rank)
-                        ),
-                        (
-                            priority_target_rank[step.to_id]
-                            if _is_type_bridge_step(step, priority_target_rank)
-                            else len(priority_target_rank)
-                        ),
-                    ),
-                )
-            if len(ranked) > LIMITS["max_neighbors"]:
-                packer.omit("neighbor_limit", len(ranked) - LIMITS["max_neighbors"])
-                ranked = ranked[:LIMITS["max_neighbors"]]
-            admitted[visit.node_id] = tuple(ranked)
-        else:
-            ranked = list(cached)
-        path_target_rank = priority_path_target_rank.get(visit.node_id, {})
-        if path_target_rank:
-            priority_path_steps[visit.node_id] = {
-                step.to_id: step for step in ranked
-                if _is_type_bridge_step(step, path_target_rank)
-                and step.traversed == "forward"
-            }
-        if depth == LIMITS["max_hops"]:
-            packer.omit("hop_limit", len(ranked))
-            continue
-        per_anchor[visit.anchor_index].append((visit, ranked))
-
-    scheduler: dict[int, list[deque[tuple[_Visit, GraphTraversalStep]]]] = {}
-    prioritized: list[tuple[int, int, int, _Visit, GraphTraversalStep]] = []
-    priority_path_pairs = {
-        (source_id, target_id)
-        for path in priority_type_paths
-        for source_id, target_id in zip(path, path[1:])
-    }
-    for anchor_index in sorted(per_anchor):
-        queues = [deque() for _ in range(8)]
-        for visit, steps in per_anchor[anchor_index]:
-            for step in steps:
-                pair = (visit, step)
-                if _step_key(visit, step) in accepted:
-                    continue
-                if (
-                    visit.node_id in priority_anchor_ids
-                    and step.to_id in priority_anchor_ids
-                ):
-                    prioritized.append((0, 0, visit.anchor_index, visit, step))
-                elif (
-                    (visit.node_id, step.to_id) in priority_path_pairs
-                    and _TYPE_TO_FAMILY[step.edge.type] == 1
-                    and priority_path_steps.get(visit.node_id, {}).get(step.to_id) == step
-                ):
-                    continue
-                elif _is_type_bridge_step(step, priority_target_rank):
-                    prioritized.append((
-                        1,
-                        priority_target_rank[step.to_id],
-                        visit.anchor_index,
-                        visit,
-                        step,
-                    ))
-                else:
-                    queues[_queue_index(step)].append(pair)
-        scheduler[anchor_index] = queues
-
-    next_visits: list[_Visit] = []
-
-    def traverse(visit: _Visit, step: GraphTraversalStep) -> _Visit | None:
-        target_id = step.to_id
-        if target_id in (*visit.lineage, visit.node_id):
-            packer.omit("cycle")
-            return None
-        already_visited = target_id in visited
-        if not already_visited and len(visited) >= LIMITS["max_nodes"]:
-            packer.omit("node_limit")
-            return None
-        packer.usage["edges_traversed"] += 1
-        target = nodes[target_id]
-        proof = source.proof(step.edge)
-        if proof is None:
-            packer.omit("proof_unavailable")
-            if not already_visited:
-                visited.add(target_id)
-            return None
-        addition, missing_source = _relation_addition(
-            source, nodes[visit.node_id], target, step, proof, visit.depth + 1,
-            include_item=not already_visited,
-        )
-        if missing_source:
-            packer.omit("source_unavailable")
-        if not already_visited:
-            visited.add(target_id)
-        if packer.add(addition):
-            accepted.add(_step_key(visit, step))
-            next_visit = _Visit(
-                target_id, visit.anchor_index, visit.depth + 1,
-                (*visit.lineage, visit.node_id),
-                f"{_FAMILY_TYPES[_TYPE_TO_FAMILY[step.edge.type]][0]} relationship",
-            )
-            if already_visited:
-                packer.omit("alternative_path")
-            else:
-                next_visits.append(next_visit)
-            return next_visit
-        return None
-
-    ordered_priorities = sorted(
-        prioritized,
-        key=lambda item: (
-            item[0], item[1], item[2], _queue_index(item[4]), item[4].to_id,
-        ),
-    )
-    for kind, _target_rank, _anchor_index, visit, step in ordered_priorities:
-        if kind == 0:
-            traverse(visit, step)
-
-    if priority_type_paths:
-        visits_by_id = {visit.node_id: visit for visit in visits}
-        for path in priority_type_paths:
-            current = visits_by_id.get(path[0])
-            if current is None:
-                continue
-            for target_id in path[1:]:
-                if current.depth >= LIMITS["max_hops"]:
-                    packer.omit("hop_limit")
-                    break
-                if current.node_id not in priority_path_steps:
-                    target_rank = priority_path_target_rank.get(current.node_id, {})
-                    cached = admitted.get(current.node_id)
-                    if cached is None:
-                        neighbors = list(adjacency.get(current.node_id, ()))
-                        packer.usage["eligible_edges_considered"] += len(neighbors)
-                        ranked = _ranked_neighbors(neighbors, nodes, query_terms, degrees)
-                        ranked = sorted(
-                            ranked,
-                            key=lambda value: (
-                                target_rank[value.to_id]
-                                if _is_type_bridge_step(value, target_rank)
-                                and value.traversed == "forward"
-                                else len(target_rank),
-                            ),
-                        )
-                        if len(ranked) > LIMITS["max_neighbors"]:
-                            packer.omit(
-                                "neighbor_limit", len(ranked) - LIMITS["max_neighbors"],
-                            )
-                            ranked = ranked[:LIMITS["max_neighbors"]]
-                        admitted[current.node_id] = tuple(ranked)
-                    else:
-                        ranked = list(cached)
-                    priority_path_steps[current.node_id] = {
-                        value.to_id: value for value in ranked
-                        if _is_type_bridge_step(value, target_rank)
-                        and value.traversed == "forward"
-                    }
-                step = priority_path_steps[current.node_id].get(target_id)
-                if step is None:
-                    break
-                pair = (current.node_id, target_id, step.edge.type, step.traversed)
-                if pair in accepted:
-                    next_visit = _Visit(
-                        target_id, current.anchor_index, current.depth + 1,
-                        (*current.lineage, current.node_id), "types relationship",
-                    )
-                else:
-                    next_visit = traverse(current, step)
-                    if next_visit is None:
-                        break
-                visits_by_id[target_id] = next_visit
-                current = next_visit
-
-    for kind, _target_rank, _anchor_index, visit, step in ordered_priorities:
-        if kind != 0 and (
-            visit.node_id, step.to_id, step.edge.type, step.traversed
-        ) not in accepted:
-            traverse(visit, step)
-    while any(queue for queues in scheduler.values() for queue in queues):
-        for anchor_index in sorted(scheduler):
-            queues = scheduler[anchor_index]
-            for queue in queues:
-                if queue:
-                    traverse(*queue.popleft())
-    return next_visits
-
-
-def _step_key(
-    visit: _Visit,
-    step: GraphTraversalStep,
-) -> tuple[str, str, str, str]:
-    return visit.node_id, step.to_id, step.edge.type, step.traversed
-
-
-def _is_type_bridge_step(
-    step: GraphTraversalStep,
-    priority_target_rank: Mapping[str, int],
-) -> bool:
-    return (
-        step.to_id in priority_target_rank
-        and _TYPE_TO_FAMILY[step.edge.type] == 1
-    )
-
-
-def _selected_signature_type_paths(
-    anchor_ids: Sequence[str],
-    state: GraphIndexState,
-    nodes: Mapping[str, Mapping[str, Any]],
-) -> tuple[tuple[str, ...], ...]:
-    """Return proven input-type paths from selected callable declarations."""
-    anchor_rank = {node_id: index for index, node_id in enumerate(anchor_ids)}
-    typescript_parameter_spans = {
-        node_id: _typescript_parameter_span(nodes[node_id])
-        for node_id in anchor_ids
-        if node_id in nodes and nodes[node_id].get("language") == "typescript"
-    }
-    type_edges = {
-        (edge.from_id, edge.to_id, edge.type)
-        for edge in state.edges
-        if edge.namespace == "loci"
-        and edge.type in _TYPE_TO_FAMILY
-        and _TYPE_TO_FAMILY[edge.type] == 1
-        and edge.resolution in _ALLOWED_RESOLUTIONS
-    }
-
-    def resolved_record(record: Any) -> bool:
-        return (
-            record.status == "resolved"
-            and record.source_id in nodes
-            and record.target_id in nodes
-            and (record.source_id, record.target_id, record.raw.relation) in type_edges
-            and nodes[record.target_id].get("kind") not in _NATIVE_KINDS
-        )
-
-    inputs = sorted(
-        (
-            record for record in state.type_relations
-            if resolved_record(record)
-            and record.source_id in anchor_rank
-            and record.source_kind in _SIGNATURE_OWNER_KINDS
-            and record.raw.owner.kind in _SIGNATURE_OWNER_KINDS
-            and _proven_input_type_record(
-                record,
-                nodes[record.source_id],
-                typescript_parameter_span=typescript_parameter_spans.get(record.source_id),
-            )
-        ),
-        key=lambda record: (
-            anchor_rank[record.source_id], record.raw.line, record.raw.column,
-            record.target_id,
-        ),
-    )
-    dependencies: dict[str, list[Any]] = defaultdict(list)
-    for record in state.type_relations:
-        if (
-            resolved_record(record)
-            and record.source_kind in _CONTRACT_OWNER_KINDS
-            and record.raw.owner.kind in _CONTRACT_OWNER_KINDS
-            and record.raw.context in _CONTRACT_TYPE_CONTEXTS
-        ):
-            dependencies[record.source_id].append(record)
-
-    paths: list[tuple[str, ...]] = []
-    for anchor_id in anchor_ids:
-        authored_inputs = [record for record in inputs if record.source_id == anchor_id]
-        fallback = None
-        for record in authored_inputs:
-            direct = (record.source_id, record.target_id)
-            if fallback is None:
-                fallback = direct
-            downstream = sorted(
-                dependencies.get(record.target_id, ()),
-                key=lambda value: (value.raw.line, value.raw.column, value.target_id),
-            )
-            if downstream:
-                paths.append((*direct, downstream[0].target_id))
-                break
-        else:
-            if fallback is not None:
-                paths.append(fallback)
-    return tuple(paths)
-
-
-def _proven_input_type_record(
-    record: Any,
-    source_node: Mapping[str, Any],
-    *,
-    typescript_parameter_span: tuple[int, int] | None = None,
-) -> bool:
-    """Accept only annotations whose indexed evidence proves an input position."""
-    raw = record.raw
-    if raw.context != "annotation":
-        return False
-    if raw.language in {"python", "go", "rust"}:
-        # These extractors assign ``annotation`` only while visiting callable
-        # parameters (and Go receivers); returns and declaration fields receive
-        # separate controlled contexts.
-        return True
-    if raw.language != "typescript":
-        return False
-
-    # The shared TypeScript observer also uses ``annotation`` for local variable
-    # declarations and for annotations nested in generic constraints.  Parse the
-    # bounded stored signature and require the exact site to fall in the outer
-    # callable declaration's structural parameter field.  Decorated or multiline
-    # declarations whose first-line signature cannot prove that position remain
-    # ordinary edges.
-    start = source_node.get("byte_offset")
-    if typescript_parameter_span is None or type(start) is not int:
-        return False
-    relative_start = raw.start_byte - start
-    relative_end = raw.end_byte - start
-    parameter_start, parameter_end = typescript_parameter_span
-    return parameter_start <= relative_start and relative_end <= parameter_end
-
-
-def _typescript_parameter_span(
-    source_node: Mapping[str, Any],
-) -> tuple[int, int] | None:
-    """Parse one bounded stored signature and locate its outer parameters."""
-    signature = source_node.get("signature")
-    if not isinstance(signature, str):
-        return None
-    encoded = signature.encode("utf-8")
-    if len(encoded) > 16_384:
-        return None
-    try:
-        from tree_sitter import Parser
-        from tree_sitter_language_pack import get_language
-
-        grammar = "tsx" if str(source_node.get("file_path", "")).endswith(".tsx") \
-            else "typescript"
-        root = Parser(get_language(grammar)).parse(encoded).root_node
-    except Exception:
-        return None
-
-    pending = [root]
-    while pending:
-        node = pending.pop()
-        if node.type in {
-            "function_declaration", "function_expression", "method_definition",
-        }:
-            parameters = node.child_by_field_name("parameters")
-            if parameters is not None:
-                return parameters.start_byte, parameters.end_byte
-        pending.extend(reversed(node.named_children))
-    return None
-
-
-def _selected_anchor_type_bridges(
-    visits: Sequence[_Visit],
-    adjacency: Mapping[str, Sequence[GraphTraversalStep]],
-    nodes: Mapping[str, Mapping[str, Any]],
-) -> tuple[str, ...]:
-    """Find declaration nodes joined to at least two selected anchors by types."""
-    anchors_by_target: dict[str, set[int]] = defaultdict(set)
-    for visit in visits:
-        for step in adjacency.get(visit.node_id, ()):
-            target = nodes[step.to_id]
-            if (
-                _TYPE_TO_FAMILY[step.edge.type] == 1
-                and target.get("kind") not in _NATIVE_KINDS
-            ):
-                anchors_by_target[step.to_id].add(visit.anchor_index)
-    return tuple(
-        target_id
-        for target_id, anchor_indexes in sorted(
-            anchors_by_target.items(),
-            key=lambda item: (tuple(sorted(item[1])), item[0]),
-        )
-        if len(anchor_indexes) >= 2
-    )
-
-
-@dataclass(frozen=True)
-class _Lift:
-    node: Mapping[str, Any]
-    basis: str
-
-
-def _ownership_lifts(
-    source: RetrievalSource,
-    node: Mapping[str, Any],
-    query_terms: set[str],
-) -> tuple[_Lift, ...]:
-    if node.get("kind") not in _NATIVE_KINDS:
-        owner = source.file_owner(node)
-        return (_Lift(owner, "indexed_file"),) if owner is not None else ()
-    basis = {
-        "file": "indexed_file",
-        "package": "go_package",
-        "crate": "rust_crate",
-        "module": "swift_module",
-    }[str(node["kind"])]
-    return tuple(
-        _Lift(member, basis)
-        for member in source.endpoint_members(
-            node, query_terms, limit=LIMITS["max_owner_members"],
-        )
-    )
+    return _PreparedRetrieval(source, anchors, packer)
 
 
 def _anchor_addition(
     source: RetrievalSource,
     node: Mapping[str, Any],
-    index: int,
     anchor: _SelectedAnchor,
+    preview_budget: int,
 ) -> tuple[Addition, bool]:
     nodes: list[Mapping[str, Any]] = [node]
     ownership = []
     items = []
-    missing_source = False
+    missing_source = True
     if _source_node(node) or node.get("kind") == "file":
         try:
             full = source.definition(node)
-            preview, complete = preview_span(full, LIMITS["max_anchor_source_bytes"])
+            missing_source = False
             items.append(ItemInput(node, "anchor", 0, "Explicit source identity" if not anchor.matched_terms
                                    else "Query matches " + ", ".join(anchor.matched_terms[:4]),
-                                   full, preview, complete))
+                                   full, full, True, anchor.literal_match, preview_budget))
         except (KeyError, UnicodeError, ValueError):
             missing_source = True
     owner = source.file_owner(node)
@@ -769,118 +169,6 @@ def _anchor_addition(
         nodes.append(owner)
         ownership.append((str(owner["id"]), str(node["id"]), "indexed_file"))
     return Addition(tuple(nodes), tuple(items), tuple(ownership)), missing_source
-
-
-def _lift_addition(
-    source: RetrievalSource,
-    owner: Mapping[str, Any],
-    member: Mapping[str, Any],
-    basis: str,
-    depth: int,
-) -> tuple[Addition, bool]:
-    if member.get("kind") == "file" and owner.get("kind") not in _NATIVE_KINDS:
-        return Addition(
-            nodes=(owner, member),
-            ownership=((str(member["id"]), str(owner["id"]), "indexed_file"),),
-        ), False
-    missing_source = False
-    try:
-        full = source.definition(member)
-        preview, complete = preview_span(full, LIMITS["max_related_source_bytes"])
-        items = (ItemInput(member, "related", depth, "Validated ownership context",
-                           full, preview, complete),)
-    except (KeyError, UnicodeError, ValueError):
-        items = ()
-        missing_source = True
-    return Addition(
-        nodes=(owner, member),
-        items=items,
-        ownership=((str(owner["id"]), str(member["id"]), basis),),
-    ), missing_source
-
-
-def _relation_addition(
-    source: RetrievalSource,
-    current: Mapping[str, Any],
-    target: Mapping[str, Any],
-    step: GraphTraversalStep,
-    proof: tuple,
-    depth: int,
-    *,
-    include_item: bool,
-) -> tuple[Addition, bool]:
-    nodes: list[Mapping[str, Any]] = [current, target]
-    items = []
-    ownership = []
-    missing_source = False
-    if include_item and _source_node(target):
-        try:
-            full = source.definition(target)
-            preview, complete = preview_span(full, LIMITS["max_related_source_bytes"])
-            items.append(ItemInput(target, "related", depth,
-                                   f"Selected by {step.edge.type}", full, preview, complete))
-        except (KeyError, UnicodeError, ValueError):
-            missing_source = True
-        owner = source.file_owner(target)
-        if owner is not None:
-            nodes.append(owner)
-            ownership.append((str(owner["id"]), str(target["id"]), "indexed_file"))
-    configuration = source.resolution_configuration(step.edge)
-    return Addition(
-        nodes=tuple(nodes),
-        items=tuple(items),
-        ownership=tuple(ownership),
-        relation=RelationInput(step.edge, step.traversed, proof, configuration),
-    ), missing_source
-
-
-def _eligible_edges(
-    edges: Sequence[GraphEdge],
-    nodes: Mapping[str, Mapping[str, Any]],
-) -> tuple[GraphEdge, ...]:
-    unique = {
-        edge_identity(edge): edge
-        for edge in edges
-        if edge.namespace == "loci"
-        and edge.type in _TYPE_TO_FAMILY
-        and edge.resolution in _ALLOWED_RESOLUTIONS
-        and edge.from_id in nodes and edge.to_id in nodes
-    }
-    return tuple(unique[key] for key in sorted(unique))
-
-
-def _ranked_neighbors(
-    neighbors: Sequence[GraphTraversalStep],
-    nodes: Mapping[str, Mapping[str, Any]],
-    query_terms: set[str],
-    degrees: Mapping[str, int],
-) -> list[GraphTraversalStep]:
-    def key(step: GraphTraversalStep) -> tuple[Any, ...]:
-        node = nodes[step.to_id]
-        text = " ".join(str(node.get(value, "")) for value in
-                        ("name", "file_path", "signature"))
-        overlap = len(query_terms & set(graph_text_terms(text)))
-        edge = step.edge
-        return (
-            _queue_index(step), -overlap, degrees.get(step.to_id, 0), step.to_id,
-            edge.type, edge.from_id, edge.to_id, edge.evidence.file,
-            edge.evidence.line, edge.evidence.content_hash, step.traversed,
-        )
-
-    grouped: dict[int, list[GraphTraversalStep]] = defaultdict(list)
-    for step in neighbors:
-        grouped[_queue_index(step)].append(step)
-    queues = [deque(sorted(grouped[index], key=key)) for index in range(8)]
-    result = []
-    while any(queues):
-        for queue in queues:
-            if queue:
-                result.append(queue.popleft())
-    return result
-
-
-def _queue_index(step: GraphTraversalStep) -> int:
-    return _TYPE_TO_FAMILY[step.edge.type] * 2 + (0 if step.traversed == "forward" else 1)
 
 
 def _select_anchors(
@@ -908,8 +196,12 @@ def _select_anchors(
                            "omitted_candidates": 0}, "exact_file", {"bytes": 0, "files": 0}, omissions
 
     eligible = [node for node in nodes.values() if _source_node(node)]
-    selection = select_graph_anchors(eligible, query, (), max_anchors=LIMITS["max_anchors"])
-    if selection.anchors:
+    exact_symbols = [node for node in eligible if query.strip() in {
+        node.get("name"), node.get("qualified_name"),
+    }]
+    selection = select_graph_anchors(exact_symbols or eligible, query, (),
+                                     max_anchors=LIMITS["max_anchors"])
+    if selection.anchors and exact_symbols:
         anchors = tuple(_from_graph_anchor(anchor) for anchor in selection.anchors)
         if selection.omitted_candidates:
             omissions["anchor_limit"] += selection.omitted_candidates
@@ -926,6 +218,17 @@ def _select_anchors(
         omissions["lookup_limit"] += 1
     if unavailable:
         omissions["source_unavailable"] += unavailable
+    if not literal and selection.anchors:
+        anchors = tuple(_from_graph_anchor(anchor) for anchor in selection.anchors)
+        if selection.omitted_candidates:
+            omissions["anchor_limit"] += selection.omitted_candidates
+        if selection.qualified_candidates > 1:
+            omissions["ambiguous_anchor"] += selection.qualified_candidates - 1
+        return anchors, {
+            "mode": "inferred",
+            "candidate_count": selection.qualified_candidates,
+            "omitted_candidates": selection.omitted_candidates,
+        }, "symbol_metadata", stats, omissions
     omitted = max(0, len(literal) - LIMITS["max_anchors"])
     anchors = tuple(literal[:LIMITS["max_anchors"]])
     if omitted:
@@ -1010,7 +313,10 @@ def _literal_anchors(
             else:
                 node = file_node
             node_id = str(node["id"])
-            selected.setdefault(node_id, _SelectedAnchor(node_id, 0.0, (), ("source_literal",)))
+            selected.setdefault(node_id, _SelectedAnchor(
+                node_id, 0.0, (), ("source_literal",),
+                (offset, offset + len(needle)),
+            ))
             if matches >= LIMITS["max_literal_matches"]:
                 limited = True
                 break
@@ -1027,25 +333,6 @@ def _markdown_page_root(node: Mapping[str, Any]) -> bool:
     if not isinstance(markdown, Mapping):
         return False
     return markdown.get("page_root") is True or markdown.get("root_id") == node.get("id")
-
-
-def _count_unresolved(packer: RetrievalPacker, state: GraphIndexState, node_id: str) -> None:
-    for record in (*state.imports, *state.symbol_references, *state.calls, *state.type_relations):
-        owner = getattr(record, "source_id", getattr(record, "caller_id", None))
-        if owner != node_id or getattr(record, "status", None) == "resolved":
-            continue
-        reason = str(getattr(record, "unresolved_reason", ""))
-        if "ambiguous" in reason:
-            omission = "ambiguous_relation"
-        elif "external" in reason:
-            omission = "external_relation"
-        elif "inaccessible" in reason or "private" in reason:
-            omission = "inaccessible_relation"
-        elif "unsupported" in reason:
-            omission = "unsupported_semantics"
-        else:
-            omission = "unresolved_relation"
-        packer.omit(omission)
 
 
 def _validate_request(query: str, seed_ids: list[str] | None) -> tuple[str, ...]:

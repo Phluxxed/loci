@@ -1,4 +1,4 @@
-"""Fixed graph-on/off Loci MCP control with per-call source receipts.
+"""Retained graph-on/off experiment receipts and evaluation support.
 
 This server is benchmark infrastructure.  The selected arm, target repository,
 Loci store and receipt directory are bound by one startup configuration and are
@@ -7,7 +7,6 @@ not caller-selectable tool arguments.
 from __future__ import annotations
 
 import argparse
-import asyncio
 from dataclasses import dataclass
 import hashlib
 import json
@@ -15,19 +14,15 @@ import os
 from pathlib import Path, PurePosixPath
 import threading
 import time
-from typing import Annotated, Any, Callable, Literal, Mapping
+from typing import Any, Literal, Mapping
 import uuid
 
 from mcp.server.mcpserver import MCPServer
 from mcp.types import CallToolResult, TextContent
-from pydantic import ConfigDict, Field
 
 from loci import service
-from loci._retrieval_output import Addition, LIMITS
 from loci.graph.contracts import GraphContractError
 from loci.graph.profiles import read_contained_file
-from loci.retrieval import _anchor_addition, _prepare_context
-from loci.retrieval_io import finalize_response
 from loci.storage.store_identity import initialize_store
 from loci.storage.store_resolver import activate_mcp_store
 
@@ -134,56 +129,15 @@ def bind_runtime_store(config: ControlConfig) -> None:
     activate_mcp_store(binding)
 
 
+RETIREMENT_MESSAGE = (
+    "Graph-on/off complete-work execution requires the pinned legacy Loci checkout; "
+    "source-context-v1 does not implement those experimental arms. "
+    "Historical receipts and evaluation remain readable."
+)
+
+
 def prepare_target_index(config: ControlConfig) -> dict[str, Any]:
-    """Create the bound store and fully index the clean target before timing."""
-    bind_runtime_store(config)
-    return service.index_repo(config.target_root, incremental=False)
-
-
-def retrieve_direct_source(
-    repo: Path,
-    query: str = "",
-    *,
-    seed_ids: list[str] | None = None,
-) -> dict[str, Any]:
-    """Run maintained selection and direct-source packing without graph traversal."""
-    store, nodes, state = service._load_graph_context(repo, ensure_fresh=True)
-    coverage = service.query_coverage_from_index(
-        service._load_required_index(store, repo), "indexed_symbols",
-    )
-    prepared = _prepare_context(
-        repo,
-        store,
-        nodes,
-        state,
-        query,
-        seed_ids=seed_ids,
-        coverage=coverage["state"],
-    )
-    packer = prepared.packer
-    visited: set[str] = set()
-    for index, anchor in enumerate(prepared.anchors):
-        if anchor.node_id in visited:
-            packer.omit("alternative_path")
-            continue
-        if len(visited) >= LIMITS["max_nodes"]:
-            packer.omit("node_limit")
-            break
-        visited.add(anchor.node_id)
-        node = nodes[anchor.node_id]
-        addition, missing_source = _anchor_addition(prepared.source, node, index, anchor)
-        if missing_source:
-            packer.omit("source_unavailable")
-        # _anchor_addition also returns indexed-file membership.  The direct
-        # control retains only the selected identity and its exact source.
-        packer.add(Addition(nodes=(node,), items=addition.items))
-    if not prepared.anchors:
-        packer.omit("no_anchor")
-    packer.usage["nodes_examined"] = len(visited)
-    payload = packer.finish()
-    payload["policy"] = DIRECT_POLICY
-    payload["scope"]["relationships"] = "omitted_by_benchmark_control"
-    return finalize_response(payload, payload["usage"]["evidence_bytes"])
+    raise ValueError(RETIREMENT_MESSAGE)
 
 
 class ReceiptStore:
@@ -470,141 +424,8 @@ def _error_result(code: str, message: str, details: Mapping[str, Any]) -> CallTo
     )
 
 
-class ControlAdapter:
-    def __init__(self, config: ControlConfig) -> None:
-        self.config = config
-        self.receipts = ReceiptStore(config)
-        self.lock = asyncio.Lock()
-
-    def _repo(self, supplied: str) -> Path:
-        try:
-            candidate = Path(supplied).resolve(strict=True)
-        except (OSError, RuntimeError) as exc:
-            raise _RepositoryUnavailable("repository path is unavailable") from exc
-        if candidate != self.config.target_root:
-            raise _RepositoryOutOfScope(
-                "repository is outside the configured benchmark target"
-            )
-        return candidate
-
-    def call(
-        self,
-        operation: Literal["loci_retrieve", "loci_read"],
-        arguments: Mapping[str, Any],
-        invoke: Callable[[Path], dict[str, Any]],
-    ) -> CallToolResult:
-        started = time.time_ns()
-        try:
-            repo = self._repo(str(arguments["repo"]))
-            payload = invoke(repo)
-            result = CallToolResult(content=[], structured_content=payload, is_error=False)
-        except _RepositoryOutOfScope as exc:
-            result = _error_result(
-                "REPOSITORY_OUT_OF_SCOPE", str(exc),
-                {"configured_target": str(self.config.target_root)},
-            )
-        except _RepositoryUnavailable as exc:
-            result = _error_result("INVALID_REPOSITORY", str(exc), {})
-        except service.LociError as exc:
-            result = _error_result(exc.code, exc.message, exc.details)
-        except GraphContractError as exc:
-            result = _error_result(exc.code, exc.message, exc.details)
-        except Exception as exc:
-            result = _error_result(
-                "BENCHMARK_CONTROL_FAILURE",
-                "Benchmark Loci control failed",
-                {"exception": type(exc).__name__, "message": str(exc)},
-            )
-        try:
-            return self.receipts.record(
-                operation, arguments, result, started_unix_ns=started,
-            )
-        except Exception as exc:
-            return _error_result(
-                "RECEIPT_WRITE_FAILED",
-                "Benchmark call receipt could not be persisted",
-                {"exception": type(exc).__name__, "message": str(exc)},
-            )
-
-
 def create_server(config: ControlConfig) -> MCPServer:
-    """Create the identical two-tool MCP surface used by both fixed arms."""
-    adapter = ControlAdapter(config)
-    server = MCPServer(
-        "loci",
-        instructions=(
-            "Retrieve deterministic bounded source context from the configured "
-            "benchmark repository and expand exact returned source extents."
-        ),
-    )
-
-    @server.tool(structured_output=False)
-    async def loci_retrieve(
-        repo: Annotated[str, Field(strict=True, min_length=1)],
-        query: Annotated[
-            str, Field(strict=True, json_schema_extra={"x-maxUtf8Bytes": 4096}),
-        ] = "",
-        seed_ids: Annotated[
-            list[Annotated[str, Field(strict=True, min_length=1)]] | None,
-            Field(default=None, max_length=5, json_schema_extra={"uniqueItems": True}),
-        ] = None,
-    ) -> CallToolResult:
-        """Retrieve deterministic bounded static source context.
-
-        Provide a query or up to five exact seed IDs returned earlier. An exact
-        indexed relative file path in ``query`` selects that file; other queries
-        select bounded source candidates. The repository refreshes automatically.
-        Results report source, any relationship proof made available by the
-        fixed startup policy, ambiguity and omissions. Use
-        an incomplete item's short ``source_ref`` with ``loci_read`` to hydrate its
-        exact source, or pass a returned node ID as a seed to re-anchor under the
-        fixed startup policy. Relationships are static and non-exhaustive.
-        """
-        arguments = {"repo": repo, "query": query, "seed_ids": seed_ids}
-        async with adapter.lock:
-            if config.arm == "on":
-                invoke = lambda target: service.retrieve(
-                    target, query=query, seed_ids=seed_ids, ensure_fresh=True,
-                )
-            else:
-                invoke = lambda target: retrieve_direct_source(
-                    target, query=query, seed_ids=seed_ids,
-                )
-            return adapter.call("loci_retrieve", arguments, invoke)
-
-    @server.tool(structured_output=False)
-    async def loci_read(
-        repo: Annotated[str, Field(strict=True, min_length=1)],
-        source_ref: Annotated[str, Field(strict=True, min_length=1)],
-    ) -> CallToolResult:
-        """Expand one exact source extent named by a returned ``source_ref``.
-
-        Pass the returned short handle unchanged. Follow ``next_source_ref``
-        until it is null to page an incomplete extent. An unknown or expired
-        handle requires fresh ``loci_retrieve`` context in the same repository.
-        ``SOURCE_STALE`` means the indexed source changed; make a fresh
-        ``loci_retrieve`` request instead of reusing the old locator.
-        """
-        arguments = {"repo": repo, "source_ref": source_ref}
-        async with adapter.lock:
-            return adapter.call(
-                "loci_read",
-                arguments,
-                lambda target: service.read(target, source_ref, ensure_fresh=True),
-            )
-
-    _strict_tool_arguments(server)
-    return server
-
-
-def _strict_tool_arguments(server: MCPServer) -> None:
-    for tool in server._tool_manager.list_tools():
-        model = tool.fn_metadata.arg_model
-        config = dict(model.model_config)
-        config.update({"extra": "forbid", "strict": True})
-        model.model_config = ConfigDict(**config)
-        model.model_rebuild(force=True)
-        tool.parameters = model.model_json_schema(by_alias=True)
+    raise ValueError(RETIREMENT_MESSAGE)
 
 
 def load_receipts(receipt_dir: str | Path) -> list[dict[str, Any]]:
@@ -667,8 +488,9 @@ def main(argv: list[str] | None = None) -> None:
         result = prepare_target_index(config)
         print(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(",", ":")))
         return
+    server = create_server(config)
     bind_runtime_store(config)
-    create_server(config).run(transport="stdio")
+    server.run(transport="stdio")
 
 
 if __name__ == "__main__":
@@ -685,5 +507,4 @@ __all__ = [
     "main",
     "prepare_target_index",
     "receipt_source_bytes",
-    "retrieve_direct_source",
 ]

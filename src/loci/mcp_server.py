@@ -199,8 +199,9 @@ def create_server(
     mcp = LociMCP(
         "loci",
         instructions=(
-            "Retrieve deterministic bounded source context and expand exact returned "
-            "source extents from the loci cache. Successful results are in "
+            "Select bounded indexed source with source-context-v1 and expand exact "
+            "returned extents from the loci cache. Relationships are not selected. "
+            "Successful results are in "
             "structuredContent; content is empty. In Code Mode, store the raw "
             "result under a unique key before displaying result.structuredContent "
             "?? result. Recover a display mistake from that saved result."
@@ -230,15 +231,16 @@ def create_server(
             ),
         ] = None,
     ) -> Annotated[CallToolResult, LociRetrieveOutput]:
-        """Retrieve deterministic bounded static source context.
+        """Select bounded indexed source under source-context-v1.
 
         Provide a query or up to five exact seed IDs returned earlier. An exact
         indexed relative file path in ``query`` selects that file; other queries
-        select bounded source candidates. The repository refreshes automatically.
-        Results include source, relationship proof, ambiguity and omissions. Use
-        an incomplete item's short ``source_ref`` with ``loci_read`` to hydrate its
-        exact source, or pass a returned node ID as a seed to re-anchor under the
-        same fixed policy. Relationships are static and non-exhaustive.
+        rank bounded source candidates, including matching source literals before
+        weak metadata. Source freshness is automatic and does not refresh graph
+        data. Results include source, ambiguity and omissions; relationships are
+        not selected. Use an incomplete item's short ``source_ref`` with
+        ``loci_read`` to continue its exact owning extent, or pass a returned node
+        ID as a seed for further source context.
         """
         _validate_normal_retrieve_request(query, seed_ids)
         return _handle_loci_error(
@@ -258,10 +260,10 @@ def create_server(
         """Expand one exact source extent named by a returned ``source_ref``.
 
         Pass the returned short handle unchanged. Follow ``next_source_ref``
-        until it is null to page an incomplete extent. An unknown or expired
+        until it is null to page an incomplete extent. An unknown or unavailable
         handle requires fresh ``loci_retrieve`` context in the same repository.
-        ``SOURCE_STALE`` means the indexed source changed; make a fresh
-        ``loci_retrieve`` request instead of reusing the old locator.
+        Cross-repository and stale handles are refused. ``SOURCE_STALE`` means
+        the indexed source changed; make a fresh ``loci_retrieve`` request.
         """
         return _handle_loci_error(
             lambda service: service.read(

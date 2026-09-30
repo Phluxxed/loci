@@ -1,20 +1,20 @@
 ---
 name: loci
-description: Agent-owned codebase navigation infrastructure. Use when repository work needs source retrieval or relationship tracing. For standalone documentation or configuration checks where symbol navigation is irrelevant, use a targeted direct read. Skip retrieval only when relevant source from the target checkout is already observed, current, and sufficient.
+description: Agent-owned codebase navigation infrastructure. Use when repository work needs indexed source retrieval. For standalone documentation or configuration checks where symbol navigation is irrelevant, use a targeted direct read. Skip retrieval only when relevant source from the target checkout is already observed, current, and sufficient.
 ---
 
 # loci — codebase retrieval
 
-Use Loci's normal MCP operation for repository source discovery and relationship
-tracing. Supply the actual repository root and the question or known identity.
-Loci selects graph context deterministically inside the operation.
+Use Loci's normal MCP operations for repository source discovery and exact
+continuation. Supply the actual repository root and the question or known
+identity. `source-context-v1` selects bounded source anchors.
 
 ## Inspect evidence before acting
 
 A filename, recalled summary or startup index count is not source inspection.
 Skip retrieval only when the relevant source from the target checkout is already
 observed, current and sufficient for this action. Refresh affected evidence after
-edits. Exact edits require the full affected source, including relevant callers
+edits. Exact edits require the full affected source. Inspect callers separately
 when the change depends on them.
 
 ## Normal workflow
@@ -63,15 +63,14 @@ text(JSON.stringify({
     ({node_id, role, source_ref, complete, extent})),
   sources: packet.sources?.map(({id, file, source_ref, content_hash, start_line, end_line}) =>
     ({id, file, source_ref, content_hash, start_line, end_line})),
-  relationship_count: packet.relationships?.length,
+  relationship_scope: packet.scope?.relationships,
   omissions: packet.omissions,
   usage: packet.usage,
   recovery_key: "loci.retrieve.1"
 }));
 ```
 
-Use `load("loci.retrieve.1")` to inspect the selected full source and its
-relationships in separate bounded outputs; the saved result contains both.
+Use `load("loci.retrieve.1")` to inspect selected source in bounded outputs.
 For `loci_read`, save the raw result, display status, source metadata,
 `complete`, and `next_source_ref`, then display the source content in bounded
 pieces. Follow the next reference when needed. Do not drop coverage or
@@ -79,30 +78,31 @@ omissions from the conclusion merely because the first receipt is compact.
 Recover a display mistake from the saved result. Inspect returned errors before
 consuming success fields.
 
-Use `loci_retrieve` for initial discovery and further context. It creates or
-refreshes the index and runs the maintained graph policy. The response includes
-candidate identities, selected source, proved relationships, coverage and
-omissions. Read the returned source and proof before deciding it is sufficient.
+Use `loci_retrieve` for initial discovery and further source context. It creates
+or refreshes the source index and returns candidate identities, selected source,
+coverage and omissions. Exact IDs and indexed paths select directly; matching
+source literals compete before weak metadata and their excerpts include the
+match when possible. Read the returned source before deciding it is sufficient.
 Several candidates remain alternatives; an omitted match is not disproved.
 
 For an incomplete source item, pass its short `source_ref` unchanged to
 `loci_read`. Follow `next_source_ref` until the exact source needed is complete.
 A stale or unavailable reference requires fresh retrieval. Re-anchor a returned
-node ID with `loci_retrieve` when further context is needed. Repeating an identical request
-against an unchanged snapshot returns the same bounded selection.
+node ID with `loci_retrieve` when more source context is needed. Repeating an
+identical request against an unchanged snapshot returns the same bounded selection.
 
-Both operations take `repo`. Traversal families, direction, depth, ranking and
-budgets are owned by Loci; there are no per-request policy controls. An import's
-file/package/module endpoint remains distinct from its selected declarations.
-The `ownership` field describes indexed source membership and is not a semantic
-relationship. A zero-edge packet does not prove that no dependencies exist.
+Both operations take `repo`. Loci owns selection and byte budgets; there are no
+per-request policy controls. A full selected definition is returned when it
+fits; otherwise use the excerpt and exact owning-extent `source_ref`. Indexed
+file ownership identities remain distinct from declarations. `ownership`, when
+present, describes indexed source membership. Normal `relationships=[]` and
+`scope.relationships="not_selected"` do not establish independence.
 
 ## Coverage and failures
 
-Preserve partial/unknown coverage and unsupported, unresolved, ambiguous,
-external, inaccessible, stale and budget omissions in conclusions. Stored edges
-prove only the supported static relationship, not runtime dispatch or exhaustive
-impact. Rust `declared_possible` configuration remains possible.
+Preserve partial/unknown coverage, candidate ambiguity, inaccessible or stale
+source, and budget omissions in conclusions. Source selection does not report
+callers, tests, type dependencies or other graph expansion.
 
 Treat `structuredContent.error` as a failure with a code, message and details.
 For `REPOSITORY_ROOT_OVERLAP` with `relationship=requested_descendant`, retry
@@ -132,6 +132,6 @@ itself through that surface, consult
 Read [normal-retrieval.md](references/normal-retrieval.md) when interpreting the
 normal packet, exact-source continuation or work limits. Read
 [language-resolution.md](references/language-resolution.md) when a particular
-language's static resolution guarantee or omission affects the task.
+language's diagnostic static resolution guarantee or omission affects the task.
 Resolve a file-symlinked `SKILL.md` to its real source path before following
 relative references.

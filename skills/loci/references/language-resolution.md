@@ -1,10 +1,10 @@
 # Language-specific resolution
 
-Normal `loci_retrieve` composes existing proved calls, types, values and imports
-without an agent-selected intent. The resolver limits below still apply to its
-relationships. Recipes naming `loci_explore`, `loci_graph_*` or exact legacy tools
-refer to the operator diagnostic surface; intent-specific exploration coverage
-does not restrict the new normal policy's eligible stored edge families.
+Normal `loci_retrieve` selects source without relationship expansion. The
+resolution contracts below describe the operator-selected diagnostic surface:
+`loci_explore`, `loci_graph_*` and exact legacy tools. They do not describe
+normal source selection or imply that an empty normal relationship array proves
+independence.
 
 ## Contents
 
@@ -50,12 +50,12 @@ branches; selection does not increase relationship certainty.
 | Go | Exact package identity, import/package clauses and full contained `go.mod`/`go.work`/replacement controls | No implicit interface satisfaction, inferred method sets, promoted dispatch or active build/cgo/platform selection; dot/blank imports do not create symbol targets |
 | Rust | Exact lexical or Cargo/module-owned imported declaration, complete import/re-export/module statements, cfg attributes and Cargo controls | `declared_possible` retains supported conditions without choosing an active build. Divergent, inaccessible, external and unowned origins stay unproven; no macro expansion, associated projection inference, trait-object dispatch or implementing census |
 
-Go and Rust conservatively carry all indexed controls of their respective
-families. Large workspaces can therefore exhaust the evidence budget even for a
-short dependency path. A delivered related definition and its entire selected
-proof path form one atomic bundle; a budget-limited bundle is omitted. Anchors
-may be clipped on UTF-8 boundaries and report `complete=false`. Check packet
-omissions and the source coverage state independently of relationship scope.
+Diagnostic Go and Rust exploration conservatively carries all indexed controls
+of their respective families. Large workspaces can exhaust its evidence budget
+even for a short dependency path. A delivered related definition and its entire
+selected proof path form one atomic bundle; a budget-limited bundle is omitted.
+Anchors may be clipped on UTF-8 boundaries and report `complete=false`. Check
+packet omissions and source coverage independently of relationship scope.
 Use `loci_graph_references(family="type")`, the default symbol family and
 `loci_graph_calls` for specific unresolved reasons beyond aggregate omissions.
 For JS/TS resolver-control paths and hashes, inspect import/reference diagnostics;
@@ -143,6 +143,6 @@ it does not mean the current default Cargo build activates that edge. The
 resolved-symbol reference layer reaches a terminal Rust item only for the
 bounded, visibility-checked, configuration-convergent subset.
 
-Normal unresolved outcomes do not degrade graph health. Loci does not guess
+Expected unresolved outcomes do not degrade graph health. Loci does not guess
 targets by bare name, maintain a separate top-level import store, or expose an
 import CLI command.

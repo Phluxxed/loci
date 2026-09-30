@@ -104,7 +104,7 @@ restart. Choose the actual repository/workspace path.
 | `loci store repair-catalog [--max-repositories N] [--max-total-index-bytes N]` | Explicitly repairing legacy, corrupt, or interrupted inventory |
 
 These CLI routes are compatibility tooling and do not implement the normal
-deterministic context policy. Report that limitation when using the temporary
+`source-context-v1` policy. Report that limitation when using the temporary
 bridge. There is no CLI import, reference, or call command. Use diagnostic graph MCP tools
 for dependency, symbol-reference, and call traversal and diagnostics.
 

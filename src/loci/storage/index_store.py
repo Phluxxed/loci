@@ -281,15 +281,21 @@ class IndexStore:
         *,
         coverage: Mapping[str, Any] | None = None,
         graph_state: GraphIndexState | None = None,
+        source_only: bool = False,
     ) -> None:
-        persisted_graph = graph_state or GraphIndexState.empty()
-        persisted_graph = GraphIndexState.from_dict(persisted_graph.to_dict())
         indexed_nodes = {symbol.id: symbol.to_dict() for symbol in symbols}
-        _validate_graph_state(
-            persisted_graph,
-            indexed_nodes=indexed_nodes,
-            file_hashes=file_hashes,
-        )
+        if source_only:
+            self.validate_source_index({"symbols": [symbol.to_dict() for symbol in symbols],
+                                        "file_hashes": file_hashes})
+        persisted_graph = None
+        if not source_only:
+            persisted_graph = graph_state or GraphIndexState.empty()
+            persisted_graph = GraphIndexState.from_dict(persisted_graph.to_dict())
+            _validate_graph_state(
+                persisted_graph,
+                indexed_nodes=indexed_nodes,
+                file_hashes=file_hashes,
+            )
 
         cache_key = self._cache_key(repo_path)
         token = self._catalog.begin_mutation("write", cache_key)
@@ -326,13 +332,13 @@ class IndexStore:
             index_data = {
                 "schema_version": INDEX_SCHEMA_VERSION,
                 "extractor_version": EXTRACTOR_VERSION,
-                "graph_resolver_version": GRAPH_RESOLVER_VERSION,
+                "graph_resolver_version": None if source_only else GRAPH_RESOLVER_VERSION,
                 "symbols": [s.to_dict() for s in symbols],
                 "file_hashes": file_hashes,
                 "repo_path": str(
                     Path(self._canonical_repo(str(repo_path))).resolve()
                 ),
-                "graph": persisted_graph.to_dict(),
+                "graph": persisted_graph.to_dict() if persisted_graph is not None else None,
             }
             if coverage is not None:
                 index_data["coverage"] = dict(coverage)
@@ -361,6 +367,65 @@ class IndexStore:
 
     def get_graph_edges(self, repo_path: Path) -> list[GraphEdge]:
         return list(self.get_graph_state(repo_path).edges)
+
+    def validate_source_index(self, index: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
+        """Validate the metadata needed to select and read indexed source."""
+        from pathlib import PurePosixPath
+
+        def invalid(message: str) -> None:
+            raise GraphContractError("INVALID_SOURCE_INDEX", message, {})
+
+        def relative(value: Any) -> bool:
+            return (isinstance(value, str) and bool(value) and "\\" not in value
+                    and not PurePosixPath(value).is_absolute()
+                    and ".." not in PurePosixPath(value).parts
+                    and PurePosixPath(value).as_posix() == value)
+
+        if not isinstance(index, Mapping):
+            invalid("Source index must be an object")
+        hashes = index.get("file_hashes")
+        symbols = index.get("symbols")
+        if not isinstance(hashes, dict) or not isinstance(symbols, list):
+            invalid("Source index requires symbols and file hashes")
+        for path, content_hash in hashes.items():
+            if (not relative(path) or not isinstance(content_hash, str)
+                    or re.fullmatch(r"[0-9a-f]{64}", content_hash) is None):
+                invalid("Source index contains an invalid path or file hash")
+        nodes: dict[str, dict[str, Any]] = {}
+        for symbol in symbols:
+            if not isinstance(symbol, dict):
+                invalid("Source index contains an invalid symbol")
+            node_id = symbol.get("id")
+            if not isinstance(node_id, str) or not node_id or node_id in nodes:
+                invalid("Source index contains invalid or duplicate identities")
+            if any(not isinstance(symbol.get(key), str) for key in
+                   ("name", "qualified_name", "kind", "language", "file_path")):
+                invalid("Source index contains invalid symbol fields")
+            if not relative(symbol["file_path"]):
+                invalid("Source index contains an invalid symbol path")
+            if symbol["kind"] not in {"package", "crate", "module"}:
+                if symbol["file_path"] not in hashes:
+                    invalid("Source symbol is not in the indexed file inventory")
+                if any(type(symbol.get(key)) is not int or symbol[key] < 0
+                       for key in ("byte_offset", "byte_length")):
+                    invalid("Source index contains invalid byte extents")
+                content_hash = symbol.get("content_hash")
+                if (not isinstance(content_hash, str)
+                        or re.fullmatch(r"[0-9a-f]{64}", content_hash) is None):
+                    invalid("Source index contains an invalid symbol hash")
+                if symbol["kind"] == "file" and content_hash != hashes[symbol["file_path"]]:
+                    invalid("File identity differs from its indexed hash")
+            for key in ("signature", "docstring", "summary"):
+                if key in symbol and not isinstance(symbol[key], str):
+                    invalid("Source index contains invalid source metadata")
+            for key in ("keywords", "decorators"):
+                value = symbol.get(key, [])
+                if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+                    invalid("Source index contains invalid source metadata")
+            if not isinstance(symbol.get("metadata", {}), dict):
+                invalid("Source index contains invalid source metadata")
+            nodes[node_id] = symbol
+        return nodes
 
     def validate_graph_state(
         self,

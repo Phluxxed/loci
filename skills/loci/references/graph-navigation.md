@@ -1,9 +1,11 @@
 # Graph navigation and relationship contracts
 
 This is the operator diagnostic surface (`LOCI_MCP_SURFACE=diagnostic`). Normal
-repository retrieval uses `loci_retrieve`; its graph policy is automatic. See
-[normal-retrieval.md](normal-retrieval.md) for that workflow. The explicit
-intents and traversal controls below are diagnostic compatibility interfaces.
+`loci_retrieve` selects source under `source-context-v1` and does not traverse
+relationships. See [normal-retrieval.md](normal-retrieval.md) for that workflow.
+The explicit intents and traversal controls below are diagnostic interfaces.
+Graph indexing and freshness are separate from normal source reads. After a
+source change, refresh the diagnostic graph explicitly before using its edges.
 
 ## Contents
 
