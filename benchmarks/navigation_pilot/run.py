@@ -1,7 +1,7 @@
 """Run the frozen Ember navigation pilot through isolated Codex App Servers.
 
 Usage: /Users/brummerv/loci/.venv/bin/python -m benchmarks.navigation_pilot.run
-       --output /path/outside/the/source/repos [--preflight-only]
+       [--output ~/phluxxed/tmp/run-name] [--preflight-only]
 """
 from __future__ import annotations
 
@@ -52,7 +52,7 @@ def load_case() -> tuple[dict, str]:
 
 
 def check_output_location(output: Path, case: dict) -> Path:
-    output = output.resolve()
+    output = output.expanduser().resolve()
     roots = (ORIGINAL.resolve(), HARNESS.resolve(), Path(case["source_repository"]).resolve(strict=True))
     if any(output == root or output.is_relative_to(root) or root.is_relative_to(output) for root in roots):
         raise ValueError("output must be outside the Loci and Ember source repositories")
@@ -400,6 +400,7 @@ def execute(output: Path, *, preflight_only: bool = False) -> dict:
         raise RuntimeError(f"run with {PYTHON}")
     case, digest = load_case()
     output = check_output_location(output, case)
+    output.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
     output.mkdir(mode=0o700, parents=False, exist_ok=False)
     run_started = time.monotonic()
     result: dict = {"schema_version": 1, "case_id": case["case_id"], "case_sha256": digest,
@@ -528,7 +529,9 @@ def main() -> None:
         serve_target(args.serve_target)
         return
     if args.output is None:
-        parser.error("--output is required")
+        args.output = Path.home() / "phluxxed/tmp" / (
+            "loci-navigation-pilot-" + time.strftime("%Y%m%d-%H%M%S")
+        )
     os.umask(0o077)
     receipt = execute(args.output, preflight_only=args.preflight_only)
     print(json.dumps({"status": receipt["status"], "result": str(args.output / "result.json")}))

@@ -79,8 +79,17 @@ From the isolated branch:
 
 ```sh
 cd /Users/brummerv/phluxxed/loci-scalpel
-/Users/brummerv/loci/.venv/bin/python -m benchmarks.navigation_pilot.run --output /tmp/loci-navigation-pilot-20260930
+/Users/brummerv/loci/.venv/bin/python -m benchmarks.navigation_pilot.run --output "$HOME/phluxxed/tmp/loci-navigation-pilot-20260930"
 ```
+
+Outputs live under `~/phluxxed/tmp`, outside the repositories and outside system
+temporary storage. The runner creates missing parent directories. Omitting
+`--output` uses a fresh timestamped directory under that same persistent base.
+Existing output directories are never overwritten.
+
+The earlier temporary probe directories have been copied and verified byte for
+byte under `~/phluxxed/tmp`; [host-blocker.json](host-blocker.json) records their
+persistent locations. Historical paths embedded in raw captures remain intact.
 
 Use a fresh output directory. For a check with no model generation, add
 `--preflight-only` and use a separate output directory. Actual runs use the
