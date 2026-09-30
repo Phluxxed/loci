@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "case_id": "ember-dependency-lifecycle",
+  "case_sha256": "a22c11fb0561051c8975163254101b3d9480f0a4f9c3d34f5acd5c0a6ef939de",
+  "model": "gpt-6.1-sol",
+  "reasoning_effort": "high",
+  "preflight_only": true,
+  "status": "preflight_failed_zero_episodes",
+  "arms": {
+    "vanilla": {
+      "preflight": {
+        "status": "failed",
+        "error": "strict command canary failed: {'exitCode': 71, 'stdout': '', 'stderr': 'sandbox-exec: sandbox_apply: Operation not permitted\\n'}"
+      },
+      "episode": "not_run",
+      "target": {
+        "commit": "85969df8efff36866c39f2d609dd3b685323c00b",
+        "archive_sha256": "b2b66cf64093d498e29ec8c112b256437075ce41e90192049d5dbdf8c3c7806f",
+        "archive_bytes": 3430400,
+        "path": "/private/tmp/loci-navigation-pilot-host-preflight-20260930/arms/vanilla/workspace"
+      },
+      "configuration": {
+        "profile": "loci_episode_read",
+        "project_doc_max_bytes": 0,
+        "loci_enabled": false,
+        "namespace": null,
+        "serving": null,
+        "instructions": {
+          "sha256": "e25ac4596b4721fdb528915d96dc9d5846e25a91bfbd65190efaddb0b9ed1ce6",
+          "bytes": 449,
+          "bundled_skill": null
+        }
+      },
+      "preflight_elapsed_ms": 232.938
+    },
+    "production": {
+      "preflight": {
+        "status": "failed",
+        "error": "strict command canary failed: {'exitCode': 71, 'stdout': '', 'stderr': 'sandbox-exec: sandbox_apply: Operation not permitted\\n'}"
+      },
+      "episode": "not_run",
+      "target": {
+        "commit": "85969df8efff36866c39f2d609dd3b685323c00b",
+        "archive_sha256": "b2b66cf64093d498e29ec8c112b256437075ce41e90192049d5dbdf8c3c7806f",
+        "archive_bytes": 3430400,
+        "path": "/private/tmp/loci-navigation-pilot-host-preflight-20260930/arms/production/workspace"
+      },
+      "serving": {
+        "commit": "9655a287ca28d758a8848b6622887c54f8f81a41",
+        "archive_sha256": "ddf478618de7e6a5c172eb98040a4e78a2597329e89785ec8e5d20530ef54086",
+        "archive_bytes": 246343680,
+        "path": "/private/tmp/loci-navigation-pilot-host-preflight-20260930/serving/production"
+      },
+      "configuration": {
+        "profile": "loci_episode_read",
+        "project_doc_max_bytes": 0,
+        "loci_enabled": true,
+        "namespace": "pilot-production-b6b1f7166925",
+        "serving": "/private/tmp/loci-navigation-pilot-host-preflight-20260930/serving/production",
+        "instructions": {
+          "sha256": "b5cc51298fc9d8e7d1d2fa7ba71a12f226e51a78247dd21ce2756106d6bd23d4",
+          "bytes": 7349,
+          "bundled_skill": "/private/tmp/loci-navigation-pilot-host-preflight-20260930/serving/production/skills/loci/SKILL.md"
+        }
+      },
+      "preflight_elapsed_ms": 1452.49
+    },
+    "source_context": {
+      "preflight": {
+        "status": "failed",
+        "error": "strict command canary failed: {'exitCode': 71, 'stdout': '', 'stderr': 'sandbox-exec: sandbox_apply: Operation not permitted\\n'}"
+      },
+      "episode": "not_run",
+      "target": {
+        "commit": "85969df8efff36866c39f2d609dd3b685323c00b",
+        "archive_sha256": "b2b66cf64093d498e29ec8c112b256437075ce41e90192049d5dbdf8c3c7806f",
+        "archive_bytes": 3430400,
+        "path": "/private/tmp/loci-navigation-pilot-host-preflight-20260930/arms/source_context/workspace"
+      },
+      "serving": {
+        "commit": "180a886c83ba1bf979661120cbb267eda5396556",
+        "archive_sha256": "56e50f84c97c00f19a909679e6578b61a3521c46b7625e782dbd30c55027f789",
+        "archive_bytes": 246343680,
+        "path": "/private/tmp/loci-navigation-pilot-host-preflight-20260930/serving/source_context"
+      },
+      "configuration": {
+        "profile": "loci_episode_read",
+        "project_doc_max_bytes": 0,
+        "loci_enabled": true,
+        "namespace": "pilot-source_context-b6b1f7166925",
+        "serving": "/private/tmp/loci-navigation-pilot-host-preflight-20260930/serving/source_context",
+        "instructions": {
+          "sha256": "7935c5d3b6170ceb26cc924e504eb6ab0ccd51668b1acf0b461264b19337fdc9",
+          "bytes": 7323,
+          "bundled_skill": "/private/tmp/loci-navigation-pilot-host-preflight-20260930/serving/source_context/skills/loci/SKILL.md"
+        }
+      },
+      "preflight_elapsed_ms": 1419.629
+    }
+  },
+  "limitations": [
+    "One task and one turn per condition; no statistical winner.",
+    "Prompt cache warmth is uncontrolled; cached and uncached input are separate.",
+    "No model reliance or unique source-read count is inferred from tool observations."
+  ],
+  "setup_elapsed_ms": 9326.663,
+  "total_elapsed_ms": 12439.613
+}

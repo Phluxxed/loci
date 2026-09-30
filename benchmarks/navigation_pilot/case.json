@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "case_id": "ember-dependency-lifecycle",
+  "source_repository": "/Users/brummerv/phluxxed/ember",
+  "source_commit": "85969df8efff36866c39f2d609dd3b685323c00b",
+  "model": "gpt-6.1-sol",
+  "reasoning_effort": "high",
+  "time_cap_seconds": 300,
+  "conditions": {
+    "vanilla": null,
+    "production": "9655a287ca28d758a8848b6622887c54f8f81a41",
+    "source_context": "180a886c83ba1bf979661120cbb267eda5396556"
+  },
+  "navigation_instruction_policy": "Vanilla receives only the common instructions. Each Loci arm additionally receives skills/loci/SKILL.md from its pinned product commit as developer instructions. Ambient host skills remain disabled. This product instruction difference is included in reported token usage; no reference documents or serving-source access are granted.",
+  "instructions": "Inspect this repository to answer the question. This is a read-only investigation: do not edit files, install dependencies, start application/model runs, or contact external services. Use the available local navigation tools as you judge useful. Ground each result in source file paths and line numbers. Distinguish CLI status output from chat context actions. Explain the actual behavior, including refusal paths; do not propose or implement a fix.",
+  "prompt": "An Ember graph has Work build active and Work checks complete. A pending proposal for Work ship depends on [build, checks] and has an acceptance Eval. An operator approves it, checks ember --status, then completes build through Ember and checks status again. Separately, an older restored graph marks ship ready even while build remains active. In that stale state, Ember's chat context offers :run ship. Trace the approval, state changes, status/context output, and attempted run. Does that attempt start Codex, alter the graph, or persist a run receipt? Identify the source responsible for each result.",
+  "oracle": [
+    {"id": "approval", "expected": "Pending approval materializes Work as ready, then reconciles idle Work before one save, leaving ship blocked because build is active.", "sources": ["src/ember/proposals.py", "src/ember/graph.py"]},
+    {"id": "blocked_display", "expected": "Ship appears under Blocked Work, blocked_by includes only build in depends_on order, and chat context does not offer :run ship. CLI status does not render chat action commands.", "sources": ["src/ember/status.py", "src/ember/chat.py"]},
+    {"id": "completion", "expected": "The active-to-complete transition of build reconciles dependencies before the same save. Ship becomes ready and appears under Ready Work; chat context now offers :run ship.", "sources": ["src/ember/graph.py", "src/ember/status.py", "src/ember/chat.py"]},
+    {"id": "stale_projection", "expected": "Status projection classifies by stored status and computes blockers only for blocked entries. It does not repair stale-ready state, so ship appears ready and chat context offers :run ship despite build being active.", "sources": ["src/ember/status.py", "src/ember/chat.py"]},
+    {"id": "claim_guard", "expected": "The run entrypoint calls GraphStore.claim_work before constructing the execution prompt, allocating the run ID, or starting Codex. require_runnable_work checks actual dependencies and raises WorkNotRunnable waiting on build before transition_work.", "sources": ["src/ember/execution.py", "src/ember/graph.py"]},
+    {"id": "refusal_effects", "expected": "The refused stale-ready attempt starts no Codex turn, leaves the graph unchanged, and saves no run receipt. Explicit dependency reconciliation would repair the stale-ready status to blocked.", "sources": ["src/ember/execution.py", "src/ember/graph.py", "src/ember/chat.py"]}
+  ],
+  "required_source_files": ["src/ember/proposals.py", "src/ember/graph.py", "src/ember/status.py", "src/ember/chat.py", "src/ember/execution.py"],
+  "scoring": "Score each fact 1 for correct and source-grounded, 0.5 for correct but incomplete or unsupported, 0 for missing/incorrect. Report critical contradictions separately. Freeze before trial output. This file and the oracle must remain outside trial visibility.",
+  "limits": ["One task and one run per condition; no statistical winner.", "Ember has 93 tracked files and substantial cross-module behavior, but is not a huge codebase.", "Observed navigation and delivered source do not reveal hidden reasoning or prove model reliance.", "No forced Loci use: unused tool access is a valid measured outcome.", "Warm provider prompt caches are not controllable; report cached and uncached input separately.", "No comparable dollar cost without verified account-specific pricing."]
+}
