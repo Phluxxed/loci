@@ -341,7 +341,7 @@ def summarize_wire(path: Path, thread_id: str, turn_id: str | None,
     mcp = [x for x in trace if x["type"] == "mcpToolCall"]
     shell = [x for x in trace if x["type"] == "commandExecution"]
     answers = [x for x in trace if x["type"] == "agentMessage" and isinstance(x.get("text"), str)]
-    final = [x for x in answers if x.get("phase") == "final"]
+    final = [x for x in answers if x.get("phase") == "final_answer"]
     subagent_starts = sum(x["type"] == "subAgentActivity" and x.get("kind") == "started"
                          for x in trace)
     selected = final[-1] if final else None

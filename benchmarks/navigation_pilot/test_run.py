@@ -95,7 +95,7 @@ class PilotRunTests(unittest.TestCase):
             event(7, "item/completed", {"item": {"id": "a1", "type": "agentMessage",
                                                 "phase": "commentary", "text": "thinking"}}),
             event(8, "item/completed", {"item": {"id": "a2", "type": "agentMessage",
-                                                "phase": "final", "text": "answer"}}),
+                                                "phase": "final_answer", "text": "answer"}}),
             event(9, "rawResponse/completed", {"responseId": "r1"}),
             event(10, "rawResponse/completed", {"responseId": "r1"}),
             event(11, "item/completed", {"item": {**shell, "aggregatedOutput": "conflict"}}),

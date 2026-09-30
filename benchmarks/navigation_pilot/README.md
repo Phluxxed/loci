@@ -2,12 +2,17 @@
 
 ## Current result
 
-**No valid comparison yet. The corrected runner awaits a terminal launch.**
+**The matched pilot is complete.** All three answers scored 6/6. Vanilla took
+149.1 seconds, production Loci 238.4 seconds, and source context 209.5 seconds.
+The new version improved on production; ordinary Codex used the least time and
+fewest tokens for this task. See the [completed comparison](results-20260930.md)
+for metrics, ordered navigation, graph delivery, scoring, and limitations.
 
-The latest attempted pilot started all three model turns but was interrupted by
-controller and cache-placement defects. Its partial measurements are preserved
-below; they cannot establish a winner. Corrections and focused verification are
-complete.
+Run `~/phluxxed/tmp/loci-navigation-pilot-20260930-141931` completed all three
+requested root turns with known usage and no subagents. Final answers were
+recovered offline from the runtime's `final_answer` phase; the decoder's phase
+check is corrected. Original receipts, prior failures, and interrupted runs
+remain preserved below. No further model run was required for recovery.
 
 ### Earlier preflight attempts
 
