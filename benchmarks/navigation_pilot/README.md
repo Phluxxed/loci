@@ -143,6 +143,50 @@ Use a fresh output directory. For a check with no model generation, add
 `--preflight-only` and use a separate output directory. Actual runs use the
 existing Codex account and consume its normal usage allowance.
 
+## Production graph toggle
+
+The paired mode runs two fresh arms, `graph_on` then `graph_off`, using production
+commit `9655a287ca28d758a8848b6622887c54f8f81a41` in both. Run it from an ordinary
+terminal with:
+
+```sh
+cd /Users/brummerv/phluxxed/loci-scalpel
+PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 TMPDIR="$HOME/phluxxed/tmp" /Users/brummerv/loci/.venv/bin/python -m benchmarks.navigation_pilot.run --graph-toggle
+```
+
+The default output is a fresh `~/phluxxed/tmp/loci-graph-toggle-<timestamp>`
+directory. Add `--preflight-only` for a check without model generation. Omit
+`--graph-toggle` to run the original three conditions.
+
+Both arms retain the frozen Ember commit, question, oracle, common instructions,
+production skill, normal tool descriptions and schemas, `gpt-6.1-sol` with high
+reasoning, and 300-second turn cap. The server binds production's internal
+`service.RetrievalRuntime(graph_enrichment=True/False)` for its whole process.
+Its hidden `--graph-enrichment on/off` setting is accepted only with
+`--serve-target`; trial tool arguments and response packets contain no runtime
+setting. Graph off keeps production's anchor selection, source packing,
+ownership, policy, graph freshness and loading, and `service.read`, while
+skipping graph enrichment. Both stores start cold outside the source archives;
+preflight checks tool inventories without preindexing.
+
+`result.json` preserves the original case hash and separately records the paired
+experiment's conditions, order, production pin and runtime flags. The original
+case's three conditions do not describe this pair. The same strict permission
+canary must pass before either measured turn starts; a nested host sandbox
+failure requires an ordinary terminal run. One task and one turn per arm can
+show the observed difference, without establishing a general graph advantage.
+
+Preparation passed eight focused runner checks and a model-free smoke of both
+actual production stdio commands. Their descriptors, instructions, anchor
+selection, anchor source and hydrated read source matched; graph on returned
+12 relationships for `src/ember/graph.py`, while off returned zero. Both rejected
+another repository and indexed 66 source paths without their own stores. See
+[validation receipt](graph-toggle-validation.json) for the retained packets and
+the corrected validator assumption. No paired model episodes have run yet.
+The earlier vanilla result is a reference, rather than a fresh matched arm in
+this pair. Graph off retains production's indexing cost; this comparison tests
+the enrichment switch, not removal of the graph engine.
+
 ## What to compare
 
 | Metric | Interpretation |

@@ -1,7 +1,7 @@
 """Run the frozen Ember navigation pilot through isolated Codex App Servers.
 
 Usage: /Users/brummerv/loci/.venv/bin/python -m benchmarks.navigation_pilot.run
-       [--output ~/phluxxed/tmp/run-name] [--preflight-only]
+       [--output ~/phluxxed/tmp/run-name] [--preflight-only] [--graph-toggle]
 """
 from __future__ import annotations
 
@@ -17,6 +17,7 @@ import subprocess
 import sys
 import tarfile
 import time
+from types import SimpleNamespace
 from typing import Any, Awaitable, Callable
 
 from benchmarks.complete_work.isolation import READ_PROFILE, build_overrides, verify_profile
@@ -29,6 +30,7 @@ ORIGINAL = Path("/Users/brummerv/loci")
 PYTHON = ORIGINAL / ".venv/bin/python"
 USER_CONFIG = Path.home() / ".codex/config.toml"
 ARMS = ("vanilla", "production", "source_context")
+PRODUCTION_COMMIT = "9655a287ca28d758a8848b6622887c54f8f81a41"
 USAGE_FIELDS = ("inputTokens", "cachedInputTokens", "outputTokens", "reasoningOutputTokens", "totalTokens")
 
 
@@ -96,12 +98,19 @@ def target_guard(
     return guarded
 
 
-def serve_target(target: Path) -> None:
+def serve_target(target: Path, *, graph_enrichment: bool | None = None) -> None:
     from loci import mcp_server
     from mcp.server.mcpserver.exceptions import ToolError
 
     if os.environ.get("LOCI_MCP_SURFACE") != "normal":
         raise RuntimeError("pilot requires the normal Loci tool surface")
+    if graph_enrichment is not None:
+        from loci import service
+
+        runtime = service.RetrievalRuntime(graph_enrichment=graph_enrichment)
+        mcp_server._service_module = SimpleNamespace(
+            retrieve=runtime.retrieve, read=service.read, LociError=service.LociError,
+        )
     mcp_server.mcp.call_tool = target_guard(mcp_server.mcp.call_tool, target, ToolError)
     mcp_server.main()
 
@@ -134,6 +143,10 @@ def arm_overrides(workspace: Path, arm: str, serving: Path | None, namespace: st
             },
             "startup_timeout_sec": 60, "tool_timeout_sec": 60,
         }
+        if arm in {"graph_on", "graph_off"}:
+            overrides["mcp_servers.loci"]["args"] += [
+                "--graph-enrichment", "on" if arm == "graph_on" else "off",
+            ]
     return overrides
 
 
@@ -424,10 +437,16 @@ def run_turn(client: AppServer, case: dict, workspace: Path, thread_id: str) -> 
     return row
 
 
-def execute(output: Path, *, preflight_only: bool = False) -> dict:
+def execute(output: Path, *, preflight_only: bool = False, graph_toggle: bool = False) -> dict:
     if Path(sys.prefix).resolve() != PYTHON.parent.parent.resolve():
         raise RuntimeError(f"run with {PYTHON}")
     case, digest = load_case()
+    conditions = case["conditions"]
+    if graph_toggle:
+        if conditions["production"] != PRODUCTION_COMMIT:
+            raise ValueError("graph toggle requires the frozen production commit")
+        conditions = {"graph_on": PRODUCTION_COMMIT, "graph_off": PRODUCTION_COMMIT}
+    arms = tuple(conditions)
     output = check_output_location(output, case)
     output.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
     output.mkdir(mode=0o700, parents=False, exist_ok=False)
@@ -435,32 +454,41 @@ def execute(output: Path, *, preflight_only: bool = False) -> dict:
     result: dict = {"schema_version": 1, "case_id": case["case_id"], "case_sha256": digest,
                     "model": case["model"], "reasoning_effort": case["reasoning_effort"],
                     "preflight_only": preflight_only, "status": "preparing",
-                    "arms": {arm: {"preflight": "not_run", "episode": "not_run"} for arm in ARMS},
+                    "arms": {arm: {"preflight": "not_run", "episode": "not_run"} for arm in arms},
                     "limitations": ["One task and one turn per condition; no statistical winner.",
                                     "Prompt cache warmth is uncontrolled; cached and uncached input are separate.",
                                     "No model reliance or unique source-read count is inferred from tool observations."]}
+    if graph_toggle:
+        result["experiment"] = {
+            "id": "production-graph-toggle", "conditions": conditions, "order": list(arms),
+            "runtime_flags": {"graph_on": {"graph_enrichment": True},
+                              "graph_off": {"graph_enrichment": False}},
+            "runtime_binding": "loci.service.RetrievalRuntime",
+            "case_sha256": digest, "target_commit": case["source_commit"],
+            "time_cap_seconds": case["time_cap_seconds"], "cold_stores": True,
+        }
     write_json(output / "result.json", result)
     owned: list[tuple[AppServer | None, Journal]] = []
     live: dict[str, tuple[AppServer, Journal, Path, str]] = {}
     active_arm: str | None = None
     try:
         source = Path(case["source_repository"]).resolve(strict=True)
-        for arm in ARMS:
+        for arm in arms:
             directory = output / "arms" / arm
             directory.mkdir(parents=True)
             workspace = directory / "workspace"
             result["arms"][arm]["target"] = archive(source, case["source_commit"], workspace)
             (workspace / ".episode-tmp").mkdir()
             serving = None
-            commit = case["conditions"][arm]
+            commit = conditions[arm]
             if commit is not None:
                 serving = output / "serving" / arm
-                repo = ORIGINAL if arm == "production" else HARNESS
+                repo = ORIGINAL if arm in {"production", "graph_on", "graph_off"} else HARNESS
                 serving.parent.mkdir(parents=True, exist_ok=True)
                 result["arms"][arm]["serving"] = archive(repo, commit, serving)
             write_json(output / "result.json", result)
         result["setup_elapsed_ms"] = round((time.monotonic() - run_started) * 1000, 3)
-        for arm in ARMS:
+        for arm in arms:
             directory = output / "arms" / arm
             workspace = directory / "workspace"
             serving = output / "serving" / arm if arm != "vanilla" else None
@@ -475,6 +503,8 @@ def execute(output: Path, *, preflight_only: bool = False) -> dict:
                 "store": str(workspace.parent / "loci-store") if serving else None,
                 "agents_enabled": False,
                 "instructions": instruction_meta}
+            if graph_toggle:
+                result["arms"][arm]["configuration"]["graph_enrichment"] = arm == "graph_on"
             journal = Journal(directory / "wire.jsonl")
             client = None
             preflight_started = time.monotonic()
@@ -495,14 +525,14 @@ def execute(output: Path, *, preflight_only: bool = False) -> dict:
             result["arms"][arm]["preflight_elapsed_ms"] = round(
                 (time.monotonic() - preflight_started) * 1000, 3)
             write_json(output / "result.json", result)
-        if any(result["arms"][arm]["preflight"].get("status") != "passed" for arm in ARMS):
+        if any(result["arms"][arm]["preflight"].get("status") != "passed" for arm in arms):
             result["status"] = "preflight_failed_zero_episodes"
         elif preflight_only:
             result["status"] = "preflight_passed_no_generation"
         else:
             result["status"] = "running"
             write_json(output / "result.json", result)
-            for arm in ARMS:
+            for arm in arms:
                 client, journal, workspace, thread_id = live[arm]
                 active_arm = arm
                 result["arms"][arm]["episode"] = {"status": "attempted"}
@@ -519,11 +549,11 @@ def execute(output: Path, *, preflight_only: bool = False) -> dict:
                     break
             result["status"] = "completed" if all(
                 isinstance(result["arms"][arm]["episode"], dict)
-                and result["arms"][arm]["episode"].get("status") == "completed" for arm in ARMS
+                and result["arms"][arm]["episode"].get("status") == "completed" for arm in arms
             ) else "episodes_incomplete"
     except (OSError, subprocess.CalledProcessError, tarfile.TarError, RuntimeFailure, ValueError) as exc:
         result["status"] = ("capture_failed" if result["status"] == "running" or any(
-            isinstance(result["arms"][arm]["episode"], dict) for arm in ARMS)
+            isinstance(result["arms"][arm]["episode"], dict) for arm in arms)
             else "preparation_failed_zero_episodes")
         result["error"] = str(exc)
     except KeyboardInterrupt:
@@ -551,19 +581,27 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--preflight-only", action="store_true")
+    parser.add_argument("--graph-toggle", action="store_true",
+                        help="compare the frozen production graph enrichment on and off")
     parser.add_argument("--serve-target", type=Path, help=argparse.SUPPRESS)
+    parser.add_argument("--graph-enrichment", choices=("on", "off"), help=argparse.SUPPRESS)
     args = parser.parse_args()
     if args.serve_target is not None:
-        if args.output is not None or args.preflight_only:
-            parser.error("server mode accepts only --serve-target")
-        serve_target(args.serve_target)
+        if args.output is not None or args.preflight_only or args.graph_toggle:
+            parser.error("server mode accepts only --serve-target and --graph-enrichment")
+        serve_target(args.serve_target, graph_enrichment=(
+            None if args.graph_enrichment is None else args.graph_enrichment == "on"
+        ))
         return
+    if args.graph_enrichment is not None:
+        parser.error("--graph-enrichment requires --serve-target")
     if args.output is None:
         args.output = Path.home() / "phluxxed/tmp" / (
-            "loci-navigation-pilot-" + time.strftime("%Y%m%d-%H%M%S")
+            ("loci-graph-toggle-" if args.graph_toggle else "loci-navigation-pilot-")
+            + time.strftime("%Y%m%d-%H%M%S")
         )
     os.umask(0o077)
-    receipt = execute(args.output, preflight_only=args.preflight_only)
+    receipt = execute(args.output, preflight_only=args.preflight_only, graph_toggle=args.graph_toggle)
     print(json.dumps({"status": receipt["status"], "result": str(args.output / "result.json")}))
     if receipt["status"] not in {"completed", "preflight_passed_no_generation"}:
         raise SystemExit(1)
