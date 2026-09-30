@@ -1,0 +1,178 @@
+{
+  "run": "/Users/brummerv/phluxxed/tmp/loci-graph-toggle-20260930-161902",
+  "status": "completed",
+  "model": "gpt-6.1-sol",
+  "effort": "high",
+  "case_sha256": "4ef626b50fe3eba3f0aa2d9b950112d50b8d2500855172b4ace5913cba23bd6e",
+  "experiment": {
+    "id": "production-graph-toggle",
+    "conditions": {
+      "graph_on": "9655a287ca28d758a8848b6622887c54f8f81a41",
+      "graph_off": "9655a287ca28d758a8848b6622887c54f8f81a41"
+    },
+    "order": [
+      "graph_on",
+      "graph_off"
+    ],
+    "runtime_flags": {
+      "graph_on": {
+        "graph_enrichment": true
+      },
+      "graph_off": {
+        "graph_enrichment": false
+      }
+    },
+    "runtime_binding": "loci.service.RetrievalRuntime",
+    "case_sha256": "4ef626b50fe3eba3f0aa2d9b950112d50b8d2500855172b4ace5913cba23bd6e",
+    "target_commit": "85969df8efff36866c39f2d609dd3b685323c00b",
+    "time_cap_seconds": 300,
+    "cold_stores": true
+  },
+  "metrics": {
+    "graph_on": {
+      "elapsed_seconds": 143.814026,
+      "usage": {
+        "inputTokens": 461346,
+        "cachedInputTokens": 394624,
+        "outputTokens": 4180,
+        "reasoningOutputTokens": 475,
+        "totalTokens": 465526,
+        "cacheWriteInputTokens": 0,
+        "uncachedInputTokens": 66722
+      },
+      "retrieve_calls": 6,
+      "read_calls": 12,
+      "shell_calls": 6,
+      "shell_failures": 1,
+      "mcp_failures": 0,
+      "relationships": 60,
+      "distinct_relationships": 54,
+      "relationship_types": {
+        "uses_type": 4,
+        "calls": 5,
+        "references": 14,
+        "imports": 31
+      },
+      "edges_traversed": 694,
+      "eligible_edges_considered": 1366,
+      "tool_output_bytes": {
+        "mcp_result_json": 165251,
+        "shell_aggregated": 88252
+      },
+      "mcp_sum_duration_ms": 22444,
+      "mcp_median_duration_ms": 1101.5,
+      "subagents": 0,
+      "compactions": 0,
+      "indexed_paths": 66,
+      "self_store_paths": 0,
+      "pending_mutation": false,
+      "loci_retrieve_median_duration_ms": 1356.0,
+      "loci_read_median_duration_ms": 1080.5,
+      "required_source_owners_cited": 5
+    },
+    "graph_off": {
+      "elapsed_seconds": 144.54934599999999,
+      "usage": {
+        "inputTokens": 422558,
+        "cachedInputTokens": 352256,
+        "outputTokens": 3914,
+        "reasoningOutputTokens": 370,
+        "totalTokens": 426472,
+        "cacheWriteInputTokens": 0,
+        "uncachedInputTokens": 70302
+      },
+      "retrieve_calls": 11,
+      "read_calls": 15,
+      "shell_calls": 5,
+      "shell_failures": 0,
+      "mcp_failures": 0,
+      "relationships": 0,
+      "distinct_relationships": 0,
+      "relationship_types": {},
+      "edges_traversed": 0,
+      "eligible_edges_considered": 0,
+      "tool_output_bytes": {
+        "mcp_result_json": 138768,
+        "shell_aggregated": 64224
+      },
+      "mcp_sum_duration_ms": 28995,
+      "mcp_median_duration_ms": 1058.0,
+      "subagents": 0,
+      "compactions": 0,
+      "indexed_paths": 66,
+      "self_store_paths": 0,
+      "pending_mutation": false,
+      "loci_retrieve_median_duration_ms": 1094,
+      "loci_read_median_duration_ms": 1043,
+      "required_source_owners_cited": 5
+    }
+  },
+  "provenance": {
+    "graph_on": {
+      "wire_sha256": "f390ee8712bc30816b64cd754e757610fe12f9e7753eda3061d078433467d4c3",
+      "thread_id": "01a0f0f7-9636-7031-80c1-68fc00084c61",
+      "turn_id": "01a0f0f7-a338-7f92-982f-bab453955f01",
+      "instructions_sha256": "8e9e1a6bcbef9d5cc43115f4a06fba92f518fc740466845f3d024aa2f492afcc"
+    },
+    "graph_off": {
+      "wire_sha256": "9e6b987ee66721d9e4d546a91c23f1d8dee68ab08f2dc8f485e1faeff5e387ba",
+      "thread_id": "01a0f0f7-9ce5-7e03-8999-97cb0d38558d",
+      "turn_id": "01a0f0f9-d51f-7cd1-8004-2a4ac5342170",
+      "instructions_sha256": "8e9e1a6bcbef9d5cc43115f4a06fba92f518fc740466845f3d024aa2f492afcc"
+    }
+  },
+  "limits": [
+    "One task and one turn per condition; no statistical winner.",
+    "Prompt cache warmth is uncontrolled; cached and uncached input are separate.",
+    "No model reliance or unique source-read count is inferred from tool observations."
+  ],
+  "identical_tool_descriptors": true,
+  "off_relative_to_on": {
+    "inputTokens": -8.407572624451065,
+    "cachedInputTokens": -10.736295815763864,
+    "uncachedInputTokens": 5.365546596325044,
+    "totalTokens": -8.389219936158243,
+    "elapsed_seconds_percent": 0.511299224736228
+  },
+  "scoring": {
+    "reviewer": {
+      "task": "graph_pair_score",
+      "model": "gpt-6.1-sol",
+      "effort": "high",
+      "fork": "none",
+      "condition_and_metrics_blinded": true
+    },
+    "literal_oracle_scores": {
+      "graph_on": 5.5,
+      "graph_off": 5.5
+    },
+    "requested_trace_complete": {
+      "graph_on": true,
+      "graph_off": true
+    },
+    "critical_contradictions": [],
+    "qualification": "Both omit an explicit statement that reconciliation repairs stale-ready ship to blocked. Frozen oracle includes this auxiliary repair fact, but prompt asks about attempted run, not repair. Original pilot reviewer allowed the same omission and assigned6/6; literal scores must not be used to infer a quality difference across batches. Both imply normal blocked/ready chat actions through stored-ready rule. Graph-off auxiliary test claims were not verified by implementation-only blinded grader."
+  },
+  "navigation_audit": {
+    "reviewer": "graph_pair_navigation",
+    "model": "gpt-6.1-sol",
+    "effort": "high",
+    "fork": "none",
+    "adopted": "Graph-on execution retrieve selected related RunStore and agent followed its exact reference. Central approval/reconciliation/claim call chains absent from delivered relationships; proven by source in both. No attribution of fewer calls solely to graph, or absence from index.",
+    "graph_on_related_reference_followed": {
+      "retrieve_ordinal": 165,
+      "read_ordinal": 269,
+      "source_ref": "sr1_xoeikz6gcj6lghrzgnh2udcikm",
+      "node": "src/ember/runs.py::RunStore#class"
+    },
+    "mcp_content_file_footprint": {
+      "graph_on": 21,
+      "graph_off": 14
+    },
+    "mcp_or_shell_content_file_footprint": {
+      "graph_on": 25,
+      "graph_off": 18
+    },
+    "footprint_limit": "Includes snippets and source search matches, not unique complete files/model attention; excludes file listings."
+  }
+}

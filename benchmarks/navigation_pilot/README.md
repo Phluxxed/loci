@@ -145,6 +145,13 @@ existing Codex account and consume its normal usage allowance.
 
 ## Production graph toggle
 
+**The pair is complete.** Graph on took 143.8 seconds and off 144.5 seconds;
+both correctly traced the requested behavior. Off used 8.4% fewer total tokens
+but 5.4% more uncached input and more Loci calls. On supplied one graph-selected
+reference the agent followed. See the
+[paired comparison](graph-toggle-results-20260930.md) for measurements, source
+grading qualifications, navigation, and the earlier vanilla reference.
+
 The paired mode runs two fresh arms, `graph_on` then `graph_off`, using production
 commit `9655a287ca28d758a8848b6622887c54f8f81a41` in both. Run it from an ordinary
 terminal with:
@@ -182,7 +189,9 @@ selection, anchor source and hydrated read source matched; graph on returned
 12 relationships for `src/ember/graph.py`, while off returned zero. Both rejected
 another repository and indexed 66 source paths without their own stores. See
 [validation receipt](graph-toggle-validation.json) for the retained packets and
-the corrected validator assumption. No paired model episodes have run yet.
+the corrected validator assumption. The measured pair completed in
+`~/phluxxed/tmp/loci-graph-toggle-20260930-161902`; both passed preflight, with
+known root usage and no subagents or capture errors.
 The earlier vanilla result is a reference, rather than a fresh matched arm in
 this pair. Graph off retains production's indexing cost; this comparison tests
 the enrichment switch, not removal of the graph engine.

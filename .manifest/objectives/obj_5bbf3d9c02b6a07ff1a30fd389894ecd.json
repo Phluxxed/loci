@@ -498,12 +498,12 @@
       "id": "ws_69b0ebb85664c7d103aa2a93196bf0e8",
       "title": "Isolate production graph traversal on and off",
       "outcome": "Repeat the frozen Ember investigation with identical pinned production Loci in two conditions and compare correctness, navigation, elapsed time and tokens.",
-      "details": "Vik requested the same tests with prod graph switched on/off. Production offers a benchmark control, not a public switch. Off removes traversal/enrichment but retains indexing/freshness. Two fresh conditions use same task/model/high/300s and cold stores; prior vanilla result is reference only. Original prod source and installed server remain untouched.",
+      "details": "Vik requested same tests with production graph switched on/off. Pinned production internal RetrievalRuntime flag preserves normal packet/source baseline and descriptors. Off skips enrichment/traversal, retaining indexing/graph freshness/read. Two fresh conditions match task/model/high/300s and start cold stores; earlier vanilla is reference only. Actual completed run161902 returned30September. Original prod source and installed server untouched.",
       "tasks": [
         {
           "id": "task_782470fbc134197ff907cf0d338dc1a4",
           "title": "Verify and prepare the matched production graph control",
-          "outcome": "A runnable isolated pair uses the pinned legacy control without importing the retired development version.",
+          "outcome": "A runnable isolated pair uses the pinned production internal graph enrichment toggle through the unchanged normal MCP server.",
           "details": "Adopted /root/graph_toggle_runner (GPT-6.1 Sol/high/fork none) run.py,test_run.py,README.md. Original /root/graph_pair_runner GPT-6 Sol/high/fork none failed before work: model capacity; superseded its legacy-control brief after discovering cleaner pinned service.RetrievalRuntime. Primary reviewed changed code and actual stdio wrapper. Off preserves anchor ownership/packet schema/normal descriptors, unlike old complete_work direct-source control; it still indexes/loads graph for freshness and read. Eight focused checks passed; primary live SDK smoke performed two retrieves and one read per arm, wrong-repo refusal, each66index paths/no selfstore/pending, identical instructions/descriptors/anchor source/read bytes. Original validator incorrectly assumed a query had no anchors; actual three test matches were valid. Corrected assessment offline from retained packets, no repeated calls. Verified artifact benchmarks/navigation_pilot/graph-toggle-validation.json and ~/phluxxed/tmp/loci-graph-toggle-validation-tsk8e05t/verified-result.json. No model episodes run here. Both archive same 9655a287 and retain original case SHA, gpt-6.1-sol/high/300s; pair flags/order separately frozen.",
           "decompositionComplete": true,
           "completionCriteria": [
@@ -540,7 +540,7 @@
           "id": "task_9425d8a49e4f76e46eadc57bc3a60782",
           "title": "Run two fresh production graph conditions",
           "outcome": "Actual completed model turns and raw receipts for graph on/off, or retained concrete runtime failure.",
-          "details": "Ready terminal command: cd ~/phluxxed/loci-scalpel then ~/loci/.venv/bin/python -m benchmarks.navigation_pilot.run --graph-toggle. Outputs ~/phluxxed/tmp/loci-graph-toggle-<timestamp>/result.json, raw wire, two frozen production archives/outside stores. No new nested probe: unchanged host/input already established. Both fresh conditions must pass original strict preflight. Earlier vanilla is reference only. On returned receipt, complete W4.2 and blinded source scoring/report W4.3.",
+          "details": "Vik returned completed receipt ~/phluxxed/tmp/loci-graph-toggle-20260930-161902/result.json. Both passed same strict preflight/model gpt-6.1-sol/high; matching production and target Git archive hashes, matching instruction hashes and live descriptors. Raw wire re-reduction exactly equals stored telemetry; both root turns complete with known usage, no capture/usage errors/subagents/compactions/file changes. Each66index paths, no store paths/pending. Graph on delivered60records/54distinct and694traversededges, off0, consistent startup flags. Prepared assessment preserves raw receipt intact.",
           "decompositionComplete": true,
           "completionCriteria": [
             "Both graph conditions complete under verified identical model/effort and read-only boundaries; any failures and missing telemetry remain explicit."
@@ -548,8 +548,19 @@
           "dependencies": [
             "task_782470fbc134197ff907cf0d338dc1a4"
           ],
-          "externalBlocker": "This Codex host cannot enforce nested macOS sandbox (previous ordinary and escalated probes failed exit71 sandbox_apply); launch prepared --graph-toggle runner in Vik's ordinary terminal, as successful W3 pilot did.",
-          "completion": null,
+          "externalBlocker": null,
+          "completion": {
+            "evidence": [
+              {
+                "criterion": "Both graph conditions complete under verified identical model/effort and read-only boundaries; any failures and missing telemetry remain explicit.",
+                "summary": "Both actual root turns completed, identical preflight and frozen identities. Raw wire matches decoded telemetry, known usage and no isolation violations. Graph on143.814s/off144.549s; one benign shell discovery miss on, no MCP failures.",
+                "references": [
+                  "/Users/brummerv/phluxxed/tmp/loci-graph-toggle-20260930-161902/result.json",
+                  "/Users/brummerv/phluxxed/tmp/loci-graph-toggle-20260930-161902/assessment/comparison.json"
+                ]
+              }
+            ]
+          },
           "discontinued": null,
           "tasks": []
         },
@@ -557,7 +568,7 @@
           "id": "task_2636a5f9d347b4a4817dc9eb8cb0ca9d",
           "title": "Compare graph utility and cost",
           "outcome": "Source-grounded blinded scoring and measured paired differences answer whether graph traversal helped this Ember task.",
-          "details": "",
+          "details": "Completed matched production pair run161902. Adopted /root/graph_pair_score GPT-6.1 Sol/high/fork none source-grounded blinded judgment: both requested traces correct/no contradictions, literal oracle5.5/6each because omitted auxiliary explicit repair sentence. Preserved scoring qualification: prior reviewer accepted same omission at6/6, so numeric grades do not show across-batch quality difference. Reviewer test auxiliary statements remain unchecked. Artifact run/assessment/blind-scoring.json, comparison.json. Adopted /root/graph_pair_navigation GPT-6.1 Sol/high/fork none: graph-on followed graph-selected RunStore source_ref (retrieve165→read269), verified primary from original traces;54distinctrelationships primarilyimports, no central behavior call chains delivered. Graph on fewerlookups/loweruncached, offlesscontext/lowercachedtotal; same answer/time within0.7s. On/off143.8/144.5s, total465526/426472, uncached66722/70302,18/26MCPcalls. Earlier vanilla199889total/51251uncached/149.1s is historicalreference, not freshmatchedarm. Previous production238.4s→latest143.8s cautions latency rankings; no decisiveoverallwinner/no modelreliance inference. Report graph-toggle-results-20260930.md, compactreceipt and answers retained in branch. No further product fix/campaign required for this completed user-requested pair.",
           "decompositionComplete": true,
           "completionCriteria": [
             "Report correctness, actual navigation and graph delivery, elapsed time and token/cache totals with paired causal limits and earlier vanilla reference labeled."
@@ -566,7 +577,20 @@
             "task_9425d8a49e4f76e46eadc57bc3a60782"
           ],
           "externalBlocker": null,
-          "completion": null,
+          "completion": {
+            "evidence": [
+              {
+                "criterion": "Report correctness, actual navigation and graph delivery, elapsed time and token/cache totals with paired causal limits and earlier vanilla reference labeled.",
+                "summary": "Report contains actual identities, all requested measures/cache split, blinded correctness and literal-score qualification, traced graph-selected reference use, graph coverage/callchain limits, source footprint qualifications, historical vanilla reference, order/cache/single-run limits. Raw data immutable; no extra trial.",
+                "references": [
+                  "benchmarks/navigation_pilot/graph-toggle-results-20260930.md",
+                  "benchmarks/navigation_pilot/graph-toggle-completed-run.json",
+                  "/Users/brummerv/phluxxed/tmp/loci-graph-toggle-20260930-161902/assessment/blind-scoring.json",
+                  "/Users/brummerv/phluxxed/tmp/loci-graph-toggle-20260930-161902/assessment/navigation.md"
+                ]
+              }
+            ]
+          },
           "discontinued": null,
           "tasks": []
         }
