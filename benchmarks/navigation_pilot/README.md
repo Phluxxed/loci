@@ -30,6 +30,16 @@ setup measurements, not agent task timings. Compile and three focused runner
 checks passed. Live tool inventories, model-turn telemetry, and answers remain
 unverified because preflight stopped before thread creation.
 
+The subsequent terminal run `~/phluxxed/tmp/loci-navigation-pilot-20260930-131341`
+successfully created all three threads with the pinned model/effort and expected
+tool inventories: vanilla had no MCP tools, and both Loci versions exposed only
+`loci_retrieve` and `loci_read`. Its permission probe then failed because the
+hardcoded `/usr/bin/python3` invoked Apple's developer-tools launcher. The probe
+now uses `/bin/sh` built-ins, so it needs no Apple Python or developer-tools
+installation. Four focused checks pass, including a check that unrestricted
+read/write access is rejected by the probe. No model turn started in that run;
+the corrected preflight still needs an ordinary-terminal launch.
+
 ## Frozen comparison
 
 | Condition | Navigation available | Loci commit |

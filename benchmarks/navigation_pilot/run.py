@@ -12,6 +12,7 @@ import io
 import json
 import os
 from pathlib import Path
+import shlex
 import subprocess
 import sys
 import tarfile
@@ -142,23 +143,28 @@ def arm_instructions(case: dict, serving: Path | None) -> tuple[str, dict]:
 
 def canary(client: AppServer, workspace: Path, outside: Path) -> dict:
     visible = workspace / ".episode-tmp/visible-canary"
-    visible.write_text("visible")
-    outside.write_text("hidden")
+    visible.write_text("visible\n")
+    outside.write_text("hidden\n")
     source_write = workspace / ".pilot-write-canary"
     source_write.write_text("unchanged")
-    script = (
-        "from pathlib import Path; import json; r={};\n"
-        f"for k,p in {repr({'visible': str(visible), 'hidden': str(outside)})}.items():\n"
-        " try:r[k]=Path(p).read_text()\n"
-        " except OSError:r[k]='denied'\n"
-        f"p=Path({str(source_write)!r});\n"
-        "try:\n p.write_text('changed'); r['source_write']='allowed'\n"
-        "except OSError:r['source_write']='denied'\n"
-        "print(json.dumps(r))"
-    )
+    script = f"""\
+canary_visible=denied
+IFS= read -r canary_visible < {shlex.quote(str(visible))} || canary_visible=denied
+if IFS= read -r canary_hidden < {shlex.quote(str(outside))}; then
+    canary_hidden=allowed
+else
+    canary_hidden=denied
+fi
+if printf changed > {shlex.quote(str(source_write))}; then
+    canary_write=allowed
+else
+    canary_write=denied
+fi
+printf '{{"visible":"%s","hidden":"%s","source_write":"%s"}}\\n' "$canary_visible" "$canary_hidden" "$canary_write"
+"""
     try:
         response = client.call("command/exec", {
-            "command": ["/usr/bin/python3", "-c", script], "cwd": str(workspace),
+            "command": ["/bin/sh", "-c", script], "cwd": str(workspace),
             "permissionProfile": READ_PROFILE, "timeoutMs": 10000,
         }, timeout=15)
         try:

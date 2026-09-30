@@ -4,13 +4,41 @@ from __future__ import annotations
 import asyncio
 import json
 from pathlib import Path
+import subprocess
 import tempfile
 import unittest
 
-from benchmarks.navigation_pilot.run import arm_overrides, summarize_wire, target_guard
+from benchmarks.navigation_pilot.run import arm_overrides, canary, summarize_wire, target_guard
 
 
 class PilotRunTests(unittest.TestCase):
+    def test_canary_uses_native_shell_and_rejects_unrestricted_access(self) -> None:
+        class LocalClient:
+            def call(self, method, params, *, timeout):
+                self.command = params["command"]
+                completed = subprocess.run(
+                    self.command, cwd=params["cwd"], capture_output=True,
+                    text=True, timeout=timeout,
+                )
+                return {"exitCode": completed.returncode, "stdout": completed.stdout,
+                        "stderr": completed.stderr}
+
+        base = Path.home() / "phluxxed/tmp"
+        base.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=base) as directory:
+            root = Path(directory)
+            workspace = root / "workspace with 'quotes'"
+            (workspace / ".episode-tmp").mkdir(parents=True)
+            client = LocalClient()
+            result = canary(client, workspace, root / "outside")
+            self.assertEqual(client.command[:2], ["/bin/sh", "-c"])
+            self.assertEqual(result["command_result"]["exitCode"], 0)
+            self.assertEqual(result["observed"], {
+                "visible": "visible", "hidden": "allowed", "source_write": "allowed",
+            })
+            self.assertEqual(result["status"], "failed")
+            self.assertFalse((workspace / ".pilot-write-canary").exists())
+
     def test_wire_deduplicates_and_preserves_completion_order(self) -> None:
         def event(ordinal: int, method: str, params: dict) -> str:
             return json.dumps({"ordinal": ordinal, "monotonic": float(ordinal),
