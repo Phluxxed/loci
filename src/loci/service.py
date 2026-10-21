@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 from functools import partial
 from itertools import islice
 from pathlib import Path, PurePosixPath
-from typing import Any, Literal, TypedDict
+from typing import Any, Callable, Literal, Sequence, TypedDict
 
 import pathspec
 
@@ -1367,6 +1367,83 @@ def _validate_graph_record_query(
         )
 
 
+def _graph_record_page(
+    repo_path: Path,
+    records: Sequence[Any],
+    *,
+    file: str | None,
+    status: str,
+    offset: int,
+    limit: int,
+    sort_key: Callable[[Any], tuple],
+    serialize: Callable[[Any], dict[str, Any]],
+) -> dict[str, Any]:
+    """Page one record family under the shared diagnostic query contract.
+
+    Counts describe the file-selected set before status filtering. Offsets
+    describe the status-selected ordering. Serialize only the returned page.
+    """
+    selected = sorted(
+        (record for record in records if file is None or record.raw.source_file == file),
+        key=sort_key,
+    )
+    filtered = (
+        selected if status == "all"
+        else [record for record in selected if record.status == status]
+    )
+    items = [serialize(record) for record in filtered[offset:offset + limit]]
+    next_offset = offset + len(items)
+    return {
+        "schema_version": GRAPH_SCHEMA_VERSION,
+        "repo": str(repo_path),
+        "file": file,
+        "status": status,
+        "items": items,
+        "counts": {
+            "total": len(selected),
+            "resolved": sum(record.status == "resolved" for record in selected),
+            "unresolved": sum(record.status == "unresolved" for record in selected),
+            "returned": len(items),
+        },
+        "pagination": {
+            "offset": offset,
+            "limit": limit,
+            "next_offset": next_offset if next_offset < len(filtered) else None,
+        },
+    }
+
+
+def _import_record_item(record: Any) -> dict[str, Any]:
+    raw = record.raw
+    serialized = record.to_dict()
+    return {
+        "raw": serialized["raw"],
+        "source_file": raw.source_file,
+        "source_id": record.source_id,
+        "target_file": record.target_file,
+        "target_package": record.target_package,
+        "target_crate": record.target_crate,
+        "target_module": record.target_module,
+        "target_kind": record.target_kind,
+        "target_id": record.target_id,
+        "specifier": raw.specifier,
+        "imported_name": raw.imported_name,
+        "language": raw.language,
+        "line": raw.line,
+        "text": raw.text,
+        "type_only": raw.type_only,
+        "is_reexport": raw.is_reexport,
+        "status": record.status,
+        "resolution": (
+            "import-resolved" if record.status == "resolved" else None
+        ),
+        "unresolved_reason": record.unresolved_reason,
+        "resolution_basis": record.resolution_basis,
+        "resolution_control_files": list(record.resolution_control_files),
+        "resolution_configuration": record.resolution_configuration,
+    }
+
+
 def graph_imports(
     repo: str | Path,
     *,
@@ -1379,79 +1456,44 @@ def graph_imports(
     _validate_graph_record_query(file, status, offset, limit)
     repo_path = Path(repo).resolve()
     _, _, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
-    records = [
-        record
-        for record in state.imports
-        if file is None or record.raw.source_file == file
-    ]
-    records.sort(key=lambda record: (
-        record.raw.source_file,
-        record.raw.line,
-        record.raw.specifier,
-        record.raw.imported_name or "",
-        record.target_file or "",
-        record.target_package or "",
-        record.target_crate or "",
-    ))
-    resolved_count = sum(record.status == "resolved" for record in records)
-    unresolved_count = sum(record.status == "unresolved" for record in records)
-    filtered = (
-        records
-        if status == "all"
-        else [record for record in records if record.status == status]
+    return _graph_record_page(
+        repo_path, state.imports, file=file, status=status,
+        offset=offset, limit=limit, sort_key=lambda record: (
+            record.raw.source_file,
+            record.raw.line,
+            record.raw.specifier,
+            record.raw.imported_name or "",
+            record.target_file or "",
+            record.target_package or "",
+            record.target_crate or "",
+        ),
+        serialize=_import_record_item,
     )
-    page = filtered[offset:offset + limit]
-    items = []
-    for record in page:
-        raw = record.raw
-        serialized = record.to_dict()
-        items.append({
-            "raw": serialized["raw"],
-            "source_file": raw.source_file,
-            "source_id": record.source_id,
-            "target_file": record.target_file,
-            "target_package": record.target_package,
-            "target_crate": record.target_crate,
-            "target_module": record.target_module,
-            "target_kind": record.target_kind,
-            "target_id": record.target_id,
-            "specifier": raw.specifier,
-            "imported_name": raw.imported_name,
-            "language": raw.language,
-            "line": raw.line,
-            "text": raw.text,
-            "type_only": raw.type_only,
-            "is_reexport": raw.is_reexport,
-            "status": record.status,
-            "resolution": (
-                "import-resolved" if record.status == "resolved" else None
-            ),
-            "unresolved_reason": record.unresolved_reason,
-            "resolution_basis": record.resolution_basis,
-            "resolution_control_files": list(record.resolution_control_files),
-            "resolution_configuration": record.resolution_configuration,
-        })
-    next_offset = offset + len(page)
-    if next_offset >= len(filtered):
-        next_offset = None
 
+
+def _symbol_reference_item(record: Any) -> dict[str, Any]:
+    serialized = record.to_dict()
     return {
-        "schema_version": GRAPH_SCHEMA_VERSION,
-        "repo": str(repo_path),
-        "file": file,
-        "status": status,
-        "items": items,
-        "counts": {
-            "total": len(records),
-            "resolved": resolved_count,
-            "unresolved": unresolved_count,
-            "returned": len(items),
-        },
-        "pagination": {
-            "offset": offset,
-            "limit": limit,
-            "next_offset": next_offset,
-        },
+        "raw": serialized["raw"],
+        "binding": serialized["binding"],
+        "source_file": record.raw.source_file,
+        "source_id": record.source_id,
+        "source_kind": record.source_kind,
+        "import_source_id": record.import_source_id,
+        "import_target_id": record.import_target_id,
+        "target_file": record.target_file,
+        "target_id": record.target_id,
+        "target_kind": record.target_kind,
+        "status": record.status,
+        "resolution": (
+            "import-resolved" if record.status == "resolved" else None
+        ),
+        "unresolved_reason": record.unresolved_reason,
+        "import_unresolved_reason": record.import_unresolved_reason,
+        "resolution_basis": record.resolution_basis,
+        "support": serialized["support"],
+        "resolution_control_files": list(record.resolution_control_files),
+        "resolution_configuration": record.resolution_configuration,
     }
 
 
@@ -1471,105 +1513,33 @@ def graph_references(
     repo_path = Path(repo).resolve()
     _, _, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
     if family == "type":
-        return _type_reference_page(repo_path, state, file, status, offset, limit)
-    records = [
-        record
-        for record in state.symbol_references
-        if file is None or record.raw.source_file == file
-    ]
-    records.sort(key=lambda record: (
-        record.raw.source_file,
-        record.raw.line,
-        record.raw.column,
-        record.raw.start_byte,
-        record.binding.import_line if record.binding is not None else 0,
-        record.binding.import_specifier if record.binding is not None else "",
-        record.binding.local_name if record.binding is not None else "",
-        record.target_file or "",
-        record.target_id or "",
-    ))
-    resolved_count = sum(record.status == "resolved" for record in records)
-    unresolved_count = sum(record.status == "unresolved" for record in records)
-    filtered = (
-        records
-        if status == "all"
-        else [record for record in records if record.status == status]
+        from loci.graph.type_relations import type_site_key
+
+        page = _graph_record_page(
+            repo_path, state.type_relations, file=file, status=status,
+            offset=offset, limit=limit,
+            sort_key=lambda record: type_site_key(record.raw),
+            serialize=lambda record: {
+                **record.to_dict(), "source_file": record.raw.source_file,
+                "resolution": record.resolution,
+            },
+        )
+        return {**page, "family": "type"}
+    return _graph_record_page(
+        repo_path, state.symbol_references, file=file, status=status,
+        offset=offset, limit=limit, sort_key=lambda record: (
+            record.raw.source_file,
+            record.raw.line,
+            record.raw.column,
+            record.raw.start_byte,
+            record.binding.import_line if record.binding is not None else 0,
+            record.binding.import_specifier if record.binding is not None else "",
+            record.binding.local_name if record.binding is not None else "",
+            record.target_file or "",
+            record.target_id or "",
+        ),
+        serialize=_symbol_reference_item,
     )
-    page = filtered[offset:offset + limit]
-    items = []
-    for record in page:
-        serialized = record.to_dict()
-        items.append({
-            "raw": serialized["raw"],
-            "binding": serialized["binding"],
-            "source_file": record.raw.source_file,
-            "source_id": record.source_id,
-            "source_kind": record.source_kind,
-            "import_source_id": record.import_source_id,
-            "import_target_id": record.import_target_id,
-            "target_file": record.target_file,
-            "target_id": record.target_id,
-            "target_kind": record.target_kind,
-            "status": record.status,
-            "resolution": (
-                "import-resolved" if record.status == "resolved" else None
-            ),
-            "unresolved_reason": record.unresolved_reason,
-            "import_unresolved_reason": record.import_unresolved_reason,
-            "resolution_basis": record.resolution_basis,
-            "support": serialized["support"],
-            "resolution_control_files": list(record.resolution_control_files),
-            "resolution_configuration": record.resolution_configuration,
-        })
-    next_offset = offset + len(page)
-    if next_offset >= len(filtered):
-        next_offset = None
-
-    return {
-        "schema_version": GRAPH_SCHEMA_VERSION,
-        "repo": str(repo_path),
-        "file": file,
-        "status": status,
-        "items": items,
-        "counts": {
-            "total": len(records),
-            "resolved": resolved_count,
-            "unresolved": unresolved_count,
-            "returned": len(items),
-        },
-        "pagination": {
-            "offset": offset,
-            "limit": limit,
-            "next_offset": next_offset,
-        },
-    }
-
-
-def _type_reference_page(
-    repo_path: Path, state: GraphIndexState, file: str | None,
-    status: str, offset: int, limit: int,
-) -> dict[str, Any]:
-    from loci.graph.type_relations import type_site_key
-
-    records = sorted(
-        (record for record in state.type_relations if file is None or record.raw.source_file == file),
-        key=lambda record: type_site_key(record.raw),
-    )
-    filtered = [record for record in records if status == "all" or record.status == status]
-    page = filtered[offset:offset + limit]
-    next_offset = offset + len(page)
-    return {
-        "schema_version": GRAPH_SCHEMA_VERSION, "repo": str(repo_path),
-        "file": file, "status": status, "family": "type",
-        "items": [{**record.to_dict(), "source_file": record.raw.source_file,
-                   "resolution": record.resolution} for record in page],
-        "counts": {"total": len(records),
-                   "resolved": sum(record.status == "resolved" for record in records),
-                   "unresolved": sum(record.status == "unresolved" for record in records),
-                   "returned": len(page)},
-        "pagination": {"offset": offset, "limit": limit,
-                       "next_offset": next_offset if next_offset < len(filtered) else None},
-    }
 
 
 def graph_calls(
@@ -1584,53 +1554,21 @@ def graph_calls(
     _validate_graph_record_query(file, status, offset, limit)
     repo_path = Path(repo).resolve()
     _, _, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
-    records = [
-        record
-        for record in state.calls
-        if file is None or record.raw.source_file == file
-    ]
-    records.sort(key=lambda record: (
-        record.raw.source_file,
-        record.raw.line,
-        record.raw.column,
-        record.raw.start_byte,
-        record.raw.callee_start_byte,
-        record.caller_id or "",
-        record.target_file or "",
-        record.target_id or "",
-        record.resolution or "",
-    ))
-    resolved_count = sum(record.status == "resolved" for record in records)
-    unresolved_count = sum(record.status == "unresolved" for record in records)
-    filtered = (
-        records
-        if status == "all"
-        else [record for record in records if record.status == status]
+    return _graph_record_page(
+        repo_path, state.calls, file=file, status=status,
+        offset=offset, limit=limit, sort_key=lambda record: (
+            record.raw.source_file,
+            record.raw.line,
+            record.raw.column,
+            record.raw.start_byte,
+            record.raw.callee_start_byte,
+            record.caller_id or "",
+            record.target_file or "",
+            record.target_id or "",
+            record.resolution or "",
+        ),
+        serialize=lambda record: record.to_dict(),
     )
-    page = filtered[offset:offset + limit]
-    items = [record.to_dict() for record in page]
-    next_offset = offset + len(page)
-    if next_offset >= len(filtered):
-        next_offset = None
-
-    return {
-        "schema_version": GRAPH_SCHEMA_VERSION,
-        "repo": str(repo_path),
-        "file": file,
-        "status": status,
-        "items": items,
-        "counts": {
-            "total": len(records),
-            "resolved": resolved_count,
-            "unresolved": unresolved_count,
-            "returned": len(items),
-        },
-        "pagination": {
-            "offset": offset,
-            "limit": limit,
-            "next_offset": next_offset,
-        },
-    }
 
 
 def graph_health(
