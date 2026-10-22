@@ -40,6 +40,10 @@ def validate_packets(packets: list[dict]) -> None:
     from loci.mcp_output_models import LociReadOutput, LociRetrieveOutput
     for envelope in packets:
         payload = envelope["structuredContent"]
+        if payload.get("policy") == "graph-free-file-v1":
+            from benchmarks.architecture_cases import validate_graph_free_packet
+            validate_graph_free_packet(payload)
+            continue
         model = LociReadOutput if "source" in payload else LociRetrieveOutput
         model.model_validate(payload)
 
@@ -89,6 +93,57 @@ def tree_bytes(root: Path) -> int:
     return sum(p.stat().st_size for p in root.rglob("*") if p.is_file())
 
 
+def acquire(service, repo: Path, request: dict, inventory: dict, rows: list,
+            *, graph_free: bool, enrichment: bool) -> tuple[list, dict]:
+    from benchmarks.architecture_cases import ACQUISITION_LIMITS as limits, next_acquisition_query
+    packets, queries, asked = [], [], []
+    continuations = source_bytes = output_bytes = 0
+    reason = "query_limit"
+    while len(queries) < limits["retrieval_calls"]:
+        if source_bytes >= limits["source_bytes"] or output_bytes >= limits["output_bytes"]:
+            reason = "byte_admission_limit"
+            break
+        query = request["query"] if not asked else next_acquisition_query(inventory, packets, asked)
+        if query is None:
+            reason = "discovery_exhausted"
+            break
+        start = len(packets)
+        with measure(rows, "retrieval" if not asked else "followup", case_id=request["case_id"], query=query) as row:
+            packet = service.retrieve(repo, query, ensure_fresh=True, graph_enrichment=enrichment)
+            row["usage"] = packet.get("usage")
+        def append(payload):
+            nonlocal source_bytes, output_bytes
+            envelope = {"content": [], "structuredContent": payload, "isError": False}
+            packets.append(envelope)
+            source_bytes += payload["usage"]["evidence_bytes"]
+            output_bytes += len(json.dumps(envelope, ensure_ascii=False, separators=(",", ":")).encode())
+        append(packet)
+        for item in packet["items"]:
+            reference = item["source_ref"] if not item["complete"] else None
+            seen = set()
+            while reference:
+                if (continuations >= limits["continuation_calls"] or source_bytes >= limits["source_bytes"]
+                        or output_bytes >= limits["output_bytes"]):
+                    break
+                if reference in seen:
+                    raise ValueError("non-progressing acquisition continuation")
+                seen.add(reference)
+                with measure(rows, "continuation", case_id=request["case_id"]) as row:
+                    page = service.read(repo, reference, ensure_fresh=True)
+                    row["usage"] = page.get("usage")
+                append(page)
+                continuations += 1
+                reference = page.get("next_source_ref") if not page["complete"] else None
+                if not page["complete"] and not reference:
+                    raise ValueError("incomplete acquisition source without continuation")
+        queries.append({"query": query, "packet_start": start, "packet_end": len(packets)})
+        asked.append(query)
+    return packets, {"queries": queries, "termination": reason,
+        "continuation_calls": continuations, "source_bytes": source_bytes, "output_bytes": output_bytes,
+        "soft_byte_limit_overshoot": {"source_bytes": max(0, source_bytes - limits["source_bytes"]),
+                                      "output_bytes": max(0, output_bytes - limits["output_bytes"])}}
+
+
 def worker(config_path: Path) -> int:
     """One fresh process per condition/repetition, importing ONLY its candidate src."""
     started = time.perf_counter_ns()
@@ -98,18 +153,26 @@ def worker(config_path: Path) -> int:
     rows: list[dict] = []
     report: dict = {"status": "incomplete", "phases": rows, "cases": [], "indexes": {}}
     output = Path(config["artifacts"])
+    graph_free = config.get("architecture") == "graph-free"
+    acquisition = config.get("operation") == "acquisition"
     try:
         with measure(rows, "runtime_setup"):
-            from loci import service
-            from loci.storage.store_identity import bind_mcp_store
-            from loci.storage.store_resolver import activate_mcp_store
-            import loci.service
-            loaded = Path(loci.service.__file__).resolve()
+            if graph_free:
+                from loci.graph_free import GraphFreeSource
+                import loci.graph_free
+                service = GraphFreeSource(Path(config["store"]) / config["namespace"])
+                loaded = Path(loci.graph_free.__file__).resolve()
+                resolution = {"base_dir": config["store"], "namespace": config["namespace"],
+                              "store_id": config["namespace"]}
+            else:
+                from loci import service
+                from loci.storage.store_identity import bind_mcp_store
+                from loci.storage.store_resolver import activate_mcp_store
+                activate_mcp_store(bind_mcp_store())
+                loaded = Path(service.__file__).resolve()
+                resolution = service.get_store_resolution().to_dict()
             if not loaded.is_relative_to(implementation / "src"):
                 raise ValueError(f"candidate import escaped implementation: {loaded}")
-            binding = bind_mcp_store()
-            activate_mcp_store(binding)
-            resolution = service.get_store_resolution().to_dict()
             if (Path(resolution["base_dir"]).resolve() != Path(config["store"]).resolve()
                     or resolution.get("namespace") != config["namespace"]):
                 raise ValueError("runtime store binding differs from experiment")
@@ -119,17 +182,18 @@ def worker(config_path: Path) -> int:
             report["python"] = sys.version
             report["dependencies"] = sorted((d.metadata["Name"], d.version)
                                                 for d in importlib.metadata.distributions())
+        inventories = {}
         for snapshot, path in config["snapshots"].items():
             repo = Path(path)
             with measure(rows, "indexing", snapshot=snapshot) as measurement:
-                measurement["work"] = service.index_repo(repo, incremental=False)
-            store = service.get_store()
+                measurement["work"] = service.index_repo(repo) if graph_free else service.index_repo(repo, incremental=False)
+            store = None if graph_free else service.get_store()
             # Nongit source exports must retain their identity despite living
             # below a worktree. Never use the implementation checkout as input.
-            canonical = store._canonical_repo(str(repo))
+            canonical = str(repo.resolve()) if graph_free else store._canonical_repo(str(repo))
             if Path(canonical).resolve() != repo.resolve():
                 raise ValueError("fixture canonicalized outside its isolated source root")
-            index = store.load(repo)
+            index = service.inventory(repo) if graph_free else store.load(repo)
             if index is None:
                 raise ValueError("indexing did not produce an index")
             index_file = output / "indexes" / f"{snapshot}.json.gz"
@@ -137,9 +201,27 @@ def worker(config_path: Path) -> int:
             index_file.write_bytes(gzip.compress(json.dumps(index, ensure_ascii=False,
                                         separators=(",", ":"), allow_nan=False).encode(), mtime=0))
             report["indexes"][snapshot] = str(index_file.relative_to(output))
+            if acquisition:
+                with measure(rows, "discovery", snapshot=snapshot):
+                    hashes = dict(index.get("file_hashes", {}))
+                    if not graph_free:
+                        hashes.update(index.get("graph", {}).get("input_hashes", {}))
+                    inventories[snapshot] = {"schema_version": 1, "files": {
+                        name: {"sha256": value, "size": (repo / name).stat().st_size}
+                        for name, value in sorted(hashes.items()) if (repo / name).is_file()}}
+                    write(output / "inventories" / f"{snapshot}.json", inventories[snapshot])
         for request in ([] if config.get("operation") == "exact-source" else config["requests"]):
             repo = Path(config["snapshots"][request["snapshot"]])
             case_id = request["case_id"]
+            if acquisition:
+                packets, trace = acquire(service, repo, request, inventories[request["snapshot"]], rows,
+                                         graph_free=graph_free, enrichment=config["enrichment"] == "on")
+                case_file = output / "packets" / f"{case_id}.json"
+                write(case_file, packets)
+                report["cases"].append({"case_id": case_id, "snapshot": request["snapshot"],
+                                        "packets": str(case_file.relative_to(output)), "acquisition": trace})
+                write(output / "worker.json", report)
+                continue
             with measure(rows, "retrieval", case_id=case_id) as measurement:
                 packet = service.retrieve(repo, request.get("query", ""),
                                           seed_ids=request.get("seed_ids"), ensure_fresh=True,
@@ -170,7 +252,9 @@ def worker(config_path: Path) -> int:
             write(output / "worker.json", report)
         report["store_bytes"] = tree_bytes(Path(config["store"]))
         report["cache_bytes"] = tree_bytes(Path(os.environ["XDG_CACHE_HOME"]))
-        report["catalog"] = service.list_repos()
+        report["catalog"] = None if graph_free else service.list_repos()
+        report["loaded_semantic_modules"] = sorted(n for n in sys.modules if n in {"loci.graph", "loci.parser", "loci.storage"}
+            or n.startswith(("loci.graph.", "loci.parser.", "loci.storage."))) if graph_free else None
         report["status"] = "completed"
     except Exception as exc:
         report.update(status="failed", error=f"{type(exc).__name__}: {exc}", traceback=traceback.format_exc())
@@ -392,18 +476,25 @@ def comparisons(output: Path, runs: list[dict]) -> list[dict]:
             if a["case_id"] != b["case_id"]:
                 raise ValueError("paired capability inventories differ")
             def values(item):
-                return {"anchor_selected": int(item["anchor_selection"]["selected"]),
+                values = {"anchor_selected": int(item["anchor_selection"]["selected"]),
                         "gold_spans_covered": item["source_coverage"]["covered"],
                         "gold_spans_required": item["source_coverage"]["required"],
                         "relationships_available": item["relationships"]["available_dependency_links_total"],
                         "relationships_delivered": item["relationships"]["delivered_dependency_links_total"],
                         "relationships_required": item["relationships"]["required_semantic_dependencies_total"],
                         "forbidden_relationships": item["negative_cases"]["forbidden_proven_relationships"]}
+                if "acquisition" in item:
+                    values.update(anchor_source_acquired=int(item["acquisition"]["anchor_source_acquired"]),
+                        initial_gold_spans_covered=item["acquisition"]["initial_source_coverage"]["covered"],
+                        session_relationships_delivered=item["session_relationships"]["delivered_dependency_links_total"])
+                return values
             a_values, b_values = values(a), values(b)
             delta = {k: b_values[k] - a_values[k] for k in a_values}
             regressed = any(delta[k] < 0 for k in ("anchor_selected", "gold_spans_covered", "relationships_available", "relationships_delivered")) or delta["forbidden_relationships"] > 0
             dimensions.append({"case_id": a["case_id"], "control": a_values, "variant": b_values,
                                "delta_variant_minus_control": delta, "capability_regression": regressed,
+                               "source_acquisition_regression": (delta["gold_spans_covered"] < 0 or
+                                   delta.get("anchor_source_acquired", 0) < 0),
                                "efficiency": {"control": a["efficiency"], "variant": b["efficiency"]}})
         performance = {}
         for phase in sorted(set(control["phase_totals"]) | set(variant["phase_totals"])):
@@ -480,6 +571,7 @@ def preserve_evaluator(output: Path) -> dict:
 def run(args) -> int:
     from benchmarks.architecture_cases import load_suite, prepare_snapshots, verify_snapshots, requests, score
     from benchmarks.architecture_reads import requests as read_requests, check_case
+    from benchmarks.architecture_cases import score_acquisition
 
     operation = getattr(args, "operation", "retrieval")
     if operation == "exact-source" and not getattr(args, "mechanism", None):
@@ -505,13 +597,17 @@ def run(args) -> int:
               "harness_dirty": bool(git(ROOT, "status", "--porcelain", "--untracked-files=no")),
               "host": {"platform": platform.platform(), "python": sys.version, "executable": sys.executable},
               "operation": operation,
-              "mechanism": (args.mechanism if operation == "exact-source" else
+              "mechanism": (args.mechanism if operation in {"exact-source", "acquisition"} else
                             "graph enrichment; both conditions retain full graph indexing and storage"),
               "graph_free": False,
               "limits": ["source delivery is not agent task correctness", "single runs are descriptive, not significance tests",
                          "OS filesystem/provider caches are not claimed cold", "phase RSS is the process lifetime high-water mark",
                          "deterministic continuation hydrates selected incomplete items only"],
               "primary_before": before}
+    report["architectures"] = {arm: getattr(args, arm + "_architecture", "graph") for arm in ("control", "variant")}
+    if operation != "acquisition" and "graph-free" in report["architectures"].values():
+        raise ValueError("graph-free candidate requires explicit acquisition observer")
+    report["graph_free"] = report["architectures"] if operation == "acquisition" else False
     created: set[Path] = set()
     try:
         worktree_parent = primary / ".worktrees"
@@ -573,6 +669,7 @@ def run(args) -> int:
                                 if operation == "exact-source" else requests(corpus))
                     config = {"implementation": str(implementation), "revision": refs[arm],
                               "operation": operation,
+                              "architecture": report["architectures"][arm],
                               "enrichment": "on" if operation == "exact-source" else getattr(args, arm + "_enrichment"), "store": str(store),
                               "namespace": namespace, "snapshots": snapshots,
                               "artifacts": str(artifacts), "requests": assigned}
@@ -631,7 +728,8 @@ def run(args) -> int:
                         raise ValueError("incomplete or reordered request inventory")
                     binding = result["binding"]
                     if (Path(binding["base_dir"]) != store or binding["namespace"] != namespace
-                            or result["service_source"] != str(implementation / "src/loci/service.py")):
+                            or result["service_source"] != str(implementation / "src/loci" /
+                                ("graph_free.py" if config["architecture"] == "graph-free" else "service.py"))):
                         raise ValueError("worker implementation/store identity mismatch")
                     entry["binding"] = binding
                     entry["cases"] = [{"case_id": case["case_id"], "snapshot": case["snapshot"],
@@ -646,10 +744,16 @@ def run(args) -> int:
                         else:
                             index = read_index(artifacts / result["indexes"][case["snapshot"]])
                             validate_packets(packets)
-                            scores.append(score(corpus, case["case_id"], Path(snapshots[case["snapshot"]]), index, packets))
+                            if operation == "acquisition":
+                                inventory = json.loads((artifacts / "inventories" / f"{case['snapshot']}.json").read_text())
+                                scores.append(score_acquisition(corpus, case["case_id"], Path(snapshots[case["snapshot"]]),
+                                    index, packets, case["acquisition"], inventory))
+                            else:
+                                scores.append(score(corpus, case["case_id"], Path(snapshots[case["snapshot"]]), index, packets))
                     write(artifacts / "capability.json", scores)
                     entry["capability"] = str((artifacts / "capability.json").relative_to(output))
-                    invalid_cases = [item["case_id"] for item in scores if not item["integrity_ok"]]
+                    entry["legacy_packet_invalid_cases"] = [item["case_id"] for item in scores if not item["integrity_ok"]]
+                    invalid_cases = [item["case_id"] for item in scores if not item.get("acquisition_integrity_ok", item["integrity_ok"])]
                     if invalid_cases:
                         entry.update(status="invalid", invalid_cases=invalid_cases,
                                      error="independent source/output/proof integrity check failed")
@@ -697,6 +801,7 @@ def run(args) -> int:
 def verify(output: Path) -> int:
     from benchmarks.architecture_cases import load_suite, prepare_snapshots, score
     from benchmarks.architecture_reads import check_case
+    from benchmarks.architecture_cases import score_acquisition
     import tempfile
 
     output = output.resolve()
@@ -734,10 +839,17 @@ def verify(output: Path) -> int:
                 else:
                     index = read_index(artifacts / worker_result["indexes"][case["snapshot"]])
                     validate_packets(packets)
-                    actual.append(score(corpus, case["case_id"], Path(snapshots[case["snapshot"]]), index, packets))
+                    if result.get("operation") == "acquisition":
+                        inventory = json.loads((artifacts / "inventories" / f"{case['snapshot']}.json").read_text())
+                        actual.append(score_acquisition(corpus, case["case_id"], Path(snapshots[case["snapshot"]]),
+                            index, packets, case["acquisition"], inventory))
+                    else:
+                        actual.append(score(corpus, case["case_id"], Path(snapshots[case["snapshot"]]), index, packets))
                 count += 1
             if actual != json.loads((artifacts / "capability.json").read_text()):
                 raise ValueError("independent capability replay differs")
+        if result.get("operation") == "acquisition" and comparisons(output, result["runs"]) != result["comparisons"]:
+            raise ValueError("independent acquisition comparison replay differs")
         if result.get("operation") == "exact-source" and read_comparisons(output, result["runs"]) != result["comparisons"]:
             raise ValueError("independent exact-read comparison replay differs")
     print(json.dumps({"status": "verified", "case_executions": count, "output": str(output)}))
@@ -754,7 +866,9 @@ def main() -> int:
     execution.add_argument("--variant-ref", default="HEAD")
     execution.add_argument("--control-enrichment", choices=("on", "off"), default="on")
     execution.add_argument("--variant-enrichment", choices=("on", "off"), default="off")
-    execution.add_argument("--operation", choices=("retrieval", "exact-source"), default="retrieval")
+    execution.add_argument("--operation", choices=("retrieval", "exact-source", "acquisition"), default="retrieval")
+    execution.add_argument("--control-architecture", choices=("graph", "graph-free"), default="graph")
+    execution.add_argument("--variant-architecture", choices=("graph", "graph-free"), default="graph")
     execution.add_argument("--mechanism", help="actual mechanism under comparison, recorded in result metadata")
     execution.add_argument("--read-file", action="append", help="exact-source snapshot:relative/path; repeatable")
     execution.add_argument("--read-negatives", action="store_true", help="run destructive-in-copy error probes on selected small files")
