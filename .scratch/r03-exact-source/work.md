@@ -60,3 +60,13 @@ source_boundary final recommendation: adopted with demonstrated-defect correctio
 Source payload -> payload digest -> root index footer -> full index-byte digest ->
 sidecar avoids circular hashing. No added key/database. Exact-source separation
 still hashes all index bytes and refreshes/compiles full semantics when necessary.
+
+read_harness result: adopted after primary inspection. Direct mode extends the
+existing runner with an explicit mechanism, fresh reader process, frozen exact
+page/error observer, small deterministic suite and paired replay. Concrete gaps
+found during inspection (post-read fixture verification, replay inventories and
+paired equivalence, required UTF-8 negative inventory) were corrected before
+measurement. Final focused exact-source harness suite: 3 passed in 20.19 s.
+Primary also ran existing harness/corpus and source projection checks with
+PYTHONPATH=src: 26 passed in 26.96 s. Observer and candidate have independent
+revision identities. The prospective schedule is protocol.md.

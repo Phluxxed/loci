@@ -137,7 +137,7 @@ def worker(config_path: Path) -> int:
             index_file.write_bytes(gzip.compress(json.dumps(index, ensure_ascii=False,
                                         separators=(",", ":"), allow_nan=False).encode(), mtime=0))
             report["indexes"][snapshot] = str(index_file.relative_to(output))
-        for request in config["requests"]:
+        for request in ([] if config.get("operation") == "exact-source" else config["requests"]):
             repo = Path(config["snapshots"][request["snapshot"]])
             case_id = request["case_id"]
             with measure(rows, "retrieval", case_id=case_id) as measurement:
@@ -178,6 +178,146 @@ def worker(config_path: Path) -> int:
         report["process_elapsed_ns"] = time.perf_counter_ns() - started
         report["process_resources"] = usage()
         write(output / "worker.json", report)
+    return 0 if report["status"] == "completed" else 1
+
+
+def read_worker(config_path: Path) -> int:
+    """Read an already indexed store in a fresh process, with no retrieval warmup."""
+    from benchmarks.architecture_reads import locator, errors
+
+    started = time.perf_counter_ns()
+    config = json.loads(config_path.read_text())
+    implementation = Path(config["implementation"])
+    sys.path.insert(0, str(implementation / "src"))
+    output = Path(config["artifacts"])
+    rows: list[dict] = []
+    report: dict = {"status": "incomplete", "phases": rows, "cases": []}
+    try:
+        with measure(rows, "read_runtime_setup"):
+            from loci import service
+            from loci.storage.store_identity import bind_mcp_store
+            from loci.storage.store_resolver import activate_mcp_store
+            import loci.service
+            loaded = Path(loci.service.__file__).resolve()
+            if not loaded.is_relative_to(implementation / "src"):
+                raise ValueError(f"candidate import escaped implementation: {loaded}")
+            activate_mcp_store(bind_mcp_store())
+            binding = service.get_store_resolution().to_dict()
+            if (Path(binding["base_dir"]).resolve() != Path(config["store"]).resolve()
+                    or binding["namespace"] != config["namespace"]):
+                raise ValueError("read worker store binding differs from experiment")
+            report.update(binding=binding, service_source=str(loaded), pid=os.getpid())
+        # Benchmark-only observation of the existing service seams. The direct
+        # candidate can bypass graph context, yielding zero observed calls.
+        report["observed_service_calls"] = {key: 0 for key in (
+            "graph_context", "ensure_fresh_index", "index_is_stale", "index_repo_unlocked",
+            "store_load", "store_load_source_index", "store_validate_graph_state")}
+        for name, key in (("_load_graph_context", "graph_context"),
+                          ("ensure_fresh_index", "ensure_fresh_index"),
+                          ("_index_is_stale", "index_is_stale"),
+                          ("_index_repo_unlocked", "index_repo_unlocked")):
+            original = getattr(service, name, None)
+            if original is None:
+                continue
+            def instrumented(*args, _original=original, _key=key, **kwargs):
+                report["observed_service_calls"][_key] += 1
+                with measure(rows, "diagnostic_" + _key):
+                    return _original(*args, **kwargs)
+            setattr(service, name, instrumented)
+        from loci.storage.index_store import IndexStore
+        for name, key in (("load", "store_load"),
+                          ("load_source_index", "store_load_source_index"),
+                          ("validate_graph_state", "store_validate_graph_state")):
+            original = getattr(IndexStore, name, None)
+            if original is None:
+                continue
+            def instrumented_store(self, *args, _original=original, _key=key, **kwargs):
+                report["observed_service_calls"][_key] += 1
+                with measure(rows, "diagnostic_" + _key):
+                    return _original(self, *args, **kwargs)
+            setattr(IndexStore, name, instrumented_store)
+
+        def call(repo, reference, phase, case_id, *, fresh=False, expected_error=False):
+            with measure(rows, phase, case_id=case_id) as measurement:
+                try:
+                    result = service.read(repo, reference, ensure_fresh=fresh)
+                except service.LociError as exc:
+                    if not expected_error:
+                        raise
+                    result = {"code": exc.code, "message": exc.message, "details": exc.details}
+                    measurement["error_code"] = exc.code
+                else:
+                    if expected_error:
+                        raise ValueError(f"negative read unexpectedly succeeded: {phase}")
+                    measurement["usage"] = result.get("usage")
+                return result
+
+        for request in config["requests"]:
+            repo = Path(config["snapshots"][request["snapshot"]])
+            report.setdefault("index_file_bytes", {})[request["snapshot"]] = service.get_store()._index_path(repo).stat().st_size
+            file = request["file"]
+            raw = (repo / file).read_bytes()
+            if hashlib.sha256(raw).hexdigest() != request["sha256"] or len(raw) != request["size"]:
+                raise ValueError("read source changed since request preparation")
+            reference = locator(repo, file, raw)
+            case_id = request["case_id"]
+            first = call(repo, reference, "first_read", case_id, fresh=True)
+            repeat = call(repo, reference, "repeat_read", case_id, fresh=True)
+            without_refresh = call(repo, reference, "read_without_refresh", case_id)
+            pages = [first]
+            seen = {reference}
+            next_ref = first["next_source_ref"]
+            while next_ref is not None:
+                if next_ref in seen:
+                    raise ValueError("non-progressing read continuation")
+                seen.add(next_ref)
+                page = call(repo, next_ref, "read_continuation", case_id, fresh=True)
+                pages.append(page)
+                next_ref = page["next_source_ref"]
+            negatives = {}
+            if request["negatives"]:
+                negatives = {name: call(repo, ref, "read_expected_error", case_id,
+                                       expected_error=True) for name, ref in errors(repo, file, raw)}
+                # Change the source only within this worker, then restore exact bytes.
+                # The outer runner verifies every frozen snapshot after the worker exits.
+                path = repo / file
+                try:
+                    path.write_bytes(raw + b"\n")
+                    negatives["stale"] = call(repo, reference, "read_expected_error", case_id,
+                                               expected_error=True)
+                    negatives["stale_refresh"] = call(repo, reference, "read_expected_error", case_id,
+                                                       fresh=True, expected_error=True)
+                finally:
+                    path.write_bytes(raw)
+                    with measure(rows, "freshness_restore", case_id=case_id) as measurement:
+                        measurement["work"] = service.ensure_fresh_index(repo)
+                outside = Path(config["store"]) / f"outside-{case_id}.txt"
+                outside.parent.mkdir(parents=True, exist_ok=True)
+                outside.write_bytes(raw)
+                try:
+                    path.unlink()
+                    path.symlink_to(outside)
+                    negatives["outside_symlink"] = call(repo, reference, "read_expected_error", case_id,
+                                                        expected_error=True)
+                finally:
+                    path.unlink(missing_ok=True)
+                    path.write_bytes(raw)
+                    outside.unlink(missing_ok=True)
+            case_file = output / "packets" / f"{case_id}.json"
+            write(case_file, {"pages": pages, "repeat": repeat, "without_refresh": without_refresh,
+                              "negatives": negatives})
+            report["cases"].append({"case_id": case_id, "snapshot": request["snapshot"],
+                                    "packets": str(case_file.relative_to(output))})
+            write(output / "reader.json", report)
+        report["store_bytes"] = tree_bytes(Path(config["store"]))
+        report["cache_bytes"] = tree_bytes(Path(os.environ["XDG_CACHE_HOME"]))
+        report["status"] = "completed"
+    except Exception as exc:
+        report.update(status="failed", error=f"{type(exc).__name__}: {exc}", traceback=traceback.format_exc())
+    finally:
+        report["process_elapsed_ns"] = time.perf_counter_ns() - started
+        report["process_resources"] = usage()
+        write(output / "reader.json", report)
     return 0 if report["status"] == "completed" else 1
 
 
@@ -277,6 +417,45 @@ def comparisons(output: Path, runs: list[dict]) -> list[dict]:
     return pairs
 
 
+def read_comparisons(output: Path, runs: list[dict]) -> list[dict]:
+    from benchmarks.architecture_reads import comparable
+
+    pairs = []
+    for control in (r for r in runs if r["arm"] == "control"):
+        variant = next((r for r in runs if r["arm"] == "variant"
+                        and r["repetition"] == control["repetition"] and r["suite"] == control["suite"]), None)
+        if variant is None or any(r["status"] != "completed" for r in (control, variant)):
+            pairs.append({"control": control["id"], "status": "unavailable"})
+            continue
+        left = json.loads((output / control["capability"]).read_text())
+        right = json.loads((output / variant["capability"]).read_text())
+        if left != right:
+            pairs.append({"control": control["id"], "variant": variant["id"],
+                          "status": "different_verified_source"})
+            continue
+        equivalent = True
+        control_config = json.loads((output / control["capability"]).parent.joinpath("config.json").read_text())
+        variant_config = json.loads((output / variant["capability"]).parent.joinpath("config.json").read_text())
+        for a_case, b_case in zip(control["cases"], variant["cases"], strict=True):
+            if a_case["case_id"] != b_case["case_id"]:
+                raise ValueError("paired direct-read inventories differ")
+            a = json.loads((output / a_case["packets"]).read_text())
+            b = json.loads((output / b_case["packets"]).read_text())
+            if comparable(a, Path(control_config["snapshots"][a_case["snapshot"]])) != comparable(
+                    b, Path(variant_config["snapshots"][b_case["snapshot"]])):
+                equivalent = False
+        performance = {}
+        for phase in sorted(set(control["phase_totals"]) | set(variant["phase_totals"])):
+            a = control["phase_totals"].get(phase)
+            b = variant["phase_totals"].get(phase)
+            performance[phase] = {"control": a, "variant": b,
+                                  "elapsed_delta_ns": b["elapsed_ns"] - a["elapsed_ns"] if a and b else None}
+        pairs.append({"control": control["id"], "variant": variant["id"],
+                      "status": "compared" if equivalent else "different_output",
+                      "exact_output_equivalent": equivalent, "performance": performance})
+    return pairs
+
+
 def preserve_evaluator(output: Path) -> dict:
     """Retain the actual observer code, even during uncommitted development."""
     files = {Path(__file__).resolve()}
@@ -300,6 +479,11 @@ def preserve_evaluator(output: Path) -> dict:
 
 def run(args) -> int:
     from benchmarks.architecture_cases import load_suite, prepare_snapshots, verify_snapshots, requests, score
+    from benchmarks.architecture_reads import requests as read_requests, check_case
+
+    operation = getattr(args, "operation", "retrieval")
+    if operation == "exact-source" and not getattr(args, "mechanism", None):
+        raise ValueError("exact-source requires --mechanism")
 
     repo = Path(args.repo).resolve()
     common = Path(git(repo, "rev-parse", "--path-format=absolute", "--git-common-dir"))
@@ -320,7 +504,9 @@ def run(args) -> int:
               "harness_revision": git(ROOT, "rev-parse", "HEAD"),
               "harness_dirty": bool(git(ROOT, "status", "--porcelain", "--untracked-files=no")),
               "host": {"platform": platform.platform(), "python": sys.version, "executable": sys.executable},
-              "mechanism": "graph enrichment; both conditions retain full graph indexing and storage",
+              "operation": operation,
+              "mechanism": (args.mechanism if operation == "exact-source" else
+                            "graph enrichment; both conditions retain full graph indexing and storage"),
               "graph_free": False,
               "limits": ["source delivery is not agent task correctness", "single runs are descriptive, not significance tests",
                          "OS filesystem/provider caches are not claimed cold", "phase RSS is the process lifetime high-water mark",
@@ -382,10 +568,14 @@ def run(args) -> int:
                     runtime = run_root / str(corpus_id)
                     store = runtime / "store"
                     namespace = f"r0-{token[:16]}-{label}"
+                    assigned = (read_requests(snapshots, getattr(args, "read_file", None) or [],
+                                              negatives=getattr(args, "read_negatives", False))
+                                if operation == "exact-source" else requests(corpus))
                     config = {"implementation": str(implementation), "revision": refs[arm],
-                              "enrichment": getattr(args, arm + "_enrichment"), "store": str(store),
+                              "operation": operation,
+                              "enrichment": "on" if operation == "exact-source" else getattr(args, arm + "_enrichment"), "store": str(store),
                               "namespace": namespace, "snapshots": snapshots,
-                              "artifacts": str(artifacts), "requests": requests(corpus)}
+                              "artifacts": str(artifacts), "requests": assigned}
                     config_path = artifacts / "config.json"
                     write(config_path, config)
                     env = dict(os.environ)
@@ -412,6 +602,31 @@ def run(args) -> int:
                     if execution["exit_code"] != 0 or result["status"] != "completed":
                         entry.update(status="failed", error=result.get("error", "nonzero worker exit"))
                         continue
+                    if operation == "exact-source":
+                        read_execution = run_process([sys.executable, "-B", str(Path(__file__).resolve()),
+                                                      "_read_worker", str(config_path)], implementation, env,
+                                                     artifacts / "read-process.log")
+                        entry["read_execution"] = read_execution
+                        verify_snapshots(corpus, snapshots)  # reject unrestored error probes or candidate writes
+                        reader_path = artifacts / "reader.json"
+                        if not reader_path.exists():
+                            entry.update(status="failed", error="read worker did not retain a terminal receipt")
+                            continue
+                        reader = json.loads(reader_path.read_text())
+                        entry["index_process_resources"] = entry["process_resources"]
+                        entry["process_resources"] = reader.get("process_resources")
+                        entry["phase_totals"].update(summarize(
+                            [row for row in reader["phases"] if not row["phase"].startswith("diagnostic_")] ))
+                        entry["diagnostic_phase_totals"] = summarize(
+                            [row for row in reader["phases"] if row["phase"].startswith("diagnostic_")])
+                        entry["observed_service_calls"] = reader.get("observed_service_calls")
+                        entry["index_file_bytes"] = reader.get("index_file_bytes")
+                        entry["store_bytes"] = reader.get("store_bytes")
+                        entry["cache_bytes"] = reader.get("cache_bytes")
+                        if read_execution["exit_code"] != 0 or reader["status"] != "completed":
+                            entry.update(status="failed", error=reader.get("error", "nonzero read worker exit"))
+                            continue
+                        result = reader
                     if [r["case_id"] for r in result["cases"]] != [r["case_id"] for r in config["requests"]]:
                         raise ValueError("incomplete or reordered request inventory")
                     binding = result["binding"]
@@ -419,12 +634,19 @@ def run(args) -> int:
                             or result["service_source"] != str(implementation / "src/loci/service.py")):
                         raise ValueError("worker implementation/store identity mismatch")
                     entry["binding"] = binding
+                    entry["cases"] = [{"case_id": case["case_id"], "snapshot": case["snapshot"],
+                                       "packets": str((artifacts / case["packets"]).relative_to(output))}
+                                      for case in result["cases"]] if operation == "exact-source" else []
                     scores = []
                     for case in result["cases"]:
-                        index = read_index(artifacts / result["indexes"][case["snapshot"]])
                         packets = json.loads((artifacts / case["packets"]).read_text())
-                        validate_packets(packets)
-                        scores.append(score(corpus, case["case_id"], Path(snapshots[case["snapshot"]]), index, packets))
+                        if operation == "exact-source":
+                            request = next(r for r in config["requests"] if r["case_id"] == case["case_id"])
+                            scores.append(check_case(Path(snapshots[case["snapshot"]]), request, packets))
+                        else:
+                            index = read_index(artifacts / result["indexes"][case["snapshot"]])
+                            validate_packets(packets)
+                            scores.append(score(corpus, case["case_id"], Path(snapshots[case["snapshot"]]), index, packets))
                     write(artifacts / "capability.json", scores)
                     entry["capability"] = str((artifacts / "capability.json").relative_to(output))
                     invalid_cases = [item["case_id"] for item in scores if not item["integrity_ok"]]
@@ -437,9 +659,12 @@ def run(args) -> int:
         for key in ("base_dir", "namespace", "store_id"):
             if len({b[key] for b in bindings}) != len(bindings):
                 raise ValueError(f"conditions share {key}")
-        report["comparisons"] = comparisons(output, report["runs"])
-        report["status"] = ("invalid" if any(r["status"] == "invalid" for r in report["runs"]) else
-                            "completed" if all(r["status"] == "completed" for r in report["runs"]) else "failed")
+        report["comparisons"] = (read_comparisons(output, report["runs"]) if operation == "exact-source"
+                                 else comparisons(output, report["runs"]))
+        report["status"] = ("invalid" if any(r["status"] == "invalid" for r in report["runs"]) or
+                            any(p["status"] in {"different_verified_source", "different_output"} for p in report["comparisons"]) else
+                            "completed" if all(r["status"] == "completed" for r in report["runs"]) and
+                            all(p["status"] == "compared" for p in report["comparisons"]) else "failed")
     except (KeyboardInterrupt, SystemExit):
         report.update(status="incomplete", error="interrupted; later work was not reached")
     except Exception as exc:
@@ -471,6 +696,7 @@ def run(args) -> int:
 
 def verify(output: Path) -> int:
     from benchmarks.architecture_cases import load_suite, prepare_snapshots, score
+    from benchmarks.architecture_reads import check_case
     import tempfile
 
     output = output.resolve()
@@ -495,16 +721,25 @@ def verify(output: Path) -> int:
                 corpus["snapshots"] = {key: value for key, value in corpus["snapshots"].items()
                                        if key in {case["snapshot"] for case in corpus["cases"]}}
             snapshots = prepare_snapshots(corpus, Path(temporary) / entry["id"])
-            worker_result = json.loads((artifacts / "worker.json").read_text())
+            direct = result.get("operation") == "exact-source"
+            worker_result = json.loads((artifacts / ("reader.json" if direct else "worker.json")).read_text())
+            if [case["case_id"] for case in worker_result["cases"]] != [request["case_id"] for request in config["requests"]]:
+                raise ValueError("retained read request inventory differs from worker receipt")
             actual = []
             for case in worker_result["cases"]:
-                index = read_index(artifacts / worker_result["indexes"][case["snapshot"]])
                 packets = json.loads((artifacts / case["packets"]).read_text())
-                validate_packets(packets)
-                actual.append(score(corpus, case["case_id"], Path(snapshots[case["snapshot"]]), index, packets))
+                if direct:
+                    request = next(r for r in config["requests"] if r["case_id"] == case["case_id"])
+                    actual.append(check_case(Path(snapshots[case["snapshot"]]), request, packets))
+                else:
+                    index = read_index(artifacts / worker_result["indexes"][case["snapshot"]])
+                    validate_packets(packets)
+                    actual.append(score(corpus, case["case_id"], Path(snapshots[case["snapshot"]]), index, packets))
                 count += 1
             if actual != json.loads((artifacts / "capability.json").read_text()):
                 raise ValueError("independent capability replay differs")
+        if result.get("operation") == "exact-source" and read_comparisons(output, result["runs"]) != result["comparisons"]:
+            raise ValueError("independent exact-read comparison replay differs")
     print(json.dumps({"status": "verified", "case_executions": count, "output": str(output)}))
     return 0
 
@@ -519,6 +754,10 @@ def main() -> int:
     execution.add_argument("--variant-ref", default="HEAD")
     execution.add_argument("--control-enrichment", choices=("on", "off"), default="on")
     execution.add_argument("--variant-enrichment", choices=("on", "off"), default="off")
+    execution.add_argument("--operation", choices=("retrieval", "exact-source"), default="retrieval")
+    execution.add_argument("--mechanism", help="actual mechanism under comparison, recorded in result metadata")
+    execution.add_argument("--read-file", action="append", help="exact-source snapshot:relative/path; repeatable")
+    execution.add_argument("--read-negatives", action="store_true", help="run destructive-in-copy error probes on selected small files")
     execution.add_argument("--corpus", action="append")
     execution.add_argument("--repetitions", type=int, default=1)
     execution.add_argument("--case", action="append", help="explicit case scope; repeat to select several")
@@ -526,9 +765,15 @@ def main() -> int:
     replay.add_argument("--output", required=True, type=Path)
     internal = commands.add_parser("_worker", help="internal isolated worker")
     internal.add_argument("config", type=Path)
+    direct_worker = commands.add_parser("_read_worker", help="internal fresh read worker")
+    direct_worker.add_argument("config", type=Path)
     args = parser.parse_args()
     if args.command == "_worker":
         return worker(args.config)
+    if args.command == "_read_worker":
+        if str(ROOT) not in sys.path:
+            sys.path.insert(0, str(ROOT))
+        return read_worker(args.config)
     # Script execution also works without installing benchmark modules.
     if str(ROOT) not in sys.path:
         sys.path.insert(0, str(ROOT))

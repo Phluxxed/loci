@@ -148,3 +148,44 @@ python -m benchmarks.architecture verify --output /tmp/loci-enrichment-valid
 
 This narrower fixture comparison can establish harness operation without claiming all corpus guarantees passed.
 The full-corpus result must be reported alongside it.
+
+## Exact-source comparisons
+
+Use the same runner with `--operation exact-source`. Declare the mechanism
+explicitly; both enrichment settings are forced on because this operation does
+not evaluate enrichment. For example:
+
+```sh
+python -m benchmarks.architecture run \
+  --operation exact-source --mechanism 'generation-bound source projection versus full semantic reconstruction' \
+  --control-ref CONTROL_COMMIT --variant-ref CANDIDATE_COMMIT \
+  --corpus benchmarks/corpora/typescript-context-v3 --case anvil_retrieval_limits \
+  --read-file anvil:src/brain-context/render.ts --repetitions 2 \
+  --output /tmp/loci-exact-source
+python -m benchmarks.architecture verify --output /tmp/loci-exact-source
+```
+
+Repeat `--read-file snapshot:relative/path` to select whole source extents in
+the selected corpus. An independent locator is constructed from each frozen
+file. A fresh reader process follows indexing, so its first read has no warmed
+semantic state. First, repeated and continuation reads use ordinary freshness
+checks; a separate no-refresh read is diagnostic. Each returned byte, extent,
+hash, line, page and output-size accounting field is verified independently.
+Paired comparison normalizes only opaque handles bound to isolated roots and
+root paths in error details. Replay also recomputes paired equivalence.
+
+`architecture_reads.build_small_suite(Path(destination))` creates a deterministic
+frozen corpus with Unicode pagination, Go/Cargo/JavaScript resolver controls and
+an unindexed file. Pass that directory as `--corpus` and select e.g.
+`--read-file imported_interface:unicode.md --read-negatives` for fixed rejection
+probes. Use negatives on small disposable fixtures: they mutate/restore source
+and run full refreshes, whose costs are retained. Inputs are checked again after
+the read process, including failed executions.
+
+Reader and indexing CPU/RSS are separate; RSS is still a process high-water
+mark. Operation phase totals exclude nested diagnostic instrumentation timings.
+Exact-source correctness does not credit semantic relationship proof or agent
+task correctness. Existing five proof-support discrepancies remain unresolved
+and must accompany any result claiming broader corpus behavior. The R0.3
+experimental candidate still compiles and stores the full graph, streams its
+bytes for generation validation, and performs full refreshes when needed.
