@@ -1020,6 +1020,11 @@ collection with a temporary `pytest`-namespaced store. In-process, subprocess,
 and MCP tests inherit that boundary, and the store is removed when the session
 finishes, so tests cannot read or write an operator store by default.
 
+Architectural evaluation uses `python -m benchmarks.architecture run --output /tmp/loci-experiment`.
+See [architectural comparisons](benchmarks/ARCHITECTURE.md) for isolated
+revision comparisons, retained replay, capability/resource accounting and the
+existing native Level B path. Ordinary deterministic runs make no model calls.
+
 ## License
 
 MIT
