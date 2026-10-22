@@ -1,0 +1,269 @@
+{
+  "schema_version": 1,
+  "policy": "normal-graph-v1",
+  "snapshot": "12d32206e997c7709464ed2b522056f2417b5cba06eb4011065d8fc0f56b6a8a",
+  "status": "partial",
+  "selection": {
+    "mode": "explicit",
+    "candidate_count": 1,
+    "omitted_candidates": 0
+  },
+  "scope": {
+    "source": "indexed_supported_source",
+    "coverage": "complete",
+    "matching": "explicit_ids",
+    "relationships": "known_static_relationships",
+    "exhaustive": false
+  },
+  "anchors": [
+    {
+      "node_id": "consumer.ts::processOrder#function",
+      "score": 0.0,
+      "matched_terms": [],
+      "match_scope": []
+    }
+  ],
+  "nodes": [
+    {
+      "id": "consumer.ts::processOrder#function",
+      "name": "processOrder",
+      "kind": "function",
+      "file": "consumer.ts"
+    },
+    {
+      "id": "consumer.ts::__file__#file",
+      "name": "consumer.ts",
+      "kind": "file",
+      "file": "consumer.ts"
+    },
+    {
+      "id": "types.ts::Payload#interface",
+      "name": "Payload",
+      "kind": "interface",
+      "file": "types.ts"
+    },
+    {
+      "id": "types.ts::__file__#file",
+      "name": "types.ts",
+      "kind": "file",
+      "file": "types.ts"
+    }
+  ],
+  "items": [
+    {
+      "node_id": "consumer.ts::processOrder#function",
+      "role": "anchor",
+      "depth": 0,
+      "why": "Explicit source identity",
+      "source_ids": [
+        1
+      ],
+      "complete": true,
+      "extent": {
+        "file": "consumer.ts",
+        "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+        "start_byte": 69,
+        "end_byte": 152
+      },
+      "source_ref": "sr1_boeplavjolkdrmc44q7vaf3kyy"
+    },
+    {
+      "node_id": "types.ts::Payload#interface",
+      "role": "related",
+      "depth": 1,
+      "why": "Selected by uses_type",
+      "source_ids": [
+        2
+      ],
+      "complete": true,
+      "extent": {
+        "file": "types.ts",
+        "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+        "start_byte": 7,
+        "end_byte": 67
+      },
+      "source_ref": "sr1_eggtm5hmxyw2h3rt5n7yivfwqq"
+    }
+  ],
+  "ownership": [
+    {
+      "owner_id": "consumer.ts::__file__#file",
+      "member_id": "consumer.ts::processOrder#function",
+      "basis": "indexed_file"
+    },
+    {
+      "owner_id": "types.ts::__file__#file",
+      "member_id": "types.ts::Payload#interface",
+      "basis": "indexed_file"
+    }
+  ],
+  "relationships": [
+    {
+      "id": 1,
+      "edge": {
+        "from": "consumer.ts::processOrder#function",
+        "to": "types.ts::Payload#interface",
+        "type": "uses_type",
+        "directed": true,
+        "namespace": "loci",
+        "resolution": "import-resolved",
+        "evidence": {
+          "file": "consumer.ts",
+          "line": 2,
+          "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+        }
+      },
+      "traversed": "forward",
+      "source_ids": [
+        1,
+        3,
+        4,
+        5
+      ],
+      "proof": "complete",
+      "resolution_configuration": null
+    },
+    {
+      "id": 2,
+      "edge": {
+        "from": "consumer.ts::__file__#file",
+        "to": "types.ts::Payload#interface",
+        "type": "references_type",
+        "directed": true,
+        "namespace": "loci",
+        "resolution": "import-resolved",
+        "evidence": {
+          "file": "consumer.ts",
+          "line": 2,
+          "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+        }
+      },
+      "traversed": "forward",
+      "source_ids": [
+        1,
+        4,
+        5
+      ],
+      "proof": "complete",
+      "resolution_configuration": null
+    },
+    {
+      "id": 3,
+      "edge": {
+        "from": "consumer.ts::__file__#file",
+        "to": "types.ts::__file__#file",
+        "type": "imports_type",
+        "directed": true,
+        "namespace": "loci",
+        "resolution": "import-resolved",
+        "evidence": {
+          "file": "consumer.ts",
+          "line": 1,
+          "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b"
+        }
+      },
+      "traversed": "forward",
+      "source_ids": [
+        4
+      ],
+      "proof": "complete",
+      "resolution_configuration": null
+    }
+  ],
+  "sources": [
+    {
+      "id": 1,
+      "file": "consumer.ts",
+      "start_byte": 69,
+      "end_byte": 152,
+      "start_line": 2,
+      "end_line": 4,
+      "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+      "content": "function processOrder(value: ImportedPayload): string {\n  return value.requestId;\n}",
+      "source_ref": "sr1_boeplavjolkdrmc44q7vaf3kyy"
+    },
+    {
+      "id": 2,
+      "file": "types.ts",
+      "start_byte": 7,
+      "end_byte": 67,
+      "start_line": 1,
+      "end_line": 4,
+      "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+      "content": "interface Payload {\n  requestId: string;\n  amount: number;\n}",
+      "source_ref": "sr1_eggtm5hmxyw2h3rt5n7yivfwqq"
+    },
+    {
+      "id": 3,
+      "file": "consumer.ts",
+      "start_byte": 62,
+      "end_byte": 125,
+      "start_line": 2,
+      "end_line": 2,
+      "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+      "content": "export function processOrder(value: ImportedPayload): string {\n",
+      "source_ref": "sr1_t3jcbstfhsgaenjinnccy4tfki"
+    },
+    {
+      "id": 4,
+      "file": "consumer.ts",
+      "start_byte": 0,
+      "end_byte": 62,
+      "start_line": 1,
+      "end_line": 1,
+      "content_hash": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+      "content": "import type { Payload as ImportedPayload } from \"./types.js\";\n",
+      "source_ref": "sr1_odi3uiwoqcl5bds4bzpetytl5u"
+    },
+    {
+      "id": 5,
+      "file": "types.ts",
+      "start_byte": 0,
+      "end_byte": 27,
+      "start_line": 1,
+      "end_line": 1,
+      "content_hash": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+      "content": "export interface Payload {\n",
+      "source_ref": "sr1_adkaebp73on32yihcev6twbdmq"
+    }
+  ],
+  "omissions": [
+    {
+      "reason": "cycle",
+      "count": 2
+    },
+    {
+      "reason": "alternative_path",
+      "count": 2
+    }
+  ],
+  "limits": {
+    "max_hops": 2,
+    "max_nodes": 64,
+    "max_neighbors": 32,
+    "max_items": 12,
+    "max_anchors": 3,
+    "max_explicit_anchors": 5,
+    "max_owner_members": 3,
+    "max_evidence_bytes": 8192,
+    "max_output_bytes": 16384,
+    "max_anchor_source_bytes": 1024,
+    "max_related_source_bytes": 768,
+    "max_lookup_bytes": 33554432,
+    "max_lookup_files": 4096,
+    "max_literal_matches": 256
+  },
+  "usage": {
+    "nodes_examined": 4,
+    "eligible_edges_considered": 6,
+    "edges_traversed": 4,
+    "relationships_delivered": 3,
+    "lookup_bytes": 0,
+    "lookup_files": 0,
+    "evidence_bytes": 219,
+    "output_bytes": 5173,
+    "estimated_tokens": 1294,
+    "token_estimate_method": "utf8_bytes_div_4",
+    "output_encoding": "mcp_result_json_utf8"
+  }
+}

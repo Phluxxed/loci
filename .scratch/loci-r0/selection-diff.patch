@@ -1,0 +1,51 @@
+diff --git a/src/loci/retrieval.py b/src/loci/retrieval.py
+index f605ce8..b92602e 100644
+--- a/src/loci/retrieval.py
++++ b/src/loci/retrieval.py
+@@ -907,6 +907,21 @@ def _select_anchors(
+         return (anchor,), {"mode": "file", "candidate_count": 1,
+                            "omitted_candidates": 0}, "exact_file", {"bytes": 0, "files": 0}, omissions
+ 
++    literal, stats, limited, unavailable = _literal_anchors(nodes, source, query)
++    if limited:
++        omissions["lookup_limit"] += 1
++    if unavailable:
++        omissions["source_unavailable"] += unavailable
++    omitted = max(0, len(literal) - LIMITS["max_anchors"])
++    anchors = tuple(literal[:LIMITS["max_anchors"]])
++    if omitted:
++        omissions["anchor_limit"] += omitted
++    if len(literal) > 1:
++        omissions["ambiguous_anchor"] += len(literal) - 1
++    if anchors:
++        return anchors, {"mode": "literal", "candidate_count": len(literal),
++                         "omitted_candidates": omitted}, "source_literal", stats, omissions
++
+     eligible = [node for node in nodes.values() if _source_node(node)]
+     selection = select_graph_anchors(eligible, query, (), max_anchors=LIMITS["max_anchors"])
+     if selection.anchors:
+@@ -919,21 +934,9 @@ def _select_anchors(
+             "mode": "inferred",
+             "candidate_count": selection.qualified_candidates,
+             "omitted_candidates": selection.omitted_candidates,
+-        }, "symbol_metadata", {"bytes": 0, "files": 0}, omissions
+-
+-    literal, stats, limited, unavailable = _literal_anchors(nodes, source, query)
+-    if limited:
+-        omissions["lookup_limit"] += 1
+-    if unavailable:
+-        omissions["source_unavailable"] += unavailable
+-    omitted = max(0, len(literal) - LIMITS["max_anchors"])
+-    anchors = tuple(literal[:LIMITS["max_anchors"]])
+-    if omitted:
+-        omissions["anchor_limit"] += omitted
+-    if len(literal) > 1:
+-        omissions["ambiguous_anchor"] += len(literal) - 1
+-    return anchors, {"mode": "literal", "candidate_count": len(literal),
+-                     "omitted_candidates": omitted}, "source_literal", stats, omissions
++        }, "symbol_metadata", stats, omissions
++    return (), {"mode": "literal", "candidate_count": 0,
++                "omitted_candidates": 0}, "source_literal", stats, omissions
+ 
+ 
+ def _from_graph_anchor(anchor: GraphAnchor) -> _SelectedAnchor:

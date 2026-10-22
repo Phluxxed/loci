@@ -1,0 +1,6175 @@
+{
+  "experiment": "control",
+  "serving_revision": "f41b3eaa4c7871c68972de5f760572a6bcbe1760",
+  "request_policy": "same evaluator-known exact gold anchor per pair",
+  "measurement": "three warm direct retrieval repetitions after separate indexing",
+  "corpora": {
+    "typescript": {
+      "version": "typescript-context-v3",
+      "cases": 17,
+      "corpus_sha256": "5d8f490a820f4e326aa522c2d963c8f0a56ea0c2d472f4d2b66caaeda9834b01"
+    },
+    "multilingual": {
+      "version": "multilingual-context-v1",
+      "cases": 19,
+      "corpus_sha256": "0337e8d40d91c1daa1132ca30be7e260797d6caac5531d3c139a79738ffda0a0"
+    }
+  },
+  "cases": [
+    {
+      "corpus": "typescript",
+      "case_id": "imported_interface",
+      "snapshot": "imported_interface",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "processOrder",
+          "kind": "function"
+        },
+        "gold_interval": [
+          69,
+          152
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 7.07825,
+          "cpu_ms": 4.975,
+          "packet_sha256": "90659055b662e8e6866d71f3b5b63e997f639802417e0977ffc8c7511dbfc1ab",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 5.290958,
+          "cpu_ms": 4.0,
+          "packet_sha256": "90659055b662e8e6866d71f3b5b63e997f639802417e0977ffc8c7511dbfc1ab",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 5.388084,
+          "cpu_ms": 4.027,
+          "packet_sha256": "90659055b662e8e6866d71f3b5b63e997f639802417e0977ffc8c7511dbfc1ab",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 3,
+        "covered_gold_source_count": 3,
+        "covered_gold_source_ids": [
+          "entry",
+          "payload",
+          "import"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 1,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 3,
+        "packet_source_count": 5,
+        "packet_item_count": 2,
+        "packet_output_bytes": 5173,
+        "evidence_bytes": 219,
+        "nodes_examined": 4,
+        "eligible_edges_considered": 6,
+        "edges_traversed": 4,
+        "omissions": [
+          {
+            "reason": "cycle",
+            "count": 2
+          },
+          {
+            "reason": "alternative_path",
+            "count": 2
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "local_interface",
+      "snapshot": "local_interface",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "processOrder",
+          "kind": "function"
+        },
+        "gold_interval": [
+          75,
+          150
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 4.891584,
+          "cpu_ms": 3.313,
+          "packet_sha256": "027f302bf32e646eee05c8a83db86166a52182a3557da63e65dfa91985b0d026",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 3.833333,
+          "cpu_ms": 2.657,
+          "packet_sha256": "027f302bf32e646eee05c8a83db86166a52182a3557da63e65dfa91985b0d026",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 4.146625,
+          "cpu_ms": 2.576,
+          "packet_sha256": "027f302bf32e646eee05c8a83db86166a52182a3557da63e65dfa91985b0d026",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 2,
+        "covered_gold_source_count": 2,
+        "covered_gold_source_ids": [
+          "entry",
+          "payload"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 1,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 1,
+        "packet_source_count": 4,
+        "packet_item_count": 2,
+        "packet_output_bytes": 3968,
+        "evidence_bytes": 149,
+        "nodes_examined": 3,
+        "eligible_edges_considered": 2,
+        "edges_traversed": 1,
+        "omissions": [
+          {
+            "reason": "cycle",
+            "count": 1
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "local_alias_chain",
+      "snapshot": "local_alias_chain",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "processOrder",
+          "kind": "function"
+        },
+        "gold_interval": [
+          132,
+          206
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 6.792333,
+          "cpu_ms": 5.063,
+          "packet_sha256": "9cfe63fad344518135807ff39eac2cb04ad622701496e865849ed38b27583de2",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 5.399833,
+          "cpu_ms": 4.165,
+          "packet_sha256": "9cfe63fad344518135807ff39eac2cb04ad622701496e865849ed38b27583de2",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 5.084584,
+          "cpu_ms": 4.06,
+          "packet_sha256": "9cfe63fad344518135807ff39eac2cb04ad622701496e865849ed38b27583de2",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 4,
+        "covered_gold_source_count": 4,
+        "covered_gold_source_ids": [
+          "entry",
+          "payload",
+          "first",
+          "second"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 3,
+        "available_relationship_count": 3,
+        "delivered_relationship_count": 3,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 3,
+        "packet_source_count": 8,
+        "packet_item_count": 4,
+        "packet_output_bytes": 6836,
+        "evidence_bytes": 205,
+        "nodes_examined": 5,
+        "eligible_edges_considered": 6,
+        "edges_traversed": 3,
+        "omissions": [
+          {
+            "reason": "hop_limit",
+            "count": 2
+          },
+          {
+            "reason": "cycle",
+            "count": 1
+          },
+          {
+            "reason": "alternative_path",
+            "count": 1
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "imported_alias_chain",
+      "snapshot": "imported_alias_chain",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "processOrder",
+          "kind": "function"
+        },
+        "gold_interval": [
+          49,
+          123
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 7.908458,
+          "cpu_ms": 6.388,
+          "packet_sha256": "7a68241da0acbc77e22a46658698ac906844bc521aab7b2ca371a60f5b07011c",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 7.004458,
+          "cpu_ms": 5.712,
+          "packet_sha256": "7a68241da0acbc77e22a46658698ac906844bc521aab7b2ca371a60f5b07011c",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 7.696208,
+          "cpu_ms": 5.923,
+          "packet_sha256": "7a68241da0acbc77e22a46658698ac906844bc521aab7b2ca371a60f5b07011c",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 5,
+        "covered_gold_source_count": 5,
+        "covered_gold_source_ids": [
+          "entry",
+          "payload",
+          "first",
+          "second",
+          "import"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 3,
+        "available_relationship_count": 3,
+        "delivered_relationship_count": 3,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 5,
+        "packet_source_count": 9,
+        "packet_item_count": 4,
+        "packet_output_bytes": 7889,
+        "evidence_bytes": 247,
+        "nodes_examined": 6,
+        "eligible_edges_considered": 10,
+        "edges_traversed": 6,
+        "omissions": [
+          {
+            "reason": "hop_limit",
+            "count": 2
+          },
+          {
+            "reason": "cycle",
+            "count": 2
+          },
+          {
+            "reason": "alternative_path",
+            "count": 3
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "named_type_reexport_chain",
+      "snapshot": "named_type_reexport_chain",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "processOrder",
+          "kind": "function"
+        },
+        "gold_interval": [
+          76,
+          159
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 8.253959,
+          "cpu_ms": 5.718,
+          "packet_sha256": "bca2793a87faaa1a81b08792c8af99b66a14b7e8ec2e5ba9da7d1cbbc20cd48d",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 7.806917,
+          "cpu_ms": 5.452,
+          "packet_sha256": "bca2793a87faaa1a81b08792c8af99b66a14b7e8ec2e5ba9da7d1cbbc20cd48d",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 7.439166,
+          "cpu_ms": 5.215,
+          "packet_sha256": "bca2793a87faaa1a81b08792c8af99b66a14b7e8ec2e5ba9da7d1cbbc20cd48d",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 4,
+        "covered_gold_source_count": 4,
+        "covered_gold_source_ids": [
+          "entry",
+          "payload",
+          "import",
+          "reexport"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 1,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 4,
+        "packet_source_count": 6,
+        "packet_item_count": 2,
+        "packet_output_bytes": 5944,
+        "evidence_bytes": 286,
+        "nodes_examined": 5,
+        "eligible_edges_considered": 8,
+        "edges_traversed": 6,
+        "omissions": [
+          {
+            "reason": "cycle",
+            "count": 2
+          },
+          {
+            "reason": "alternative_path",
+            "count": 4
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "same_name_wrong_file",
+      "snapshot": "same_name_wrong_file",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "processOrder",
+          "kind": "function"
+        },
+        "gold_interval": [
+          69,
+          152
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 6.815917,
+          "cpu_ms": 4.431,
+          "packet_sha256": "3d125a0d542348235cddd358ae4978695570752a1efabcc72adfa696c46b1290",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 5.759667,
+          "cpu_ms": 3.9,
+          "packet_sha256": "3d125a0d542348235cddd358ae4978695570752a1efabcc72adfa696c46b1290",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 5.49525,
+          "cpu_ms": 3.955,
+          "packet_sha256": "3d125a0d542348235cddd358ae4978695570752a1efabcc72adfa696c46b1290",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 3,
+        "covered_gold_source_count": 3,
+        "covered_gold_source_ids": [
+          "entry",
+          "payload",
+          "import"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 1,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 3,
+        "packet_source_count": 5,
+        "packet_item_count": 2,
+        "packet_output_bytes": 5173,
+        "evidence_bytes": 219,
+        "nodes_examined": 4,
+        "eligible_edges_considered": 6,
+        "edges_traversed": 4,
+        "omissions": [
+          {
+            "reason": "cycle",
+            "count": 2
+          },
+          {
+            "reason": "alternative_path",
+            "count": 2
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "local_heritage",
+      "snapshot": "local_heritage",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "Processor",
+          "kind": "class"
+        },
+        "gold_interval": [
+          153,
+          252
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::Processor#class"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::Processor#class"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 6.854041,
+          "cpu_ms": 5.009,
+          "packet_sha256": "088b5308144ce44c42e2e10aebd6f77c83d1eb153d05a836f9deb624eee9d1ed",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 7.27025,
+          "cpu_ms": 4.551,
+          "packet_sha256": "088b5308144ce44c42e2e10aebd6f77c83d1eb153d05a836f9deb624eee9d1ed",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 7.18025,
+          "cpu_ms": 5.243,
+          "packet_sha256": "088b5308144ce44c42e2e10aebd6f77c83d1eb153d05a836f9deb624eee9d1ed",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 4,
+        "covered_gold_source_count": 4,
+        "covered_gold_source_ids": [
+          "entry",
+          "contract",
+          "base",
+          "child"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 3,
+        "available_relationship_count": 3,
+        "delivered_relationship_count": 3,
+        "precise_kind_links_delivered": 3,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 3,
+        "packet_source_count": 8,
+        "packet_item_count": 4,
+        "packet_output_bytes": 6978,
+        "evidence_bytes": 252,
+        "nodes_examined": 5,
+        "eligible_edges_considered": 6,
+        "edges_traversed": 4,
+        "omissions": [
+          {
+            "reason": "cycle",
+            "count": 2
+          },
+          {
+            "reason": "alternative_path",
+            "count": 2
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "imported_heritage",
+      "snapshot": "imported_heritage",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "Processor",
+          "kind": "class"
+        },
+        "gold_interval": [
+          125,
+          224
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::Processor#class"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::Processor#class"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 10.869375,
+          "cpu_ms": 8.849,
+          "packet_sha256": "3b0b393e6a5d9c00650d5ecbf07ea449a880e340fc800fe2102606ae32395c94",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 10.426125,
+          "cpu_ms": 8.281,
+          "packet_sha256": "3b0b393e6a5d9c00650d5ecbf07ea449a880e340fc800fe2102606ae32395c94",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 9.77275,
+          "cpu_ms": 8.074,
+          "packet_sha256": "3b0b393e6a5d9c00650d5ecbf07ea449a880e340fc800fe2102606ae32395c94",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 5,
+        "covered_gold_source_count": 5,
+        "covered_gold_source_ids": [
+          "entry",
+          "contract",
+          "base",
+          "child",
+          "import"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 3,
+        "available_relationship_count": 3,
+        "delivered_relationship_count": 3,
+        "precise_kind_links_delivered": 3,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 6,
+        "packet_source_count": 9,
+        "packet_item_count": 5,
+        "packet_output_bytes": 9065,
+        "evidence_bytes": 323,
+        "nodes_examined": 7,
+        "eligible_edges_considered": 12,
+        "edges_traversed": 9,
+        "omissions": [
+          {
+            "reason": "cycle",
+            "count": 3
+          },
+          {
+            "reason": "alternative_path",
+            "count": 6
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "ambiguous_star_exports",
+      "snapshot": "ambiguous_star_exports",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "processOrder",
+          "kind": "function"
+        },
+        "gold_interval": [
+          70,
+          153
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 6.859875,
+          "cpu_ms": 4.857,
+          "packet_sha256": "7e3fc917d9021bc820012ae0fe0b8ee9c2963803cba27e56709ab54ef9e440f6",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 6.088791,
+          "cpu_ms": 4.518,
+          "packet_sha256": "7e3fc917d9021bc820012ae0fe0b8ee9c2963803cba27e56709ab54ef9e440f6",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 5.975333,
+          "cpu_ms": 4.464,
+          "packet_sha256": "7e3fc917d9021bc820012ae0fe0b8ee9c2963803cba27e56709ab54ef9e440f6",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 5,
+        "covered_gold_source_count": 5,
+        "covered_gold_source_ids": [
+          "entry",
+          "left",
+          "right",
+          "barrel",
+          "import"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 0,
+        "available_relationship_count": 0,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 3,
+        "packet_source_count": 6,
+        "packet_item_count": 3,
+        "packet_output_bytes": 6104,
+        "evidence_bytes": 321,
+        "nodes_examined": 7,
+        "eligible_edges_considered": 6,
+        "edges_traversed": 3,
+        "omissions": [
+          {
+            "reason": "hop_limit",
+            "count": 2
+          },
+          {
+            "reason": "cycle",
+            "count": 1
+          },
+          {
+            "reason": "ambiguous_relation",
+            "count": 2
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "generic_shadow",
+      "snapshot": "generic_shadow",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "processOrder",
+          "kind": "function"
+        },
+        "gold_interval": [
+          50,
+          125
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 5.032958,
+          "cpu_ms": 3.495,
+          "packet_sha256": "f16c4fca93b665d68a83bdef95b09640d063e117f75b869bc30d4fc27e98e7a1",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 4.420125,
+          "cpu_ms": 2.989,
+          "packet_sha256": "f16c4fca93b665d68a83bdef95b09640d063e117f75b869bc30d4fc27e98e7a1",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 4.200083,
+          "cpu_ms": 2.958,
+          "packet_sha256": "f16c4fca93b665d68a83bdef95b09640d063e117f75b869bc30d4fc27e98e7a1",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 2,
+        "covered_gold_source_count": 2,
+        "covered_gold_source_ids": [
+          "entry",
+          "import"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 0,
+        "available_relationship_count": 0,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 1,
+        "packet_source_count": 3,
+        "packet_item_count": 2,
+        "packet_output_bytes": 3805,
+        "evidence_bytes": 178,
+        "nodes_examined": 4,
+        "eligible_edges_considered": 2,
+        "edges_traversed": 1,
+        "omissions": [
+          {
+            "reason": "cycle",
+            "count": 1
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 4
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "exported_arrow",
+      "snapshot": "exported_arrow",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "useNumber",
+          "kind": "function"
+        },
+        "gold_interval": [
+          42,
+          89
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::useNumber#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::useNumber#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 5.830417,
+          "cpu_ms": 4.14,
+          "packet_sha256": "cdff79082c10cff41f9b6721f592c7a9d9bb9d981b0e82495efa87077cb78a9b",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 4.611542,
+          "cpu_ms": 3.429,
+          "packet_sha256": "cdff79082c10cff41f9b6721f592c7a9d9bb9d981b0e82495efa87077cb78a9b",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 4.871458,
+          "cpu_ms": 3.443,
+          "packet_sha256": "cdff79082c10cff41f9b6721f592c7a9d9bb9d981b0e82495efa87077cb78a9b",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 4,
+        "covered_gold_source_count": 4,
+        "covered_gold_source_ids": [
+          "entry",
+          "callee",
+          "import",
+          "callee_export"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 1,
+        "precise_kind_links_delivered": 1,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 3,
+        "packet_source_count": 5,
+        "packet_item_count": 2,
+        "packet_output_bytes": 5098,
+        "evidence_bytes": 144,
+        "nodes_examined": 4,
+        "eligible_edges_considered": 6,
+        "edges_traversed": 3,
+        "omissions": [
+          {
+            "reason": "cycle",
+            "count": 3
+          },
+          {
+            "reason": "alternative_path",
+            "count": 1
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 1
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "default_identifier",
+      "snapshot": "default_identifier",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "useNumber",
+          "kind": "function"
+        },
+        "gold_interval": [
+          38,
+          85
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::useNumber#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::useNumber#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 5.956042,
+          "cpu_ms": 4.197,
+          "packet_sha256": "89964907d4921bae77ebaf8136f1ec2c1cf41bf1f4423ae19a1e1aa403c822b6",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 5.557459,
+          "cpu_ms": 3.711,
+          "packet_sha256": "89964907d4921bae77ebaf8136f1ec2c1cf41bf1f4423ae19a1e1aa403c822b6",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 5.11275,
+          "cpu_ms": 3.679,
+          "packet_sha256": "89964907d4921bae77ebaf8136f1ec2c1cf41bf1f4423ae19a1e1aa403c822b6",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 4,
+        "covered_gold_source_count": 4,
+        "covered_gold_source_ids": [
+          "entry",
+          "callee",
+          "import",
+          "export"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 1,
+        "precise_kind_links_delivered": 1,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 3,
+        "packet_source_count": 6,
+        "packet_item_count": 2,
+        "packet_output_bytes": 5360,
+        "evidence_bytes": 161,
+        "nodes_examined": 4,
+        "eligible_edges_considered": 6,
+        "edges_traversed": 3,
+        "omissions": [
+          {
+            "reason": "cycle",
+            "count": 3
+          },
+          {
+            "reason": "alternative_path",
+            "count": 1
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 1
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "named_function_control",
+      "snapshot": "named_function_control",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "useNumber",
+          "kind": "function"
+        },
+        "gold_interval": [
+          42,
+          89
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::useNumber#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::useNumber#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 5.515917,
+          "cpu_ms": 3.815,
+          "packet_sha256": "7af6b5b18f297ac842fd4de6ec5bcd88609b4fc3e9b5583896e320fd359ccb30",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 4.987334,
+          "cpu_ms": 3.493,
+          "packet_sha256": "7af6b5b18f297ac842fd4de6ec5bcd88609b4fc3e9b5583896e320fd359ccb30",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 5.552833,
+          "cpu_ms": 4.023,
+          "packet_sha256": "7af6b5b18f297ac842fd4de6ec5bcd88609b4fc3e9b5583896e320fd359ccb30",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 4,
+        "covered_gold_source_count": 4,
+        "covered_gold_source_ids": [
+          "entry",
+          "callee",
+          "import",
+          "callee_export"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 1,
+        "precise_kind_links_delivered": 1,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 3,
+        "packet_source_count": 5,
+        "packet_item_count": 2,
+        "packet_output_bytes": 5119,
+        "evidence_bytes": 152,
+        "nodes_examined": 4,
+        "eligible_edges_considered": 6,
+        "edges_traversed": 3,
+        "omissions": [
+          {
+            "reason": "cycle",
+            "count": 3
+          },
+          {
+            "reason": "alternative_path",
+            "count": 1
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 1
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "inline_default_control",
+      "snapshot": "inline_default_control",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "useNumber",
+          "kind": "function"
+        },
+        "gold_interval": [
+          38,
+          85
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::useNumber#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::useNumber#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 5.60275,
+          "cpu_ms": 3.992,
+          "packet_sha256": "0fbfcd3c0a38a510b3a297e91fb2ee93d89965b0ef6ad00d5e34d20b82d854f3",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 4.915916,
+          "cpu_ms": 3.616,
+          "packet_sha256": "0fbfcd3c0a38a510b3a297e91fb2ee93d89965b0ef6ad00d5e34d20b82d854f3",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 5.145291,
+          "cpu_ms": 3.896,
+          "packet_sha256": "0fbfcd3c0a38a510b3a297e91fb2ee93d89965b0ef6ad00d5e34d20b82d854f3",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 4,
+        "covered_gold_source_count": 4,
+        "covered_gold_source_ids": [
+          "entry",
+          "callee",
+          "import",
+          "callee_export"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 1,
+        "precise_kind_links_delivered": 1,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 3,
+        "packet_source_count": 5,
+        "packet_item_count": 2,
+        "packet_output_bytes": 5125,
+        "evidence_bytes": 156,
+        "nodes_examined": 4,
+        "eligible_edges_considered": 6,
+        "edges_traversed": 3,
+        "omissions": [
+          {
+            "reason": "cycle",
+            "count": 3
+          },
+          {
+            "reason": "alternative_path",
+            "count": 1
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 1
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "anvil_temporal_arguments",
+      "snapshot": "anvil",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "src/brain-context/temporal.ts",
+        "symbol": {
+          "name": "temporalCliArgs",
+          "kind": "function"
+        },
+        "gold_interval": [
+          8841,
+          9262
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "src/brain-context/temporal.ts::temporalCliArgs#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "src/brain-context/temporal.ts::temporalCliArgs#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 2030.593,
+          "cpu_ms": 2014.914,
+          "packet_sha256": "dde764d67920179e04c120e1c7dc8d170d40de536673ccc892c35282ccbbaa19",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 2186.817792,
+          "cpu_ms": 2170.296,
+          "packet_sha256": "dde764d67920179e04c120e1c7dc8d170d40de536673ccc892c35282ccbbaa19",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 2296.386917,
+          "cpu_ms": 2282.511,
+          "packet_sha256": "dde764d67920179e04c120e1c7dc8d170d40de536673ccc892c35282ccbbaa19",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 5,
+        "covered_gold_source_count": 5,
+        "covered_gold_source_ids": [
+          "entry",
+          "query",
+          "view",
+          "views",
+          "transition"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 4,
+        "available_relationship_count": 4,
+        "delivered_relationship_count": 3,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 1,
+        "delivery_integrity_violations": [
+          {
+            "edge": {
+              "from": "src/brain-context/retrieve.ts::retrieveBrainContext#function",
+              "to": "src/brain-context/temporal.ts::temporalCliArgs#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "src/brain-context/retrieve.ts",
+                "line": 658,
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85"
+              }
+            },
+            "reason": "invalid_relationship_proof: complete indexed relationship proof is not delivered"
+          }
+        ],
+        "endpoint_issues": [],
+        "packet_relationship_count": 6,
+        "packet_source_count": 16,
+        "packet_item_count": 6,
+        "packet_output_bytes": 16284,
+        "evidence_bytes": 3018,
+        "nodes_examined": 37,
+        "eligible_edges_considered": 61,
+        "edges_traversed": 54,
+        "omissions": [
+          {
+            "reason": "hop_limit",
+            "count": 3
+          },
+          {
+            "reason": "cycle",
+            "count": 4
+          },
+          {
+            "reason": "alternative_path",
+            "count": 2
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 16
+          },
+          {
+            "reason": "ambiguous_relation",
+            "count": 1
+          },
+          {
+            "reason": "external_relation",
+            "count": 3
+          },
+          {
+            "reason": "source_preview",
+            "count": 1
+          },
+          {
+            "reason": "evidence_budget",
+            "count": 1
+          },
+          {
+            "reason": "output_budget",
+            "count": 50
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "anvil_retrieval_limits",
+      "snapshot": "anvil",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "src/brain-context/render.ts",
+        "symbol": {
+          "name": "compilerRetrievalLimits",
+          "kind": "function"
+        },
+        "gold_interval": [
+          1664,
+          2936
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "src/brain-context/render.ts::compilerRetrievalLimits#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "src/brain-context/render.ts::compilerRetrievalLimits#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 2128.791834,
+          "cpu_ms": 2117.029,
+          "packet_sha256": "26ec4aa22fc9853d17902867b66e7c98a782a8b349096151bcb11f186f8307a0",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 2251.863709,
+          "cpu_ms": 2240.166,
+          "packet_sha256": "26ec4aa22fc9853d17902867b66e7c98a782a8b349096151bcb11f186f8307a0",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 2214.637959,
+          "cpu_ms": 2200.603,
+          "packet_sha256": "26ec4aa22fc9853d17902867b66e7c98a782a8b349096151bcb11f186f8307a0",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 8,
+        "covered_gold_source_count": 2,
+        "covered_gold_source_ids": [
+          "input",
+          "unavailable"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 6,
+        "available_relationship_count": 6,
+        "delivered_relationship_count": 1,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 2,
+        "delivery_integrity_violations": [
+          {
+            "edge": {
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "to": "src/brain-context/render.ts::compilerHasUnavailableEvidence#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "src/brain-context/render.ts",
+                "line": 35,
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd"
+              }
+            },
+            "reason": "invalid_relationship_proof: complete indexed relationship proof is not delivered"
+          },
+          {
+            "edge": {
+              "from": "src/brain-context/harness.ts::envelopeFromResult#function",
+              "to": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "evidence": {
+                "file": "src/brain-context/harness.ts",
+                "line": 182,
+                "content_hash": "fe826d4fc3d2c8a58697067cfdea58a75b3ab2f0f7f93f7c2f356c952c99b556"
+              }
+            },
+            "reason": "invalid_relationship_proof: complete indexed relationship proof is not delivered"
+          }
+        ],
+        "endpoint_issues": [],
+        "packet_relationship_count": 4,
+        "packet_source_count": 14,
+        "packet_item_count": 5,
+        "packet_output_bytes": 15938,
+        "evidence_bytes": 4688,
+        "nodes_examined": 35,
+        "eligible_edges_considered": 56,
+        "edges_traversed": 45,
+        "omissions": [
+          {
+            "reason": "hop_limit",
+            "count": 7
+          },
+          {
+            "reason": "cycle",
+            "count": 4
+          },
+          {
+            "reason": "alternative_path",
+            "count": 1
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 8
+          },
+          {
+            "reason": "ambiguous_relation",
+            "count": 1
+          },
+          {
+            "reason": "source_preview",
+            "count": 2
+          },
+          {
+            "reason": "output_budget",
+            "count": 45
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "anvil_renderer_result_contract",
+      "snapshot": "anvil",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "src/brain-context/render.ts",
+        "symbol": {
+          "name": "renderCompilerPromptEvidenceContext",
+          "kind": "function"
+        },
+        "gold_interval": [
+          4860,
+          5435
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 1988.568458,
+          "cpu_ms": 1976.92,
+          "packet_sha256": "21b7705de5587f487e5f111d0b31de852dd62ef2d9bf3f5a34af8f217690006b",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 2256.36025,
+          "cpu_ms": 2241.454,
+          "packet_sha256": "21b7705de5587f487e5f111d0b31de852dd62ef2d9bf3f5a34af8f217690006b",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 2113.803917,
+          "cpu_ms": 2103.017,
+          "packet_sha256": "21b7705de5587f487e5f111d0b31de852dd62ef2d9bf3f5a34af8f217690006b",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 5,
+        "covered_gold_source_count": 3,
+        "covered_gold_source_ids": [
+          "entry",
+          "input",
+          "project"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 4,
+        "available_relationship_count": 4,
+        "delivered_relationship_count": 2,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 4,
+        "packet_source_count": 13,
+        "packet_item_count": 4,
+        "packet_output_bytes": 16196,
+        "evidence_bytes": 4897,
+        "nodes_examined": 31,
+        "eligible_edges_considered": 52,
+        "edges_traversed": 43,
+        "omissions": [
+          {
+            "reason": "hop_limit",
+            "count": 7
+          },
+          {
+            "reason": "cycle",
+            "count": 2
+          },
+          {
+            "reason": "alternative_path",
+            "count": 1
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 7
+          },
+          {
+            "reason": "ambiguous_relation",
+            "count": 1
+          },
+          {
+            "reason": "source_preview",
+            "count": 1
+          },
+          {
+            "reason": "evidence_budget",
+            "count": 1
+          },
+          {
+            "reason": "output_budget",
+            "count": 41
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "python_alias_annotation",
+      "snapshot": "python_contracts",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.py",
+        "symbol": {
+          "name": "decode",
+          "kind": "function"
+        },
+        "gold_interval": [
+          109,
+          164
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.py::decode#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.py::decode#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 12.391083,
+          "cpu_ms": 9.887,
+          "packet_sha256": "9e5782cd13c2f952d53e5e56c18160d55ad4dc31bccd0dd3831785ccc6cb8978",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 10.9275,
+          "cpu_ms": 9.139,
+          "packet_sha256": "9e5782cd13c2f952d53e5e56c18160d55ad4dc31bccd0dd3831785ccc6cb8978",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 10.576375,
+          "cpu_ms": 8.979,
+          "packet_sha256": "9e5782cd13c2f952d53e5e56c18160d55ad4dc31bccd0dd3831785ccc6cb8978",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 6,
+        "covered_gold_source_count": 5,
+        "covered_gold_source_ids": [
+          "entry",
+          "alias",
+          "payload",
+          "import",
+          "reexport"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 3,
+        "available_relationship_count": 3,
+        "delivered_relationship_count": 3,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 9,
+        "packet_source_count": 9,
+        "packet_item_count": 5,
+        "packet_output_bytes": 10009,
+        "evidence_bytes": 262,
+        "nodes_examined": 8,
+        "eligible_edges_considered": 19,
+        "edges_traversed": 10,
+        "omissions": [
+          {
+            "reason": "hop_limit",
+            "count": 4
+          },
+          {
+            "reason": "cycle",
+            "count": 5
+          },
+          {
+            "reason": "alternative_path",
+            "count": 5
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 2
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "python_base_and_literal_forward",
+      "snapshot": "python_contracts",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.py",
+        "symbol": {
+          "name": "Child",
+          "kind": "class"
+        },
+        "gold_interval": [
+          166,
+          193
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.py::Child#class"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.py::Child#class"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 13.670792,
+          "cpu_ms": 11.766,
+          "packet_sha256": "7f288b01dcab4620ec71de39c0e60acff877a31079249b465bf0509e3c3ec600",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 13.637208,
+          "cpu_ms": 11.41,
+          "packet_sha256": "7f288b01dcab4620ec71de39c0e60acff877a31079249b465bf0509e3c3ec600",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 12.627125,
+          "cpu_ms": 11.143,
+          "packet_sha256": "7f288b01dcab4620ec71de39c0e60acff877a31079249b465bf0509e3c3ec600",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 7,
+        "covered_gold_source_count": 7,
+        "covered_gold_source_ids": [
+          "entry",
+          "base",
+          "base_import",
+          "later",
+          "payload",
+          "import",
+          "reexport"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 2,
+        "available_relationship_count": 2,
+        "delivered_relationship_count": 2,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 10,
+        "packet_source_count": 10,
+        "packet_item_count": 6,
+        "packet_output_bytes": 11216,
+        "evidence_bytes": 308,
+        "nodes_examined": 9,
+        "eligible_edges_considered": 20,
+        "edges_traversed": 14,
+        "omissions": [
+          {
+            "reason": "hop_limit",
+            "count": 1
+          },
+          {
+            "reason": "cycle",
+            "count": 5
+          },
+          {
+            "reason": "alternative_path",
+            "count": 9
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 2
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "python_known_call_impact",
+      "snapshot": "python_impact",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "lib.py",
+        "symbol": {
+          "name": "target",
+          "kind": "function"
+        },
+        "gold_interval": [
+          0,
+          26
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "lib.py::target#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "lib.py::target#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 5.539875,
+          "cpu_ms": 3.948,
+          "packet_sha256": "e8311bc1ea46b46bd756b525263d108558b853805332a1a4febb9b38bc43dba2",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 4.85375,
+          "cpu_ms": 3.513,
+          "packet_sha256": "e8311bc1ea46b46bd756b525263d108558b853805332a1a4febb9b38bc43dba2",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 4.825292,
+          "cpu_ms": 3.428,
+          "packet_sha256": "e8311bc1ea46b46bd756b525263d108558b853805332a1a4febb9b38bc43dba2",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 3,
+        "covered_gold_source_count": 3,
+        "covered_gold_source_ids": [
+          "entry",
+          "caller",
+          "import"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 1,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 3,
+        "packet_source_count": 4,
+        "packet_item_count": 2,
+        "packet_output_bytes": 4567,
+        "evidence_bytes": 91,
+        "nodes_examined": 4,
+        "eligible_edges_considered": 6,
+        "edges_traversed": 3,
+        "omissions": [
+          {
+            "reason": "cycle",
+            "count": 3
+          },
+          {
+            "reason": "alternative_path",
+            "count": 1
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "python_unproven_contracts",
+      "snapshot": "python_uncertainty",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "negative.py",
+        "symbol": {
+          "name": "unknown",
+          "kind": "function"
+        },
+        "gold_interval": [
+          125,
+          203
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "negative.py::unknown#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "negative.py::unknown#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 9.993833,
+          "cpu_ms": 7.969,
+          "packet_sha256": "842822942ba71b7875b9ed7dd9ec050ace093ca448850bfeded9248552fe71d4",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 9.254958,
+          "cpu_ms": 7.443,
+          "packet_sha256": "842822942ba71b7875b9ed7dd9ec050ace093ca448850bfeded9248552fe71d4",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 8.920167,
+          "cpu_ms": 7.321,
+          "packet_sha256": "842822942ba71b7875b9ed7dd9ec050ace093ca448850bfeded9248552fe71d4",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 6,
+        "covered_gold_source_count": 2,
+        "covered_gold_source_ids": [
+          "entry",
+          "shadow"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 0,
+        "available_relationship_count": 0,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 4,
+        "packet_source_count": 10,
+        "packet_item_count": 6,
+        "packet_output_bytes": 8957,
+        "evidence_bytes": 336,
+        "nodes_examined": 10,
+        "eligible_edges_considered": 8,
+        "edges_traversed": 4,
+        "omissions": [
+          {
+            "reason": "cycle",
+            "count": 4
+          },
+          {
+            "reason": "unsupported_semantics",
+            "count": 3
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 7
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "javascript_value_dependencies",
+      "snapshot": "javascript_dependencies",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "run",
+        "file": "app.js",
+        "symbol": {
+          "name": "run",
+          "kind": "function"
+        },
+        "gold_interval": [
+          56,
+          98
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "app.js::run#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "app.js::run#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 20.422625,
+          "cpu_ms": 18.176,
+          "packet_sha256": "dc4372580e7687ed9451fbaca594382eb9122bccefe82c6845d992d771b05bd9",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 19.662666,
+          "cpu_ms": 17.362,
+          "packet_sha256": "dc4372580e7687ed9451fbaca594382eb9122bccefe82c6845d992d771b05bd9",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 19.4,
+          "cpu_ms": 17.261,
+          "packet_sha256": "dc4372580e7687ed9451fbaca594382eb9122bccefe82c6845d992d771b05bd9",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 7,
+        "covered_gold_source_count": 7,
+        "covered_gold_source_ids": [
+          "run",
+          "add",
+          "make",
+          "import",
+          "barrel",
+          "default",
+          "arrow_export"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 3,
+        "available_relationship_count": 3,
+        "delivered_relationship_count": 3,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 12,
+        "packet_source_count": 14,
+        "packet_item_count": 7,
+        "packet_output_bytes": 13552,
+        "evidence_bytes": 411,
+        "nodes_examined": 11,
+        "eligible_edges_considered": 24,
+        "edges_traversed": 17,
+        "omissions": [
+          {
+            "reason": "cycle",
+            "count": 7
+          },
+          {
+            "reason": "alternative_path",
+            "count": 13
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "javascript_direct_class_base",
+      "snapshot": "javascript_dependencies",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "app.js",
+        "symbol": {
+          "name": "Worker",
+          "kind": "class"
+        },
+        "gold_interval": [
+          106,
+          163
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "app.js::Worker#class"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "app.js::Worker#class"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 20.12025,
+          "cpu_ms": 18.353,
+          "packet_sha256": "fbda3286c0e6f50570e66e691f21141de30fdf85134fa056150a49c607d90438",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 19.960375,
+          "cpu_ms": 18.143,
+          "packet_sha256": "fbda3286c0e6f50570e66e691f21141de30fdf85134fa056150a49c607d90438",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 19.779334,
+          "cpu_ms": 17.965,
+          "packet_sha256": "fbda3286c0e6f50570e66e691f21141de30fdf85134fa056150a49c607d90438",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 4,
+        "covered_gold_source_count": 4,
+        "covered_gold_source_ids": [
+          "entry",
+          "base",
+          "import",
+          "base_export"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 1,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 12,
+        "packet_source_count": 14,
+        "packet_item_count": 7,
+        "packet_output_bytes": 13550,
+        "evidence_bytes": 411,
+        "nodes_examined": 11,
+        "eligible_edges_considered": 24,
+        "edges_traversed": 18,
+        "omissions": [
+          {
+            "reason": "cycle",
+            "count": 6
+          },
+          {
+            "reason": "alternative_path",
+            "count": 14
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "javascript_known_call_impact",
+      "snapshot": "javascript_dependencies",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "add",
+        "file": "helper.js",
+        "symbol": {
+          "name": "add",
+          "kind": "function"
+        },
+        "gold_interval": [
+          13,
+          39
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "helper.js::add#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "helper.js::add#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 16.121458,
+          "cpu_ms": 14.573,
+          "packet_sha256": "f7aeea4bed6607c4e14d8e2fef6318960900febcf806e4d0c2ee76e47c30a18f",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 16.115,
+          "cpu_ms": 14.535,
+          "packet_sha256": "f7aeea4bed6607c4e14d8e2fef6318960900febcf806e4d0c2ee76e47c30a18f",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 16.265875,
+          "cpu_ms": 14.418,
+          "packet_sha256": "f7aeea4bed6607c4e14d8e2fef6318960900febcf806e4d0c2ee76e47c30a18f",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 7,
+        "covered_gold_source_count": 7,
+        "covered_gold_source_ids": [
+          "add",
+          "run",
+          "make",
+          "method",
+          "import",
+          "barrel",
+          "arrow_export"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 3,
+        "available_relationship_count": 3,
+        "delivered_relationship_count": 3,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 12,
+        "packet_source_count": 14,
+        "packet_item_count": 7,
+        "packet_output_bytes": 13544,
+        "evidence_bytes": 411,
+        "nodes_examined": 11,
+        "eligible_edges_considered": 24,
+        "edges_traversed": 15,
+        "omissions": [
+          {
+            "reason": "hop_limit",
+            "count": 3
+          },
+          {
+            "reason": "cycle",
+            "count": 6
+          },
+          {
+            "reason": "alternative_path",
+            "count": 9
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "javascript_unproven_dependencies",
+      "snapshot": "javascript_uncertainty",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "bad.js",
+        "symbol": {
+          "name": "unproven",
+          "kind": "function"
+        },
+        "gold_interval": [
+          138,
+          196
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "bad.js::unproven#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "bad.js::unproven#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 9.837458,
+          "cpu_ms": 7.884,
+          "packet_sha256": "8c718475bc17a17eaa353f27369739ebb47a37d62d05feb383d41ea8cab28401",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 9.289709,
+          "cpu_ms": 7.358,
+          "packet_sha256": "8c718475bc17a17eaa353f27369739ebb47a37d62d05feb383d41ea8cab28401",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 8.976,
+          "cpu_ms": 7.072,
+          "packet_sha256": "8c718475bc17a17eaa353f27369739ebb47a37d62d05feb383d41ea8cab28401",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 6,
+        "covered_gold_source_count": 2,
+        "covered_gold_source_ids": [
+          "entry",
+          "barrel"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 0,
+        "available_relationship_count": 0,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 4,
+        "packet_source_count": 10,
+        "packet_item_count": 6,
+        "packet_output_bytes": 8947,
+        "evidence_bytes": 335,
+        "nodes_examined": 10,
+        "eligible_edges_considered": 8,
+        "edges_traversed": 5,
+        "omissions": [
+          {
+            "reason": "hop_limit",
+            "count": 1
+          },
+          {
+            "reason": "cycle",
+            "count": 2
+          },
+          {
+            "reason": "alternative_path",
+            "count": 2
+          },
+          {
+            "reason": "unsupported_semantics",
+            "count": 1
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 5
+          },
+          {
+            "reason": "ambiguous_relation",
+            "count": 1
+          },
+          {
+            "reason": "external_relation",
+            "count": 1
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "go_alias_generic_contract",
+      "snapshot": "go_contracts",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "app/main.go",
+        "symbol": {
+          "name": "Build",
+          "kind": "function"
+        },
+        "gold_interval": [
+          47,
+          151
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "app/main.go::Build#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "app/main.go::Build#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 19.631916,
+          "cpu_ms": 16.915,
+          "packet_sha256": "4d9fb2493ab96759e9d21f9ffb38fdd7d58bd05250aa50ef515734ef4a6e48e5",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 20.45825,
+          "cpu_ms": 16.887,
+          "packet_sha256": "4d9fb2493ab96759e9d21f9ffb38fdd7d58bd05250aa50ef515734ef4a6e48e5",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 19.28175,
+          "cpu_ms": 16.176,
+          "packet_sha256": "4d9fb2493ab96759e9d21f9ffb38fdd7d58bd05250aa50ef515734ef4a6e48e5",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 8,
+        "covered_gold_source_count": 8,
+        "covered_gold_source_ids": [
+          "entry",
+          "alias",
+          "id",
+          "page",
+          "constraint",
+          "import",
+          "module",
+          "package"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 5,
+        "available_relationship_count": 5,
+        "delivered_relationship_count": 5,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 11,
+        "packet_source_count": 13,
+        "packet_item_count": 5,
+        "packet_output_bytes": 12491,
+        "evidence_bytes": 314,
+        "nodes_examined": 8,
+        "eligible_edges_considered": 22,
+        "edges_traversed": 14,
+        "omissions": [
+          {
+            "reason": "hop_limit",
+            "count": 4
+          },
+          {
+            "reason": "cycle",
+            "count": 4
+          },
+          {
+            "reason": "alternative_path",
+            "count": 10
+          },
+          {
+            "reason": "unsupported_semantics",
+            "count": 1
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 1
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "go_explicit_embedding",
+      "snapshot": "go_embedding",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "app/main.go",
+        "symbol": {
+          "name": "Start",
+          "kind": "function"
+        },
+        "gold_interval": [
+          47,
+          119
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "app/main.go::Start#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "app/main.go::Start#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 15.943333,
+          "cpu_ms": 13.734,
+          "packet_sha256": "402e51a4d66ae249c5a7bb30bd9392cef07de60a78e6feea3e19d992bd5e3cdb",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 15.028666,
+          "cpu_ms": 13.068,
+          "packet_sha256": "402e51a4d66ae249c5a7bb30bd9392cef07de60a78e6feea3e19d992bd5e3cdb",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 16.743042,
+          "cpu_ms": 13.232,
+          "packet_sha256": "402e51a4d66ae249c5a7bb30bd9392cef07de60a78e6feea3e19d992bd5e3cdb",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 8,
+        "covered_gold_source_count": 8,
+        "covered_gold_source_ids": [
+          "entry",
+          "entity",
+          "audit",
+          "combined",
+          "runner",
+          "import",
+          "module",
+          "package"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 4,
+        "available_relationship_count": 4,
+        "delivered_relationship_count": 4,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 8,
+        "packet_source_count": 15,
+        "packet_item_count": 6,
+        "packet_output_bytes": 12305,
+        "evidence_bytes": 325,
+        "nodes_examined": 9,
+        "eligible_edges_considered": 16,
+        "edges_traversed": 10,
+        "omissions": [
+          {
+            "reason": "hop_limit",
+            "count": 3
+          },
+          {
+            "reason": "cycle",
+            "count": 3
+          },
+          {
+            "reason": "alternative_path",
+            "count": 5
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 1
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "go_known_api_impact",
+      "snapshot": "go_impact",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "api/api.go",
+        "symbol": {
+          "name": "Handle",
+          "kind": "function"
+        },
+        "gold_interval": [
+          47,
+          74
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "api/api.go::Handle#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "api/api.go::Handle#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 19.8735,
+          "cpu_ms": 17.072,
+          "packet_sha256": "ec15d77a3c9e4d2304187be30e97bce88fa2325500fd9aebf249c0ef6a99cd09",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 18.995875,
+          "cpu_ms": 16.497,
+          "packet_sha256": "ec15d77a3c9e4d2304187be30e97bce88fa2325500fd9aebf249c0ef6a99cd09",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 19.643125,
+          "cpu_ms": 16.695,
+          "packet_sha256": "ec15d77a3c9e4d2304187be30e97bce88fa2325500fd9aebf249c0ef6a99cd09",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 8,
+        "covered_gold_source_count": 8,
+        "covered_gold_source_ids": [
+          "entry",
+          "request",
+          "serve",
+          "work",
+          "server_import",
+          "worker_import",
+          "module",
+          "package"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 5,
+        "available_relationship_count": 5,
+        "delivered_relationship_count": 5,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 11,
+        "packet_source_count": 14,
+        "packet_item_count": 4,
+        "packet_output_bytes": 12307,
+        "evidence_bytes": 301,
+        "nodes_examined": 8,
+        "eligible_edges_considered": 22,
+        "edges_traversed": 15,
+        "omissions": [
+          {
+            "reason": "hop_limit",
+            "count": 2
+          },
+          {
+            "reason": "cycle",
+            "count": 5
+          },
+          {
+            "reason": "alternative_path",
+            "count": 11
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "go_unproven_package_uses",
+      "snapshot": "go_uncertainty",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "cmd/main.go",
+        "symbol": {
+          "name": "Keep",
+          "kind": "function"
+        },
+        "gold_interval": [
+          123,
+          152
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "cmd/main.go::Keep#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "cmd/main.go::Keep#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 16.335709,
+          "cpu_ms": 14.228,
+          "packet_sha256": "6884dfede60c35b2c82be8d610b0e4fe11a911bd0e147d39c3b38c96434eb887",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 15.174042,
+          "cpu_ms": 13.505,
+          "packet_sha256": "6884dfede60c35b2c82be8d610b0e4fe11a911bd0e147d39c3b38c96434eb887",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 15.265417,
+          "cpu_ms": 13.378,
+          "packet_sha256": "6884dfede60c35b2c82be8d610b0e4fe11a911bd0e147d39c3b38c96434eb887",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 7,
+        "covered_gold_source_count": 7,
+        "covered_gold_source_ids": [
+          "entry",
+          "request",
+          "probe",
+          "missing",
+          "imports",
+          "module",
+          "package"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 1,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 5,
+        "packet_source_count": 15,
+        "packet_item_count": 7,
+        "packet_output_bytes": 12154,
+        "evidence_bytes": 403,
+        "nodes_examined": 14,
+        "eligible_edges_considered": 10,
+        "edges_traversed": 6,
+        "omissions": [
+          {
+            "reason": "cycle",
+            "count": 4
+          },
+          {
+            "reason": "alternative_path",
+            "count": 2
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 7
+          },
+          {
+            "reason": "ambiguous_relation",
+            "count": 1
+          },
+          {
+            "reason": "external_relation",
+            "count": 1
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "rust_authored_trait_contract",
+      "snapshot": "rust_contracts",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "src/lib.rs",
+        "symbol": {
+          "name": "build",
+          "kind": "function"
+        },
+        "gold_interval": [
+          321,
+          410
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "src/lib.rs::build#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "src/lib.rs::build#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 18.075542,
+          "cpu_ms": 15.027,
+          "packet_sha256": "1918f6a511f1a538b4c0a8b26af9b95d2d127c9c5e7ac488bdd029aab6b5069b",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 17.0105,
+          "cpu_ms": 14.195,
+          "packet_sha256": "1918f6a511f1a538b4c0a8b26af9b95d2d127c9c5e7ac488bdd029aab6b5069b",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 16.248292,
+          "cpu_ms": 13.757,
+          "packet_sha256": "1918f6a511f1a538b4c0a8b26af9b95d2d127c9c5e7ac488bdd029aab6b5069b",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 9,
+        "covered_gold_source_count": 9,
+        "covered_gold_source_ids": [
+          "entry",
+          "id",
+          "format",
+          "render",
+          "receipt",
+          "format_impl",
+          "render_impl",
+          "envelope",
+          "cargo"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 11,
+        "available_relationship_count": 11,
+        "delivered_relationship_count": 10,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 10,
+        "packet_source_count": 15,
+        "packet_item_count": 8,
+        "packet_output_bytes": 13654,
+        "evidence_bytes": 463,
+        "nodes_examined": 9,
+        "eligible_edges_considered": 22,
+        "edges_traversed": 13,
+        "omissions": [
+          {
+            "reason": "hop_limit",
+            "count": 5
+          },
+          {
+            "reason": "cycle",
+            "count": 4
+          },
+          {
+            "reason": "alternative_path",
+            "count": 7
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 3
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "rust_contained_optional_reexport",
+      "snapshot": "rust_workspace",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "app/src/lib.rs",
+        "symbol": {
+          "name": "use_it",
+          "kind": "function"
+        },
+        "gold_interval": [
+          28,
+          86
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "app/src/lib.rs::use_it#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "app/src/lib.rs::use_it#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 10.3485,
+          "cpu_ms": 7.892,
+          "packet_sha256": "f0620761b0de2f8c854120de2ccf850b6b07090de20a38d75c2b7f8f39d39b7b",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 8.862625,
+          "cpu_ms": 6.976,
+          "packet_sha256": "f0620761b0de2f8c854120de2ccf850b6b07090de20a38d75c2b7f8f39d39b7b",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 9.163667,
+          "cpu_ms": 7.015,
+          "packet_sha256": "f0620761b0de2f8c854120de2ccf850b6b07090de20a38d75c2b7f8f39d39b7b",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 8,
+        "covered_gold_source_count": 8,
+        "covered_gold_source_ids": [
+          "entry",
+          "thing",
+          "import",
+          "reexport",
+          "module",
+          "workspace",
+          "core_cargo",
+          "app_cargo"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 2,
+        "available_relationship_count": 2,
+        "delivered_relationship_count": 2,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 3,
+        "packet_source_count": 9,
+        "packet_item_count": 2,
+        "packet_output_bytes": 6668,
+        "evidence_bytes": 473,
+        "nodes_examined": 6,
+        "eligible_edges_considered": 7,
+        "edges_traversed": 5,
+        "omissions": [
+          {
+            "reason": "cycle",
+            "count": 2
+          },
+          {
+            "reason": "alternative_path",
+            "count": 2
+          },
+          {
+            "reason": "proof_unavailable",
+            "count": 1
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "rust_known_call_impact",
+      "snapshot": "rust_impact",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "src/api.rs",
+        "symbol": {
+          "name": "parse",
+          "kind": "function"
+        },
+        "gold_interval": [
+          40,
+          94
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "src/api.rs::parse#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "src/api.rs::parse#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 9.61425,
+          "cpu_ms": 7.273,
+          "packet_sha256": "b76bf47288c5d2ad7099cc30b98ebb9e9e578510139f880c25eb8e4a7606b78f",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 8.14725,
+          "cpu_ms": 6.616,
+          "packet_sha256": "b76bf47288c5d2ad7099cc30b98ebb9e9e578510139f880c25eb8e4a7606b78f",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 8.157834,
+          "cpu_ms": 6.637,
+          "packet_sha256": "b76bf47288c5d2ad7099cc30b98ebb9e9e578510139f880c25eb8e4a7606b78f",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 6,
+        "covered_gold_source_count": 6,
+        "covered_gold_source_ids": [
+          "entry",
+          "config",
+          "caller",
+          "module",
+          "import",
+          "cargo"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 3,
+        "available_relationship_count": 3,
+        "delivered_relationship_count": 3,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 5,
+        "packet_source_count": 9,
+        "packet_item_count": 3,
+        "packet_output_bytes": 7543,
+        "evidence_bytes": 256,
+        "nodes_examined": 5,
+        "eligible_edges_considered": 10,
+        "edges_traversed": 7,
+        "omissions": [
+          {
+            "reason": "cycle",
+            "count": 3
+          },
+          {
+            "reason": "alternative_path",
+            "count": 4
+          },
+          {
+            "reason": "proof_unavailable",
+            "count": 1
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "rust_unproven_contracts",
+      "snapshot": "rust_uncertainty",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "src/lib.rs",
+        "symbol": {
+          "name": "probe",
+          "kind": "function"
+        },
+        "gold_interval": [
+          146,
+          290
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "src/lib.rs::probe#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "src/lib.rs::probe#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 9.657125,
+          "cpu_ms": 7.255,
+          "packet_sha256": "b7a9796386341b05daa79066b5d7f1dad16ef5c130b35d837b7c499c51f5cf9b",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 8.266792,
+          "cpu_ms": 6.595,
+          "packet_sha256": "b7a9796386341b05daa79066b5d7f1dad16ef5c130b35d837b7c499c51f5cf9b",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 8.206959,
+          "cpu_ms": 6.767,
+          "packet_sha256": "b7a9796386341b05daa79066b5d7f1dad16ef5c130b35d837b7c499c51f5cf9b",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 7,
+        "covered_gold_source_count": 5,
+        "covered_gold_source_ids": [
+          "entry",
+          "thing",
+          "generic",
+          "imports",
+          "cargo"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 1,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 3,
+        "packet_source_count": 6,
+        "packet_item_count": 3,
+        "packet_output_bytes": 6336,
+        "evidence_bytes": 451,
+        "nodes_examined": 8,
+        "eligible_edges_considered": 10,
+        "edges_traversed": 8,
+        "omissions": [
+          {
+            "reason": "cycle",
+            "count": 2
+          },
+          {
+            "reason": "alternative_path",
+            "count": 3
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 4
+          },
+          {
+            "reason": "ambiguous_relation",
+            "count": 1
+          },
+          {
+            "reason": "external_relation",
+            "count": 1
+          },
+          {
+            "reason": "inaccessible_relation",
+            "count": 1
+          },
+          {
+            "reason": "proof_unavailable",
+            "count": 4
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "tsx_props_control",
+      "snapshot": "tsx_props",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "badge.tsx",
+        "symbol": {
+          "name": "Badge",
+          "kind": "function"
+        },
+        "gold_interval": [
+          45,
+          112
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "badge.tsx::Badge#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "badge.tsx::Badge#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 5.719334,
+          "cpu_ms": 4.34,
+          "packet_sha256": "c8c50dec86adfbc7a83c3d77a72a223347a0b8ff905e1843d9332a21f0370a08",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 4.9525,
+          "cpu_ms": 3.849,
+          "packet_sha256": "c8c50dec86adfbc7a83c3d77a72a223347a0b8ff905e1843d9332a21f0370a08",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 5.626,
+          "cpu_ms": 4.096,
+          "packet_sha256": "c8c50dec86adfbc7a83c3d77a72a223347a0b8ff905e1843d9332a21f0370a08",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 3,
+        "covered_gold_source_count": 3,
+        "covered_gold_source_ids": [
+          "entry",
+          "props",
+          "import"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 1,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 3,
+        "packet_source_count": 5,
+        "packet_item_count": 2,
+        "packet_output_bytes": 5091,
+        "evidence_bytes": 178,
+        "nodes_examined": 4,
+        "eligible_edges_considered": 6,
+        "edges_traversed": 4,
+        "omissions": [
+          {
+            "reason": "cycle",
+            "count": 2
+          },
+          {
+            "reason": "alternative_path",
+            "count": 2
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "markdown_section_control",
+      "snapshot": "markdown_navigation",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "guide.md",
+        "symbol": {
+          "name": "Limits",
+          "kind": "section"
+        },
+        "gold_interval": [
+          36,
+          147
+        ],
+        "status": "missing",
+        "matching_ids": [],
+        "request_fallback": "markdown_exact_file"
+      },
+      "request": {
+        "query": "guide.md"
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 4.054334,
+          "cpu_ms": 2.379,
+          "packet_sha256": "d32bb7a2af8d60789bcc3994413f20722708e72c9144ad75a56e579f756550f2",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 3.341083,
+          "cpu_ms": 1.856,
+          "packet_sha256": "d32bb7a2af8d60789bcc3994413f20722708e72c9144ad75a56e579f756550f2",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 3.5005,
+          "cpu_ms": 1.83,
+          "packet_sha256": "d32bb7a2af8d60789bcc3994413f20722708e72c9144ad75a56e579f756550f2",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 2,
+        "covered_gold_source_count": 2,
+        "covered_gold_source_ids": [
+          "entry",
+          "peer"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 0,
+        "available_relationship_count": 0,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2097,
+        "evidence_bytes": 200,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "python_loci_bundle_contract",
+      "snapshot": "loci_python_output_contract",
+      "condition": "baseline",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "src/loci/_exploration_output.py",
+        "symbol": {
+          "name": "_validate_bundle",
+          "kind": "function"
+        },
+        "gold_interval": [
+          8659,
+          10287
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "src/loci/_exploration_output.py::_validate_bundle#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "src/loci/_exploration_output.py::_validate_bundle#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 30.297875,
+          "cpu_ms": 28.443,
+          "packet_sha256": "a9079fe0b07c480344ec9435a5f3101f5ed795d602dd22496b4e53cfa2f7f052",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 29.460208,
+          "cpu_ms": 27.915,
+          "packet_sha256": "a9079fe0b07c480344ec9435a5f3101f5ed795d602dd22496b4e53cfa2f7f052",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 30.052667,
+          "cpu_ms": 28.233,
+          "packet_sha256": "a9079fe0b07c480344ec9435a5f3101f5ed795d602dd22496b4e53cfa2f7f052",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 4,
+        "covered_gold_source_count": 4,
+        "covered_gold_source_ids": [
+          "entry",
+          "bundle",
+          "span",
+          "relation"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 4,
+        "available_relationship_count": 4,
+        "delivered_relationship_count": 2,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 2,
+        "delivery_integrity_violations": [
+          {
+            "edge": {
+              "from": "src/loci/_exploration_output.py::_validate_bundle#function",
+              "to": "src/loci/_exploration_output.py::_validate_span#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "src/loci/_exploration_output.py",
+                "line": 232,
+                "content_hash": "3088c657a03f3b8724fe14f133888837f7b74edd80fbb0b726aaead75a5b2270"
+              }
+            },
+            "reason": "invalid_relationship_proof: complete persisted proof is not delivered"
+          },
+          {
+            "edge": {
+              "from": "src/loci/_exploration_output.py::pack_exploration#function",
+              "to": "src/loci/_exploration_output.py::_validate_bundle#function",
+              "type": "calls",
+              "directed": true,
+              "namespace": "loci",
+              "resolution": "exact",
+              "evidence": {
+                "file": "src/loci/_exploration_output.py",
+                "line": 103,
+                "content_hash": "3088c657a03f3b8724fe14f133888837f7b74edd80fbb0b726aaead75a5b2270"
+              }
+            },
+            "reason": "invalid_relationship_proof: complete persisted proof is not delivered"
+          }
+        ],
+        "endpoint_issues": [],
+        "packet_relationship_count": 4,
+        "packet_source_count": 12,
+        "packet_item_count": 6,
+        "packet_output_bytes": 16332,
+        "evidence_bytes": 3812,
+        "nodes_examined": 17,
+        "eligible_edges_considered": 32,
+        "edges_traversed": 23,
+        "omissions": [
+          {
+            "reason": "hop_limit",
+            "count": 6
+          },
+          {
+            "reason": "cycle",
+            "count": 3
+          },
+          {
+            "reason": "unresolved_relation",
+            "count": 88
+          },
+          {
+            "reason": "source_preview",
+            "count": 3
+          },
+          {
+            "reason": "output_budget",
+            "count": 19
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "imported_interface",
+      "snapshot": "imported_interface",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "processOrder",
+          "kind": "function"
+        },
+        "gold_interval": [
+          69,
+          152
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 3.350542,
+          "cpu_ms": 2.288,
+          "packet_sha256": "e055b0ab825090f0e73a4a2a4211266d475ae304ab115e7cef893d853c392a16",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 3.382209,
+          "cpu_ms": 2.145,
+          "packet_sha256": "e055b0ab825090f0e73a4a2a4211266d475ae304ab115e7cef893d853c392a16",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 3.0835,
+          "cpu_ms": 2.055,
+          "packet_sha256": "e055b0ab825090f0e73a4a2a4211266d475ae304ab115e7cef893d853c392a16",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 3,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2185,
+        "evidence_bytes": 83,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "local_interface",
+      "snapshot": "local_interface",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "processOrder",
+          "kind": "function"
+        },
+        "gold_interval": [
+          75,
+          150
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 3.554917,
+          "cpu_ms": 2.036,
+          "packet_sha256": "120c33665082b7c2f5b5506dd3141ca2b93a2b67213b7b4d82e7f2b79926cbc7",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 2.991458,
+          "cpu_ms": 1.858,
+          "packet_sha256": "120c33665082b7c2f5b5506dd3141ca2b93a2b67213b7b4d82e7f2b79926cbc7",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 3.965,
+          "cpu_ms": 1.841,
+          "packet_sha256": "120c33665082b7c2f5b5506dd3141ca2b93a2b67213b7b4d82e7f2b79926cbc7",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 2,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2177,
+        "evidence_bytes": 75,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "local_alias_chain",
+      "snapshot": "local_alias_chain",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "processOrder",
+          "kind": "function"
+        },
+        "gold_interval": [
+          132,
+          206
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 3.159292,
+          "cpu_ms": 2.111,
+          "packet_sha256": "faf27f5972750f0098cf9cd4bc0c9475863d0f101251c1876b862d00d4e83ff5",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 2.971416,
+          "cpu_ms": 1.966,
+          "packet_sha256": "faf27f5972750f0098cf9cd4bc0c9475863d0f101251c1876b862d00d4e83ff5",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 3.672292,
+          "cpu_ms": 2.11,
+          "packet_sha256": "faf27f5972750f0098cf9cd4bc0c9475863d0f101251c1876b862d00d4e83ff5",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 4,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 3,
+        "available_relationship_count": 3,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2178,
+        "evidence_bytes": 74,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "imported_alias_chain",
+      "snapshot": "imported_alias_chain",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "processOrder",
+          "kind": "function"
+        },
+        "gold_interval": [
+          49,
+          123
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 3.616959,
+          "cpu_ms": 2.493,
+          "packet_sha256": "e757c6a8da66380c9eb5e4b26b14fa06ed5a7762fc967077ee6296f6795df04b",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 3.282583,
+          "cpu_ms": 2.264,
+          "packet_sha256": "e757c6a8da66380c9eb5e4b26b14fa06ed5a7762fc967077ee6296f6795df04b",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 3.58625,
+          "cpu_ms": 2.294,
+          "packet_sha256": "e757c6a8da66380c9eb5e4b26b14fa06ed5a7762fc967077ee6296f6795df04b",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 5,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 3,
+        "available_relationship_count": 3,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2176,
+        "evidence_bytes": 74,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "named_type_reexport_chain",
+      "snapshot": "named_type_reexport_chain",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "processOrder",
+          "kind": "function"
+        },
+        "gold_interval": [
+          76,
+          159
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 3.440542,
+          "cpu_ms": 2.321,
+          "packet_sha256": "fd07ddb01fe9870c2c6243907e923f8b83a69185ed05f968cf855d4fb7a0b169",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 3.373917,
+          "cpu_ms": 2.182,
+          "packet_sha256": "fd07ddb01fe9870c2c6243907e923f8b83a69185ed05f968cf855d4fb7a0b169",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 3.428917,
+          "cpu_ms": 2.144,
+          "packet_sha256": "fd07ddb01fe9870c2c6243907e923f8b83a69185ed05f968cf855d4fb7a0b169",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 4,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2185,
+        "evidence_bytes": 83,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "same_name_wrong_file",
+      "snapshot": "same_name_wrong_file",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "processOrder",
+          "kind": "function"
+        },
+        "gold_interval": [
+          69,
+          152
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 3.173209,
+          "cpu_ms": 2.08,
+          "packet_sha256": "e92447513ea7d954883fd7f8b0abe613cd632cc24d03203ee5762f5432dc7c88",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 3.399208,
+          "cpu_ms": 2.276,
+          "packet_sha256": "e92447513ea7d954883fd7f8b0abe613cd632cc24d03203ee5762f5432dc7c88",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 3.267959,
+          "cpu_ms": 2.113,
+          "packet_sha256": "e92447513ea7d954883fd7f8b0abe613cd632cc24d03203ee5762f5432dc7c88",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 3,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2185,
+        "evidence_bytes": 83,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "local_heritage",
+      "snapshot": "local_heritage",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "Processor",
+          "kind": "class"
+        },
+        "gold_interval": [
+          153,
+          252
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::Processor#class"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::Processor#class"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 3.411459,
+          "cpu_ms": 2.065,
+          "packet_sha256": "156155cd85beff1eafc3ae24d2ad94fbc30669f8c6cea73eca74033626acaf67",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 3.122459,
+          "cpu_ms": 1.977,
+          "packet_sha256": "156155cd85beff1eafc3ae24d2ad94fbc30669f8c6cea73eca74033626acaf67",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 3.096167,
+          "cpu_ms": 1.948,
+          "packet_sha256": "156155cd85beff1eafc3ae24d2ad94fbc30669f8c6cea73eca74033626acaf67",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 4,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 3,
+        "available_relationship_count": 3,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2173,
+        "evidence_bytes": 99,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "imported_heritage",
+      "snapshot": "imported_heritage",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "Processor",
+          "kind": "class"
+        },
+        "gold_interval": [
+          125,
+          224
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::Processor#class"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::Processor#class"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 3.655583,
+          "cpu_ms": 2.697,
+          "packet_sha256": "d9ad49d0b1788bae8e609df6e13ad18200e1bd2a5e973ef8ca29b650edc691c1",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 3.57575,
+          "cpu_ms": 2.426,
+          "packet_sha256": "d9ad49d0b1788bae8e609df6e13ad18200e1bd2a5e973ef8ca29b650edc691c1",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 3.460959,
+          "cpu_ms": 2.461,
+          "packet_sha256": "d9ad49d0b1788bae8e609df6e13ad18200e1bd2a5e973ef8ca29b650edc691c1",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 5,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 3,
+        "available_relationship_count": 3,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2173,
+        "evidence_bytes": 99,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "ambiguous_star_exports",
+      "snapshot": "ambiguous_star_exports",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "processOrder",
+          "kind": "function"
+        },
+        "gold_interval": [
+          70,
+          153
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 3.62125,
+          "cpu_ms": 2.342,
+          "packet_sha256": "b1de82e97d52c52679f18d635f5588141775f2d9d8793c1f7044eb3a6b22620d",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 3.309458,
+          "cpu_ms": 2.142,
+          "packet_sha256": "b1de82e97d52c52679f18d635f5588141775f2d9d8793c1f7044eb3a6b22620d",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 4.545,
+          "cpu_ms": 2.129,
+          "packet_sha256": "b1de82e97d52c52679f18d635f5588141775f2d9d8793c1f7044eb3a6b22620d",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 5,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 0,
+        "available_relationship_count": 0,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2185,
+        "evidence_bytes": 83,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "generic_shadow",
+      "snapshot": "generic_shadow",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "processOrder",
+          "kind": "function"
+        },
+        "gold_interval": [
+          50,
+          125
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::processOrder#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 3.135208,
+          "cpu_ms": 2.101,
+          "packet_sha256": "488c2aeaf13a7cf42dec0c9b5d8daa54ae0c64dd259825c4881980e352b8a340",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 2.925417,
+          "cpu_ms": 1.953,
+          "packet_sha256": "488c2aeaf13a7cf42dec0c9b5d8daa54ae0c64dd259825c4881980e352b8a340",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 3.267417,
+          "cpu_ms": 2.065,
+          "packet_sha256": "488c2aeaf13a7cf42dec0c9b5d8daa54ae0c64dd259825c4881980e352b8a340",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 2,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 0,
+        "available_relationship_count": 0,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2177,
+        "evidence_bytes": 75,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "exported_arrow",
+      "snapshot": "exported_arrow",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "useNumber",
+          "kind": "function"
+        },
+        "gold_interval": [
+          42,
+          89
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::useNumber#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::useNumber#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 3.139083,
+          "cpu_ms": 2.023,
+          "packet_sha256": "d760a88855f3a5ab55ca37d8017d025ffbf8fe5cb66ad69f9a6f39edb9ba8b1b",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 3.415208,
+          "cpu_ms": 2.001,
+          "packet_sha256": "d760a88855f3a5ab55ca37d8017d025ffbf8fe5cb66ad69f9a6f39edb9ba8b1b",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 3.276042,
+          "cpu_ms": 2.166,
+          "packet_sha256": "d760a88855f3a5ab55ca37d8017d025ffbf8fe5cb66ad69f9a6f39edb9ba8b1b",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 4,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2130,
+        "evidence_bytes": 47,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "default_identifier",
+      "snapshot": "default_identifier",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "useNumber",
+          "kind": "function"
+        },
+        "gold_interval": [
+          38,
+          85
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::useNumber#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::useNumber#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 3.068875,
+          "cpu_ms": 2.055,
+          "packet_sha256": "1d1c8502c869be9b10f6070fa2ac4e5cb4d802b412b63c4c6ea42294139dc288",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 3.245041,
+          "cpu_ms": 2.173,
+          "packet_sha256": "1d1c8502c869be9b10f6070fa2ac4e5cb4d802b412b63c4c6ea42294139dc288",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 3.042,
+          "cpu_ms": 2.045,
+          "packet_sha256": "1d1c8502c869be9b10f6070fa2ac4e5cb4d802b412b63c4c6ea42294139dc288",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 4,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2130,
+        "evidence_bytes": 47,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "named_function_control",
+      "snapshot": "named_function_control",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "useNumber",
+          "kind": "function"
+        },
+        "gold_interval": [
+          42,
+          89
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::useNumber#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::useNumber#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 3.307542,
+          "cpu_ms": 2.057,
+          "packet_sha256": "ed8ccf1bc5a4e5d71845c9d770720342a8d3bfc840f72fd4a8060b21133b9c6e",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 3.073292,
+          "cpu_ms": 2.006,
+          "packet_sha256": "ed8ccf1bc5a4e5d71845c9d770720342a8d3bfc840f72fd4a8060b21133b9c6e",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 2.999458,
+          "cpu_ms": 1.965,
+          "packet_sha256": "ed8ccf1bc5a4e5d71845c9d770720342a8d3bfc840f72fd4a8060b21133b9c6e",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 4,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2130,
+        "evidence_bytes": 47,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "inline_default_control",
+      "snapshot": "inline_default_control",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.ts",
+        "symbol": {
+          "name": "useNumber",
+          "kind": "function"
+        },
+        "gold_interval": [
+          38,
+          85
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.ts::useNumber#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.ts::useNumber#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 3.613833,
+          "cpu_ms": 2.233,
+          "packet_sha256": "643d902a1a5e225ffcf06c098be51f2c2d8f4c673a8ccb6010d181006d8bda7a",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 3.302875,
+          "cpu_ms": 2.216,
+          "packet_sha256": "643d902a1a5e225ffcf06c098be51f2c2d8f4c673a8ccb6010d181006d8bda7a",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 3.180958,
+          "cpu_ms": 1.898,
+          "packet_sha256": "643d902a1a5e225ffcf06c098be51f2c2d8f4c673a8ccb6010d181006d8bda7a",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 4,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2130,
+        "evidence_bytes": 47,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "anvil_temporal_arguments",
+      "snapshot": "anvil",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "src/brain-context/temporal.ts",
+        "symbol": {
+          "name": "temporalCliArgs",
+          "kind": "function"
+        },
+        "gold_interval": [
+          8841,
+          9262
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "src/brain-context/temporal.ts::temporalCliArgs#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "src/brain-context/temporal.ts::temporalCliArgs#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 1980.838958,
+          "cpu_ms": 1976.962,
+          "packet_sha256": "9cef95ab9f679ae392f80ca4e93f62fe8edcf4649daf02f2e5d1a60e59c1a186",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 2132.281,
+          "cpu_ms": 2128.585,
+          "packet_sha256": "9cef95ab9f679ae392f80ca4e93f62fe8edcf4649daf02f2e5d1a60e59c1a186",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 1968.3365,
+          "cpu_ms": 1964.996,
+          "packet_sha256": "9cef95ab9f679ae392f80ca4e93f62fe8edcf4649daf02f2e5d1a60e59c1a186",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 5,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 4,
+        "available_relationship_count": 4,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2751,
+        "evidence_bytes": 421,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "anvil_retrieval_limits",
+      "snapshot": "anvil",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "src/brain-context/render.ts",
+        "symbol": {
+          "name": "compilerRetrievalLimits",
+          "kind": "function"
+        },
+        "gold_interval": [
+          1664,
+          2936
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "src/brain-context/render.ts::compilerRetrievalLimits#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "src/brain-context/render.ts::compilerRetrievalLimits#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 2081.159584,
+          "cpu_ms": 2077.709,
+          "packet_sha256": "0f9b2ddfab788fcd45cb3caff321a8dd4428225254051728050fe5c3974f6340",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 1928.429083,
+          "cpu_ms": 1924.767,
+          "packet_sha256": "0f9b2ddfab788fcd45cb3caff321a8dd4428225254051728050fe5c3974f6340",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 2177.330625,
+          "cpu_ms": 2171.864,
+          "packet_sha256": "0f9b2ddfab788fcd45cb3caff321a8dd4428225254051728050fe5c3974f6340",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 8,
+        "covered_gold_source_count": 0,
+        "covered_gold_source_ids": [],
+        "all_gold_source_present": false,
+        "required_relationship_count": 6,
+        "available_relationship_count": 6,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 3416,
+        "evidence_bytes": 1012,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [
+          {
+            "reason": "source_preview",
+            "count": 1
+          }
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "corpus": "typescript",
+      "case_id": "anvil_renderer_result_contract",
+      "snapshot": "anvil",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "src/brain-context/render.ts",
+        "symbol": {
+          "name": "renderCompilerPromptEvidenceContext",
+          "kind": "function"
+        },
+        "gold_interval": [
+          4860,
+          5435
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 1897.771792,
+          "cpu_ms": 1894.208,
+          "packet_sha256": "8888a20d77e802b4fb872a537a3280cf5868b58916d38bb9152b248c2b14f1b8",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 2223.248417,
+          "cpu_ms": 2216.797,
+          "packet_sha256": "8888a20d77e802b4fb872a537a3280cf5868b58916d38bb9152b248c2b14f1b8",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 2222.258083,
+          "cpu_ms": 2216.088,
+          "packet_sha256": "8888a20d77e802b4fb872a537a3280cf5868b58916d38bb9152b248c2b14f1b8",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 5,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 4,
+        "available_relationship_count": 4,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": 0,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2973,
+        "evidence_bytes": 575,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "python_alias_annotation",
+      "snapshot": "python_contracts",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.py",
+        "symbol": {
+          "name": "decode",
+          "kind": "function"
+        },
+        "gold_interval": [
+          109,
+          164
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.py::decode#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.py::decode#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 6.738917,
+          "cpu_ms": 3.873,
+          "packet_sha256": "f14f9d2c51e4c05b4c2855398ce510d6f347a682a89c1857ba01c9140e33f1e7",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 5.139084,
+          "cpu_ms": 3.399,
+          "packet_sha256": "f14f9d2c51e4c05b4c2855398ce510d6f347a682a89c1857ba01c9140e33f1e7",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 5.017292,
+          "cpu_ms": 3.374,
+          "packet_sha256": "f14f9d2c51e4c05b4c2855398ce510d6f347a682a89c1857ba01c9140e33f1e7",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 6,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 3,
+        "available_relationship_count": 3,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2128,
+        "evidence_bytes": 55,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "python_base_and_literal_forward",
+      "snapshot": "python_contracts",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "consumer.py",
+        "symbol": {
+          "name": "Child",
+          "kind": "class"
+        },
+        "gold_interval": [
+          166,
+          193
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "consumer.py::Child#class"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "consumer.py::Child#class"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 4.974,
+          "cpu_ms": 3.404,
+          "packet_sha256": "da8a1605a015dd7b8dd3109fe5ca0d3b61b0a0801bee2e25aba00c0a7a6c4006",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 4.593791,
+          "cpu_ms": 3.309,
+          "packet_sha256": "da8a1605a015dd7b8dd3109fe5ca0d3b61b0a0801bee2e25aba00c0a7a6c4006",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 4.917417,
+          "cpu_ms": 3.49,
+          "packet_sha256": "da8a1605a015dd7b8dd3109fe5ca0d3b61b0a0801bee2e25aba00c0a7a6c4006",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 7,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 2,
+        "available_relationship_count": 2,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2082,
+        "evidence_bytes": 27,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "python_known_call_impact",
+      "snapshot": "python_impact",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "lib.py",
+        "symbol": {
+          "name": "target",
+          "kind": "function"
+        },
+        "gold_interval": [
+          0,
+          26
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "lib.py::target#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "lib.py::target#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 3.57,
+          "cpu_ms": 2.237,
+          "packet_sha256": "145768e3e6a99e00607519c3d46805285fd74c5ee5763fd0adb4aaca5588802a",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 3.362125,
+          "cpu_ms": 1.996,
+          "packet_sha256": "145768e3e6a99e00607519c3d46805285fd74c5ee5763fd0adb4aaca5588802a",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 3.451458,
+          "cpu_ms": 1.976,
+          "packet_sha256": "145768e3e6a99e00607519c3d46805285fd74c5ee5763fd0adb4aaca5588802a",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 3,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2038,
+        "evidence_bytes": 26,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "python_unproven_contracts",
+      "snapshot": "python_uncertainty",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "negative.py",
+        "symbol": {
+          "name": "unknown",
+          "kind": "function"
+        },
+        "gold_interval": [
+          125,
+          203
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "negative.py::unknown#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "negative.py::unknown#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 4.615666,
+          "cpu_ms": 3.411,
+          "packet_sha256": "f6a7b6834f8481fbb50d6d633cca749424473d350dbd61af1845cfb03a5b93ae",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 4.504792,
+          "cpu_ms": 3.326,
+          "packet_sha256": "f6a7b6834f8481fbb50d6d633cca749424473d350dbd61af1845cfb03a5b93ae",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 4.394334,
+          "cpu_ms": 3.298,
+          "packet_sha256": "f6a7b6834f8481fbb50d6d633cca749424473d350dbd61af1845cfb03a5b93ae",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 6,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 0,
+        "available_relationship_count": 0,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2156,
+        "evidence_bytes": 78,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "javascript_value_dependencies",
+      "snapshot": "javascript_dependencies",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "run",
+        "file": "app.js",
+        "symbol": {
+          "name": "run",
+          "kind": "function"
+        },
+        "gold_interval": [
+          56,
+          98
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "app.js::run#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "app.js::run#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 4.284041,
+          "cpu_ms": 3.139,
+          "packet_sha256": "52e533f2a5359243b124531854f6d3b756fe1421f06e43df8cfb6a4e1c1b1690",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 4.426292,
+          "cpu_ms": 3.076,
+          "packet_sha256": "52e533f2a5359243b124531854f6d3b756fe1421f06e43df8cfb6a4e1c1b1690",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 3.84625,
+          "cpu_ms": 2.779,
+          "packet_sha256": "52e533f2a5359243b124531854f6d3b756fe1421f06e43df8cfb6a4e1c1b1690",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 7,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "run"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 3,
+        "available_relationship_count": 3,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2040,
+        "evidence_bytes": 42,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "javascript_direct_class_base",
+      "snapshot": "javascript_dependencies",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "app.js",
+        "symbol": {
+          "name": "Worker",
+          "kind": "class"
+        },
+        "gold_interval": [
+          106,
+          163
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "app.js::Worker#class"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "app.js::Worker#class"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 4.239542,
+          "cpu_ms": 2.919,
+          "packet_sha256": "b20427d9744fa9badea9d672911a5e053d96552da904409505aba7815867fc98",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 4.286167,
+          "cpu_ms": 2.89,
+          "packet_sha256": "b20427d9744fa9badea9d672911a5e053d96552da904409505aba7815867fc98",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 4.99175,
+          "cpu_ms": 2.928,
+          "packet_sha256": "b20427d9744fa9badea9d672911a5e053d96552da904409505aba7815867fc98",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 4,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2059,
+        "evidence_bytes": 57,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "javascript_known_call_impact",
+      "snapshot": "javascript_dependencies",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "add",
+        "file": "helper.js",
+        "symbol": {
+          "name": "add",
+          "kind": "function"
+        },
+        "gold_interval": [
+          13,
+          39
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "helper.js::add#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "helper.js::add#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 4.198542,
+          "cpu_ms": 3.002,
+          "packet_sha256": "26211652cb3ed806a4fb87976c139f8e11d06eb6cbcf918a1b0e3d1188d9a56d",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 4.780291,
+          "cpu_ms": 3.742,
+          "packet_sha256": "26211652cb3ed806a4fb87976c139f8e11d06eb6cbcf918a1b0e3d1188d9a56d",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 4.343416,
+          "cpu_ms": 3.247,
+          "packet_sha256": "26211652cb3ed806a4fb87976c139f8e11d06eb6cbcf918a1b0e3d1188d9a56d",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 7,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "add"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 3,
+        "available_relationship_count": 3,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2057,
+        "evidence_bytes": 26,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "javascript_unproven_dependencies",
+      "snapshot": "javascript_uncertainty",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "bad.js",
+        "symbol": {
+          "name": "unproven",
+          "kind": "function"
+        },
+        "gold_interval": [
+          138,
+          196
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "bad.js::unproven#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "bad.js::unproven#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 4.476125,
+          "cpu_ms": 3.382,
+          "packet_sha256": "86c8a5d3edc6980327e0ffad79032ce4090e8cd4599f4b99348056c106654a97",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 4.029125,
+          "cpu_ms": 3.023,
+          "packet_sha256": "86c8a5d3edc6980327e0ffad79032ce4090e8cd4599f4b99348056c106654a97",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 4.117875,
+          "cpu_ms": 2.941,
+          "packet_sha256": "86c8a5d3edc6980327e0ffad79032ce4090e8cd4599f4b99348056c106654a97",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 6,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 0,
+        "available_relationship_count": 0,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2085,
+        "evidence_bytes": 58,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "go_alias_generic_contract",
+      "snapshot": "go_contracts",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "app/main.go",
+        "symbol": {
+          "name": "Build",
+          "kind": "function"
+        },
+        "gold_interval": [
+          47,
+          151
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "app/main.go::Build#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "app/main.go::Build#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 4.735208,
+          "cpu_ms": 3.515,
+          "packet_sha256": "1acf1940c01cf8b0ef8e30494429b5813418e0794d607fa88383878e39d19537",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 4.870041,
+          "cpu_ms": 3.313,
+          "packet_sha256": "1acf1940c01cf8b0ef8e30494429b5813418e0794d607fa88383878e39d19537",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 5.277375,
+          "cpu_ms": 3.386,
+          "packet_sha256": "1acf1940c01cf8b0ef8e30494429b5813418e0794d607fa88383878e39d19537",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 8,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 5,
+        "available_relationship_count": 5,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2167,
+        "evidence_bytes": 104,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "go_explicit_embedding",
+      "snapshot": "go_embedding",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "app/main.go",
+        "symbol": {
+          "name": "Start",
+          "kind": "function"
+        },
+        "gold_interval": [
+          47,
+          119
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "app/main.go::Start#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "app/main.go::Start#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 5.318292,
+          "cpu_ms": 3.587,
+          "packet_sha256": "4feadee7e7cb82c54ceb6c08b6e486e94419c63fdde8d4170203d75f8cec5ec1",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 4.477834,
+          "cpu_ms": 3.15,
+          "packet_sha256": "4feadee7e7cb82c54ceb6c08b6e486e94419c63fdde8d4170203d75f8cec5ec1",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 4.016291,
+          "cpu_ms": 2.879,
+          "packet_sha256": "4feadee7e7cb82c54ceb6c08b6e486e94419c63fdde8d4170203d75f8cec5ec1",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 8,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 4,
+        "available_relationship_count": 4,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2135,
+        "evidence_bytes": 72,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "go_known_api_impact",
+      "snapshot": "go_impact",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "api/api.go",
+        "symbol": {
+          "name": "Handle",
+          "kind": "function"
+        },
+        "gold_interval": [
+          47,
+          74
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "api/api.go::Handle#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "api/api.go::Handle#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 4.298791,
+          "cpu_ms": 3.243,
+          "packet_sha256": "396d9a303dda5f8165edc5f0275e2a475d5d4190a21804687b65edbe16cee0b8",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 3.995042,
+          "cpu_ms": 2.887,
+          "packet_sha256": "396d9a303dda5f8165edc5f0275e2a475d5d4190a21804687b65edbe16cee0b8",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 4.165417,
+          "cpu_ms": 2.914,
+          "packet_sha256": "396d9a303dda5f8165edc5f0275e2a475d5d4190a21804687b65edbe16cee0b8",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 8,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 5,
+        "available_relationship_count": 5,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2079,
+        "evidence_bytes": 27,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "go_unproven_package_uses",
+      "snapshot": "go_uncertainty",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "cmd/main.go",
+        "symbol": {
+          "name": "Keep",
+          "kind": "function"
+        },
+        "gold_interval": [
+          123,
+          152
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "cmd/main.go::Keep#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "cmd/main.go::Keep#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 4.154,
+          "cpu_ms": 3.05,
+          "packet_sha256": "9b83cac5357b9b8ba77240126697428686981faf59c7de66f1d3a66f1d00a575",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 4.761667,
+          "cpu_ms": 2.954,
+          "packet_sha256": "9b83cac5357b9b8ba77240126697428686981faf59c7de66f1d3a66f1d00a575",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 4.306875,
+          "cpu_ms": 3.161,
+          "packet_sha256": "9b83cac5357b9b8ba77240126697428686981faf59c7de66f1d3a66f1d00a575",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 7,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2088,
+        "evidence_bytes": 29,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "rust_authored_trait_contract",
+      "snapshot": "rust_contracts",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "src/lib.rs",
+        "symbol": {
+          "name": "build",
+          "kind": "function"
+        },
+        "gold_interval": [
+          321,
+          410
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "src/lib.rs::build#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "src/lib.rs::build#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 4.719709,
+          "cpu_ms": 3.705,
+          "packet_sha256": "0612f18b68bc62ce1d06857448dfd02c111fa3b65d7da72797f965cc057c3c07",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 4.581458,
+          "cpu_ms": 3.562,
+          "packet_sha256": "0612f18b68bc62ce1d06857448dfd02c111fa3b65d7da72797f965cc057c3c07",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 4.522083,
+          "cpu_ms": 3.509,
+          "packet_sha256": "0612f18b68bc62ce1d06857448dfd02c111fa3b65d7da72797f965cc057c3c07",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 9,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 11,
+        "available_relationship_count": 11,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2144,
+        "evidence_bytes": 89,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "rust_contained_optional_reexport",
+      "snapshot": "rust_workspace",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "app/src/lib.rs",
+        "symbol": {
+          "name": "use_it",
+          "kind": "function"
+        },
+        "gold_interval": [
+          28,
+          86
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "app/src/lib.rs::use_it#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "app/src/lib.rs::use_it#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 4.621958,
+          "cpu_ms": 3.409,
+          "packet_sha256": "a70f5d78152047e26c72fa3b84a92a30bea1ff968a1882a379dbe6e0d0cf5431",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 4.655417,
+          "cpu_ms": 3.054,
+          "packet_sha256": "a70f5d78152047e26c72fa3b84a92a30bea1ff968a1882a379dbe6e0d0cf5431",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 4.095667,
+          "cpu_ms": 2.836,
+          "packet_sha256": "a70f5d78152047e26c72fa3b84a92a30bea1ff968a1882a379dbe6e0d0cf5431",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 8,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 2,
+        "available_relationship_count": 2,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2150,
+        "evidence_bytes": 58,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "rust_known_call_impact",
+      "snapshot": "rust_impact",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "src/api.rs",
+        "symbol": {
+          "name": "parse",
+          "kind": "function"
+        },
+        "gold_interval": [
+          40,
+          94
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "src/api.rs::parse#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "src/api.rs::parse#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 4.232667,
+          "cpu_ms": 3.124,
+          "packet_sha256": "60aa360c64fed12a7a8753d7a18f76aca5ee8b2a7a95c167de2497072759e241",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 3.99275,
+          "cpu_ms": 2.941,
+          "packet_sha256": "60aa360c64fed12a7a8753d7a18f76aca5ee8b2a7a95c167de2497072759e241",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 3.941708,
+          "cpu_ms": 2.765,
+          "packet_sha256": "60aa360c64fed12a7a8753d7a18f76aca5ee8b2a7a95c167de2497072759e241",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 6,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 3,
+        "available_relationship_count": 3,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2101,
+        "evidence_bytes": 54,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "rust_unproven_contracts",
+      "snapshot": "rust_uncertainty",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "src/lib.rs",
+        "symbol": {
+          "name": "probe",
+          "kind": "function"
+        },
+        "gold_interval": [
+          146,
+          290
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "src/lib.rs::probe#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "src/lib.rs::probe#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 4.839584,
+          "cpu_ms": 3.76,
+          "packet_sha256": "1723babea25b86351941b420c0ae3cf3285f7877c205ffc84c1dba381c5f2a7c",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 4.977,
+          "cpu_ms": 3.898,
+          "packet_sha256": "1723babea25b86351941b420c0ae3cf3285f7877c205ffc84c1dba381c5f2a7c",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 5.064083,
+          "cpu_ms": 3.626,
+          "packet_sha256": "1723babea25b86351941b420c0ae3cf3285f7877c205ffc84c1dba381c5f2a7c",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 7,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2205,
+        "evidence_bytes": 144,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "tsx_props_control",
+      "snapshot": "tsx_props",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "badge.tsx",
+        "symbol": {
+          "name": "Badge",
+          "kind": "function"
+        },
+        "gold_interval": [
+          45,
+          112
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "badge.tsx::Badge#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "badge.tsx::Badge#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 3.540375,
+          "cpu_ms": 2.156,
+          "packet_sha256": "83e80812b6567e68a6bcf590359b7628f47e36c13736f3b36644890cf791180f",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 3.232542,
+          "cpu_ms": 2.04,
+          "packet_sha256": "83e80812b6567e68a6bcf590359b7628f47e36c13736f3b36644890cf791180f",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 3.197833,
+          "cpu_ms": 2.064,
+          "packet_sha256": "83e80812b6567e68a6bcf590359b7628f47e36c13736f3b36644890cf791180f",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 3,
+        "covered_gold_source_count": 1,
+        "covered_gold_source_ids": [
+          "entry"
+        ],
+        "all_gold_source_present": false,
+        "required_relationship_count": 1,
+        "available_relationship_count": 1,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2110,
+        "evidence_bytes": 67,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "markdown_section_control",
+      "snapshot": "markdown_navigation",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "guide.md",
+        "symbol": {
+          "name": "Limits",
+          "kind": "section"
+        },
+        "gold_interval": [
+          36,
+          147
+        ],
+        "status": "missing",
+        "matching_ids": [],
+        "request_fallback": "markdown_exact_file"
+      },
+      "request": {
+        "query": "guide.md"
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 3.251333,
+          "cpu_ms": 1.949,
+          "packet_sha256": "d32bb7a2af8d60789bcc3994413f20722708e72c9144ad75a56e579f756550f2",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 2.735166,
+          "cpu_ms": 1.661,
+          "packet_sha256": "d32bb7a2af8d60789bcc3994413f20722708e72c9144ad75a56e579f756550f2",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 3.301459,
+          "cpu_ms": 1.789,
+          "packet_sha256": "d32bb7a2af8d60789bcc3994413f20722708e72c9144ad75a56e579f756550f2",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 2,
+        "covered_gold_source_count": 2,
+        "covered_gold_source_ids": [
+          "entry",
+          "peer"
+        ],
+        "all_gold_source_present": true,
+        "required_relationship_count": 0,
+        "available_relationship_count": 0,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 2097,
+        "evidence_bytes": 200,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [],
+        "status": "ok"
+      }
+    },
+    {
+      "corpus": "multilingual",
+      "case_id": "python_loci_bundle_contract",
+      "snapshot": "loci_python_output_contract",
+      "condition": "intervention",
+      "anchor": {
+        "gold_context_id": "entry",
+        "file": "src/loci/_exploration_output.py",
+        "symbol": {
+          "name": "_validate_bundle",
+          "kind": "function"
+        },
+        "gold_interval": [
+          8659,
+          10287
+        ],
+        "status": "indexed",
+        "matching_ids": [
+          "src/loci/_exploration_output.py::_validate_bundle#function"
+        ]
+      },
+      "request": {
+        "seed_ids": [
+          "src/loci/_exploration_output.py::_validate_bundle#function"
+        ]
+      },
+      "attempts": [
+        {
+          "repetition": 1,
+          "wall_ms": 17.035292,
+          "cpu_ms": 15.206,
+          "packet_sha256": "81373ba1d0e39b84a97ffbf7361e8526744600893c03eff07a1d4ef9c5796bcc",
+          "error": null
+        },
+        {
+          "repetition": 2,
+          "wall_ms": 16.7745,
+          "cpu_ms": 14.957,
+          "packet_sha256": "81373ba1d0e39b84a97ffbf7361e8526744600893c03eff07a1d4ef9c5796bcc",
+          "error": null
+        },
+        {
+          "repetition": 3,
+          "wall_ms": 16.603542,
+          "cpu_ms": 14.812,
+          "packet_sha256": "81373ba1d0e39b84a97ffbf7361e8526744600893c03eff07a1d4ef9c5796bcc",
+          "error": null
+        }
+      ],
+      "score": {
+        "gold_source_count": 4,
+        "covered_gold_source_count": 0,
+        "covered_gold_source_ids": [],
+        "all_gold_source_present": false,
+        "required_relationship_count": 4,
+        "available_relationship_count": 4,
+        "delivered_relationship_count": 0,
+        "precise_kind_links_delivered": null,
+        "forbidden_proven_relationships": 0,
+        "delivery_integrity_violations": [],
+        "endpoint_issues": [],
+        "packet_relationship_count": 0,
+        "packet_source_count": 1,
+        "packet_item_count": 1,
+        "packet_output_bytes": 3455,
+        "evidence_bytes": 997,
+        "nodes_examined": 1,
+        "eligible_edges_considered": 0,
+        "edges_traversed": 0,
+        "omissions": [
+          {
+            "reason": "source_preview",
+            "count": 1
+          }
+        ],
+        "status": "partial"
+      }
+    }
+  ]
+}

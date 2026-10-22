@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "status": "ok",
+  "source": {
+    "id": 1,
+    "file": "src/brain-context/temporal.ts",
+    "start_byte": 8841,
+    "end_byte": 9262,
+    "start_line": 222,
+    "end_line": 235,
+    "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+    "content": "function temporalCliArgs(query: TemporalQuery): string[] {\n  return [\n    \"--temporal-view\",\n    query.view,\n    \"--request-time\",\n    query.request_time,\n    ...(query.world_at === undefined ? [] : [\"--world-at\", query.world_at]),\n    \"--known-at\",\n    query.known_at,\n    ...(query.transition === undefined\n      ? []\n      : [\"--transition-from\", query.transition.from, \"--transition-to\", query.transition.to]),\n  ];\n}",
+    "source_ref": "sr1_n5gaaynzywjd2gmj6lqupmviei"
+  },
+  "complete": true,
+  "next_source_ref": null,
+  "usage": {
+    "evidence_bytes": 421,
+    "output_bytes": 925,
+    "output_encoding": "mcp_result_json_utf8"
+  }
+}
