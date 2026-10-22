@@ -1,0 +1,79 @@
+{
+  "observer_revision": "be96a7f88332213d8a2473daa7992239f93aeaef",
+  "candidate_revision": "a38e17d1456581786e950b892b2cd49684c08229",
+  "replay": [
+    {
+      "experiment": "anvil",
+      "exit_code": 0,
+      "stdout": "{\"status\": \"verified\", \"case_executions\": 4, \"output\": \"/Users/brummerv/phluxxed/loci/.worktrees/r03-exact-source/.scratch/r03-exact-source/results/anvil\"}\n",
+      "stderr": ""
+    },
+    {
+      "experiment": "small-controls",
+      "exit_code": 0,
+      "stdout": "{\"status\": \"verified\", \"case_executions\": 16, \"output\": \"/Users/brummerv/phluxxed/loci/.worktrees/r03-exact-source/.scratch/r03-exact-source/results/small-controls\"}\n",
+      "stderr": ""
+    },
+    {
+      "experiment": "small-negatives",
+      "exit_code": 0,
+      "stdout": "{\"status\": \"verified\", \"case_executions\": 4, \"output\": \"/Users/brummerv/phluxxed/loci/.worktrees/r03-exact-source/.scratch/r03-exact-source/results/small-negatives\"}\n",
+      "stderr": ""
+    }
+  ],
+  "negative_controls": [
+    {
+      "control": "retained packet corruption",
+      "rejected": true,
+      "exit_code": 1,
+      "reason": "retained artifact inventory/hash mismatch"
+    },
+    {
+      "control": "source bytes",
+      "rejected": true,
+      "reason": "8 validation errors for LociReadOutput\nfunction-after[_bounded_page(), LociReadSuccess].source\n  Value error, source content must match its UTF-8 byte span [type=value_error, input_value={'content': 'corrupted', ...: 8192, 'start_line': 2}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error\nLociErrorOutput.error\n  Field required [type=missing, input_value={'complete': True, 'next_...'mcp_result_json_utf8'}}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/missing\nLociErrorOutput.complete\n  Extra inputs are not permitted [type=extra_forbidden, input_value=True, input_type=bool]\n    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden\nLociErrorOutput.next_source_ref\n  Extra inputs are not permitted [type=extra_forbidden, input_value=None, input_type=NoneType]\n    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden\nLociErrorOutput.schema_version\n  Extra inputs are not permitted [type=extra_forbidden, input_value=1, input_type=int]\n    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden\nLociErrorOutput.source\n  Extra inputs are not permitted [type=extra_forbidden, input_value={'content': 'corrupted', ...: 8192, 'start_line': 2}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden\nLociErrorOutput.status\n  Extra inputs are not permitted [type=extra_forbidden, input_value='ok', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden\nLociErrorOutput.usage\n  Extra inputs are not permitted [type=extra_forbidden, input_value={'evidence_bytes': 6835, ... 'mcp_result_json_utf8'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden"
+    },
+    {
+      "control": "truncated continuation",
+      "rejected": true,
+      "reason": "exact source was not completed"
+    },
+    {
+      "control": "missing utf8 negative",
+      "rejected": true,
+      "reason": "negative request inventory incomplete"
+    },
+    {
+      "control": "same-length source corruption with unchanged spans/hash/accounting",
+      "rejected": true,
+      "reason": "incorrect source page 1"
+    }
+  ],
+  "both_primary_working_states_unchanged": true,
+  "preservation_comparison": "Porcelain terminal newline normalized; HEAD, staged diff, status entries and dirty/untracked file hashes exactly equal.",
+  "focused_candidate_tests": {
+    "command": "PYTHONPATH=src /Users/brummerv/phluxxed/loci/.venv/bin/python -B -m pytest -q tests/test_source_access.py tests/test_retrieval_io.py tests/test_normal_source_refs.py tests/test_source_ref_store.py tests/test_retrieval.py tests/test_retrieval_enrichment.py tests/test_normal_retrieval_acceptance.py tests/storage/test_index_store.py tests/storage/test_store_health.py tests/test_service.py -k \"not test_graph_health_counts_imports_without_degrading_normal_unresolved_records and not test_service_materializes_profile_without_leaking_declared_neighbors\"",
+    "passed": 296,
+    "deselected": 2,
+    "elapsed_s": 9.64,
+    "qualification": "two graph-health expectation failures independently reproduced on unchanged control; initial plain-venv checks importing main are excluded"
+  },
+  "harness_tests": [
+    {
+      "command": "PYTHONPATH=src /Users/brummerv/phluxxed/loci/.venv/bin/python -B -m pytest -q tests/test_architecture.py tests/test_architecture_cases.py tests/test_source_access.py",
+      "passed": 26,
+      "elapsed_s": 26.96
+    },
+    {
+      "command": "PYTHONPATH=src /Users/brummerv/phluxxed/loci/.venv/bin/python -B -m pytest -q tests/test_architecture_reads.py",
+      "passed": 3,
+      "elapsed_s": 18.74
+    }
+  ],
+  "isolation_and_cleanup": {
+    "distinct_store_identities": 12,
+    "run_count": 12,
+    "all_owned_execution_worktrees_and_runtime_directories_removed": true,
+    "implementation_worktree_retained": true
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "answer_contract": "exact_json_facts_v1: no extra keys; object key order ignored; array order as specified in each prompt. Answers and gold context are evaluator-only, never agent-visible.",
+  "authored_at": "2026-09-10",
+  "baseline_engine": {
+    "commit": "9acd3e3589ddc034cade36e03c26c4508e9d4434",
+    "extractor_version": 24,
+    "repository": "https://github.com/Phluxxed/loci.git"
+  },
+  "cases": [
+    {
+      "allowed_unresolved": [],
+      "anchor": "entry",
+      "answer": {
+        "origin_file": "types.ts",
+        "required_fields": {
+          "amount": "number",
+          "requestId": "string"
+        },
+        "return_type": "string",
+        "returned_field": "requestId"
+      },
+      "context": [
+        {
+          "end_byte": 153,
+          "file": "consumer.ts",
+          "id": "entry",
+          "reason": "Required to determine the task answer from authored source.",
+          "sha256": "d790964f272208fe856f89057ab051906ee0253733a78686e0872f31761588b2",
+          "start_byte": 62,
+          "symbol": {
+            "kind": "function",
+            "name": "processOrder"
+          }
+        },
+        {
+          "end_byte": 68,
+          "file": "types.ts",
+          "id": "payload",
+          "reason": "Required to determine the task answer from authored source.",
+          "sha256": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+          "start_byte": 0,
+          "symbol": {
+            "kind": "interface",
+            "name": "Payload"
+          }
+        },
+        {
+          "end_byte": 62,
+          "file": "consumer.ts",
+          "id": "import",
+          "reason": "Authored import proves the origin and local spelling.",
+          "sha256": "a3b3c969e5af4920d8688271be6b677639a17b9490c0047806abf59bd4debd3b",
+          "start_byte": 0,
+          "symbol": null
+        }
+      ],
+      "forbidden_relationships": [],
+      "group": "type_context",
+      "id": "imported_interface",
+      "prompt": "Prepare a correctly typed regression input for processOrder. Report required_fields as a name-to-type object, return_type, returned_field, and origin_file of the declaration defining the fields. Return only the specified JSON object. Sort arrays alphabetically unless an execution order is explicitly requested.",
+      "relationships": [
+        {
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "payload"
+        }
+      ],
+      "snapshot": "imported_interface",
+      "success_check": "exact_json_facts_v1"
+    }
+  ],
+  "limits": "One maintained repository, three real contract-comprehension/regression-design tasks; this does not establish broad developer-task or code-edit performance. Model/tool/resource controls and agent runs are subsequent work.",
+  "purpose": "Source-grounded contract comprehension and regression-design tasks, plus adversarial correctness/endpoint controls.",
+  "schema_version": 1,
+  "snapshots": {
+    "imported_interface": {
+      "archive": "fixtures.tar.gz",
+      "archive_sha256": "14973fe6b4891aa1d918001a3b39737acc1fc7dc14e28b4f64d51d4aa344c046",
+      "files": {
+        "Cargo.toml": "933bf227afb44ef0e08cc266b6601411bed64cbadf5d5d60c579872b6ae2a037",
+        "consumer.ts": "a6dd900f493bd5797d2125204404016dbbbdac61d5be50c63f80d9dcc0b8661b",
+        "dep.js": "5d8f65d2774e206bc9f7a7a4ad39ca2dc563b5c31e46ab57ef4874961237ce29",
+        "go.mod": "d4a7905fed02fc6c1ef2db8c9312b76a70d78f802eb018ed3dcc4d9149607271",
+        "jsconfig.json": "47237893b3b6cf9df6f40bcae4b157ab23b3b2d123c8d14be8e927899e0eb4ab",
+        "main.go": "ef7897ad4661b5050de4a5138100cead36b3736de9fdee8f2ce3ec1539569b94",
+        "main.js": "16d80535ace3dc9f277298758e31a4105e6663b6ea59aa981ba9a8b57826e06a",
+        "not-indexed.txt": "0e341e1fe8dfb59c5817f6458f8ed7ede07a6e28b63395f0927d42be3c5f7bb1",
+        "package.json": "559b8dc2d03c9247ebd261623c89f45792a701fb18c03995fc63609a644c4efa",
+        "src/lib.rs": "849a9e8d3f8e81f6b5c704775cd43b5efc26e300cb78d68192c2b2b55294819d",
+        "types.ts": "29a33111811199921ab7517a6ef4050dd00bfc155afca61bcb71aee3af09e14d",
+        "unicode.md": "44f879e03eb9aed98552c4511d8e576738d5d788b282f12dea34d4fc2f15abcf"
+      },
+      "prefix": "imported_interface",
+      "provenance": {
+        "base_case": "typescript-context-v1/imported_interface",
+        "kind": "deterministic_exact_source_fixture"
+      }
+    }
+  },
+  "version": "typescript-context-v1"
+}

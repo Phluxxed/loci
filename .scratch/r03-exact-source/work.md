@@ -70,3 +70,22 @@ measurement. Final focused exact-source harness suite: 3 passed in 20.19 s.
 Primary also ran existing harness/corpus and source projection checks with
 PYTHONPATH=src: 26 passed in 26.96 s. Observer and candidate have independent
 revision identities. The prospective schedule is protocol.md.
+
+Execution completed at observer be96a7f against control 4cadfe1 and candidate
+a38e17d. All six paired comparisons passed, including 24 independently scored
+request executions and 36 rejection probes. All three retained replays passed.
+Deliberate packet corruption, source corruption, continuation truncation and
+missing UTF-8 negative controls were rejected. Twelve store identities were
+distinct; all owned execution checkouts/runtime directories were removed.
+Both main working states match the initial snapshot (only porcelain's terminal
+newline required serialization normalization). No source files were restored
+or cleaned in either main repository.
+
+Anvil mean first/repeat/continuation: 3525/3506/3552 ms control versus
+126/105/124 ms candidate; reader peak 426.8 versus 55.8 MB. Full indexing
+remains about 5 s / 500 MB. Candidate still hashes the full index and retains
+graph work during refresh. Recommendation: source decoupling is viable within
+demonstrated safeguards; integration is a separate decision. Five semantic
+proof discrepancies remain visible and unresolved. RESULTS.md/summary.json and
+validation.json contain evidence and limitations. Stop after evidence commit
+and explicitly requested branch push; no production integration or campaign.
