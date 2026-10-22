@@ -1,0 +1,160 @@
+...........FF........................F.F.F.....                          [100%]
+=================================== FAILURES ===================================
+________ AnvilOracleTests.test_pinned_export_matches_complete_file_map _________
+
+self = <tests.test_complete_work_anvil.AnvilOracleTests testMethod=test_pinned_export_matches_complete_file_map>
+
+    def test_pinned_export_matches_complete_file_map(self) -> None:
+        result = anvil.validate_pinned_source()
+        self.assertEqual(result["id"], "pinned_source_identity")
+>       self.assertTrue(result["passed"], result["detail"])
+E       AssertionError: False is not true : pinned Anvil source export is unavailable
+
+tests/test_complete_work_anvil.py:17: AssertionError
+_____ AnvilOracleTests.test_prepare_target_makes_a_verified_isolated_copy ______
+
+self = <tests.test_complete_work_anvil.AnvilOracleTests testMethod=test_prepare_target_makes_a_verified_isolated_copy>
+
+    def test_prepare_target_makes_a_verified_isolated_copy(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary) / "target"
+>           result = anvil.prepare_target(target)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_complete_work_anvil.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+destination = PosixPath('/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/tmpv4l04apt/target')
+
+    def prepare_target(destination: Path, *, source_root: Path = DEFAULT_SOURCE_ROOT) -> dict[str, Any]:
+        """Make an isolated target copy only after confirming the retained export.
+    
+        Dependency preparation remains explicit: run ``npm ci`` in the returned
+        destination with the pinned package-lock before a measured episode.
+        """
+        identity = validate_pinned_source(source_root)
+        if not identity["passed"]:
+>           raise ValueError(identity["detail"])
+E           ValueError: pinned Anvil source export is unavailable
+
+benchmarks/complete_work/oracles/anvil.py:90: ValueError
+_ CompleteWorkPreparationTests.test_anvil_target_and_controller_config_are_isolated _
+
+self = <tests.test_complete_work_prepare.CompleteWorkPreparationTests testMethod=test_anvil_target_and_controller_config_are_isolated>
+
+    def test_anvil_target_and_controller_config_are_isolated(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+>           result = self._prepare("episode-v1-b1-on", Path(temporary))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_complete_work_prepare.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_complete_work_prepare.py:17: in _prepare
+    return prepare.prepare_run(
+benchmarks/complete_work/prepare.py:333: in prepare_run
+    source = _prepare_anvil(target)
+             ^^^^^^^^^^^^^^^^^^^^^^
+benchmarks/complete_work/prepare.py:226: in _prepare_anvil
+    metadata = anvil.prepare_target(target)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+destination = PosixPath('/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/tmp1rk0up23/episode/workspaces/episode-v1-b1-on')
+
+    def prepare_target(destination: Path, *, source_root: Path = DEFAULT_SOURCE_ROOT) -> dict[str, Any]:
+        """Make an isolated target copy only after confirming the retained export.
+    
+        Dependency preparation remains explicit: run ``npm ci`` in the returned
+        destination with the pinned package-lock before a measured episode.
+        """
+        identity = validate_pinned_source(source_root)
+        if not identity["passed"]:
+>           raise ValueError(identity["detail"])
+E           ValueError: pinned Anvil source export is unavailable
+
+benchmarks/complete_work/oracles/anvil.py:90: ValueError
+_ CompleteWorkPreparationTests.test_install_flag_is_the_only_dependency_transition _
+
+self = <tests.test_complete_work_prepare.CompleteWorkPreparationTests testMethod=test_install_flag_is_the_only_dependency_transition>
+
+    def test_install_flag_is_the_only_dependency_transition(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            with (
+                patch("benchmarks.complete_work.prepare._install_dependencies", return_value={"status": "prepared", "kind": "mock"}) as install,
+                patch("benchmarks.complete_work.prepare.prepare_target_index", return_value={"indexed": 4}),
+            ):
+>               result = self._prepare("episode-v1-b3-on", Path(temporary), install_dependencies=True, preindex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_complete_work_prepare.py:99: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_complete_work_prepare.py:17: in _prepare
+    return prepare.prepare_run(
+benchmarks/complete_work/prepare.py:333: in prepare_run
+    source = _prepare_anvil(target)
+             ^^^^^^^^^^^^^^^^^^^^^^
+benchmarks/complete_work/prepare.py:226: in _prepare_anvil
+    metadata = anvil.prepare_target(target)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+destination = PosixPath('/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/tmpfavuokcv/episode/workspaces/episode-v1-b3-on')
+
+    def prepare_target(destination: Path, *, source_root: Path = DEFAULT_SOURCE_ROOT) -> dict[str, Any]:
+        """Make an isolated target copy only after confirming the retained export.
+    
+        Dependency preparation remains explicit: run ``npm ci`` in the returned
+        destination with the pinned package-lock before a measured episode.
+        """
+        identity = validate_pinned_source(source_root)
+        if not identity["passed"]:
+>           raise ValueError(identity["detail"])
+E           ValueError: pinned Anvil source export is unavailable
+
+benchmarks/complete_work/oracles/anvil.py:90: ValueError
+_ CompleteWorkPreparationTests.test_prepare_records_preindex_without_a_model_turn _
+
+self = <tests.test_complete_work_prepare.CompleteWorkPreparationTests testMethod=test_prepare_records_preindex_without_a_model_turn>
+
+    def test_prepare_records_preindex_without_a_model_turn(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            with (
+                patch("benchmarks.complete_work.prepare._install_dependencies", return_value={"status": "prepared", "kind": "mock"}),
+                patch("benchmarks.complete_work.prepare.prepare_target_index", return_value={"indexed": 4}) as indexed,
+            ):
+>               result = self._prepare("episode-v1-b1-off", Path(temporary), preindex=True, install_dependencies=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_complete_work_prepare.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_complete_work_prepare.py:17: in _prepare
+    return prepare.prepare_run(
+benchmarks/complete_work/prepare.py:333: in prepare_run
+    source = _prepare_anvil(target)
+             ^^^^^^^^^^^^^^^^^^^^^^
+benchmarks/complete_work/prepare.py:226: in _prepare_anvil
+    metadata = anvil.prepare_target(target)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+destination = PosixPath('/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/tmpeq8ccwmo/episode/workspaces/episode-v1-b1-off')
+
+    def prepare_target(destination: Path, *, source_root: Path = DEFAULT_SOURCE_ROOT) -> dict[str, Any]:
+        """Make an isolated target copy only after confirming the retained export.
+    
+        Dependency preparation remains explicit: run ``npm ci`` in the returned
+        destination with the pinned package-lock before a measured episode.
+        """
+        identity = validate_pinned_source(source_root)
+        if not identity["passed"]:
+>           raise ValueError(identity["detail"])
+E           ValueError: pinned Anvil source export is unavailable
+
+benchmarks/complete_work/oracles/anvil.py:90: ValueError
+=========================== short test summary info ============================
+FAILED tests/test_complete_work_anvil.py::AnvilOracleTests::test_pinned_export_matches_complete_file_map
+FAILED tests/test_complete_work_anvil.py::AnvilOracleTests::test_prepare_target_makes_a_verified_isolated_copy
+FAILED tests/test_complete_work_prepare.py::CompleteWorkPreparationTests::test_anvil_target_and_controller_config_are_isolated
+FAILED tests/test_complete_work_prepare.py::CompleteWorkPreparationTests::test_install_flag_is_the_only_dependency_transition
+FAILED tests/test_complete_work_prepare.py::CompleteWorkPreparationTests::test_prepare_records_preindex_without_a_model_turn
+5 failed, 42 passed in 59.88s

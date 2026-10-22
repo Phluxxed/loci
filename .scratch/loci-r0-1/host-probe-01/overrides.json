@@ -1,0 +1,112 @@
+{
+  "default_permissions": "loci_episode_read",
+  "approval_policy": "never",
+  "features.hooks": false,
+  "features.memories": false,
+  "features.apps": false,
+  "features.plugins": false,
+  "features.multi_agent": false,
+  "features.skip_host_skill_discovery": true,
+  "features.network_proxy": true,
+  "web_search": "disabled",
+  "model_reasoning_effort": "high",
+  "shell_environment_policy.set": {
+    "TMPDIR": "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-r01-host-p462tyfw/workspace/.episode-tmp",
+    "LOCI_BASE_DIR": "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/loci-r01-host-p462tyfw/workspace/.episode-store",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "mcp_servers.llm-wiki.enabled": false,
+  "mcp_servers.anvil.enabled": false,
+  "mcp_servers.lens.enabled": false,
+  "mcp_servers.agent-browser.enabled": false,
+  "mcp_servers.agent-browser-corporate.enabled": false,
+  "mcp_servers.node_repl.enabled": false,
+  "mcp_servers.computer-use.enabled": false,
+  "mcp_servers.neural-telemetry.enabled": false,
+  "mcp_servers.loci": {
+    "enabled": true,
+    "required": true,
+    "command": "/usr/bin/false",
+    "args": [],
+    "env": {},
+    "startup_timeout_sec": 60,
+    "tool_timeout_sec": 60
+  },
+  "permissions.loci_episode_read": {
+    "description": "Isolated complete-work source and prepared dependencies",
+    "filesystem": {
+      ":root": "deny",
+      ":minimal": "read",
+      ":tmpdir": "deny",
+      ":slash_tmp": "deny",
+      ":workspace_roots": {
+        ".": "read",
+        ".git": "read",
+        ".codex": "read",
+        ".agents": "read",
+        ".complete-work-isolation.json": "read",
+        "node_modules": "read",
+        ".venv": "read",
+        ".episode-tmp": "write",
+        ".episode-store": "write"
+      },
+      "/Users/brummerv/.claude": "deny",
+      "/Users/brummerv/.claude/**": "deny",
+      "/Users/brummerv/Downloads": "deny",
+      "/Users/brummerv/Downloads/**": "deny",
+      "/Users/brummerv/work": "deny",
+      "/Users/brummerv/work/**": "deny",
+      "/Users/brummerv/improvements": "deny",
+      "/Users/brummerv/improvements/**": "deny",
+      "/Users/brummerv/claude-otel": "deny",
+      "/Users/brummerv/claude-otel/**": "deny"
+    },
+    "network": {
+      "enabled": true,
+      "domains": {
+        "127.0.0.1": "allow",
+        "localhost": "allow",
+        "[::1]": "allow"
+      }
+    }
+  },
+  "permissions.loci_episode_write": {
+    "description": "Isolated complete-work source and prepared dependencies",
+    "filesystem": {
+      ":root": "deny",
+      ":minimal": "read",
+      ":tmpdir": "deny",
+      ":slash_tmp": "deny",
+      ":workspace_roots": {
+        ".": "write",
+        ".git": "read",
+        ".codex": "read",
+        ".agents": "read",
+        ".complete-work-isolation.json": "read",
+        "node_modules": "read",
+        ".venv": "read",
+        ".episode-tmp": "write",
+        ".episode-store": "write"
+      },
+      "/Users/brummerv/.claude": "deny",
+      "/Users/brummerv/.claude/**": "deny",
+      "/Users/brummerv/Downloads": "deny",
+      "/Users/brummerv/Downloads/**": "deny",
+      "/Users/brummerv/work": "deny",
+      "/Users/brummerv/work/**": "deny",
+      "/Users/brummerv/improvements": "deny",
+      "/Users/brummerv/improvements/**": "deny",
+      "/Users/brummerv/claude-otel": "deny",
+      "/Users/brummerv/claude-otel/**": "deny"
+    },
+    "network": {
+      "enabled": true,
+      "domains": {
+        "127.0.0.1": "allow",
+        "localhost": "allow",
+        "[::1]": "allow"
+      }
+    }
+  },
+  "mcp_servers.loci.enabled": false
+}

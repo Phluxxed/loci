@@ -1,5 +1,14 @@
 # Complete-work comparison implementation
 
+For **R0 native-tools versus current Loci**, use
+[`r0.py`](r0.py) to prepare independent snapshots and read back fresh native
+agent rollouts, and follow the
+[corrected R0.1 qualification](../../docs/reviews/2026-10-22-r0-1-native-qualification.md).
+R0 inherits the existing host sandbox and permissions unchanged. It does not
+launch this historical controller, require its custom permission profiles, or
+run supplementary Seatbelt checks. The commands below belong to the retained
+historical graph-on/off campaign.
+
 This is the implementation for **W1.8.4.4.10.2.2**. The fixed question, prompts,
 eight-row schedule and decision rule remain in
 [design-v1](../complete-work/design-v1/protocol.md). This directory does not

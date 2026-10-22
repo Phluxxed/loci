@@ -12,7 +12,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Mapping
 
-from .control import load_receipts
+from .control import ControlConfig, load_receipts
 
 
 SCHEMA_VERSION = 1
@@ -68,11 +68,11 @@ def _native_calls(accounting: Mapping[str, Any]) -> tuple[list[dict[str, Any]], 
                 continue
             packet: dict[str, Any] | None = None
             if (item.get("status") == "completed" and item.get("error") in (None, {})
-                    and isinstance(result, Mapping) and "isError" not in result):
-                # ThreadStartResponse.McpToolCallResult omits ``isError`` for a
-                # successful native item.  This is the sole default applied by
-                # the join; failed/error items stay unknown unless a future
-                # protocol adds an exact result shape for them.
+                    and isinstance(result, Mapping)
+                    and ("isError" not in result or result["isError"] is False)):
+                # App Server items omit isError; native rollout items retain
+                # an explicit false. Both observed success shapes normalize
+                # to the retained CallToolResult. Error results stay unknown.
                 packet = dict(result)
                 if packet.get("_meta") is None:
                     packet.pop("_meta", None)
@@ -207,7 +207,8 @@ def _overlap_and_add(intervals: list[tuple[int, int]], start: int, end: int) -> 
     return overlap
 
 
-def summarize_delivery(receipt_dir: Path, accounting: dict) -> dict:
+def summarize_delivery(receipt_dir: Path, accounting: dict, *,
+                       expected_control: ControlConfig | None = None) -> dict:
     """Return auditable delivery evidence, preserving unmatched uncertainty.
 
     Receipt loading validates ordered control records and their content-addressed
@@ -236,6 +237,17 @@ def summarize_delivery(receipt_dir: Path, accounting: dict) -> dict:
     matched_count = unmatched_count = ambiguous_count = 0
     episode_calls: list[dict[str, Any]] = []
     arms = {receipt.get("arm") for receipt in receipts if isinstance(receipt.get("arm"), str)}
+    identities = [tuple(r.get(field) for field in ("arm", "target_root", "store_dir", "config_sha256"))
+                  for r in receipts]
+    if receipts and (any(not all(isinstance(value, str) for value in identity) for identity in identities)
+                     or any(identity != identities[0] for identity in identities)
+                     or len(arms) != 1 or not arms <= {"on", "off"}):
+        errors.append({"code": "CONTROL_IDENTITY_MISMATCH", "detail": "receipts do not share one control identity"})
+    if expected_control is not None:
+        expected = (expected_control.arm, str(expected_control.target_root),
+                    str(expected_control.store_dir), expected_control.config_sha256)
+        if any(identity != expected for identity in identities):
+            errors.append({"code": "CONTROL_IDENTITY_MISMATCH", "detail": "receipt control differs from configured run"})
     prepared: list[tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]], list[int]]] = []
     for receipt in receipts:
         try:

@@ -3,31 +3,96 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import hashlib
+import os
 import json
 from pathlib import Path, PurePosixPath
 
-from .controller import sha, write_json
 from .runtime import RuntimeFailure
 
 
+IGNORED = {".git", "node_modules", ".venv", ".episode-tmp", ".episode-store"}
+
+
+def sha(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def write_json(path: Path, value: dict) -> None:
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(json.dumps(value, indent=2, ensure_ascii=False) + "\n")
+    temporary.replace(path)
+
+
+def source_snapshot(repo: Path, destination: Path) -> dict:
+    """Retain actual source bytes, excluding only declared runtime/dependency data."""
+    files = {}
+    total = 0
+    paths = []
+    for directory, children, filenames in os.walk(repo, followlinks=False):
+        children[:] = sorted(x for x in children if x not in IGNORED)
+        for name in [*children, *filenames]:
+            if name not in IGNORED:
+                paths.append(Path(directory) / name)
+    for path in sorted(paths):
+        relative = path.relative_to(repo)
+        if path.is_symlink():
+            raise RuntimeFailure(f"unexpected source symlink: {relative}")
+        if not path.is_file():
+            continue
+        data = path.read_bytes()
+        total += len(data)
+        if len(data) > 32 * 1024 * 1024 or total > 256 * 1024 * 1024:
+            raise RuntimeFailure("source snapshot bound exceeded")
+        digest = sha(data)
+        files[relative.as_posix()] = digest
+        target = destination / "blobs" / digest
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if not target.exists():
+            target.write_bytes(data)
+        elif sha(target.read_bytes()) != digest:
+            raise RuntimeFailure("source archive content address mismatch")
+    return {"files": files, "content_bytes": total,
+            "sha256": sha(json.dumps(files, sort_keys=True).encode())}
+
+
+def verify_snapshot(snapshot: dict, expected_identity: str | None = None) -> None:
+    files = snapshot.get("files")
+    if not isinstance(files, dict):
+        raise RuntimeFailure("snapshot file map is unavailable")
+    identity = sha(json.dumps(files, sort_keys=True).encode())
+    if snapshot.get("sha256") != identity:
+        raise RuntimeFailure("snapshot file map differs from its identity")
+    if expected_identity is not None and identity != expected_identity:
+        raise RuntimeFailure("snapshot differs from captured stage identity")
+
+
+def _source_bytes(history: Path, digest: str) -> bytes:
+    if not isinstance(digest, str) or len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest):
+        raise RuntimeFailure("invalid snapshot content address")
+    data = (history / "blobs" / digest).read_bytes()
+    if sha(data) != digest:
+        raise RuntimeFailure("snapshot source bytes differ from their identity")
+    return data
+
+
 def restore_snapshot(snapshot: dict, history: Path, destination: Path) -> None:
+    verify_snapshot(snapshot)
     destination.mkdir(parents=True, exist_ok=False)
     for name, digest in snapshot["files"].items():
         relative = PurePosixPath(name)
         if (not name or relative.is_absolute() or ".." in relative.parts
                 or "\\" in name or relative.as_posix() != name):
             raise RuntimeFailure("unsafe snapshot path")
-        if len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest):
-            raise RuntimeFailure("invalid snapshot content address")
-        data = (history / "blobs" / digest).read_bytes()
-        if sha(data) != digest:
-            raise RuntimeFailure("snapshot source bytes differ from their identity")
+        data = _source_bytes(history, digest)
         target = destination / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(data)
 
 
 def snapshot_diff(before: dict, after: dict, history: Path) -> tuple[list[dict], str]:
+    verify_snapshot(before)
+    verify_snapshot(after)
     changes = []
     patches = []
     for name in sorted(before["files"].keys() | after["files"].keys()):
@@ -36,8 +101,8 @@ def snapshot_diff(before: dict, after: dict, history: Path) -> tuple[list[dict],
             continue
         changes.append({"file": name, "before": old, "after": new})
         try:
-            left = (history / "blobs" / old).read_text().splitlines(keepends=True) if old else []
-            right = (history / "blobs" / new).read_text().splitlines(keepends=True) if new else []
+            left = _source_bytes(history, old).decode().splitlines(keepends=True) if old else []
+            right = _source_bytes(history, new).decode().splitlines(keepends=True) if new else []
         except UnicodeError:
             patches.append(f"Binary source changed: {name}\n")
             continue
@@ -56,6 +121,7 @@ def evaluate_episode(config_path: Path) -> dict:
     destination.mkdir(exist_ok=False)
     history = output / "source-history"
     before = json.loads((output / "source-before.json").read_text())
+    verify_snapshot(before)
     report = {"schema_version": 1, "run_id": config["run_id"],
               "episode_receipt_sha256": sha((output / "result.json").read_bytes()),
               "correct": None, "manual_review": "pending_arm_blinded_review",
@@ -68,6 +134,10 @@ def evaluate_episode(config_path: Path) -> dict:
                                      "reason": "no retained stage snapshot"})
             continue
         snapshot = json.loads(snapshot_path.read_text())
+        identity = stage.get("source_snapshot_sha256")
+        if not isinstance(identity, str):
+            raise RuntimeFailure("stage source identity is unavailable")
+        verify_snapshot(snapshot, identity)
         stage_root = destination / identifier
         candidate = stage_root / "candidate"
         restore_snapshot(snapshot, history, candidate)

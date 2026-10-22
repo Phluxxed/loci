@@ -116,6 +116,21 @@ class CompleteWorkPreparationTests(unittest.TestCase):
             str(Path(result["target"]) / ".venv" / "bin" / "python"),
         )
 
+    def test_dependency_access_cannot_expose_hidden_evaluator_inputs(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            with (
+                patch("benchmarks.complete_work.prepare._install_dependencies", return_value={"status": "prepared"}),
+                patch("benchmarks.complete_work.prepare.prepare_target_index", return_value={"indexed": 4}),
+            ):
+                result = self._prepare("episode-v1-b2-on", Path(temporary), install_dependencies=True, preindex=True)
+            path = Path(result["config_path"])
+            config = json.loads(path.read_text())
+            for exposed in (PROJECT, PROJECT / "benchmarks", Path(config["output_dir"]).parent):
+                config["readonly_roots"] = [str(exposed)]
+                path.write_text(json.dumps(config))
+                with self.subTest(exposed=exposed), self.assertRaisesRegex(Exception, "hidden observer inputs"):
+                    controller.load_run_config(path)
+
 
 if __name__ == "__main__":
     unittest.main()

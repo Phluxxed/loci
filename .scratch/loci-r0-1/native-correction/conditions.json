@@ -1,0 +1,228 @@
+{
+  "model": "gpt-6-luna",
+  "effort": "medium",
+  "prompt_hashes": [
+    "native-fixture-read-copy-assert-exit7"
+  ],
+  "native_protection": {
+    "approval_policy": "on-request",
+    "approvals_reviewer": "auto_review",
+    "sandbox_policy": {
+      "type": "workspace-write",
+      "writable_roots": [
+        "/",
+        "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T"
+      ],
+      "network_access": true,
+      "exclude_tmpdir_env_var": false,
+      "exclude_slash_tmp": false
+    },
+    "permission_profile": {
+      "type": "managed",
+      "file_system": {
+        "type": "restricted",
+        "entries": [
+          {
+            "path": {
+              "type": "path",
+              "path": "/"
+            },
+            "access": "write"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/.claude"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/.claude/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/Downloads"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/Downloads/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/claude-otel"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/claude-otel/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/improvements"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/improvements/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/work"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/work/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "special",
+              "value": {
+                "kind": "minimal"
+              }
+            },
+            "access": "read"
+          },
+          {
+            "path": {
+              "type": "special",
+              "value": {
+                "kind": "tmpdir"
+              }
+            },
+            "access": "write"
+          }
+        ]
+      },
+      "network": "enabled"
+    },
+    "active_permission_profile": {
+      "id": "brummerv_filesystem_guard"
+    },
+    "file_system_sandbox_policy": {
+      "kind": "restricted",
+      "entries": [
+        {
+          "path": {
+            "type": "path",
+            "path": "/"
+          },
+          "access": "write"
+        },
+        {
+          "path": {
+            "type": "path",
+            "path": "/Users/brummerv/.claude"
+          },
+          "access": "deny"
+        },
+        {
+          "path": {
+            "type": "glob_pattern",
+            "pattern": "/Users/brummerv/.claude/**"
+          },
+          "access": "deny"
+        },
+        {
+          "path": {
+            "type": "path",
+            "path": "/Users/brummerv/Downloads"
+          },
+          "access": "deny"
+        },
+        {
+          "path": {
+            "type": "glob_pattern",
+            "pattern": "/Users/brummerv/Downloads/**"
+          },
+          "access": "deny"
+        },
+        {
+          "path": {
+            "type": "path",
+            "path": "/Users/brummerv/claude-otel"
+          },
+          "access": "deny"
+        },
+        {
+          "path": {
+            "type": "glob_pattern",
+            "pattern": "/Users/brummerv/claude-otel/**"
+          },
+          "access": "deny"
+        },
+        {
+          "path": {
+            "type": "path",
+            "path": "/Users/brummerv/improvements"
+          },
+          "access": "deny"
+        },
+        {
+          "path": {
+            "type": "glob_pattern",
+            "pattern": "/Users/brummerv/improvements/**"
+          },
+          "access": "deny"
+        },
+        {
+          "path": {
+            "type": "path",
+            "path": "/Users/brummerv/work"
+          },
+          "access": "deny"
+        },
+        {
+          "path": {
+            "type": "glob_pattern",
+            "pattern": "/Users/brummerv/work/**"
+          },
+          "access": "deny"
+        },
+        {
+          "path": {
+            "type": "special",
+            "value": {
+              "kind": "minimal"
+            }
+          },
+          "access": "read"
+        },
+        {
+          "path": {
+            "type": "special",
+            "value": {
+              "kind": "tmpdir"
+            }
+          },
+          "access": "write"
+        }
+      ]
+    }
+  }
+}

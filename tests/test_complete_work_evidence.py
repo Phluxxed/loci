@@ -247,3 +247,56 @@ def test_corrupt_control_receipt_stops_the_join_before_any_attribution(tmp_path:
     assert result["status"] == "unknown"
     assert result["errors"][0]["code"] == "RECEIPT_LOAD_FAILED"
     assert result["episode"] == {}
+
+
+def test_mixed_or_wrong_control_identity_cannot_be_known_delivery(tmp_path: Path) -> None:
+    target = tmp_path / "target"
+    target.mkdir()
+    source = target / "source.py"
+    source.write_text("alpha\n")
+    config = _config(tmp_path, target)
+    store = ReceiptStore(config)
+    for query in ("alpha", "source"):
+        store.record("loci_retrieve", {"repo": str(target), "query": query},
+                     CallToolResult(content=[], structured_content=_payload(source), is_error=False),
+                     started_unix_ns=1)
+    receipt_dir = tmp_path / "receipts"
+    paths = sorted((receipt_dir / "receipts").glob("*.json"))
+    receipts = [json.loads(path.read_text()) for path in paths]
+    accounting = {"stages": [{"stage_id": "orient", "items": [
+        _native_item(receipt_dir, receipt) for receipt in receipts]}]}
+    assert summarize_delivery(receipt_dir, accounting, expected_control=config)["status"] == "known"
+
+    receipts[1]["arm"] = "off"
+    paths[1].write_text(json.dumps(receipts[1]))
+    mixed = summarize_delivery(receipt_dir, accounting)
+    assert mixed["status"] == "unknown"
+    assert "CONTROL_IDENTITY_MISMATCH" in {e["code"] for e in mixed["errors"]}
+
+    # Even a self-consistent directory must match the configured run.
+    receipts[0]["arm"] = "off"
+    paths[0].write_text(json.dumps(receipts[0]))
+    wrong = summarize_delivery(receipt_dir, accounting, expected_control=config)
+    assert wrong["status"] == "unknown"
+    assert "CONTROL_IDENTITY_MISMATCH" in {e["code"] for e in wrong["errors"]}
+
+
+def test_native_rollout_explicit_iserror_false_joins_but_true_does_not(tmp_path: Path) -> None:
+    target = tmp_path / "target"
+    target.mkdir()
+    source = target / "source.py"
+    source.write_text("alpha\n")
+    config = _config(tmp_path, target)
+    ReceiptStore(config).record(
+        "loci_retrieve", {"repo": str(target), "query": "alpha"},
+        CallToolResult(content=[], structured_content=_payload(source), is_error=False),
+        started_unix_ns=1,
+    )
+    receipt_dir = tmp_path / "receipts"
+    receipt = json.loads(next((receipt_dir / "receipts").glob("*.json")).read_text())
+    item = _native_item(receipt_dir, receipt)
+    item["result"]["isError"] = False
+    accounting = {"stages": [{"stage_id": "turn-1", "items": [item]}]}
+    assert summarize_delivery(receipt_dir, accounting, expected_control=config)["status"] == "known"
+    item["result"]["isError"] = True
+    assert summarize_delivery(receipt_dir, accounting, expected_control=config)["status"] == "unknown"

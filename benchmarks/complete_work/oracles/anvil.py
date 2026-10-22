@@ -26,6 +26,11 @@ DEFAULT_SOURCE_ROOT = Path("/tmp/anvil-source-tasks-20260914/t21")
 ROOT = Path(__file__).resolve().parents[3]
 SOURCE_MANIFEST = ROOT / "benchmarks/comparisons/ordinary-adoption-v1/cases.json"
 FIXTURE = Path(__file__).with_name("anvil_creation_evidence_fixture.mjs")
+EXPECTED_CHECKS = {
+    "evidence_categories", "phase_and_card_invariants", "advisory_graph_invariants",
+    "explicit_marker_controls", "history_controls", "recursive_reparent_controls",
+    "api_page_parity", "safe_public_output",
+}
 
 
 def _sha256(path: Path) -> str:
@@ -208,12 +213,23 @@ def evaluate(
     try:
         fixture_result = json.loads(output.read_text(encoding="utf-8"))
         checks = fixture_result["checks"]
-        if not isinstance(checks, list) or not all(isinstance(item, dict) for item in checks):
+        if (not isinstance(checks, list) or not checks
+                or not all(isinstance(item, dict) and isinstance(item.get("passed"), bool)
+                           and isinstance(item.get("id"), str) for item in checks)):
             raise ValueError("fixture check result has an invalid shape")
+        ids = [item["id"] for item in checks]
+        # A genuine runtime failure is a failed check, never a passing oracle.
+        if (len(ids) != len(set(ids)) or
+                (set(ids) != EXPECTED_CHECKS and not any(
+                    item["id"] == "fixture_runtime" and item["passed"] is False for item in checks))):
+            raise ValueError("fixture check IDs are incomplete or unexpected")
+        errors = fixture_result.get("errors")
+        if not isinstance(errors, list) or not all(isinstance(item, str) for item in errors):
+            raise ValueError("fixture errors have an invalid shape")
         report["checks"] = checks
-        report["errors"] = [str(item) for item in fixture_result.get("errors", [])]
-        report["status"] = "passed" if all(item.get("passed") is True for item in checks) else "failed"
-    except (OSError, ValueError, TypeError, json.JSONDecodeError) as error:
+        report["errors"] = errors
+        report["status"] = "passed" if not errors and all(item["passed"] for item in checks) else "failed"
+    except (OSError, KeyError, ValueError, TypeError, json.JSONDecodeError) as error:
         report["errors"].append(f"independent fixture output is invalid: {_safe_error(error)}")
     return report
 

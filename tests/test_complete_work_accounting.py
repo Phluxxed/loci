@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import math
 from pathlib import Path
+import pytest
 
 from benchmarks.complete_work.accounting import arm_cost, summarize
 
@@ -217,3 +218,17 @@ def test_interruption_retains_partial_usage_without_claiming_a_complete_total(tm
     assert result["observed_cumulative_usage"]["inputTokens"] == 100
     assert result["stages"][0]["observed_usage_delta"]["inputTokens"] == 100
     assert result["phase_groups"]["downstream"]["elapsed_ms"] is None
+
+
+@pytest.mark.parametrize("field", ["inputTokens", "cachedInputTokens", "outputTokens",
+                                  "reasoningOutputTokens", "totalTokens"])
+def test_missing_required_usage_field_prevents_complete_resource_total(tmp_path: Path, field: str) -> None:
+    records = [_usage("turn-1", 100, 20, 10), _usage("turn-2", 150, 40, 15),
+               _usage("turn-3", 200, 60, 20)]
+    del records[-1]["message"]["params"]["tokenUsage"]["total"][field]
+    result = _summarize(tmp_path, records)
+    assert result["usage_status"] == "unknown"
+    assert result["usage"] is None
+    assert arm_cost([{"run_id": "one", "correct": True, "elapsed_ms": 100,
+                      "usage_status": result["usage_status"], "usage": result["usage"]}],
+                    1, 1, expected_run_ids=["one"]) == {"status": "unproven"}

@@ -1,0 +1,13 @@
+{
+  "kind": "restrictive-seatbelt-control-no-generation",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1)(deny default)(allow process-exec (literal \"/usr/bin/true\"))(allow process-fork)(allow file-read* (subpath \"/usr/lib\") (subpath \"/System/Library\") (literal \"/usr/bin/true\"))",
+    "/usr/bin/true"
+  ],
+  "exit_code": 71,
+  "stdout": "",
+  "stderr": "sandbox-exec: sandbox_apply: Operation not permitted\n",
+  "model_generation": false
+}

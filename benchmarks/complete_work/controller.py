@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import argparse
 import fcntl
-import hashlib
 import json
 import os
 from pathlib import Path
@@ -16,56 +15,12 @@ import time
 from typing import Callable
 
 from .accounting import summarize
+from .evaluate import IGNORED, sha, source_snapshot, write_json
 from .isolation import READ_PROFILE, WRITE_PROFILE, build_overrides, verify_profile
 from .runtime import AppServer, Journal, RuntimeFailure, command_with_config
 
 MODEL = "gpt-5.6-terra"
 EFFORT = "high"
-IGNORED = {".git", "node_modules", ".venv", ".episode-tmp", ".episode-store"}
-
-
-def sha(data: bytes) -> str:
-    return hashlib.sha256(data).hexdigest()
-
-
-def write_json(path: Path, value: dict) -> None:
-    temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(json.dumps(value, indent=2, ensure_ascii=False) + "\n")
-    temporary.replace(path)
-
-
-def source_snapshot(repo: Path, destination: Path) -> dict:
-    """Retain actual source bytes, excluding only declared runtime/dependency data."""
-    files = {}
-    total = 0
-    paths = []
-    for directory, children, filenames in os.walk(repo, followlinks=False):
-        children[:] = sorted(x for x in children if x not in IGNORED)
-        for name in [*children, *filenames]:
-            if name not in IGNORED:
-                paths.append(Path(directory) / name)
-    for path in sorted(paths):
-        relative = path.relative_to(repo)
-        if path.is_symlink():
-            raise RuntimeFailure(f"unexpected source symlink: {relative}")
-        if not path.is_file():
-            continue
-        data = path.read_bytes()
-        total += len(data)
-        if len(data) > 32 * 1024 * 1024 or total > 256 * 1024 * 1024:
-            raise RuntimeFailure("source snapshot bound exceeded")
-        digest = sha(data)
-        files[relative.as_posix()] = digest
-        target = destination / "blobs" / digest
-        target.parent.mkdir(parents=True, exist_ok=True)
-        if not target.exists():
-            target.write_bytes(data)
-        elif sha(target.read_bytes()) != digest:
-            raise RuntimeFailure("source archive content address mismatch")
-    return {"files": files, "content_bytes": total,
-            "sha256": sha(json.dumps(files, sort_keys=True).encode())}
-
-
 def verify_freeze(path: Path, expected_sha256: str, required: list[Path]) -> dict:
     raw = path.read_bytes()
     if sha(raw) != expected_sha256:
@@ -152,7 +107,7 @@ def isolation_probe(client: AppServer, repo: Path, hidden: Path) -> dict:
     # Never probe actual denied user directories: this tests our own canaries.
     script = (
         "from pathlib import Path; import json; r={};\n"
-        f"for k,p in {repr({'visible': str(visible), 'hidden': str(hidden)})}.items():\n"
+        f"for k,p in {repr({'visible': str(visible), 'source_read': str(protected), 'hidden': str(hidden)})}.items():\n"
         " try:r[k]=Path(p).read_text()\n"
         " except OSError:r[k]='denied'\n"
         f"for k,p in {repr({'source_write': str(writable), 'protected_write': str(protected)})}.items():\n"
@@ -173,7 +128,7 @@ def isolation_probe(client: AppServer, repo: Path, hidden: Path) -> dict:
         values = json.loads(result["stdout"])
     except (KeyError, ValueError):
         values = {}
-    expected = {"visible": "visible-canary", "hidden": "denied",
+    expected = {"visible": "visible-canary", "source_read": original_protected.decode(), "hidden": "denied",
                 "source_write": "denied", "protected_write": "denied"}
     passed = values == expected
     writable.unlink(missing_ok=True)
@@ -399,9 +354,13 @@ def _execute(config_path: Path, *, preflight_only: bool = False,
                 x.get("elapsed_ms") or 0 for x in result["stages"])) if reached else None
     if result.get("thread_id") and result["stages"]:
         result["accounting"] = summarize(output / "wire.jsonl", result["stages"], result["thread_id"])
+        from .control import ControlConfig
         from .evidence import summarize_delivery
         control = json.loads(Path(config["mcp_config_path"]).read_text())
-        result["delivery"] = summarize_delivery(Path(control["receipt_dir"]), result["accounting"])
+        result["delivery"] = summarize_delivery(
+            Path(control["receipt_dir"]), result["accounting"],
+            expected_control=ControlConfig.load(Path(config["mcp_config_path"])),
+        )
     if result.get("cleanup_errors"):
         result["status"] = "cleanup_failed"
         result["errors"].extend(result["cleanup_errors"])

@@ -5,12 +5,43 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 from benchmarks.complete_work.oracles import anvil
 
 
 class AnvilOracleTests(unittest.TestCase):
+    def test_incomplete_corrupt_or_errored_fixture_output_cannot_pass(self) -> None:
+        good = {"checks": [{"id": name, "passed": True, "detail": "control"}
+                           for name in sorted(anvil.EXPECTED_CHECKS)], "errors": []}
+        variants = [good, {}, {"checks": [], "errors": []},
+                    {**good, "checks": good["checks"][:-1]},
+                    {**good, "checks": good["checks"] + [good["checks"][0]]},
+                    {**good, "errors": ["fixture failed after checks"]},
+                    {**good, "errors": "invalid"},
+                    {"checks": [{"id": "fixture_runtime", "passed": False}], "errors": []}]
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "node_modules").mkdir()
+            for name in ("package.json", "package-lock.json", "src/manifest/view-server.ts"):
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("fixture")
+            for index, payload in enumerate(variants):
+                with self.subTest(index=index):
+                    def run(command, **kwargs):
+                        Path(command[-1]).write_text(json.dumps(payload))
+                        return subprocess.CompletedProcess(command, 0)
+
+                    with (patch.object(anvil, "_runtime_provenance", return_value={
+                            "node_version": "v22.18.0", "package_lock_sha256": "lock"}),
+                          patch.object(anvil, "source_manifest", return_value={
+                              "source_files": {"package-lock.json": "lock"}}),
+                          patch.object(anvil.subprocess, "run", side_effect=run)):
+                        result = anvil.evaluate(root, work_dir=root / str(index))
+                    self.assertEqual(result["status"] == "passed", index == 0, result)
+
     def test_pinned_export_matches_complete_file_map(self) -> None:
         result = anvil.validate_pinned_source()
         self.assertEqual(result["id"], "pinned_source_identity")
