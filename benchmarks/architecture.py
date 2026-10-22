@@ -883,6 +883,8 @@ def main() -> int:
     direct_worker.add_argument("config", type=Path)
     args = parser.parse_args()
     if args.command == "_worker":
+        if str(ROOT) not in sys.path:
+            sys.path.insert(0, str(ROOT))
         return worker(args.config)
     if args.command == "_read_worker":
         if str(ROOT) not in sys.path:
