@@ -16,3 +16,10 @@ Primary owns harness adaptation, deterministic acquisition protocol, measurement
 - proof-audit: proof-audit.md/json, adopted with material qualification: original per-relation proof is incomplete, but all five strict support sets are present in same-case actual acquired sources. Preserve original invalid score, add distinct strict aggregate-session measure.
 - acquisition-design: acquisition-design.md, adopted bounded common scheduler and caps; modified evidence adapter to add strict session support with provenance, preserving the original packet score. No scorer changed.
 - Lead checks: 23 directly relevant candidate/harness tests pass, including all five missing-caller negative controls and corruption rejection. Prospective protocol in protocol.md.
+
+## Complete outcome
+
+- Independent replay reuse: proof-audit worker, retained-context fit is original proof artifact/source audit; exclusive scope expanded only to replay.json plus its owned audit corrections. Sol/high/none inherited from explicit original assignment. Two full paired records and smoke replayed with exact manifests and case inventories. Adopted receipt in replay.json; strict packet failures retained, distinct strict session proof passes.
+- Original/R0.3: identical source/proof outcomes; continuation cost 146.81 vs4.18 s. R0.3/graph-free: 186 vs180 of187 source spans; 78 vs0 of84 semantic links. Both retain entry source36/36. Candidate much cheaper but loses bounded acquisition and semantics.
+- Final artifacts: RESULTS.md, summary.json with exact repetitions/case costs, immutable results/*, proof-audit.md/json, replay.json, validation.json, preservation-after.json. Both main trees and prior R0.3 tree unchanged. No production integration or model campaign.
+- Outcome complete. Recommend separate demand-driven semantic experiment, not implemented. Stop at comparison/recommendation.

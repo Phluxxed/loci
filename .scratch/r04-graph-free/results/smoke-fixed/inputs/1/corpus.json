@@ -1,0 +1,2543 @@
+{
+  "schema_version": 1,
+  "version": "multilingual-context-v1",
+  "authored_at": "2026-09-12",
+  "task_id": "task_20015e6a552bcd64cff4d3a003b8ba4d",
+  "purpose": "Small source/context implementation targets for W4.2-W4.6; no provider outcomes or final measurement freeze.",
+  "starting_implementation": {
+    "repository": "https://github.com/Phluxxed/loci.git",
+    "commit": "60f22c7df320466b23112ba88905fc790ddd98c9"
+  },
+  "answer_contract": "exact_json_facts_v1; answers, context, relationship expectations and labels are evaluator-only.",
+  "source_coverage_policy": {
+    "version": "exact-task-declaration-spans-v2",
+    "declarations": "Exact complete authored declaration bodies, excluding surrounding whitespace/export modifiers; variable bindings use the complete declarator without const/let/var or its final statement semicolon. Internal bytes, members, as-const assertions and heritage clauses are retained.",
+    "linkage": "Exact imports and re-export statements retain all tokens; direct callee export headers are separate required spans in endpoint controls.",
+    "task_relevance": "The full outer input declarations and type-alias linkage remain conservative requirements; the unused BrainCompiledEvidence members are excluded only from anvil_retrieval_limits.",
+    "matching": "Exact original file and byte intervals; no token similarity, name-only matching or source normalization at scoring time.",
+    "signatures": "Credit each exact source-bearing signature only within its identified indexed declaration. Transformed/noncontiguous signatures remain metadata without source credit; complete output bytes still count.",
+    "go": "Complete authored type_spec/type_alias excludes the enclosing shared type keyword; keep alias equals sign, arguments, constraints, bodies and embedding."
+  },
+  "budgets": {
+    "search_k": 5,
+    "max_anchors": 5,
+    "max_dependency_hops": 3,
+    "default_impact_hops": 1,
+    "max_nodes_examined": 64,
+    "max_selected_items": 12,
+    "max_neighbors_per_node": 32,
+    "explore_evidence_bytes": 8192,
+    "explore_output_bytes": 16384,
+    "max_evidence_bytes_per_operation": 16384,
+    "max_evidence_spans_per_operation": 64,
+    "max_output_bytes_per_operation": 32768,
+    "max_source_bytes_per_task": 131072,
+    "max_output_bytes_per_task": 262144,
+    "max_tool_calls_per_task": 24,
+    "max_operation_seconds": 10,
+    "max_task_seconds": 180
+  },
+  "retained_controls": {
+    "corpus": "../typescript-context-v3/corpus.json",
+    "sha256": "5d8f490a820f4e326aa522c2d963c8f0a56ea0c2d472f4d2b66caaeda9834b01",
+    "case_ids": [
+      "imported_interface",
+      "local_interface",
+      "local_alias_chain",
+      "imported_alias_chain",
+      "named_type_reexport_chain",
+      "same_name_wrong_file",
+      "local_heritage",
+      "imported_heritage",
+      "ambiguous_star_exports",
+      "generic_shadow",
+      "exported_arrow",
+      "default_identifier",
+      "named_function_control",
+      "inline_default_control",
+      "anvil_temporal_arguments",
+      "anvil_retrieval_limits",
+      "anvil_renderer_result_contract"
+    ],
+    "policy": "Preserve all old inputs and outcomes; do not pool historical measurements with future multilingual runs."
+  },
+  "snapshots": {
+    "python_contracts": {
+      "archive": "fixtures.tar.gz",
+      "archive_sha256": "94cf067dc5e30c3139bdc75e1b4e9dfecf19db1c0b62f0e1404fb85e3254d4f5",
+      "prefix": "python_contracts",
+      "provenance": {
+        "kind": "authored_context_fixture",
+        "starting_commit": "60f22c7df320466b23112ba88905fc790ddd98c9"
+      },
+      "files": {
+        "barrel.py": "ea3012e0017f334a3c46f223013d209cbe35aa479aaaf93b239dd3364f6b303a",
+        "consumer.py": "38e1d9c9113f856e3f61838cbd1dea5c5fc4a01c1ec941ab8b027743eb1ca462",
+        "schema.py": "e15994eefb294c55da32540a16759f095f67ae73ce7ecd7f5e9634c25c6f4ecd",
+        "wrong.py": "d333e9d9091dd0d2ecc34f4ed9b17225b6726cb4835ff025eea4881fe8ff86f3"
+      }
+    },
+    "python_impact": {
+      "archive": "fixtures.tar.gz",
+      "archive_sha256": "94cf067dc5e30c3139bdc75e1b4e9dfecf19db1c0b62f0e1404fb85e3254d4f5",
+      "prefix": "python_impact",
+      "provenance": {
+        "kind": "authored_context_fixture",
+        "starting_commit": "60f22c7df320466b23112ba88905fc790ddd98c9"
+      },
+      "files": {
+        "app.py": "8579ebf29628ad4fceef102736706b5d31dfc9ec2b2a2a4b65560467168cded0",
+        "lib.py": "e90074bde6f68906b18cd2dd68cec01eb01d6b35cfa5264896405a14cf650435"
+      }
+    },
+    "python_uncertainty": {
+      "archive": "fixtures.tar.gz",
+      "archive_sha256": "94cf067dc5e30c3139bdc75e1b4e9dfecf19db1c0b62f0e1404fb85e3254d4f5",
+      "prefix": "python_uncertainty",
+      "provenance": {
+        "kind": "authored_context_fixture",
+        "starting_commit": "60f22c7df320466b23112ba88905fc790ddd98c9"
+      },
+      "files": {
+        "left.py": "4b924a8edab261765af15873e2a0a40a8b72c4fbd3296e7f9508184a80b55838",
+        "model.py": "a28cc7764f351e2f05320829281b10b51decf2bba78d2b6757da301542bd7196",
+        "negative.py": "b6c8f8e77212b18160d14bf416bc2d940cab7c016532c0ca11f82ede61d097c8",
+        "right.py": "4b924a8edab261765af15873e2a0a40a8b72c4fbd3296e7f9508184a80b55838",
+        "wrong.py": "b3edb2e6daf3bb7b9094128a1c506ea539d5a346709d0254ee4202c0abfb33c0"
+      }
+    },
+    "javascript_dependencies": {
+      "archive": "fixtures.tar.gz",
+      "archive_sha256": "94cf067dc5e30c3139bdc75e1b4e9dfecf19db1c0b62f0e1404fb85e3254d4f5",
+      "prefix": "javascript_dependencies",
+      "provenance": {
+        "kind": "authored_context_fixture",
+        "starting_commit": "60f22c7df320466b23112ba88905fc790ddd98c9"
+      },
+      "files": {
+        "app.js": "1d0d2fb4cc6877f326f993f20e05e23b22e05a978f3e037b4b26c3af2550a88c",
+        "barrel.js": "b2b45765fdfa71f94888a5459919ab00ab243a0e5edad925de34a122ba346e04",
+        "contracts.js": "ab2c02fa56cd54099a9831ed7ed31bebef78597b48c1f29571d2eee5f4447822",
+        "helper.js": "6a1835c96fc597b7c7a8ba7cd2717fbd1aef2ea8be4b0bf82e8fd00d0fa5911e",
+        "wrong.js": "aa24a74d347a81052b1fda29ee57a221daf97ae7dc047205758af7a442582bf9"
+      }
+    },
+    "javascript_uncertainty": {
+      "archive": "fixtures.tar.gz",
+      "archive_sha256": "94cf067dc5e30c3139bdc75e1b4e9dfecf19db1c0b62f0e1404fb85e3254d4f5",
+      "prefix": "javascript_uncertainty",
+      "provenance": {
+        "kind": "authored_context_fixture",
+        "starting_commit": "60f22c7df320466b23112ba88905fc790ddd98c9"
+      },
+      "files": {
+        "bad.js": "d21387525160b54b0826f5b6a9c892a936b8c944b5b4848a84e8fda045274f42",
+        "barrel.js": "c63a9e4e681e57529e38d14442b791fc8d8a58a7066fc8328a8db6116c8a19c7",
+        "left.js": "db0854f581ead5e079842120c2a245bbf369f81ed596d61bbdc076905ddc387f",
+        "right.js": "3636ac75818c1f4605ef9b0eded69264ce9ef6d1a07354cfda03bafa00f591e3"
+      }
+    },
+    "go_contracts": {
+      "archive": "fixtures.tar.gz",
+      "archive_sha256": "94cf067dc5e30c3139bdc75e1b4e9dfecf19db1c0b62f0e1404fb85e3254d4f5",
+      "prefix": "go_contracts",
+      "provenance": {
+        "kind": "authored_context_fixture",
+        "starting_commit": "60f22c7df320466b23112ba88905fc790ddd98c9"
+      },
+      "files": {
+        "app/main.go": "42f4fa200e1fa83b79f4654719ad230c33f465bc92ca436d4dcbbbaefa1038d3",
+        "go.mod": "01cc905450c59f6d3133f5fd339444536aa4d2b32468f197ea50d39884391d4d",
+        "model/model.go": "a867db1d5712a8adc3f24331e4fdb46891caca261ba6f7f16eb0a44c9e3601c5",
+        "wrong/model.go": "afd89e0ea37700984c51ba225df307201ecc05521d1c8a9aabe3afc23792291b"
+      }
+    },
+    "go_embedding": {
+      "archive": "fixtures.tar.gz",
+      "archive_sha256": "94cf067dc5e30c3139bdc75e1b4e9dfecf19db1c0b62f0e1404fb85e3254d4f5",
+      "prefix": "go_embedding",
+      "provenance": {
+        "kind": "authored_context_fixture",
+        "starting_commit": "60f22c7df320466b23112ba88905fc790ddd98c9"
+      },
+      "files": {
+        "app/main.go": "28de25654eb6c82853c0a8476cd3ac42d54479fca107038d90d0117de47047a0",
+        "go.mod": "01cc905450c59f6d3133f5fd339444536aa4d2b32468f197ea50d39884391d4d",
+        "model/model.go": "ad39cb0074512b17521197d48758991623961efd7edc5acc472f98742d89abc6"
+      }
+    },
+    "go_impact": {
+      "archive": "fixtures.tar.gz",
+      "archive_sha256": "94cf067dc5e30c3139bdc75e1b4e9dfecf19db1c0b62f0e1404fb85e3254d4f5",
+      "prefix": "go_impact",
+      "provenance": {
+        "kind": "authored_context_fixture",
+        "starting_commit": "60f22c7df320466b23112ba88905fc790ddd98c9"
+      },
+      "files": {
+        "api/api.go": "a7f10af67423f7dfb8cac758f519ce135834ee686b3ba6328b0575e26e010046",
+        "cmd/server/main.go": "9a71af30fcac65e6443378eab3562c1dc659c28a86df882a3e12f13e5598c5b3",
+        "cmd/worker/main.go": "fc98aa964d34d18b7781e7c711f4cdc39fbfc22c8700b7eca5fd6732678ec5d6",
+        "go.mod": "01cc905450c59f6d3133f5fd339444536aa4d2b32468f197ea50d39884391d4d"
+      }
+    },
+    "go_uncertainty": {
+      "archive": "fixtures.tar.gz",
+      "archive_sha256": "94cf067dc5e30c3139bdc75e1b4e9dfecf19db1c0b62f0e1404fb85e3254d4f5",
+      "prefix": "go_uncertainty",
+      "provenance": {
+        "kind": "authored_context_fixture",
+        "starting_commit": "60f22c7df320466b23112ba88905fc790ddd98c9"
+      },
+      "files": {
+        "cmd/main.go": "15091813263a54f5f9e2aea00fbfa452ac16d5e39028b25d036f3dfad1660a15",
+        "go.mod": "01cc905450c59f6d3133f5fd339444536aa4d2b32468f197ea50d39884391d4d",
+        "model/model.go": "6d478b1b050450fc228dc1a04d79f699dbf67a6c2604e6e3a37c8b283f58a0cc",
+        "one/one.go": "4e64908f4809dab4c8edb15950795243ed2d683926a7ad0161aee3e339348548",
+        "two/two.go": "4e64908f4809dab4c8edb15950795243ed2d683926a7ad0161aee3e339348548",
+        "wrong/model.go": "735d698d25508944a983c66e26ea47872482bb9f451d8b6517db968ade3fa97c"
+      }
+    },
+    "rust_contracts": {
+      "archive": "fixtures.tar.gz",
+      "archive_sha256": "94cf067dc5e30c3139bdc75e1b4e9dfecf19db1c0b62f0e1404fb85e3254d4f5",
+      "prefix": "rust_contracts",
+      "provenance": {
+        "kind": "authored_context_fixture",
+        "starting_commit": "60f22c7df320466b23112ba88905fc790ddd98c9"
+      },
+      "files": {
+        "Cargo.toml": "734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9",
+        "src/lib.rs": "855238dc5190e9d859a182d935a663e3eeaef0f4534f65d044086b4bf3b67c6b"
+      }
+    },
+    "rust_workspace": {
+      "archive": "fixtures.tar.gz",
+      "archive_sha256": "94cf067dc5e30c3139bdc75e1b4e9dfecf19db1c0b62f0e1404fb85e3254d4f5",
+      "prefix": "rust_workspace",
+      "provenance": {
+        "kind": "authored_context_fixture",
+        "starting_commit": "60f22c7df320466b23112ba88905fc790ddd98c9"
+      },
+      "files": {
+        "Cargo.toml": "0b2cca07d060390b0a8ade7f1d04c040e37e27e7d171fb49f15da4d20b44309d",
+        "app/Cargo.toml": "2b7f9afdc90c9c79ec3fad92297a865073758ed8857bf503b866d2e83da896f2",
+        "app/src/lib.rs": "d00f07b3195c149dc4f01e5e09d54985292fbaac29cba0d86a894d8dabb38df5",
+        "core/Cargo.toml": "3bb9f9c34a1c780a54ae360478a23d86ced98be6b966c9fe3e20eec9ec33f29b",
+        "core/src/api.rs": "2e34330f38722bdc3736ced392800acf892b66797390ea6a2beb3db596240c66",
+        "core/src/lib.rs": "7186e7e71accaa9d217e75e361754288c8c0eec1f1fe5ceee0f5786c5536217b",
+        "wrong.rs": "9cdbd7232e39e03e652cc5958c94e4b1d35fa16e3a1ff3d5e1c7ca746c245b0e"
+      }
+    },
+    "rust_impact": {
+      "archive": "fixtures.tar.gz",
+      "archive_sha256": "94cf067dc5e30c3139bdc75e1b4e9dfecf19db1c0b62f0e1404fb85e3254d4f5",
+      "prefix": "rust_impact",
+      "provenance": {
+        "kind": "authored_context_fixture",
+        "starting_commit": "60f22c7df320466b23112ba88905fc790ddd98c9"
+      },
+      "files": {
+        "Cargo.toml": "734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9",
+        "src/api.rs": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+        "src/lib.rs": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710"
+      }
+    },
+    "rust_uncertainty": {
+      "archive": "fixtures.tar.gz",
+      "archive_sha256": "94cf067dc5e30c3139bdc75e1b4e9dfecf19db1c0b62f0e1404fb85e3254d4f5",
+      "prefix": "rust_uncertainty",
+      "provenance": {
+        "kind": "authored_context_fixture",
+        "starting_commit": "60f22c7df320466b23112ba88905fc790ddd98c9"
+      },
+      "files": {
+        "Cargo.toml": "5702cbe97faccb5347b9d50991fcceb3c6ffacbfae6bd0b50112716b2b9a5ec0",
+        "src/a.rs": "1b454ec3d972e0d45ebb255ed707b96aac33ad9e8fd36b259ae42046baef2bea",
+        "src/b.rs": "1b454ec3d972e0d45ebb255ed707b96aac33ad9e8fd36b259ae42046baef2bea",
+        "src/lib.rs": "4317120f11acecf02dbf24a231eb4772f5052a158ec22af3a4804445d9e30ce7",
+        "src/model.rs": "79efeb8d1c1b79ee6ebc0d927dcc44cde0a38b65166c005076fa756157087782",
+        "src/private_api.rs": "0a99797371233e380848bdadade68da20eaad29843ab11cb06499eb1ba3725d1",
+        "wrong.rs": "1a796ad3b7f2ca03b124522f2464bda468445c5d758f61359848987d2fb0c859"
+      }
+    },
+    "tsx_props": {
+      "archive": "fixtures.tar.gz",
+      "archive_sha256": "94cf067dc5e30c3139bdc75e1b4e9dfecf19db1c0b62f0e1404fb85e3254d4f5",
+      "prefix": "tsx_props",
+      "provenance": {
+        "kind": "authored_context_fixture",
+        "starting_commit": "60f22c7df320466b23112ba88905fc790ddd98c9"
+      },
+      "files": {
+        "badge.tsx": "5b4483e65def4b4d5ddde658ece6a92969f51ca305c96f256bc8468afaefa50e",
+        "props.ts": "4d0e8c294bd005227b1313e53ec747e068fd8c39d370ab738a91c2618529e392"
+      }
+    },
+    "markdown_navigation": {
+      "archive": "fixtures.tar.gz",
+      "archive_sha256": "94cf067dc5e30c3139bdc75e1b4e9dfecf19db1c0b62f0e1404fb85e3254d4f5",
+      "prefix": "markdown_navigation",
+      "provenance": {
+        "kind": "authored_context_fixture",
+        "starting_commit": "60f22c7df320466b23112ba88905fc790ddd98c9"
+      },
+      "files": {
+        "guide.md": "527d7a3189451c595d11ed69fd87d18ecf0ab1cf0601229f86ba0fd44a5e66ec"
+      }
+    },
+    "loci_python_output_contract": {
+      "archive": "fixtures.tar.gz",
+      "archive_sha256": "94cf067dc5e30c3139bdc75e1b4e9dfecf19db1c0b62f0e1404fb85e3254d4f5",
+      "prefix": "loci_python_output_contract",
+      "provenance": {
+        "kind": "maintained_source_module_snapshot",
+        "repository": "https://github.com/Phluxxed/loci.git",
+        "commit": "60f22c7df320466b23112ba88905fc790ddd98c9",
+        "paths": [
+          "src/loci/_exploration_output.py"
+        ],
+        "limit": "One complete maintained module, not a full-repository or code-edit benchmark."
+      },
+      "files": {
+        "src/loci/_exploration_output.py": "3088c657a03f3b8724fe14f133888837f7b74edd80fbb0b726aaead75a5b2270"
+      }
+    }
+  },
+  "cases": [
+    {
+      "id": "python_alias_annotation",
+      "language": "python",
+      "group": "language_fixture",
+      "question_kind": "contract",
+      "snapshot": "python_contracts",
+      "anchor": "entry",
+      "prompt": "Locate decode and prepare an annotated input regression. Report function_file, alias_rhs, payload_origin, payload_fields as a name-to-annotation object, and authored_return. Preserve authored spelling; do not evaluate annotations. Return only the specified JSON object. Sort arrays alphabetically except explicitly ordered pairs.",
+      "context": [
+        {
+          "id": "entry",
+          "file": "consumer.py",
+          "start_byte": 109,
+          "end_byte": 164,
+          "sha256": "558ff212ad4fad224d20117cc56f25fb07a3be9d8c471b9a5658d97dd3ae21a9",
+          "symbol": {
+            "name": "decode",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "alias",
+          "file": "consumer.py",
+          "start_byte": 87,
+          "end_byte": 107,
+          "sha256": "cacbc53dde11242e55adfb13ce439b3617b22c01aede67cbc540bfc6681ef2e1",
+          "symbol": {
+            "name": "Alias",
+            "kind": "type"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "payload",
+          "file": "schema.py",
+          "start_byte": 0,
+          "end_byte": 34,
+          "sha256": "fbc060734857298af0bc95adb581cebcda4f3d12b7371b9a5b84e9eeae95724d",
+          "symbol": {
+            "name": "Payload",
+            "kind": "class"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "import",
+          "file": "consumer.py",
+          "start_byte": 29,
+          "end_byte": 61,
+          "sha256": "5a6e39157797dc35112692e9616b6dc1b128c208015ae2d477d2c53aae76f9eb",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "reexport",
+          "file": "barrel.py",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "504908d02d3d71f869d399221002015c659b73ba8d18694e5c4373f6c4fd8fd5",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "alias_marker",
+          "file": "consumer.py",
+          "start_byte": 0,
+          "end_byte": 28,
+          "sha256": "ccb5f0eef7420d0676c19fd0f9b6f82e493103c7aaa8b75e87989a6a3838318c",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        }
+      ],
+      "relationships": [
+        {
+          "from": "entry",
+          "kind": "parameter_annotation",
+          "to": "alias"
+        },
+        {
+          "from": "alias",
+          "kind": "alias_target",
+          "to": "payload"
+        },
+        {
+          "from": "entry",
+          "kind": "type_argument",
+          "to": "payload"
+        }
+      ],
+      "forbidden_relationships": [
+        {
+          "from": "entry",
+          "target_file": "wrong.py",
+          "reason": "Same name is not import provenance."
+        }
+      ],
+      "allowed_unresolved": [
+        {
+          "name": "TypeAlias",
+          "reason": "Recognized authored alias marker; no external typing source is claimed."
+        }
+      ],
+      "answer": {
+        "function_file": "consumer.py",
+        "alias_rhs": "P",
+        "payload_origin": "schema.py",
+        "payload_fields": {
+          "request_id": "str"
+        },
+        "authored_return": "list[P]"
+      },
+      "success_check": "exact_json_facts_v1"
+    },
+    {
+      "id": "python_base_and_literal_forward",
+      "language": "python",
+      "group": "language_fixture",
+      "question_kind": "contract",
+      "snapshot": "python_contracts",
+      "anchor": "entry",
+      "prompt": "Locate Child and later. Report direct_base, base_origin, base_fields as a name-to-annotation object, literal_forward_target for the annotation \"P\", and mro_computed. Describe only authored context; mro_computed asks whether this static context proves a computed MRO. Return only the specified JSON object. Sort arrays alphabetically except explicitly ordered pairs.",
+      "context": [
+        {
+          "id": "entry",
+          "file": "consumer.py",
+          "start_byte": 166,
+          "end_byte": 193,
+          "sha256": "874268998ed249a6307588123b97e3c6cf844cc84d1981253a9d6961816608c4",
+          "symbol": {
+            "name": "Child",
+            "kind": "class"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "base",
+          "file": "schema.py",
+          "start_byte": 36,
+          "end_byte": 65,
+          "sha256": "530520bae1f5f9992db2ca9e14661ff643cb91cc6240f9878ce58e8a42c00b7c",
+          "symbol": {
+            "name": "Base",
+            "kind": "class"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "base_import",
+          "file": "consumer.py",
+          "start_byte": 62,
+          "end_byte": 85,
+          "sha256": "da7bcb70fc452adb41819a13dc892e7132522fc6ea8466c7cf303f46799444fd",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "later",
+          "file": "consumer.py",
+          "start_byte": 195,
+          "end_byte": 241,
+          "sha256": "e3e93c34015caf7ad773941f594df519bfbd027483a89f93320fb8c6d8237ba2",
+          "symbol": {
+            "name": "later",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "payload",
+          "file": "schema.py",
+          "start_byte": 0,
+          "end_byte": 34,
+          "sha256": "fbc060734857298af0bc95adb581cebcda4f3d12b7371b9a5b84e9eeae95724d",
+          "symbol": {
+            "name": "Payload",
+            "kind": "class"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "import",
+          "file": "consumer.py",
+          "start_byte": 29,
+          "end_byte": 61,
+          "sha256": "5a6e39157797dc35112692e9616b6dc1b128c208015ae2d477d2c53aae76f9eb",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "reexport",
+          "file": "barrel.py",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "504908d02d3d71f869d399221002015c659b73ba8d18694e5c4373f6c4fd8fd5",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        }
+      ],
+      "relationships": [
+        {
+          "from": "entry",
+          "kind": "direct_class_base",
+          "to": "base"
+        },
+        {
+          "from": "later",
+          "kind": "literal_forward_annotation",
+          "to": "payload"
+        }
+      ],
+      "forbidden_relationships": [],
+      "allowed_unresolved": [],
+      "answer": {
+        "direct_base": "Base",
+        "base_origin": "schema.py",
+        "base_fields": {
+          "enabled": "bool"
+        },
+        "literal_forward_target": "schema.py::Payload",
+        "mro_computed": false
+      },
+      "success_check": "exact_json_facts_v1"
+    },
+    {
+      "id": "python_known_call_impact",
+      "language": "python",
+      "group": "language_fixture",
+      "question_kind": "impact",
+      "snapshot": "python_impact",
+      "anchor": "entry",
+      "prompt": "Locate target and identify its known direct caller. Report target_file, caller_file, caller_name, local_import_name, and edge_direction as an array [caller, callee]. Return only the specified JSON object. Sort arrays alphabetically except explicitly ordered pairs.",
+      "context": [
+        {
+          "id": "entry",
+          "file": "lib.py",
+          "start_byte": 0,
+          "end_byte": 26,
+          "sha256": "00b11743da085fa77d79d131971cf9de571cbf8154642e2551810d20f76a2b93",
+          "symbol": {
+            "name": "target",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "caller",
+          "file": "app.py",
+          "start_byte": 33,
+          "end_byte": 65,
+          "sha256": "34c3d2859273c191f506ef7ee2910adfbb61ca348536b9c881a9bdc87efb6ac7",
+          "symbol": {
+            "name": "caller",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "import",
+          "file": "app.py",
+          "start_byte": 0,
+          "end_byte": 31,
+          "sha256": "0a0b8d3da49f3716931f7df061b4a01708aa851ac476a9eb816c2e5aad8c02b2",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        }
+      ],
+      "relationships": [
+        {
+          "from": "caller",
+          "kind": "calls",
+          "to": "entry"
+        }
+      ],
+      "forbidden_relationships": [],
+      "allowed_unresolved": [],
+      "answer": {
+        "target_file": "lib.py",
+        "caller_file": "app.py",
+        "caller_name": "caller",
+        "local_import_name": "alias",
+        "edge_direction": [
+          "caller",
+          "target"
+        ]
+      },
+      "success_check": "exact_json_facts_v1"
+    },
+    {
+      "id": "python_unproven_contracts",
+      "language": "python",
+      "group": "language_fixture",
+      "question_kind": "uncertainty",
+      "snapshot": "python_uncertainty",
+      "anchor": "entry",
+      "prompt": "Review the annotation and base uses in negative.py under the declared static context boundary. Report exact_repository_targets for Missing, External, Choice, nested P, generic P, make_type() and make_base(); generic_P_is_imported_payload; compound_string_supported for \"list[P]\"; and runtime_evaluation_allowed. The boundary resolves only proven authored names and bare/dotted literal forward references, never computed expressions or ambiguous wildcard origins. Return only the specified JSON object. Sort arrays alphabetically except explicitly ordered pairs.",
+      "context": [
+        {
+          "id": "entry",
+          "file": "negative.py",
+          "start_byte": 125,
+          "end_byte": 203,
+          "sha256": "278150947da530e8b17bc521a95d18db22854f0538000d8f0edfccaffe927ba9",
+          "symbol": {
+            "name": "unknown",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "imports",
+          "file": "negative.py",
+          "start_byte": 0,
+          "end_byte": 123,
+          "sha256": "48344d4396f9370b1642abc26edbe68b3af0ff60818972226de0ce036e3484a1",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "shadow",
+          "file": "negative.py",
+          "start_byte": 205,
+          "end_byte": 302,
+          "sha256": "070dafb5a1575b1ab35fcef4f0d0e0b27b421cd57760ad95c6f35a77a16a5b07",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "generic",
+          "file": "negative.py",
+          "start_byte": 304,
+          "end_byte": 351,
+          "sha256": "9fc626f08fa8d8004d15a3b6fabe5d94db97a36349f3dfa0c4931a787542ee8c",
+          "symbol": {
+            "name": "generic",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "computed",
+          "file": "negative.py",
+          "start_byte": 353,
+          "end_byte": 416,
+          "sha256": "d728401688af558bb083343caab0104c2b188ddd5a52a084297d6afb29b7322d",
+          "symbol": {
+            "name": "computed",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "dynamic",
+          "file": "negative.py",
+          "start_byte": 418,
+          "end_byte": 454,
+          "sha256": "f17eda4fe9ce84b86e6885d8356fdaad1a15af993c677ec6a0d6732e99f0e209",
+          "symbol": {
+            "name": "Dynamic",
+            "kind": "class"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        }
+      ],
+      "relationships": [],
+      "forbidden_relationships": [
+        {
+          "use": "Missing",
+          "target_file": "wrong.py"
+        },
+        {
+          "use": "Choice",
+          "target_files": [
+            "left.py",
+            "right.py"
+          ]
+        },
+        {
+          "use": "nested P or generic P",
+          "target_file": "model.py"
+        },
+        {
+          "use": "computed annotation or class base",
+          "exact_target": false
+        }
+      ],
+      "allowed_unresolved": [
+        {
+          "use": "Missing",
+          "reason": "Name missing at the declared import endpoint; wrong.py is unrelated."
+        },
+        {
+          "use": "External",
+          "reason": "Import endpoint is not repository-contained."
+        },
+        {
+          "use": "Choice",
+          "reason": "Multiple wildcard origins are unproven by this bounded resolver."
+        },
+        {
+          "use": "nested P",
+          "reason": "Enclosing local value shadows the module import."
+        },
+        {
+          "use": "generic P",
+          "reason": "Type parameter binds the name; it is not the imported Payload."
+        },
+        {
+          "use": "make_type(), make_base(), \"list[P]\"",
+          "reason": "Computed expressions and compound string annotation grammar are unsupported."
+        }
+      ],
+      "answer": {
+        "exact_repository_targets": [],
+        "generic_P_is_imported_payload": false,
+        "compound_string_supported": false,
+        "runtime_evaluation_allowed": false
+      },
+      "success_check": "exact_json_facts_v1"
+    },
+    {
+      "id": "javascript_value_dependencies",
+      "language": "javascript",
+      "group": "language_fixture",
+      "question_kind": "dependencies",
+      "snapshot": "javascript_dependencies",
+      "anchor": "run",
+      "prompt": "Locate run and identify the source of each direct helper call. Report function_file, direct_callees, helper_origin, add_expression, and default_export_binding. No type annotation is required for this JavaScript dependency question. Return only the specified JSON object. Sort arrays alphabetically except explicitly ordered pairs.",
+      "context": [
+        {
+          "id": "run",
+          "file": "app.js",
+          "start_byte": 56,
+          "end_byte": 98,
+          "sha256": "32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18",
+          "symbol": {
+            "name": "run",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "add",
+          "file": "helper.js",
+          "start_byte": 13,
+          "end_byte": 39,
+          "sha256": "4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f",
+          "symbol": {
+            "name": "add",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "make",
+          "file": "helper.js",
+          "start_byte": 41,
+          "end_byte": 75,
+          "sha256": "2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df",
+          "symbol": {
+            "name": "make",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "import",
+          "file": "app.js",
+          "start_byte": 0,
+          "end_byte": 48,
+          "sha256": "5bfc3c4c47940fb978e1cd4c03b7aaa9dc1b42cb9aa5c4fa3ef62f98113dac30",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "barrel",
+          "file": "barrel.js",
+          "start_byte": 0,
+          "end_byte": 51,
+          "sha256": "c91cf562e53ce5646e120e8d635681aa083cc965b0e2a6a7d42b103aaff83ce1",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "default",
+          "file": "helper.js",
+          "start_byte": 76,
+          "end_byte": 96,
+          "sha256": "0ef92751d948994840414eedb75cbcfbefc49b9a8433089373ba6a04fe3e712f",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "arrow_export",
+          "file": "helper.js",
+          "start_byte": 0,
+          "end_byte": 40,
+          "sha256": "4a122cce248d876d6be3c189ae370689255fab442718353f33f350ae828036ff",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        }
+      ],
+      "relationships": [
+        {
+          "from": "run",
+          "kind": "calls",
+          "to": "add"
+        },
+        {
+          "from": "run",
+          "kind": "calls",
+          "to": "make"
+        },
+        {
+          "from": "make",
+          "kind": "calls",
+          "to": "add"
+        }
+      ],
+      "forbidden_relationships": [
+        {
+          "from": "run",
+          "target_file": "wrong.js",
+          "reason": "Wrong-origin same-name arrow."
+        }
+      ],
+      "allowed_unresolved": [],
+      "answer": {
+        "function_file": "app.js",
+        "direct_callees": [
+          "add",
+          "make"
+        ],
+        "helper_origin": "helper.js",
+        "add_expression": "value + 1",
+        "default_export_binding": "make"
+      },
+      "success_check": "exact_json_facts_v1"
+    },
+    {
+      "id": "javascript_direct_class_base",
+      "language": "javascript",
+      "group": "language_fixture",
+      "question_kind": "dependencies",
+      "snapshot": "javascript_dependencies",
+      "anchor": "entry",
+      "prompt": "Locate Worker and inspect its authored direct class base. Report class_file, local_base_name, base_name, base_origin, base_method, and proves_runtime_dispatch. The last field asks whether the authored extends clause alone proves a runtime method target. Return only the specified JSON object. Sort arrays alphabetically except explicitly ordered pairs.",
+      "context": [
+        {
+          "id": "entry",
+          "file": "app.js",
+          "start_byte": 106,
+          "end_byte": 163,
+          "sha256": "bc5db1762411251ec1c2aaf40c7d9ad35605067cb12ead39defcc3a11742fecd",
+          "symbol": {
+            "name": "Worker",
+            "kind": "class"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "base",
+          "file": "contracts.js",
+          "start_byte": 7,
+          "end_byte": 48,
+          "sha256": "d008204f7f136fa616ff53854973369408209b1bab7d09e54c4062f34810af16",
+          "symbol": {
+            "name": "Base",
+            "kind": "class"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "import",
+          "file": "app.js",
+          "start_byte": 0,
+          "end_byte": 48,
+          "sha256": "5bfc3c4c47940fb978e1cd4c03b7aaa9dc1b42cb9aa5c4fa3ef62f98113dac30",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "base_export",
+          "file": "barrel.js",
+          "start_byte": 52,
+          "end_byte": 100,
+          "sha256": "4a04b889e7a0d056392b094c74c93ed1ec7571f5f8e61964c14b973eae27dcd4",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        }
+      ],
+      "relationships": [
+        {
+          "from": "entry",
+          "kind": "direct_class_extends",
+          "to": "base"
+        }
+      ],
+      "forbidden_relationships": [
+        {
+          "from": "entry",
+          "kind": "implements",
+          "reason": "No authored implements/structural type claim exists in this JavaScript."
+        }
+      ],
+      "allowed_unresolved": [],
+      "answer": {
+        "class_file": "app.js",
+        "local_base_name": "Parent",
+        "base_name": "Base",
+        "base_origin": "contracts.js",
+        "base_method": "enabled",
+        "proves_runtime_dispatch": false
+      },
+      "success_check": "exact_json_facts_v1"
+    },
+    {
+      "id": "javascript_known_call_impact",
+      "language": "javascript",
+      "group": "language_fixture",
+      "question_kind": "impact",
+      "snapshot": "javascript_dependencies",
+      "anchor": "add",
+      "prompt": "Locate add and report origin_file and its known direct_callers using file::name (qualify the class method as Worker.work). Include same-file and imported calls; do not infer runtime callers. Return only the specified JSON object. Sort arrays alphabetically except explicitly ordered pairs.",
+      "context": [
+        {
+          "id": "add",
+          "file": "helper.js",
+          "start_byte": 13,
+          "end_byte": 39,
+          "sha256": "4aefb1497be66b317d3f91396a3176122b327f14b82a547d2413b26a4c5bf67f",
+          "symbol": {
+            "name": "add",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "run",
+          "file": "app.js",
+          "start_byte": 56,
+          "end_byte": 98,
+          "sha256": "32a6b20fc4a076296be6f828e8db617099b861c91d461d8e33b87cc2ed308a18",
+          "symbol": {
+            "name": "run",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "make",
+          "file": "helper.js",
+          "start_byte": 41,
+          "end_byte": 75,
+          "sha256": "2490aa255b64a55751d0d40c59218fd36bfdb515c55095f7b9484d379048e5df",
+          "symbol": {
+            "name": "make",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "method",
+          "file": "app.js",
+          "start_byte": 136,
+          "end_byte": 161,
+          "sha256": "fc5691268bb3ee147c5ce653cb740088ca42491be3a2d5ea3a26b85b2c08d953",
+          "symbol": {
+            "name": "work",
+            "kind": "method"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "import",
+          "file": "app.js",
+          "start_byte": 0,
+          "end_byte": 48,
+          "sha256": "5bfc3c4c47940fb978e1cd4c03b7aaa9dc1b42cb9aa5c4fa3ef62f98113dac30",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "barrel",
+          "file": "barrel.js",
+          "start_byte": 0,
+          "end_byte": 51,
+          "sha256": "c91cf562e53ce5646e120e8d635681aa083cc965b0e2a6a7d42b103aaff83ce1",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "arrow_export",
+          "file": "helper.js",
+          "start_byte": 0,
+          "end_byte": 40,
+          "sha256": "4a122cce248d876d6be3c189ae370689255fab442718353f33f350ae828036ff",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        }
+      ],
+      "relationships": [
+        {
+          "from": "run",
+          "kind": "calls",
+          "to": "add"
+        },
+        {
+          "from": "method",
+          "kind": "calls",
+          "to": "add"
+        },
+        {
+          "from": "make",
+          "kind": "calls",
+          "to": "add"
+        }
+      ],
+      "forbidden_relationships": [],
+      "allowed_unresolved": [],
+      "answer": {
+        "origin_file": "helper.js",
+        "direct_callers": [
+          "app.js::Worker.work",
+          "app.js::run",
+          "helper.js::make"
+        ]
+      },
+      "success_check": "exact_json_facts_v1"
+    },
+    {
+      "id": "javascript_unproven_dependencies",
+      "language": "javascript",
+      "group": "language_fixture",
+      "question_kind": "uncertainty",
+      "snapshot": "javascript_uncertainty",
+      "anchor": "entry",
+      "prompt": "Review the dependency uses in bad.js under the bounded source-only contract. Report proven_targets for the values returned by unproven, default_forwarded_by_star, computed_call_exact, shadowed_Thing_is_import, commonjs_member_proven, dynamic_import_proven, computed_base_proven, and jsdoc_type_supported. A matching name alone is not proof; CommonJS member inference and JSDoc types are outside this slice. Return only the specified JSON object. Sort arrays alphabetically except explicitly ordered pairs.",
+      "context": [
+        {
+          "id": "entry",
+          "file": "bad.js",
+          "start_byte": 138,
+          "end_byte": 196,
+          "sha256": "6522ac544fc6e9dca38c175edc521c5470035abbdeb32b6a3aad7b1ad03c6450",
+          "symbol": {
+            "name": "unproven",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "imports",
+          "file": "bad.js",
+          "start_byte": 0,
+          "end_byte": 129,
+          "sha256": "a8c316ee399eb09553ec8a08f3d6fc81fee22731fdec05a0053c59de53a543ac",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "remaining",
+          "file": "bad.js",
+          "start_byte": 197,
+          "end_byte": 570,
+          "sha256": "99d58968b9ae0344ba78c4761cf80dfe34767bb56b31d05804236a0d9185aa92",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "barrel",
+          "file": "barrel.js",
+          "start_byte": 0,
+          "end_byte": 54,
+          "sha256": "c40c83470653ee03626bf7e23b731cef11bd261d30a8c64c0533fe9ad39d8496",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "left",
+          "file": "left.js",
+          "start_byte": 0,
+          "end_byte": 58,
+          "sha256": "d75f23836bceb17d06f8d311fa9adc03f2e93f71f7f6314b34a76b77bdcf1bcc",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "right",
+          "file": "right.js",
+          "start_byte": 0,
+          "end_byte": 21,
+          "sha256": "08ed4642dabccc68223ce115e0f44a7abb13be660f57d718752c98f9f4d58cdd",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        }
+      ],
+      "relationships": [],
+      "forbidden_relationships": [
+        {
+          "use": "unproven Thing",
+          "target_files": [
+            "left.js",
+            "right.js"
+          ]
+        },
+        {
+          "use": "Factory",
+          "target_file": "left.js",
+          "reason": "Star does not forward default."
+        },
+        {
+          "use": "shadowed Thing, model[key](), loaded.Thing, import(path), chooseBase()",
+          "exact_target": false
+        }
+      ],
+      "allowed_unresolved": [
+        {
+          "use": "Thing",
+          "reason": "Ambiguous star-export origins."
+        },
+        {
+          "use": "Factory",
+          "reason": "Default is not re-exported by star."
+        },
+        {
+          "use": "External",
+          "reason": "External package is outside the repository."
+        },
+        {
+          "use": "shadowed/computed/CommonJS/dynamic/JSDoc forms",
+          "reason": "No supported source-proven relation."
+        }
+      ],
+      "answer": {
+        "proven_targets": [],
+        "default_forwarded_by_star": false,
+        "computed_call_exact": false,
+        "shadowed_Thing_is_import": false,
+        "commonjs_member_proven": false,
+        "dynamic_import_proven": false,
+        "computed_base_proven": false,
+        "jsdoc_type_supported": false
+      },
+      "success_check": "exact_json_facts_v1"
+    },
+    {
+      "id": "go_alias_generic_contract",
+      "language": "go",
+      "group": "language_fixture",
+      "question_kind": "contract",
+      "snapshot": "go_contracts",
+      "anchor": "entry",
+      "prompt": "Locate Build. Report function_file, model_origin, alias_target, defined_underlying_type, generic_constraint, constraint_terms as authored strings, and page_field. Distinguish the AliasID alias from the UserID defined type; do not infer assignability or method sets. Return only the specified JSON object. Sort arrays alphabetically except explicitly ordered pairs.",
+      "context": [
+        {
+          "id": "entry",
+          "file": "app/main.go",
+          "start_byte": 47,
+          "end_byte": 151,
+          "sha256": "31c9ee2ddaff199f97160184fc9d6182cb06a1287da54c4261bef9ac2b0155c3",
+          "symbol": {
+            "name": "Build",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "alias",
+          "file": "model/model.go",
+          "start_byte": 38,
+          "end_byte": 54,
+          "sha256": "882de16db7bd6957e2a40e1e67c528ccf39abda2a6c46e8bfbf90e7a28d231d5",
+          "symbol": {
+            "name": "AliasID",
+            "kind": "type"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "id",
+          "file": "model/model.go",
+          "start_byte": 20,
+          "end_byte": 32,
+          "sha256": "dc82128201a52d2d54587eb58f518521d1a9cfe20b705bff22019a7b9276b8ae",
+          "symbol": {
+            "name": "UserID",
+            "kind": "type"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "page",
+          "file": "model/model.go",
+          "start_byte": 102,
+          "end_byte": 135,
+          "sha256": "876f2540a7a42d6314ad1225a218346bae1eb6d297661404d616acc72f748d0e",
+          "symbol": {
+            "name": "Page",
+            "kind": "type"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "constraint",
+          "file": "model/model.go",
+          "start_byte": 61,
+          "end_byte": 95,
+          "sha256": "a1e91217f32bcd72d6be8afb88a4e563bdb50cfa96943bfc665a26aafc7355b2",
+          "symbol": {
+            "name": "Number",
+            "kind": "type"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "import",
+          "file": "app/main.go",
+          "start_byte": 14,
+          "end_byte": 45,
+          "sha256": "e0a6d5037c09e2d342dd0792d9fa37211df29fe5f0333f8ba5376eb6699ccba3",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "module",
+          "file": "go.mod",
+          "start_byte": 0,
+          "end_byte": 32,
+          "sha256": "5bf1b385f7d5abc709ce8739d49d81a846b001fc879067321d3f711633559d36",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "package",
+          "file": "model/model.go",
+          "start_byte": 0,
+          "end_byte": 13,
+          "sha256": "e21dd15ee683d5b3c7acbc9d2e50c0753f7cf565604024421ea8cd7196abd0f9",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        }
+      ],
+      "relationships": [
+        {
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "alias"
+        },
+        {
+          "from": "entry",
+          "kind": "return_type",
+          "to": "page"
+        },
+        {
+          "from": "entry",
+          "kind": "type_argument",
+          "to": "id"
+        },
+        {
+          "from": "alias",
+          "kind": "alias_target",
+          "to": "id"
+        },
+        {
+          "from": "page",
+          "kind": "generic_constraint",
+          "to": "constraint"
+        }
+      ],
+      "forbidden_relationships": [
+        {
+          "from": "entry",
+          "target_file": "wrong/model.go"
+        },
+        {
+          "use": "T, int64, int, any",
+          "repository_target": false
+        }
+      ],
+      "allowed_unresolved": [
+        {
+          "use": "T",
+          "reason": "Lexical type parameter, not an unrelated indexed declaration."
+        }
+      ],
+      "answer": {
+        "function_file": "app/main.go",
+        "model_origin": "model/model.go",
+        "alias_target": "UserID",
+        "defined_underlying_type": "int64",
+        "generic_constraint": "Number",
+        "constraint_terms": [
+          "~int",
+          "~int64"
+        ],
+        "page_field": "Value"
+      },
+      "success_check": "exact_json_facts_v1"
+    },
+    {
+      "id": "go_explicit_embedding",
+      "language": "go",
+      "group": "language_fixture",
+      "question_kind": "contract",
+      "snapshot": "go_embedding",
+      "anchor": "entry",
+      "prompt": "Locate Start and inspect its parameter contracts. Report struct_embedding as [owner, embedded], interface_embedding as [owner, embedded], audit_field, runner_method, embedding_is_class_inheritance, and promoted_call_proven. The last field asks whether embedding alone proves the target of e.Stamp(). Return only the specified JSON object. Sort arrays alphabetically except explicitly ordered pairs.",
+      "context": [
+        {
+          "id": "entry",
+          "file": "app/main.go",
+          "start_byte": 47,
+          "end_byte": 119,
+          "sha256": "c9f677a5d2d2902a1199ea86639320651fc69ce9804e1116f2b352e5046d429a",
+          "symbol": {
+            "name": "Start",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "entity",
+          "file": "model/model.go",
+          "start_byte": 81,
+          "end_byte": 104,
+          "sha256": "ea03cc0c3cf117be25ce503da33686ef1f0701f69179b75c515758bc394e556f",
+          "symbol": {
+            "name": "Entity",
+            "kind": "type"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "audit",
+          "file": "model/model.go",
+          "start_byte": 20,
+          "end_byte": 50,
+          "sha256": "164916ba74e0d75e3a63428a5e4fad13ac22edb46d32cd43c0f7abbe96ea08e2",
+          "symbol": {
+            "name": "Audit",
+            "kind": "type"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "combined",
+          "file": "model/model.go",
+          "start_byte": 149,
+          "end_byte": 178,
+          "sha256": "85717ebbef9a5a0646cf61ede1ca33ea3fd085cb6742a7c26b96324b5d742a2f",
+          "symbol": {
+            "name": "Combined",
+            "kind": "type"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "runner",
+          "file": "model/model.go",
+          "start_byte": 111,
+          "end_byte": 143,
+          "sha256": "1de3affe96f8fd3dca4c09105f1b78d5dbda0a59a0beca815d74d77e20d90a83",
+          "symbol": {
+            "name": "Runner",
+            "kind": "type"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "import",
+          "file": "app/main.go",
+          "start_byte": 14,
+          "end_byte": 45,
+          "sha256": "e0a6d5037c09e2d342dd0792d9fa37211df29fe5f0333f8ba5376eb6699ccba3",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "module",
+          "file": "go.mod",
+          "start_byte": 0,
+          "end_byte": 32,
+          "sha256": "5bf1b385f7d5abc709ce8739d49d81a846b001fc879067321d3f711633559d36",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "package",
+          "file": "model/model.go",
+          "start_byte": 0,
+          "end_byte": 13,
+          "sha256": "e21dd15ee683d5b3c7acbc9d2e50c0753f7cf565604024421ea8cd7196abd0f9",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        }
+      ],
+      "relationships": [
+        {
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "entity"
+        },
+        {
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "combined"
+        },
+        {
+          "from": "entity",
+          "kind": "struct_embedding",
+          "to": "audit"
+        },
+        {
+          "from": "combined",
+          "kind": "interface_embedding",
+          "to": "runner"
+        }
+      ],
+      "forbidden_relationships": [
+        {
+          "use": "e.Stamp()",
+          "kind": "calls",
+          "reason": "Promoted-member dispatch is outside the supported subset."
+        },
+        {
+          "use": "Entity/Combined",
+          "kind": "class_inheritance"
+        }
+      ],
+      "allowed_unresolved": [],
+      "answer": {
+        "struct_embedding": [
+          "Entity",
+          "Audit"
+        ],
+        "interface_embedding": [
+          "Combined",
+          "Runner"
+        ],
+        "audit_field": "Created",
+        "runner_method": "Run",
+        "embedding_is_class_inheritance": false,
+        "promoted_call_proven": false
+      },
+      "success_check": "exact_json_facts_v1"
+    },
+    {
+      "id": "go_known_api_impact",
+      "language": "go",
+      "group": "language_fixture",
+      "question_kind": "impact",
+      "snapshot": "go_impact",
+      "anchor": "entry",
+      "prompt": "Locate Handle and Request in api. Report api_file, known_direct_callers as file::name, request_field and request_field_type. Inspect the exact package/import routes; do not claim all runtime impact. Return only the specified JSON object. Sort arrays alphabetically except explicitly ordered pairs.",
+      "context": [
+        {
+          "id": "entry",
+          "file": "api/api.go",
+          "start_byte": 47,
+          "end_byte": 74,
+          "sha256": "9cc68888af0f803728ab812ae6f49147f3a7f6e93037167e605d723ac3340822",
+          "symbol": {
+            "name": "Handle",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "request",
+          "file": "api/api.go",
+          "start_byte": 18,
+          "end_byte": 45,
+          "sha256": "c6a7e151be8d2ddcaca203b5445f3e9748ed11853af5396a18f61920494e6925",
+          "symbol": {
+            "name": "Request",
+            "kind": "type"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "serve",
+          "file": "cmd/server/main.go",
+          "start_byte": 45,
+          "end_byte": 92,
+          "sha256": "ce2d0feab9ecb91e9a7653020117aff4c6da66b222273ee4388494e38d09e9b2",
+          "symbol": {
+            "name": "Serve",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "work",
+          "file": "cmd/worker/main.go",
+          "start_byte": 53,
+          "end_byte": 107,
+          "sha256": "8782c2a12952b30c1f8a0ec7cca634b8cfda6fcd2eb673eab7229d29a765c505",
+          "symbol": {
+            "name": "Work",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "server_import",
+          "file": "cmd/server/main.go",
+          "start_byte": 14,
+          "end_byte": 43,
+          "sha256": "131b81a7a99d79dfa119a9fb09d9fbafd774b192dafb8db48e734463305738ed",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "worker_import",
+          "file": "cmd/worker/main.go",
+          "start_byte": 14,
+          "end_byte": 51,
+          "sha256": "3c9c2b972b06a6213c9286ea6534bffc998bd9a9bf20888654397d976e2c7d1b",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "module",
+          "file": "go.mod",
+          "start_byte": 0,
+          "end_byte": 32,
+          "sha256": "5bf1b385f7d5abc709ce8739d49d81a846b001fc879067321d3f711633559d36",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "package",
+          "file": "api/api.go",
+          "start_byte": 0,
+          "end_byte": 11,
+          "sha256": "fc707199563c7558fa3681ba59f16924986e0042969408254885e93812b2a288",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        }
+      ],
+      "relationships": [
+        {
+          "from": "serve",
+          "kind": "calls",
+          "to": "entry"
+        },
+        {
+          "from": "work",
+          "kind": "calls",
+          "to": "entry"
+        },
+        {
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "request"
+        },
+        {
+          "from": "serve",
+          "kind": "parameter_type",
+          "to": "request"
+        },
+        {
+          "from": "work",
+          "kind": "parameter_type",
+          "to": "request"
+        }
+      ],
+      "forbidden_relationships": [],
+      "allowed_unresolved": [],
+      "answer": {
+        "api_file": "api/api.go",
+        "known_direct_callers": [
+          "cmd/server/main.go::Serve",
+          "cmd/worker/main.go::Work"
+        ],
+        "request_field": "ID",
+        "request_field_type": "int64"
+      },
+      "success_check": "exact_json_facts_v1"
+    },
+    {
+      "id": "go_unproven_package_uses",
+      "language": "go",
+      "group": "language_fixture",
+      "question_kind": "uncertainty",
+      "snapshot": "go_uncertainty",
+      "anchor": "entry",
+      "prompt": "Locate Keep, Probe and Missing. Report keep_type_origin, exact_probe_or_missing_callees, and whether changing go.mod from example.com/acme to example.com/other permits retaining the old import proof in old_proof_survives_module_change. Preserve shadowed, ambiguous, external and missing endpoints. Return only the specified JSON object. Sort arrays alphabetically except explicitly ordered pairs.",
+      "context": [
+        {
+          "id": "entry",
+          "file": "cmd/main.go",
+          "start_byte": 123,
+          "end_byte": 152,
+          "sha256": "271dedf9a4f1ae4488ff940ab60621c51b52800d1543d086b02de93fd5f76925",
+          "symbol": {
+            "name": "Keep",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "request",
+          "file": "model/model.go",
+          "start_byte": 20,
+          "end_byte": 36,
+          "sha256": "86e5f87aecbd626f6648c9f2b6bf3bf501ee8e3dcbae947bf08aeb28d53c0ee2",
+          "symbol": {
+            "name": "Request",
+            "kind": "type"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "probe",
+          "file": "cmd/main.go",
+          "start_byte": 154,
+          "end_byte": 233,
+          "sha256": "8f417d777639cc7cd28e30aaeb50d9ae6de4bdec133969ef6011ef8cf26ae970",
+          "symbol": {
+            "name": "Probe",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "missing",
+          "file": "cmd/main.go",
+          "start_byte": 235,
+          "end_byte": 266,
+          "sha256": "f13e4733cff5722acf920ae34920f4cda4e5271df9e6be53331e1fc758b6ca42",
+          "symbol": {
+            "name": "Missing",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "imports",
+          "file": "cmd/main.go",
+          "start_byte": 14,
+          "end_byte": 121,
+          "sha256": "ad2aec02940712984f5258eee5e8cd1ab851fc9e63e2a741bbbb2dfc9834949e",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "module",
+          "file": "go.mod",
+          "start_byte": 0,
+          "end_byte": 32,
+          "sha256": "5bf1b385f7d5abc709ce8739d49d81a846b001fc879067321d3f711633559d36",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "package",
+          "file": "model/model.go",
+          "start_byte": 0,
+          "end_byte": 13,
+          "sha256": "e21dd15ee683d5b3c7acbc9d2e50c0753f7cf565604024421ea8cd7196abd0f9",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        }
+      ],
+      "relationships": [
+        {
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "request"
+        }
+      ],
+      "forbidden_relationships": [
+        {
+          "use": "api.Request/api.Absent",
+          "target_file": "wrong/model.go"
+        },
+        {
+          "use": "Probe api.Handle, shared.Open, fmt.Println, api.Absent",
+          "exact_target": false
+        }
+      ],
+      "allowed_unresolved": [
+        {
+          "use": "Probe api.Handle",
+          "reason": "Parameter shadows the imported package alias."
+        },
+        {
+          "use": "shared.Open",
+          "reason": "Two imported packages declare the same binding name."
+        },
+        {
+          "use": "fmt.Println",
+          "reason": "Standard library is external to the contained repository."
+        },
+        {
+          "use": "api.Absent",
+          "reason": "Name is absent from the proven package endpoint."
+        }
+      ],
+      "answer": {
+        "keep_type_origin": "model/model.go",
+        "exact_probe_or_missing_callees": [],
+        "old_proof_survives_module_change": false
+      },
+      "success_check": "exact_json_facts_v1",
+      "control_mutations": [
+        {
+          "file": "go.mod",
+          "replace": "module example.com/acme",
+          "with": "module example.com/other",
+          "expected": "Invalidate previous module/path proof; unchanged imported source must not retain its old exact target."
+        }
+      ]
+    },
+    {
+      "id": "rust_authored_trait_contract",
+      "language": "rust",
+      "group": "language_fixture",
+      "question_kind": "contract",
+      "snapshot": "rust_contracts",
+      "anchor": "entry",
+      "prompt": "Locate build and Receipt. Report alias_underlying_type for UserId, build_bound, return_constructor, supertrait of Render, receipt_field, and explicitly_implemented_traits for Receipt. Set dynamic_call_target_proven according to whether these declarations alone identify a trait-object call target. Do not expand macros or execute Rust. Return only the specified JSON object. Sort arrays alphabetically except explicitly ordered pairs.",
+      "context": [
+        {
+          "id": "entry",
+          "file": "src/lib.rs",
+          "start_byte": 321,
+          "end_byte": 410,
+          "sha256": "103803b47b750508d508763653e9c705ec596008cca52b98b58915e6132f382d",
+          "symbol": {
+            "name": "build",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "id",
+          "file": "src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 22,
+          "sha256": "50f58848b9237239f8bcac7b5818b4243fc1ccd738cc668384124a4c4cda8fba",
+          "symbol": {
+            "name": "UserId",
+            "kind": "type"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "format",
+          "file": "src/lib.rs",
+          "start_byte": 24,
+          "end_byte": 43,
+          "sha256": "f63bb930956ee5af63a25d30a3a0e73d7958cb1b6b8c1d82196e4d190cc06837",
+          "symbol": {
+            "name": "Format",
+            "kind": "trait"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "render",
+          "file": "src/lib.rs",
+          "start_byte": 45,
+          "end_byte": 101,
+          "sha256": "358c17c1aa01f6b15cb8960a1c3347bd546337d117cb05328cedbf2314282f40",
+          "symbol": {
+            "name": "Render",
+            "kind": "trait"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "receipt",
+          "file": "src/lib.rs",
+          "start_byte": 103,
+          "end_byte": 140,
+          "sha256": "ebc6f499055ca48ef7c8f503f971ec7dd9d2bb0af945e7202ee903ed6de789fc",
+          "symbol": {
+            "name": "Receipt",
+            "kind": "struct"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "format_impl",
+          "file": "src/lib.rs",
+          "start_byte": 142,
+          "end_byte": 168,
+          "sha256": "7f8e415ccb367c952eff88c4080e98d0e050843e8ef114fbdb5d2e03dd883c22",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "render_impl",
+          "file": "src/lib.rs",
+          "start_byte": 170,
+          "end_byte": 255,
+          "sha256": "5a49dda0064889477c044fe2b0e3de90d68d942265695fffa6b19965ac219ef4",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "envelope",
+          "file": "src/lib.rs",
+          "start_byte": 257,
+          "end_byte": 319,
+          "sha256": "351db124225d48639721ea1d510e24e472343b261bc636747de4d28cc9de7dd6",
+          "symbol": {
+            "name": "Envelope",
+            "kind": "struct"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "cargo",
+          "file": "Cargo.toml",
+          "start_byte": 0,
+          "end_byte": 60,
+          "sha256": "592fae5720fdc47aa1f9f3da59ed9667ef7b5a3ce79bb789ca2d6c90ed7572a7",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        }
+      ],
+      "relationships": [
+        {
+          "from": "entry",
+          "kind": "generic_bound",
+          "to": "render"
+        },
+        {
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "id"
+        },
+        {
+          "from": "entry",
+          "kind": "return_type",
+          "to": "envelope"
+        },
+        {
+          "from": "envelope",
+          "kind": "generic_bound",
+          "to": "render"
+        },
+        {
+          "from": "envelope",
+          "kind": "field_type",
+          "to": "id"
+        },
+        {
+          "from": "render",
+          "kind": "supertrait",
+          "to": "format"
+        },
+        {
+          "from": "receipt",
+          "kind": "field_type",
+          "to": "id"
+        },
+        {
+          "from": "format_impl",
+          "kind": "impl_trait",
+          "to": "format"
+        },
+        {
+          "from": "format_impl",
+          "kind": "impl_self_type",
+          "to": "receipt"
+        },
+        {
+          "from": "render_impl",
+          "kind": "impl_trait",
+          "to": "render"
+        },
+        {
+          "from": "render_impl",
+          "kind": "impl_self_type",
+          "to": "receipt"
+        }
+      ],
+      "forbidden_relationships": [
+        {
+          "use": "format! or dynamic Render::render",
+          "kind": "calls"
+        },
+        {
+          "use": "T, u64, String",
+          "repository_target": false
+        }
+      ],
+      "allowed_unresolved": [
+        {
+          "use": "T",
+          "reason": "Local type parameter; do not search for a same-name repository type."
+        },
+        {
+          "use": "String",
+          "reason": "Standard-library declaration is not in this repository."
+        }
+      ],
+      "answer": {
+        "alias_underlying_type": "u64",
+        "build_bound": "Render",
+        "return_constructor": "Envelope",
+        "supertrait": "Format",
+        "receipt_field": "id",
+        "explicitly_implemented_traits": [
+          "Format",
+          "Render"
+        ],
+        "dynamic_call_target_proven": false
+      },
+      "success_check": "exact_json_facts_v1"
+    },
+    {
+      "id": "rust_contained_optional_reexport",
+      "language": "rust",
+      "group": "language_fixture",
+      "question_kind": "contract",
+      "snapshot": "rust_workspace",
+      "anchor": "entry",
+      "prompt": "Locate use_it. Report public_name, declaration_origin, field_name, field_type, dependency_package, configuration as unconditional or declared_possible, and active_feature_proven. Use the authored optional workspace dependency and public re-export; do not inspect a Cargo cache or assume the active build. Return only the specified JSON object. Sort arrays alphabetically except explicitly ordered pairs.",
+      "context": [
+        {
+          "id": "entry",
+          "file": "app/src/lib.rs",
+          "start_byte": 28,
+          "end_byte": 86,
+          "sha256": "5d2535cfd098cb88cd6b1f0db4a7946f7585cd16110db2226cdbcfc72eddc889",
+          "symbol": {
+            "name": "use_it",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "thing",
+          "file": "core/src/api.rs",
+          "start_byte": 0,
+          "end_byte": 32,
+          "sha256": "820b79e8f30c30a15e73e961b7f9e4383ff1705a0f25db7bbdc5f242c0755fc7",
+          "symbol": {
+            "name": "Thing",
+            "kind": "struct"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "import",
+          "file": "app/src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 26,
+          "sha256": "1ae83d661c6efda247a92c18de9c02a95c3d84406d930453986deca79fe315b0",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "reexport",
+          "file": "core/src/lib.rs",
+          "start_byte": 13,
+          "end_byte": 54,
+          "sha256": "85a4aa957dfcced687e31be7da817cb62ab815c184255c01fe725acc119f1c69",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "module",
+          "file": "core/src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 12,
+          "sha256": "d04e70351fafab947cc325e2e85a3999f7ac8920a49a705203e52517a8f3fabb",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "workspace",
+          "file": "Cargo.toml",
+          "start_byte": 0,
+          "end_byte": 114,
+          "sha256": "2a2284fa3f8dbd5efdd58a7b563806a7b66dc3b743d70fd23e34752e17ad7e6b",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "core_cargo",
+          "file": "core/Cargo.toml",
+          "start_byte": 0,
+          "end_byte": 62,
+          "sha256": "3f88fd9bfd1eb10b9403dae7110f2d6445bd0d45f4f7c366e51fbb44297e3925",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "app_cargo",
+          "file": "app/Cargo.toml",
+          "start_byte": 0,
+          "end_byte": 122,
+          "sha256": "82083135ec932c825cf0755cf77f90f824ddb3f6684c562251082e4082de8790",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        }
+      ],
+      "relationships": [
+        {
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "thing"
+        },
+        {
+          "from": "entry",
+          "kind": "return_type",
+          "to": "thing"
+        }
+      ],
+      "forbidden_relationships": [
+        {
+          "from": "entry",
+          "target_file": "wrong.rs"
+        },
+        {
+          "use": "core_api",
+          "configuration": "unconditional"
+        }
+      ],
+      "allowed_unresolved": [],
+      "answer": {
+        "public_name": "PublicThing",
+        "declaration_origin": "core/src/api.rs",
+        "field_name": "id",
+        "field_type": "u64",
+        "dependency_package": "core-api",
+        "configuration": "declared_possible",
+        "active_feature_proven": false
+      },
+      "success_check": "exact_json_facts_v1",
+      "control_mutations": [
+        {
+          "file": "app/Cargo.toml",
+          "replace": ", optional = true",
+          "with": "",
+          "expected": "Refresh Cargo proof and configuration to unconditional for this now-unconditional contained dependency."
+        }
+      ]
+    },
+    {
+      "id": "rust_known_call_impact",
+      "language": "rust",
+      "group": "language_fixture",
+      "question_kind": "impact",
+      "snapshot": "rust_impact",
+      "anchor": "entry",
+      "prompt": "Locate parse and Config. Report parse_file, direct_caller as file::name, config_field, field_type and configuration. Follow only the authored module/import and definite static call. Return only the specified JSON object. Sort arrays alphabetically except explicitly ordered pairs.",
+      "context": [
+        {
+          "id": "entry",
+          "file": "src/api.rs",
+          "start_byte": 40,
+          "end_byte": 94,
+          "sha256": "91b9c07a9838b8edebfaab9948759a0247a144867d2ff813d8fbcc3f83264d60",
+          "symbol": {
+            "name": "parse",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "config",
+          "file": "src/api.rs",
+          "start_byte": 0,
+          "end_byte": 38,
+          "sha256": "bc4cca496a476493b11035964344447dc324f8b87e5206c8bb5ee6ad108185e5",
+          "symbol": {
+            "name": "Config",
+            "kind": "struct"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "caller",
+          "file": "src/lib.rs",
+          "start_byte": 47,
+          "end_byte": 102,
+          "sha256": "8c3788e0e0ce7f8f3829e81cbeaa7759be89a200869c29dbc7d5fc8c8e1c1304",
+          "symbol": {
+            "name": "caller",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "module",
+          "file": "src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 12,
+          "sha256": "d04e70351fafab947cc325e2e85a3999f7ac8920a49a705203e52517a8f3fabb",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "import",
+          "file": "src/lib.rs",
+          "start_byte": 13,
+          "end_byte": 45,
+          "sha256": "d61d24f1f269f2ac66936a50c72489bf0ca89eb3df48e5cc6f44a21764459f26",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "cargo",
+          "file": "Cargo.toml",
+          "start_byte": 0,
+          "end_byte": 60,
+          "sha256": "592fae5720fdc47aa1f9f3da59ed9667ef7b5a3ce79bb789ca2d6c90ed7572a7",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        }
+      ],
+      "relationships": [
+        {
+          "from": "caller",
+          "kind": "calls",
+          "to": "entry"
+        },
+        {
+          "from": "caller",
+          "kind": "parameter_type",
+          "to": "config"
+        },
+        {
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "config"
+        }
+      ],
+      "forbidden_relationships": [],
+      "allowed_unresolved": [],
+      "answer": {
+        "parse_file": "src/api.rs",
+        "direct_caller": "src/lib.rs::caller",
+        "config_field": "strict",
+        "field_type": "bool",
+        "configuration": "unconditional"
+      },
+      "success_check": "exact_json_facts_v1"
+    },
+    {
+      "id": "rust_unproven_contracts",
+      "language": "rust",
+      "group": "language_fixture",
+      "question_kind": "uncertainty",
+      "snapshot": "rust_uncertainty",
+      "anchor": "entry",
+      "prompt": "Review probe and generic under the bounded resolver. Report probe_type_origin, generic_Thing_is_model_Thing, choice_single_origin_proven, hidden_accessible, external_Display_contained, macro_target_proven, and shared_import_may_be_guessed. Shared occupies separate Rust namespaces; this bounded import resolver has no proven single endpoint for that import, so do not guess from name similarity or choose an active cfg. Return only the specified JSON object. Sort arrays alphabetically except explicitly ordered pairs.",
+      "context": [
+        {
+          "id": "entry",
+          "file": "src/lib.rs",
+          "start_byte": 146,
+          "end_byte": 290,
+          "sha256": "bec4429184159b5fd0f91ca1af7169ad1287096480708bb8864ba2ce75722e0c",
+          "symbol": {
+            "name": "probe",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "thing",
+          "file": "src/model.rs",
+          "start_byte": 0,
+          "end_byte": 17,
+          "sha256": "5bbc80990efa85a1da0e82d019b5c581ac57bb214631059478160e63ce9e0112",
+          "symbol": {
+            "name": "Thing",
+            "kind": "struct"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "generic",
+          "file": "src/lib.rs",
+          "start_byte": 292,
+          "end_byte": 346,
+          "sha256": "99b99fbcead703a99a65de4df4bba557136e7f6e0fb590a89c2f8ce12626eb0f",
+          "symbol": {
+            "name": "generic",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "imports",
+          "file": "src/lib.rs",
+          "start_byte": 0,
+          "end_byte": 144,
+          "sha256": "6fd7befe33442b879c094266fa4fd0f3f7c67198bec0658d98e2e82afd886018",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "ambiguous",
+          "file": "src/model.rs",
+          "start_byte": 19,
+          "end_byte": 187,
+          "sha256": "970514a01f804111ee65ba8bf1d44d0c97a355b6cc39951508bac7e45af1dce1",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "hidden",
+          "file": "src/private_api.rs",
+          "start_byte": 0,
+          "end_byte": 14,
+          "sha256": "be69f0cfb1dd94f3683fa73a8b1eb9149ee7f6ad14015a3198d1eeee336d4b89",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "cargo",
+          "file": "Cargo.toml",
+          "start_byte": 0,
+          "end_byte": 90,
+          "sha256": "a70bd840acd77bc2363c5ae4f4d362c17cb14370f3c5c01f8b92b5286a82b622",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        }
+      ],
+      "relationships": [
+        {
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "thing"
+        }
+      ],
+      "forbidden_relationships": [
+        {
+          "use": "Thing or Hidden",
+          "target_file": "wrong.rs"
+        },
+        {
+          "use": "generic Thing",
+          "target_file": "src/model.rs"
+        },
+        {
+          "use": "Choice",
+          "target_files": [
+            "src/a.rs",
+            "src/b.rs"
+          ]
+        },
+        {
+          "use": "Shared, Hidden, Display, Generated!",
+          "exact_target": false
+        }
+      ],
+      "allowed_unresolved": [
+        {
+          "use": "Choice",
+          "reason": "Declared cfg alternatives resolve to different endpoints; active features are unknown."
+        },
+        {
+          "use": "Shared",
+          "reason": "Existing bounded import/reference resolver cannot prove a single namespace endpoint."
+        },
+        {
+          "use": "Hidden",
+          "reason": "Private child-module item is inaccessible to this importer."
+        },
+        {
+          "use": "Display",
+          "reason": "Standard library is outside the repository."
+        },
+        {
+          "use": "generic Thing",
+          "reason": "Lexical type parameter shadows the imported type."
+        },
+        {
+          "use": "Generated!",
+          "reason": "Macro expansion is outside indexed authored-source semantics."
+        }
+      ],
+      "answer": {
+        "probe_type_origin": "src/model.rs",
+        "generic_Thing_is_model_Thing": false,
+        "choice_single_origin_proven": false,
+        "hidden_accessible": false,
+        "external_Display_contained": false,
+        "macro_target_proven": false,
+        "shared_import_may_be_guessed": false
+      },
+      "success_check": "exact_json_facts_v1"
+    },
+    {
+      "id": "tsx_props_control",
+      "language": "typescript",
+      "group": "regression_control",
+      "question_kind": "contract",
+      "snapshot": "tsx_props",
+      "anchor": "entry",
+      "prompt": "Before changing Badge, report component_file, props_origin, prop_fields (name to authored type), rendered_field, and whether the JSX span element proves a repository function call in jsx_proves_call. Return only the specified JSON object. Sort arrays alphabetically except explicitly ordered pairs.",
+      "context": [
+        {
+          "id": "entry",
+          "file": "badge.tsx",
+          "start_byte": 45,
+          "end_byte": 112,
+          "sha256": "ebcb683005bc41a15d37cfa4bb595d6eb4fc6b85e5d55e4ef9a49d2de2c5d156",
+          "symbol": {
+            "name": "Badge",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "props",
+          "file": "props.ts",
+          "start_byte": 7,
+          "end_byte": 64,
+          "sha256": "26a2217f5238a20e7f8240af37e4ff823b294efabf106fa5da664cfb415ee4c5",
+          "symbol": {
+            "name": "Props",
+            "kind": "interface"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "import",
+          "file": "badge.tsx",
+          "start_byte": 0,
+          "end_byte": 37,
+          "sha256": "365a8acb0b80d313001bdb127c140358ab263e34fd14d2894e0a6c08a2bf2f28",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        }
+      ],
+      "relationships": [
+        {
+          "from": "entry",
+          "kind": "parameter_type",
+          "to": "props"
+        }
+      ],
+      "forbidden_relationships": [
+        {
+          "from": "entry",
+          "kind": "calls",
+          "target_name": "span",
+          "reason": "JSX markup is not a proven repository call target."
+        }
+      ],
+      "allowed_unresolved": [],
+      "answer": {
+        "component_file": "badge.tsx",
+        "props_origin": "props.ts",
+        "prop_fields": {
+          "label": "string",
+          "tone": "\"quiet\" | \"loud\""
+        },
+        "rendered_field": "label",
+        "jsx_proves_call": false
+      },
+      "success_check": "exact_json_facts_v1"
+    },
+    {
+      "id": "markdown_section_control",
+      "language": "markdown",
+      "group": "regression_control",
+      "question_kind": "locate",
+      "snapshot": "markdown_navigation",
+      "anchor": "entry",
+      "prompt": "Locate the Limits section of the context guide. Report heading, nested_heading, budget_bytes, unicode_word, and following_peer. Include only facts from the guide. Return only the specified JSON object. Sort arrays alphabetically except explicitly ordered pairs.",
+      "context": [
+        {
+          "id": "entry",
+          "file": "guide.md",
+          "start_byte": 36,
+          "end_byte": 147,
+          "sha256": "98cebe0636d4e6d7bc51a422f1d5382dfb671c9f6785f815116e159b9eb2f8c7",
+          "symbol": {
+            "name": "Limits",
+            "kind": "section"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "peer",
+          "file": "guide.md",
+          "start_byte": 149,
+          "end_byte": 161,
+          "sha256": "9ac1e747dea3ab4487dd479f62efa36611df89140165a681b6742da94e7be608",
+          "symbol": null,
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        }
+      ],
+      "relationships": [],
+      "forbidden_relationships": [],
+      "allowed_unresolved": [],
+      "answer": {
+        "heading": "Limits",
+        "nested_heading": "Omissions",
+        "budget_bytes": 8192,
+        "unicode_word": "café",
+        "following_peer": "Ownership"
+      },
+      "success_check": "exact_json_facts_v1"
+    },
+    {
+      "id": "python_loci_bundle_contract",
+      "language": "python",
+      "group": "maintained_module_task",
+      "question_kind": "contract",
+      "snapshot": "loci_python_output_contract",
+      "anchor": "entry",
+      "prompt": "Prepare an input-contract regression for _validate_bundle. Report bundle_fields, span_fields, relation_fields and item_fields as field-name arrays, allowed_traversal as a string array, root_role for a bundle without relations, and missing_definition_error when sources is empty. Inspect the authored data classes and validation; do not execute the code. Return only the specified JSON object. Sort arrays alphabetically except explicitly ordered pairs.",
+      "context": [
+        {
+          "id": "entry",
+          "file": "src/loci/_exploration_output.py",
+          "start_byte": 8659,
+          "end_byte": 10287,
+          "sha256": "be83c4ac54708193307430a99000ff89f70a2163500ba85e71f9dc0b92e507ba",
+          "symbol": {
+            "name": "_validate_bundle",
+            "kind": "function"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "bundle",
+          "file": "src/loci/_exploration_output.py",
+          "start_byte": 1059,
+          "end_byte": 1187,
+          "sha256": "8e5ad4f44a20d27fec26b006e1a1040adbd96df85fee1d0b645977d6c3be2d60",
+          "symbol": {
+            "name": "Bundle",
+            "kind": "class"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "span",
+          "file": "src/loci/_exploration_output.py",
+          "start_byte": 776,
+          "end_byte": 940,
+          "sha256": "d178428fa82227f61b82a41c128c4e1e85e532f4d41407752e796707860372d9",
+          "symbol": {
+            "name": "Span",
+            "kind": "class"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        },
+        {
+          "id": "relation",
+          "file": "src/loci/_exploration_output.py",
+          "start_byte": 943,
+          "end_byte": 1056,
+          "sha256": "b78834404e50b1d2436a6d13505df1b791d30b0f20159ec3c9e3313e87975941",
+          "symbol": {
+            "name": "Relation",
+            "kind": "class"
+          },
+          "reason": "Required authored source for this task; exact origin and bytes matter."
+        }
+      ],
+      "relationships": [
+        {
+          "from": "entry",
+          "kind": "parameter_annotation",
+          "to": "bundle"
+        },
+        {
+          "from": "bundle",
+          "kind": "field_annotation",
+          "to": "span"
+        },
+        {
+          "from": "bundle",
+          "kind": "field_annotation",
+          "to": "relation"
+        },
+        {
+          "from": "relation",
+          "kind": "field_annotation",
+          "to": "span"
+        }
+      ],
+      "forbidden_relationships": [],
+      "allowed_unresolved": [
+        {
+          "name": "Any",
+          "reason": "External typing marker; no repository declaration is claimed."
+        }
+      ],
+      "answer": {
+        "bundle_fields": [
+          "item",
+          "relations",
+          "sources"
+        ],
+        "span_fields": [
+          "content",
+          "content_hash",
+          "end_byte",
+          "end_line",
+          "file",
+          "start_byte",
+          "start_line"
+        ],
+        "relation_fields": [
+          "edge",
+          "sources",
+          "traversed"
+        ],
+        "item_fields": [
+          "depth",
+          "file",
+          "id",
+          "kind",
+          "name",
+          "role",
+          "why"
+        ],
+        "allowed_traversal": [
+          "forward",
+          "reverse"
+        ],
+        "root_role": "anchor",
+        "missing_definition_error": "bundle requires a definition source"
+      },
+      "success_check": "exact_json_facts_v1"
+    }
+  ],
+  "measurement_status": "Implementation targets only. Final source/schema/model/provider/scorer/schedule freeze belongs to W4.7."
+}
