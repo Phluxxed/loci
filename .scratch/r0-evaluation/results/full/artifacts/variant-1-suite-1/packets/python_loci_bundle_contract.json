@@ -1,0 +1,215 @@
+[
+  {
+    "content": [],
+    "isError": false,
+    "structuredContent": {
+      "anchors": [
+        {
+          "match_scope": [
+            "symbol_name",
+            "qualified_name",
+            "signature",
+            "keywords"
+          ],
+          "matched_terms": [
+            "validate",
+            "bundle"
+          ],
+          "node_id": "src/loci/_exploration_output.py::_validate_bundle#function",
+          "score": 225.552
+        },
+        {
+          "match_scope": [
+            "symbol_name",
+            "qualified_name",
+            "signature",
+            "keywords"
+          ],
+          "matched_terms": [
+            "bundle"
+          ],
+          "node_id": "src/loci/_exploration_output.py::Bundle#class",
+          "score": 19.114
+        }
+      ],
+      "items": [
+        {
+          "complete": false,
+          "depth": 0,
+          "extent": {
+            "content_hash": "3088c657a03f3b8724fe14f133888837f7b74edd80fbb0b726aaead75a5b2270",
+            "end_byte": 10287,
+            "file": "src/loci/_exploration_output.py",
+            "start_byte": 8659
+          },
+          "node_id": "src/loci/_exploration_output.py::_validate_bundle#function",
+          "role": "anchor",
+          "source_ids": [
+            1
+          ],
+          "source_ref": "sr1_gu7suyv6x2x7233njh5ufzkteu",
+          "why": "Query matches validate, bundle"
+        },
+        {
+          "complete": true,
+          "depth": 0,
+          "extent": {
+            "content_hash": "3088c657a03f3b8724fe14f133888837f7b74edd80fbb0b726aaead75a5b2270",
+            "end_byte": 1187,
+            "file": "src/loci/_exploration_output.py",
+            "start_byte": 1059
+          },
+          "node_id": "src/loci/_exploration_output.py::Bundle#class",
+          "role": "anchor",
+          "source_ids": [
+            2
+          ],
+          "source_ref": "sr1_dn3my5pbmtpr3xp4fqetefkf5a",
+          "why": "Query matches bundle"
+        }
+      ],
+      "limits": {
+        "max_anchor_source_bytes": 1024,
+        "max_anchors": 3,
+        "max_evidence_bytes": 8192,
+        "max_explicit_anchors": 5,
+        "max_hops": 2,
+        "max_items": 12,
+        "max_literal_matches": 256,
+        "max_lookup_bytes": 33554432,
+        "max_lookup_files": 4096,
+        "max_neighbors": 32,
+        "max_nodes": 64,
+        "max_output_bytes": 16384,
+        "max_owner_members": 3,
+        "max_related_source_bytes": 768
+      },
+      "nodes": [
+        {
+          "file": "src/loci/_exploration_output.py",
+          "id": "src/loci/_exploration_output.py::_validate_bundle#function",
+          "kind": "function",
+          "name": "_validate_bundle"
+        },
+        {
+          "file": "src/loci/_exploration_output.py",
+          "id": "src/loci/_exploration_output.py::__file__#file",
+          "kind": "file",
+          "name": "_exploration_output.py"
+        },
+        {
+          "file": "src/loci/_exploration_output.py",
+          "id": "src/loci/_exploration_output.py::Bundle#class",
+          "kind": "class",
+          "name": "Bundle"
+        }
+      ],
+      "omissions": [
+        {
+          "count": 3,
+          "reason": "anchor_limit"
+        },
+        {
+          "count": 4,
+          "reason": "ambiguous_anchor"
+        },
+        {
+          "count": 1,
+          "reason": "source_preview"
+        }
+      ],
+      "ownership": [
+        {
+          "basis": "indexed_file",
+          "member_id": "src/loci/_exploration_output.py::_validate_bundle#function",
+          "owner_id": "src/loci/_exploration_output.py::__file__#file"
+        },
+        {
+          "basis": "indexed_file",
+          "member_id": "src/loci/_exploration_output.py::Bundle#class",
+          "owner_id": "src/loci/_exploration_output.py::__file__#file"
+        }
+      ],
+      "policy": "normal-graph-v1",
+      "relationships": [],
+      "schema_version": 1,
+      "scope": {
+        "coverage": "complete",
+        "exhaustive": false,
+        "matching": "symbol_metadata",
+        "relationships": "known_static_relationships",
+        "source": "indexed_supported_source"
+      },
+      "selection": {
+        "candidate_count": 5,
+        "mode": "inferred",
+        "omitted_candidates": 3
+      },
+      "snapshot": "c58aefdda3242314f9d968d0f36df7dd0cbb23787c8d86500768ef5c19f03e3a",
+      "sources": [
+        {
+          "content": "def _validate_bundle(bundle: Bundle) -> None:\n    if not isinstance(bundle, Bundle) or not isinstance(bundle.item, dict):\n        raise ValueError(\"bundle item is invalid\")\n    required = {\"id\", \"name\", \"kind\", \"file\", \"role\", \"depth\", \"why\"}\n    if set(bundle.item) != required:\n        raise ValueError(\"bundle item fields are invalid\")\n    if any(not isinstance(bundle.item[field], str) or not bundle.item[field] for field in (\"id\", \"name\", \"kind\", \"file\", \"role\", \"why\")):\n        raise ValueError(\"bundle item text field is invalid\")\n    if bundle.item[\"role\"] not in {\"anchor\", \"dependency\", \"dependent\"} or type(bundle.item[\"depth\"]) is not int or bundle.item[\"depth\"] < 0:\n        raise ValueError(\"bundle item role or depth is invalid\")\n    if not bundle.relations and bundle.item[\"role\"] != \"anchor\":\n        raise ValueError(\"a root bundle must be an anchor\")\n    if bundle.relations and bundle.item[\"role\"] == \"anchor\":\n        raise ValueError(\"a related bundle cannot be an anchor\")\n",
+          "content_hash": "3088c657a03f3b8724fe14f133888837f7b74edd80fbb0b726aaead75a5b2270",
+          "end_byte": 9656,
+          "end_line": 228,
+          "file": "src/loci/_exploration_output.py",
+          "id": 1,
+          "source_ref": "sr1_t6lnbjwp37ksoj24qdxynbbipa",
+          "start_byte": 8659,
+          "start_line": 215
+        },
+        {
+          "content": "@dataclass(frozen=True)\nclass Bundle:\n    item: dict[str, Any]\n    sources: tuple[Span, ...]\n    relations: tuple[Relation, ...]",
+          "content_hash": "3088c657a03f3b8724fe14f133888837f7b74edd80fbb0b726aaead75a5b2270",
+          "end_byte": 1187,
+          "end_line": 48,
+          "file": "src/loci/_exploration_output.py",
+          "id": 2,
+          "source_ref": "sr1_dn3my5pbmtpr3xp4fqetefkf5a",
+          "start_byte": 1059,
+          "start_line": 44
+        }
+      ],
+      "status": "partial",
+      "usage": {
+        "edges_traversed": 0,
+        "eligible_edges_considered": 0,
+        "estimated_tokens": 1203,
+        "evidence_bytes": 1125,
+        "lookup_bytes": 0,
+        "lookup_files": 0,
+        "nodes_examined": 2,
+        "output_bytes": 4811,
+        "output_encoding": "mcp_result_json_utf8",
+        "relationships_delivered": 0,
+        "token_estimate_method": "utf8_bytes_div_4"
+      }
+    }
+  },
+  {
+    "content": [],
+    "isError": false,
+    "structuredContent": {
+      "complete": true,
+      "next_source_ref": null,
+      "schema_version": 1,
+      "source": {
+        "content": "def _validate_bundle(bundle: Bundle) -> None:\n    if not isinstance(bundle, Bundle) or not isinstance(bundle.item, dict):\n        raise ValueError(\"bundle item is invalid\")\n    required = {\"id\", \"name\", \"kind\", \"file\", \"role\", \"depth\", \"why\"}\n    if set(bundle.item) != required:\n        raise ValueError(\"bundle item fields are invalid\")\n    if any(not isinstance(bundle.item[field], str) or not bundle.item[field] for field in (\"id\", \"name\", \"kind\", \"file\", \"role\", \"why\")):\n        raise ValueError(\"bundle item text field is invalid\")\n    if bundle.item[\"role\"] not in {\"anchor\", \"dependency\", \"dependent\"} or type(bundle.item[\"depth\"]) is not int or bundle.item[\"depth\"] < 0:\n        raise ValueError(\"bundle item role or depth is invalid\")\n    if not bundle.relations and bundle.item[\"role\"] != \"anchor\":\n        raise ValueError(\"a root bundle must be an anchor\")\n    if bundle.relations and bundle.item[\"role\"] == \"anchor\":\n        raise ValueError(\"a related bundle cannot be an anchor\")\n    if not isinstance(bundle.sources, tuple) or not bundle.sources:\n        raise ValueError(\"bundle requires a definition source\")\n    for span in bundle.sources:\n        _validate_span(span)\n    if not isinstance(bundle.relations, tuple):\n        raise ValueError(\"bundle relations must be a tuple\")\n    for relation in bundle.relations:\n        if not isinstance(relation, Relation) or relation.traversed not in {\"forward\", \"reverse\"} or not isinstance(relation.edge, dict) or not relation.sources:\n            raise ValueError(\"bundle relation is invalid\")\n        for span in relation.sources:\n            _validate_span(span)",
+        "content_hash": "3088c657a03f3b8724fe14f133888837f7b74edd80fbb0b726aaead75a5b2270",
+        "end_byte": 10287,
+        "end_line": 239,
+        "file": "src/loci/_exploration_output.py",
+        "id": 1,
+        "source_ref": "sr1_gu7suyv6x2x7233njh5ufzkteu",
+        "start_byte": 8659,
+        "start_line": 215
+      },
+      "status": "ok",
+      "usage": {
+        "evidence_bytes": 1628,
+        "output_bytes": 2204,
+        "output_encoding": "mcp_result_json_utf8"
+      }
+    }
+  }
+]

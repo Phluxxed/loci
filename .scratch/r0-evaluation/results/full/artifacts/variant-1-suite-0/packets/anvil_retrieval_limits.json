@@ -1,0 +1,153 @@
+[
+  {
+    "content": [],
+    "isError": false,
+    "structuredContent": {
+      "anchors": [
+        {
+          "match_scope": [
+            "symbol_name",
+            "qualified_name",
+            "signature"
+          ],
+          "matched_terms": [
+            "compilerretrievallimit"
+          ],
+          "node_id": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+          "score": 409.779
+        }
+      ],
+      "items": [
+        {
+          "complete": false,
+          "depth": 0,
+          "extent": {
+            "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+            "end_byte": 2936,
+            "file": "src/brain-context/render.ts",
+            "start_byte": 1664
+          },
+          "node_id": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+          "role": "anchor",
+          "source_ids": [
+            1
+          ],
+          "source_ref": "sr1_7ctllceyxrwo27yt5422rto5cy",
+          "why": "Query matches compilerretrievallimit"
+        }
+      ],
+      "limits": {
+        "max_anchor_source_bytes": 1024,
+        "max_anchors": 3,
+        "max_evidence_bytes": 8192,
+        "max_explicit_anchors": 5,
+        "max_hops": 2,
+        "max_items": 12,
+        "max_literal_matches": 256,
+        "max_lookup_bytes": 33554432,
+        "max_lookup_files": 4096,
+        "max_neighbors": 32,
+        "max_nodes": 64,
+        "max_output_bytes": 16384,
+        "max_owner_members": 3,
+        "max_related_source_bytes": 768
+      },
+      "nodes": [
+        {
+          "file": "src/brain-context/render.ts",
+          "id": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+          "kind": "function",
+          "name": "compilerRetrievalLimits"
+        },
+        {
+          "file": "src/brain-context/render.ts",
+          "id": "src/brain-context/render.ts::__file__#file",
+          "kind": "file",
+          "name": "render.ts"
+        }
+      ],
+      "omissions": [
+        {
+          "count": 1,
+          "reason": "source_preview"
+        }
+      ],
+      "ownership": [
+        {
+          "basis": "indexed_file",
+          "member_id": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+          "owner_id": "src/brain-context/render.ts::__file__#file"
+        }
+      ],
+      "policy": "normal-graph-v1",
+      "relationships": [],
+      "schema_version": 1,
+      "scope": {
+        "coverage": "partial",
+        "exhaustive": false,
+        "matching": "symbol_metadata",
+        "relationships": "known_static_relationships",
+        "source": "indexed_supported_source"
+      },
+      "selection": {
+        "candidate_count": 1,
+        "mode": "inferred",
+        "omitted_candidates": 0
+      },
+      "snapshot": "0bc7f6f3a9beda7b0d519d8ef3e18b01430867eb2adac0e09833f03088f34b20",
+      "sources": [
+        {
+          "content": "function compilerRetrievalLimits(retrieval: BrainRetrievalResult): string | undefined {\n  const unavailable = compilerHasUnavailableEvidence(retrieval.diagnostics);\n  const budgetLimited = retrieval.omissions.some(({ reason }) =>\n    [\"byte_limit\", \"content_byte_limit\", \"delivery_byte_limit\", \"item_limit\"].includes(reason),\n  ) || [\n    \"byte_budget_exhausted\", \"content_budget_exhausted\", \"delivery_budget_exhausted\", \"item_budget_exhausted\",\n  ].includes(retrieval.stop.reason) || retrieval.evidence.some(({ selectionReasons }) =>\n    selectionReasons.some((reason) =>\n      [\"hard_limit_excerpt\", \"content_limit_excerpt\", \"delivered_limit_excerpt\"].includes(reason)),\n  );\n  const messages = [\n    ...(unavailable ? [RETRIEVAL_LIMIT_MESSAGES.unavailable]\n      : retrieval.stop.reason === \"provider_degraded\" ? [RETRIEVAL_LIMIT_MESSAGES.problem] : []),\n    ...(budgetLimited ? [RETRIEVAL_LIMIT_MESSAGES.budget] : []),\n    ...(retrieval.reporting.diagnostics.total > retrieval.reporting.diagnostics.returned\n",
+          "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+          "end_byte": 2676,
+          "end_line": 48,
+          "file": "src/brain-context/render.ts",
+          "id": 1,
+          "source_ref": "sr1_us7lv36qz2q7wxlxb5wizvcvcu",
+          "start_byte": 1664,
+          "start_line": 34
+        }
+      ],
+      "status": "partial",
+      "usage": {
+        "edges_traversed": 0,
+        "eligible_edges_considered": 0,
+        "estimated_tokens": 876,
+        "evidence_bytes": 1012,
+        "lookup_bytes": 0,
+        "lookup_files": 0,
+        "nodes_examined": 1,
+        "output_bytes": 3501,
+        "output_encoding": "mcp_result_json_utf8",
+        "relationships_delivered": 0,
+        "token_estimate_method": "utf8_bytes_div_4"
+      }
+    }
+  },
+  {
+    "content": [],
+    "isError": false,
+    "structuredContent": {
+      "complete": true,
+      "next_source_ref": null,
+      "schema_version": 1,
+      "source": {
+        "content": "function compilerRetrievalLimits(retrieval: BrainRetrievalResult): string | undefined {\n  const unavailable = compilerHasUnavailableEvidence(retrieval.diagnostics);\n  const budgetLimited = retrieval.omissions.some(({ reason }) =>\n    [\"byte_limit\", \"content_byte_limit\", \"delivery_byte_limit\", \"item_limit\"].includes(reason),\n  ) || [\n    \"byte_budget_exhausted\", \"content_budget_exhausted\", \"delivery_budget_exhausted\", \"item_budget_exhausted\",\n  ].includes(retrieval.stop.reason) || retrieval.evidence.some(({ selectionReasons }) =>\n    selectionReasons.some((reason) =>\n      [\"hard_limit_excerpt\", \"content_limit_excerpt\", \"delivered_limit_excerpt\"].includes(reason)),\n  );\n  const messages = [\n    ...(unavailable ? [RETRIEVAL_LIMIT_MESSAGES.unavailable]\n      : retrieval.stop.reason === \"provider_degraded\" ? [RETRIEVAL_LIMIT_MESSAGES.problem] : []),\n    ...(budgetLimited ? [RETRIEVAL_LIMIT_MESSAGES.budget] : []),\n    ...(retrieval.reporting.diagnostics.total > retrieval.reporting.diagnostics.returned\n      ? [RETRIEVAL_LIMIT_MESSAGES.diagnostics] : []),\n    ...(retrieval.reporting.omissions.total > retrieval.reporting.omissions.returned\n      ? [RETRIEVAL_LIMIT_MESSAGES.omissions] : []),\n  ];\n  return messages.length > 0 ? messages.join(\" \") : undefined;\n}",
+        "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+        "end_byte": 2936,
+        "end_line": 54,
+        "file": "src/brain-context/render.ts",
+        "id": 1,
+        "source_ref": "sr1_7ctllceyxrwo27yt5422rto5cy",
+        "start_byte": 1664,
+        "start_line": 34
+      },
+      "status": "ok",
+      "usage": {
+        "evidence_bytes": 1272,
+        "output_bytes": 1795,
+        "output_encoding": "mcp_result_json_utf8"
+      }
+    }
+  }
+]

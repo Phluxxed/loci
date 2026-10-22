@@ -1,0 +1,271 @@
+[
+  {
+    "content": [],
+    "isError": false,
+    "structuredContent": {
+      "anchors": [
+        {
+          "match_scope": [
+            "symbol_name",
+            "qualified_name",
+            "signature",
+            "keywords"
+          ],
+          "matched_terms": [
+            "target"
+          ],
+          "node_id": "lib.py::target#function",
+          "score": 12.298
+        }
+      ],
+      "items": [
+        {
+          "complete": true,
+          "depth": 0,
+          "extent": {
+            "content_hash": "e90074bde6f68906b18cd2dd68cec01eb01d6b35cfa5264896405a14cf650435",
+            "end_byte": 26,
+            "file": "lib.py",
+            "start_byte": 0
+          },
+          "node_id": "lib.py::target#function",
+          "role": "anchor",
+          "source_ids": [
+            1
+          ],
+          "source_ref": "sr1_bpv6wtfucxhlkbjjvxdezrv2c4",
+          "why": "Query matches target"
+        },
+        {
+          "complete": true,
+          "depth": 1,
+          "extent": {
+            "content_hash": "8579ebf29628ad4fceef102736706b5d31dfc9ec2b2a2a4b65560467168cded0",
+            "end_byte": 65,
+            "file": "app.py",
+            "start_byte": 33
+          },
+          "node_id": "app.py::caller#function",
+          "role": "related",
+          "source_ids": [
+            2
+          ],
+          "source_ref": "sr1_skggxs5xwsz5ebrnnejfuju6ie",
+          "why": "Selected by calls"
+        }
+      ],
+      "limits": {
+        "max_anchor_source_bytes": 1024,
+        "max_anchors": 3,
+        "max_evidence_bytes": 8192,
+        "max_explicit_anchors": 5,
+        "max_hops": 2,
+        "max_items": 12,
+        "max_literal_matches": 256,
+        "max_lookup_bytes": 33554432,
+        "max_lookup_files": 4096,
+        "max_neighbors": 32,
+        "max_nodes": 64,
+        "max_output_bytes": 16384,
+        "max_owner_members": 3,
+        "max_related_source_bytes": 768
+      },
+      "nodes": [
+        {
+          "file": "lib.py",
+          "id": "lib.py::target#function",
+          "kind": "function",
+          "name": "target"
+        },
+        {
+          "file": "lib.py",
+          "id": "lib.py::__file__#file",
+          "kind": "file",
+          "name": "lib.py"
+        },
+        {
+          "file": "app.py",
+          "id": "app.py::caller#function",
+          "kind": "function",
+          "name": "caller"
+        },
+        {
+          "file": "app.py",
+          "id": "app.py::__file__#file",
+          "kind": "file",
+          "name": "app.py"
+        }
+      ],
+      "omissions": [
+        {
+          "count": 3,
+          "reason": "cycle"
+        },
+        {
+          "count": 1,
+          "reason": "alternative_path"
+        }
+      ],
+      "ownership": [
+        {
+          "basis": "indexed_file",
+          "member_id": "lib.py::target#function",
+          "owner_id": "lib.py::__file__#file"
+        },
+        {
+          "basis": "indexed_file",
+          "member_id": "app.py::caller#function",
+          "owner_id": "app.py::__file__#file"
+        }
+      ],
+      "policy": "normal-graph-v1",
+      "relationships": [
+        {
+          "edge": {
+            "directed": true,
+            "evidence": {
+              "content_hash": "8579ebf29628ad4fceef102736706b5d31dfc9ec2b2a2a4b65560467168cded0",
+              "file": "app.py",
+              "line": 4
+            },
+            "from": "app.py::caller#function",
+            "namespace": "loci",
+            "resolution": "import-resolved",
+            "to": "lib.py::target#function",
+            "type": "calls"
+          },
+          "id": 1,
+          "proof": "complete",
+          "resolution_configuration": null,
+          "source_ids": [
+            2,
+            3,
+            4,
+            1
+          ],
+          "traversed": "reverse"
+        },
+        {
+          "edge": {
+            "directed": true,
+            "evidence": {
+              "content_hash": "8579ebf29628ad4fceef102736706b5d31dfc9ec2b2a2a4b65560467168cded0",
+              "file": "app.py",
+              "line": 4
+            },
+            "from": "app.py::caller#function",
+            "namespace": "loci",
+            "resolution": "import-resolved",
+            "to": "lib.py::target#function",
+            "type": "references"
+          },
+          "id": 2,
+          "proof": "complete",
+          "resolution_configuration": null,
+          "source_ids": [
+            2,
+            4,
+            1
+          ],
+          "traversed": "reverse"
+        },
+        {
+          "edge": {
+            "directed": true,
+            "evidence": {
+              "content_hash": "8579ebf29628ad4fceef102736706b5d31dfc9ec2b2a2a4b65560467168cded0",
+              "file": "app.py",
+              "line": 1
+            },
+            "from": "app.py::__file__#file",
+            "namespace": "loci",
+            "resolution": "import-resolved",
+            "to": "lib.py::__file__#file",
+            "type": "imports"
+          },
+          "id": 3,
+          "proof": "complete",
+          "resolution_configuration": null,
+          "source_ids": [
+            4
+          ],
+          "traversed": "reverse"
+        }
+      ],
+      "schema_version": 1,
+      "scope": {
+        "coverage": "complete",
+        "exhaustive": false,
+        "matching": "symbol_metadata",
+        "relationships": "known_static_relationships",
+        "source": "indexed_supported_source"
+      },
+      "selection": {
+        "candidate_count": 1,
+        "mode": "inferred",
+        "omitted_candidates": 0
+      },
+      "snapshot": "9cccd7aec7b9cc52e424ea82ea1b0fd3ddb3e48052997437368160b774a1e78c",
+      "sources": [
+        {
+          "content": "def target():\n    return 1",
+          "content_hash": "e90074bde6f68906b18cd2dd68cec01eb01d6b35cfa5264896405a14cf650435",
+          "end_byte": 26,
+          "end_line": 2,
+          "file": "lib.py",
+          "id": 1,
+          "source_ref": "sr1_bpv6wtfucxhlkbjjvxdezrv2c4",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "def caller():\n    return alias()",
+          "content_hash": "8579ebf29628ad4fceef102736706b5d31dfc9ec2b2a2a4b65560467168cded0",
+          "end_byte": 65,
+          "end_line": 4,
+          "file": "app.py",
+          "id": 2,
+          "source_ref": "sr1_skggxs5xwsz5ebrnnejfuju6ie",
+          "start_byte": 33,
+          "start_line": 3
+        },
+        {
+          "content": "    return alias()\n",
+          "content_hash": "8579ebf29628ad4fceef102736706b5d31dfc9ec2b2a2a4b65560467168cded0",
+          "end_byte": 66,
+          "end_line": 4,
+          "file": "app.py",
+          "id": 3,
+          "source_ref": "sr1_7z3cvzzx7jeoyxdrv6n2hrvwta",
+          "start_byte": 47,
+          "start_line": 4
+        },
+        {
+          "content": "from lib import target as alias\n",
+          "content_hash": "8579ebf29628ad4fceef102736706b5d31dfc9ec2b2a2a4b65560467168cded0",
+          "end_byte": 32,
+          "end_line": 1,
+          "file": "app.py",
+          "id": 4,
+          "source_ref": "sr1_ydifrzb5ndi6le2wurpsfczsi4",
+          "start_byte": 0,
+          "start_line": 1
+        }
+      ],
+      "status": "partial",
+      "usage": {
+        "edges_traversed": 3,
+        "eligible_edges_considered": 6,
+        "estimated_tokens": 1158,
+        "evidence_bytes": 91,
+        "lookup_bytes": 0,
+        "lookup_files": 0,
+        "nodes_examined": 4,
+        "output_bytes": 4630,
+        "output_encoding": "mcp_result_json_utf8",
+        "relationships_delivered": 3,
+        "token_estimate_method": "utf8_bytes_div_4"
+      }
+    }
+  }
+]

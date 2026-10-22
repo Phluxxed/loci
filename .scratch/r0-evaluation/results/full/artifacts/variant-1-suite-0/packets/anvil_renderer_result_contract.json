@@ -1,0 +1,122 @@
+[
+  {
+    "content": [],
+    "isError": false,
+    "structuredContent": {
+      "anchors": [
+        {
+          "match_scope": [
+            "symbol_name",
+            "qualified_name",
+            "signature"
+          ],
+          "matched_terms": [
+            "rendercompilerpromptevidencecontext"
+          ],
+          "node_id": "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function",
+          "score": 409.779
+        }
+      ],
+      "items": [
+        {
+          "complete": true,
+          "depth": 0,
+          "extent": {
+            "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+            "end_byte": 5435,
+            "file": "src/brain-context/render.ts",
+            "start_byte": 4860
+          },
+          "node_id": "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function",
+          "role": "anchor",
+          "source_ids": [
+            1
+          ],
+          "source_ref": "sr1_426olm3tnkevizu7hkck6zo3fu",
+          "why": "Query matches rendercompilerpromptevidencecontext"
+        }
+      ],
+      "limits": {
+        "max_anchor_source_bytes": 1024,
+        "max_anchors": 3,
+        "max_evidence_bytes": 8192,
+        "max_explicit_anchors": 5,
+        "max_hops": 2,
+        "max_items": 12,
+        "max_literal_matches": 256,
+        "max_lookup_bytes": 33554432,
+        "max_lookup_files": 4096,
+        "max_neighbors": 32,
+        "max_nodes": 64,
+        "max_output_bytes": 16384,
+        "max_owner_members": 3,
+        "max_related_source_bytes": 768
+      },
+      "nodes": [
+        {
+          "file": "src/brain-context/render.ts",
+          "id": "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function",
+          "kind": "function",
+          "name": "renderCompilerPromptEvidenceContext"
+        },
+        {
+          "file": "src/brain-context/render.ts",
+          "id": "src/brain-context/render.ts::__file__#file",
+          "kind": "file",
+          "name": "render.ts"
+        }
+      ],
+      "omissions": [],
+      "ownership": [
+        {
+          "basis": "indexed_file",
+          "member_id": "src/brain-context/render.ts::renderCompilerPromptEvidenceContext#function",
+          "owner_id": "src/brain-context/render.ts::__file__#file"
+        }
+      ],
+      "policy": "normal-graph-v1",
+      "relationships": [],
+      "schema_version": 1,
+      "scope": {
+        "coverage": "partial",
+        "exhaustive": false,
+        "matching": "symbol_metadata",
+        "relationships": "known_static_relationships",
+        "source": "indexed_supported_source"
+      },
+      "selection": {
+        "candidate_count": 1,
+        "mode": "inferred",
+        "omitted_candidates": 0
+      },
+      "snapshot": "0bc7f6f3a9beda7b0d519d8ef3e18b01430867eb2adac0e09833f03088f34b20",
+      "sources": [
+        {
+          "content": "function renderCompilerPromptEvidenceContext(retrieval: BrainRetrievalResult): PromptBrainContextRender {\n  const resolution = retrieval.contractVersion === \"3\" ? retrieval.query.projectResolution : undefined;\n  return renderPromptEvidenceContext({\n    matchedProject: resolution?.status === \"matched\" ? resolution.page : undefined,\n    includeRoute: true,\n    diagnostics: retrieval.contractVersion === \"3\" ? compilerContextDiagnostics(retrieval) : [],\n    temporal: retrieval.query.temporal,\n    evidence: retrieval.evidence,\n    hardBytes: Number.MAX_SAFE_INTEGER,\n  });\n}",
+          "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+          "end_byte": 5435,
+          "end_line": 106,
+          "file": "src/brain-context/render.ts",
+          "id": 1,
+          "source_ref": "sr1_426olm3tnkevizu7hkck6zo3fu",
+          "start_byte": 4860,
+          "start_line": 96
+        }
+      ],
+      "status": "ok",
+      "usage": {
+        "edges_traversed": 0,
+        "eligible_edges_considered": 0,
+        "estimated_tokens": 771,
+        "evidence_bytes": 575,
+        "lookup_bytes": 0,
+        "lookup_files": 0,
+        "nodes_examined": 1,
+        "output_bytes": 3084,
+        "output_encoding": "mcp_result_json_utf8",
+        "relationships_delivered": 0,
+        "token_estimate_method": "utf8_bytes_div_4"
+      }
+    }
+  }
+]
