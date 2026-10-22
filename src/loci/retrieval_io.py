@@ -15,6 +15,7 @@ from .graph.profiles import read_contained_file
 from .graph.state import GraphIndexState
 from .storage.index_store import IndexStore
 from .storage.source_refs import SourceRefStore
+from .source_access import control_files as _control_files
 
 
 READ_SOURCE_BYTES = 8192
@@ -106,26 +107,21 @@ def _decode(repo: Path, reference: str, *,
     return value
 
 
-def _control_files(state: GraphIndexState) -> set[str]:
-    paths = {path for path in state.input_hashes
-             if PurePosixPath(path).name in {"go.mod", "go.work", "Cargo.toml", "Package.swift"}}
-    for record in (*state.imports, *state.symbol_references, *state.calls, *state.type_relations):
-        paths.update(getattr(record, "resolution_control_files", ()))
-        paths.update(control.file for control in getattr(record, "resolution_controls", ()))
-    return paths
-
-
 def read_source(repo: Path, store: IndexStore, nodes: Mapping[str, dict],
-                state: GraphIndexState, reference: str) -> dict[str, Any]:
+                state: GraphIndexState | None, reference: str, *,
+                source_index: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """Read a fixed page from a current, contained, indexed source extent."""
     references = SourceRefStore(repo, store)
     value = _decode(repo, reference, references=references)
     file = value["file"]
     # Markdown has a page-root section rather than a zero-width file node.
     # The index's file hashes define source eligibility for every language.
-    index = store.load(repo)
+    index = source_index if source_index is not None else store.load(repo)
     hashes = dict(index.get("file_hashes", {})) if index is not None else {}
-    if file in _control_files(state):
+    if source_index is not None:
+        if file in source_index["resolver_control_files"]:
+            hashes.setdefault(file, source_index["graph"]["input_hashes"].get(file))
+    elif state is not None and file in _control_files(state):
         hashes.setdefault(file, state.input_hashes.get(file))
     if file not in hashes:
         raise _invalid("Source reference is not indexed source or a resolver control")

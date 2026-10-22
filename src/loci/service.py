@@ -518,12 +518,15 @@ def _index_repo_unlocked(
     return output
 
 
-def ensure_fresh_index(repo: str | Path) -> dict[str, Any]:
+def ensure_fresh_index(repo: str | Path, *, source_only: bool = False) -> dict[str, Any]:
     repo_path = Path(repo).resolve()
     _validate_repo_path(repo_path)
     store = get_store()
-    index = store.load(repo_path)
-    if index is not None and not _index_is_stale(repo_path, store, index):
+    index = store.load_source_index(repo_path) if source_only else store.load(repo_path)
+    if source_only and index is None:
+        # Existing stores and corrupt/torn generations retain legacy semantics.
+        return ensure_fresh_index(repo_path)
+    if index is not None and not _index_is_stale(repo_path, store, index, source_only=source_only):
         return {"repo": str(repo_path), "refreshed": False}
 
     lock_path = store.refresh_lock_path(repo_path)
@@ -532,8 +535,11 @@ def ensure_fresh_index(repo: str | Path) -> dict[str, Any]:
     try:
         # Another reader or explicit index operation may have built it while
         # we waited. First use and stale refresh share the same writer lock.
-        index = store.load(repo_path)
-        if index is not None and not _index_is_stale(repo_path, store, index):
+        index = store.load_source_index(repo_path) if source_only else store.load(repo_path)
+        if source_only and index is None:
+            index = store.load(repo_path)
+            source_only = False
+        if index is not None and not _index_is_stale(repo_path, store, index, source_only=source_only):
             return {"repo": str(repo_path), "refreshed": False}
         result = _index_repo_unlocked(repo_path, incremental=True)
         return {"repo": str(repo_path), "refreshed": True, "index": result}
@@ -1234,9 +1240,16 @@ def read(
     from loci.retrieval_io import read_source
 
     repo_path = Path(repo).resolve()
-    store, nodes, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
+    store = get_store()
+    if ensure_fresh:
+        ensure_fresh_index(repo_path, source_only=True)
+    source_index = store.load_source_index(repo_path)
+    if source_index is None:
+        store, nodes, state = _load_graph_context(repo_path, ensure_fresh=False)
+    else:
+        nodes, state = {}, None
     try:
-        return read_source(repo_path, store, nodes, state, source_ref)
+        return read_source(repo_path, store, nodes, state, source_ref, source_index=source_index)
     except GraphContractError as exc:
         raise LociError(exc.code, exc.message, exc.details) from exc
 
@@ -1888,7 +1901,8 @@ def _load_required_index(store: IndexStore, repo_path: Path) -> dict[str, Any]:
     return index
 
 
-def _index_is_stale(repo_path: Path, store: IndexStore, index: dict[str, Any]) -> bool:
+def _index_is_stale(repo_path: Path, store: IndexStore, index: dict[str, Any], *,
+                    source_only: bool = False) -> bool:
     if not index_versions_current(index):
         return True
     stored_coverage = stored_query_coverage(index)
@@ -1902,6 +1916,7 @@ def _index_is_stale(repo_path: Path, store: IndexStore, index: dict[str, Any]) -
         repository_scan,
         stored_coverage=stored_coverage,
         stop_after_first=True,
+        source_only=source_only,
     ))
 
 
@@ -1964,6 +1979,7 @@ def _current_index_staleness_reasons(
     stored_coverage: StoredQueryCoverage | None,
     persisted_graph: GraphIndexState | None = None,
     stop_after_first: bool = False,
+    source_only: bool = False,
 ) -> tuple[HealthReason, ...]:
     reasons: list[HealthReason] = []
     if stored_coverage is None:
@@ -2017,7 +2033,8 @@ def _current_index_staleness_reasons(
             "INDEX_GRAPH_MISSING",
         ))
     else:
-        if persisted_graph is None:
+        indexed_graph_hashes = graph["input_hashes"] if source_only else None
+        if not source_only and persisted_graph is None:
             try:
                 persisted_graph = store.validate_graph_state(index)
             except GraphContractError as exc:
@@ -2028,6 +2045,7 @@ def _current_index_staleness_reasons(
                 ))
         if persisted_graph is not None:
             indexed_graph_hashes = persisted_graph.input_hashes
+        if indexed_graph_hashes is not None:
             if current_graph_hashes != indexed_graph_hashes:
                 reasons.append(HealthReason(
                     "stale",
@@ -2039,7 +2057,7 @@ def _current_index_staleness_reasons(
                 ))
     if reasons and stop_after_first:
         return tuple(reasons)
-    if not _active_graph_paths_are_safe(repo_path, index):
+    if not _active_graph_paths_are_safe(repo_path, index, source_only=source_only):
         reasons.append(HealthReason(
             "stale",
             "GRAPH_ACTIVE_PATH_UNSAFE",
@@ -2080,32 +2098,10 @@ def _hash_change_details(
 def _active_graph_paths_are_safe(
     repo_path: Path,
     index: dict[str, Any],
+    *, source_only: bool = False,
 ) -> bool:
-    graph = index.get("graph")
-    edge_values = graph.get("edges", []) if isinstance(graph, dict) else []
-    symbols = {
-        symbol.get("id"): symbol
-        for symbol in index.get("symbols", [])
-        if isinstance(symbol, dict) and isinstance(symbol.get("id"), str)
-    }
-    paths: set[str] = set()
-    node_values = graph.get("nodes", []) if isinstance(graph, dict) else []
-    for node in node_values:
-        if not isinstance(node, dict):
-            continue
-        symbol = symbols.get(node.get("id"))
-        if isinstance(symbol, dict) and isinstance(symbol.get("file_path"), str):
-            paths.add(symbol["file_path"])
-    for edge in edge_values:
-        if not isinstance(edge, dict) or edge.get("namespace") == "loci":
-            continue
-        evidence = edge.get("evidence")
-        if isinstance(evidence, dict) and isinstance(evidence.get("file"), str):
-            paths.add(evidence["file"])
-        for endpoint in (edge.get("from"), edge.get("to")):
-            symbol = symbols.get(endpoint)
-            if isinstance(symbol, dict) and isinstance(symbol.get("file_path"), str):
-                paths.add(symbol["file_path"])
+    from loci.source_access import active_paths
+    paths = index["active_paths"] if source_only else active_paths(index)
     return all(_repository_file_path_is_safe(repo_path, path) for path in paths)
 
 

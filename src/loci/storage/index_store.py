@@ -338,8 +338,20 @@ class IndexStore:
                 index_data["coverage"] = dict(coverage)
             index_path = self._index_path(repo_path)
             tmp_path = index_path.with_suffix(".tmp")
-            tmp_path.write_text(json.dumps(index_data, indent=2))
+            from loci.source_access import projection, source_index, source_digest
+            source = source_index(index_data, persisted_graph)
+            # Last field: load_source_index verifies this footer from the same
+            # bytes it hashes, without decoding the semantic record payload.
+            index_data["source_access_sha256"] = source_digest(source)
+            index_bytes = json.dumps(index_data, indent=2).encode("utf-8")
+            tmp_path.write_bytes(index_bytes)
             tmp_path.replace(index_path)
+            # Only a fully validated, persisted generation can supply source
+            # eligibility. A torn/mismatched projection falls back on reads.
+            source_path = repo_dir / "source-access.json"
+            source_tmp = source_path.with_suffix(".tmp")
+            source_tmp.write_text(json.dumps(projection(source, index_bytes)))
+            source_tmp.replace(source_path)
             catalog_entry = RepositoryCatalogEntry(
                 cache_key=cache_key,
                 symbols=len(symbols),
@@ -358,6 +370,13 @@ class IndexStore:
         if not index_path.exists():
             return None
         return json.loads(index_path.read_text())
+
+    def load_source_index(self, repo_path: Path) -> Optional[dict[str, Any]]:
+        from loci.source_access import load_projection
+        identity = str(Path(self._canonical_repo(str(repo_path))).resolve())
+        source = load_projection(self._repo_dir(repo_path) / "source-access.json",
+                                 self._index_path(repo_path), identity)
+        return source if source is not None and index_versions_current(source) else None
 
     def get_graph_edges(self, repo_path: Path) -> list[GraphEdge]:
         return list(self.get_graph_state(repo_path).edges)
