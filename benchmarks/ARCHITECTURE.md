@@ -137,6 +137,14 @@ semantic scorer. They receive no complete-proof credit here. Per-case raw
 source/output/schema corruption and independent proof failures remain explicit;
 an affected run/overall full comparison is `invalid`, with all attempted conditions
 and measured failed work retained. An unavailable comparison is never reported
-as an efficiency win. A narrower, explicitly selected valid fixture comparison
-can establish harness operation without claiming all corpus guarantees passed.
+as an efficiency win. For an explicitly selected valid end-to-end control:
+
+```sh
+python -m benchmarks.architecture run \
+  --case imported_interface --case python_alias_annotation \
+  --output /tmp/loci-enrichment-valid
+python -m benchmarks.architecture verify --output /tmp/loci-enrichment-valid
+```
+
+This narrower fixture comparison can establish harness operation without claiming all corpus guarantees passed.
 The full-corpus result must be reported alongside it.

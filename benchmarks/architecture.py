@@ -205,6 +205,12 @@ def run_process(command: list[str], cwd: Path, env: dict, log: Path) -> dict:
                 os.killpg(process.pid, signal.SIGKILL)
             except ProcessLookupError:
                 pass
+            terminal = resource.getrusage(resource.RUSAGE_CHILDREN)
+            write(log.with_suffix(".execution.json"), {
+                "exit_code": process.returncode, "elapsed_ns": time.perf_counter_ns() - started,
+                "user_cpu_s": terminal.ru_utime - before.ru_utime,
+                "system_cpu_s": terminal.ru_stime - before.ru_stime,
+            })
     after = resource.getrusage(resource.RUSAGE_CHILDREN)
     return {"exit_code": code, "elapsed_ns": time.perf_counter_ns() - started,
             "user_cpu_s": after.ru_utime - before.ru_utime,
@@ -345,6 +351,8 @@ def run(args) -> int:
             if corpus["cases"]:
                 corpus["_input_id"] = i
                 corpora.append(corpus)
+        if not corpora:
+            raise ValueError("experiment must contain at least one case")
         if requested_cases - found_cases:
             raise ValueError(f"unknown selected cases: {sorted(requested_cases - found_cases)}")
         report["selected_cases"] = sorted(requested_cases) if requested_cases else None
@@ -423,6 +431,8 @@ def run(args) -> int:
                     if invalid_cases:
                         entry.update(status="invalid", invalid_cases=invalid_cases,
                                      error="independent source/output/proof integrity check failed")
+        if len(report["runs"]) != 2 * args.repetitions * len(corpora):
+            raise ValueError("assigned comparison inventory is incomplete")
         bindings = [r["binding"] for r in report["runs"] if "binding" in r]
         for key in ("base_dir", "namespace", "store_id"):
             if len({b[key] for b in bindings}) != len(bindings):

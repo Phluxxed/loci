@@ -117,3 +117,42 @@ def test_no_worker_receipt_cannot_become_success(tmp_path, monkeypatch):
     assert len(result['runs']) == 2
     assert all(row['status'] == 'failed' and 'phase_totals' not in row for row in result['runs'])
     assert result['comparisons'][0]['status'] == 'unavailable'
+
+
+def test_empty_assignment_cannot_vacuously_pass(tmp_path):
+    from argparse import Namespace
+    from benchmarks import architecture
+
+    suite = small_suite(tmp_path / 'suite')
+    corpus = json.loads((suite / 'corpus.json').read_text())
+    corpus['cases'] = []
+    raw = json.dumps(corpus).encode()
+    (suite / 'corpus.json').write_bytes(raw)
+    (suite / 'corpus.sha256').write_text(hashlib.sha256(raw).hexdigest())
+    output = tmp_path / 'empty'
+    args = Namespace(repo=str(ROOT), output=str(output), corpus=[str(suite)], repetitions=1,
+                     control_ref='HEAD', variant_ref='HEAD', control_enrichment='on', variant_enrichment='off')
+    assert architecture.run(args) == 1
+    result = json.loads((output / 'result.json').read_text())
+    assert result['status'] == 'invalid'
+    assert 'at least one case' in result['error']
+    assert result['runs'] == []
+
+
+def test_interruption_remains_incomplete_and_cleans_only_owned_resources(tmp_path, monkeypatch):
+    from argparse import Namespace
+    from benchmarks import architecture
+
+    suite = small_suite(tmp_path / 'suite')
+    output = tmp_path / 'interrupted'
+    def interrupt(*args):
+        raise KeyboardInterrupt
+    monkeypatch.setattr(architecture, 'run_process', interrupt)
+    args = Namespace(repo=str(ROOT), output=str(output), corpus=[str(suite)], repetitions=1,
+                     control_ref='HEAD', variant_ref='HEAD', control_enrichment='on', variant_enrichment='off')
+    assert architecture.run(args) == 1
+    result = json.loads((output / 'result.json').read_text())
+    assert result['status'] == 'incomplete'
+    assert result['primary_unchanged']
+    assert all(not Path(row['path']).exists() for row in result['cleanup'])
+    assert not (output / '.owned').exists()

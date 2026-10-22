@@ -30,3 +30,17 @@ for the new committed R0.1 path; it must not introduce historical sandbox gates.
 The five reviewed mechanisms: enrichment, representative member expansion,
 metadata/literal selection precedence, repeated graph validation, backend parse
 reuse. Only enrichment is executed here. No production architectural change.
+
+Corrected execution_audit result: adopted. R0.1 native execution/completed telemetry,
+continuation, failure, explicit interruption and independent fixture replay passed;
+measured-pilot freeze/task/attribution qualifications remain. The corrected native
+path is complete_work.r0, not the historical custom-profile controller. Final docs
+reflect this distinction; no live model execution was requested or performed here.
+
+First committed harness: 8b21db82cb5d249336b5d3e9936e0df518b185ea.
+Full-corpus run: all 72 case executions retained; strict independent proof scorer
+rejects five support claims in three control cases, consistent with R0 review.
+The full experiment is invalid; no success/efficiency win inferred. All source,
+output bytes, identities and cleanup checks passed. Explicitly scoped paired
+comparison passes and detects graph-off evidence regressions. Subsequent guards
+reject empty assignments and retain terminal process resources on interruption.
