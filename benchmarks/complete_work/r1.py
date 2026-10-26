@@ -82,21 +82,56 @@ def freeze(plan_path: Path, destination: Path) -> dict:
     return bound
 
 
-def read_freeze(path: Path, *, runtime: bool = True) -> dict:
+def _instrumentation_changes(path: Path, frozen: dict) -> dict:
+    """An explicit amendment may replace only these existing harness pins."""
+    amendment = json.loads(path.read_text())
+    claimed = amendment.pop("amendment_sha256", None)
+    if (identity(amendment) != claimed or amendment.get("schema_version") != 1
+            or amendment.get("kind") != "r1-instrumentation-amendment"
+            or amendment.get("freeze_sha256") != frozen["freeze_sha256"]):
+        raise ValueError("instrumentation amendment identity or base freeze differs")
+    root = Path(__file__).resolve().parents[2]
+    allowed = {str(Path(__file__).resolve()),
+               str(Path(__file__).with_name("accounting.py").resolve()),
+               str(root / ".scratch/r1-integrated/pilot-execute.py")}
+    changes = amendment.get("changes")
+    original = frozen["host"].get("orchestration_files", {})
+    if not isinstance(changes, dict) or not changes or set(changes) - allowed:
+        raise ValueError("instrumentation amendment contains disallowed paths")
+    for name, change in changes.items():
+        if (name not in original or not isinstance(change, dict)
+                or set(change) != {"before_sha256", "after_sha256"}
+                or change["before_sha256"] != original[name]
+                or not isinstance(change["after_sha256"], str)
+                or len(change["after_sha256"]) != 64
+                or any(c not in "0123456789abcdef" for c in change["after_sha256"])
+                or change["after_sha256"] == change["before_sha256"]):
+            raise ValueError("instrumentation amendment does not replace an original pin")
+    return changes
+
+
+def _amendment_record(path: Path | None) -> dict | None:
+    return None if path is None else {"path": str(path.resolve()), "sha256": r0.digest(path)}
+
+
+def read_freeze(path: Path, *, runtime: bool = True, amendment: Path | None = None) -> dict:
     frozen = json.loads(path.read_text())
     claimed = frozen.pop("freeze_sha256")
     if identity(frozen) != claimed:
         raise ValueError("prospective freeze changed")
     frozen["freeze_sha256"] = claimed
+    changes = {} if amendment is None else _instrumentation_changes(amendment, frozen)
     if runtime and r0.digest(Path(frozen["native_config"])) != frozen["native_config_sha256"]:
         raise ValueError("native configuration changed after freeze")
     if runtime and r0.digest(Path(frozen["host"]["executable"])) != frozen["host"]["sha256"]:
         raise ValueError("native executable changed after freeze")
-    pinned_host_files = {**frozen["host"].get("startup_context_files", {}),
-                         **frozen["host"].get("orchestration_files", {})}
-    for name, expected in pinned_host_files.items() if runtime else ():
+    for name, expected in frozen["host"].get("startup_context_files", {}).items() if runtime else ():
         if r0.digest(Path(name)) != expected:
             raise ValueError("shared startup context changed after freeze")
+    for name, expected in frozen["host"].get("orchestration_files", {}).items() if runtime else ():
+        expected = changes.get(name, {}).get("after_sha256", expected)
+        if r0.digest(Path(name)) != expected:
+            raise ValueError("orchestration changed outside the recorded instrumentation amendment")
     for condition in frozen["conditions"].values() if runtime else ():
         for name, expected in condition.get("implementation_files", {}).items():
             if r0.digest(Path(name)) != expected:
@@ -124,8 +159,9 @@ def command(frozen: dict, condition: str, workspace: Path, observer: Path) -> li
     return argv + ["-"]
 
 
-def prepare(freeze_path: Path, run_id: str, destination: Path) -> dict:
-    frozen = read_freeze(freeze_path)
+def prepare(freeze_path: Path, run_id: str, destination: Path,
+            *, amendment: Path | None = None) -> dict:
+    frozen = read_freeze(freeze_path, amendment=amendment)
     # The unchanged global SessionStart hook indexes any Git ancestor. An
     # exported source directory outside Git makes that hook take its existing
     # no-repository exit without changing hook settings or native permissions.
@@ -146,16 +182,20 @@ def prepare(freeze_path: Path, run_id: str, destination: Path) -> dict:
     observer, workspace = Path(manifest["observer"]), Path(manifest["workspace"])
     manifest["r1"] = {**scheduled, "freeze": str(freeze_path.resolve()),
                       "argv": command(frozen, scheduled["condition"], workspace, observer)}
+    if amendment is not None:
+        manifest["r1"]["instrumentation_amendment"] = _amendment_record(amendment)
     # Identical task text in all arms. Tool availability is host configuration.
     (observer / "prompt.txt").write_text(task["prompt"])
     write_json(observer / "run.json", manifest)
     return manifest
 
 
-def execute(config: Path, gate: Path) -> dict:
+def execute(config: Path, gate: Path, *, amendment: Path | None = None) -> dict:
     """Run exactly one fresh native thread; archive failure without substituting a run."""
     manifest = json.loads(config.read_text())
-    frozen = read_freeze(Path(manifest["r1"]["freeze"]))
+    frozen = read_freeze(Path(manifest["r1"]["freeze"]), amendment=amendment)
+    if manifest["r1"].get("instrumentation_amendment") != _amendment_record(amendment):
+        raise ValueError("run instrumentation amendment differs from preparation")
     permission = json.loads(gate.read_text())
     if permission.get("status") != "passed":
         raise ValueError("a passing deterministic qualification gate is required")
@@ -179,6 +219,8 @@ def execute(config: Path, gate: Path) -> dict:
         raise ValueError("run already attempted; no automatic retry")
     record = {"run_id": manifest["run_id"], "status": "started", "gate_sha256": r0.digest(gate),
               "freeze_sha256": frozen["freeze_sha256"], "measured": True}
+    if amendment is not None:
+        record["instrumentation_amendment"] = _amendment_record(amendment)
     write_json(marker, record)
     start = time.monotonic()
     with (observer / "exec.jsonl").open("wb") as out, (observer / "exec.stderr").open("wb") as err:
@@ -229,10 +271,11 @@ def replay(config: Path, destination: Path) -> dict:
     return result
 
 
-def evaluate(config: Path, trace: Path, thread_id: str) -> dict:
+def evaluate(config: Path, trace: Path, thread_id: str,
+             *, amendment: Path | None = None) -> dict:
     """Use R0's native accounting and independently grade the retained source copy."""
     manifest = json.loads(config.read_text())
-    frozen = read_freeze(Path(manifest["r1"]["freeze"]))
+    frozen = read_freeze(Path(manifest["r1"]["freeze"]), amendment=amendment)
     qualification = r0.qualify(config, trace, thread_id=thread_id)
     observer = Path(manifest["observer"])
     oracle = replay(config, observer / "evaluation")
@@ -245,6 +288,7 @@ def evaluate(config: Path, trace: Path, thread_id: str) -> dict:
               "loci_telemetry": {"source_bytes": None, "semantic_requests": None,
                                  "proof_requests": None, "status": "requires_captured_call_attribution"},
               "manual_review": "pending_arm_blinded_review", "measured": True,
+              "instrumentation_amendment": _amendment_record(amendment),
               "limitations": qualification["limitations"][:3] + [
                   "Native tool availability follows unchanged host config; other MCP tools remain available.",
                   "Loci use, semantic/proof requests and evidence bytes require captured-call attribution; unavailable values remain unknown.",
@@ -273,15 +317,17 @@ def main() -> None:
     r = sub.add_parser("replay")
     r.add_argument("--config", type=Path, required=True)
     r.add_argument("--destination", type=Path, required=True)
+    for operation in (p, e, q):
+        operation.add_argument("--amendment", type=Path)
     args = parser.parse_args()
     if args.operation == "freeze":
         result = freeze(args.plan, args.destination)
     elif args.operation == "prepare":
-        result = prepare(args.freeze, args.run_id, args.destination)
+        result = prepare(args.freeze, args.run_id, args.destination, amendment=args.amendment)
     elif args.operation == "execute":
-        result = execute(args.config, args.gate)
+        result = execute(args.config, args.gate, amendment=args.amendment)
     elif args.operation == "evaluate":
-        result = evaluate(args.config, args.trace, args.thread_id)
+        result = evaluate(args.config, args.trace, args.thread_id, amendment=args.amendment)
     else:
         result = replay(args.config, args.destination)
     print(json.dumps({k: result[k] for k in ("run_id", "status", "freeze_sha256", "correct", "thread_id") if k in result}))

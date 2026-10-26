@@ -1,3 +1,5 @@
+> **Instrumentation repair complete:** The original first native thread now qualifies with known usage and unchanged successful grading/replay. The original freeze and rejected receipt are preserved. Explicit amendment and resume support are ready; check-only validates assignment2 next and15 pending. See [instrumentation-repair.md](instrumentation-repair.md). No pilot task was launched during repair.
+
 > **Latest update:** The external top-level native run completed the first task correctly. The current blocker is the frozen accounting reader counting host bootstrap as task history. Provider usage and native settings are present and independently reconciled; 15 assignments remain unattempted. See [top-level-first-run.md](top-level-first-run.md). The report below preserves the initial closeout context.
 
 # Loci R1: implementation qualified; native pilot blocked

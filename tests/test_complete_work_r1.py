@@ -130,3 +130,91 @@ def test_execute_pins_subscription_auth_scrubs_keys_and_never_retries(tmp_path, 
     with pytest.raises(ValueError,match='already attempted'):
         r1.execute(observer/'run.json',gate)
     assert sum(argv[1]=='exec' for argv in calls)==1
+
+
+def _amended_freeze(tmp_path):
+    path = _freeze(tmp_path)
+    frozen = json.loads(path.read_text())
+    name = str(Path(r1.__file__).with_name('accounting.py').resolve())
+    frozen['host']['orchestration_files'] = {name: '1' * 64}
+    frozen.pop('freeze_sha256')
+    frozen['freeze_sha256'] = r1.identity(frozen)
+    write_json(path, frozen)
+    payload = {'schema_version':1, 'kind':'r1-instrumentation-amendment',
+               'freeze_sha256':frozen['freeze_sha256'],
+               'changes':{name:{'before_sha256':'1'*64,'after_sha256':r0.digest(Path(name))}}}
+    amendment = tmp_path/'instrumentation-amendment.json'
+    _write_amendment(amendment, payload)
+    return path, amendment
+
+
+def _write_amendment(path, payload):
+    payload = {key:value for key,value in payload.items() if key != 'amendment_sha256'}
+    write_json(path, {**payload,'amendment_sha256':r1.identity(payload)})
+
+
+def test_explicit_amendment_preserves_original_freeze_and_native_command(tmp_path):
+    path, amendment = _amended_freeze(tmp_path)
+    before = path.read_bytes()
+    with pytest.raises(ValueError,match='orchestration changed'):
+        r1.read_freeze(path)
+    original = r1.read_freeze(path,runtime=False)
+    frozen = r1.read_freeze(path,amendment=amendment)
+    assert frozen == original and path.read_bytes() == before
+    manifest = r1.prepare(path,'task-0-native',tmp_path/'run',amendment=amendment)
+    observer,workspace=Path(manifest['observer']),Path(manifest['workspace'])
+    assert manifest['r1']['argv']==r1.command(original,'native',workspace,observer)
+    assert manifest['r1']['instrumentation_amendment']['sha256']==r0.digest(amendment)
+
+
+@pytest.mark.parametrize('mutation',['self_hash','base','before','after','disallowed','unpinned'])
+def test_instrumentation_amendment_rejects_wrong_or_excessive_substitution(tmp_path,mutation):
+    path, amendment = _amended_freeze(tmp_path)
+    payload=json.loads(amendment.read_text())
+    name=next(iter(payload['changes']))
+    if mutation=='self_hash':
+        payload['note']='unrecorded change'
+        write_json(amendment,payload)
+    else:
+        if mutation=='base':payload['freeze_sha256']='0'*64
+        elif mutation=='before':payload['changes'][name]['before_sha256']='0'*64
+        elif mutation=='after':payload['changes'][name]['after_sha256']='0'*64
+        elif mutation=='disallowed':payload['changes'][str(Path(r0.__file__).resolve())]=payload['changes'].pop(name)
+        elif mutation=='unpinned':payload['changes'][str(Path(r1.__file__).resolve())]=payload['changes'].pop(name)
+        _write_amendment(amendment,payload)
+    with pytest.raises(ValueError):
+        r1.read_freeze(path,amendment=amendment)
+
+
+def test_offline_read_still_rejects_malformed_supplied_amendment(tmp_path):
+    path, amendment = _amended_freeze(tmp_path)
+    payload=json.loads(amendment.read_text());payload['freeze_sha256']='0'*64
+    _write_amendment(amendment,payload)
+    with pytest.raises(ValueError,match='amendment identity or base'):
+        r1.read_freeze(path,runtime=False,amendment=amendment)
+
+
+@pytest.mark.parametrize('pin',['startup','candidate','config','host'])
+def test_amendment_does_not_relax_scientific_or_native_environment_pins(tmp_path,pin):
+    path, amendment = _amended_freeze(tmp_path)
+    frozen=json.loads(path.read_text())
+    if pin in {'startup','candidate'}:
+        target=tmp_path/(pin+'.txt');target.write_text('original')
+        if pin=='startup':frozen['host']['startup_context_files']={str(target):r0.digest(target)}
+        else:frozen['conditions']['integrated']['implementation_files']={str(target):r0.digest(target)}
+        frozen.pop('freeze_sha256');frozen['freeze_sha256']=r1.identity(frozen);write_json(path,frozen)
+        payload=json.loads(amendment.read_text());payload['freeze_sha256']=frozen['freeze_sha256'];_write_amendment(amendment,payload)
+    else:target=Path(frozen['native_config'] if pin=='config' else frozen['host']['executable'])
+    target.write_text('drift')
+    with pytest.raises(ValueError):r1.read_freeze(path,amendment=amendment)
+
+
+def test_execute_requires_the_same_explicit_amendment_as_preparation(tmp_path,monkeypatch):
+    path, amendment = _amended_freeze(tmp_path)
+    manifest=r1.prepare(path,'task-0-native',tmp_path/'run',amendment=amendment)
+    other=tmp_path/'other-amendment.json'
+    payload=json.loads(amendment.read_text());payload['note']='different receipt';_write_amendment(other,payload)
+    gate=tmp_path/'gate.json';write_json(gate,{'status':'passed'})
+    monkeypatch.setattr(subprocess,'run',lambda *args,**kwargs:pytest.fail('must not launch'))
+    with pytest.raises(ValueError,match='amendment differs from preparation'):
+        r1.execute(Path(manifest['observer'])/'run.json',gate,amendment=other)

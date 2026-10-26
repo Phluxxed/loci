@@ -213,6 +213,31 @@ def _native_usage(value: object) -> dict:
     return usage
 
 
+def _native_bootstrap_user(payload: dict, turn_id: str) -> bool:
+    """Recognize the recorded host envelope, never a task's textual prefix."""
+    metadata = payload.get("internal_chat_message_metadata_passthrough")
+    if not isinstance(metadata, dict) or "content_item_kinds" not in metadata:
+        return False
+    kinds = metadata["content_item_kinds"]
+    if not isinstance(kinds, list):
+        raise ValueError("native user message classification is malformed")
+    expected = ["agents_md.instructions", "environments.environment_context"]
+    if not any(kind in expected for kind in kinds):
+        return False
+    content = payload.get("content")
+    provenance = metadata.get("content_item_metadata")
+    if (kinds != expected or metadata.get("turn_id") != turn_id
+            or not isinstance(content, list) or len(content) != 2
+            or not isinstance(provenance, list) or len(provenance) != 2
+            or any(not isinstance(part, dict) or part.get("type") != "input_text"
+                   or not isinstance(part.get("text"), str) or not part["text"]
+                   for part in content)
+            or provenance != [{"provenance": {"type": "agents_md"}},
+                              {"provenance": {"type": "harness", "hook": False}}]):
+        raise ValueError("native bootstrap provenance is malformed or unsupported")
+    return True
+
+
 def summarize_native(rollout_path: Path, thread_id: str) -> dict:
     """Reduce one fresh native rollout, retaining only safe metadata in the report.
 
@@ -248,6 +273,7 @@ def summarize_native(rollout_path: Path, thread_id: str) -> dict:
     finals: dict[str, int] = {}
     usage_positions: dict[str, list[int]] = {}
     first_turn_users = 0
+    bootstrap_rows: list[int] = []
     active: str | None = None
     response_records: dict[str, tuple[str, dict, dict, dict]] = {}
     call_records: dict[tuple[str, str, str], dict] = {}
@@ -368,8 +394,13 @@ def summarize_native(rollout_path: Path, thread_id: str) -> dict:
             if attributed is not None and attributed != active:
                 raise ValueError("native response item has foreign turn attribution")
             if payload.get("type") == "message":
-                if payload.get("role") == "user" and active == next(iter(started), None):
-                    first_turn_users += 1
+                if payload.get("role") == "user":
+                    if _native_bootstrap_user(payload, active):
+                        if active != next(iter(started)) or first_turn_users or bootstrap_rows:
+                            raise ValueError("native bootstrap is duplicated or misplaced")
+                        bootstrap_rows.append(index)
+                    elif active == next(iter(started)):
+                        first_turn_users += 1
                 if (active == next(iter(started), None) and first_turn_users == 0
                         and payload.get("role") == "assistant"):
                     raise ValueError("native rollout contains inherited first-turn history")
@@ -448,6 +479,7 @@ def summarize_native(rollout_path: Path, thread_id: str) -> dict:
         "rollout_path": str(rollout_path), "session_id": meta["session_id"], "cwd": meta["cwd"],
         "cli_version": meta["cli_version"], "source": "subagent" if isinstance(source, dict) else source,
         "thread_source": meta["thread_source"],
+        "bootstrap_message_rows": bootstrap_rows,
     }
     result["turn_contexts"] = [contexts[turn] for turn in started]
     result["native_errors"] = native_errors

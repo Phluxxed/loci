@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
+import hashlib
 from pathlib import Path
 
 import pytest
@@ -215,3 +217,103 @@ def test_corrupted_native_trace_never_becomes_known(
     mutation(rows)
     with pytest.raises(ValueError, match=expected):
         _summarize(tmp_path, rows)
+
+
+def _bootstrap(turn: str = TURNS[0]) -> dict:
+    return _response("message", turn, role="user", content=[
+        {"type": "input_text", "text": "host guidance"},
+        {"type": "input_text", "text": "host environment"},
+    ], internal_chat_message_metadata_passthrough={
+        "turn_id": turn,
+        "content_item_kinds": ["agents_md.instructions", "environments.environment_context"],
+        "content_item_metadata": [{"provenance": {"type": "agents_md"}},
+                                  {"provenance": {"type": "harness", "hook": False}}],
+    })
+
+
+def test_typed_host_bootstrap_preserves_usage_and_task_freshness(tmp_path):
+    rows = _episode()
+    rows.insert(2, _bootstrap())
+    result = _summarize(tmp_path, rows)
+    assert result["usage_status"] == "known"
+    assert result["usage"]["totalTokens"] == 25
+    assert result["native_provenance"]["bootstrap_message_rows"] == [2]
+
+
+def test_retained_top_level_trace_is_read_without_rewriting_evidence():
+    path = (Path(__file__).resolve().parents[1] / ".scratch/r1-integrated/pilot"
+            / "archived-runs/receipt-location-native/observer/qualification/native-rollout.jsonl")
+    before = hashlib.sha256(path.read_bytes()).hexdigest()
+    result = summarize_native(path, "01a176ca-a192-7cb1-8351-a0ca42d0d477")
+    assert result["usage_status"] == "known" and result["native_errors"] == []
+    assert result["usage"] == {
+        "inputTokens": 118160, "cachedInputTokens": 95232, "outputTokens": 934,
+        "reasoningOutputTokens": 124, "totalTokens": 119094,
+        "cacheWriteInputTokens": 0, "uncachedInputTokens": 22928,
+    }
+    assert result["native_provenance"]["bootstrap_message_rows"] == [7]
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == before
+
+
+@pytest.mark.parametrize("mutation", [
+    lambda p: p["internal_chat_message_metadata_passthrough"].pop("turn_id"),
+    lambda p: p["internal_chat_message_metadata_passthrough"]["content_item_kinds"].append("user.text"),
+    lambda p: p["internal_chat_message_metadata_passthrough"].pop("content_item_metadata"),
+    lambda p: p["internal_chat_message_metadata_passthrough"]["content_item_metadata"][0].update(provenance={"type": "user"}),
+    lambda p: p["internal_chat_message_metadata_passthrough"]["content_item_metadata"][1]["provenance"].update(hook=True),
+    lambda p: p["content"].pop(),
+    lambda p: p["content"][0].update(type="output_text"),
+    lambda p: p["content"][0].update(text=""),
+])
+def test_partial_or_mixed_bootstrap_metadata_is_rejected(tmp_path, mutation):
+    rows = _episode()
+    bootstrap = _bootstrap()
+    mutation(bootstrap["payload"])
+    rows.insert(2, bootstrap)
+    with pytest.raises(ValueError, match="bootstrap provenance"):
+        _summarize(tmp_path, rows)
+
+
+@pytest.mark.parametrize("placement", ["duplicate", "after_task", "later_turn"])
+def test_bootstrap_is_only_one_envelope_before_the_first_task(tmp_path, placement):
+    rows = _episode()
+    if placement == "duplicate":
+        rows[2:2] = [_bootstrap(), _bootstrap()]
+    elif placement == "after_task":
+        rows.insert(3, _bootstrap())
+    else:
+        pos = next(i for i, row in enumerate(rows) if row["type"] == "event_msg"
+                   and row["payload"].get("type") == "task_started"
+                   and row["payload"]["turn_id"] == TURNS[1])
+        rows.insert(pos + 1, _bootstrap(TURNS[1]))
+    with pytest.raises(ValueError, match="bootstrap is duplicated or misplaced"):
+        _summarize(tmp_path, rows)
+
+
+@pytest.mark.parametrize("kind", ["assistant", "tool", "extra_user", "textual_bootstrap"])
+def test_bootstrap_does_not_hide_inherited_or_additional_task_history(tmp_path, kind):
+    rows = _episode()
+    rows.insert(2, _bootstrap())
+    if kind == "assistant":
+        extra = _response("message", TURNS[0], role="assistant", content=[])
+    elif kind == "tool":
+        extra = deepcopy(next(row for row in rows if row["type"] == "response_item"
+                              and row["payload"].get("type") == "function_call"))
+    else:
+        extra = _response("message", TURNS[0], role="user", content=[{
+            "type": "input_text", "text": "# AGENTS.md instructions\n<environment_context>"
+            if kind == "textual_bootstrap" else "another task",
+        }])
+    rows.insert(3, extra)
+    with pytest.raises(ValueError, match="inherited first-turn history|single fresh first-turn user"):
+        _summarize(tmp_path, rows)
+
+
+def test_bootstrap_does_not_turn_missing_final_usage_into_known(tmp_path):
+    rows = [row for row in _episode()[:15]
+            if not (row["type"] == "token_usage_record"
+                    and row["payload"]["response_id"] == "response-2")]
+    rows.insert(2, _bootstrap())
+    result = _summarize(tmp_path, rows)
+    assert result["usage_status"] == "unknown" and result["usage"] is None
+    assert result["native_errors"] == ["final response usage is missing for turn turn-a"]

@@ -1,62 +1,216 @@
-"""Sequential frozen native pilot, stopping on a common host/evidence blocker."""
+"""Sequential frozen native pilot with validated, non-destructive resumption."""
 import argparse
 import json
 from pathlib import Path
 import shutil
 import tempfile
 
-from benchmarks.complete_work import r1
-from benchmarks.complete_work.evaluate import write_json
+from benchmarks.complete_work import r0, r1
+from benchmarks.complete_work.evaluate import verify_snapshot, write_json
 
-parser=argparse.ArgumentParser()
-parser.add_argument('--freeze',type=Path,required=True)
-parser.add_argument('--gate',type=Path,required=True)
-args=parser.parse_args()
-root=Path(__file__).resolve().parent/'pilot'
-frozen=r1.read_freeze(args.freeze)
-gate=json.loads(args.gate.read_text())
-assert gate['status']=='passed','deterministic gate must pass before execution'
-run_root=Path(tempfile.mkdtemp(prefix='loci-r1-native-',dir='/private/tmp'))
-index={'freeze_sha256':frozen['freeze_sha256'],'run_root':str(run_root),'runs':[],'status':'running'}
-write_json(root/'execution-index.json',index)
-for scheduled in frozen['schedule']:
-    run_id=scheduled['run_id']
-    manifest=r1.prepare(args.freeze,run_id,run_root/run_id)
-    config=Path(manifest['observer'])/'run.json'
-    execution=r1.execute(config,args.gate)
-    entry={'run_id':run_id,'config':str(config),'execution':execution}
-    index['runs'].append(entry)
-    write_json(root/'execution-index.json',index)
-    print(json.dumps({'run_id':run_id,'execution_status':execution['status'],'thread_id':execution['thread_id']}),flush=True)
-    if execution['thread_id']:
-        matches=list((Path.home()/'.codex/sessions').rglob('*'+execution['thread_id']+'.jsonl'))
+
+def read(path):
+    return json.loads(Path(path).read_text())
+
+
+def require(condition, message):
+    if not condition:
+        raise ValueError(message)
+
+
+def validate_prefix(index, frozen, root):
+    """Skip only completed assignments bound to retained, independently graded bytes."""
+    require(index.get('freeze_sha256') == frozen['freeze_sha256'], 'index freeze differs')
+    runs = index.get('runs')
+    require(isinstance(runs, list) and len(runs) <= len(frozen['schedule']), 'invalid retained prefix')
+    run_root = Path(index['run_root']).resolve(strict=True)
+    threads = set()
+    for entry, scheduled in zip(runs, frozen['schedule']):
+        run_id = scheduled['run_id']
+        require(entry.get('run_id') == run_id, 'retained prefix differs from frozen schedule')
+        execution, result = entry.get('execution', {}), entry.get('evaluation', {})
+        thread = execution.get('thread_id')
+        require(execution.get('status') == 'closed' and execution.get('exit_code') == 0,
+                'retained attempt did not close successfully')
+        require(isinstance(thread, str) and thread and thread not in threads, 'missing or duplicate retained session')
+        threads.add(thread)
+        require(execution.get('run_id') == run_id and execution.get('freeze_sha256') == frozen['freeze_sha256'],
+                'retained execution identity differs')
+        require(result.get('qualification_status') == 'qualified_observations'
+                and result.get('accounting', {}).get('usage_status') == 'known'
+                and result.get('accounting', {}).get('usage') is not None,
+                'retained evidence is unqualified or usage is unknown')
+        require(type(result.get('correct')) is bool and entry.get('replay_matches') is True,
+                'retained independent grade/replay is unavailable')
+        for key, expected in {'run_id': run_id, 'thread_id': thread,
+                              'freeze_sha256': frozen['freeze_sha256'],
+                              'condition': scheduled['condition']}.items():
+            require(result.get(key) == expected, f'retained result {key} differs')
+        result_path = Path(entry['evaluation_result'])
+        require(r0.digest(result_path) == entry['evaluation_result_sha256'] and read(result_path) == result,
+                'retained evaluation bytes differ')
+        archive = root / 'archived-runs' / run_id
+        require(Path(entry['archive']).resolve() == archive.resolve(strict=True), 'retained archive differs')
+        observer = archive / 'observer'
+        config = Path(entry['config'])
+        expected_observer = run_root / run_id / 'observer'
+        workspace = run_root / run_id / 'workspace'
+        require(config.resolve(strict=True) == expected_observer / 'run.json', 'retained config is outside assigned run')
+        archived_config = observer / 'run.json'
+        require(r0.digest(config) == r0.digest(archived_config), 'original and archived assignment differ')
+        manifest = read(archived_config)
+        require(manifest.get('run_id') == run_id and manifest.get('permission_overrides') == {},
+                'retained assignment identity or native permissions differ')
+        require(Path(manifest['workspace']).resolve() == workspace and Path(manifest['observer']).resolve() == expected_observer,
+                'retained workspace or store assignment differs')
+        require(manifest['r1']['run_id'] == run_id and manifest['r1']['task'] == scheduled['task']
+                and manifest['r1']['condition'] == scheduled['condition'], 'retained condition differs')
+        require(manifest['conditions']['freeze_sha256'] == frozen['freeze_sha256']
+                and manifest['r1']['argv'] == r1.command(frozen, scheduled['condition'], workspace, expected_observer),
+                'retained invocation or condition-local store differs')
+        require(read(observer / 'execution.json') == execution, 'archived execution differs')
+        original_qualification = read(observer / 'qualification/result.json')
+        trace = observer / 'qualification/native-rollout.jsonl'
+        with trace.open() as stream:
+            metadata = json.loads(stream.readline())
+        require(metadata.get('type') == 'session_meta' and metadata.get('payload', {}).get('id') == thread,
+                'archived native session differs')
+        require(original_qualification.get('run_id') == run_id and original_qualification.get('thread_id') == thread
+                and original_qualification.get('config_sha256') == r0.digest(archived_config)
+                and original_qualification.get('native_trace_sha256') == r0.digest(trace),
+                'archived qualification bindings differ')
+        qualified_path = Path(entry['qualification_result'])
+        require(r0.digest(qualified_path) == entry['qualification_result_sha256'], 'corrected qualification bytes differ')
+        qualified = read(qualified_path)
+        require(qualified.get('status') == 'qualified_observations'
+                and qualified.get('run_id') == run_id and qualified.get('thread_id') == thread
+                and qualified.get('config_sha256') == r0.digest(archived_config)
+                and qualified.get('native_trace_sha256') == r0.digest(trace)
+                and qualified.get('accounting') == result['accounting'], 'corrected native qualification differs')
+        replay_path = Path(entry['replay_result'])
+        require(r0.digest(replay_path) == entry['replay_result_sha256'], 'retained replay bytes differ')
+        replay = read(replay_path)
+        require(all(replay.get(key) == result.get(key) for key in
+                    ['run_id', 'source_identity', 'oracle_sha256', 'correct', 'changes', 'unexpected_changes']),
+                'retained independent replay differs')
+        task = next(task for task in frozen['tasks'] if task['id'] == scheduled['task'])
+        before = read(observer / 'source-before.json')
+        after = read(observer / 'qualification/source-after.json')
+        verify_snapshot(before, task['source_identity'])
+        verify_snapshot(after, result['source_identity'])
+        require(original_qualification.get('source_before') == before['sha256']
+                and original_qualification.get('source_after') == after['sha256']
+                and qualified.get('source_before') == before['sha256']
+                and qualified.get('source_after') == after['sha256']
+                and result.get('oracle_sha256') == task['oracle_sha256'], 'retained source/oracle bindings differ')
+    # A partial or failed pending attempt cannot be silently restarted.
+    for scheduled in frozen['schedule'][len(runs):]:
+        run_id = scheduled['run_id']
+        require(not (run_root / run_id).exists() and not (root / 'archived-runs' / run_id).exists(),
+                'pending assignment already attempted or archived')
+    archive_names = {p.name for p in (root / 'archived-runs').iterdir()} if (root / 'archived-runs').exists() else set()
+    require(archive_names == {entry['run_id'] for entry in runs},
+            'archive contains assignments outside retained prefix')
+    return run_root
+
+
+def run(freeze, gate, amendment, root, *, resume=False, check_only=False):
+    frozen = r1.read_freeze(freeze, amendment=amendment)
+    require(read(gate).get('status') == 'passed', 'deterministic gate must pass before execution')
+    index_path = root / 'execution-index.json'
+    if resume:
+        require(index_path.is_file(), 'resume requires retained execution index')
+        index = read(index_path)
+        run_root = validate_prefix(index, frozen, root)
     else:
-        matches=[]
-    if len(matches)==1:
-        result=r1.evaluate(config,matches[0],execution['thread_id'])
-        entry['evaluation']=result
-        print(json.dumps({'run_id':run_id,'correct':result['correct'],'qualification':result['qualification_status'],'usage':result['accounting']['usage_status']}),flush=True)
-        # Independent replay uses frozen evaluator and archived retained bytes;
-        # it never starts another measured agent or consults the live workspace.
-        replay=r1.replay(config,Path(manifest['observer'])/'replay')
-        entry['replay_matches']=all(replay[k]==result[k] for k in ['source_identity','oracle_sha256','correct','changes','unexpected_changes'])
-        assert entry['replay_matches']
+        require(not index_path.exists() and not (root / 'archived-runs').exists(),
+                'existing execution index/archive requires --resume')
+        index = {'freeze_sha256': frozen['freeze_sha256'], 'runs': [], 'status': 'running'}
+        run_root = None
+    pending = frozen['schedule'][len(index['runs']):]
+    if check_only:
+        return {'status': 'checked', 'next_run_id': pending[0]['run_id'] if pending else None,
+                'pending': len(pending), 'retained': len(index['runs'])}
+    if run_root is None:
+        run_root = Path(tempfile.mkdtemp(prefix='loci-r1-native-', dir='/private/tmp'))
+        index['run_root'] = str(run_root)
+    index['status'] = 'running'
+    index.pop('blocker_run', None)
+    write_json(index_path, index)
+    for scheduled in pending:
+        run_id = scheduled['run_id']
+        manifest = r1.prepare(freeze, run_id, run_root / run_id, amendment=amendment)
+        config = Path(manifest['observer']) / 'run.json'
+        entry = {'run_id': run_id, 'config': str(config)}
+        result = None
+        try:
+            execution = r1.execute(config, gate, amendment=amendment)
+            entry['execution'] = execution
+            index['runs'].append(entry)
+            write_json(index_path, index)
+            print(json.dumps({'run_id': run_id, 'execution_status': execution['status'],
+                              'thread_id': execution['thread_id']}), flush=True)
+            matches = (list((Path.home() / '.codex/sessions').rglob('*' + execution['thread_id'] + '.jsonl'))
+                       if execution['thread_id'] else [])
+            require(len(matches) == 1, 'unique native rollout unavailable')
+            result = r1.evaluate(config, matches[0], execution['thread_id'], amendment=amendment)
+            entry['evaluation'] = result
+            replay = r1.replay(config, Path(manifest['observer']) / 'replay')
+            entry['replay_matches'] = all(replay[k] == result[k] for k in
+                                         ['source_identity', 'oracle_sha256', 'correct', 'changes', 'unexpected_changes'])
+            require(entry['replay_matches'], 'independent replay differs')
+            print(json.dumps({'run_id': run_id, 'correct': result['correct'],
+                              'qualification': result['qualification_status'],
+                              'usage': result['accounting']['usage_status']}), flush=True)
+        except Exception as exc:
+            entry['evidence_error'] = f'{type(exc).__name__}: {exc}'
+            if not index['runs'] or index['runs'][-1] is not entry:
+                execution_path = Path(manifest['observer']) / 'execution.json'
+                entry['execution'] = read(execution_path) if execution_path.exists() else {'status': 'execution_exception'}
+                index['runs'].append(entry)
+        archive = root / 'archived-runs' / run_id
+        try:
+            archive.parent.mkdir(exist_ok=True)
+            shutil.copytree(run_root / run_id, archive)
+            entry['archive'] = str(archive)
+            for label, relative in [('evaluation', 'evaluation/result.json'),
+                                    ('qualification', 'qualification/result.json'), ('replay', 'replay/oracle.json')]:
+                result_path = archive / 'observer' / relative
+                if result_path.exists():
+                    entry[label + '_result'] = str(result_path)
+                    entry[label + '_result_sha256'] = r0.digest(result_path)
+        except Exception as exc:
+            entry['archive_error'] = f'{type(exc).__name__}: {exc}'
+        # Wrong answers remain valid outcomes. Missing native/accounting/archive
+        # evidence stops the schedule, without replacing the failed assignment.
+        if (entry.get('evidence_error') or entry.get('archive_error')
+                or entry['execution'].get('status') != 'closed' or result is None
+                or result['qualification_status'] != 'qualified_observations'
+                or result['accounting']['usage_status'] != 'known'):
+            index['status'] = 'blocked'
+            index['blocker_run'] = run_id
+            write_json(index_path, index)
+            break
+        write_json(index_path, index)
     else:
-        entry['evidence_error']='unique native rollout unavailable'
-        result=None
-    archive=root/'archived-runs'/run_id
-    archive.parent.mkdir(exist_ok=True)
-    shutil.copytree(run_root/run_id,archive)
-    entry['archive']=str(archive)
-    # Wrong answers are scored outcomes and do not stop the schedule. Missing
-    # usage/protection/closed-thread evidence is a common-host blocker.
-    if execution['status']!='closed' or result is None or result['qualification_status']!='qualified_observations':
-        index['status']='blocked'
-        index['blocker_run']=run_id
-        write_json(root/'execution-index.json',index)
-        break
-    write_json(root/'execution-index.json',index)
-else:
-    index['status']='complete'
-    write_json(root/'execution-index.json',index)
-print(json.dumps({'status':index['status'],'attempted':len(index['runs']),'scheduled':len(frozen['schedule']),'run_root':str(run_root)}),flush=True)
+        index['status'] = 'complete'
+        write_json(index_path, index)
+    return {'status': index['status'], 'attempted': len(index['runs']),
+            'scheduled': len(frozen['schedule']), 'run_root': str(run_root)}
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--freeze', type=Path, required=True)
+    parser.add_argument('--gate', type=Path, required=True)
+    parser.add_argument('--amendment', type=Path, required=True)
+    parser.add_argument('--resume', action='store_true')
+    parser.add_argument('--check-only', action='store_true')
+    args = parser.parse_args(argv)
+    result = run(args.freeze, args.gate, args.amendment, Path(__file__).resolve().parent / 'pilot',
+                 resume=args.resume, check_only=args.check_only)
+    print(json.dumps(result), flush=True)
+
+
+if __name__ == '__main__':
+    main()
