@@ -1,0 +1,27 @@
+...F.......                                                              [100%]
+=================================== FAILURES ===================================
+___ test_continuation_navigation_validates_without_discarding_envelope_bytes ___
+
+tmp_path = PosixPath('/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T/pytest-of-brummerv/pytest-48/test_continuation_navigation_v0')
+
+    def test_continuation_navigation_validates_without_discarding_envelope_bytes(tmp_path):
+        root, service = _source(tmp_path)
+        (root / "entry.ts").write_text((root / "entry.ts").read_text() + "// padding\n" * 2000)
+        first = service.retrieve(root, "entry.ts")
+        assert not first["items"][0]["complete"]
+        page = service.read(root, first["items"][0]["source_ref"])
+        inventory = {"files": service.inventory(root)["file_hashes"]}
+        envelope = {"content": [], "structuredContent": page, "isError": False}
+        validate_integrated_packets([envelope], inventory)
+        assert page["usage"]["output_bytes"] == len(json.dumps(
+            envelope, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode())
+        assert page["usage"]["output_bytes"] <= 16384
+        forged = deepcopy(envelope)
+>       forged["structuredContent"]["navigation"]["meaning"] = "proven relationship"
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'navigation'
+
+tests/test_r1_integrated.py:130: KeyError
+=========================== short test summary info ============================
+FAILED tests/test_r1_integrated.py::test_continuation_navigation_validates_without_discarding_envelope_bytes
+1 failed, 10 passed in 4.42s

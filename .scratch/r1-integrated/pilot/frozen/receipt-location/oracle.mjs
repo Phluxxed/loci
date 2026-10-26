@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import { pathToFileURL } from 'node:url';
+const root=process.argv[2];
+const answer=JSON.parse(fs.readFileSync(path.join(root,'answer.json'),'utf8'));
+assert.deepEqual(answer,{"owner_file": "src/billing/receipt.js", "owner_symbol": "makeReceiptKey", "outbound_file": "src/transport/invoices.js", "outbound_symbol": "sendInvoice", "call_chain": ["checkout", "submitInvoice", "makeReceiptKey", "sendInvoice"], "example_key": "invoice/acme/0007"});
+const load=async file => import(pathToFileURL(path.join(root,file)).href);
+const {checkout}=await load('src/app.js'); let sent; await checkout({accountId:'acme',sequence:7},{post:(...args)=>{sent=args;}}); assert.equal(sent[2]['Idempotency-Key'],answer.example_key);
+console.log(JSON.stringify({status:'passed'}));

@@ -1,0 +1,1462 @@
+from __future__ import annotations
+
+import re
+from collections.abc import Sequence
+from dataclasses import dataclass, replace
+from pathlib import PurePosixPath
+from typing import Any, Literal, Mapping, TypeAlias, cast
+
+from loci.parser.imports import ImportUnresolvedReason, RawImport
+from loci.parser.reference_models import ImportBinding
+from loci.parser.symbols import Symbol
+
+from ._rust_import_schema import (
+    rust_context_from_dict,
+    rust_context_to_dict,
+    validate_raw_rust_context,
+)
+from ._rust_resolution import (
+    RustImportResolverIndex,
+    build_rust_import_resolver_index,
+    resolve_rust_import as _resolve_rust_import,
+)
+from .contracts import (
+    GraphContractError,
+    GraphEdge,
+    GraphEvidence,
+    JSONValue,
+)
+from .go_modules import (
+    GoModule,
+    GoPackageBinding,
+    GoPackageIndex,
+    _valid_go_identifier,
+)
+from .swift_modules import SwiftModuleIndex
+from .javascript_modules import (
+    JavaScriptResolutionBasis,
+    JavaScriptResolutionIndex,
+    JavaScriptModuleContext,
+    build_javascript_resolution_index,
+    resolve_javascript_import,
+)
+from .rust_crates import (
+    RustCrate,
+    RustCrateIndex,
+    RustResolutionBasis,
+    RustResolutionConfiguration,
+)
+
+
+ImportStatus: TypeAlias = Literal["resolved", "unresolved"]
+ImportTargetKind: TypeAlias = Literal["file", "package", "crate", "module"]
+ImportResolutionBasis: TypeAlias = (
+    JavaScriptResolutionBasis | RustResolutionBasis
+)
+_IMPORT_STATUSES = frozenset({"resolved", "unresolved"})
+_IMPORT_TARGET_KINDS = frozenset({"file", "package", "crate", "module"})
+_UNRESOLVED_REASONS = frozenset({
+    "external",
+    "not_indexed",
+    "ambiguous",
+    "unsupported_language",
+    "invalid_specifier",
+    "inaccessible",
+    "unsupported_configuration",
+})
+_RAW_IMPORT_FIELDS = {
+    "source_file",
+    "language",
+    "line",
+    "text",
+    "specifier",
+    "imported_name",
+    "type_only",
+    "is_reexport",
+    "source_hash",
+    "rust",
+}
+_STATE_RAW_IMPORT_FIELDS = _RAW_IMPORT_FIELDS | {"bindings"}
+_IMPORT_RECORD_FIELDS = {
+    "raw",
+    "source_id",
+    "target_file",
+    "target_package",
+    "target_crate",
+    "target_module",
+    "target_kind",
+    "target_id",
+    "status",
+    "unresolved_reason",
+    "resolution_basis",
+    "resolution_control_files",
+    "resolution_configuration",
+}
+_SHA256_RE = re.compile(r"[0-9a-f]{64}")
+_JAVASCRIPT_LANGUAGES = frozenset({"javascript", "typescript"})
+_JAVASCRIPT_RESOLUTION_BASES = frozenset({
+    "relative_path",
+    "compiler_paths",
+    "compiler_base_url",
+    "compiler_root_dirs",
+    "package_imports",
+    "package_self_reference",
+    "workspace_exports",
+    "workspace_legacy_entry",
+})
+_RUST_RESOLUTION_BASES = frozenset({
+    "rust_module_declaration",
+    "rust_module_path",
+    "cargo_path_dependency",
+    "cargo_workspace_dependency",
+    "cargo_package_library",
+})
+_RUST_RESOLUTION_CONFIGURATIONS = frozenset({
+    "unconditional",
+    "declared_possible",
+})
+
+
+@dataclass(frozen=True, slots=True)
+class ImportRecord:
+    raw: RawImport
+    source_id: str
+    target_file: str | None
+    target_package: str | None
+    target_crate: str | None
+    target_module: str | None
+    target_kind: ImportTargetKind | None
+    target_id: str | None
+    status: ImportStatus
+    unresolved_reason: ImportUnresolvedReason | None
+    resolution_basis: ImportResolutionBasis | None = None
+    resolution_control_files: tuple[str, ...] = ()
+    resolution_configuration: RustResolutionConfiguration | None = None
+
+    def __post_init__(self) -> None:
+        _validate_raw_import(self.raw)
+        _nonempty_string(self.source_id, "source_id")
+        if self.target_file is not None:
+            _relative_path(self.target_file, "target_file")
+        if self.target_package is not None:
+            _nonempty_string(self.target_package, "target_package")
+        if self.target_module is not None:
+            _nonempty_string(self.target_module, "target_module")
+        if self.target_crate is not None:
+            _nonempty_string(self.target_crate, "target_crate")
+        if (
+            self.target_kind is not None
+            and (
+                not isinstance(self.target_kind, str)
+                or self.target_kind not in _IMPORT_TARGET_KINDS
+            )
+        ):
+            raise _error("Invalid import target kind", field="target_kind")
+        if self.target_id is not None:
+            _nonempty_string(self.target_id, "target_id")
+        if not isinstance(self.status, str) or self.status not in _IMPORT_STATUSES:
+            raise _error("Invalid import status", field="status")
+        if (
+            self.unresolved_reason is not None
+            and (
+                not isinstance(self.unresolved_reason, str)
+                or self.unresolved_reason not in _UNRESOLVED_REASONS
+            )
+        ):
+            raise _error(
+                "Invalid import unresolved reason",
+                field="unresolved_reason",
+            )
+        if self.resolution_basis is not None:
+            if (
+                not isinstance(self.resolution_basis, str)
+                or self.resolution_basis
+                not in _JAVASCRIPT_RESOLUTION_BASES | _RUST_RESOLUTION_BASES
+            ):
+                raise _error(
+                    "Invalid import resolution basis",
+                    field="resolution_basis",
+                )
+        _validate_resolution_controls(self.resolution_control_files)
+        is_javascript = self.raw.language in _JAVASCRIPT_LANGUAGES
+        is_rust = self.raw.language == "rust"
+        if self.resolution_configuration is not None and (
+            not isinstance(self.resolution_configuration, str)
+            or self.resolution_configuration not in _RUST_RESOLUTION_CONFIGURATIONS
+        ):
+            raise _error(
+                "Invalid Rust resolution configuration",
+                field="resolution_configuration",
+            )
+        if is_javascript and self.resolution_basis in _RUST_RESOLUTION_BASES:
+            raise _error("Invalid JavaScript resolution basis")
+        if is_rust and self.resolution_basis in _JAVASCRIPT_RESOLUTION_BASES:
+            raise _error("Invalid Rust resolution basis")
+        if not (is_javascript or is_rust) and (
+            self.resolution_basis is not None or self.resolution_control_files
+        ):
+            raise _error("Only JavaScript and Rust imports may carry provenance")
+        if not is_rust and self.resolution_configuration is not None:
+            raise _error("Only Rust imports may carry resolution configuration")
+        if self.status == "resolved":
+            if self.target_kind is None:
+                raise _error("Resolved import requires a target kind")
+            if self.target_kind == "file":
+                if self.target_file is None or self.target_id is None:
+                    raise _error("Resolved file import requires a target file and ID")
+                if self.target_package is not None:
+                    raise _error("Resolved file import cannot have a target package")
+                if self.target_crate is not None:
+                    raise _error("Resolved file import cannot have a target crate")
+                if self.target_module is not None:
+                    raise _error("Resolved file import cannot have a target module")
+                if self.raw.language == "go":
+                    raise _error("Go imports must target packages")
+            elif self.target_kind == "package":
+                if self.target_file is not None:
+                    raise _error("Resolved package import cannot have a target file")
+                if self.target_crate is not None:
+                    raise _error("Resolved package import cannot have a target crate")
+                if self.target_module is not None:
+                    raise _error("Resolved package import cannot have a target module")
+                if self.target_package is None or self.target_id is None:
+                    raise _error(
+                        "Resolved package import requires a target package and ID"
+                    )
+                if self.raw.language != "go":
+                    raise _error("Only Go imports may target packages")
+            elif self.target_kind == "module":
+                if (
+                    self.target_file is not None
+                    or self.target_package is not None
+                    or self.target_crate is not None
+                ):
+                    raise _error(
+                        "Resolved module import cannot have a file, package "
+                        "or crate target"
+                    )
+                if self.target_module is None or self.target_id is None:
+                    raise _error(
+                        "Resolved module import requires a target module and ID"
+                    )
+                if self.raw.language != "swift":
+                    raise _error("Only Swift imports may target modules")
+            else:
+                if (
+                    self.target_file is not None
+                    or self.target_package is not None
+                    or self.target_module is not None
+                ):
+                    raise _error(
+                        "Resolved crate import cannot have a file or package target"
+                    )
+                if self.target_crate is None or self.target_id is None:
+                    raise _error(
+                        "Resolved crate import requires a target crate and ID"
+                    )
+                if not is_rust:
+                    raise _error("Only Rust imports may target crates")
+                if self.target_id != f"{self.target_crate}#crate":
+                    raise _error(
+                        "Resolved crate import target identity is inconsistent",
+                        field="target_id",
+                    )
+            if self.unresolved_reason is not None:
+                raise _error("Resolved import cannot have an unresolved reason")
+            if is_javascript and self.resolution_basis is None:
+                raise _error("Resolved JavaScript import requires a resolution basis")
+            if is_rust:
+                if self.resolution_basis is None:
+                    raise _error("Resolved Rust import requires a resolution basis")
+                if self.resolution_configuration is None:
+                    raise _error(
+                        "Resolved Rust import requires resolution configuration"
+                    )
+        else:
+            if any((
+                self.target_file is not None,
+                self.target_package is not None,
+                self.target_crate is not None,
+                self.target_module is not None,
+                self.target_kind is not None,
+                self.target_id is not None,
+            )):
+                raise _error("Unresolved import cannot have a target")
+            if self.unresolved_reason is None:
+                raise _error("Unresolved import requires an unresolved reason")
+            if self.resolution_basis is not None:
+                raise _error("Unresolved import cannot have a resolution basis")
+            if self.resolution_configuration is not None:
+                raise _error(
+                    "Unresolved import cannot have resolution configuration"
+                )
+            if is_rust and self.resolution_control_files:
+                raise _error("Unresolved Rust import cannot have control files")
+
+    def to_dict(self) -> dict[str, JSONValue]:
+        return {
+            "raw": _raw_import_to_dict(self.raw),
+            "source_id": self.source_id,
+            "target_file": self.target_file,
+            "target_package": self.target_package,
+            "target_crate": self.target_crate,
+            "target_module": self.target_module,
+            "target_kind": self.target_kind,
+            "target_id": self.target_id,
+            "status": self.status,
+            "unresolved_reason": self.unresolved_reason,
+            "resolution_basis": self.resolution_basis,
+            "resolution_control_files": list(self.resolution_control_files),
+            "resolution_configuration": self.resolution_configuration,
+        }
+
+    @classmethod
+    def from_dict(cls, value: Mapping[str, Any]) -> ImportRecord:
+        _require_keys(value, _IMPORT_RECORD_FIELDS, "import record")
+        raw_value = value["raw"]
+        if not isinstance(raw_value, Mapping):
+            raise _error("Import raw observation must be an object", field="raw")
+        target_file = _optional_relative_path(value["target_file"], "target_file")
+        target_package = _optional_nonempty_string(
+            value["target_package"],
+            "target_package",
+        )
+        target_crate = _optional_nonempty_string(
+            value["target_crate"],
+            "target_crate",
+        )
+        target_module = _optional_nonempty_string(
+            value["target_module"],
+            "target_module",
+        )
+        target_kind = value["target_kind"]
+        if target_kind is not None and (
+            not isinstance(target_kind, str)
+            or target_kind not in _IMPORT_TARGET_KINDS
+        ):
+            raise _error("Invalid import target kind", field="target_kind")
+        target_id = _optional_nonempty_string(value["target_id"], "target_id")
+        status = value["status"]
+        if not isinstance(status, str) or status not in _IMPORT_STATUSES:
+            raise _error("Invalid import status", field="status")
+        unresolved_reason = value["unresolved_reason"]
+        if unresolved_reason is not None and (
+            not isinstance(unresolved_reason, str)
+            or unresolved_reason not in _UNRESOLVED_REASONS
+        ):
+            raise _error(
+                "Invalid import unresolved reason",
+                field="unresolved_reason",
+            )
+        resolution_basis = value["resolution_basis"]
+        if resolution_basis is not None and (
+            not isinstance(resolution_basis, str)
+            or resolution_basis
+            not in _JAVASCRIPT_RESOLUTION_BASES | _RUST_RESOLUTION_BASES
+        ):
+            raise _error(
+                "Invalid import resolution basis",
+                field="resolution_basis",
+            )
+        resolution_control_files = _resolution_controls(
+            value["resolution_control_files"]
+        )
+        resolution_configuration = value["resolution_configuration"]
+        if resolution_configuration is not None and (
+            not isinstance(resolution_configuration, str)
+            or resolution_configuration not in _RUST_RESOLUTION_CONFIGURATIONS
+        ):
+            raise _error(
+                "Invalid Rust resolution configuration",
+                field="resolution_configuration",
+            )
+        return cls(
+            raw=_raw_import_from_dict(raw_value),
+            source_id=_nonempty_string(value["source_id"], "source_id"),
+            target_file=target_file,
+            target_package=target_package,
+            target_crate=target_crate,
+            target_module=target_module,
+            target_kind=cast(ImportTargetKind | None, target_kind),
+            target_id=target_id,
+            status=cast(ImportStatus, status),
+            unresolved_reason=cast(ImportUnresolvedReason | None, unresolved_reason),
+            resolution_basis=cast(
+                ImportResolutionBasis | None,
+                resolution_basis,
+            ),
+            resolution_control_files=resolution_control_files,
+            resolution_configuration=cast(
+                RustResolutionConfiguration | None,
+                resolution_configuration,
+            ),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class _GoResolverIndex:
+    packages: GoPackageIndex
+    modules_by_root: Mapping[str, tuple[GoModule, ...]]
+    modules_by_path: Mapping[str, tuple[GoModule, ...]]
+    bindings_by_source_module: Mapping[
+        str,
+        Mapping[str, tuple[GoPackageBinding, ...]],
+    ]
+
+
+def resolve_import(
+    raw: RawImport,
+    *,
+    file_nodes: Mapping[str, Symbol],
+    go_packages: GoPackageIndex | None = None,
+    javascript_modules: JavaScriptResolutionIndex | None = None,
+    rust_crates: RustCrateIndex | None = None,
+    swift_modules: SwiftModuleIndex | None = None,
+) -> ImportRecord:
+    """Resolve one raw import against deterministic indexed graph targets."""
+    if _is_inline_rust_module(raw):
+        raise _error(
+            "inline Rust module observations are metadata, not imports",
+            source_file=raw.source_file,
+        )
+    return resolve_imports(
+        (raw,),
+        file_nodes=file_nodes,
+        go_packages=go_packages,
+        javascript_modules=javascript_modules,
+        rust_crates=rust_crates,
+        swift_modules=swift_modules,
+    )[0]
+
+
+def resolve_imports(
+    raw_imports: Sequence[RawImport],
+    *,
+    file_nodes: Mapping[str, Symbol],
+    go_packages: GoPackageIndex | None = None,
+    javascript_modules: JavaScriptResolutionIndex | None = None,
+    rust_crates: RustCrateIndex | None = None,
+    swift_modules: SwiftModuleIndex | None = None,
+) -> list[ImportRecord]:
+    """Resolve a batch while deriving indexed language layouts only once."""
+    indexed_python_files = _indexed_python_files(file_nodes)
+    python_package_roots = _python_package_roots(indexed_python_files)
+    javascript_resolver = javascript_modules or build_javascript_resolution_index(
+        JavaScriptModuleContext((), (), ()),
+        file_nodes=file_nodes,
+    ).index
+    go_resolver = (
+        _build_go_resolver_index(go_packages)
+        if go_packages is not None
+        else None
+    )
+    rust_resolver = (
+        build_rust_import_resolver_index(rust_crates)
+        if rust_crates is not None
+        else None
+    )
+    return [
+        _resolve_import(
+            raw,
+            file_nodes=file_nodes,
+            indexed_python_files=indexed_python_files,
+            python_package_roots=python_package_roots,
+            javascript_modules=javascript_resolver,
+            go_resolver=go_resolver,
+            rust_crates=rust_crates,
+            rust_resolver=rust_resolver,
+            swift_modules=swift_modules,
+        )
+        for raw in raw_imports
+        if not _is_inline_rust_module(raw)
+    ]
+
+
+def _is_inline_rust_module(raw: RawImport) -> bool:
+    return (
+        raw.language == "rust"
+        and raw.rust is not None
+        and raw.rust.kind == "module"
+        and raw.rust.inline
+    )
+
+
+def _resolve_import(
+    raw: RawImport,
+    *,
+    file_nodes: Mapping[str, Symbol],
+    indexed_python_files: frozenset[str],
+    python_package_roots: tuple[PurePosixPath, ...],
+    javascript_modules: JavaScriptResolutionIndex,
+    go_resolver: _GoResolverIndex | None,
+    rust_crates: RustCrateIndex | None,
+    rust_resolver: RustImportResolverIndex | None,
+    swift_modules: SwiftModuleIndex | None,
+) -> ImportRecord:
+    _validate_raw_import(raw)
+    source = _require_file_node(file_nodes, raw.source_file, field="source_file")
+    if raw.language == "python":
+        target_file, unresolved_reason = _resolve_python_target(
+            raw,
+            indexed_python_files,
+            python_package_roots,
+        )
+    elif raw.language in _JAVASCRIPT_LANGUAGES:
+        resolution = resolve_javascript_import(raw, javascript_modules)
+        if resolution.target_file is None:
+            assert resolution.unresolved_reason is not None
+            return _unresolved(
+                raw,
+                source.id,
+                resolution.unresolved_reason,
+                resolution_control_files=resolution.control_files,
+            )
+        target = _require_file_node(
+            file_nodes,
+            resolution.target_file,
+            field="target_file",
+        )
+        return ImportRecord(
+            raw=raw,
+            source_id=source.id,
+            target_file=resolution.target_file,
+            target_package=None,
+            target_crate=None,
+            target_module=None,
+            target_kind="file",
+            target_id=target.id,
+            status="resolved",
+            unresolved_reason=None,
+            resolution_basis=resolution.basis,
+            resolution_control_files=resolution.control_files,
+        )
+    elif raw.language == "go":
+        if go_resolver is None:
+            return _unresolved(raw, source.id, "unsupported_language")
+        target_package, unresolved_reason = _resolve_go_target(
+            raw,
+            go_resolver,
+        )
+        if target_package is None:
+            return _unresolved(raw, source.id, unresolved_reason)
+        return ImportRecord(
+            raw=raw,
+            source_id=source.id,
+            target_file=None,
+            target_package=target_package.qualified_name,
+            target_crate=None,
+            target_module=None,
+            target_kind="package",
+            target_id=target_package.id,
+            status="resolved",
+            unresolved_reason=None,
+        )
+    elif raw.language == "rust":
+        if rust_crates is None:
+            return _unresolved(raw, source.id, "unsupported_language")
+        assert rust_resolver is not None
+        resolution = _resolve_rust_import(
+            raw,
+            index=rust_crates,
+            resolver_index=rust_resolver,
+        )
+        if resolution.unresolved_reason is not None:
+            return _unresolved(raw, source.id, resolution.unresolved_reason)
+        assert resolution.basis is not None
+        assert resolution.configuration is not None
+        if resolution.target_file is not None:
+            target = _require_file_node(
+                file_nodes,
+                resolution.target_file,
+                field="target_file",
+            )
+            if target.id != resolution.target_id:
+                raise _error(
+                    "Rust file resolution target ID does not match indexed file",
+                    field="target_id",
+                )
+            target_kind: ImportTargetKind = "file"
+        else:
+            target_kind = "crate"
+        return ImportRecord(
+            raw=raw,
+            source_id=source.id,
+            target_file=resolution.target_file,
+            target_package=None,
+            target_crate=resolution.target_crate,
+            target_module=None,
+            target_kind=target_kind,
+            target_id=resolution.target_id,
+            status="resolved",
+            unresolved_reason=None,
+            resolution_basis=resolution.basis,
+            resolution_control_files=resolution.control_files,
+            resolution_configuration=resolution.configuration,
+        )
+    elif raw.language == "swift":
+        if swift_modules is None:
+            return _unresolved(raw, source.id, "external")
+        target_module, unresolved_reason = _resolve_swift_target(raw, swift_modules)
+        if target_module is None:
+            assert unresolved_reason is not None
+            return _unresolved(raw, source.id, unresolved_reason)
+        return ImportRecord(
+            raw=raw,
+            source_id=source.id,
+            target_file=None,
+            target_package=None,
+            target_crate=None,
+            target_module=target_module.name,
+            target_kind="module",
+            target_id=target_module.id,
+            status="resolved",
+            unresolved_reason=None,
+        )
+    else:
+        return _unresolved(raw, source.id, "unsupported_language")
+    if target_file is None:
+        return _unresolved(raw, source.id, unresolved_reason)
+
+    target = _require_file_node(file_nodes, target_file, field="target_file")
+    return ImportRecord(
+        raw=raw,
+        source_id=source.id,
+        target_file=target_file,
+        target_package=None,
+        target_crate=None,
+        target_module=None,
+        target_kind="file",
+        target_id=target.id,
+        status="resolved",
+        unresolved_reason=None,
+    )
+
+
+def materialize_import_edges(
+    records: Sequence[ImportRecord],
+    *,
+    file_nodes: Mapping[str, Symbol],
+    go_packages: GoPackageIndex | None = None,
+    rust_crates: RustCrateIndex | None = None,
+    swift_modules: SwiftModuleIndex | None = None,
+) -> list[GraphEdge]:
+    """Build one deterministic evidence-backed edge per resolved dependency."""
+    edges: dict[tuple[str, str, str, str], GraphEdge] = {}
+    evidence_ranks: dict[tuple[str, str, str, str], tuple[int, str, str, str]] = {}
+    package_nodes = {
+        node.id: node
+        for node in (go_packages.package_nodes if go_packages is not None else ())
+    }
+    crate_nodes = {
+        node.id: node
+        for node in (rust_crates.crate_nodes if rust_crates is not None else ())
+    }
+    module_nodes = {
+        node.id: node
+        for node in (swift_modules.module_nodes if swift_modules is not None else ())
+    }
+
+    for record in records:
+        source = _require_file_node(
+            file_nodes,
+            record.raw.source_file,
+            field="source_file",
+        )
+        if source.id != record.source_id:
+            raise _error(
+                "Import record source does not match its file node",
+                field="source_id",
+                source_id=record.source_id,
+            )
+        if record.status != "resolved":
+            continue
+        if record.target_id is None:
+            raise _error("Resolved import requires a target ID")
+        if record.target_kind == "file":
+            if record.target_file is None:
+                raise _error("Resolved file import requires a target file")
+            target = _require_file_node(
+                file_nodes,
+                record.target_file,
+                field="target_file",
+            )
+            if target.id != record.target_id:
+                raise _error(
+                    "Import record target does not match its file node",
+                    field="target_id",
+                    target_id=record.target_id,
+                )
+        elif record.target_kind == "package":
+            if record.raw.type_only:
+                raise _error(
+                    "Go package imports cannot be type-only",
+                    field="target_id",
+                    target_id=record.target_id,
+                )
+            if record.target_package is None:
+                raise _error("Resolved package import requires a target package")
+            target = package_nodes.get(record.target_id)
+            if target is None:
+                raise _error(
+                    "Import record target is not present in the Go package index",
+                    field="target_id",
+                    target_id=record.target_id,
+                )
+            _validate_go_package_target(target, record.target_package)
+        elif record.target_kind == "module":
+            if record.target_module is None:
+                raise _error("Resolved module import requires a target module")
+            target = module_nodes.get(record.target_id)
+            if target is None:
+                raise _error(
+                    "Import record target is not present in the Swift module index",
+                    field="target_id",
+                    target_id=record.target_id,
+                )
+            _validate_swift_module_target(target, record.target_module)
+        elif record.target_kind == "crate":
+            if record.raw.type_only:
+                raise _error(
+                    "Rust crate imports cannot be type-only",
+                    field="target_id",
+                    target_id=record.target_id,
+                )
+            if record.target_crate is None:
+                raise _error("Resolved crate import requires a target crate")
+            target = crate_nodes.get(record.target_id)
+            crate = (
+                rust_crates.crates_by_id.get(record.target_id)
+                if rust_crates is not None
+                else None
+            )
+            if target is None or crate is None:
+                raise _error(
+                    "Import record target is not present in the Rust crate index",
+                    field="target_id",
+                    target_id=record.target_id,
+                )
+            root = _require_file_node(
+                file_nodes,
+                crate.target.root_file,
+                field="target_file",
+            )
+            _validate_rust_crate_target(
+                target,
+                crate,
+                target_crate=record.target_crate,
+                target_module=None,
+                root=root,
+            )
+            if record.raw.source_file == crate.target.root_file:
+                continue
+        else:
+            raise _error("Resolved import requires a supported target kind")
+        if source.id == target.id:
+            continue
+
+        edge_type = "imports_type" if record.raw.type_only else "imports"
+        edge = GraphEdge(
+            from_id=source.id,
+            to_id=target.id,
+            type=edge_type,
+            directed=True,
+            namespace="loci",
+            resolution="import-resolved",
+            evidence=GraphEvidence(
+                file=record.raw.source_file,
+                line=record.raw.line,
+                content_hash=record.raw.source_hash,
+            ),
+        )
+        key = (edge.namespace, edge.type, edge.from_id, edge.to_id)
+        rank = (
+            record.raw.line,
+            record.raw.text,
+            record.raw.specifier,
+            record.raw.imported_name or "",
+        )
+        if key not in evidence_ranks or rank < evidence_ranks[key]:
+            edges[key] = edge
+            evidence_ranks[key] = rank
+
+    return [edges[key] for key in sorted(edges)]
+
+
+def _resolve_python_target(
+    raw: RawImport,
+    indexed_files: frozenset[str],
+    package_roots: tuple[PurePosixPath, ...],
+) -> tuple[str | None, ImportUnresolvedReason]:
+    imported_name = raw.imported_name
+    if imported_name is not None and not imported_name.isidentifier():
+        return None, "invalid_specifier"
+
+    specifier = raw.specifier
+    if specifier.startswith("."):
+        base = _relative_python_base(raw.source_file, specifier)
+        if base is None:
+            return None, "invalid_specifier"
+        bases = (base,)
+    else:
+        parts = _dotted_parts(specifier)
+        if parts is None:
+            return None, "invalid_specifier"
+        bases = tuple(
+            root.joinpath(*parts)
+            for root in package_roots
+        )
+
+    targets = {
+        target
+        for base in bases
+        if (target := _resolve_python_base(base, imported_name, indexed_files))
+        is not None
+    }
+    if not targets:
+        return None, "not_indexed"
+    if len(targets) > 1:
+        return None, "ambiguous"
+    return targets.pop(), "not_indexed"
+
+
+def _indexed_python_files(file_nodes: Mapping[str, Symbol]) -> frozenset[str]:
+    return frozenset(
+        path
+        for path, node in file_nodes.items()
+        if (
+            path == node.file_path
+            and node.kind == "file"
+            and node.language == "python"
+            and path.endswith(".py")
+        )
+    )
+
+
+def _resolve_go_target(
+    raw: RawImport,
+    resolver: _GoResolverIndex,
+) -> tuple[Symbol | None, ImportUnresolvedReason]:
+    specifier = raw.specifier
+    if not _valid_go_import_specifier(specifier):
+        return None, "invalid_specifier"
+    if specifier == "C":
+        return None, "external"
+
+    source_module = _go_source_module(raw.source_file, resolver.modules_by_root)
+    if source_module is None:
+        return None, "external"
+    # Go package paths are a module prefix joined with the package subdirectory.
+    # Source: https://go.dev/ref/mod
+    bindings_by_prefix = resolver.bindings_by_source_module.get(
+        source_module.root,
+        {},
+    )
+    longest = next(
+        (
+            bindings_by_prefix[prefix]
+            for prefix in _go_import_prefixes(specifier)
+            if prefix in bindings_by_prefix
+        ),
+        (),
+    )
+    if not longest:
+        return None, "external"
+
+    if _more_specific_go_module_is_ineligible(
+        specifier,
+        longest,
+        resolver.modules_by_path,
+    ):
+        return None, "external"
+    candidates = tuple(
+        (
+            binding,
+            _go_binding_directory(binding, specifier),
+            resolver.packages.packages_by_binding.get(
+                (binding.module_root, specifier)
+            ),
+        )
+        for binding in longest
+    )
+    if len({directory for _, directory, _ in candidates}) > 1:
+        return None, "ambiguous"
+    target_ids = {target.id for _, _, target in candidates if target is not None}
+    if len(target_ids) > 1:
+        return None, "ambiguous"
+
+    binding, _, target = candidates[0]
+    key = (binding.module_root, specifier)
+    if key in resolver.packages.command_packages:
+        return None, "inaccessible"
+    if target is None:
+        return None, "not_indexed"
+    _validate_go_package_target(target, specifier)
+    if not _go_internal_import_allowed(raw.source_file, source_module, specifier):
+        return None, "inaccessible"
+    return target, "not_indexed"
+
+
+def _valid_go_import_specifier(specifier: str) -> bool:
+    if (
+        not specifier
+        or "\\" in specifier
+        or specifier.startswith(("./", "../"))
+        or any(
+            ord(character) < 32 or ord(character) == 127
+            for character in specifier
+        )
+    ):
+        return False
+    path = PurePosixPath(specifier)
+    parts = specifier.split("/")
+    return (
+        not path.is_absolute()
+        and path.as_posix() == specifier
+        and all(part not in {"", ".", ".."} for part in parts)
+    )
+
+
+def _go_source_module(
+    source_file: str,
+    modules_by_root: Mapping[str, tuple[GoModule, ...]],
+) -> GoModule | None:
+    directory = PurePosixPath(source_file).parent.as_posix()
+    while True:
+        owners = modules_by_root.get(directory, ())
+        if owners:
+            if len({module.module_path for module in owners}) != 1:
+                return None
+            return min(owners, key=lambda module: module.source)
+        if directory == ".":
+            return None
+        directory = PurePosixPath(directory).parent.as_posix()
+
+
+def _more_specific_go_module_is_ineligible(
+    specifier: str,
+    eligible_bindings: Sequence[GoPackageBinding],
+    modules_by_path: Mapping[str, tuple[GoModule, ...]],
+) -> bool:
+    eligible_prefix_length = len(eligible_bindings[0].import_prefix)
+    for prefix in _go_import_prefixes(specifier):
+        if len(prefix) <= eligible_prefix_length:
+            return False
+        for module in modules_by_path.get(prefix, ()):
+            for binding in eligible_bindings:
+                relative = _relative_directory(module.root, binding.module_root)
+                if relative not in {None, ""}:
+                    return True
+    return False
+
+
+def _go_binding_directory(binding: GoPackageBinding, specifier: str) -> str:
+    suffix = specifier[len(binding.import_prefix):].removeprefix("/")
+    if not suffix:
+        return binding.module_root
+    return (PurePosixPath(binding.module_root) / suffix).as_posix()
+
+
+def _go_import_prefixes(specifier: str) -> tuple[str, ...]:
+    parts = specifier.split("/")
+    return tuple(
+        "/".join(parts[:end])
+        for end in range(len(parts), 0, -1)
+    )
+
+
+def _build_go_resolver_index(go_packages: GoPackageIndex) -> _GoResolverIndex:
+    modules_by_root: dict[str, list[GoModule]] = {}
+    modules_by_path: dict[str, list[GoModule]] = {}
+    for module in go_packages.modules:
+        modules_by_root.setdefault(module.root, []).append(module)
+        modules_by_path.setdefault(module.module_path, []).append(module)
+
+    bindings_by_source: dict[
+        str,
+        dict[str, tuple[GoPackageBinding, ...]],
+    ] = {}
+    for source_root, bindings in go_packages.bindings_by_source_module.items():
+        grouped: dict[str, list[GoPackageBinding]] = {}
+        for binding in bindings:
+            grouped.setdefault(binding.import_prefix, []).append(binding)
+        bindings_by_source[source_root] = {
+            prefix: tuple(matches)
+            for prefix, matches in grouped.items()
+        }
+
+    return _GoResolverIndex(
+        packages=go_packages,
+        modules_by_root={
+            root: tuple(modules)
+            for root, modules in modules_by_root.items()
+        },
+        modules_by_path={
+            path: tuple(modules)
+            for path, modules in modules_by_path.items()
+        },
+        bindings_by_source_module=bindings_by_source,
+    )
+
+
+def _go_internal_import_allowed(
+    source_file: str,
+    source_module: GoModule,
+    target_import_path: str,
+) -> bool:
+    target_parts = target_import_path.split("/")
+    internal_positions = [
+        index for index, part in enumerate(target_parts) if part == "internal"
+    ]
+    if not internal_positions:
+        return True
+
+    # Go limits internal packages to importers beneath the parent import path.
+    # Source: https://go.dev/cmd/go/#hdr-Internal_Directories
+    parent_prefix = "/".join(target_parts[:internal_positions[-1]])
+    importer_directory = PurePosixPath(source_file).parent.as_posix()
+    relative = _relative_directory(importer_directory, source_module.root)
+    if relative is None:
+        return False
+    importer_path = source_module.module_path
+    if relative:
+        importer_path = f"{importer_path}/{relative}"
+    return (
+        not parent_prefix
+        or importer_path == parent_prefix
+        or importer_path.startswith(f"{parent_prefix}/")
+    )
+
+
+def _resolve_swift_target(
+    raw: RawImport,
+    swift_modules: SwiftModuleIndex,
+) -> tuple[Symbol | None, ImportUnresolvedReason | None]:
+    """Join a Swift import to a declared package target.
+
+    A declaration import — ``import struct Foundation.Data`` — still names its
+    module first, so the leading dotted component is the module either way.
+    Anything not declared by a manifest in this repository is a system
+    framework or an external package, which is ``external``, not a failure.
+    """
+    module_name = raw.specifier.split(".", 1)[0]
+    if not module_name:
+        return None, "unresolved_specifier"
+    target = swift_modules.modules_by_name.get(module_name)
+    if target is None:
+        return None, "external"
+    return target, None
+
+
+def _validate_swift_module_target(target: Symbol, target_module: str) -> None:
+    metadata = target.metadata.get("loci") if isinstance(target.metadata, dict) else None
+    if (
+        target.kind != "module"
+        or target.language != "swift"
+        or target.name != target_module
+        or not isinstance(metadata, dict)
+        or metadata.get("swift_module_node") is not True
+    ):
+        raise _error(
+            "Swift module target node is inconsistent",
+            field="target_id",
+            target_id=target.id,
+        )
+
+
+def _validate_go_package_target(target: Symbol, import_path: str) -> None:
+    loci = target.metadata.get("loci")
+    package_name = loci.get("package_name") if isinstance(loci, Mapping) else None
+    if (
+        target.kind != "package"
+        or target.language != "go"
+        or target.qualified_name != import_path
+        or not isinstance(loci, Mapping)
+        or loci.get("go_package_node") is not True
+        or loci.get("import_path") != import_path
+        or not isinstance(package_name, str)
+        or target.name != package_name
+        or package_name == "main"
+        or not _valid_go_identifier(package_name)
+    ):
+        raise _error(
+            "Go package index target is invalid",
+            field="target_id",
+            target_id=target.id,
+        )
+
+
+def _validate_rust_crate_target(
+    target: Symbol,
+    crate: RustCrate,
+    *,
+    target_crate: str,
+    target_module=None,
+    root: Symbol,
+) -> None:
+    loci = target.metadata.get("loci")
+    package_root = loci.get("package_root") if isinstance(loci, Mapping) else None
+    expected_package_root = PurePosixPath(crate.manifest).parent.as_posix()
+    valid_package_root = (
+        isinstance(package_root, str)
+        and bool(package_root)
+        and package_root == expected_package_root
+        and "\\" not in package_root
+        and not PurePosixPath(package_root).is_absolute()
+        and ".." not in PurePosixPath(package_root).parts
+        and PurePosixPath(package_root).as_posix() == package_root
+    )
+    if (
+        target.kind != "crate"
+        or target.language != "rust"
+        or target.id != crate.id
+        or target.id != f"{target_crate}#crate"
+        or target.name != crate.target.crate_name
+        or target.qualified_name != target_crate
+        or target.file_path != crate.target.root_file
+        or target.byte_offset != 0
+        or target.byte_length != 0
+        or target.signature != target_crate
+        or target.content_hash != root.content_hash
+        or target.line != 1
+        or target.end_line != 1
+        or not isinstance(loci, Mapping)
+        or loci.get("rust_crate_node") is not True
+        or loci.get("manifest") != crate.manifest
+        or loci.get("package_name") != crate.package_name
+        or not valid_package_root
+        or loci.get("target_kind") != crate.target.kind
+        or loci.get("target_name") != crate.target.target_name
+        or loci.get("crate_name") != crate.target.crate_name
+        or loci.get("crate_root") != crate.target.root_file
+        or loci.get("edition") != crate.target.edition
+        or loci.get("required_features") != list(crate.target.required_features)
+    ):
+        raise _error(
+            "Rust import target must be the matching indexed crate node",
+            field="target_id",
+            target_id=target.id,
+        )
+
+
+def _relative_directory(directory: str, root: str) -> str | None:
+    if root == ".":
+        return "" if directory == "." else directory
+    try:
+        relative = PurePosixPath(directory).relative_to(PurePosixPath(root))
+    except ValueError:
+        return None
+    return "" if relative == PurePosixPath(".") else relative.as_posix()
+
+
+def _python_package_roots(indexed_files: frozenset[str]) -> tuple[PurePosixPath, ...]:
+    package_dirs = {
+        PurePosixPath(path).parent
+        for path in indexed_files
+        if PurePosixPath(path).name == "__init__.py"
+    }
+    roots = {PurePosixPath(".")}
+    roots.update(
+        directory.parent
+        for directory in package_dirs
+        if directory.parent not in package_dirs
+    )
+    return tuple(sorted(roots, key=lambda path: path.as_posix()))
+
+
+def _relative_python_base(
+    source_file: str,
+    specifier: str,
+) -> PurePosixPath | None:
+    dot_count = len(specifier) - len(specifier.lstrip("."))
+    remainder = specifier[dot_count:]
+    parts = _dotted_parts(remainder, allow_empty=True)
+    if parts is None:
+        return None
+
+    base = PurePosixPath(source_file).parent
+    for _ in range(dot_count - 1):
+        if base == PurePosixPath("."):
+            return None
+        base = base.parent
+    return base.joinpath(*parts)
+
+
+def _dotted_parts(
+    value: str,
+    *,
+    allow_empty: bool = False,
+) -> tuple[str, ...] | None:
+    if not value:
+        return () if allow_empty else None
+    parts = tuple(value.split("."))
+    if any(not part or not part.isidentifier() for part in parts):
+        return None
+    return parts
+
+
+def _resolve_python_base(
+    base: PurePosixPath,
+    imported_name: str | None,
+    indexed_files: frozenset[str],
+) -> str | None:
+    if imported_name is not None:
+        submodule = _indexed_python_module(base / imported_name, indexed_files)
+        if submodule is not None:
+            return submodule
+    return _indexed_python_module(base, indexed_files)
+
+
+def _indexed_python_module(
+    base: PurePosixPath,
+    indexed_files: frozenset[str],
+) -> str | None:
+    candidates: list[str] = []
+    if base != PurePosixPath("."):
+        candidates.append(f"{base.as_posix()}.py")
+    candidates.append((base / "__init__.py").as_posix())
+    return next(
+        (candidate for candidate in candidates if candidate in indexed_files),
+        None,
+    )
+
+
+def _unresolved(
+    raw: RawImport,
+    source_id: str,
+    reason: ImportUnresolvedReason,
+    *,
+    resolution_control_files: tuple[str, ...] = (),
+) -> ImportRecord:
+    return ImportRecord(
+        raw=raw,
+        source_id=source_id,
+        target_file=None,
+        target_package=None,
+        target_crate=None,
+        target_module=None,
+        target_kind=None,
+        target_id=None,
+        status="unresolved",
+        unresolved_reason=reason,
+        resolution_control_files=resolution_control_files,
+    )
+
+
+def _resolution_controls(value: Any) -> tuple[str, ...]:
+    if not isinstance(value, list):
+        raise _error(
+            "JavaScript resolution control files must be an array",
+            field="resolution_control_files",
+        )
+    controls = tuple(
+        _relative_path(item, "resolution_control_files") for item in value
+    )
+    _validate_resolution_controls(controls)
+    return controls
+
+
+def _validate_resolution_controls(controls: tuple[str, ...]) -> None:
+    if not isinstance(controls, tuple):
+        raise _error(
+            "JavaScript resolution control files must be a tuple",
+            field="resolution_control_files",
+        )
+    for control in controls:
+        _relative_path(control, "resolution_control_files")
+    if controls != tuple(sorted(set(controls))):
+        raise _error(
+            "JavaScript resolution control files must be unique and sorted",
+            field="resolution_control_files",
+        )
+
+
+def _require_file_node(
+    file_nodes: Mapping[str, Symbol],
+    path: str,
+    *,
+    field: str,
+) -> Symbol:
+    node = file_nodes.get(path)
+    if node is None or node.kind != "file" or node.file_path != path:
+        raise _error(
+            "Import path does not identify an indexed file node",
+            field=field,
+            path=path,
+        )
+    return node
+
+
+def _raw_import_to_dict(raw: RawImport) -> dict[str, JSONValue]:
+    _validate_raw_import(raw)
+    return {
+        "source_file": raw.source_file,
+        "language": raw.language,
+        "line": raw.line,
+        "text": raw.text,
+        "specifier": raw.specifier,
+        "imported_name": raw.imported_name,
+        "type_only": raw.type_only,
+        "is_reexport": raw.is_reexport,
+        "source_hash": raw.source_hash,
+        "rust": rust_context_to_dict(raw.rust),
+    }
+
+
+def _raw_import_from_dict(value: Mapping[str, Any]) -> RawImport:
+    _require_keys(value, _RAW_IMPORT_FIELDS, "raw import")
+    imported_name = value["imported_name"]
+    if imported_name is not None:
+        imported_name = _nonempty_string(imported_name, "imported_name")
+    type_only = _boolean(value["type_only"], "type_only")
+    is_reexport = _boolean(value["is_reexport"], "is_reexport")
+    line = value["line"]
+    if isinstance(line, bool) or not isinstance(line, int) or line < 1:
+        raise _error("Import line must be a positive integer", field="line")
+    raw = RawImport(
+        source_file=_relative_path(value["source_file"], "source_file"),
+        language=_nonempty_string(value["language"], "language"),
+        line=line,
+        text=_nonempty_string(value["text"], "text"),
+        specifier=_string(value["specifier"], "specifier"),
+        imported_name=imported_name,
+        type_only=type_only,
+        is_reexport=is_reexport,
+        source_hash=_sha256(value["source_hash"], "source_hash"),
+        bindings=(),
+        rust=rust_context_from_dict(value["rust"]),
+    )
+    _validate_raw_import(raw)
+    return raw
+
+
+def _import_record_to_state_dict(record: ImportRecord) -> dict[str, JSONValue]:
+    payload = record.to_dict()
+    payload["raw"] = _raw_import_to_state_dict(record.raw)
+    return payload
+
+
+def _import_record_from_state_dict(value: Mapping[str, Any]) -> ImportRecord:
+    _require_keys(value, _IMPORT_RECORD_FIELDS, "import record")
+    raw_value = value["raw"]
+    if not isinstance(raw_value, Mapping):
+        raise _error("Import raw observation must be an object", field="raw")
+    raw = _raw_import_from_state_dict(raw_value)
+    public_value = dict(value)
+    public_value["raw"] = {
+        field: raw_value[field]
+        for field in _RAW_IMPORT_FIELDS
+    }
+    return replace(ImportRecord.from_dict(public_value), raw=raw)
+
+
+def _raw_import_to_state_dict(raw: RawImport) -> dict[str, JSONValue]:
+    payload = _raw_import_to_dict(raw)
+    rust = payload.pop("rust")
+    payload["bindings"] = [
+        cast(dict[str, JSONValue], binding.to_dict())
+        for binding in raw.bindings
+    ]
+    payload["rust"] = rust
+    return payload
+
+
+def _raw_import_from_state_dict(value: Mapping[str, Any]) -> RawImport:
+    _require_keys(value, _STATE_RAW_IMPORT_FIELDS, "raw import")
+    bindings_value = value["bindings"]
+    if not isinstance(bindings_value, list):
+        raise _error("Import bindings must be a list", field="bindings")
+    try:
+        bindings: list[ImportBinding] = []
+        for binding in bindings_value:
+            if not isinstance(binding, Mapping):
+                raise ValueError("bindings contains a non-object item")
+            bindings.append(ImportBinding.from_dict(binding))
+        public_value = {
+            field: value[field]
+            for field in _RAW_IMPORT_FIELDS
+        }
+        return replace(
+            _raw_import_from_dict(public_value),
+            bindings=tuple(bindings),
+        )
+    except GraphContractError:
+        raise
+    except (KeyError, TypeError, ValueError) as exc:
+        raise _error("Invalid import bindings", field="bindings") from exc
+
+
+def _validate_raw_import(raw: RawImport) -> None:
+    if not isinstance(raw, RawImport):
+        raise _error("Import raw observation must be a RawImport", field="raw")
+    _relative_path(raw.source_file, "source_file")
+    _nonempty_string(raw.language, "language")
+    if isinstance(raw.line, bool) or not isinstance(raw.line, int) or raw.line < 1:
+        raise _error("Import line must be a positive integer", field="line")
+    _nonempty_string(raw.text, "text")
+    _string(raw.specifier, "specifier")
+    if raw.imported_name is not None:
+        _nonempty_string(raw.imported_name, "imported_name")
+    _boolean(raw.type_only, "type_only")
+    _boolean(raw.is_reexport, "is_reexport")
+    _sha256(raw.source_hash, "source_hash")
+    validate_raw_rust_context(raw)
+
+
+def _require_keys(value: Mapping[str, Any], expected: set[str], record: str) -> None:
+    actual = set(value)
+    if actual != expected:
+        raise _error(
+            f"Invalid graph {record} fields",
+            record=record,
+            missing=sorted(expected - actual),
+            unknown=sorted(actual - expected),
+        )
+
+
+def _relative_path(value: Any, field: str) -> str:
+    if not isinstance(value, str) or not value or "\\" in value:
+        raise _error(f"Import {field} must be a relative path", field=field)
+    path = PurePosixPath(value)
+    if path.is_absolute() or ".." in path.parts or path.as_posix() != value:
+        raise _error(f"Import {field} must be a relative path", field=field)
+    return value
+
+
+def _optional_relative_path(value: Any, field: str) -> str | None:
+    return None if value is None else _relative_path(value, field)
+
+
+def _nonempty_string(value: Any, field: str) -> str:
+    if not isinstance(value, str) or not value:
+        raise _error(f"Import {field} must be a non-empty string", field=field)
+    return value
+
+
+def _optional_nonempty_string(value: Any, field: str) -> str | None:
+    return None if value is None else _nonempty_string(value, field)
+
+
+def _string(value: Any, field: str) -> str:
+    if not isinstance(value, str):
+        raise _error(f"Import {field} must be a string", field=field)
+    return value
+
+
+def _boolean(value: Any, field: str) -> bool:
+    if not isinstance(value, bool):
+        raise _error(f"Import {field} must be a boolean", field=field)
+    return value
+
+
+def _sha256(value: Any, field: str) -> str:
+    if not isinstance(value, str) or not _SHA256_RE.fullmatch(value):
+        raise _error(f"Import {field} must be a SHA-256 hash", field=field)
+    return value
+
+
+def _error(message: str, **details: Any) -> GraphContractError:
+    return GraphContractError(
+        "INVALID_GRAPH_SCHEMA",
+        message,
+        cast(dict[str, JSONValue], details),
+    )

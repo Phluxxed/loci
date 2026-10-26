@@ -1,0 +1,56 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/benchmarks/architecture_integrated.py", line 205, in <module>
+    main()
+    ~~~~^^
+  File "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/benchmarks/architecture_integrated.py", line 197, in main
+    result = run(args.output, args.corpus or [ROOT / "benchmarks/corpora/typescript-context-v3",
+        ROOT / "benchmarks/corpora/multilingual-context-v1"], cases=args.case, repetitions=args.repetitions)
+  File "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/benchmarks/architecture_integrated.py", line 127, in run
+    scores = acquisition_scores(corpus, snapshots, artifacts, report, demand=semantic,
+        focused=semantic, path_navigation=True, repeat=repeat)
+  File "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/benchmarks/architecture.py", line 678, in acquisition_scores
+    validate_packets(packets)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/benchmarks/architecture.py", line 52, in validate_packets
+    model.model_validate(payload)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/brummerv/phluxxed/loci/.venv/lib/python3.14/site-packages/pydantic/main.py", line 732, in model_validate
+    return cls.__pydantic_validator__.validate_python(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        obj,
+        ^^^^
+    ...<5 lines>...
+        by_name=by_name,
+        ^^^^^^^^^^^^^^^^
+    )
+    ^
+pydantic_core._pydantic_core.ValidationError: 9 validation errors for LociReadOutput
+function-after[_bounded_page(), LociReadSuccess].navigation
+  Extra inputs are not permitted [type=extra_forbidden, input_value={'candidates': [{'observe...'omitted_candidates': 0}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+LociErrorOutput.error
+  Field required [type=missing, input_value={'complete': False, 'navi...'mcp_result_json_utf8'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+LociErrorOutput.complete
+  Extra inputs are not permitted [type=extra_forbidden, input_value=False, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+LociErrorOutput.navigation
+  Extra inputs are not permitted [type=extra_forbidden, input_value={'candidates': [{'observe...'omitted_candidates': 0}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+LociErrorOutput.next_source_ref
+  Extra inputs are not permitted [type=extra_forbidden, input_value='eyJlbmQiOjI3NDY1LCJmaWxl...LCJzdGFydCI6MCwidiI6MX0', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+LociErrorOutput.schema_version
+  Extra inputs are not permitted [type=extra_forbidden, input_value=1, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+LociErrorOutput.source
+  Extra inputs are not permitted [type=extra_forbidden, input_value={'content': 'import { exe...te': 0, 'start_line': 1}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+LociErrorOutput.status
+  Extra inputs are not permitted [type=extra_forbidden, input_value='ok', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+LociErrorOutput.usage
+  Extra inputs are not permitted [type=extra_forbidden, input_value={'evidence_bytes': 8192, ... 'mcp_result_json_utf8'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden

@@ -1,0 +1,2548 @@
+from __future__ import annotations
+
+import hashlib
+import os
+import re
+import time
+import uuid
+from collections import defaultdict
+from dataclasses import dataclass, field
+from functools import partial
+from itertools import islice
+from pathlib import Path, PurePosixPath
+from typing import Any, Callable, Literal, Sequence, TypedDict
+
+import pathspec
+
+from loci.graph.contracts import (
+    GRAPH_SCHEMA_VERSION,
+    GraphContractError,
+    validate_graph_edges,
+)
+from loci.graph.go_modules import (
+    MAX_GO_CONTROL_BYTES,
+    GoModuleProblem,
+    build_go_package_index,
+    load_go_module_context,
+)
+from loci.graph.javascript_modules import (
+    JavaScriptModuleProblem,
+    build_javascript_resolution_index,
+    load_javascript_module_context,
+)
+from loci.graph.rust_crates import (
+    MAX_CARGO_CONTROL_BYTES,
+    RustCrateProblem,
+    build_rust_crate_index,
+    load_cargo_context,
+)
+from loci.graph.anchors import select_graph_anchors
+from loci.graph.materialize import load_graph_extensions, materialize_graph
+from loci.graph.swift_modules import (
+    SWIFT_MANIFEST_NAME,
+    build_swift_module_index,
+    load_swift_module_context,
+)
+from loci.graph.profiles import read_contained_file, required_frontmatter_fields
+from loci.graph.state import GraphDiagnostic, GraphIndexState
+from loci.graph.retrieval import (
+    _graph_node_ref,
+    retrieve_graph_neighbors,
+    retrieve_graph_paths,
+    retrieve_graph_question,
+)
+from loci.graph.traversal import GraphDirection
+from loci.indexability import (
+    repository_path_exclusion_root,
+    source_exclusion_reason,
+)
+from loci.parser.call_models import RawCallSite
+from loci.parser.extractor import parse_file
+from loci.parser.imports import (
+    ImportExtractionError,
+    SourceParseError,
+    RawImport,
+    extract_import_batch,
+)
+from loci.parser.languages import EXTENSION_MAP, MARKDOWN_SUFFIXES
+from loci.parser.reference_models import RawLocalExport, RawSymbolReference
+from loci.parser.symbols import Symbol, make_file_symbol
+from loci.parser.type_models import RawTypeObservation
+from loci.parser.type_observations import TypeExtractionError, extract_type_observations
+from loci.query_coverage import (
+    QueryCoverage,
+    QueryCoverageRecorder,
+    StoredQueryCoverage,
+    query_coverage_from_index,
+    stored_query_coverage,
+)
+from loci.storage.index_store import IndexStore, index_versions_current
+from loci.storage.repository_catalog import RepositoryCatalogError
+from loci.storage.store_health import (
+    DEFAULT_HEALTH_LIMIT,
+    DEFAULT_MAX_CATALOG_BYTES,
+    DEFAULT_MAX_INDEX_BYTES,
+    DEFAULT_MAX_PROBE_BYTES,
+    DEFAULT_MAX_PROBE_PATHS,
+    MAX_HEALTH_LIMIT,
+    FreshnessProbe,
+    HealthReason,
+    RepositoryProbeLimitExceeded,
+    diagnose_store,
+)
+from loci.storage.store_resolver import StoreResolution, resolve_store_base_dir
+from loci.exploration import explore_context
+
+REFRESH_LOCK_POLL_SECONDS = 0.05
+REFRESH_LOCK_RECLAIM_GRACE_SECONDS = 1.0
+MAX_SEARCH_FILE_PATHS = 500
+
+
+class SearchSymbolsResult(TypedDict):
+    symbols: list[dict[str, Any]]
+    coverage: QueryCoverage
+    search_id: str | None
+
+
+class GrepRepoResult(TypedDict):
+    matches: list[dict[str, Any]]
+    coverage: QueryCoverage
+
+
+@dataclass(frozen=True, slots=True)
+class RepositoryScan:
+    indexable_files: tuple[tuple[Path, str, str], ...]
+    go_control_candidates: tuple[Path, ...]
+    javascript_control_candidates: tuple[Path, ...]
+    cargo_control_candidates: tuple[Path, ...]
+    swift_control_candidates: tuple[Path, ...]
+    coverage: StoredQueryCoverage
+    paths_scanned: int
+    bytes_scanned: int
+
+
+@dataclass
+class LociError(Exception):
+    code: str
+    message: str
+    details: dict[str, Any] = field(default_factory=dict)
+
+    def __str__(self) -> str:
+        return self.message
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "code": self.code,
+            "message": self.message,
+            "details": self.details,
+        }
+
+
+def get_store() -> IndexStore:
+    return _get_store_with_resolution()[0]
+
+
+def get_store_resolution() -> StoreResolution:
+    return resolve_store_base_dir()
+
+
+def _get_store_with_resolution() -> tuple[IndexStore, StoreResolution]:
+    resolution = resolve_store_base_dir()
+    return IndexStore(base_dir=resolution.base_dir), resolution
+
+
+def index_repo(path: str | Path, incremental: bool = True) -> dict[str, Any]:
+    repo_path = Path(path).resolve()
+    _validate_repo_path(repo_path)
+    store = get_store()
+    lock_path = store.refresh_lock_path(repo_path)
+    timeout = float(os.environ.get("LOCI_REFRESH_LOCK_TIMEOUT", "10"))
+    _acquire_refresh_lock(lock_path, timeout=timeout)
+    try:
+        return _index_repo_unlocked(repo_path, incremental)
+    finally:
+        lock_path.unlink(missing_ok=True)
+
+
+def _index_repo_unlocked(
+    path: str | Path,
+    incremental: bool = True,
+) -> dict[str, Any]:
+    repo_path = Path(path).resolve()
+    if not repo_path.exists():
+        raise LociError(
+            "PATH_NOT_FOUND",
+            "Path not found",
+            {"path": str(repo_path)},
+        )
+    if not repo_path.is_dir():
+        raise LociError(
+            "INVALID_INPUT",
+            "Path is not a directory",
+            {"path": str(repo_path)},
+        )
+
+    store = get_store()
+    try:
+        store.ensure_root_available(repo_path)
+    except RepositoryCatalogError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+    existing = store.load(repo_path) if incremental else None
+    if existing is not None and not index_versions_current(existing):
+        existing = None
+    previous_graph: GraphIndexState | None = None
+    if existing is not None:
+        graph_value = existing.get("graph")
+        if not isinstance(graph_value, dict):
+            existing = None
+        else:
+            try:
+                previous_graph = store.validate_graph_state(existing)
+            except GraphContractError:
+                existing = None
+    existing_hashes: dict[str, str] = existing.get("file_hashes", {}) if existing else {}
+    existing_symbols: list[dict[str, Any]] = existing.get("symbols", []) if existing else []
+    previous_imports: dict[str, list[RawImport]] = defaultdict(list)
+    previous_exports: dict[str, list[RawLocalExport]] = defaultdict(list)
+    previous_symbol_references: dict[str, list[RawSymbolReference]] = defaultdict(list)
+    previous_calls: dict[str, list[RawCallSite]] = defaultdict(list)
+    previous_types: dict[str, list[RawTypeObservation]] = defaultdict(list)
+    previous_extraction_diagnostics: dict[str, list[GraphDiagnostic]] = defaultdict(list)
+    if previous_graph is not None:
+        for record in previous_graph.imports:
+            previous_imports[record.raw.source_file].append(record.raw)
+        for observation in previous_graph.rust_module_observations:
+            previous_imports[observation.source_file].append(observation)
+        for export in previous_graph.exports:
+            previous_exports[export.source_file].append(export)
+        for record in previous_graph.symbol_references:
+            previous_symbol_references[record.raw.source_file].append(record.raw)
+        for record in previous_graph.calls:
+            previous_calls[record.raw.source_file].append(record.raw)
+        for record in previous_graph.type_relations:
+            previous_types[record.raw.source_file].append(record.raw)
+        for diagnostic in previous_graph.diagnostics:
+            if (
+                diagnostic.code in {
+                    "GRAPH_IMPORT_EXTRACTION_FAILED",
+                    "GRAPH_REFERENCE_EXTRACTION_FAILED",
+                    "GRAPH_TYPE_EXTRACTION_FAILED",
+                    "GRAPH_SOURCE_UNPARSED",
+                }
+                and diagnostic.source is not None
+            ):
+                previous_extraction_diagnostics[diagnostic.source].append(diagnostic)
+    repository_scan = _scan_repository_files(repo_path, store)
+    go_module_load = load_go_module_context(
+        repo_path,
+        repository_scan.go_control_candidates,
+    )
+    javascript_module_load = load_javascript_module_context(
+        repo_path,
+        repository_scan.javascript_control_candidates,
+    )
+    swift_module_load = load_swift_module_context(
+        repo_path,
+        repository_scan.swift_control_candidates,
+    )
+    cargo_load = load_cargo_context(
+        repo_path,
+        repository_scan.cargo_control_candidates,
+    )
+    extension_load = load_graph_extensions(
+        repo_path,
+        previous_graph=previous_graph,
+    )
+    profile_fields = required_frontmatter_fields(extension_load.profiles)
+    previous_profile_fields = required_frontmatter_fields(
+        previous_graph.profiles if previous_graph is not None else ()
+    )
+    profile_fields_changed = profile_fields != previous_profile_fields
+
+    all_symbols: list[Symbol] = []
+    new_file_hashes: dict[str, str] = {}
+    files_skipped = 0
+    language_counts: dict[str, int] = defaultdict(int)
+    zero_symbol_warnings: list[dict[str, Any]] = []
+    raw_imports: list[RawImport] = []
+    raw_exports: list[RawLocalExport] = []
+    raw_symbol_references: list[RawSymbolReference] = []
+    raw_calls: list[RawCallSite] = []
+    raw_type_observations: list[RawTypeObservation] = []
+    extraction_diagnostics: list[GraphDiagnostic] = []
+
+    for src_file, rel_path, file_hash in repository_scan.indexable_files:
+        new_file_hashes[rel_path] = file_hash
+
+        requires_profile_reparse = (
+            profile_fields_changed
+            and src_file.suffix.lower() in MARKDOWN_SUFFIXES
+        )
+        if (
+            incremental
+            and not requires_profile_reparse
+            and existing_hashes.get(rel_path) == file_hash
+        ):
+            kept = [
+                Symbol.from_dict(symbol)
+                for symbol in existing_symbols
+                if (
+                    symbol["file_path"] == rel_path
+                    and symbol["kind"] not in {"package", "crate", "module"}
+                )
+            ]
+            all_symbols.extend(kept)
+            raw_imports.extend(previous_imports.get(rel_path, ()))
+            raw_exports.extend(previous_exports.get(rel_path, ()))
+            raw_symbol_references.extend(
+                previous_symbol_references.get(rel_path, ())
+            )
+            raw_calls.extend(previous_calls.get(rel_path, ()))
+            raw_type_observations.extend(previous_types.get(rel_path, ()))
+            extraction_diagnostics.extend(
+                previous_extraction_diagnostics.get(rel_path, ())
+            )
+            files_skipped += 1
+            lang = EXTENSION_MAP.get(src_file.suffix, "unknown")
+            language_counts[lang] += 1
+            continue
+
+        if profile_fields and src_file.suffix.lower() in MARKDOWN_SUFFIXES:
+            symbols = parse_file(
+                src_file,
+                markdown_frontmatter_fields=profile_fields,
+            )
+        else:
+            symbols = parse_file(src_file)
+        id_map: dict[str, str] = {}
+        for sym in symbols:
+            old_id = sym.id
+            sym.file_path = rel_path
+            suffix_match = re.search(r"~\d+$", old_id)
+            suffix = suffix_match.group(0) if suffix_match else ""
+            sym.id = f"{rel_path}::{sym.qualified_name}#{sym.kind}{suffix}"
+            id_map[old_id] = sym.id
+        for sym in symbols:
+            _remap_markdown_hierarchy_ids(sym, id_map)
+        all_symbols.extend(symbols)
+        lang = EXTENSION_MAP.get(src_file.suffix, "unknown")
+        if symbols:
+            language_counts[lang] += 1
+        else:
+            try:
+                file_bytes = src_file.read_bytes()
+            except OSError:
+                file_bytes = b""
+            line_count = len(file_bytes.splitlines())
+            is_nonempty_markdown = (
+                src_file.suffix.lower() in MARKDOWN_SUFFIXES
+                and bool(file_bytes.strip())
+            )
+            if line_count > 10 or is_nonempty_markdown:
+                zero_symbol_warnings.append({
+                    "file": rel_path,
+                    "lines": line_count,
+                    "reason": "0 symbols extracted",
+                })
+        if src_file.suffix.lower() not in MARKDOWN_SUFFIXES:
+            file_node = make_file_symbol(
+                rel_path,
+                language=lang,
+                content_hash=file_hash,
+            )
+            try:
+                batch = extract_import_batch(
+                    src_file,
+                    source_file=rel_path,
+                    language=lang,
+                    source_hash=file_hash,
+                )
+                raw_imports.extend(batch.imports)
+                raw_exports.extend(batch.exports)
+                raw_symbol_references.extend(batch.references)
+                raw_calls.extend(batch.calls)
+                if batch.go_package is not None:
+                    file_node.metadata["loci"]["go_package"] = {
+                        "name": batch.go_package.name,
+                        "line": batch.go_package.line,
+                    }
+            except ImportExtractionError as exc:
+                extraction_diagnostics.append(
+                    _extraction_diagnostic(rel_path, exc)
+                )
+            try:
+                raw_type_observations.extend(extract_type_observations(
+                    src_file, source_file=rel_path, language=lang,
+                    source_hash=file_hash, symbols=symbols,
+                ))
+            except TypeExtractionError as exc:
+                extraction_diagnostics.append(GraphDiagnostic(
+                    code="GRAPH_TYPE_EXTRACTION_FAILED", severity="warning",
+                    message=str(exc), source=rel_path,
+                    details={"reason": exc.reason, "type_code": exc.code},
+                ))
+            all_symbols.append(file_node)
+
+    file_nodes = {
+        symbol.file_path: symbol
+        for symbol in all_symbols
+        if symbol.kind == "file"
+    }
+    go_package_build = build_go_package_index(
+        go_module_load.context,
+        file_nodes=file_nodes,
+    )
+    javascript_resolution_build = build_javascript_resolution_index(
+        javascript_module_load.context,
+        file_nodes=file_nodes,
+    )
+    rust_crate_build = build_rust_crate_index(
+        cargo_load.context,
+        file_nodes=file_nodes,
+        observations=raw_imports,
+    )
+    swift_module_build = build_swift_module_index(swift_module_load.context)
+    all_symbols.extend(go_package_build.index.package_nodes)
+    all_symbols.extend(swift_module_build.index.module_nodes)
+    all_symbols.extend(rust_crate_build.index.crate_nodes)
+    go_diagnostics = tuple(
+        _go_problem_diagnostic(problem)
+        for problem in (*go_module_load.problems, *go_package_build.problems)
+    )
+    javascript_diagnostics = tuple(
+        _javascript_problem_diagnostic(problem)
+        for problem in (
+            *javascript_module_load.problems,
+            *javascript_resolution_build.problems,
+        )
+    )
+    rust_diagnostics = tuple(
+        _rust_problem_diagnostic(problem)
+        for problem in (*cargo_load.problems, *rust_crate_build.problems)
+    )
+    graph_input_hashes = {
+        **extension_load.input_hashes,
+        **go_module_load.input_hashes,
+        **javascript_module_load.input_hashes,
+        **cargo_load.input_hashes,
+        **swift_module_load.input_hashes,
+    }
+
+    graph_state = materialize_graph(
+        repo_path,
+        all_symbols,
+        new_file_hashes,
+        extension_load.profiles,
+        extension_load.contributions,
+        raw_imports=raw_imports,
+        raw_exports=raw_exports,
+        raw_symbol_references=raw_symbol_references,
+        raw_calls=raw_calls,
+        raw_type_observations=raw_type_observations,
+        go_packages=go_package_build.index,
+        swift_modules=swift_module_build.index,
+        javascript_modules=javascript_resolution_build.index,
+        rust_crates=rust_crate_build.index,
+        input_hashes=graph_input_hashes,
+        diagnostics=(
+            *extension_load.diagnostics,
+            *extraction_diagnostics,
+            *go_diagnostics,
+            *javascript_diagnostics,
+            *rust_diagnostics,
+        ),
+    )
+    try:
+        store.write(
+            repo_path,
+            all_symbols,
+            file_hashes=new_file_hashes,
+            coverage=repository_scan.coverage,
+            graph_state=graph_state,
+        )
+    except (GraphContractError, RepositoryCatalogError) as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+    output: dict[str, Any] = {
+        "path": str(repo_path),
+        "symbols_indexed": len(all_symbols),
+        "graph_profiles_loaded": len(graph_state.profiles),
+        "graph_contributions_loaded": len(graph_state.contributions),
+        "graph_contributions_reused": extension_load.contributions_reused,
+        "graph_node_overlays_indexed": len(graph_state.nodes),
+        "graph_edges_indexed": len(graph_state.edges),
+        "graph_file_nodes_indexed": sum(
+            symbol.kind == "file" for symbol in all_symbols
+        ),
+        "graph_go_packages_indexed": len(go_package_build.index.package_nodes),
+        "graph_swift_modules_indexed": len(swift_module_build.index.module_nodes),
+        "graph_rust_crates_indexed": len(rust_crate_build.index.crate_nodes),
+        "graph_imports_indexed": len(graph_state.imports),
+        "graph_imports_resolved": sum(
+            record.status == "resolved" for record in graph_state.imports
+        ),
+        "graph_imports_unresolved": sum(
+            record.status == "unresolved" for record in graph_state.imports
+        ),
+        "graph_symbol_references_indexed": len(graph_state.symbol_references),
+        "graph_symbol_references_resolved": sum(
+            record.status == "resolved" for record in graph_state.symbol_references
+        ),
+        "graph_symbol_references_unresolved": sum(
+            record.status == "unresolved" for record in graph_state.symbol_references
+        ),
+        "graph_calls_indexed": len(graph_state.calls),
+        "graph_calls_resolved": sum(
+            record.status == "resolved" for record in graph_state.calls
+        ),
+        "graph_calls_unresolved": sum(
+            record.status == "unresolved" for record in graph_state.calls
+        ),
+        "graph_type_relations_indexed": len(graph_state.type_relations),
+        "graph_type_relations_resolved": sum(
+            record.status == "resolved" for record in graph_state.type_relations
+        ),
+        "graph_type_relations_unresolved": sum(
+            record.status == "unresolved" for record in graph_state.type_relations
+        ),
+        "graph_status": _graph_status(graph_state),
+        "graph_diagnostics": [
+            diagnostic.to_dict() for diagnostic in graph_state.diagnostics
+        ],
+        "coverage": repository_scan.coverage,
+        "files_skipped": files_skipped,
+        "languages": dict(language_counts),
+    }
+    if zero_symbol_warnings:
+        output["warnings"] = zero_symbol_warnings
+    return output
+
+
+def ensure_fresh_index(repo: str | Path) -> dict[str, Any]:
+    repo_path = Path(repo).resolve()
+    _validate_repo_path(repo_path)
+    store = get_store()
+    index = store.load(repo_path)
+    if index is not None and not _index_is_stale(repo_path, store, index):
+        return {"repo": str(repo_path), "refreshed": False}
+
+    lock_path = store.refresh_lock_path(repo_path)
+    timeout = float(os.environ.get("LOCI_REFRESH_LOCK_TIMEOUT", "10"))
+    _acquire_refresh_lock(lock_path, timeout=timeout)
+    try:
+        # Another reader or explicit index operation may have built it while
+        # we waited. First use and stale refresh share the same writer lock.
+        index = store.load(repo_path)
+        if index is not None and not _index_is_stale(repo_path, store, index):
+            return {"repo": str(repo_path), "refreshed": False}
+        result = _index_repo_unlocked(repo_path, incremental=True)
+        return {"repo": str(repo_path), "refreshed": True, "index": result}
+    except LociError:
+        raise
+    except Exception as exc:
+        raise LociError(
+            "INDEX_CREATION_FAILED" if index is None else "STALE_INDEX_REFRESH_FAILED",
+            "Failed to create initial index" if index is None else "Failed to refresh stale index",
+            {"repo": str(repo_path), "error": str(exc)},
+        ) from exc
+    finally:
+        lock_path.unlink(missing_ok=True)
+
+
+def outline_repo(
+    path: str | Path,
+    file: str | None = None,
+    ensure_fresh: bool = False,
+) -> list[dict[str, Any]]:
+    repo_path = Path(path).resolve()
+    store = get_store()
+    if ensure_fresh:
+        ensure_fresh_index(repo_path)
+    index = _load_required_index(store, repo_path)
+
+    grouped: dict[str, list[dict[str, Any]]] = {}
+    languages: set[str] = set()
+    for symbol in index["symbols"]:
+        file_path = symbol["file_path"]
+        if file and file_path != file:
+            continue
+        entry: dict[str, Any] = {
+            "id": symbol.get("id", ""),
+            "name": symbol.get("name", ""),
+            "kind": symbol.get("kind", ""),
+            "line": symbol.get("line", 0),
+            "end_line": symbol.get("end_line", 0),
+            "signature": symbol.get("signature", ""),
+            "summary": symbol.get("summary", ""),
+        }
+        if symbol.get("decorators"):
+            entry["decorators"] = symbol["decorators"]
+        _add_markdown_retrieval_fields(entry, symbol)
+        grouped.setdefault(file_path, []).append(entry)
+        if symbol.get("language"):
+            languages.add(symbol["language"])
+
+    result = [{"file": fp, "symbols": symbols} for fp, symbols in sorted(grouped.items())]
+    symbol_count = sum(len(symbols) for symbols in grouped.values())
+    store.log_outline(
+        str(repo_path),
+        symbol_count,
+        file_filter=file,
+        languages=sorted(languages),
+    )
+    return result
+
+
+def get_symbols(
+    repo: str | Path,
+    symbol_ids: list[str],
+    context: int = 0,
+    ensure_fresh: bool = False,
+    selected_from_search_id: str | None = None,
+) -> list[dict[str, Any]]:
+    repo_path = Path(repo).resolve()
+    if not symbol_ids:
+        raise LociError(
+            "INVALID_INPUT",
+            "At least one symbol id is required",
+            {"repo": str(repo_path)},
+        )
+    if context < 0:
+        raise LociError(
+            "INVALID_INPUT",
+            "Context must be greater than or equal to 0",
+            {"context": context},
+        )
+
+    store = get_store()
+    if ensure_fresh:
+        ensure_fresh_index(repo_path)
+    index = _load_required_index(store, repo_path)
+    selection_ranks: list[int | None] | None = None
+    if selected_from_search_id is not None:
+        resolution = store.resolve_search_selection(
+            selected_from_search_id,
+            symbol_ids,
+            str(repo_path),
+        )
+        if resolution["status"] != "found":
+            raise LociError(
+                "INVALID_SEARCH_LINEAGE",
+                "Selected-from search lineage is invalid",
+                {
+                    "repo": str(repo_path),
+                    "search_id": selected_from_search_id,
+                    **resolution,
+                },
+            )
+        selection_ranks = resolution["ranks"]
+
+    return [
+        _get_symbol(
+            repo_path,
+            store,
+            index,
+            symbol_id,
+            context,
+            selected_from_search_id=selected_from_search_id,
+            selected_search_rank=(selection_ranks[position] if selection_ranks is not None else None),
+        )
+        for position, symbol_id in enumerate(symbol_ids)
+    ]
+
+
+def get_symbols_result(
+    repo: str | Path,
+    symbol_ids: list[str],
+    context: int = 0,
+    ensure_fresh: bool = False,
+    selected_from_search_id: str | None = None,
+    include_type_context: bool = False,
+) -> dict[str, Any]:
+    """Compose exact get with optional bounded, existing type context."""
+    if type(include_type_context) is not bool:
+        raise LociError("INVALID_INPUT", "include_type_context must be a boolean", {})
+    symbols = get_symbols(
+        repo, symbol_ids, context=context, ensure_fresh=ensure_fresh,
+        selected_from_search_id=selected_from_search_id,
+    )
+    result: dict[str, Any] = {"symbols": symbols}
+    if not include_type_context:
+        return result
+
+    from .type_context import empty_type_context, expand_type_context
+
+    repo_path = Path(repo).resolve()
+    try:
+        store, indexed_nodes, graph_state = _load_graph_context(repo_path, ensure_fresh=False)
+    except LociError as exc:
+        result["type_context"] = empty_type_context(reason=exc.code, unavailable=True)
+        return result
+    result["type_context"] = expand_type_context(repo_path, store, indexed_nodes, graph_state, symbols)
+    return result
+
+
+def search_symbols(
+    repo: str | Path,
+    query: str,
+    kind: str | None = None,
+    lang: str | None = None,
+    limit: int = 20,
+    file_paths: list[str] | None = None,
+    ensure_fresh: bool = False,
+) -> list[dict[str, Any]]:
+    return search_symbols_result(
+        repo,
+        query,
+        kind=kind,
+        lang=lang,
+        limit=limit,
+        file_paths=file_paths,
+        ensure_fresh=ensure_fresh,
+    )["symbols"]
+
+
+def _normalize_search_file_paths(
+    file_paths: list[str] | None,
+) -> frozenset[str] | None:
+    if file_paths is None:
+        return None
+    if not isinstance(file_paths, list):
+        raise LociError(
+            "INVALID_INPUT",
+            "File paths must be a list of normalized repository-relative paths",
+            {"field": "file_paths", "type": type(file_paths).__name__},
+        )
+    if len(file_paths) > MAX_SEARCH_FILE_PATHS:
+        raise LociError(
+            "INVALID_INPUT",
+            "Too many file paths",
+            {
+                "field": "file_paths",
+                "count": len(file_paths),
+                "maximum": MAX_SEARCH_FILE_PATHS,
+            },
+        )
+
+    normalized: set[str] = set()
+    for index, file_path in enumerate(file_paths):
+        valid_path = (
+            isinstance(file_path, str)
+            and bool(file_path)
+            and "\x00" not in file_path
+            and "\\" not in file_path
+        )
+        if valid_path:
+            path = PurePosixPath(file_path)
+            valid_path = (
+                not path.is_absolute()
+                and path != PurePosixPath(".")
+                and ".." not in path.parts
+                and path.as_posix() == file_path
+            )
+        if not valid_path:
+            raise LociError(
+                "INVALID_INPUT",
+                "Each file path must be a normalized repository-relative POSIX path",
+                {"field": "file_paths", "index": index},
+            )
+        normalized.add(file_path)
+    return frozenset(normalized)
+
+
+def search_symbols_result(
+    repo: str | Path,
+    query: str,
+    kind: str | None = None,
+    lang: str | None = None,
+    limit: int = 20,
+    file_paths: list[str] | None = None,
+    ensure_fresh: bool = False,
+) -> SearchSymbolsResult:
+    repo_path = Path(repo).resolve()
+    if limit < 1:
+        raise LociError(
+            "INVALID_INPUT",
+            "Limit must be greater than 0",
+            {"limit": limit},
+        )
+    normalized_file_paths = _normalize_search_file_paths(file_paths)
+
+    store = get_store()
+    if ensure_fresh:
+        ensure_fresh_index(repo_path)
+    index = _load_required_index(store, repo_path)
+
+    results = store.search(
+        repo_path,
+        query,
+        kind=kind,
+        lang=lang,
+        limit=limit,
+        file_paths=normalized_file_paths,
+    )
+    search_id: str | None = None
+    if results:
+        search_id = str(uuid.uuid4())
+        store.log_search(search_id, query, str(repo_path), [result["id"] for result in results])
+    else:
+        store.log_miss("search_empty", repo_path=str(repo_path), query=query)
+    return {
+        "symbols": results,
+        "coverage": query_coverage_from_index(index, "indexed_symbols"),
+        "search_id": search_id,
+    }
+
+
+def get_cached_file(
+    repo: str | Path,
+    file_path: str,
+    start_line: int | None = None,
+    end_line: int | None = None,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    repo_path = Path(repo).resolve()
+    store = get_store()
+    if ensure_fresh:
+        ensure_fresh_index(repo_path)
+    index = _load_required_index(store, repo_path)
+
+    control_path = PurePosixPath(file_path)
+    is_control = (
+        bool(file_path)
+        and "\\" not in file_path
+        and not control_path.is_absolute()
+        and ".." not in control_path.parts
+        and control_path.as_posix() == file_path
+        and control_path.name in {"go.mod", "go.work", "Cargo.toml"}
+    )
+    if is_control:
+        try:
+            state = store.validate_graph_state(index)
+        except GraphContractError as exc:
+            raise LociError(exc.code, exc.message, exc.details) from exc
+        result = _get_resolver_control_content(
+            repo_path, file_path, state.input_hashes.get(file_path),
+            start_line=start_line, end_line=end_line,
+        )
+    else:
+        result = store.get_file_content(
+            repo_path,
+            file_path,
+            start_line=start_line,
+            end_line=end_line,
+        )
+    if result is None:
+        raise LociError(
+            "FILE_NOT_FOUND",
+            "Resolver control is not tracked by the current index"
+            if is_control else "File not found in cache",
+            {"repo": str(repo_path), "file": file_path},
+        )
+
+    symbol_bytes = len(result["content"].encode("utf-8"))
+    file_bytes = result.pop("file_bytes")
+    language = EXTENSION_MAP.get(Path(file_path).suffix)
+    store.log_retrieval(
+        file_path,
+        symbol_bytes,
+        file_bytes,
+        repo_path=str(repo_path),
+        language=language,
+    )
+    return result
+
+
+def _get_resolver_control_content(
+    repo_path: Path,
+    file_path: str,
+    expected_hash: str | None,
+    *,
+    start_line: int | None,
+    end_line: int | None,
+) -> dict[str, Any] | None:
+    """Read bounded control bytes only when they match indexed resolver input."""
+    if expected_hash is None:
+        return None
+    limit = MAX_CARGO_CONTROL_BYTES if Path(file_path).name == "Cargo.toml" else MAX_GO_CONTROL_BYTES
+    details: dict[str, Any] = {"repo": str(repo_path), "file": file_path}
+    try:
+        raw, relative = read_contained_file(
+            repo_path, Path(file_path), record="resolver control", max_bytes=limit,
+        )
+    except GraphContractError as exc:
+        raise LociError(
+            "CONTROL_SOURCE_UNAVAILABLE",
+            "Indexed resolver control cannot be read safely within its byte limit",
+            {**details, "reason": "read_failed", "limit_bytes": limit, "cause": exc.message},
+        ) from exc
+    if relative != file_path or hashlib.sha256(raw).hexdigest() != expected_hash:
+        raise LociError(
+            "CONTROL_SOURCE_UNAVAILABLE",
+            "Resolver control differs from indexed input; refresh the index",
+            {**details, "reason": "indexed_hash_mismatch"},
+        )
+    try:
+        content = raw.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise LociError(
+            "CONTROL_SOURCE_UNAVAILABLE",
+            "Indexed resolver control is not UTF-8",
+            {**details, "reason": "invalid_utf8"},
+        ) from exc
+    lines = content.splitlines(keepends=True)
+    total_lines = len(lines)
+    start = max(0, min(start_line - 1 if start_line is not None else 0, total_lines))
+    end = max(start, min(end_line if end_line is not None else total_lines, total_lines))
+    return {
+        "file": file_path,
+        "content": "".join(lines[start:end]),
+        "total_lines": total_lines,
+        "start_line": start + 1,
+        "end_line": end,
+        "file_bytes": len(raw),
+    }
+
+
+def grep_repo(
+    repo: str | Path,
+    pattern: str,
+    ensure_fresh: bool = False,
+) -> list[dict[str, Any]]:
+    return grep_repo_result(
+        repo,
+        pattern,
+        ensure_fresh=ensure_fresh,
+    )["matches"]
+
+
+def grep_repo_result(
+    repo: str | Path,
+    pattern: str,
+    ensure_fresh: bool = False,
+) -> GrepRepoResult:
+    repo_path = Path(repo).resolve()
+    store = get_store()
+    if ensure_fresh:
+        ensure_fresh_index(repo_path)
+    index = _load_required_index(store, repo_path)
+
+    try:
+        matches = store.grep_files(repo_path, pattern)
+    except ValueError as exc:
+        raise LociError(
+            "INVALID_REGEX",
+            str(exc),
+            {"repo": str(repo_path), "pattern": pattern},
+        ) from exc
+    return {
+        "matches": matches,
+        "coverage": query_coverage_from_index(index, "indexed_source_text"),
+    }
+
+
+def graph_anchors(
+    repo: str | Path,
+    question: str,
+    seed_ids: list[str] | None = None,
+    *,
+    max_anchors: int = 10,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    repo_path = Path(repo).resolve()
+    store = get_store()
+    if ensure_fresh:
+        ensure_fresh_index(repo_path)
+    index = _load_required_index(store, repo_path)
+    symbol_values = index.get("symbols", [])
+    indexed_nodes = {
+        symbol["id"]: symbol
+        for symbol in symbol_values
+        if isinstance(symbol, dict) and isinstance(symbol.get("id"), str)
+    }
+    graph_value = index.get("graph")
+    if not isinstance(graph_value, dict):
+        raise LociError(
+            "INVALID_GRAPH_SCHEMA",
+            "Persisted graph state is missing",
+            {"repo": str(repo_path)},
+        )
+    try:
+        graph_state = store.validate_graph_state(index)
+        selection = select_graph_anchors(
+            tuple(indexed_nodes.values()),
+            question,
+            seed_ids if seed_ids is not None else [],
+            max_anchors=max_anchors,
+        )
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+    reason_kind = "explicit_seed" if selection.mode == "explicit" else "inferred"
+    anchors = []
+    for anchor in selection.anchors:
+        node = indexed_nodes[anchor.node_id]
+        anchors.append({
+            "node": _graph_node_ref(node),
+            "matched_symbol_id": anchor.matched_symbol_id,
+            "name": anchor.name,
+            "score": anchor.score,
+            "reason": {
+                "kind": reason_kind,
+                "matched_terms": list(anchor.matched_terms),
+                "match_scope": list(anchor.match_scope),
+            },
+        })
+    return {
+        "schema_version": GRAPH_SCHEMA_VERSION,
+        "repo": str(repo_path),
+        "question": question,
+        "selection": selection.mode,
+        "question_terms": list(selection.question_terms),
+        "anchors": anchors,
+        "counts": {
+            "indexed_nodes": len(indexed_nodes),
+            "eligible_units": selection.eligible_units,
+            "qualified_candidates": selection.qualified_candidates,
+            "collapsed_symbols": selection.collapsed_symbols,
+            "returned_anchors": len(anchors),
+            "omitted_candidates": selection.omitted_candidates,
+        },
+        "budget": {
+            "requested_max_anchors": selection.requested_max_anchors,
+            "effective_max_anchors": selection.effective_max_anchors,
+        },
+        "diagnostics": [
+            diagnostic.to_dict() for diagnostic in graph_state.diagnostics
+        ],
+    }
+
+
+def graph_neighbors(
+    repo: str | Path,
+    seed_ids: list[str],
+    *,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    repo_path = Path(repo).resolve()
+    if not seed_ids:
+        raise LociError(
+            "INVALID_INPUT",
+            "At least one graph seed is required",
+            {"repo": str(repo_path)},
+        )
+    if any(not isinstance(seed_id, str) or not seed_id for seed_id in seed_ids):
+        raise LociError(
+            "INVALID_INPUT",
+            "Graph seeds must be non-empty strings",
+            {"repo": str(repo_path)},
+        )
+    unique_seed_ids = list(dict.fromkeys(seed_ids))
+
+    store = get_store()
+    if ensure_fresh:
+        ensure_fresh_index(repo_path)
+    index = _load_required_index(store, repo_path)
+    symbol_values = index.get("symbols", [])
+    indexed_nodes = {
+        symbol["id"]: symbol
+        for symbol in symbol_values
+        if isinstance(symbol, dict) and isinstance(symbol.get("id"), str)
+    }
+    missing_ids = [seed_id for seed_id in unique_seed_ids if seed_id not in indexed_nodes]
+    if missing_ids:
+        raise LociError(
+            "GRAPH_ENDPOINT_NOT_FOUND",
+            "Graph seed is not indexed",
+            {"repo": str(repo_path), "missing_ids": missing_ids},
+        )
+
+    try:
+        edges = [
+            edge
+            for edge in store.get_graph_edges(repo_path)
+            if (
+                edge.namespace == "loci"
+                and edge.type == "contains"
+                and edge.directed is True
+                and edge.resolution == "exact"
+            )
+        ]
+        validate_graph_edges(edges, indexed_nodes=indexed_nodes)
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+    outgoing: dict[str, list] = {}
+    for edge in sorted(
+        edges,
+        key=lambda item: (item.namespace, item.type, item.from_id, item.to_id),
+    ):
+        outgoing.setdefault(edge.from_id, []).append(edge)
+
+    results = []
+    for seed_id in unique_seed_ids:
+        neighbors = [
+            {
+                "node": _graph_node_ref(indexed_nodes[edge.to_id]),
+                "edge": edge.to_dict(),
+            }
+            for edge in outgoing.get(seed_id, [])
+        ]
+        results.append({
+            "seed": _graph_node_ref(indexed_nodes[seed_id]),
+            "neighbors": neighbors,
+        })
+
+    return {
+        "schema_version": GRAPH_SCHEMA_VERSION,
+        "repo": str(repo_path),
+        "results": results,
+        "diagnostics": [],
+    }
+
+
+def graph_traverse_neighbors(
+    repo: str | Path,
+    seed_ids: list[str],
+    *,
+    namespaces: list[str] | None = None,
+    edge_types: list[str] | None = None,
+    resolutions: list[str] | None = None,
+    direction: GraphDirection = "outgoing",
+    max_neighbors: int = 64,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    repo_path = Path(repo).resolve()
+    _store, indexed_nodes, graph_state = _load_graph_context(
+        repo_path,
+        ensure_fresh=ensure_fresh,
+    )
+    try:
+        return retrieve_graph_neighbors(
+            repo_path,
+            indexed_nodes,
+            graph_state,
+            seed_ids,
+            namespaces=namespaces,
+            edge_types=edge_types,
+            resolutions=resolutions,
+            direction=direction,
+            max_neighbors=max_neighbors,
+        )
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+
+def graph_paths(
+    repo: str | Path,
+    source_ids: list[str],
+    target_ids: list[str],
+    *,
+    namespaces: list[str] | None = None,
+    edge_types: list[str] | None = None,
+    resolutions: list[str] | None = None,
+    direction: GraphDirection = "outgoing",
+    max_hops: int = 3,
+    max_nodes: int = 64,
+    max_paths: int = 8,
+    path_offset: int = 0,
+    max_evidence_bytes: int = 32_768,
+    max_estimated_tokens: int = 8_192,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    repo_path = Path(repo).resolve()
+    store, indexed_nodes, graph_state = _load_graph_context(
+        repo_path,
+        ensure_fresh=ensure_fresh,
+    )
+    try:
+        return retrieve_graph_paths(
+            repo_path,
+            store,
+            indexed_nodes,
+            graph_state,
+            source_ids,
+            target_ids,
+            namespaces=namespaces,
+            edge_types=edge_types,
+            resolutions=resolutions,
+            direction=direction,
+            max_hops=max_hops,
+            max_nodes=max_nodes,
+            max_paths=max_paths,
+            path_offset=path_offset,
+            max_evidence_bytes=max_evidence_bytes,
+            max_estimated_tokens=max_estimated_tokens,
+        )
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+
+@dataclass(frozen=True)
+class RetrievalRuntime:
+    """Trusted process-bound configuration, never part of a retrieval packet.
+
+    Evaluation code records ``graph_enrichment`` from this binding, not from
+    packet contents or relationship counts. The bound method exposes no graph
+    override; the public MCP input contract remains unchanged.
+    """
+
+    graph_enrichment: bool = True
+
+    def retrieve(
+        self,
+        repo: str | Path, query: str = "", *, seed_ids: list[str] | None = None,
+        ensure_fresh: bool = False,
+    ) -> dict[str, Any]:
+        return retrieve(
+            repo, query, seed_ids=seed_ids, ensure_fresh=ensure_fresh,
+            graph_enrichment=self.graph_enrichment,
+        )
+
+
+def retrieve(
+    repo: str | Path, query: str = "", *, seed_ids: list[str] | None = None,
+    ensure_fresh: bool = False,
+    graph_enrichment: bool = True,
+) -> dict[str, Any]:
+    """Return fixed-policy context with default-on graph enrichment.
+
+    ``graph_enrichment`` is an internal, process-bound control, not a public MCP
+    argument. Disabling it stops after the shared anchor/source packing stage.
+    Execution state is not included in the model-visible packet; trusted callers
+    can retain it in a ``RetrievalRuntime`` binding for evaluation/receipt metadata.
+    """
+    from loci.retrieval import retrieve_context
+
+    repo_path = Path(repo).resolve()
+    store, nodes, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
+    coverage = query_coverage_from_index(
+        _load_required_index(store, repo_path), "indexed_symbols",
+    )
+    try:
+        return retrieve_context(repo_path, store, nodes, state, query,
+                                seed_ids=seed_ids, coverage=coverage["state"],
+                                graph_enrichment=graph_enrichment)
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+
+def read(
+    repo: str | Path, source_ref: str, *, ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    """Expand one exact hash-bound source extent without source discovery."""
+    from loci.retrieval_io import read_source
+
+    repo_path = Path(repo).resolve()
+    store, nodes, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
+    try:
+        return read_source(repo_path, store, nodes, state, source_ref)
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+
+def explore(
+    repo: str | Path,
+    query: str = "",
+    *,
+    intent: str = "locate",
+    seed_ids: list[str] | None = None,
+    max_hops: int | None = None,
+    max_output_bytes: int = 16384,
+    max_evidence_bytes: int = 8192,
+    resolutions: list[str] | None = None,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    """Return compact source selected for an explicit static retrieval intent."""
+    repo_path = Path(repo).resolve()
+    store, nodes, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
+    coverage = query_coverage_from_index(_load_required_index(store, repo_path), "indexed_symbols")
+    try:
+        return explore_context(
+            repo_path, store, nodes, state, query, intent=intent, seed_ids=seed_ids,
+            max_hops=max_hops, max_output_bytes=max_output_bytes,
+            max_evidence_bytes=max_evidence_bytes, resolutions=resolutions,
+            coverage=coverage["state"],
+        )
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+
+def graph_retrieve(
+    repo: str | Path,
+    question: str,
+    seed_ids: list[str] | None = None,
+    *,
+    namespaces: list[str] | None = None,
+    edge_types: list[str] | None = None,
+    resolutions: list[str] | None = None,
+    direction: GraphDirection = "either",
+    max_anchors: int = 10,
+    max_hops: int = 3,
+    max_nodes: int = 64,
+    max_paths: int = 8,
+    path_offset: int = 0,
+    max_evidence_bytes: int = 32_768,
+    max_estimated_tokens: int = 8_192,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    repo_path = Path(repo).resolve()
+    store, indexed_nodes, graph_state = _load_graph_context(
+        repo_path,
+        ensure_fresh=ensure_fresh,
+    )
+    try:
+        return retrieve_graph_question(
+            repo_path,
+            store,
+            indexed_nodes,
+            graph_state,
+            question,
+            seed_ids,
+            namespaces=namespaces,
+            edge_types=edge_types,
+            resolutions=resolutions,
+            direction=direction,
+            max_anchors=max_anchors,
+            max_hops=max_hops,
+            max_nodes=max_nodes,
+            max_paths=max_paths,
+            path_offset=path_offset,
+            max_evidence_bytes=max_evidence_bytes,
+            max_estimated_tokens=max_estimated_tokens,
+        )
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+
+def _validate_graph_record_query(
+    file: str | None,
+    status: str,
+    offset: int,
+    limit: int,
+) -> None:
+    if file is not None:
+        valid_file = isinstance(file, str) and bool(file) and "\\" not in file
+        if valid_file:
+            file_path = PurePosixPath(file)
+            valid_file = (
+                not file_path.is_absolute()
+                and ".." not in file_path.parts
+                and file_path.as_posix() == file
+            )
+        if not valid_file:
+            raise LociError(
+                "INVALID_INPUT",
+                "File must be a normalized repository-relative path",
+                {"field": "file", "value": file},
+            )
+    if (
+        not isinstance(status, str)
+        or status not in {"all", "resolved", "unresolved"}
+    ):
+        raise LociError(
+            "INVALID_INPUT",
+            "Status must be all, resolved, or unresolved",
+            {
+                "field": "status",
+                "value": status,
+                "allowed": ["all", "resolved", "unresolved"],
+            },
+        )
+    if not isinstance(offset, int) or isinstance(offset, bool) or offset < 0:
+        raise LociError(
+            "INVALID_INPUT",
+            "Offset must be greater than or equal to 0",
+            {"field": "offset", "value": offset, "minimum": 0},
+        )
+    if (
+        not isinstance(limit, int)
+        or isinstance(limit, bool)
+        or not 1 <= limit <= 500
+    ):
+        raise LociError(
+            "INVALID_INPUT",
+            "Limit must be between 1 and 500",
+            {"field": "limit", "value": limit, "minimum": 1, "maximum": 500},
+        )
+
+
+def _graph_record_page(
+    repo_path: Path,
+    records: Sequence[Any],
+    *,
+    file: str | None,
+    status: str,
+    offset: int,
+    limit: int,
+    sort_key: Callable[[Any], tuple],
+    serialize: Callable[[Any], dict[str, Any]],
+) -> dict[str, Any]:
+    """Page one record family under the shared diagnostic query contract.
+
+    Counts describe the file-selected set before status filtering. Offsets
+    describe the status-selected ordering. Serialize only the returned page.
+    """
+    selected = sorted(
+        (record for record in records if file is None or record.raw.source_file == file),
+        key=sort_key,
+    )
+    filtered = (
+        selected if status == "all"
+        else [record for record in selected if record.status == status]
+    )
+    items = [serialize(record) for record in filtered[offset:offset + limit]]
+    next_offset = offset + len(items)
+    return {
+        "schema_version": GRAPH_SCHEMA_VERSION,
+        "repo": str(repo_path),
+        "file": file,
+        "status": status,
+        "items": items,
+        "counts": {
+            "total": len(selected),
+            "resolved": sum(record.status == "resolved" for record in selected),
+            "unresolved": sum(record.status == "unresolved" for record in selected),
+            "returned": len(items),
+        },
+        "pagination": {
+            "offset": offset,
+            "limit": limit,
+            "next_offset": next_offset if next_offset < len(filtered) else None,
+        },
+    }
+
+
+def _import_record_item(record: Any) -> dict[str, Any]:
+    raw = record.raw
+    serialized = record.to_dict()
+    return {
+        "raw": serialized["raw"],
+        "source_file": raw.source_file,
+        "source_id": record.source_id,
+        "target_file": record.target_file,
+        "target_package": record.target_package,
+        "target_crate": record.target_crate,
+        "target_module": record.target_module,
+        "target_kind": record.target_kind,
+        "target_id": record.target_id,
+        "specifier": raw.specifier,
+        "imported_name": raw.imported_name,
+        "language": raw.language,
+        "line": raw.line,
+        "text": raw.text,
+        "type_only": raw.type_only,
+        "is_reexport": raw.is_reexport,
+        "status": record.status,
+        "resolution": (
+            "import-resolved" if record.status == "resolved" else None
+        ),
+        "unresolved_reason": record.unresolved_reason,
+        "resolution_basis": record.resolution_basis,
+        "resolution_control_files": list(record.resolution_control_files),
+        "resolution_configuration": record.resolution_configuration,
+    }
+
+
+def graph_imports(
+    repo: str | Path,
+    *,
+    file: str | None = None,
+    status: Literal["all", "resolved", "unresolved"] = "all",
+    offset: int = 0,
+    limit: int = 100,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    _validate_graph_record_query(file, status, offset, limit)
+    repo_path = Path(repo).resolve()
+    _, _, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
+    return _graph_record_page(
+        repo_path, state.imports, file=file, status=status,
+        offset=offset, limit=limit, sort_key=lambda record: (
+            record.raw.source_file,
+            record.raw.line,
+            record.raw.specifier,
+            record.raw.imported_name or "",
+            record.target_file or "",
+            record.target_package or "",
+            record.target_crate or "",
+        ),
+        serialize=_import_record_item,
+    )
+
+
+def _symbol_reference_item(record: Any) -> dict[str, Any]:
+    serialized = record.to_dict()
+    return {
+        "raw": serialized["raw"],
+        "binding": serialized["binding"],
+        "source_file": record.raw.source_file,
+        "source_id": record.source_id,
+        "source_kind": record.source_kind,
+        "import_source_id": record.import_source_id,
+        "import_target_id": record.import_target_id,
+        "target_file": record.target_file,
+        "target_id": record.target_id,
+        "target_kind": record.target_kind,
+        "status": record.status,
+        "resolution": (
+            "import-resolved" if record.status == "resolved" else None
+        ),
+        "unresolved_reason": record.unresolved_reason,
+        "import_unresolved_reason": record.import_unresolved_reason,
+        "resolution_basis": record.resolution_basis,
+        "support": serialized["support"],
+        "resolution_control_files": list(record.resolution_control_files),
+        "resolution_configuration": record.resolution_configuration,
+    }
+
+
+def graph_references(
+    repo: str | Path,
+    *,
+    file: str | None = None,
+    status: Literal["all", "resolved", "unresolved"] = "all",
+    offset: int = 0,
+    limit: int = 100,
+    family: Literal["symbol", "type"] = "symbol",
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    _validate_graph_record_query(file, status, offset, limit)
+    if not isinstance(family, str) or family not in {"symbol", "type"}:
+        raise LociError("INVALID_INPUT", "Reference family must be symbol or type", {"family": family})
+    repo_path = Path(repo).resolve()
+    _, _, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
+    if family == "type":
+        from loci.graph.type_relations import type_site_key
+
+        page = _graph_record_page(
+            repo_path, state.type_relations, file=file, status=status,
+            offset=offset, limit=limit,
+            sort_key=lambda record: type_site_key(record.raw),
+            serialize=lambda record: {
+                **record.to_dict(), "source_file": record.raw.source_file,
+                "resolution": record.resolution,
+            },
+        )
+        return {**page, "family": "type"}
+    return _graph_record_page(
+        repo_path, state.symbol_references, file=file, status=status,
+        offset=offset, limit=limit, sort_key=lambda record: (
+            record.raw.source_file,
+            record.raw.line,
+            record.raw.column,
+            record.raw.start_byte,
+            record.binding.import_line if record.binding is not None else 0,
+            record.binding.import_specifier if record.binding is not None else "",
+            record.binding.local_name if record.binding is not None else "",
+            record.target_file or "",
+            record.target_id or "",
+        ),
+        serialize=_symbol_reference_item,
+    )
+
+
+def graph_calls(
+    repo: str | Path,
+    *,
+    file: str | None = None,
+    status: Literal["all", "resolved", "unresolved"] = "all",
+    offset: int = 0,
+    limit: int = 100,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    _validate_graph_record_query(file, status, offset, limit)
+    repo_path = Path(repo).resolve()
+    _, _, state = _load_graph_context(repo_path, ensure_fresh=ensure_fresh)
+    return _graph_record_page(
+        repo_path, state.calls, file=file, status=status,
+        offset=offset, limit=limit, sort_key=lambda record: (
+            record.raw.source_file,
+            record.raw.line,
+            record.raw.column,
+            record.raw.start_byte,
+            record.raw.callee_start_byte,
+            record.caller_id or "",
+            record.target_file or "",
+            record.target_id or "",
+            record.resolution or "",
+        ),
+        serialize=lambda record: record.to_dict(),
+    )
+
+
+def graph_health(
+    repo: str | Path,
+    *,
+    ensure_fresh: bool = False,
+) -> dict[str, Any]:
+    repo_path = Path(repo).resolve()
+    store = get_store()
+    if ensure_fresh:
+        ensure_fresh_index(repo_path)
+    index = _load_required_index(store, repo_path)
+    graph_value = index.get("graph")
+    if not isinstance(graph_value, dict):
+        raise LociError(
+            "INVALID_GRAPH_SCHEMA",
+            "Persisted graph state is missing",
+            {"repo": str(repo_path)},
+        )
+    try:
+        state = store.validate_graph_state(index)
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+    profiles = []
+    for loaded in state.profiles:
+        profile = loaded.profile
+        node_attributes = sorted({
+            attribute.name
+            for rule in profile.node_rules
+            for attribute in rule.attributes
+        })
+        profiles.append({
+            "namespace": profile.namespace,
+            "source": loaded.source,
+            "content_hash": loaded.content_hash,
+            "node_attributes": node_attributes,
+            "edge_types": [
+                edge_type.to_dict() for edge_type in profile.edge_types
+            ],
+        })
+    diagnostic_values = [
+        diagnostic.to_dict() for diagnostic in state.diagnostics
+    ]
+    reference_resolution_basis_counts: dict[str, int] = defaultdict(int)
+    for record in state.symbol_references:
+        if record.status == "resolved" and record.resolution_basis is not None:
+            reference_resolution_basis_counts[record.resolution_basis] += 1
+    call_resolution_basis_counts: dict[str, int] = defaultdict(int)
+    for record in state.calls:
+        if record.status == "resolved" and record.resolution_basis is not None:
+            call_resolution_basis_counts[record.resolution_basis] += 1
+    type_basis_counts: dict[str, int] = defaultdict(int)
+    type_reason_counts: dict[str, int] = defaultdict(int)
+    for record in state.type_relations:
+        if record.resolution_basis is not None:
+            type_basis_counts[record.resolution_basis] += 1
+        if record.unresolved_reason is not None:
+            type_reason_counts[record.unresolved_reason] += 1
+    return {
+        "schema_version": GRAPH_SCHEMA_VERSION,
+        "repo": str(repo_path),
+        "status": _graph_status(state),
+        "profiles": profiles,
+        "counts": {
+            "profiles": len(state.profiles),
+            "node_overlays": len(state.nodes),
+            "edges": len(state.edges),
+            "contributions": len(state.contributions),
+            "diagnostics": len(state.diagnostics),
+            "graph_file_nodes_indexed": sum(
+                isinstance(symbol, dict) and symbol.get("kind") == "file"
+                for symbol in index.get("symbols", [])
+            ),
+            "graph_swift_modules_indexed": sum(
+                isinstance(symbol, dict) and symbol.get("kind") == "module"
+                for symbol in index.get("symbols", [])
+            ),
+            "graph_go_packages_indexed": sum(
+                isinstance(symbol, dict) and symbol.get("kind") == "package"
+                for symbol in index.get("symbols", [])
+            ),
+            "graph_rust_crates_indexed": sum(
+                isinstance(symbol, dict) and symbol.get("kind") == "crate"
+                for symbol in index.get("symbols", [])
+            ),
+            "graph_imports_indexed": len(state.imports),
+            "graph_imports_resolved": sum(
+                record.status == "resolved" for record in state.imports
+            ),
+            "graph_imports_unresolved": sum(
+                record.status == "unresolved" for record in state.imports
+            ),
+            "graph_symbol_references_indexed": len(state.symbol_references),
+            "graph_symbol_references_resolved": sum(
+                record.status == "resolved" for record in state.symbol_references
+            ),
+            "graph_symbol_references_unresolved": sum(
+                record.status == "unresolved" for record in state.symbol_references
+            ),
+            "graph_symbol_references_resolved_by_basis": dict(
+                sorted(reference_resolution_basis_counts.items())
+            ),
+            "graph_calls_indexed": len(state.calls),
+            "graph_calls_resolved": sum(
+                record.status == "resolved" for record in state.calls
+            ),
+            "graph_calls_unresolved": sum(
+                record.status == "unresolved" for record in state.calls
+            ),
+            "graph_calls_resolved_by_basis": dict(
+                sorted(call_resolution_basis_counts.items())
+            ),
+            "graph_type_relations_indexed": len(state.type_relations),
+            "graph_type_relations_resolved": sum(
+                record.status == "resolved" for record in state.type_relations
+            ),
+            "graph_type_relations_unresolved": sum(
+                record.status == "unresolved" for record in state.type_relations
+            ),
+            "graph_type_relations_resolved_by_basis": dict(sorted(type_basis_counts.items())),
+            "graph_type_relations_unresolved_by_reason": dict(sorted(type_reason_counts.items())),
+        },
+        "diagnostics": diagnostic_values,
+    }
+
+
+def verify_repo(path: str | Path) -> dict[str, Any]:
+    repo_path = Path(path).resolve()
+    store = get_store()
+    result = store.verify_index(repo_path)
+    if "error" in result:
+        raise LociError(
+            "REPO_NOT_INDEXED",
+            "Repository is not indexed",
+            {"repo": str(repo_path)},
+        )
+    return result
+
+
+def list_repos() -> list[dict[str, Any]]:
+    try:
+        return get_store().list_repos()
+    except RepositoryCatalogError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+
+
+def store_health(
+    *,
+    offset: int = 0,
+    limit: int = DEFAULT_HEALTH_LIMIT,
+    max_catalog_bytes: int = DEFAULT_MAX_CATALOG_BYTES,
+    max_index_bytes: int = DEFAULT_MAX_INDEX_BYTES,
+    max_probe_paths: int = DEFAULT_MAX_PROBE_PATHS,
+    max_probe_bytes: int = DEFAULT_MAX_PROBE_BYTES,
+) -> dict[str, Any]:
+    _validate_store_health_bounds(
+        offset=offset,
+        limit=limit,
+        max_catalog_bytes=max_catalog_bytes,
+        max_index_bytes=max_index_bytes,
+        max_probe_paths=max_probe_paths,
+        max_probe_bytes=max_probe_bytes,
+    )
+    resolution = resolve_store_base_dir()
+    store = IndexStore(
+        base_dir=resolution.base_dir,
+        create_base_dir=False,
+    )
+    return diagnose_store(
+        store,
+        freshness_probe=partial(_probe_repository_freshness, store),
+        offset=offset,
+        limit=limit,
+        max_catalog_bytes=max_catalog_bytes,
+        max_index_bytes=max_index_bytes,
+        max_probe_paths=max_probe_paths,
+        max_probe_bytes=max_probe_bytes,
+    )
+
+
+def _validate_store_health_bounds(
+    *,
+    offset: int,
+    limit: int,
+    max_catalog_bytes: int,
+    max_index_bytes: int,
+    max_probe_paths: int,
+    max_probe_bytes: int,
+) -> None:
+    values = {
+        "offset": offset,
+        "limit": limit,
+        "max_catalog_bytes": max_catalog_bytes,
+        "max_index_bytes": max_index_bytes,
+        "max_probe_paths": max_probe_paths,
+        "max_probe_bytes": max_probe_bytes,
+    }
+    for parameter, value in values.items():
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise LociError(
+                "INVALID_INPUT",
+                f"{parameter} must be an integer",
+                {"parameter": parameter, "value": value},
+            )
+    if offset < 0:
+        raise LociError(
+            "INVALID_INPUT",
+            "offset must be greater than or equal to 0",
+            {"parameter": "offset", "value": offset},
+        )
+    if limit < 1 or limit > MAX_HEALTH_LIMIT:
+        raise LociError(
+            "INVALID_INPUT",
+            f"limit must be between 1 and {MAX_HEALTH_LIMIT}",
+            {"parameter": "limit", "value": limit},
+        )
+    for parameter, value in (
+        ("max_catalog_bytes", max_catalog_bytes),
+        ("max_index_bytes", max_index_bytes),
+        ("max_probe_paths", max_probe_paths),
+        ("max_probe_bytes", max_probe_bytes),
+    ):
+        if value < 0:
+            raise LociError(
+                "INVALID_INPUT",
+                f"{parameter} must be greater than or equal to 0",
+                {"parameter": parameter, "value": value},
+            )
+
+
+def session_stats(
+    repo: str | Path | None = None,
+    since_days: int | None = 7,
+) -> dict[str, Any]:
+    if since_days is not None and since_days < 0:
+        raise LociError(
+            "INVALID_INPUT",
+            "since_days must be greater than or equal to 0",
+            {"since_days": since_days},
+        )
+
+    store, resolution = _get_store_with_resolution()
+    repo_filter = str(Path(repo).resolve()) if repo else None
+    stats = store.get_session_stats(repo_filter=repo_filter, since_days=since_days)
+    stats["store"] = resolution.to_dict()
+    return stats
+
+
+def reset_session_stats() -> dict[str, Any]:
+    store, resolution = _get_store_with_resolution()
+    backup = store.reset_session()
+    return {
+        "reset": True,
+        "backup": str(backup) if backup is not None else None,
+        "store": resolution.to_dict(),
+    }
+
+
+def analyze_usage(
+    repo: str | Path | None = None,
+    since_days: int = 30,
+) -> dict[str, Any]:
+    if since_days < 0:
+        raise LociError(
+            "INVALID_INPUT",
+            "since_days must be greater than or equal to 0",
+            {"since_days": since_days},
+        )
+
+    store, resolution = _get_store_with_resolution()
+    repo_filter = str(Path(repo).resolve()) if repo else None
+    try:
+        result = store.analyze(since_days=since_days, repo_filter=repo_filter)
+    except RepositoryCatalogError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+    result["store"] = resolution.to_dict()
+    return result
+
+
+def _validate_repo_path(repo_path: Path) -> None:
+    if not repo_path.exists():
+        raise LociError(
+            "PATH_NOT_FOUND",
+            "Path not found",
+            {"path": str(repo_path)},
+        )
+    if not repo_path.is_dir():
+        raise LociError(
+            "INVALID_INPUT",
+            "Path is not a directory",
+            {"path": str(repo_path)},
+        )
+    # Path.rglob can silently skip an unreadable root, producing an empty
+    # index. Validate access before allowing either first use or refresh.
+    try:
+        with os.scandir(repo_path) as entries:
+            next(entries, None)
+        if not os.access(repo_path, os.R_OK | os.X_OK):
+            raise PermissionError(f"Cannot read or traverse {repo_path}")
+    except OSError as exc:
+        raise LociError(
+            "REPOSITORY_UNREADABLE",
+            "Cannot read repository directory",
+            {"path": str(repo_path), "error": str(exc)},
+        ) from exc
+
+
+def _load_required_index(store: IndexStore, repo_path: Path) -> dict[str, Any]:
+    index = store.load(repo_path)
+    if index is None:
+        raise LociError(
+            "REPO_NOT_INDEXED",
+            "Repository is not indexed",
+            {"repo": str(repo_path)},
+        )
+    return index
+
+
+def _index_is_stale(repo_path: Path, store: IndexStore, index: dict[str, Any]) -> bool:
+    if not index_versions_current(index):
+        return True
+    stored_coverage = stored_query_coverage(index)
+    if stored_coverage is None:
+        return True
+    repository_scan = _scan_repository_files(repo_path, store)
+    return bool(_current_index_staleness_reasons(
+        repo_path,
+        store,
+        index,
+        repository_scan,
+        stored_coverage=stored_coverage,
+        stop_after_first=True,
+    ))
+
+
+def _probe_repository_freshness(
+    store: IndexStore,
+    repo_path: Path,
+    index: dict[str, Any],
+    max_probe_paths: int,
+    max_probe_bytes: int,
+) -> FreshnessProbe:
+    try:
+        persisted_graph = store.validate_graph_state(index)
+    except GraphContractError as exc:
+        return FreshnessProbe.complete(reasons=(HealthReason(
+            "corrupt",
+            "INDEX_GRAPH_INVALID",
+            {
+                "error_code": exc.code,
+                "error": exc.message,
+                "error_details": exc.details,
+            },
+        ),))
+    try:
+        repository_scan = _scan_repository_files(
+            repo_path,
+            store,
+            max_probe_paths=max_probe_paths,
+            max_probe_bytes=max_probe_bytes,
+        )
+    except RepositoryProbeLimitExceeded as exc:
+        return FreshnessProbe.unavailable(
+            exc.code,
+            {
+                "limit": exc.limit,
+                "observed": exc.observed,
+            },
+        )
+    stored_coverage = stored_query_coverage(index)
+    reasons = _current_index_staleness_reasons(
+        repo_path,
+        store,
+        index,
+        repository_scan,
+        stored_coverage=stored_coverage,
+        persisted_graph=persisted_graph,
+    )
+    return FreshnessProbe.complete(
+        reasons=reasons,
+        paths_scanned=repository_scan.paths_scanned,
+        bytes_scanned=repository_scan.bytes_scanned,
+    )
+
+
+def _current_index_staleness_reasons(
+    repo_path: Path,
+    store: IndexStore,
+    index: dict[str, Any],
+    repository_scan: RepositoryScan,
+    *,
+    stored_coverage: StoredQueryCoverage | None,
+    persisted_graph: GraphIndexState | None = None,
+    stop_after_first: bool = False,
+) -> tuple[HealthReason, ...]:
+    reasons: list[HealthReason] = []
+    if stored_coverage is None:
+        reasons.append(HealthReason(
+            "stale",
+            "INDEX_COVERAGE_MISSING",
+        ))
+    elif repository_scan.coverage != stored_coverage:
+        reasons.append(HealthReason(
+            "stale",
+            "INDEX_COVERAGE_CHANGED",
+        ))
+    if reasons and stop_after_first:
+        return tuple(reasons)
+    current_hashes = {
+        rel_path: file_hash
+        for _, rel_path, file_hash in repository_scan.indexable_files
+    }
+    indexed_hashes = index.get("file_hashes", {})
+    if current_hashes != indexed_hashes:
+        reasons.append(HealthReason(
+            "stale",
+            "SOURCE_CONTENT_CHANGED",
+            _hash_change_details(indexed_hashes, current_hashes),
+        ))
+    if reasons and stop_after_first:
+        return tuple(reasons)
+    current_graph_hashes = {
+        **load_graph_extensions(repo_path).input_hashes,
+        **load_go_module_context(
+            repo_path,
+            repository_scan.go_control_candidates,
+        ).input_hashes,
+        **load_javascript_module_context(
+            repo_path,
+            repository_scan.javascript_control_candidates,
+        ).input_hashes,
+        **load_cargo_context(
+            repo_path,
+            repository_scan.cargo_control_candidates,
+        ).input_hashes,
+        **load_swift_module_context(
+            repo_path,
+            repository_scan.swift_control_candidates,
+        ).input_hashes,
+    }
+    graph = index.get("graph")
+    if not isinstance(graph, dict):
+        reasons.append(HealthReason(
+            "stale",
+            "INDEX_GRAPH_MISSING",
+        ))
+    else:
+        if persisted_graph is None:
+            try:
+                persisted_graph = store.validate_graph_state(index)
+            except GraphContractError as exc:
+                reasons.append(HealthReason(
+                    "stale",
+                    "INDEX_GRAPH_INVALID",
+                    {"error_code": exc.code},
+                ))
+        if persisted_graph is not None:
+            indexed_graph_hashes = persisted_graph.input_hashes
+            if current_graph_hashes != indexed_graph_hashes:
+                reasons.append(HealthReason(
+                    "stale",
+                    "GRAPH_INPUTS_CHANGED",
+                    _hash_change_details(
+                        indexed_graph_hashes,
+                        current_graph_hashes,
+                    ),
+                ))
+    if reasons and stop_after_first:
+        return tuple(reasons)
+    if not _active_graph_paths_are_safe(repo_path, index):
+        reasons.append(HealthReason(
+            "stale",
+            "GRAPH_ACTIVE_PATH_UNSAFE",
+        ))
+    return tuple(reasons)
+
+
+def _hash_change_details(
+    previous: Any,
+    current: dict[str, str],
+) -> dict[str, Any]:
+    previous_hashes = previous if isinstance(previous, dict) else {}
+    previous_paths = {
+        path
+        for path, content_hash in previous_hashes.items()
+        if isinstance(path, str) and isinstance(content_hash, str)
+    }
+    current_paths = set(current)
+    added = sorted(current_paths - previous_paths)
+    removed = sorted(previous_paths - current_paths)
+    changed = sorted(
+        path
+        for path in current_paths & previous_paths
+        if previous_hashes[path] != current[path]
+    )
+    return {
+        "added": added[:20],
+        "changed": changed[:20],
+        "removed": removed[:20],
+        "omitted": {
+            "added": max(0, len(added) - 20),
+            "changed": max(0, len(changed) - 20),
+            "removed": max(0, len(removed) - 20),
+        },
+    }
+
+
+def _active_graph_paths_are_safe(
+    repo_path: Path,
+    index: dict[str, Any],
+) -> bool:
+    graph = index.get("graph")
+    edge_values = graph.get("edges", []) if isinstance(graph, dict) else []
+    symbols = {
+        symbol.get("id"): symbol
+        for symbol in index.get("symbols", [])
+        if isinstance(symbol, dict) and isinstance(symbol.get("id"), str)
+    }
+    paths: set[str] = set()
+    node_values = graph.get("nodes", []) if isinstance(graph, dict) else []
+    for node in node_values:
+        if not isinstance(node, dict):
+            continue
+        symbol = symbols.get(node.get("id"))
+        if isinstance(symbol, dict) and isinstance(symbol.get("file_path"), str):
+            paths.add(symbol["file_path"])
+    for edge in edge_values:
+        if not isinstance(edge, dict) or edge.get("namespace") == "loci":
+            continue
+        evidence = edge.get("evidence")
+        if isinstance(evidence, dict) and isinstance(evidence.get("file"), str):
+            paths.add(evidence["file"])
+        for endpoint in (edge.get("from"), edge.get("to")):
+            symbol = symbols.get(endpoint)
+            if isinstance(symbol, dict) and isinstance(symbol.get("file_path"), str):
+                paths.add(symbol["file_path"])
+    return all(_repository_file_path_is_safe(repo_path, path) for path in paths)
+
+
+def _repository_file_path_is_safe(repo_path: Path, value: str) -> bool:
+    path = PurePosixPath(value)
+    if (
+        not value
+        or "\\" in value
+        or path.is_absolute()
+        or ".." in path.parts
+        or path.as_posix() != value
+    ):
+        return False
+    candidate = repo_path / value
+    if candidate.is_symlink():
+        return False
+    try:
+        resolved = candidate.resolve(strict=True)
+        resolved.relative_to(repo_path)
+    except (OSError, ValueError):
+        return False
+    return resolved.is_file()
+
+
+def _load_graph_context(
+    repo_path: Path,
+    *,
+    ensure_fresh: bool,
+) -> tuple[IndexStore, dict[str, dict[str, Any]], GraphIndexState]:
+    store = get_store()
+    if ensure_fresh:
+        ensure_fresh_index(repo_path)
+    index = _load_required_index(store, repo_path)
+    indexed_nodes = {
+        symbol["id"]: symbol
+        for symbol in index.get("symbols", [])
+        if isinstance(symbol, dict) and isinstance(symbol.get("id"), str)
+    }
+    graph_value = index.get("graph")
+    if not isinstance(graph_value, dict):
+        raise LociError(
+            "INVALID_GRAPH_SCHEMA",
+            "Persisted graph state is missing",
+            {"repo": str(repo_path)},
+        )
+    try:
+        state = store.validate_graph_state(index)
+    except GraphContractError as exc:
+        raise LociError(exc.code, exc.message, exc.details) from exc
+    return store, indexed_nodes, state
+
+
+
+def _graph_status(graph_state: GraphIndexState) -> str:
+    if any(
+        diagnostic.severity in {"warning", "error"}
+        for diagnostic in graph_state.diagnostics
+    ):
+        return "degraded"
+    return "healthy"
+
+
+def _acquire_refresh_lock(lock_path: Path, timeout: float) -> None:
+    deadline = time.monotonic() + timeout
+    while True:
+        try:
+            fd = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        except FileExistsError:
+            if _reclaim_abandoned_refresh_lock(lock_path):
+                continue
+            if time.monotonic() >= deadline:
+                raise LociError(
+                    "STALE_INDEX_REFRESH_FAILED",
+                    "Timed out waiting for stale index refresh lock",
+                    {"lock": str(lock_path), "timeout_seconds": timeout},
+                )
+            time.sleep(REFRESH_LOCK_POLL_SECONDS)
+            continue
+        with os.fdopen(fd, "w") as f:
+            f.write(str(os.getpid()))
+        return
+
+
+def _reclaim_abandoned_refresh_lock(lock_path: Path) -> bool:
+    try:
+        initial = lock_path.stat()
+    except FileNotFoundError:
+        return True
+    if time.time() - initial.st_mtime < REFRESH_LOCK_RECLAIM_GRACE_SECONDS:
+        return False
+    try:
+        owner = int(lock_path.read_text().strip())
+    except (OSError, ValueError):
+        owner = -1
+    if owner > 0:
+        try:
+            os.kill(owner, 0)
+        except ProcessLookupError:
+            pass
+        except PermissionError:
+            return False
+        else:
+            return False
+    try:
+        current = lock_path.stat()
+        if (current.st_dev, current.st_ino) != (initial.st_dev, initial.st_ino):
+            return False
+        lock_path.unlink()
+    except FileNotFoundError:
+        pass
+    return True
+
+
+def _scan_repository_files(
+    repo_path: Path,
+    store: IndexStore,
+    *,
+    max_probe_paths: int | None = None,
+    max_probe_bytes: int | None = None,
+) -> RepositoryScan:
+    bytes_scanned = 0
+    charged_paths: set[Path] = set()
+
+    def charge(path: Path) -> None:
+        nonlocal bytes_scanned
+        if path in charged_paths:
+            return
+        size = path.stat().st_size
+        observed = bytes_scanned + size
+        if max_probe_bytes is not None and observed > max_probe_bytes:
+            raise RepositoryProbeLimitExceeded(
+                "REPOSITORY_BYTES_LIMIT_EXCEEDED",
+                max_probe_bytes,
+                observed,
+            )
+        charged_paths.add(path)
+        bytes_scanned = observed
+
+    gitignore_path = repo_path / ".gitignore"
+    if max_probe_bytes is not None and gitignore_path.is_file():
+        with gitignore_path.open("rb") as handle:
+            gitignore_bytes = handle.read(max_probe_bytes + 1)
+        if len(gitignore_bytes) > max_probe_bytes:
+            raise RepositoryProbeLimitExceeded(
+                "REPOSITORY_BYTES_LIMIT_EXCEEDED",
+                max_probe_bytes,
+                len(gitignore_bytes),
+            )
+        charged_paths.add(gitignore_path)
+        bytes_scanned = len(gitignore_bytes)
+        gitignore = pathspec.PathSpec.from_lines(
+            "gitwildmatch",
+            gitignore_bytes.decode("utf-8", errors="replace").splitlines(),
+        )
+    else:
+        gitignore = _load_gitignore(repo_path)
+    files: list[tuple[Path, str, str]] = []
+    go_controls: list[Path] = []
+    javascript_controls: list[Path] = []
+    cargo_controls: list[Path] = []
+    swift_controls: list[Path] = []
+    coverage = QueryCoverageRecorder()
+    ignored_roots: set[PurePosixPath] = set()
+
+    candidate_iterator = repo_path.rglob("*")
+    if max_probe_paths is None:
+        candidates = sorted(candidate_iterator)
+    else:
+        bounded_candidates = list(islice(candidate_iterator, max_probe_paths + 1))
+        if len(bounded_candidates) > max_probe_paths:
+            raise RepositoryProbeLimitExceeded(
+                "REPOSITORY_PATHS_LIMIT_EXCEEDED",
+                max_probe_paths,
+                len(bounded_candidates),
+            )
+        candidates = sorted(bounded_candidates)
+
+    for candidate in candidates:
+        rel_path = candidate.relative_to(repo_path).as_posix()
+        repository_path = PurePosixPath(rel_path)
+        exclusion_root = repository_path_exclusion_root(repository_path)
+        if exclusion_root is not None:
+            coverage.record("policy_excluded", exclusion_root.as_posix())
+            continue
+        if any(parent in ignored_roots for parent in repository_path.parents):
+            continue
+        is_file = candidate.is_file()
+        is_directory = not is_file and candidate.is_dir()
+        ignore_path = f"{rel_path}/" if is_directory else rel_path
+        if gitignore and gitignore.match_file(ignore_path):
+            coverage.record("ignored", rel_path)
+            if is_directory:
+                ignored_roots.add(repository_path)
+            continue
+        is_graph_extension = (
+            candidate.suffix == ".json"
+            and (
+                repository_path.is_relative_to(
+                    PurePosixPath(".loci/graph/profiles")
+                )
+                or repository_path.is_relative_to(
+                    PurePosixPath(".loci/graph/contributions")
+                )
+            )
+        )
+        if candidate.name in {"go.mod", "go.work"}:
+            if max_probe_bytes is not None:
+                charge(candidate)
+            go_controls.append(candidate)
+        if candidate.name in {
+            "package.json",
+            "pnpm-workspace.yaml",
+            "tsconfig.json",
+            "jsconfig.json",
+        }:
+            if max_probe_bytes is not None:
+                charge(candidate)
+            javascript_controls.append(candidate)
+        if candidate.name == "Cargo.toml":
+            if max_probe_bytes is not None:
+                charge(candidate)
+            cargo_controls.append(candidate)
+        if candidate.name == SWIFT_MANIFEST_NAME:
+            if max_probe_bytes is not None:
+                charge(candidate)
+            swift_controls.append(candidate)
+        if max_probe_bytes is not None and is_graph_extension:
+            charge(candidate)
+        if not is_file:
+            continue
+        exclusion_reason = source_exclusion_reason(repository_path)
+        if exclusion_reason is not None:
+            coverage.record(exclusion_reason, rel_path)
+            continue
+        if max_probe_bytes is not None:
+            remaining = max_probe_bytes - bytes_scanned
+            file_hash, file_bytes = _bounded_file_hash(candidate, remaining)
+            observed = bytes_scanned + file_bytes
+            if file_bytes > remaining:
+                raise RepositoryProbeLimitExceeded(
+                    "REPOSITORY_BYTES_LIMIT_EXCEEDED",
+                    max_probe_bytes,
+                    observed,
+                )
+            charged_paths.add(candidate)
+            bytes_scanned = observed
+        else:
+            file_hash = store.hash_file(candidate)
+        files.append((candidate, rel_path, file_hash))
+    return RepositoryScan(
+        indexable_files=tuple(files),
+        go_control_candidates=tuple(go_controls),
+        javascript_control_candidates=tuple(javascript_controls),
+        cargo_control_candidates=tuple(cargo_controls),
+        swift_control_candidates=tuple(swift_controls),
+        coverage=coverage.build(len(files)),
+        paths_scanned=len(candidates),
+        bytes_scanned=bytes_scanned,
+    )
+
+
+def _bounded_file_hash(path: Path, max_bytes: int) -> tuple[str, int]:
+    digest = hashlib.sha256()
+    total = 0
+    with path.open("rb") as handle:
+        while True:
+            chunk = handle.read(min(64 * 1024, max_bytes - total + 1))
+            if not chunk:
+                break
+            total += len(chunk)
+            if total > max_bytes:
+                return "", total
+            digest.update(chunk)
+    return digest.hexdigest(), total
+
+
+def _go_problem_diagnostic(problem: GoModuleProblem) -> GraphDiagnostic:
+    return GraphDiagnostic(
+        severity="warning",
+        code=problem.code,
+        message=problem.message,
+        source=problem.source,
+        details=problem.details,
+    )
+
+
+def _javascript_problem_diagnostic(
+    problem: JavaScriptModuleProblem,
+) -> GraphDiagnostic:
+    return GraphDiagnostic(
+        severity="warning",
+        code=problem.code,
+        message=problem.message,
+        source=problem.source,
+        details=problem.details,
+    )
+
+
+def _rust_problem_diagnostic(problem: RustCrateProblem) -> GraphDiagnostic:
+    return GraphDiagnostic(
+        severity="warning",
+        code=problem.code,
+        message=problem.message,
+        source=problem.source,
+        details=problem.details,
+    )
+
+
+def _extraction_diagnostic(
+    source: str,
+    error: ImportExtractionError,
+) -> GraphDiagnostic:
+    if isinstance(error, SourceParseError):
+        return GraphDiagnostic(
+            severity="info",
+            code="GRAPH_SOURCE_UNPARSED",
+            message="Source could not be parsed by the bundled grammar",
+            source=source,
+            details={"reason": str(error)},
+        )
+    reference_failed = (
+        isinstance(error.__cause__, ValueError)
+        and " reference extraction failed: " in str(error)
+    )
+    return GraphDiagnostic(
+        severity="warning",
+        code=(
+            "GRAPH_REFERENCE_EXTRACTION_FAILED"
+            if reference_failed
+            else "GRAPH_IMPORT_EXTRACTION_FAILED"
+        ),
+        message=(
+            "Reference observations could not be extracted"
+            if reference_failed
+            else "Import observations could not be extracted"
+        ),
+        source=source,
+        details={"reason": str(error)},
+    )
+
+
+def _get_symbol(
+    repo_path: Path,
+    store: IndexStore,
+    index: dict[str, Any],
+    symbol_id: str,
+    context: int,
+    selected_from_search_id: str | None = None,
+    selected_search_rank: int | None = None,
+) -> dict[str, Any]:
+    meta = next((s for s in index["symbols"] if s["id"] == symbol_id), None)
+    if meta is None:
+        store.log_miss("get_not_found", repo_path=str(repo_path), symbol_id=symbol_id)
+        raise LociError(
+            "SYMBOL_NOT_FOUND",
+            "Symbol not found",
+            {"repo": str(repo_path), "symbol_id": symbol_id},
+        )
+
+    content = store.get_symbol_content(repo_path, symbol_id)
+    if content is None:
+        store.log_miss("get_not_found", repo_path=str(repo_path), symbol_id=symbol_id)
+        raise LociError(
+            "SYMBOL_NOT_FOUND",
+            "Symbol source not found",
+            {"repo": str(repo_path), "symbol_id": symbol_id},
+        )
+
+    symbol_bytes = len(content.encode("utf-8"))
+    file_bytes = store.get_symbol_file_size(repo_path, symbol_id)
+    if file_bytes is not None:
+        store.log_retrieval(
+            symbol_id,
+            symbol_bytes,
+            file_bytes,
+            repo_path=str(repo_path),
+            kind=meta.get("kind"),
+            language=meta.get("language"),
+        )
+    if selected_from_search_id is not None:
+        store.log_search_selection(
+            selected_from_search_id,
+            symbol_id,
+            str(repo_path),
+            selected_search_rank,
+        )
+
+    result: dict[str, Any] = {
+        "id": symbol_id,
+        "source": content,
+        **{
+            key: meta.get(key)
+            for key in (
+                "byte_offset",
+                "byte_length",
+                "line",
+                "end_line",
+                "signature",
+                "kind",
+                "language",
+            )
+        },
+    }
+    if meta.get("decorators"):
+        result["decorators"] = meta["decorators"]
+    if context > 0:
+        symbol_context = store.get_symbol_context(repo_path, symbol_id, context)
+        if symbol_context:
+            result["context_before"] = symbol_context["context_before"]
+            result["context_after"] = symbol_context["context_after"]
+    return result
+
+
+def _remap_markdown_hierarchy_ids(sym: Symbol, id_map: dict[str, str]) -> None:
+    metadata = sym.metadata if isinstance(sym.metadata, dict) else {}
+    markdown = metadata.get("markdown")
+    if not isinstance(markdown, dict):
+        return
+    for key in ("parent_id", "root_id"):
+        value = markdown.get(key)
+        if isinstance(value, str) and value:
+            markdown[key] = id_map.get(value, value)
+
+
+def _add_markdown_retrieval_fields(entry: dict[str, Any], symbol: dict[str, Any]) -> None:
+    metadata = symbol.get("metadata")
+    markdown = metadata.get("markdown") if isinstance(metadata, dict) else None
+    if not isinstance(markdown, dict):
+        return
+    for key in ("file_bytes", "saved_pct", "span_kind"):
+        if key in markdown:
+            entry[key] = markdown[key]
+
+
+def _load_gitignore(repo_path: Path) -> "pathspec.PathSpec | None":
+    gitignore = repo_path / ".gitignore"
+    if not gitignore.exists():
+        return None
+    lines = gitignore.read_text(encoding="utf-8", errors="replace").splitlines()
+    return pathspec.PathSpec.from_lines("gitwildmatch", lines)

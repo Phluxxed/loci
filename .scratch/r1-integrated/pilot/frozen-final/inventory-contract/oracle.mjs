@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import { pathToFileURL } from 'node:url';
+const root=process.argv[2];
+const answer=JSON.parse(fs.readFileSync(path.join(root,'answer.json'),'utf8'));
+assert.deepEqual(answer,{"files": ["src/entry.js", "src/input/csv.js", "src/domain/stock.js", "src/domain/sku.js", "src/output/wire.js"], "output": {"product_code": "AB-2", "units": 0, "schema": 2}, "invalid_numeric": "invalid count", "reserved_applied_before_clamp": true});
+const load=async file => import(pathToFileURL(path.join(root,file)).href);
+const {importStock}=await load('src/entry.js'); assert.deepEqual(importStock(' ab-2 ,5,8'),answer.output); assert.throws(()=>importStock('x,no,1'),{message:answer.invalid_numeric}); assert.deepEqual(importStock('z,8,2'),{product_code:'Z',units:6,schema:2});
+console.log(JSON.stringify({status:'passed'}));

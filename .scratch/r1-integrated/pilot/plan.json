@@ -1,0 +1,2013 @@
+{
+  "tasks": [
+    {
+      "id": "receipt-location",
+      "source": "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/tasks/receipt-location/source",
+      "prompt": "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/tasks/receipt-location/prompt.txt",
+      "oracle": "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/tasks/receipt-location/oracle.mjs",
+      "criteria": {
+        "kind": "location",
+        "correctness": "exact structured answer plus independent runtime assertions",
+        "allowed_changes": [
+          "answer.json"
+        ]
+      }
+    },
+    {
+      "id": "inventory-contract",
+      "source": "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/tasks/inventory-contract/source",
+      "prompt": "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/tasks/inventory-contract/prompt.txt",
+      "oracle": "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/tasks/inventory-contract/oracle.mjs",
+      "criteria": {
+        "kind": "cross-file-contract",
+        "correctness": "exact structured answer plus independent runtime assertions",
+        "allowed_changes": [
+          "answer.json"
+        ]
+      }
+    },
+    {
+      "id": "dispatch-ambiguity",
+      "source": "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/tasks/dispatch-ambiguity/source",
+      "prompt": "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/tasks/dispatch-ambiguity/prompt.txt",
+      "oracle": "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/tasks/dispatch-ambiguity/oracle.mjs",
+      "criteria": {
+        "kind": "ambiguous-relationships",
+        "correctness": "exact structured answer plus independent runtime assertions",
+        "allowed_changes": [
+          "answer.json"
+        ]
+      }
+    },
+    {
+      "id": "zero-quantity",
+      "source": "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/tasks/zero-quantity/source",
+      "prompt": "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/tasks/zero-quantity/prompt.txt",
+      "oracle": "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/tasks/zero-quantity/oracle.mjs",
+      "criteria": {
+        "kind": "bounded-code-change",
+        "correctness": "exact structured answer plus independent runtime assertions",
+        "allowed_changes": [
+          "answer.json",
+          "src/quantity.js"
+        ]
+      }
+    }
+  ],
+  "model": "gpt-6.1-sol",
+  "effort": "high",
+  "native_config": "/Users/brummerv/.codex/config.toml",
+  "native_protection": {
+    "approval_policy": "on-request",
+    "approvals_reviewer": "auto_review",
+    "sandbox_policy": {
+      "type": "workspace-write",
+      "writable_roots": [
+        "/",
+        "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T"
+      ],
+      "network_access": true,
+      "exclude_tmpdir_env_var": false,
+      "exclude_slash_tmp": false
+    },
+    "permission_profile": {
+      "type": "managed",
+      "file_system": {
+        "type": "restricted",
+        "entries": [
+          {
+            "path": {
+              "type": "path",
+              "path": "/"
+            },
+            "access": "write"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/.claude"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/.claude/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/Downloads"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/Downloads/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/claude-otel"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/claude-otel/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/improvements"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/improvements/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/work"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/work/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "special",
+              "value": {
+                "kind": "minimal"
+              }
+            },
+            "access": "read"
+          },
+          {
+            "path": {
+              "type": "special",
+              "value": {
+                "kind": "tmpdir"
+              }
+            },
+            "access": "write"
+          }
+        ]
+      },
+      "network": "enabled"
+    },
+    "active_permission_profile": {
+      "id": "brummerv_filesystem_guard"
+    },
+    "file_system_sandbox_policy": {
+      "kind": "restricted",
+      "entries": [
+        {
+          "path": {
+            "type": "path",
+            "path": "/"
+          },
+          "access": "write"
+        },
+        {
+          "path": {
+            "type": "path",
+            "path": "/Users/brummerv/.claude"
+          },
+          "access": "deny"
+        },
+        {
+          "path": {
+            "type": "glob_pattern",
+            "pattern": "/Users/brummerv/.claude/**"
+          },
+          "access": "deny"
+        },
+        {
+          "path": {
+            "type": "path",
+            "path": "/Users/brummerv/Downloads"
+          },
+          "access": "deny"
+        },
+        {
+          "path": {
+            "type": "glob_pattern",
+            "pattern": "/Users/brummerv/Downloads/**"
+          },
+          "access": "deny"
+        },
+        {
+          "path": {
+            "type": "path",
+            "path": "/Users/brummerv/claude-otel"
+          },
+          "access": "deny"
+        },
+        {
+          "path": {
+            "type": "glob_pattern",
+            "pattern": "/Users/brummerv/claude-otel/**"
+          },
+          "access": "deny"
+        },
+        {
+          "path": {
+            "type": "path",
+            "path": "/Users/brummerv/improvements"
+          },
+          "access": "deny"
+        },
+        {
+          "path": {
+            "type": "glob_pattern",
+            "pattern": "/Users/brummerv/improvements/**"
+          },
+          "access": "deny"
+        },
+        {
+          "path": {
+            "type": "path",
+            "path": "/Users/brummerv/work"
+          },
+          "access": "deny"
+        },
+        {
+          "path": {
+            "type": "glob_pattern",
+            "pattern": "/Users/brummerv/work/**"
+          },
+          "access": "deny"
+        },
+        {
+          "path": {
+            "type": "special",
+            "value": {
+              "kind": "minimal"
+            }
+          },
+          "access": "read"
+        },
+        {
+          "path": {
+            "type": "special",
+            "value": {
+              "kind": "tmpdir"
+            }
+          },
+          "access": "write"
+        }
+      ]
+    }
+  },
+  "conditions": {
+    "native": {
+      "tools": [],
+      "catalog": [],
+      "implementation_files": {}
+    },
+    "path-only": {
+      "command": "/Users/brummerv/phluxxed/loci/.venv/bin/python",
+      "args": [
+        "-m",
+        "loci.integrated_mcp"
+      ],
+      "env": {
+        "PYTHONPATH": "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src",
+        "LOCI_BASE_DIR": "{store}",
+        "LOCI_STORE_NAMESPACE": "r1-pilot",
+        "LOCI_MCP_STARTUP_TRACE": "{store}/startup.jsonl",
+        "LOCI_R1_STORE": "{store}",
+        "LOCI_R1_SOURCE_ONLY": "1"
+      },
+      "tools": [
+        "loci_read",
+        "loci_retrieve"
+      ],
+      "catalog": [
+        {
+          "name": "loci_retrieve",
+          "description": "Find bounded current source by words or exact relative file path.\n\nAlternatively re-anchor one previously returned node_id in seed_ids.\nNavigation candidates are source paths, including alternatives; inspect\nthem with another retrieval. This operation performs no semantic parsing.\nExpand incomplete items with loci_read using the unchanged source_ref.\n",
+          "inputSchema": {
+            "properties": {
+              "repo": {
+                "minLength": 1,
+                "title": "Repo",
+                "type": "string"
+              },
+              "query": {
+                "default": "",
+                "maxLength": 1024,
+                "title": "Query",
+                "type": "string"
+              },
+              "seed_ids": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 1,
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Seed Ids"
+              }
+            },
+            "required": [
+              "repo"
+            ],
+            "type": "object",
+            "title": "loci_retrieveArguments"
+          }
+        },
+        {
+          "name": "loci_read",
+          "description": "Read a returned hash-bound source extent; follow next_source_ref until complete.\n\nSOURCE_STALE requires new retrieval or semantic acquisition. Works with\nboth ordinary source and semantic proof source references.\n",
+          "inputSchema": {
+            "properties": {
+              "repo": {
+                "minLength": 1,
+                "title": "Repo",
+                "type": "string"
+              },
+              "source_ref": {
+                "minLength": 1,
+                "title": "Source Ref",
+                "type": "string"
+              }
+            },
+            "required": [
+              "repo",
+              "source_ref"
+            ],
+            "type": "object",
+            "title": "loci_readArguments"
+          }
+        }
+      ],
+      "implementation_files": {
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/__init__.py": "91447944015cec709e8aa7655f7e9d64e1e4508e7023a57fe3746911c0fc6fed",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/_exploration_output.py": "97b32fab397ff3b86ae2f8d7410d006f362dd5311743e060fe95771e0703fdbc",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/_retrieval_output.py": "5b9e54525b573946ebc545675445109b74d135eb744893f6eac132d59284fbad",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/_retrieval_source.py": "06311f3293bee108f5b8f28e5efc9c81d95db8939662a9af57d25d49f352cdc9",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/cli.py": "d3bf14bcc017a689b183c527e5a106e5efe9f6bd6f0a2825f17f7c19215be37d",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/demand_semantics.py": "d5b769a7f828207f15bf5bf0baf25e8f360e7afb3022ae6da27a380511d043bb",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/exploration.py": "4534a23bc8a6b33a58f28bf86fae6d505d149f9cbc404a722dfafd9b05f82f54",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/focused_proof.py": "4648a7a1d5441f97288b933bbd85e0d1e959911174de53b8107396fedccede91",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/__init__.py": "db6bf6b681894c486336c219003fbbb116659c0e69b8717f002a7e172982a791",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_call_validation.py": "216e3faaf923bd66a807eaffe106bc98b655fec8944238d7fd1f0608fbf027d3",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_cargo_targets.py": "b5c4a8c410d3a3c34338bfec3b35fa9e4b5ad02aa50a9a380db0fb4341451de8",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_cargo_workspace.py": "98d08427cf8ccc3faa27cd061128deae3cab67fa0e421b34dc37c95e9717e92d",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_go_references.py": "ebb67570d41223fc5457ed691016134e544c7ad95dbcd41799a475af606ec460",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_go_types.py": "8cec90a22ac86189bd02f151520ba84cddbc20dfc576f4d38c77f97f47017078",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_javascript_references.py": "e9255f278a4ef881c605c61df5766bcc06859c06dd2aa80cbed14e8f76e1917c",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_javascript_resolution.py": "7ddf01f28365ee83cbe7088e7edadf5dc9f73d420b7c1d40509332649d27f2fa",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_python_references.py": "211105bbc047fccfed6c104f77bb23666b910a1fb79f31b90b6f413d4e870c37",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_reference_validation.py": "a012a08a6b99fcbf8798390ba57ec9988a21240a53c994bcfa82b5a5d2812e24",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_rust_aliases.py": "923a1b87b20213f2d4118ddd8fa694129138a50fc899c48efe1492905838b356",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_rust_import_schema.py": "43c666809f0c7c9a03519f7b0907ba95f8c6b063a2fbe27ed993311f768f0d2d",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_rust_references.py": "df279894945421c3a91ef36e483e21c242024146a3a95965be63d44fa737ff8f",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_rust_resolution.py": "e9b33cfde34657f3e5e003ac89b5ac74ba545e25820315d79e2b943d9f8430df",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_rust_semantics.py": "d0a9f5e1445dd6c967c4b30ccdd19de39fc6edee2bc5bffb11af3e715806d9f1",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_rust_types.py": "ca8a45bd996656fa29232cfe3d627f9d7f23e4cfe84ae046c89be815c11dc31a",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_swift_references.py": "c558270c92c040a8da39bd5769692e5399d877e0304bcfbebd876089035bf41c",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_type_validation.py": "c8fe12df02adcd713a45f82210bfb0835024594743fbc947645e73a188b436ca",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/anchors.py": "06d81d1ed55ca0e63420469cab25a400f5bfe62d04d4d275e9bee676e04f35e7",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/builtins.py": "2008af6e78d6cc3f15cc5a8f4d09893fc269f2994ef9b806958f63fa221e066d",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/calls.py": "b0ba4abe1aaa837ae88aecdb9afa8a352146109f3c8c22e4e709aa3acdede771",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/contracts.py": "69f273c853b3585fc36b1f696a95616e23c51588a605b1d76095d77c58c2c85d",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/go_modules.py": "4e77cdd4876683b271cd3dce55955c356bd20e70287deba0c4a72aa87c796245",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/imports.py": "3b2108dd351d012d21ee7d785062433736151dcce60783d9628a82d2b1ab3ee4",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/javascript_modules.py": "4cc852dea3466fd756638b71698c69da913a9137b77192f91ffa385561c34434",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/materialize.py": "1b98e8689b09a3fa8ab09913ff96fb13b29c96473747ae460d512c154ec5dc58",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/profiles.py": "b1099b62b0a166979f538ccf3c3ec4e328f661dd608d14fd5095ee9e714e80ce",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/references.py": "c7904e32a12276236f5598f257092e0151d97a76771285d9717ff4a9c80cf7aa",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/retrieval.py": "09e832c023110a06526d93e27335d04c19cdd527079702bd8fada46fe4f23809",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/rust_crates.py": "575ef620514a22e91face8d1de0bdf5e0baa6be1b57d097bf4b13d20fe6af4a8",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/state.py": "12d9aebd265f0301a4533ac24ca0c8904a9ec985d95201d96b978116dfcb2013",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/swift_modules.py": "0268c42f20d2b5d38e95785b973f27d67c44e91d53c8937abe4088ffc55b3af4",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/traversal.py": "8100667dde9eaf14e1c16059d52624d1065ba8263ea4626529297cc2b6d4c286",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/type_models.py": "20fc57142641cb8995ab0e9c54eaae804edb4e1db401f2d77483af96e40f84b1",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/type_relations.py": "60cd0075800472db85a18b7b3e67c544ad9bfd0e661f9abc73a4d6b1c7da496b",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph_free.py": "5fde3d960c5c3598751754771026648316f1a1c81a52d3e8b5742b92e2540d19",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/indexability.py": "5c54b77cc4b04001f1b05953467363ecec59ae277f6b844973bbe19af2bdaa56",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/integrated.py": "601250ea6d9a6416586c1653764e961e9a325427ab4e3cc5eeed9219bc201f36",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/integrated_mcp.py": "4d1b8a9668aab63da6b24c0a48e1a94d3df89ec0ab9f3db31815f5372de9f85b",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/mcp_output_models.py": "5c50099cc469e27c29777e67fbaf8c6467ab8893913fe589ba6e71788e8bbf90",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/mcp_record_pages.py": "aeeabadac68b9ff349ee09cbb2caf00f39e7a8c34b4766205c991963b706e2d7",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/mcp_server.py": "6a47e22a9bf486bb22290a8066e9f4b38666060594e727f3eadb2c6d717d13f5",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/_binding_context.py": "fd97c4ed4e004d2c5de99f4e05ef9811aaeab7221a31e306581d1bdd0c5a54c7",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/_javascript_bindings.py": "af177ab626d32a3de4fc55e1d7675aed317c05486d1ef18bde761bc35d2b5b0b",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/_javascript_mutations.py": "7a4a7c53d5b64064a54e87e2fd7159ef64810cccd236944c57f4b0ecdb2b0f19",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/_python_type_syntax.py": "eda85089016cdb5cbff83925052c7f7dec82776e94f68fb9c37a1f04f5c4b255",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/_reference_exports.py": "bc881d338779829c1e0ccb7e17348f6384403089a0b98b24b224bfe5beaa06c5",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/_reference_paths.py": "65485acfccbc91e7a251ea3120a12b700362621690711b269a02141e38f85743",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/call_models.py": "37c46a52253d273ffa1bf3c7fb8b62c8381c874cb647b10e38797658fa833e77",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/calls.py": "18daef7c24a756b1cee72a31cfd07f1a099e97135977bf7846ce0707a34ba4a8",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/extractor.py": "fee0dce818b1aaf9dd9166ce0f0156c59dda01b63ab9c1eb991faf67e7de1a83",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/go_type_observations.py": "a4ec7432084668650afbdf8c75891b2e95a88ce640ae088ad6c814b73ba4d6e5",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/imports.py": "3f88d4d1d516d1080e44afc6a3aa366726b1c22b1e4ccdc7064dba583a29f837",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/javascript_heritage.py": "7b027cdaaf3e3e313cf2a560b7360c1e7d392b82610aed5bd528db5d175900af",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/languages.py": "deec7e41387195a18ebb5e6d2df94be9f712407a93e626f1816f13322f104daa",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/python_type_observations.py": "166c8d4d1400c94017dee833ea060c8fa4461e42992055a518947eee5f260a11",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/reference_models.py": "4c3f140d1729fd344f02ff9660c46c8ce52a9489d426c009ee714550054fbfb3",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/references.py": "57189332e5f9c1236ccdaaf9d7786c098256b867fdf5a24ebb19ae22bf8e7954",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/rust_type_observations.py": "09a3ee66684cb72d38178ff97d1b9eaf1794d97b6cffce6d4c1da2cdba88f8aa",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/symbols.py": "d343f1d9257f3c944fa9cd4fa26dc7049decd9dc51bb447ce694a617b1e7e8c1",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/type_models.py": "5d79c479b06f564bdd29fabb8e3c97793961cc82cb512540b929dec3f0b3d3cb",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/type_observations.py": "352ddf925f7a4d9dd09755011b3256313a8b0baf6fdeed9b376ed0c67ae66d09",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/path_navigation.py": "0b80553ed93567a3d2e8fc14cfb531d5fa40b3b6b6db659bb3c96ebd077a4f20",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/query_coverage.py": "8f58b3e6b9d775ca66e213d99865edcb6587d2fa0b3736e3e174c7558f1996fe",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/retrieval.py": "b971f6821921af309d0a101ec1b18e50059a91cb1b46110327e67924d34af5b7",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/retrieval_io.py": "4cdba00e83fdd1ff85274e22898fbd4010edb49be4d0a6719fafdcaff04fc120",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/service.py": "375e1f5cf8fdcf7570c6eaca7561cf766b6f896aee1f17bf854c0f5f1358f18a",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/source_access.py": "0bf0efb3bbce80df485aea9ddd3d2212f8f596ca6a0f54d671b32c7d0ebd805e",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/storage/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/storage/index_store.py": "79236e9ee6248e716417f9020270360ca13e929f946d124a9439b5dcf6aa73e6",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/storage/repository_catalog.py": "a47d336f210017a4bb4f7242fb447b467a2ed0841025ed47a042b9508bf0d2c6",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/storage/source_refs.py": "ce83b8d8f01b6a5d24bd4c939bd4812e4d6425a3fb955ce539941129cda0e85f",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/storage/store_health.py": "a334a5e5058016a36246f344865cda3e663c51d85fe695881d81cf7c7112cc38",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/storage/store_identity.py": "f80472b94cdc7e07c6b1dd508da4b8e9e1ef876490ccfa34bd2062cc362a7b94",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/storage/store_layout.py": "6110aaa6ccdb7da671cfceb8203be85640980404e386f184a1fae683aa7f196d",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/storage/store_resolver.py": "95da79f1f64458076c746ee39871442fd41429acc2d3ad17453c8785098ca10e",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/type_context.py": "663c099ab8fffc37071f664938c8c4b35df3aa4bee0afe4e1ee72741f858e0cc"
+      }
+    },
+    "integrated": {
+      "command": "/Users/brummerv/phluxxed/loci/.venv/bin/python",
+      "args": [
+        "-m",
+        "loci.integrated_mcp"
+      ],
+      "env": {
+        "PYTHONPATH": "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src",
+        "LOCI_BASE_DIR": "{store}",
+        "LOCI_STORE_NAMESPACE": "r1-pilot",
+        "LOCI_MCP_STARTUP_TRACE": "{store}/startup.jsonl",
+        "LOCI_R1_STORE": "{store}",
+        "LOCI_R1_SOURCE_ONLY": "0"
+      },
+      "tools": [
+        "loci_proof",
+        "loci_read",
+        "loci_retrieve",
+        "loci_semantic"
+      ],
+      "catalog": [
+        {
+          "name": "loci_retrieve",
+          "description": "Find bounded current source by words or exact relative file path.\n\nAlternatively re-anchor one previously returned node_id in seed_ids.\nNavigation candidates are source paths, including alternatives; inspect\nthem with another retrieval. This operation performs no semantic parsing.\nExpand incomplete items with loci_read using the unchanged source_ref.\n",
+          "inputSchema": {
+            "properties": {
+              "repo": {
+                "minLength": 1,
+                "title": "Repo",
+                "type": "string"
+              },
+              "query": {
+                "default": "",
+                "maxLength": 1024,
+                "title": "Query",
+                "type": "string"
+              },
+              "seed_ids": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 1,
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Seed Ids"
+              }
+            },
+            "required": [
+              "repo"
+            ],
+            "type": "object",
+            "title": "loci_retrieveArguments"
+          }
+        },
+        {
+          "name": "loci_read",
+          "description": "Read a returned hash-bound source extent; follow next_source_ref until complete.\n\nSOURCE_STALE requires new retrieval or semantic acquisition. Works with\nboth ordinary source and semantic proof source references.\n",
+          "inputSchema": {
+            "properties": {
+              "repo": {
+                "minLength": 1,
+                "title": "Repo",
+                "type": "string"
+              },
+              "source_ref": {
+                "minLength": 1,
+                "title": "Source Ref",
+                "type": "string"
+              }
+            },
+            "required": [
+              "repo",
+              "source_ref"
+            ],
+            "type": "object",
+            "title": "loci_readArguments"
+          }
+        },
+        {
+          "name": "loci_semantic",
+          "description": "Request bounded static JS/TS/Rust relationships for a source question.\n\nOptionally anchor to a repository-relative file already located.\nIncludes complete source proof for emitted relationships and native\nuncertainty; omissions and empty output never prove absence. Python\nand Go semantics are unsupported. Retains one slice for followup proof.\n",
+          "inputSchema": {
+            "properties": {
+              "repo": {
+                "minLength": 1,
+                "title": "Repo",
+                "type": "string"
+              },
+              "query": {
+                "maxLength": 1024,
+                "minLength": 1,
+                "title": "Query",
+                "type": "string"
+              },
+              "anchor_file": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Anchor File"
+              }
+            },
+            "required": [
+              "repo",
+              "query"
+            ],
+            "type": "object",
+            "title": "loci_semanticArguments"
+          }
+        },
+        {
+          "name": "loci_proof",
+          "description": "Request focused proof for one previously delivered semantic node ID.\n\nReuses the most recent computed slice without new resolution. Can\nfollow IDs returned by proof itself. Repository changes require a\nfresh loci_semantic request. Missing proof remains unknown.\n",
+          "inputSchema": {
+            "properties": {
+              "repo": {
+                "minLength": 1,
+                "title": "Repo",
+                "type": "string"
+              },
+              "node_id": {
+                "minLength": 1,
+                "title": "Node Id",
+                "type": "string"
+              }
+            },
+            "required": [
+              "repo",
+              "node_id"
+            ],
+            "type": "object",
+            "title": "loci_proofArguments"
+          }
+        }
+      ],
+      "implementation_files": {
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/__init__.py": "91447944015cec709e8aa7655f7e9d64e1e4508e7023a57fe3746911c0fc6fed",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/_exploration_output.py": "97b32fab397ff3b86ae2f8d7410d006f362dd5311743e060fe95771e0703fdbc",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/_retrieval_output.py": "5b9e54525b573946ebc545675445109b74d135eb744893f6eac132d59284fbad",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/_retrieval_source.py": "06311f3293bee108f5b8f28e5efc9c81d95db8939662a9af57d25d49f352cdc9",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/cli.py": "d3bf14bcc017a689b183c527e5a106e5efe9f6bd6f0a2825f17f7c19215be37d",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/demand_semantics.py": "d5b769a7f828207f15bf5bf0baf25e8f360e7afb3022ae6da27a380511d043bb",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/exploration.py": "4534a23bc8a6b33a58f28bf86fae6d505d149f9cbc404a722dfafd9b05f82f54",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/focused_proof.py": "4648a7a1d5441f97288b933bbd85e0d1e959911174de53b8107396fedccede91",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/__init__.py": "db6bf6b681894c486336c219003fbbb116659c0e69b8717f002a7e172982a791",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_call_validation.py": "216e3faaf923bd66a807eaffe106bc98b655fec8944238d7fd1f0608fbf027d3",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_cargo_targets.py": "b5c4a8c410d3a3c34338bfec3b35fa9e4b5ad02aa50a9a380db0fb4341451de8",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_cargo_workspace.py": "98d08427cf8ccc3faa27cd061128deae3cab67fa0e421b34dc37c95e9717e92d",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_go_references.py": "ebb67570d41223fc5457ed691016134e544c7ad95dbcd41799a475af606ec460",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_go_types.py": "8cec90a22ac86189bd02f151520ba84cddbc20dfc576f4d38c77f97f47017078",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_javascript_references.py": "e9255f278a4ef881c605c61df5766bcc06859c06dd2aa80cbed14e8f76e1917c",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_javascript_resolution.py": "7ddf01f28365ee83cbe7088e7edadf5dc9f73d420b7c1d40509332649d27f2fa",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_python_references.py": "211105bbc047fccfed6c104f77bb23666b910a1fb79f31b90b6f413d4e870c37",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_reference_validation.py": "a012a08a6b99fcbf8798390ba57ec9988a21240a53c994bcfa82b5a5d2812e24",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_rust_aliases.py": "923a1b87b20213f2d4118ddd8fa694129138a50fc899c48efe1492905838b356",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_rust_import_schema.py": "43c666809f0c7c9a03519f7b0907ba95f8c6b063a2fbe27ed993311f768f0d2d",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_rust_references.py": "df279894945421c3a91ef36e483e21c242024146a3a95965be63d44fa737ff8f",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_rust_resolution.py": "e9b33cfde34657f3e5e003ac89b5ac74ba545e25820315d79e2b943d9f8430df",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_rust_semantics.py": "d0a9f5e1445dd6c967c4b30ccdd19de39fc6edee2bc5bffb11af3e715806d9f1",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_rust_types.py": "ca8a45bd996656fa29232cfe3d627f9d7f23e4cfe84ae046c89be815c11dc31a",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_swift_references.py": "c558270c92c040a8da39bd5769692e5399d877e0304bcfbebd876089035bf41c",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/_type_validation.py": "c8fe12df02adcd713a45f82210bfb0835024594743fbc947645e73a188b436ca",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/anchors.py": "06d81d1ed55ca0e63420469cab25a400f5bfe62d04d4d275e9bee676e04f35e7",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/builtins.py": "2008af6e78d6cc3f15cc5a8f4d09893fc269f2994ef9b806958f63fa221e066d",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/calls.py": "b0ba4abe1aaa837ae88aecdb9afa8a352146109f3c8c22e4e709aa3acdede771",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/contracts.py": "69f273c853b3585fc36b1f696a95616e23c51588a605b1d76095d77c58c2c85d",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/go_modules.py": "4e77cdd4876683b271cd3dce55955c356bd20e70287deba0c4a72aa87c796245",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/imports.py": "3b2108dd351d012d21ee7d785062433736151dcce60783d9628a82d2b1ab3ee4",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/javascript_modules.py": "4cc852dea3466fd756638b71698c69da913a9137b77192f91ffa385561c34434",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/materialize.py": "1b98e8689b09a3fa8ab09913ff96fb13b29c96473747ae460d512c154ec5dc58",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/profiles.py": "b1099b62b0a166979f538ccf3c3ec4e328f661dd608d14fd5095ee9e714e80ce",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/references.py": "c7904e32a12276236f5598f257092e0151d97a76771285d9717ff4a9c80cf7aa",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/retrieval.py": "09e832c023110a06526d93e27335d04c19cdd527079702bd8fada46fe4f23809",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/rust_crates.py": "575ef620514a22e91face8d1de0bdf5e0baa6be1b57d097bf4b13d20fe6af4a8",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/state.py": "12d9aebd265f0301a4533ac24ca0c8904a9ec985d95201d96b978116dfcb2013",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/swift_modules.py": "0268c42f20d2b5d38e95785b973f27d67c44e91d53c8937abe4088ffc55b3af4",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/traversal.py": "8100667dde9eaf14e1c16059d52624d1065ba8263ea4626529297cc2b6d4c286",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/type_models.py": "20fc57142641cb8995ab0e9c54eaae804edb4e1db401f2d77483af96e40f84b1",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph/type_relations.py": "60cd0075800472db85a18b7b3e67c544ad9bfd0e661f9abc73a4d6b1c7da496b",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/graph_free.py": "5fde3d960c5c3598751754771026648316f1a1c81a52d3e8b5742b92e2540d19",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/indexability.py": "5c54b77cc4b04001f1b05953467363ecec59ae277f6b844973bbe19af2bdaa56",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/integrated.py": "601250ea6d9a6416586c1653764e961e9a325427ab4e3cc5eeed9219bc201f36",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/integrated_mcp.py": "4d1b8a9668aab63da6b24c0a48e1a94d3df89ec0ab9f3db31815f5372de9f85b",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/mcp_output_models.py": "5c50099cc469e27c29777e67fbaf8c6467ab8893913fe589ba6e71788e8bbf90",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/mcp_record_pages.py": "aeeabadac68b9ff349ee09cbb2caf00f39e7a8c34b4766205c991963b706e2d7",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/mcp_server.py": "6a47e22a9bf486bb22290a8066e9f4b38666060594e727f3eadb2c6d717d13f5",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/_binding_context.py": "fd97c4ed4e004d2c5de99f4e05ef9811aaeab7221a31e306581d1bdd0c5a54c7",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/_javascript_bindings.py": "af177ab626d32a3de4fc55e1d7675aed317c05486d1ef18bde761bc35d2b5b0b",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/_javascript_mutations.py": "7a4a7c53d5b64064a54e87e2fd7159ef64810cccd236944c57f4b0ecdb2b0f19",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/_python_type_syntax.py": "eda85089016cdb5cbff83925052c7f7dec82776e94f68fb9c37a1f04f5c4b255",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/_reference_exports.py": "bc881d338779829c1e0ccb7e17348f6384403089a0b98b24b224bfe5beaa06c5",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/_reference_paths.py": "65485acfccbc91e7a251ea3120a12b700362621690711b269a02141e38f85743",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/call_models.py": "37c46a52253d273ffa1bf3c7fb8b62c8381c874cb647b10e38797658fa833e77",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/calls.py": "18daef7c24a756b1cee72a31cfd07f1a099e97135977bf7846ce0707a34ba4a8",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/extractor.py": "fee0dce818b1aaf9dd9166ce0f0156c59dda01b63ab9c1eb991faf67e7de1a83",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/go_type_observations.py": "a4ec7432084668650afbdf8c75891b2e95a88ce640ae088ad6c814b73ba4d6e5",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/imports.py": "3f88d4d1d516d1080e44afc6a3aa366726b1c22b1e4ccdc7064dba583a29f837",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/javascript_heritage.py": "7b027cdaaf3e3e313cf2a560b7360c1e7d392b82610aed5bd528db5d175900af",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/languages.py": "deec7e41387195a18ebb5e6d2df94be9f712407a93e626f1816f13322f104daa",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/python_type_observations.py": "166c8d4d1400c94017dee833ea060c8fa4461e42992055a518947eee5f260a11",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/reference_models.py": "4c3f140d1729fd344f02ff9660c46c8ce52a9489d426c009ee714550054fbfb3",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/references.py": "57189332e5f9c1236ccdaaf9d7786c098256b867fdf5a24ebb19ae22bf8e7954",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/rust_type_observations.py": "09a3ee66684cb72d38178ff97d1b9eaf1794d97b6cffce6d4c1da2cdba88f8aa",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/symbols.py": "d343f1d9257f3c944fa9cd4fa26dc7049decd9dc51bb447ce694a617b1e7e8c1",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/type_models.py": "5d79c479b06f564bdd29fabb8e3c97793961cc82cb512540b929dec3f0b3d3cb",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/parser/type_observations.py": "352ddf925f7a4d9dd09755011b3256313a8b0baf6fdeed9b376ed0c67ae66d09",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/path_navigation.py": "0b80553ed93567a3d2e8fc14cfb531d5fa40b3b6b6db659bb3c96ebd077a4f20",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/query_coverage.py": "8f58b3e6b9d775ca66e213d99865edcb6587d2fa0b3736e3e174c7558f1996fe",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/retrieval.py": "b971f6821921af309d0a101ec1b18e50059a91cb1b46110327e67924d34af5b7",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/retrieval_io.py": "4cdba00e83fdd1ff85274e22898fbd4010edb49be4d0a6719fafdcaff04fc120",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/service.py": "375e1f5cf8fdcf7570c6eaca7561cf766b6f896aee1f17bf854c0f5f1358f18a",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/source_access.py": "0bf0efb3bbce80df485aea9ddd3d2212f8f596ca6a0f54d671b32c7d0ebd805e",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/storage/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/storage/index_store.py": "79236e9ee6248e716417f9020270360ca13e929f946d124a9439b5dcf6aa73e6",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/storage/repository_catalog.py": "a47d336f210017a4bb4f7242fb447b467a2ed0841025ed47a042b9508bf0d2c6",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/storage/source_refs.py": "ce83b8d8f01b6a5d24bd4c939bd4812e4d6425a3fb955ce539941129cda0e85f",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/storage/store_health.py": "a334a5e5058016a36246f344865cda3e663c51d85fe695881d81cf7c7112cc38",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/storage/store_identity.py": "f80472b94cdc7e07c6b1dd508da4b8e9e1ef876490ccfa34bd2062cc362a7b94",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/storage/store_layout.py": "6110aaa6ccdb7da671cfceb8203be85640980404e386f184a1fae683aa7f196d",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/storage/store_resolver.py": "95da79f1f64458076c746ee39871442fd41429acc2d3ad17453c8785098ca10e",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/src/loci/type_context.py": "663c099ab8fffc37071f664938c8c4b35df3aa4bee0afe4e1ee72741f858e0cc"
+      }
+    },
+    "eager": {
+      "command": "/Users/brummerv/phluxxed/loci/.venv/bin/python",
+      "args": [
+        "-m",
+        "loci.mcp_server"
+      ],
+      "env": {
+        "PYTHONPATH": "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src",
+        "LOCI_BASE_DIR": "{store}",
+        "LOCI_STORE_NAMESPACE": "r1-pilot",
+        "LOCI_MCP_STARTUP_TRACE": "{store}/startup.jsonl",
+        "LOCI_R1_STORE": "{store}",
+        "LOCI_R1_SOURCE_ONLY": "0"
+      },
+      "tools": [
+        "loci_read",
+        "loci_retrieve"
+      ],
+      "catalog": [
+        {
+          "name": "loci_retrieve",
+          "description": "Retrieve deterministic bounded static source context.\n\nProvide a query or up to five exact seed IDs returned earlier. An exact\nindexed relative file path in ``query`` selects that file; other queries\nselect bounded source candidates. The repository refreshes automatically.\nResults include source, relationship proof, ambiguity and omissions. Use\nan incomplete item's short ``source_ref`` with ``loci_read`` to hydrate its\nexact source, or pass a returned node ID as a seed to re-anchor under the\nsame fixed policy. Relationships are static and non-exhaustive.\n",
+          "inputSchema": {
+            "properties": {
+              "repo": {
+                "minLength": 1,
+                "title": "Repo",
+                "type": "string"
+              },
+              "query": {
+                "default": "",
+                "title": "Query",
+                "type": "string",
+                "x-maxUtf8Bytes": 4096
+              },
+              "seed_ids": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "maxItems": 5,
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Seed Ids",
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "repo"
+            ],
+            "type": "object",
+            "title": "loci_retrieveArguments"
+          },
+          "outputSchema": {
+            "type": "object",
+            "$defs": {
+              "JsonValue": {},
+              "LociErrorBody": {
+                "additionalProperties": false,
+                "properties": {
+                  "code": {
+                    "title": "Code",
+                    "type": "string"
+                  },
+                  "message": {
+                    "title": "Message",
+                    "type": "string"
+                  },
+                  "details": {
+                    "additionalProperties": {
+                      "$ref": "#/$defs/JsonValue"
+                    },
+                    "title": "Details",
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "code",
+                  "message",
+                  "details"
+                ],
+                "title": "LociErrorBody",
+                "type": "object"
+              },
+              "LociErrorOutput": {
+                "additionalProperties": false,
+                "properties": {
+                  "error": {
+                    "$ref": "#/$defs/LociErrorBody"
+                  }
+                },
+                "required": [
+                  "error"
+                ],
+                "title": "LociErrorOutput",
+                "type": "object"
+              },
+              "LociRetrieveSuccess": {
+                "additionalProperties": false,
+                "properties": {
+                  "schema_version": {
+                    "const": 1,
+                    "title": "Schema Version",
+                    "type": "integer"
+                  },
+                  "policy": {
+                    "const": "normal-graph-v1",
+                    "title": "Policy",
+                    "type": "string"
+                  },
+                  "snapshot": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "title": "Snapshot",
+                    "type": "string"
+                  },
+                  "status": {
+                    "enum": [
+                      "ok",
+                      "partial",
+                      "empty"
+                    ],
+                    "title": "Status",
+                    "type": "string"
+                  },
+                  "selection": {
+                    "$ref": "#/$defs/NormalSelection"
+                  },
+                  "scope": {
+                    "$ref": "#/$defs/NormalScope"
+                  },
+                  "anchors": {
+                    "items": {
+                      "$ref": "#/$defs/NormalAnchor"
+                    },
+                    "title": "Anchors",
+                    "type": "array"
+                  },
+                  "nodes": {
+                    "items": {
+                      "$ref": "#/$defs/NormalNode"
+                    },
+                    "title": "Nodes",
+                    "type": "array"
+                  },
+                  "items": {
+                    "items": {
+                      "$ref": "#/$defs/NormalItem"
+                    },
+                    "title": "Items",
+                    "type": "array"
+                  },
+                  "ownership": {
+                    "items": {
+                      "$ref": "#/$defs/NormalOwnership"
+                    },
+                    "title": "Ownership",
+                    "type": "array"
+                  },
+                  "relationships": {
+                    "items": {
+                      "$ref": "#/$defs/NormalRelationship"
+                    },
+                    "title": "Relationships",
+                    "type": "array"
+                  },
+                  "sources": {
+                    "items": {
+                      "$ref": "#/$defs/NormalSource"
+                    },
+                    "title": "Sources",
+                    "type": "array"
+                  },
+                  "omissions": {
+                    "items": {
+                      "$ref": "#/$defs/NormalOmission"
+                    },
+                    "title": "Omissions",
+                    "type": "array"
+                  },
+                  "limits": {
+                    "$ref": "#/$defs/NormalLimits"
+                  },
+                  "usage": {
+                    "$ref": "#/$defs/NormalUsage"
+                  }
+                },
+                "required": [
+                  "schema_version",
+                  "policy",
+                  "snapshot",
+                  "status",
+                  "selection",
+                  "scope",
+                  "anchors",
+                  "nodes",
+                  "items",
+                  "ownership",
+                  "relationships",
+                  "sources",
+                  "omissions",
+                  "limits",
+                  "usage"
+                ],
+                "title": "LociRetrieveSuccess",
+                "type": "object"
+              },
+              "NormalAnchor": {
+                "additionalProperties": false,
+                "properties": {
+                  "node_id": {
+                    "minLength": 1,
+                    "title": "Node Id",
+                    "type": "string"
+                  },
+                  "score": {
+                    "title": "Score",
+                    "type": "number"
+                  },
+                  "matched_terms": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "title": "Matched Terms",
+                    "type": "array"
+                  },
+                  "match_scope": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "title": "Match Scope",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "node_id",
+                  "score",
+                  "matched_terms",
+                  "match_scope"
+                ],
+                "title": "NormalAnchor",
+                "type": "object"
+              },
+              "NormalEdge": {
+                "additionalProperties": false,
+                "properties": {
+                  "from": {
+                    "minLength": 1,
+                    "title": "From",
+                    "type": "string"
+                  },
+                  "to": {
+                    "minLength": 1,
+                    "title": "To",
+                    "type": "string"
+                  },
+                  "type": {
+                    "minLength": 1,
+                    "title": "Type",
+                    "type": "string"
+                  },
+                  "directed": {
+                    "const": true,
+                    "title": "Directed",
+                    "type": "boolean"
+                  },
+                  "namespace": {
+                    "const": "loci",
+                    "title": "Namespace",
+                    "type": "string"
+                  },
+                  "resolution": {
+                    "enum": [
+                      "exact",
+                      "declared",
+                      "import-resolved"
+                    ],
+                    "title": "Resolution",
+                    "type": "string"
+                  },
+                  "evidence": {
+                    "$ref": "#/$defs/NormalEvidence"
+                  }
+                },
+                "required": [
+                  "from",
+                  "to",
+                  "type",
+                  "directed",
+                  "namespace",
+                  "resolution",
+                  "evidence"
+                ],
+                "title": "NormalEdge",
+                "type": "object"
+              },
+              "NormalEvidence": {
+                "additionalProperties": false,
+                "properties": {
+                  "file": {
+                    "minLength": 1,
+                    "title": "File",
+                    "type": "string"
+                  },
+                  "line": {
+                    "minimum": 1,
+                    "title": "Line",
+                    "type": "integer"
+                  },
+                  "content_hash": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "title": "Content Hash",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file",
+                  "line",
+                  "content_hash"
+                ],
+                "title": "NormalEvidence",
+                "type": "object"
+              },
+              "NormalExtent": {
+                "additionalProperties": false,
+                "properties": {
+                  "file": {
+                    "minLength": 1,
+                    "title": "File",
+                    "type": "string"
+                  },
+                  "content_hash": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "title": "Content Hash",
+                    "type": "string"
+                  },
+                  "start_byte": {
+                    "minimum": 0,
+                    "title": "Start Byte",
+                    "type": "integer"
+                  },
+                  "end_byte": {
+                    "minimum": 0,
+                    "title": "End Byte",
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "file",
+                  "content_hash",
+                  "start_byte",
+                  "end_byte"
+                ],
+                "title": "NormalExtent",
+                "type": "object"
+              },
+              "NormalItem": {
+                "additionalProperties": false,
+                "properties": {
+                  "node_id": {
+                    "minLength": 1,
+                    "title": "Node Id",
+                    "type": "string"
+                  },
+                  "role": {
+                    "enum": [
+                      "anchor",
+                      "related"
+                    ],
+                    "title": "Role",
+                    "type": "string"
+                  },
+                  "depth": {
+                    "minimum": 0,
+                    "title": "Depth",
+                    "type": "integer"
+                  },
+                  "why": {
+                    "minLength": 1,
+                    "title": "Why",
+                    "type": "string"
+                  },
+                  "source_ids": {
+                    "items": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "minItems": 1,
+                    "title": "Source Ids",
+                    "type": "array"
+                  },
+                  "complete": {
+                    "title": "Complete",
+                    "type": "boolean"
+                  },
+                  "extent": {
+                    "$ref": "#/$defs/NormalExtent"
+                  },
+                  "source_ref": {
+                    "minLength": 1,
+                    "title": "Source Ref",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "node_id",
+                  "role",
+                  "depth",
+                  "why",
+                  "source_ids",
+                  "complete",
+                  "extent",
+                  "source_ref"
+                ],
+                "title": "NormalItem",
+                "type": "object"
+              },
+              "NormalLimits": {
+                "additionalProperties": false,
+                "properties": {
+                  "max_hops": {
+                    "const": 2,
+                    "title": "Max Hops",
+                    "type": "integer"
+                  },
+                  "max_nodes": {
+                    "const": 64,
+                    "title": "Max Nodes",
+                    "type": "integer"
+                  },
+                  "max_neighbors": {
+                    "const": 32,
+                    "title": "Max Neighbors",
+                    "type": "integer"
+                  },
+                  "max_items": {
+                    "const": 12,
+                    "title": "Max Items",
+                    "type": "integer"
+                  },
+                  "max_anchors": {
+                    "const": 3,
+                    "title": "Max Anchors",
+                    "type": "integer"
+                  },
+                  "max_explicit_anchors": {
+                    "const": 5,
+                    "title": "Max Explicit Anchors",
+                    "type": "integer"
+                  },
+                  "max_owner_members": {
+                    "const": 3,
+                    "title": "Max Owner Members",
+                    "type": "integer"
+                  },
+                  "max_evidence_bytes": {
+                    "const": 8192,
+                    "title": "Max Evidence Bytes",
+                    "type": "integer"
+                  },
+                  "max_output_bytes": {
+                    "const": 16384,
+                    "title": "Max Output Bytes",
+                    "type": "integer"
+                  },
+                  "max_anchor_source_bytes": {
+                    "const": 1024,
+                    "title": "Max Anchor Source Bytes",
+                    "type": "integer"
+                  },
+                  "max_related_source_bytes": {
+                    "const": 768,
+                    "title": "Max Related Source Bytes",
+                    "type": "integer"
+                  },
+                  "max_lookup_bytes": {
+                    "const": 33554432,
+                    "title": "Max Lookup Bytes",
+                    "type": "integer"
+                  },
+                  "max_lookup_files": {
+                    "const": 4096,
+                    "title": "Max Lookup Files",
+                    "type": "integer"
+                  },
+                  "max_literal_matches": {
+                    "const": 256,
+                    "title": "Max Literal Matches",
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "max_hops",
+                  "max_nodes",
+                  "max_neighbors",
+                  "max_items",
+                  "max_anchors",
+                  "max_explicit_anchors",
+                  "max_owner_members",
+                  "max_evidence_bytes",
+                  "max_output_bytes",
+                  "max_anchor_source_bytes",
+                  "max_related_source_bytes",
+                  "max_lookup_bytes",
+                  "max_lookup_files",
+                  "max_literal_matches"
+                ],
+                "title": "NormalLimits",
+                "type": "object"
+              },
+              "NormalNode": {
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "minLength": 1,
+                    "title": "Id",
+                    "type": "string"
+                  },
+                  "name": {
+                    "title": "Name",
+                    "type": "string"
+                  },
+                  "kind": {
+                    "minLength": 1,
+                    "title": "Kind",
+                    "type": "string"
+                  },
+                  "file": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "title": "File"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "kind",
+                  "file"
+                ],
+                "title": "NormalNode",
+                "type": "object"
+              },
+              "NormalOmission": {
+                "additionalProperties": false,
+                "properties": {
+                  "reason": {
+                    "enum": [
+                      "no_anchor",
+                      "anchor_limit",
+                      "ambiguous_anchor",
+                      "lookup_limit",
+                      "node_limit",
+                      "neighbor_limit",
+                      "item_limit",
+                      "hop_limit",
+                      "cycle",
+                      "alternative_path",
+                      "ownership_limit",
+                      "unsupported_semantics",
+                      "unresolved_relation",
+                      "ambiguous_relation",
+                      "external_relation",
+                      "inaccessible_relation",
+                      "source_unavailable",
+                      "source_stale",
+                      "source_preview",
+                      "proof_unavailable",
+                      "evidence_budget",
+                      "output_budget"
+                    ],
+                    "title": "Reason",
+                    "type": "string"
+                  },
+                  "count": {
+                    "minimum": 1,
+                    "title": "Count",
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "reason",
+                  "count"
+                ],
+                "title": "NormalOmission",
+                "type": "object"
+              },
+              "NormalOwnership": {
+                "additionalProperties": false,
+                "properties": {
+                  "owner_id": {
+                    "minLength": 1,
+                    "title": "Owner Id",
+                    "type": "string"
+                  },
+                  "member_id": {
+                    "minLength": 1,
+                    "title": "Member Id",
+                    "type": "string"
+                  },
+                  "basis": {
+                    "enum": [
+                      "indexed_file",
+                      "go_package",
+                      "rust_crate",
+                      "swift_module"
+                    ],
+                    "title": "Basis",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "owner_id",
+                  "member_id",
+                  "basis"
+                ],
+                "title": "NormalOwnership",
+                "type": "object"
+              },
+              "NormalRelationship": {
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "minimum": 1,
+                    "title": "Id",
+                    "type": "integer"
+                  },
+                  "edge": {
+                    "$ref": "#/$defs/NormalEdge"
+                  },
+                  "traversed": {
+                    "enum": [
+                      "forward",
+                      "reverse"
+                    ],
+                    "title": "Traversed",
+                    "type": "string"
+                  },
+                  "source_ids": {
+                    "items": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "minItems": 1,
+                    "title": "Source Ids",
+                    "type": "array"
+                  },
+                  "proof": {
+                    "const": "complete",
+                    "title": "Proof",
+                    "type": "string"
+                  },
+                  "resolution_configuration": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "unconditional",
+                          "declared_possible"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "title": "Resolution Configuration"
+                  }
+                },
+                "required": [
+                  "id",
+                  "edge",
+                  "traversed",
+                  "source_ids",
+                  "proof",
+                  "resolution_configuration"
+                ],
+                "title": "NormalRelationship",
+                "type": "object"
+              },
+              "NormalScope": {
+                "additionalProperties": false,
+                "properties": {
+                  "source": {
+                    "const": "indexed_supported_source",
+                    "title": "Source",
+                    "type": "string"
+                  },
+                  "coverage": {
+                    "enum": [
+                      "complete",
+                      "partial",
+                      "unknown"
+                    ],
+                    "title": "Coverage",
+                    "type": "string"
+                  },
+                  "matching": {
+                    "enum": [
+                      "explicit_ids",
+                      "exact_file",
+                      "symbol_metadata",
+                      "source_literal"
+                    ],
+                    "title": "Matching",
+                    "type": "string"
+                  },
+                  "relationships": {
+                    "const": "known_static_relationships",
+                    "description": "Evidence domain of any returned relationships: known static source relationships. Not an execution-stage report or a guarantee that relationships were searched for or selected.",
+                    "title": "Relationships",
+                    "type": "string"
+                  },
+                  "exhaustive": {
+                    "const": false,
+                    "title": "Exhaustive",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "source",
+                  "coverage",
+                  "matching",
+                  "relationships",
+                  "exhaustive"
+                ],
+                "title": "NormalScope",
+                "type": "object"
+              },
+              "NormalSelection": {
+                "additionalProperties": false,
+                "properties": {
+                  "mode": {
+                    "enum": [
+                      "explicit",
+                      "inferred",
+                      "file",
+                      "literal"
+                    ],
+                    "title": "Mode",
+                    "type": "string"
+                  },
+                  "candidate_count": {
+                    "minimum": 0,
+                    "title": "Candidate Count",
+                    "type": "integer"
+                  },
+                  "omitted_candidates": {
+                    "minimum": 0,
+                    "title": "Omitted Candidates",
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "mode",
+                  "candidate_count",
+                  "omitted_candidates"
+                ],
+                "title": "NormalSelection",
+                "type": "object"
+              },
+              "NormalSource": {
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "minimum": 1,
+                    "title": "Id",
+                    "type": "integer"
+                  },
+                  "file": {
+                    "minLength": 1,
+                    "title": "File",
+                    "type": "string"
+                  },
+                  "start_byte": {
+                    "minimum": 0,
+                    "title": "Start Byte",
+                    "type": "integer"
+                  },
+                  "end_byte": {
+                    "minimum": 0,
+                    "title": "End Byte",
+                    "type": "integer"
+                  },
+                  "start_line": {
+                    "minimum": 1,
+                    "title": "Start Line",
+                    "type": "integer"
+                  },
+                  "end_line": {
+                    "minimum": 1,
+                    "title": "End Line",
+                    "type": "integer"
+                  },
+                  "content_hash": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "title": "Content Hash",
+                    "type": "string"
+                  },
+                  "content": {
+                    "title": "Content",
+                    "type": "string"
+                  },
+                  "source_ref": {
+                    "minLength": 1,
+                    "title": "Source Ref",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "file",
+                  "start_byte",
+                  "end_byte",
+                  "start_line",
+                  "end_line",
+                  "content_hash",
+                  "content",
+                  "source_ref"
+                ],
+                "title": "NormalSource",
+                "type": "object"
+              },
+              "NormalUsage": {
+                "additionalProperties": false,
+                "properties": {
+                  "nodes_examined": {
+                    "minimum": 0,
+                    "title": "Nodes Examined",
+                    "type": "integer"
+                  },
+                  "eligible_edges_considered": {
+                    "minimum": 0,
+                    "title": "Eligible Edges Considered",
+                    "type": "integer"
+                  },
+                  "edges_traversed": {
+                    "minimum": 0,
+                    "title": "Edges Traversed",
+                    "type": "integer"
+                  },
+                  "relationships_delivered": {
+                    "minimum": 0,
+                    "title": "Relationships Delivered",
+                    "type": "integer"
+                  },
+                  "lookup_bytes": {
+                    "minimum": 0,
+                    "title": "Lookup Bytes",
+                    "type": "integer"
+                  },
+                  "lookup_files": {
+                    "minimum": 0,
+                    "title": "Lookup Files",
+                    "type": "integer"
+                  },
+                  "evidence_bytes": {
+                    "minimum": 0,
+                    "title": "Evidence Bytes",
+                    "type": "integer"
+                  },
+                  "output_bytes": {
+                    "minimum": 0,
+                    "title": "Output Bytes",
+                    "type": "integer"
+                  },
+                  "estimated_tokens": {
+                    "minimum": 0,
+                    "title": "Estimated Tokens",
+                    "type": "integer"
+                  },
+                  "token_estimate_method": {
+                    "const": "utf8_bytes_div_4",
+                    "title": "Token Estimate Method",
+                    "type": "string"
+                  },
+                  "output_encoding": {
+                    "const": "mcp_result_json_utf8",
+                    "title": "Output Encoding",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "nodes_examined",
+                  "eligible_edges_considered",
+                  "edges_traversed",
+                  "relationships_delivered",
+                  "lookup_bytes",
+                  "lookup_files",
+                  "evidence_bytes",
+                  "output_bytes",
+                  "estimated_tokens",
+                  "token_estimate_method",
+                  "output_encoding"
+                ],
+                "title": "NormalUsage",
+                "type": "object"
+              }
+            },
+            "anyOf": [
+              {
+                "$ref": "#/$defs/LociRetrieveSuccess"
+              },
+              {
+                "$ref": "#/$defs/LociErrorOutput"
+              }
+            ],
+            "title": "LociRetrieveOutput"
+          }
+        },
+        {
+          "name": "loci_read",
+          "description": "Expand one exact source extent named by a returned ``source_ref``.\n\nPass the returned short handle unchanged. Follow ``next_source_ref``\nuntil it is null to page an incomplete extent. An unknown or expired\nhandle requires fresh ``loci_retrieve`` context in the same repository.\n``SOURCE_STALE`` means the indexed source changed; make a fresh\n``loci_retrieve`` request instead of reusing the old locator.\n",
+          "inputSchema": {
+            "properties": {
+              "repo": {
+                "minLength": 1,
+                "title": "Repo",
+                "type": "string"
+              },
+              "source_ref": {
+                "minLength": 1,
+                "title": "Source Ref",
+                "type": "string"
+              }
+            },
+            "required": [
+              "repo",
+              "source_ref"
+            ],
+            "type": "object",
+            "title": "loci_readArguments"
+          },
+          "outputSchema": {
+            "type": "object",
+            "$defs": {
+              "JsonValue": {},
+              "LociErrorBody": {
+                "additionalProperties": false,
+                "properties": {
+                  "code": {
+                    "title": "Code",
+                    "type": "string"
+                  },
+                  "message": {
+                    "title": "Message",
+                    "type": "string"
+                  },
+                  "details": {
+                    "additionalProperties": {
+                      "$ref": "#/$defs/JsonValue"
+                    },
+                    "title": "Details",
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "code",
+                  "message",
+                  "details"
+                ],
+                "title": "LociErrorBody",
+                "type": "object"
+              },
+              "LociErrorOutput": {
+                "additionalProperties": false,
+                "properties": {
+                  "error": {
+                    "$ref": "#/$defs/LociErrorBody"
+                  }
+                },
+                "required": [
+                  "error"
+                ],
+                "title": "LociErrorOutput",
+                "type": "object"
+              },
+              "LociReadSuccess": {
+                "additionalProperties": false,
+                "properties": {
+                  "schema_version": {
+                    "const": 1,
+                    "title": "Schema Version",
+                    "type": "integer"
+                  },
+                  "status": {
+                    "const": "ok",
+                    "title": "Status",
+                    "type": "string"
+                  },
+                  "source": {
+                    "$ref": "#/$defs/NormalSource"
+                  },
+                  "complete": {
+                    "title": "Complete",
+                    "type": "boolean"
+                  },
+                  "next_source_ref": {
+                    "anyOf": [
+                      {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "title": "Next Source Ref"
+                  },
+                  "usage": {
+                    "$ref": "#/$defs/NormalReadUsage"
+                  }
+                },
+                "required": [
+                  "schema_version",
+                  "status",
+                  "source",
+                  "complete",
+                  "next_source_ref",
+                  "usage"
+                ],
+                "title": "LociReadSuccess",
+                "type": "object"
+              },
+              "NormalReadUsage": {
+                "additionalProperties": false,
+                "properties": {
+                  "evidence_bytes": {
+                    "minimum": 0,
+                    "title": "Evidence Bytes",
+                    "type": "integer"
+                  },
+                  "output_bytes": {
+                    "minimum": 0,
+                    "title": "Output Bytes",
+                    "type": "integer"
+                  },
+                  "output_encoding": {
+                    "const": "mcp_result_json_utf8",
+                    "title": "Output Encoding",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "evidence_bytes",
+                  "output_bytes",
+                  "output_encoding"
+                ],
+                "title": "NormalReadUsage",
+                "type": "object"
+              },
+              "NormalSource": {
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "minimum": 1,
+                    "title": "Id",
+                    "type": "integer"
+                  },
+                  "file": {
+                    "minLength": 1,
+                    "title": "File",
+                    "type": "string"
+                  },
+                  "start_byte": {
+                    "minimum": 0,
+                    "title": "Start Byte",
+                    "type": "integer"
+                  },
+                  "end_byte": {
+                    "minimum": 0,
+                    "title": "End Byte",
+                    "type": "integer"
+                  },
+                  "start_line": {
+                    "minimum": 1,
+                    "title": "Start Line",
+                    "type": "integer"
+                  },
+                  "end_line": {
+                    "minimum": 1,
+                    "title": "End Line",
+                    "type": "integer"
+                  },
+                  "content_hash": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "title": "Content Hash",
+                    "type": "string"
+                  },
+                  "content": {
+                    "title": "Content",
+                    "type": "string"
+                  },
+                  "source_ref": {
+                    "minLength": 1,
+                    "title": "Source Ref",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "file",
+                  "start_byte",
+                  "end_byte",
+                  "start_line",
+                  "end_line",
+                  "content_hash",
+                  "content",
+                  "source_ref"
+                ],
+                "title": "NormalSource",
+                "type": "object"
+              }
+            },
+            "anyOf": [
+              {
+                "$ref": "#/$defs/LociReadSuccess"
+              },
+              {
+                "$ref": "#/$defs/LociErrorOutput"
+              }
+            ],
+            "title": "LociReadOutput"
+          }
+        }
+      ],
+      "implementation_files": {
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/__init__.py": "91447944015cec709e8aa7655f7e9d64e1e4508e7023a57fe3746911c0fc6fed",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/_exploration_output.py": "97b32fab397ff3b86ae2f8d7410d006f362dd5311743e060fe95771e0703fdbc",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/_retrieval_output.py": "5b9e54525b573946ebc545675445109b74d135eb744893f6eac132d59284fbad",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/_retrieval_source.py": "06311f3293bee108f5b8f28e5efc9c81d95db8939662a9af57d25d49f352cdc9",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/cli.py": "d3bf14bcc017a689b183c527e5a106e5efe9f6bd6f0a2825f17f7c19215be37d",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/exploration.py": "4534a23bc8a6b33a58f28bf86fae6d505d149f9cbc404a722dfafd9b05f82f54",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/__init__.py": "db6bf6b681894c486336c219003fbbb116659c0e69b8717f002a7e172982a791",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/_call_validation.py": "216e3faaf923bd66a807eaffe106bc98b655fec8944238d7fd1f0608fbf027d3",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/_cargo_targets.py": "b5c4a8c410d3a3c34338bfec3b35fa9e4b5ad02aa50a9a380db0fb4341451de8",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/_cargo_workspace.py": "98d08427cf8ccc3faa27cd061128deae3cab67fa0e421b34dc37c95e9717e92d",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/_go_references.py": "ebb67570d41223fc5457ed691016134e544c7ad95dbcd41799a475af606ec460",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/_go_types.py": "8cec90a22ac86189bd02f151520ba84cddbc20dfc576f4d38c77f97f47017078",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/_javascript_references.py": "e9255f278a4ef881c605c61df5766bcc06859c06dd2aa80cbed14e8f76e1917c",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/_javascript_resolution.py": "7ddf01f28365ee83cbe7088e7edadf5dc9f73d420b7c1d40509332649d27f2fa",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/_python_references.py": "211105bbc047fccfed6c104f77bb23666b910a1fb79f31b90b6f413d4e870c37",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/_reference_validation.py": "a012a08a6b99fcbf8798390ba57ec9988a21240a53c994bcfa82b5a5d2812e24",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/_rust_aliases.py": "923a1b87b20213f2d4118ddd8fa694129138a50fc899c48efe1492905838b356",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/_rust_import_schema.py": "43c666809f0c7c9a03519f7b0907ba95f8c6b063a2fbe27ed993311f768f0d2d",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/_rust_references.py": "df279894945421c3a91ef36e483e21c242024146a3a95965be63d44fa737ff8f",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/_rust_resolution.py": "e9b33cfde34657f3e5e003ac89b5ac74ba545e25820315d79e2b943d9f8430df",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/_rust_semantics.py": "d0a9f5e1445dd6c967c4b30ccdd19de39fc6edee2bc5bffb11af3e715806d9f1",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/_rust_types.py": "ca8a45bd996656fa29232cfe3d627f9d7f23e4cfe84ae046c89be815c11dc31a",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/_swift_references.py": "c558270c92c040a8da39bd5769692e5399d877e0304bcfbebd876089035bf41c",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/_type_validation.py": "c8fe12df02adcd713a45f82210bfb0835024594743fbc947645e73a188b436ca",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/anchors.py": "06d81d1ed55ca0e63420469cab25a400f5bfe62d04d4d275e9bee676e04f35e7",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/builtins.py": "2008af6e78d6cc3f15cc5a8f4d09893fc269f2994ef9b806958f63fa221e066d",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/calls.py": "b0ba4abe1aaa837ae88aecdb9afa8a352146109f3c8c22e4e709aa3acdede771",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/contracts.py": "69f273c853b3585fc36b1f696a95616e23c51588a605b1d76095d77c58c2c85d",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/go_modules.py": "4e77cdd4876683b271cd3dce55955c356bd20e70287deba0c4a72aa87c796245",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/imports.py": "3b2108dd351d012d21ee7d785062433736151dcce60783d9628a82d2b1ab3ee4",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/javascript_modules.py": "4cc852dea3466fd756638b71698c69da913a9137b77192f91ffa385561c34434",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/materialize.py": "1b98e8689b09a3fa8ab09913ff96fb13b29c96473747ae460d512c154ec5dc58",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/profiles.py": "b1099b62b0a166979f538ccf3c3ec4e328f661dd608d14fd5095ee9e714e80ce",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/references.py": "c7904e32a12276236f5598f257092e0151d97a76771285d9717ff4a9c80cf7aa",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/retrieval.py": "09e832c023110a06526d93e27335d04c19cdd527079702bd8fada46fe4f23809",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/rust_crates.py": "575ef620514a22e91face8d1de0bdf5e0baa6be1b57d097bf4b13d20fe6af4a8",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/state.py": "12d9aebd265f0301a4533ac24ca0c8904a9ec985d95201d96b978116dfcb2013",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/swift_modules.py": "0268c42f20d2b5d38e95785b973f27d67c44e91d53c8937abe4088ffc55b3af4",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/traversal.py": "8100667dde9eaf14e1c16059d52624d1065ba8263ea4626529297cc2b6d4c286",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/type_models.py": "20fc57142641cb8995ab0e9c54eaae804edb4e1db401f2d77483af96e40f84b1",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/graph/type_relations.py": "60cd0075800472db85a18b7b3e67c544ad9bfd0e661f9abc73a4d6b1c7da496b",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/indexability.py": "5c54b77cc4b04001f1b05953467363ecec59ae277f6b844973bbe19af2bdaa56",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/mcp_output_models.py": "5c50099cc469e27c29777e67fbaf8c6467ab8893913fe589ba6e71788e8bbf90",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/mcp_record_pages.py": "aeeabadac68b9ff349ee09cbb2caf00f39e7a8c34b4766205c991963b706e2d7",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/mcp_server.py": "6a47e22a9bf486bb22290a8066e9f4b38666060594e727f3eadb2c6d717d13f5",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/_binding_context.py": "fd97c4ed4e004d2c5de99f4e05ef9811aaeab7221a31e306581d1bdd0c5a54c7",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/_javascript_bindings.py": "af177ab626d32a3de4fc55e1d7675aed317c05486d1ef18bde761bc35d2b5b0b",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/_javascript_mutations.py": "7a4a7c53d5b64064a54e87e2fd7159ef64810cccd236944c57f4b0ecdb2b0f19",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/_python_type_syntax.py": "eda85089016cdb5cbff83925052c7f7dec82776e94f68fb9c37a1f04f5c4b255",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/_reference_exports.py": "bc881d338779829c1e0ccb7e17348f6384403089a0b98b24b224bfe5beaa06c5",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/_reference_paths.py": "65485acfccbc91e7a251ea3120a12b700362621690711b269a02141e38f85743",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/call_models.py": "37c46a52253d273ffa1bf3c7fb8b62c8381c874cb647b10e38797658fa833e77",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/calls.py": "18daef7c24a756b1cee72a31cfd07f1a099e97135977bf7846ce0707a34ba4a8",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/extractor.py": "fee0dce818b1aaf9dd9166ce0f0156c59dda01b63ab9c1eb991faf67e7de1a83",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/go_type_observations.py": "a4ec7432084668650afbdf8c75891b2e95a88ce640ae088ad6c814b73ba4d6e5",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/imports.py": "3f88d4d1d516d1080e44afc6a3aa366726b1c22b1e4ccdc7064dba583a29f837",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/javascript_heritage.py": "7b027cdaaf3e3e313cf2a560b7360c1e7d392b82610aed5bd528db5d175900af",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/languages.py": "deec7e41387195a18ebb5e6d2df94be9f712407a93e626f1816f13322f104daa",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/python_type_observations.py": "166c8d4d1400c94017dee833ea060c8fa4461e42992055a518947eee5f260a11",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/reference_models.py": "4c3f140d1729fd344f02ff9660c46c8ce52a9489d426c009ee714550054fbfb3",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/references.py": "57189332e5f9c1236ccdaaf9d7786c098256b867fdf5a24ebb19ae22bf8e7954",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/rust_type_observations.py": "09a3ee66684cb72d38178ff97d1b9eaf1794d97b6cffce6d4c1da2cdba88f8aa",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/symbols.py": "d343f1d9257f3c944fa9cd4fa26dc7049decd9dc51bb447ce694a617b1e7e8c1",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/type_models.py": "5d79c479b06f564bdd29fabb8e3c97793961cc82cb512540b929dec3f0b3d3cb",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/parser/type_observations.py": "352ddf925f7a4d9dd09755011b3256313a8b0baf6fdeed9b376ed0c67ae66d09",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/query_coverage.py": "8f58b3e6b9d775ca66e213d99865edcb6587d2fa0b3736e3e174c7558f1996fe",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/retrieval.py": "b971f6821921af309d0a101ec1b18e50059a91cb1b46110327e67924d34af5b7",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/retrieval_io.py": "990fd341008c159a7e212cccf1d3edbbca0b6a14646995bb58cbdc988a80906c",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/service.py": "249df7ddb0538437c0f008b0fa05d04f0d58361f28e8d9bb7391e10ed57dcacc",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/storage/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/storage/index_store.py": "5b4c2dcdf0fcf4979ee4674d4f1dac8154e9611ec29ea710c8201c59c91d6c9a",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/storage/repository_catalog.py": "a47d336f210017a4bb4f7242fb447b467a2ed0841025ed47a042b9508bf0d2c6",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/storage/source_refs.py": "ce83b8d8f01b6a5d24bd4c939bd4812e4d6425a3fb955ce539941129cda0e85f",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/storage/store_health.py": "a334a5e5058016a36246f344865cda3e663c51d85fe695881d81cf7c7112cc38",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/storage/store_identity.py": "f80472b94cdc7e07c6b1dd508da4b8e9e1ef876490ccfa34bd2062cc362a7b94",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/storage/store_layout.py": "6110aaa6ccdb7da671cfceb8203be85640980404e386f184a1fae683aa7f196d",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/storage/store_resolver.py": "95da79f1f64458076c746ee39871442fd41429acc2d3ad17453c8785098ca10e",
+        "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/eager-src/loci/type_context.py": "663c099ab8fffc37071f664938c8c4b35df3aa4bee0afe4e1ee72741f858e0cc"
+      }
+    }
+  },
+  "timeout_seconds": 600,
+  "host": {
+    "executable": "/Users/brummerv/.codex/packages/standalone/releases/0.164.0-aarch64-apple-darwin/bin/codex",
+    "sha256": "d8990e3ee7acfbc26f91265b12a1a83f0fee40d0e0f8f1f40a37d4ec21f499cf",
+    "version": "codex-cli 0.164.0",
+    "auth": "existing ChatGPT subscription; forced_login_method=chatgpt; model_provider=openai; API env removed",
+    "non_loci_mcp_configuration": [
+      {
+        "name": "agent-browser",
+        "enabled": true,
+        "transport": "stdio",
+        "config_identity": "4c8dc22243840e7cae1b0cc7d141a4bdd20e6548ed11118898172aab1587ffe4"
+      },
+      {
+        "name": "agent-browser-corporate",
+        "enabled": true,
+        "transport": "stdio",
+        "config_identity": "10590446b0a3fd7c1c8700ef34b9daf05c1e3dada525c2bc346174447553c3b1"
+      },
+      {
+        "name": "anvil",
+        "enabled": false,
+        "transport": "stdio",
+        "config_identity": "cf1929a1ae8d36b469ed69d5bc0a7b39c1baf4612d14b4bdfd5ce5cb5d91b502"
+      },
+      {
+        "name": "codex_app",
+        "enabled": false,
+        "transport": "stdio",
+        "config_identity": "40c912c732f665661204bf7851c51c7a57cf71ef69aa4868bc80c13335ceeb0b"
+      },
+      {
+        "name": "computer-use",
+        "enabled": false,
+        "transport": "stdio",
+        "config_identity": "adb23f419a6addd8bcef2aaa64625076629d0a86b45ed99c3d491d6532bb5a72"
+      },
+      {
+        "name": "lens",
+        "enabled": true,
+        "transport": "stdio",
+        "config_identity": "3319247b04574dd9e14aea4ffba1bc5ece2ee42644e417b0ba745ddfac0c0eae"
+      },
+      {
+        "name": "llm-wiki",
+        "enabled": true,
+        "transport": "stdio",
+        "config_identity": "65ccaed21edeea3abed25ddb4dd42e5c512d72530dd71da22899a4dee3b29a76"
+      },
+      {
+        "name": "loci",
+        "enabled": true,
+        "transport": "stdio",
+        "config_identity": "a460d042f2c6f79ec63f8c2426cf8232aff22f7df77e0349b01294bfd931236c"
+      },
+      {
+        "name": "neural-telemetry",
+        "enabled": true,
+        "transport": "stdio",
+        "config_identity": "d002b7a750b256ce7728f3227f98dac826e008fef3cf4c424a01649451ff4894"
+      },
+      {
+        "name": "node_repl",
+        "enabled": true,
+        "transport": "stdio",
+        "config_identity": "c2f666b115dd6752b07fe6172b70f5752799509d162bed4e4f659e2d928bae63"
+      }
+    ],
+    "native_tools": "unchanged codex exec defaults and loaded configuration; no disabled native tools",
+    "startup_context_files": {
+      "/Users/brummerv/.codex/hooks.json": "b4659d13f33073ba38536815d3898999fb989194664152c2fc97e303bf977df8",
+      "/Users/brummerv/.codex/hooks/loci-session-start.sh": "7762dfe57ac0f75f99d2924db5605fae03e6729f4a74f192da44ec741264d0f8",
+      "/Users/brummerv/.codex/hooks/ambient-mcp-session-start.sh": "12416a433fe6e7dd537283c0596c139da2d098ac5f0d5c03930989bd48b48827",
+      "/Users/brummerv/loci/.shared/loci-session-start-core.sh": "3fa5e336326d03d7d9e91310715e04acd1502a06fbf5d370b5e33ea378362e2d",
+      "/Users/brummerv/.codex/AGENTS.md": "37c3587c23d671af2411d0e9ca5e5bce49151d3f35f0ed77048b78245d28f078",
+      "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/AGENTS.md": "56c4d64c8a0e4c6c7aa88c7a9c9ae924663cd203cfeded59b83159bfd12e6af1",
+      "/Users/brummerv/.codex/skills/loci/SKILL.md": "309b4b4a6c8bbbd6308cb0dbce4cb2adc181c2cb3bae8091c17aa9397f280c07"
+    },
+    "orchestration_files": {
+      "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/benchmarks/complete_work/r0.py": "f582571e84a809afe1e65168dff8410c3fe8c35efa023c263bf6e180f9aecef0",
+      "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/benchmarks/complete_work/r1.py": "27081bef2f07a85b31606d211dc2474e37fc5a72ab9436603d5d734dadb0ac3c",
+      "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/benchmarks/complete_work/accounting.py": "5e60931758daaf24dc72e8c1d5d48e162a393f33e10a0d0ab46b1ecaa09b4018",
+      "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/benchmarks/complete_work/evaluate.py": "ac149531a221589bf4342f6fd4cb6aa7a7adf258c076f20daf027a4c8e510e43",
+      "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot-freeze.py": "63f1e5841c5c70bfe61dd9e4a5dcd04821e22cd60a7ff52feaccb52ef9d3c9f9",
+      "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot-execute.py": "26c7b7737f628820b71f26c76e5ebbdfaa0f8e8921c7d1b2d39731aa1c5cb821"
+    },
+    "installed_runtime": {
+      "mcp": "2.0.0",
+      "tree-sitter-language-pack": "1.15.8",
+      "pathspec": "1.1.1",
+      "pydantic": "2.13.4"
+    },
+    "startup_indexing": "run exported copies outside Git; unchanged Loci hook exits before list/index; shared ambient Loci hints remain",
+    "docs": [
+      "https://learn.chatgpt.com/docs/non-interactive-mode",
+      "https://learn.chatgpt.com/docs/auth"
+    ]
+  }
+}
