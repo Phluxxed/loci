@@ -1,0 +1,290 @@
+{
+  "schema_version": 1,
+  "version": "typescript-context-controls-v3",
+  "frozen_at": "2026-09-11T03:12:01.821668+00:00",
+  "task": "W2.1.9.1",
+  "task_id": "task_ab337404e97211d31dfd4a4465734d25",
+  "corpus_version": "typescript-context-v3",
+  "corpus_sha256": "5d8f490a820f4e326aa522c2d963c8f0a56ea0c2d472f4d2b66caaeda9834b01",
+  "baseline_engine": {
+    "repository": "https://github.com/Phluxxed/loci.git",
+    "commit": "9acd3e3589ddc034cade36e03c26c4508e9d4434",
+    "extractor_version": 24
+  },
+  "baseline_source_tree": "9d4bbe2669f07de2e416839b171c3778bf734816",
+  "protocol": {
+    "file": "comparison-controls.md",
+    "sha256": "606a6e01ca997e3251365a09fe93f2c439258ac4150b5551440e6a0f22e1cc0a"
+  },
+  "case_ids": [
+    "imported_interface",
+    "local_interface",
+    "local_alias_chain",
+    "imported_alias_chain",
+    "named_type_reexport_chain",
+    "same_name_wrong_file",
+    "local_heritage",
+    "imported_heritage",
+    "ambiguous_star_exports",
+    "generic_shadow",
+    "exported_arrow",
+    "default_identifier",
+    "named_function_control",
+    "inline_default_control",
+    "anvil_temporal_arguments",
+    "anvil_retrieval_limits",
+    "anvil_renderer_result_contract"
+  ],
+  "arms": {
+    "A": "current_search_get_and_explicit_graph",
+    "B": "same_plus_existing_edge_expansion_and_hydration",
+    "C": "B_policy_plus_proven_type_dependencies_and_explicit_heritage"
+  },
+  "agent": {
+    "route": "local_codex_exec",
+    "cli_version": "0.154.0",
+    "auth_mode": "ChatGPT",
+    "model": "gpt-5.6-luna",
+    "reasoning_effort": "high",
+    "service_tier": "default",
+    "temperature": "unset",
+    "seed": "unsupported_not_claimed",
+    "backend_snapshot": "not_exposed_not_pinned",
+    "fresh_session": true,
+    "delegation": false,
+    "web": false,
+    "repository_execution": false,
+    "ambient_context": false,
+    "gold_visible": false,
+    "common_prompt": "Use the repository tools to answer the following source-comprehension task. Inspect source before answering. Search returns at most five results. Retrieve the exact selected source and any type or dependency context needed for the task. Existing graph tools and bounded file/grep fallback are available. Preserve ambiguous and unresolved relationships; a matching name alone is not proof. Use only each tool's declared parameters. Respect returned omission and budget information. Inspect narrow source ranges to stay within the span and byte limits. Use selected_from_search_id only when your get is deliberately selected from that exact search; omit it for direct or outline-driven gets. No causal explanations or evaluation IDs are required. Resource helpers supply no repository context. Return only the requested JSON answer. Do not delegate, browse externally, execute repository code or consult files outside the supplied snapshot. Task:\n"
+  },
+  "schedule": {
+    "repetitions": 3,
+    "case_order": "corpus_order",
+    "arm_orders": [
+      [
+        "A",
+        "B",
+        "C"
+      ],
+      [
+        "B",
+        "C",
+        "A"
+      ],
+      [
+        "C",
+        "A",
+        "B"
+      ]
+    ],
+    "concurrency": 1,
+    "planned_runs": 153,
+    "index_state": "fresh_per_run_prebuilt_outside_retrieval_timer",
+    "max_outage_block_replacements": 1,
+    "correctness_retries": 0
+  },
+  "limits": {
+    "search_k": 5,
+    "max_anchors": 5,
+    "max_hops": 3,
+    "max_nodes": 32,
+    "max_paths": 16,
+    "max_neighbors_per_seed": 16,
+    "max_evidence_spans": 64,
+    "max_evidence_bytes": 16384,
+    "max_estimated_evidence_tokens": 4096,
+    "max_serialized_output_bytes_per_operation": 32768,
+    "max_serialized_output_bytes_per_run": 262144,
+    "max_source_bytes_per_run": 131072,
+    "max_top_level_tool_calls_per_run": 24,
+    "max_retrieval_seconds_per_operation": 10,
+    "max_end_to_end_seconds_per_run": 180,
+    "max_reported_input_tokens_per_run": 200000,
+    "max_reported_output_tokens_per_run": 8192
+  },
+  "graph_filters": {
+    "direction": "outgoing",
+    "resolutions": [
+      "exact",
+      "declared",
+      "import-resolved"
+    ],
+    "edge_types": "all_supported_by_assigned_arm",
+    "namespaces": "assigned_snapshot_only",
+    "path_offset": 0
+  },
+  "acceptance": {
+    "fixture_correct_answers_required": 42,
+    "unsupported_proven_relationships_allowed": 0,
+    "missing_repaired_endpoints_allowed": 0,
+    "maintained_correct_answers_min": 8,
+    "per_task_success_regression_allowed": 0,
+    "minimum_fully_successful_paired_tasks": 2,
+    "delivered_context_recall_regression_allowed": 0,
+    "median_sum_output_bytes_ratio_max": 1.0,
+    "median_sum_gross_input_tokens_ratio_max": 1.0,
+    "maintained_p95_latency_ratio_max": 1.25,
+    "p95_method": "nearest_rank",
+    "comparison_pairs": [
+      [
+        "B",
+        "A"
+      ],
+      [
+        "C",
+        "B"
+      ],
+      [
+        "C",
+        "A"
+      ]
+    ],
+    "unavailable_required_measurement": "inconclusive",
+    "false_relationship_gate_scope": "all_cases_all_runs",
+    "tool_calls_relative_reduction_min": 0.2,
+    "minimum_tasks_with_one_fewer_median_tool_call": 2
+  },
+  "accounting": {
+    "primary_context_cost": "provider_reported_gross_input_tokens",
+    "cached_tokens": "separate_no_assumed_cache_control",
+    "estimated_tokens": "loci_estimate_separate_from_measured",
+    "dollars": "unavailable_chatgpt_auth_no_api_price_conversion",
+    "complete_tool_output": "UTF8 bytes of the complete model-visible result payload: compact structured JSON or every exact text content string; transport timing/framing is included in provider tokens.",
+    "source_bytes": "each_delivery_including_duplicates",
+    "resource_helpers": "Count all terminal helper/error events, completed or failed, and their exact payloads; unknown payload types make accounting inconclusive.",
+    "source_signatures": "Each exact signature occurrence is verified within its identified indexed declaration; noncontiguous/transformed metadata is not source credit.",
+    "primary_read_measure": "all_observed_top_level_tool_calls_including_errors_helpers_and_planned_work",
+    "causal_attribution": "not_collected_or_inferred",
+    "recoverable_errors": "Count exact calls/output; a later exact answer may pass if all required measurements and hard budgets are valid."
+  },
+  "environment": {
+    "python": "3.12.13 (main, May 10 2026, 19:20:41) [Clang 22.1.3 ]",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "packages": {
+      "PyJWT": "2.13.0",
+      "PyYAML": "6.0.3",
+      "Pygments": "2.19.2",
+      "annotated-types": "0.7.0",
+      "anyio": "4.14.0",
+      "attrs": "26.1.0",
+      "cffi": "2.0.0",
+      "click": "8.4.1",
+      "cryptography": "49.0.0",
+      "h11": "0.16.0",
+      "httpcore2": "2.10.0",
+      "httpx2": "2.10.0",
+      "idna": "3.18",
+      "iniconfig": "2.3.0",
+      "jsonschema": "4.26.0",
+      "jsonschema-specifications": "2025.9.1",
+      "loci": "0.2.0",
+      "mcp": "2.0.0",
+      "mcp-types": "2.0.0",
+      "opentelemetry-api": "1.44.0",
+      "packaging": "26.0",
+      "pathspec": "1.1.1",
+      "pluggy": "1.6.0",
+      "pycparser": "3.0",
+      "pydantic": "2.13.4",
+      "pydantic_core": "2.46.4",
+      "pytest": "9.0.2",
+      "python-multipart": "0.0.32",
+      "referencing": "0.37.0",
+      "rpds-py": "2026.5.1",
+      "sse-starlette": "3.4.5",
+      "starlette": "1.3.1",
+      "tree-sitter": "0.25.2",
+      "tree-sitter-language-pack": "1.15.8",
+      "truststore": "0.10.4",
+      "typing-inspection": "0.4.2",
+      "typing_extensions": "4.15.0",
+      "uvicorn": "0.49.0"
+    },
+    "pyproject_sha256": "56f91a5b3ae2593ef62bd2ec6b6012f6d67c81eadaec6f4c67f0c2a74b8a8a1d",
+    "uv_lock_sha256": "8e77b4d240f057fbcb375047a7c1dd20ef89fd16fb8632ebe7c7fd489581a1f3"
+  },
+  "capability_probe": {
+    "args": [
+      "codex",
+      "exec",
+      "--ignore-user-config",
+      "--ephemeral",
+      "--skip-git-repo-check",
+      "--sandbox",
+      "read-only",
+      "--json",
+      "--color",
+      "never",
+      "-m",
+      "gpt-5.6-luna",
+      "-c",
+      "model_reasoning_effort=\"high\"",
+      "-C",
+      "<fresh-empty-directory>",
+      "Reply with exactly LOCI_CONTROLS_READY. Do not use tools, inspect files, or delegate."
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 5.212,
+    "stderr": "Reading additional input from stdin...\n",
+    "stdout_events": [
+      {
+        "type": "thread.started",
+        "thread_id": "01a089b6-abc6-7192-8cd4-1cc9b6eba9b3"
+      },
+      {
+        "type": "turn.started"
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_0",
+          "type": "agent_message",
+          "text": "LOCI_CONTROLS_READY"
+        }
+      },
+      {
+        "type": "turn.completed",
+        "usage": {
+          "input_tokens": 13827,
+          "cached_input_tokens": 8960,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 10,
+          "reasoning_output_tokens": 0
+        }
+      }
+    ]
+  },
+  "runtime_documentation": "https://learn.chatgpt.com/docs/non-interactive-mode",
+  "measurement_status": "V3 declared before fresh measurements; observed calls and recoverable-error treatment differ from historical v1/v2.",
+  "staged_schedule": {
+    "A_only_runs": 51,
+    "AB_runs": 102,
+    "AB_arm_orders": [
+      [
+        "A",
+        "B"
+      ],
+      [
+        "B",
+        "A"
+      ],
+      [
+        "A",
+        "B"
+      ]
+    ],
+    "ABC_runs": 153,
+    "comparators_rerun_in_each_matched_batch": true
+  },
+  "predecessor": {
+    "version": "typescript-context-controls-v2",
+    "sha256": "42e6e6adaafd63171f48ef8bf386a3343afcd865e743a568e0304b5157b16d62"
+  },
+  "read_lineage_protocol": {
+    "file": "observation-protocol.md",
+    "sha256": "37cac6a3779558c538222e8a67a59c75db2daee609ea4bd7fb18b1387a2a1547"
+  },
+  "source_corpus_commit": "da795a6a37e12bcc4acace8498132e6b251c5e19"
+}

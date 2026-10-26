@@ -1,0 +1,4014 @@
+[
+  {
+    "acquisition": {
+      "anchor_source_acquired": true,
+      "base_query_count": 5,
+      "continuation_calls": 7,
+      "focused_calls": 4,
+      "initial_semantic_integrity_ok": true,
+      "initial_source_coverage": {
+        "covered": 5,
+        "covered_context_ids": [
+          "entry",
+          "query",
+          "transition",
+          "view",
+          "views"
+        ],
+        "ratio": 1.0,
+        "required": 5
+      },
+      "limits": {
+        "continuation_calls": 16,
+        "output_bytes": 262144,
+        "retrieval_calls": 5,
+        "source_bytes": 131072
+      },
+      "max_focused_calls": 4,
+      "output_bytes": 189765,
+      "qualification": "endpoint source availability is not semantic proof or task correctness",
+      "queries": [
+        {
+          "packet_end": 7,
+          "packet_start": 0,
+          "query": "temporalCliArgs"
+        },
+        {
+          "operation": "semantic_context",
+          "packet_end": 8,
+          "packet_start": 7,
+          "query": "temporalCliArgs"
+        },
+        {
+          "packet_end": 9,
+          "packet_start": 8,
+          "query": "package.json"
+        },
+        {
+          "packet_end": 10,
+          "packet_start": 9,
+          "query": "tsconfig.json"
+        },
+        {
+          "packet_end": 12,
+          "packet_start": 10,
+          "query": "src/manifest/query.ts"
+        },
+        {
+          "operation": "focused_proof",
+          "packet_end": 13,
+          "packet_start": 12,
+          "query": "src/brain-context/temporal.ts::temporalCliArgs#function"
+        },
+        {
+          "operation": "focused_proof",
+          "packet_end": 14,
+          "packet_start": 13,
+          "query": "src/brain-context/temporal.ts::TemporalQuery#type"
+        },
+        {
+          "operation": "focused_proof",
+          "packet_end": 15,
+          "packet_start": 14,
+          "query": "src/brain-context/temporal.ts::TemporalTransition#type"
+        },
+        {
+          "operation": "focused_proof",
+          "packet_end": 16,
+          "packet_start": 15,
+          "query": "src/brain-context/temporal.ts::TemporalView#type"
+        }
+      ],
+      "relationship_endpoint_contexts_acquired": 4,
+      "session_proof_qualification": "unchanged strict scorer over same-case acquired source union; packet proof score remains unchanged",
+      "soft_byte_limit_overshoot": {
+        "output_bytes": 0,
+        "source_bytes": 0
+      },
+      "source_bytes": 62111,
+      "termination": "query_limit"
+    },
+    "acquisition_integrity_ok": true,
+    "anchor_selection": {
+      "candidate_symbol_ids": [
+        "src/brain-context/temporal.ts::temporalCliArgs#function"
+      ],
+      "expected_context_id": "entry",
+      "selected": true,
+      "selected_node_ids": [
+        "src/brain-context/temporal.ts::TemporalQuery#type",
+        "src/brain-context/temporal.ts::TemporalTransition#type",
+        "src/brain-context/temporal.ts::TemporalView#type",
+        "src/brain-context/temporal.ts::temporalCliArgs#function"
+      ]
+    },
+    "case_id": "anvil_temporal_arguments",
+    "efficiency": {
+      "discovery_output_bytes": 24017,
+      "output_bytes": 189765,
+      "packet_count": 16,
+      "repeated_source_bytes": 21953,
+      "snapshot_fraction_delivered": 0.01836633997833907,
+      "snapshot_source_bytes": 2442185,
+      "source_bytes": 66807,
+      "total_delivered_bytes": 213782,
+      "unique_source_bytes": 44854
+    },
+    "integrity_ok": true,
+    "negative_cases": {
+      "forbidden_delivered_relationships": null,
+      "forbidden_proven_relationships": 0
+    },
+    "output_integrity": {
+      "failures": [],
+      "passed": true,
+      "valid_source_spans": 90
+    },
+    "preserved_guarantees": {
+      "snapshot_verified": true,
+      "task_answer_correct": null,
+      "task_answer_status": "unobserved; source and proof delivery do not establish task correctness"
+    },
+    "relationships": {
+      "available_dependency_links": [
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 222
+              },
+              "from": "src/brain-context/temporal.ts::temporalCliArgs#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 222
+              },
+              "from": "src/brain-context/temporal.ts::temporalCliArgs#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "entry",
+          "from_status": "indexed",
+          "index": 0,
+          "kind": "parameter_type",
+          "match_mode": "generic_type_dependency",
+          "to": "query",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 14
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalView#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 14
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalView#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "query",
+          "from_status": "indexed",
+          "index": 1,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "view",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 5
+              },
+              "from": "src/brain-context/temporal.ts::TemporalView#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 5
+              },
+              "from": "src/brain-context/temporal.ts::TemporalView#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+              "type": "uses_type"
+            }
+          ],
+          "from": "view",
+          "from_status": "indexed",
+          "index": 2,
+          "kind": "type_query",
+          "match_mode": "generic_type_dependency",
+          "to": "views",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 18
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalTransition#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 18
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalTransition#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "query",
+          "from_status": "indexed",
+          "index": 3,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "transition",
+          "to_status": "indexed"
+        }
+      ],
+      "available_dependency_links_total": 4,
+      "case_id": "anvil_temporal_arguments",
+      "delivered_dependency_links": [
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 222
+              },
+              "from": "src/brain-context/temporal.ts::temporalCliArgs#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 222
+              },
+              "from": "src/brain-context/temporal.ts::temporalCliArgs#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "entry",
+          "from_status": "indexed",
+          "index": 0,
+          "kind": "parameter_type",
+          "match_mode": "generic_type_dependency",
+          "to": "query",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 14
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalView#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 14
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalView#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "query",
+          "from_status": "indexed",
+          "index": 1,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "view",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 5
+              },
+              "from": "src/brain-context/temporal.ts::TemporalView#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 5
+              },
+              "from": "src/brain-context/temporal.ts::TemporalView#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+              "type": "uses_type"
+            }
+          ],
+          "from": "view",
+          "from_status": "indexed",
+          "index": 2,
+          "kind": "type_query",
+          "match_mode": "generic_type_dependency",
+          "to": "views",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 18
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalTransition#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 18
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalTransition#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "query",
+          "from_status": "indexed",
+          "index": 3,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "transition",
+          "to_status": "indexed"
+        }
+      ],
+      "delivered_dependency_links_total": 4,
+      "delivery_integrity_violations": [],
+      "dependency_link_recall": {
+        "available": 4,
+        "available_ratio": 1.0,
+        "delivered": 4,
+        "delivered_ratio": 1.0,
+        "label": "Exact endpoint dependency links; generic uses_type/references_type do not prove precise subtypes.",
+        "required": 4
+      },
+      "endpoint_issues": [],
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_proven_relationships": 0,
+      "forbidden_scope": "Authored frozen negatives plus delivered edge/index consistency and complete exploration source proof; not exhaustive semantic truth.",
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "precise_kind_links_available_total": 0,
+      "precise_kind_links_delivered_total": 0,
+      "required_semantic_dependencies": [
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 222
+              },
+              "from": "src/brain-context/temporal.ts::temporalCliArgs#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 222
+              },
+              "from": "src/brain-context/temporal.ts::temporalCliArgs#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "entry",
+          "from_status": "indexed",
+          "index": 0,
+          "kind": "parameter_type",
+          "match_mode": "generic_type_dependency",
+          "to": "query",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 14
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalView#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 14
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalView#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "query",
+          "from_status": "indexed",
+          "index": 1,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "view",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 5
+              },
+              "from": "src/brain-context/temporal.ts::TemporalView#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 5
+              },
+              "from": "src/brain-context/temporal.ts::TemporalView#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+              "type": "uses_type"
+            }
+          ],
+          "from": "view",
+          "from_status": "indexed",
+          "index": 2,
+          "kind": "type_query",
+          "match_mode": "generic_type_dependency",
+          "to": "views",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 18
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalTransition#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 18
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalTransition#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "query",
+          "from_status": "indexed",
+          "index": 3,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "transition",
+          "to_status": "indexed"
+        }
+      ],
+      "required_semantic_dependencies_total": 4,
+      "schema_version": 2,
+      "source_only_endpoints": []
+    },
+    "session_relationships": {
+      "available_dependency_links": [
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 222
+              },
+              "from": "src/brain-context/temporal.ts::temporalCliArgs#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 222
+              },
+              "from": "src/brain-context/temporal.ts::temporalCliArgs#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "entry",
+          "from_status": "indexed",
+          "index": 0,
+          "kind": "parameter_type",
+          "match_mode": "generic_type_dependency",
+          "to": "query",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 14
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalView#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 14
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalView#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "query",
+          "from_status": "indexed",
+          "index": 1,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "view",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 5
+              },
+              "from": "src/brain-context/temporal.ts::TemporalView#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 5
+              },
+              "from": "src/brain-context/temporal.ts::TemporalView#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+              "type": "uses_type"
+            }
+          ],
+          "from": "view",
+          "from_status": "indexed",
+          "index": 2,
+          "kind": "type_query",
+          "match_mode": "generic_type_dependency",
+          "to": "views",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 18
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalTransition#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 18
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalTransition#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "query",
+          "from_status": "indexed",
+          "index": 3,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "transition",
+          "to_status": "indexed"
+        }
+      ],
+      "available_dependency_links_total": 4,
+      "case_id": "anvil_temporal_arguments",
+      "delivered_dependency_links": [
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 222
+              },
+              "from": "src/brain-context/temporal.ts::temporalCliArgs#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 222
+              },
+              "from": "src/brain-context/temporal.ts::temporalCliArgs#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "entry",
+          "from_status": "indexed",
+          "index": 0,
+          "kind": "parameter_type",
+          "match_mode": "generic_type_dependency",
+          "to": "query",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 14
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalView#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 14
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalView#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "query",
+          "from_status": "indexed",
+          "index": 1,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "view",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 5
+              },
+              "from": "src/brain-context/temporal.ts::TemporalView#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 5
+              },
+              "from": "src/brain-context/temporal.ts::TemporalView#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+              "type": "uses_type"
+            }
+          ],
+          "from": "view",
+          "from_status": "indexed",
+          "index": 2,
+          "kind": "type_query",
+          "match_mode": "generic_type_dependency",
+          "to": "views",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 18
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalTransition#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 18
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalTransition#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "query",
+          "from_status": "indexed",
+          "index": 3,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "transition",
+          "to_status": "indexed"
+        }
+      ],
+      "delivered_dependency_links_total": 4,
+      "delivery_integrity_violations": [],
+      "dependency_link_recall": {
+        "available": 4,
+        "available_ratio": 1.0,
+        "delivered": 4,
+        "delivered_ratio": 1.0,
+        "label": "Exact endpoint dependency links; generic uses_type/references_type do not prove precise subtypes.",
+        "required": 4
+      },
+      "endpoint_issues": [],
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_proven_relationships": 0,
+      "forbidden_scope": "Authored frozen negatives plus delivered edge/index consistency and complete exploration source proof; not exhaustive semantic truth.",
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "precise_kind_links_available_total": 0,
+      "precise_kind_links_delivered_total": 0,
+      "required_semantic_dependencies": [
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 222
+              },
+              "from": "src/brain-context/temporal.ts::temporalCliArgs#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 222
+              },
+              "from": "src/brain-context/temporal.ts::temporalCliArgs#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "entry",
+          "from_status": "indexed",
+          "index": 0,
+          "kind": "parameter_type",
+          "match_mode": "generic_type_dependency",
+          "to": "query",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 14
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalView#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 14
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalView#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "query",
+          "from_status": "indexed",
+          "index": 1,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "view",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 5
+              },
+              "from": "src/brain-context/temporal.ts::TemporalView#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 5
+              },
+              "from": "src/brain-context/temporal.ts::TemporalView#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TEMPORAL_VIEWS#constant",
+              "type": "uses_type"
+            }
+          ],
+          "from": "view",
+          "from_status": "indexed",
+          "index": 2,
+          "kind": "type_query",
+          "match_mode": "generic_type_dependency",
+          "to": "views",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 18
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalTransition#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "26114e86f4c6c998cf185927e061d1d66ac97720b008698cf39708beea36f718",
+                "file": "src/brain-context/temporal.ts",
+                "line": 18
+              },
+              "from": "src/brain-context/temporal.ts::TemporalQuery#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/temporal.ts::TemporalTransition#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "query",
+          "from_status": "indexed",
+          "index": 3,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "transition",
+          "to_status": "indexed"
+        }
+      ],
+      "required_semantic_dependencies_total": 4,
+      "schema_version": 2,
+      "source_only_endpoints": []
+    },
+    "session_source_provenance": [
+      {
+        "packet": 0,
+        "session_id": 1,
+        "source_id": 1
+      },
+      {
+        "packet": 0,
+        "session_id": 2,
+        "source_id": 2
+      },
+      {
+        "packet": 1,
+        "session_id": 3,
+        "source_id": 1
+      },
+      {
+        "packet": 2,
+        "session_id": 4,
+        "source_id": 1
+      },
+      {
+        "packet": 3,
+        "session_id": 5,
+        "source_id": 1
+      },
+      {
+        "packet": 4,
+        "session_id": 6,
+        "source_id": 1
+      },
+      {
+        "packet": 5,
+        "session_id": 7,
+        "source_id": 1
+      },
+      {
+        "packet": 6,
+        "session_id": 8,
+        "source_id": 1
+      },
+      {
+        "packet": 7,
+        "session_id": 9,
+        "source_id": 1
+      },
+      {
+        "packet": 7,
+        "session_id": 10,
+        "source_id": 2
+      },
+      {
+        "packet": 7,
+        "session_id": 11,
+        "source_id": 3
+      },
+      {
+        "packet": 7,
+        "session_id": 12,
+        "source_id": 4
+      },
+      {
+        "packet": 7,
+        "session_id": 13,
+        "source_id": 5
+      },
+      {
+        "packet": 7,
+        "session_id": 14,
+        "source_id": 6
+      },
+      {
+        "packet": 7,
+        "session_id": 15,
+        "source_id": 7
+      },
+      {
+        "packet": 8,
+        "session_id": 16,
+        "source_id": 1
+      },
+      {
+        "packet": 9,
+        "session_id": 17,
+        "source_id": 1
+      },
+      {
+        "packet": 10,
+        "session_id": 18,
+        "source_id": 1
+      },
+      {
+        "packet": 11,
+        "session_id": 19,
+        "source_id": 1
+      },
+      {
+        "packet": 12,
+        "session_id": 20,
+        "source_id": 1
+      },
+      {
+        "packet": 12,
+        "session_id": 21,
+        "source_id": 2
+      },
+      {
+        "packet": 12,
+        "session_id": 22,
+        "source_id": 3
+      },
+      {
+        "packet": 12,
+        "session_id": 23,
+        "source_id": 4
+      },
+      {
+        "packet": 12,
+        "session_id": 24,
+        "source_id": 5
+      },
+      {
+        "packet": 12,
+        "session_id": 25,
+        "source_id": 6
+      },
+      {
+        "packet": 12,
+        "session_id": 26,
+        "source_id": 7
+      },
+      {
+        "packet": 12,
+        "session_id": 27,
+        "source_id": 8
+      },
+      {
+        "packet": 12,
+        "session_id": 28,
+        "source_id": 9
+      },
+      {
+        "packet": 12,
+        "session_id": 29,
+        "source_id": 10
+      },
+      {
+        "packet": 12,
+        "session_id": 30,
+        "source_id": 11
+      },
+      {
+        "packet": 12,
+        "session_id": 31,
+        "source_id": 12
+      },
+      {
+        "packet": 12,
+        "session_id": 32,
+        "source_id": 13
+      },
+      {
+        "packet": 13,
+        "session_id": 33,
+        "source_id": 1
+      },
+      {
+        "packet": 13,
+        "session_id": 34,
+        "source_id": 2
+      },
+      {
+        "packet": 13,
+        "session_id": 35,
+        "source_id": 3
+      },
+      {
+        "packet": 13,
+        "session_id": 36,
+        "source_id": 4
+      },
+      {
+        "packet": 13,
+        "session_id": 37,
+        "source_id": 5
+      },
+      {
+        "packet": 13,
+        "session_id": 38,
+        "source_id": 6
+      },
+      {
+        "packet": 13,
+        "session_id": 39,
+        "source_id": 7
+      },
+      {
+        "packet": 13,
+        "session_id": 40,
+        "source_id": 8
+      },
+      {
+        "packet": 13,
+        "session_id": 41,
+        "source_id": 9
+      },
+      {
+        "packet": 13,
+        "session_id": 42,
+        "source_id": 10
+      },
+      {
+        "packet": 13,
+        "session_id": 43,
+        "source_id": 11
+      },
+      {
+        "packet": 13,
+        "session_id": 44,
+        "source_id": 12
+      },
+      {
+        "packet": 13,
+        "session_id": 45,
+        "source_id": 13
+      },
+      {
+        "packet": 13,
+        "session_id": 46,
+        "source_id": 14
+      },
+      {
+        "packet": 13,
+        "session_id": 47,
+        "source_id": 15
+      },
+      {
+        "packet": 13,
+        "session_id": 48,
+        "source_id": 16
+      },
+      {
+        "packet": 13,
+        "session_id": 49,
+        "source_id": 17
+      },
+      {
+        "packet": 13,
+        "session_id": 50,
+        "source_id": 18
+      },
+      {
+        "packet": 13,
+        "session_id": 51,
+        "source_id": 19
+      },
+      {
+        "packet": 13,
+        "session_id": 52,
+        "source_id": 20
+      },
+      {
+        "packet": 13,
+        "session_id": 53,
+        "source_id": 21
+      },
+      {
+        "packet": 13,
+        "session_id": 54,
+        "source_id": 22
+      },
+      {
+        "packet": 13,
+        "session_id": 55,
+        "source_id": 23
+      },
+      {
+        "packet": 13,
+        "session_id": 56,
+        "source_id": 24
+      },
+      {
+        "packet": 13,
+        "session_id": 57,
+        "source_id": 25
+      },
+      {
+        "packet": 13,
+        "session_id": 58,
+        "source_id": 26
+      },
+      {
+        "packet": 13,
+        "session_id": 59,
+        "source_id": 27
+      },
+      {
+        "packet": 13,
+        "session_id": 60,
+        "source_id": 28
+      },
+      {
+        "packet": 13,
+        "session_id": 61,
+        "source_id": 29
+      },
+      {
+        "packet": 13,
+        "session_id": 62,
+        "source_id": 30
+      },
+      {
+        "packet": 13,
+        "session_id": 63,
+        "source_id": 31
+      },
+      {
+        "packet": 13,
+        "session_id": 64,
+        "source_id": 32
+      },
+      {
+        "packet": 13,
+        "session_id": 65,
+        "source_id": 33
+      },
+      {
+        "packet": 13,
+        "session_id": 66,
+        "source_id": 34
+      },
+      {
+        "packet": 13,
+        "session_id": 67,
+        "source_id": 35
+      },
+      {
+        "packet": 13,
+        "session_id": 68,
+        "source_id": 36
+      },
+      {
+        "packet": 13,
+        "session_id": 69,
+        "source_id": 37
+      },
+      {
+        "packet": 13,
+        "session_id": 70,
+        "source_id": 38
+      },
+      {
+        "packet": 14,
+        "session_id": 71,
+        "source_id": 1
+      },
+      {
+        "packet": 14,
+        "session_id": 72,
+        "source_id": 2
+      },
+      {
+        "packet": 14,
+        "session_id": 73,
+        "source_id": 3
+      },
+      {
+        "packet": 14,
+        "session_id": 74,
+        "source_id": 4
+      },
+      {
+        "packet": 14,
+        "session_id": 75,
+        "source_id": 5
+      },
+      {
+        "packet": 14,
+        "session_id": 76,
+        "source_id": 6
+      },
+      {
+        "packet": 15,
+        "session_id": 77,
+        "source_id": 1
+      },
+      {
+        "packet": 15,
+        "session_id": 78,
+        "source_id": 2
+      },
+      {
+        "packet": 15,
+        "session_id": 79,
+        "source_id": 3
+      },
+      {
+        "packet": 15,
+        "session_id": 80,
+        "source_id": 4
+      },
+      {
+        "packet": 15,
+        "session_id": 81,
+        "source_id": 5
+      },
+      {
+        "packet": 15,
+        "session_id": 82,
+        "source_id": 6
+      },
+      {
+        "packet": 15,
+        "session_id": 83,
+        "source_id": 7
+      },
+      {
+        "packet": 15,
+        "session_id": 84,
+        "source_id": 8
+      },
+      {
+        "packet": 15,
+        "session_id": 85,
+        "source_id": 9
+      },
+      {
+        "packet": 15,
+        "session_id": 86,
+        "source_id": 10
+      },
+      {
+        "packet": 15,
+        "session_id": 87,
+        "source_id": 11
+      },
+      {
+        "packet": 15,
+        "session_id": 88,
+        "source_id": 12
+      },
+      {
+        "packet": 15,
+        "session_id": 89,
+        "source_id": 13
+      },
+      {
+        "packet": 15,
+        "session_id": 90,
+        "source_id": 14
+      }
+    ],
+    "snapshot": "anvil",
+    "source_coverage": {
+      "covered": 5,
+      "covered_context_ids": [
+        "entry",
+        "query",
+        "transition",
+        "view",
+        "views"
+      ],
+      "ratio": 1.0,
+      "required": 5
+    },
+    "structural_proof": {
+      "claims": 0,
+      "qualification": "structural proof is separate from authored semantic dependency credit",
+      "verified": 0,
+      "violations": []
+    }
+  },
+  {
+    "acquisition": {
+      "anchor_source_acquired": true,
+      "base_query_count": 5,
+      "continuation_calls": 13,
+      "focused_calls": 3,
+      "initial_semantic_integrity_ok": true,
+      "initial_source_coverage": {
+        "covered": 3,
+        "covered_context_ids": [
+          "entry",
+          "messages",
+          "unavailable"
+        ],
+        "ratio": 0.375,
+        "required": 8
+      },
+      "limits": {
+        "continuation_calls": 16,
+        "output_bytes": 262144,
+        "retrieval_calls": 5,
+        "source_bytes": 131072
+      },
+      "max_focused_calls": 4,
+      "output_bytes": 310261,
+      "qualification": "endpoint source availability is not semantic proof or task correctness",
+      "queries": [
+        {
+          "packet_end": 8,
+          "packet_start": 0,
+          "query": "compilerRetrievalLimits"
+        },
+        {
+          "operation": "semantic_context",
+          "packet_end": 10,
+          "packet_start": 8,
+          "query": "compilerRetrievalLimits"
+        },
+        {
+          "packet_end": 15,
+          "packet_start": 10,
+          "query": "src/brain-context/retrieve.ts"
+        },
+        {
+          "packet_end": 16,
+          "packet_start": 15,
+          "query": "package.json"
+        },
+        {
+          "packet_end": 18,
+          "packet_start": 16,
+          "query": "src/continuity/render.ts"
+        },
+        {
+          "operation": "focused_proof",
+          "packet_end": 19,
+          "packet_start": 18,
+          "query": "src/brain-context/render.ts::compilerRetrievalLimits#function"
+        },
+        {
+          "operation": "focused_proof",
+          "packet_end": 20,
+          "packet_start": 19,
+          "query": "src/brain-context/retrieve.ts::BrainRetrievalResult#type"
+        },
+        {
+          "operation": "focused_proof",
+          "packet_end": 21,
+          "packet_start": 20,
+          "query": "src/brain-context/retrieve.ts::BrainCompiledEvidence#type"
+        }
+      ],
+      "relationship_endpoint_contexts_acquired": 6,
+      "session_proof_qualification": "unchanged strict scorer over same-case acquired source union; packet proof score remains unchanged",
+      "soft_byte_limit_overshoot": {
+        "output_bytes": 48117,
+        "source_bytes": 1176
+      },
+      "source_bytes": 132248,
+      "termination": "query_limit"
+    },
+    "acquisition_integrity_ok": true,
+    "anchor_selection": {
+      "candidate_symbol_ids": [
+        "src/brain-context/render.ts::compilerRetrievalLimits#function"
+      ],
+      "expected_context_id": "entry",
+      "selected": true,
+      "selected_node_ids": [
+        "src/brain-context/render.ts::compilerRetrievalLimits#function",
+        "src/brain-context/retrieve.ts::BrainCompiledEvidence#type",
+        "src/brain-context/retrieve.ts::BrainRetrievalResult#type"
+      ]
+    },
+    "case_id": "anvil_retrieval_limits",
+    "efficiency": {
+      "discovery_output_bytes": 24017,
+      "output_bytes": 310261,
+      "packet_count": 21,
+      "repeated_source_bytes": 47351,
+      "snapshot_fraction_delivered": 0.038214959145191706,
+      "snapshot_source_bytes": 2442185,
+      "source_bytes": 140679,
+      "total_delivered_bytes": 334278,
+      "unique_source_bytes": 93328
+    },
+    "integrity_ok": true,
+    "negative_cases": {
+      "forbidden_delivered_relationships": null,
+      "forbidden_proven_relationships": 0
+    },
+    "output_integrity": {
+      "failures": [],
+      "passed": true,
+      "valid_source_spans": 136
+    },
+    "preserved_guarantees": {
+      "snapshot_verified": true,
+      "task_answer_correct": null,
+      "task_answer_status": "unobserved; source and proof delivery do not establish task correctness"
+    },
+    "relationships": {
+      "available_dependency_links": [
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 34
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "to": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 34
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "to": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "entry",
+          "from_status": "indexed",
+          "index": 0,
+          "kind": "parameter_type",
+          "match_mode": "generic_type_dependency",
+          "to": "input",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 135
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerOmission#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 135
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerOmission#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 1,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "omission",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 138
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerStop#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 138
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerStop#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 2,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "stop",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 141
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerReporting#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 141
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerReporting#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 3,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "reporting",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 140
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerDiagnostic#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 140
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerDiagnostic#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 4,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "diagnostic",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 35
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/render.ts::compilerHasUnavailableEvidence#function",
+              "type": "calls"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 35
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/render.ts::compilerHasUnavailableEvidence#function",
+              "type": "calls"
+            }
+          ],
+          "from": "entry",
+          "from_status": "indexed",
+          "index": 5,
+          "kind": "calls",
+          "match_mode": "exact_kind",
+          "to": "unavailable",
+          "to_status": "indexed"
+        }
+      ],
+      "available_dependency_links_total": 6,
+      "case_id": "anvil_retrieval_limits",
+      "delivered_dependency_links": [
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 34
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "to": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 34
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "to": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "entry",
+          "from_status": "indexed",
+          "index": 0,
+          "kind": "parameter_type",
+          "match_mode": "generic_type_dependency",
+          "to": "input",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 135
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerOmission#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 135
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerOmission#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 1,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "omission",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 138
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerStop#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 138
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerStop#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 2,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "stop",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 141
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerReporting#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 141
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerReporting#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 3,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "reporting",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 140
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerDiagnostic#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 140
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerDiagnostic#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 4,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "diagnostic",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 35
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/render.ts::compilerHasUnavailableEvidence#function",
+              "type": "calls"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 35
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/render.ts::compilerHasUnavailableEvidence#function",
+              "type": "calls"
+            }
+          ],
+          "from": "entry",
+          "from_status": "indexed",
+          "index": 5,
+          "kind": "calls",
+          "match_mode": "exact_kind",
+          "to": "unavailable",
+          "to_status": "indexed"
+        }
+      ],
+      "delivered_dependency_links_total": 6,
+      "delivery_integrity_violations": [],
+      "dependency_link_recall": {
+        "available": 6,
+        "available_ratio": 1.0,
+        "delivered": 6,
+        "delivered_ratio": 1.0,
+        "label": "Exact endpoint dependency links; generic uses_type/references_type do not prove precise subtypes.",
+        "required": 6
+      },
+      "endpoint_issues": [],
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_proven_relationships": 0,
+      "forbidden_scope": "Authored frozen negatives plus delivered edge/index consistency and complete exploration source proof; not exhaustive semantic truth.",
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "precise_kind_links_available_total": 1,
+      "precise_kind_links_delivered_total": 1,
+      "required_semantic_dependencies": [
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 34
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "to": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 34
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "to": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "entry",
+          "from_status": "indexed",
+          "index": 0,
+          "kind": "parameter_type",
+          "match_mode": "generic_type_dependency",
+          "to": "input",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 135
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerOmission#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 135
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerOmission#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 1,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "omission",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 138
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerStop#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 138
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerStop#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 2,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "stop",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 141
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerReporting#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 141
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerReporting#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 3,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "reporting",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 140
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerDiagnostic#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 140
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerDiagnostic#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 4,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "diagnostic",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 35
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/render.ts::compilerHasUnavailableEvidence#function",
+              "type": "calls"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 35
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/render.ts::compilerHasUnavailableEvidence#function",
+              "type": "calls"
+            }
+          ],
+          "from": "entry",
+          "from_status": "indexed",
+          "index": 5,
+          "kind": "calls",
+          "match_mode": "exact_kind",
+          "to": "unavailable",
+          "to_status": "indexed"
+        }
+      ],
+      "required_semantic_dependencies_total": 6,
+      "schema_version": 2,
+      "source_only_endpoints": []
+    },
+    "session_relationships": {
+      "available_dependency_links": [
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 34
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "to": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 34
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "to": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "entry",
+          "from_status": "indexed",
+          "index": 0,
+          "kind": "parameter_type",
+          "match_mode": "generic_type_dependency",
+          "to": "input",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 135
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerOmission#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 135
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerOmission#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 1,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "omission",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 138
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerStop#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 138
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerStop#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 2,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "stop",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 141
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerReporting#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 141
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerReporting#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 3,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "reporting",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 140
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerDiagnostic#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 140
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerDiagnostic#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 4,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "diagnostic",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 35
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/render.ts::compilerHasUnavailableEvidence#function",
+              "type": "calls"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 35
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/render.ts::compilerHasUnavailableEvidence#function",
+              "type": "calls"
+            }
+          ],
+          "from": "entry",
+          "from_status": "indexed",
+          "index": 5,
+          "kind": "calls",
+          "match_mode": "exact_kind",
+          "to": "unavailable",
+          "to_status": "indexed"
+        }
+      ],
+      "available_dependency_links_total": 6,
+      "case_id": "anvil_retrieval_limits",
+      "delivered_dependency_links": [
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 34
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "to": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 34
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "to": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "entry",
+          "from_status": "indexed",
+          "index": 0,
+          "kind": "parameter_type",
+          "match_mode": "generic_type_dependency",
+          "to": "input",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 135
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerOmission#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 135
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerOmission#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 1,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "omission",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 138
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerStop#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 138
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerStop#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 2,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "stop",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 141
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerReporting#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 141
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerReporting#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 3,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "reporting",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 140
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerDiagnostic#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 140
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerDiagnostic#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 4,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "diagnostic",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 35
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/render.ts::compilerHasUnavailableEvidence#function",
+              "type": "calls"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 35
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/render.ts::compilerHasUnavailableEvidence#function",
+              "type": "calls"
+            }
+          ],
+          "from": "entry",
+          "from_status": "indexed",
+          "index": 5,
+          "kind": "calls",
+          "match_mode": "exact_kind",
+          "to": "unavailable",
+          "to_status": "indexed"
+        }
+      ],
+      "delivered_dependency_links_total": 6,
+      "delivery_integrity_violations": [],
+      "dependency_link_recall": {
+        "available": 6,
+        "available_ratio": 1.0,
+        "delivered": 6,
+        "delivered_ratio": 1.0,
+        "label": "Exact endpoint dependency links; generic uses_type/references_type do not prove precise subtypes.",
+        "required": 6
+      },
+      "endpoint_issues": [],
+      "forbidden_proven_relationship_edges": [],
+      "forbidden_proven_relationships": 0,
+      "forbidden_scope": "Authored frozen negatives plus delivered edge/index consistency and complete exploration source proof; not exhaustive semantic truth.",
+      "missing_endpoints": [],
+      "multiple_endpoints": [],
+      "precise_kind_links_available_total": 1,
+      "precise_kind_links_delivered_total": 1,
+      "required_semantic_dependencies": [
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 34
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "to": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 34
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "import-resolved",
+              "to": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "entry",
+          "from_status": "indexed",
+          "index": 0,
+          "kind": "parameter_type",
+          "match_mode": "generic_type_dependency",
+          "to": "input",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 135
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerOmission#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 135
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerOmission#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 1,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "omission",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 138
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerStop#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 138
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerStop#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 2,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "stop",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 141
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerReporting#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 141
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerReporting#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 3,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "reporting",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 140
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerDiagnostic#type",
+              "type": "uses_type"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "ff4445869eda217b6c574d43437fd2576be513f520a14019c54efe3ef9a66a85",
+                "file": "src/brain-context/retrieve.ts",
+                "line": 140
+              },
+              "from": "src/brain-context/retrieve.ts::BrainRetrievalResult#type",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/retrieve.ts::BrainCompilerDiagnostic#type",
+              "type": "uses_type"
+            }
+          ],
+          "from": "input",
+          "from_status": "indexed",
+          "index": 4,
+          "kind": "property_type",
+          "match_mode": "generic_type_dependency",
+          "to": "diagnostic",
+          "to_status": "indexed"
+        },
+        {
+          "available": true,
+          "available_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 35
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/render.ts::compilerHasUnavailableEvidence#function",
+              "type": "calls"
+            }
+          ],
+          "delivered": true,
+          "delivered_edges": [
+            {
+              "directed": true,
+              "evidence": {
+                "content_hash": "cb58c97ad2e8c247aca183710b6e280312221f187105b610226200134f6efabd",
+                "file": "src/brain-context/render.ts",
+                "line": 35
+              },
+              "from": "src/brain-context/render.ts::compilerRetrievalLimits#function",
+              "namespace": "loci",
+              "resolution": "exact",
+              "to": "src/brain-context/render.ts::compilerHasUnavailableEvidence#function",
+              "type": "calls"
+            }
+          ],
+          "from": "entry",
+          "from_status": "indexed",
+          "index": 5,
+          "kind": "calls",
+          "match_mode": "exact_kind",
+          "to": "unavailable",
+          "to_status": "indexed"
+        }
+      ],
+      "required_semantic_dependencies_total": 6,
+      "schema_version": 2,
+      "source_only_endpoints": []
+    },
+    "session_source_provenance": [
+      {
+        "packet": 0,
+        "session_id": 1,
+        "source_id": 1
+      },
+      {
+        "packet": 0,
+        "session_id": 2,
+        "source_id": 2
+      },
+      {
+        "packet": 0,
+        "session_id": 3,
+        "source_id": 3
+      },
+      {
+        "packet": 1,
+        "session_id": 4,
+        "source_id": 1
+      },
+      {
+        "packet": 2,
+        "session_id": 5,
+        "source_id": 1
+      },
+      {
+        "packet": 3,
+        "session_id": 6,
+        "source_id": 1
+      },
+      {
+        "packet": 4,
+        "session_id": 7,
+        "source_id": 1
+      },
+      {
+        "packet": 5,
+        "session_id": 8,
+        "source_id": 1
+      },
+      {
+        "packet": 6,
+        "session_id": 9,
+        "source_id": 1
+      },
+      {
+        "packet": 7,
+        "session_id": 10,
+        "source_id": 1
+      },
+      {
+        "packet": 8,
+        "session_id": 11,
+        "source_id": 1
+      },
+      {
+        "packet": 8,
+        "session_id": 12,
+        "source_id": 2
+      },
+      {
+        "packet": 8,
+        "session_id": 13,
+        "source_id": 3
+      },
+      {
+        "packet": 8,
+        "session_id": 14,
+        "source_id": 4
+      },
+      {
+        "packet": 8,
+        "session_id": 15,
+        "source_id": 5
+      },
+      {
+        "packet": 9,
+        "session_id": 16,
+        "source_id": 1
+      },
+      {
+        "packet": 10,
+        "session_id": 17,
+        "source_id": 1
+      },
+      {
+        "packet": 11,
+        "session_id": 18,
+        "source_id": 1
+      },
+      {
+        "packet": 12,
+        "session_id": 19,
+        "source_id": 1
+      },
+      {
+        "packet": 13,
+        "session_id": 20,
+        "source_id": 1
+      },
+      {
+        "packet": 14,
+        "session_id": 21,
+        "source_id": 1
+      },
+      {
+        "packet": 15,
+        "session_id": 22,
+        "source_id": 1
+      },
+      {
+        "packet": 16,
+        "session_id": 23,
+        "source_id": 1
+      },
+      {
+        "packet": 17,
+        "session_id": 24,
+        "source_id": 1
+      },
+      {
+        "packet": 18,
+        "session_id": 25,
+        "source_id": 1
+      },
+      {
+        "packet": 18,
+        "session_id": 26,
+        "source_id": 2
+      },
+      {
+        "packet": 18,
+        "session_id": 27,
+        "source_id": 3
+      },
+      {
+        "packet": 18,
+        "session_id": 28,
+        "source_id": 4
+      },
+      {
+        "packet": 18,
+        "session_id": 29,
+        "source_id": 5
+      },
+      {
+        "packet": 18,
+        "session_id": 30,
+        "source_id": 6
+      },
+      {
+        "packet": 18,
+        "session_id": 31,
+        "source_id": 7
+      },
+      {
+        "packet": 18,
+        "session_id": 32,
+        "source_id": 8
+      },
+      {
+        "packet": 18,
+        "session_id": 33,
+        "source_id": 9
+      },
+      {
+        "packet": 18,
+        "session_id": 34,
+        "source_id": 10
+      },
+      {
+        "packet": 18,
+        "session_id": 35,
+        "source_id": 11
+      },
+      {
+        "packet": 18,
+        "session_id": 36,
+        "source_id": 12
+      },
+      {
+        "packet": 18,
+        "session_id": 37,
+        "source_id": 13
+      },
+      {
+        "packet": 18,
+        "session_id": 38,
+        "source_id": 14
+      },
+      {
+        "packet": 18,
+        "session_id": 39,
+        "source_id": 15
+      },
+      {
+        "packet": 18,
+        "session_id": 40,
+        "source_id": 16
+      },
+      {
+        "packet": 18,
+        "session_id": 41,
+        "source_id": 17
+      },
+      {
+        "packet": 18,
+        "session_id": 42,
+        "source_id": 18
+      },
+      {
+        "packet": 18,
+        "session_id": 43,
+        "source_id": 19
+      },
+      {
+        "packet": 18,
+        "session_id": 44,
+        "source_id": 20
+      },
+      {
+        "packet": 18,
+        "session_id": 45,
+        "source_id": 21
+      },
+      {
+        "packet": 18,
+        "session_id": 46,
+        "source_id": 22
+      },
+      {
+        "packet": 18,
+        "session_id": 47,
+        "source_id": 23
+      },
+      {
+        "packet": 18,
+        "session_id": 48,
+        "source_id": 24
+      },
+      {
+        "packet": 19,
+        "session_id": 49,
+        "source_id": 1
+      },
+      {
+        "packet": 19,
+        "session_id": 50,
+        "source_id": 2
+      },
+      {
+        "packet": 19,
+        "session_id": 51,
+        "source_id": 3
+      },
+      {
+        "packet": 19,
+        "session_id": 52,
+        "source_id": 4
+      },
+      {
+        "packet": 19,
+        "session_id": 53,
+        "source_id": 5
+      },
+      {
+        "packet": 19,
+        "session_id": 54,
+        "source_id": 6
+      },
+      {
+        "packet": 19,
+        "session_id": 55,
+        "source_id": 7
+      },
+      {
+        "packet": 19,
+        "session_id": 56,
+        "source_id": 8
+      },
+      {
+        "packet": 19,
+        "session_id": 57,
+        "source_id": 9
+      },
+      {
+        "packet": 19,
+        "session_id": 58,
+        "source_id": 10
+      },
+      {
+        "packet": 19,
+        "session_id": 59,
+        "source_id": 11
+      },
+      {
+        "packet": 19,
+        "session_id": 60,
+        "source_id": 12
+      },
+      {
+        "packet": 19,
+        "session_id": 61,
+        "source_id": 13
+      },
+      {
+        "packet": 19,
+        "session_id": 62,
+        "source_id": 14
+      },
+      {
+        "packet": 19,
+        "session_id": 63,
+        "source_id": 15
+      },
+      {
+        "packet": 19,
+        "session_id": 64,
+        "source_id": 16
+      },
+      {
+        "packet": 19,
+        "session_id": 65,
+        "source_id": 17
+      },
+      {
+        "packet": 19,
+        "session_id": 66,
+        "source_id": 18
+      },
+      {
+        "packet": 19,
+        "session_id": 67,
+        "source_id": 19
+      },
+      {
+        "packet": 19,
+        "session_id": 68,
+        "source_id": 20
+      },
+      {
+        "packet": 19,
+        "session_id": 69,
+        "source_id": 21
+      },
+      {
+        "packet": 19,
+        "session_id": 70,
+        "source_id": 22
+      },
+      {
+        "packet": 19,
+        "session_id": 71,
+        "source_id": 23
+      },
+      {
+        "packet": 19,
+        "session_id": 72,
+        "source_id": 24
+      },
+      {
+        "packet": 19,
+        "session_id": 73,
+        "source_id": 25
+      },
+      {
+        "packet": 19,
+        "session_id": 74,
+        "source_id": 26
+      },
+      {
+        "packet": 19,
+        "session_id": 75,
+        "source_id": 27
+      },
+      {
+        "packet": 19,
+        "session_id": 76,
+        "source_id": 28
+      },
+      {
+        "packet": 19,
+        "session_id": 77,
+        "source_id": 29
+      },
+      {
+        "packet": 19,
+        "session_id": 78,
+        "source_id": 30
+      },
+      {
+        "packet": 19,
+        "session_id": 79,
+        "source_id": 31
+      },
+      {
+        "packet": 19,
+        "session_id": 80,
+        "source_id": 32
+      },
+      {
+        "packet": 19,
+        "session_id": 81,
+        "source_id": 33
+      },
+      {
+        "packet": 19,
+        "session_id": 82,
+        "source_id": 34
+      },
+      {
+        "packet": 19,
+        "session_id": 83,
+        "source_id": 35
+      },
+      {
+        "packet": 19,
+        "session_id": 84,
+        "source_id": 36
+      },
+      {
+        "packet": 19,
+        "session_id": 85,
+        "source_id": 37
+      },
+      {
+        "packet": 19,
+        "session_id": 86,
+        "source_id": 38
+      },
+      {
+        "packet": 19,
+        "session_id": 87,
+        "source_id": 39
+      },
+      {
+        "packet": 19,
+        "session_id": 88,
+        "source_id": 40
+      },
+      {
+        "packet": 19,
+        "session_id": 89,
+        "source_id": 41
+      },
+      {
+        "packet": 19,
+        "session_id": 90,
+        "source_id": 42
+      },
+      {
+        "packet": 19,
+        "session_id": 91,
+        "source_id": 43
+      },
+      {
+        "packet": 19,
+        "session_id": 92,
+        "source_id": 44
+      },
+      {
+        "packet": 19,
+        "session_id": 93,
+        "source_id": 45
+      },
+      {
+        "packet": 19,
+        "session_id": 94,
+        "source_id": 46
+      },
+      {
+        "packet": 19,
+        "session_id": 95,
+        "source_id": 47
+      },
+      {
+        "packet": 19,
+        "session_id": 96,
+        "source_id": 48
+      },
+      {
+        "packet": 19,
+        "session_id": 97,
+        "source_id": 49
+      },
+      {
+        "packet": 19,
+        "session_id": 98,
+        "source_id": 50
+      },
+      {
+        "packet": 19,
+        "session_id": 99,
+        "source_id": 51
+      },
+      {
+        "packet": 20,
+        "session_id": 100,
+        "source_id": 1
+      },
+      {
+        "packet": 20,
+        "session_id": 101,
+        "source_id": 2
+      },
+      {
+        "packet": 20,
+        "session_id": 102,
+        "source_id": 3
+      },
+      {
+        "packet": 20,
+        "session_id": 103,
+        "source_id": 4
+      },
+      {
+        "packet": 20,
+        "session_id": 104,
+        "source_id": 5
+      },
+      {
+        "packet": 20,
+        "session_id": 105,
+        "source_id": 6
+      },
+      {
+        "packet": 20,
+        "session_id": 106,
+        "source_id": 7
+      },
+      {
+        "packet": 20,
+        "session_id": 107,
+        "source_id": 8
+      },
+      {
+        "packet": 20,
+        "session_id": 108,
+        "source_id": 9
+      },
+      {
+        "packet": 20,
+        "session_id": 109,
+        "source_id": 10
+      },
+      {
+        "packet": 20,
+        "session_id": 110,
+        "source_id": 11
+      },
+      {
+        "packet": 20,
+        "session_id": 111,
+        "source_id": 12
+      },
+      {
+        "packet": 20,
+        "session_id": 112,
+        "source_id": 13
+      },
+      {
+        "packet": 20,
+        "session_id": 113,
+        "source_id": 14
+      },
+      {
+        "packet": 20,
+        "session_id": 114,
+        "source_id": 15
+      },
+      {
+        "packet": 20,
+        "session_id": 115,
+        "source_id": 16
+      },
+      {
+        "packet": 20,
+        "session_id": 116,
+        "source_id": 17
+      },
+      {
+        "packet": 20,
+        "session_id": 117,
+        "source_id": 18
+      },
+      {
+        "packet": 20,
+        "session_id": 118,
+        "source_id": 19
+      },
+      {
+        "packet": 20,
+        "session_id": 119,
+        "source_id": 20
+      },
+      {
+        "packet": 20,
+        "session_id": 120,
+        "source_id": 21
+      },
+      {
+        "packet": 20,
+        "session_id": 121,
+        "source_id": 22
+      },
+      {
+        "packet": 20,
+        "session_id": 122,
+        "source_id": 23
+      },
+      {
+        "packet": 20,
+        "session_id": 123,
+        "source_id": 24
+      },
+      {
+        "packet": 20,
+        "session_id": 124,
+        "source_id": 25
+      },
+      {
+        "packet": 20,
+        "session_id": 125,
+        "source_id": 26
+      },
+      {
+        "packet": 20,
+        "session_id": 126,
+        "source_id": 27
+      },
+      {
+        "packet": 20,
+        "session_id": 127,
+        "source_id": 28
+      },
+      {
+        "packet": 20,
+        "session_id": 128,
+        "source_id": 29
+      },
+      {
+        "packet": 20,
+        "session_id": 129,
+        "source_id": 30
+      },
+      {
+        "packet": 20,
+        "session_id": 130,
+        "source_id": 31
+      },
+      {
+        "packet": 20,
+        "session_id": 131,
+        "source_id": 32
+      },
+      {
+        "packet": 20,
+        "session_id": 132,
+        "source_id": 33
+      },
+      {
+        "packet": 20,
+        "session_id": 133,
+        "source_id": 34
+      },
+      {
+        "packet": 20,
+        "session_id": 134,
+        "source_id": 35
+      },
+      {
+        "packet": 20,
+        "session_id": 135,
+        "source_id": 36
+      },
+      {
+        "packet": 20,
+        "session_id": 136,
+        "source_id": 37
+      }
+    ],
+    "snapshot": "anvil",
+    "source_coverage": {
+      "covered": 8,
+      "covered_context_ids": [
+        "diagnostic",
+        "entry",
+        "input",
+        "messages",
+        "omission",
+        "reporting",
+        "stop",
+        "unavailable"
+      ],
+      "ratio": 1.0,
+      "required": 8
+    },
+    "structural_proof": {
+      "claims": 0,
+      "qualification": "structural proof is separate from authored semantic dependency credit",
+      "verified": 0,
+      "violations": []
+    }
+  }
+]

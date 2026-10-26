@@ -1,0 +1,1845 @@
+[
+  {
+    "content": [],
+    "isError": false,
+    "structuredContent": {
+      "anchors": [],
+      "items": [
+        {
+          "complete": true,
+          "depth": 0,
+          "extent": {
+            "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+            "end_byte": 95,
+            "file": "src/api.rs",
+            "start_byte": 0
+          },
+          "node_id": "src/api.rs::__file__#file",
+          "role": "anchor",
+          "source_ids": [
+            1
+          ],
+          "source_ref": "eyJlbmQiOjk1LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjF9",
+          "why": "source_literal"
+        },
+        {
+          "complete": true,
+          "depth": 0,
+          "extent": {
+            "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+            "end_byte": 103,
+            "file": "src/lib.rs",
+            "start_byte": 0
+          },
+          "node_id": "src/lib.rs::__file__#file",
+          "role": "anchor",
+          "source_ids": [
+            2
+          ],
+          "source_ref": "eyJlbmQiOjEwMywiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6MCwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0IjowLCJ2IjoxfQ",
+          "why": "source_literal"
+        }
+      ],
+      "limits": {
+        "max_file_bytes": 2097152,
+        "max_files": 4096,
+        "max_preview_bytes": 1024,
+        "max_read_bytes": 8192,
+        "max_results": 3,
+        "max_scan_bytes": 67108864
+      },
+      "nodes": [],
+      "omissions": [
+        {
+          "count": 1,
+          "reason": "unsupported_semantics"
+        }
+      ],
+      "ownership": [],
+      "policy": "graph-free-file-v1",
+      "relationships": [],
+      "schema_version": 1,
+      "scope": {
+        "coverage": "complete",
+        "exhaustive": false,
+        "matching": "source_literal",
+        "relationships": "unsupported",
+        "source": "text_repository_files"
+      },
+      "selection": {
+        "candidate_count": 2,
+        "mode": "literal",
+        "omitted_candidates": 0
+      },
+      "snapshot": "829cca3477fcf30665d664678021f66aac4ec00969c7db8efcc6a5fe19b9cfab",
+      "sources": [
+        {
+          "content": "pub struct Config { pub strict: bool }\n\npub fn parse(config: Config) -> bool { config.strict }\n",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 95,
+          "end_line": 3,
+          "file": "src/api.rs",
+          "id": 1,
+          "source_ref": "eyJlbmQiOjk1LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjF9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "pub mod api;\nuse crate::api::{parse, Config};\n\npub fn caller(config: Config) -> bool { parse(config) }\n",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 103,
+          "end_line": 4,
+          "file": "src/lib.rs",
+          "id": 2,
+          "source_ref": "eyJlbmQiOjEwMywiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6MCwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0IjowLCJ2IjoxfQ",
+          "start_byte": 0,
+          "start_line": 1
+        }
+      ],
+      "status": "partial",
+      "usage": {
+        "estimated_tokens": 903,
+        "evidence_bytes": 198,
+        "lookup_bytes": 259,
+        "lookup_files": 3,
+        "output_bytes": 3611,
+        "output_encoding": "mcp_result_json_utf8"
+      }
+    }
+  },
+  {
+    "content": [],
+    "isError": false,
+    "structuredContent": {
+      "anchors": [
+        {
+          "match_scope": [
+            "symbol_metadata"
+          ],
+          "matched_terms": [
+            "parse"
+          ],
+          "node_id": "src/api.rs::parse#function",
+          "score": 130
+        }
+      ],
+      "items": [
+        {
+          "complete": true,
+          "depth": 0,
+          "extent": {
+            "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+            "end_byte": 94,
+            "file": "src/api.rs",
+            "start_byte": 40
+          },
+          "node_id": "src/api.rs::parse#function",
+          "role": "anchor",
+          "source_ids": [
+            1
+          ],
+          "source_ref": "s:eyJlbmQiOjk0LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0Ijo0MCwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0Ijo0MCwidiI6Mn0",
+          "why": "matched question identifier"
+        },
+        {
+          "complete": true,
+          "depth": 1,
+          "extent": {
+            "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+            "end_byte": 38,
+            "file": "src/api.rs",
+            "start_byte": 0
+          },
+          "node_id": "src/api.rs::Config#struct",
+          "role": "related",
+          "source_ids": [
+            2
+          ],
+          "source_ref": "s:eyJlbmQiOjM4LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "why": "two-hop outward source candidate"
+        },
+        {
+          "complete": true,
+          "depth": 1,
+          "extent": {
+            "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+            "end_byte": 102,
+            "file": "src/lib.rs",
+            "start_byte": 47
+          },
+          "node_id": "src/lib.rs::caller#function",
+          "role": "related",
+          "source_ids": [
+            10
+          ],
+          "source_ref": "s:eyJlbmQiOjEwMiwiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6NDcsInJlcG8iOiIvVXNlcnMvYnJ1bW1lcnYvcGhsdXh4ZWQvbG9jaS8ud29ya3RyZWVzL3IwNS1kZW1hbmQtc2VtYW50aWNzLy5zY3JhdGNoL3IwNi1uYXZpZ2F0aW9uLXByb29mL3Jlc3VsdHMvZnVsbC1kZW1hbmQtZm9jdXNlZC8ub3duZWQvdmFyaWFudC0xLzEvZml4dHVyZXMvcnVzdF9pbXBhY3QiLCJzdGFydCI6NDcsInYiOjJ9",
+          "why": "proved relationship endpoint"
+        }
+      ],
+      "limits": {
+        "max_evidence_bytes": 8192,
+        "max_items": 12,
+        "max_output_bytes": 16384,
+        "max_parsed_files": 48,
+        "max_relationships": 12
+      },
+      "nodes": [
+        {
+          "file": "src/api.rs",
+          "id": "src/api.rs::parse#function",
+          "kind": "function",
+          "name": "parse"
+        },
+        {
+          "file": "src/api.rs",
+          "id": "src/api.rs::Config#struct",
+          "kind": "struct",
+          "name": "Config"
+        },
+        {
+          "file": "src/lib.rs",
+          "id": "src/lib.rs::caller#function",
+          "kind": "function",
+          "name": "caller"
+        }
+      ],
+      "omissions": [],
+      "ownership": [],
+      "policy": "demand-semantic-v1",
+      "relationships": [
+        {
+          "edge": {
+            "directed": true,
+            "evidence": {
+              "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+              "file": "src/api.rs",
+              "line": 3
+            },
+            "from": "src/api.rs::parse#function",
+            "namespace": "loci",
+            "resolution": "exact",
+            "to": "src/api.rs::Config#struct",
+            "type": "uses_type"
+          },
+          "id": 1,
+          "proof": "complete",
+          "resolution_configuration": "unconditional",
+          "source_ids": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            1,
+            2
+          ],
+          "traversed": "forward"
+        },
+        {
+          "edge": {
+            "directed": true,
+            "evidence": {
+              "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+              "file": "src/lib.rs",
+              "line": 4
+            },
+            "from": "src/lib.rs::caller#function",
+            "namespace": "loci",
+            "resolution": "import-resolved",
+            "to": "src/api.rs::parse#function",
+            "type": "references"
+          },
+          "id": 2,
+          "proof": "complete",
+          "resolution_configuration": "unconditional",
+          "source_ids": [
+            8,
+            9,
+            4,
+            6,
+            7,
+            10,
+            1
+          ],
+          "traversed": "reverse"
+        },
+        {
+          "edge": {
+            "directed": true,
+            "evidence": {
+              "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+              "file": "src/lib.rs",
+              "line": 4
+            },
+            "from": "src/lib.rs::caller#function",
+            "namespace": "loci",
+            "resolution": "import-resolved",
+            "to": "src/api.rs::parse#function",
+            "type": "calls"
+          },
+          "id": 3,
+          "proof": "complete",
+          "resolution_configuration": "unconditional",
+          "source_ids": [
+            11,
+            12,
+            10,
+            9,
+            4,
+            7,
+            6,
+            1
+          ],
+          "traversed": "reverse"
+        }
+      ],
+      "schema_version": 1,
+      "scope": {
+        "coverage": "complete",
+        "exhaustive": false,
+        "matching": "symbol_metadata",
+        "relationships": "known_static_relationships",
+        "source": "indexed_supported_source"
+      },
+      "selection": {
+        "candidate_count": 3,
+        "mode": "inferred",
+        "omitted_candidates": 0
+      },
+      "snapshot": "829cca3477fcf30665d664678021f66aac4ec00969c7db8efcc6a5fe19b9cfab",
+      "sources": [
+        {
+          "content": "pub fn parse(config: Config) -> bool { config.strict }",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 94,
+          "end_line": 3,
+          "file": "src/api.rs",
+          "id": 1,
+          "source_ref": "s:eyJlbmQiOjk0LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0Ijo0MCwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0Ijo0MCwidiI6Mn0",
+          "start_byte": 40,
+          "start_line": 3
+        },
+        {
+          "content": "pub struct Config { pub strict: bool }",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 38,
+          "end_line": 1,
+          "file": "src/api.rs",
+          "id": 2,
+          "source_ref": "s:eyJlbmQiOjM4LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "Config",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 67,
+          "end_line": 3,
+          "file": "src/api.rs",
+          "id": 3,
+          "source_ref": "s:eyJlbmQiOjY3LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0Ijo2MSwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0Ijo2MSwidiI6Mn0",
+          "start_byte": 61,
+          "start_line": 3
+        },
+        {
+          "content": "pub fn parse(config: Config) -> bool { config.strict }\n",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 95,
+          "end_line": 3,
+          "file": "src/api.rs",
+          "id": 4,
+          "source_ref": "s:eyJlbmQiOjk1LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0Ijo0MCwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0Ijo0MCwidiI6Mn0",
+          "start_byte": 40,
+          "start_line": 3
+        },
+        {
+          "content": "pub struct Config { pub strict: bool }\n",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 39,
+          "end_line": 1,
+          "file": "src/api.rs",
+          "id": 5,
+          "source_ref": "s:eyJlbmQiOjM5LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "pub mod api;",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 12,
+          "end_line": 1,
+          "file": "src/lib.rs",
+          "id": 6,
+          "source_ref": "s:eyJlbmQiOjEyLCJmaWxlIjoic3JjL2xpYi5ycyIsImhhc2giOiI1ZmI3NDZiM2NhNWMzYzBkZWFjYTc2MjM4MjBkMWQwNTZkZmViYjIzMWY0YmI2OGJjZDNlMzUzZjczOWJkNzEwIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "[package]\nname = \"ledger\"\nversion = \"0.1.0\"\nedition = \"2021\"\n",
+          "content_hash": "734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9",
+          "end_byte": 61,
+          "end_line": 4,
+          "file": "Cargo.toml",
+          "id": 7,
+          "source_ref": "s:eyJlbmQiOjYxLCJmaWxlIjoiQ2FyZ28udG9tbCIsImhhc2giOiI3MzQyNDJhNDI0M2VkNTBmNzQ5NmM0OTViMjFmNDU2YWE1ZDA3Y2Y4MmIwMzZkZDFiMDkwNGE4Njc4ZjIyOGY5Iiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "parse",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 92,
+          "end_line": 4,
+          "file": "src/lib.rs",
+          "id": 8,
+          "source_ref": "s:eyJlbmQiOjkyLCJmaWxlIjoic3JjL2xpYi5ycyIsImhhc2giOiI1ZmI3NDZiM2NhNWMzYzBkZWFjYTc2MjM4MjBkMWQwNTZkZmViYjIzMWY0YmI2OGJjZDNlMzUzZjczOWJkNzEwIiwib2Zmc2V0Ijo4NywicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0Ijo4NywidiI6Mn0",
+          "start_byte": 87,
+          "start_line": 4
+        },
+        {
+          "content": "pub mod api;\nuse crate::api::{parse, Config};",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 45,
+          "end_line": 2,
+          "file": "src/lib.rs",
+          "id": 9,
+          "source_ref": "s:eyJlbmQiOjQ1LCJmaWxlIjoic3JjL2xpYi5ycyIsImhhc2giOiI1ZmI3NDZiM2NhNWMzYzBkZWFjYTc2MjM4MjBkMWQwNTZkZmViYjIzMWY0YmI2OGJjZDNlMzUzZjczOWJkNzEwIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "pub fn caller(config: Config) -> bool { parse(config) }",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 102,
+          "end_line": 4,
+          "file": "src/lib.rs",
+          "id": 10,
+          "source_ref": "s:eyJlbmQiOjEwMiwiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6NDcsInJlcG8iOiIvVXNlcnMvYnJ1bW1lcnYvcGhsdXh4ZWQvbG9jaS8ud29ya3RyZWVzL3IwNS1kZW1hbmQtc2VtYW50aWNzLy5zY3JhdGNoL3IwNi1uYXZpZ2F0aW9uLXByb29mL3Jlc3VsdHMvZnVsbC1kZW1hbmQtZm9jdXNlZC8ub3duZWQvdmFyaWFudC0xLzEvZml4dHVyZXMvcnVzdF9pbXBhY3QiLCJzdGFydCI6NDcsInYiOjJ9",
+          "start_byte": 47,
+          "start_line": 4
+        },
+        {
+          "content": "parse(config)",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 100,
+          "end_line": 4,
+          "file": "src/lib.rs",
+          "id": 11,
+          "source_ref": "s:eyJlbmQiOjEwMCwiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6ODcsInJlcG8iOiIvVXNlcnMvYnJ1bW1lcnYvcGhsdXh4ZWQvbG9jaS8ud29ya3RyZWVzL3IwNS1kZW1hbmQtc2VtYW50aWNzLy5zY3JhdGNoL3IwNi1uYXZpZ2F0aW9uLXByb29mL3Jlc3VsdHMvZnVsbC1kZW1hbmQtZm9jdXNlZC8ub3duZWQvdmFyaWFudC0xLzEvZml4dHVyZXMvcnVzdF9pbXBhY3QiLCJzdGFydCI6ODcsInYiOjJ9",
+          "start_byte": 87,
+          "start_line": 4
+        },
+        {
+          "content": "pub fn caller(config: Config) -> bool { parse(config) }\n",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 103,
+          "end_line": 4,
+          "file": "src/lib.rs",
+          "id": 12,
+          "source_ref": "s:eyJlbmQiOjEwMywiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6NDcsInJlcG8iOiIvVXNlcnMvYnJ1bW1lcnYvcGhsdXh4ZWQvbG9jaS8ud29ya3RyZWVzL3IwNS1kZW1hbmQtc2VtYW50aWNzLy5zY3JhdGNoL3IwNi1uYXZpZ2F0aW9uLXByb29mL3Jlc3VsdHMvZnVsbC1kZW1hbmQtZm9jdXNlZC8ub3duZWQvdmFyaWFudC0xLzEvZml4dHVyZXMvcnVzdF9pbXBhY3QiLCJzdGFydCI6NDcsInYiOjJ9",
+          "start_byte": 47,
+          "start_line": 4
+        }
+      ],
+      "status": "ok",
+      "uncertainty": {
+        "configuration_meaning": "declared_possible does not establish active configuration",
+        "configuration_possible_count": 0,
+        "counts": [],
+        "examples": [],
+        "examples_omitted": 0,
+        "exhaustive": false,
+        "scope": "native_records_in_computed_slice"
+      },
+      "usage": {
+        "edges_traversed": 3,
+        "eligible_edges_considered": 6,
+        "estimated_tokens": 3142,
+        "evidence_bytes": 256,
+        "lookup_bytes": 259,
+        "lookup_files": 3,
+        "nodes_examined": 6,
+        "output_bytes": 12567,
+        "output_encoding": "mcp_result_json_utf8",
+        "relationships_delivered": 3,
+        "token_estimate_method": "utf8_bytes_div_4"
+      }
+    }
+  },
+  {
+    "content": [],
+    "isError": false,
+    "structuredContent": {
+      "anchors": [],
+      "items": [
+        {
+          "complete": true,
+          "depth": 0,
+          "extent": {
+            "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+            "end_byte": 95,
+            "file": "src/api.rs",
+            "start_byte": 0
+          },
+          "node_id": "src/api.rs::__file__#file",
+          "role": "anchor",
+          "source_ids": [
+            1
+          ],
+          "source_ref": "eyJlbmQiOjk1LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjF9",
+          "why": "source_literal"
+        },
+        {
+          "complete": true,
+          "depth": 0,
+          "extent": {
+            "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+            "end_byte": 103,
+            "file": "src/lib.rs",
+            "start_byte": 0
+          },
+          "node_id": "src/lib.rs::__file__#file",
+          "role": "anchor",
+          "source_ids": [
+            2
+          ],
+          "source_ref": "eyJlbmQiOjEwMywiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6MCwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0IjowLCJ2IjoxfQ",
+          "why": "source_literal"
+        }
+      ],
+      "limits": {
+        "max_file_bytes": 2097152,
+        "max_files": 4096,
+        "max_preview_bytes": 1024,
+        "max_read_bytes": 8192,
+        "max_results": 3,
+        "max_scan_bytes": 67108864
+      },
+      "nodes": [],
+      "omissions": [
+        {
+          "count": 1,
+          "reason": "unsupported_semantics"
+        }
+      ],
+      "ownership": [],
+      "policy": "graph-free-file-v1",
+      "relationships": [],
+      "schema_version": 1,
+      "scope": {
+        "coverage": "complete",
+        "exhaustive": false,
+        "matching": "source_literal",
+        "relationships": "unsupported",
+        "source": "text_repository_files"
+      },
+      "selection": {
+        "candidate_count": 2,
+        "mode": "literal",
+        "omitted_candidates": 0
+      },
+      "snapshot": "829cca3477fcf30665d664678021f66aac4ec00969c7db8efcc6a5fe19b9cfab",
+      "sources": [
+        {
+          "content": "pub struct Config { pub strict: bool }\n\npub fn parse(config: Config) -> bool { config.strict }\n",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 95,
+          "end_line": 3,
+          "file": "src/api.rs",
+          "id": 1,
+          "source_ref": "eyJlbmQiOjk1LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjF9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "pub mod api;\nuse crate::api::{parse, Config};\n\npub fn caller(config: Config) -> bool { parse(config) }\n",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 103,
+          "end_line": 4,
+          "file": "src/lib.rs",
+          "id": 2,
+          "source_ref": "eyJlbmQiOjEwMywiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6MCwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0IjowLCJ2IjoxfQ",
+          "start_byte": 0,
+          "start_line": 1
+        }
+      ],
+      "status": "partial",
+      "usage": {
+        "estimated_tokens": 903,
+        "evidence_bytes": 198,
+        "lookup_bytes": 259,
+        "lookup_files": 3,
+        "output_bytes": 3611,
+        "output_encoding": "mcp_result_json_utf8"
+      }
+    }
+  },
+  {
+    "content": [],
+    "isError": false,
+    "structuredContent": {
+      "anchors": [],
+      "items": [
+        {
+          "complete": true,
+          "depth": 0,
+          "extent": {
+            "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+            "end_byte": 95,
+            "file": "src/api.rs",
+            "start_byte": 0
+          },
+          "node_id": "src/api.rs::__file__#file",
+          "role": "anchor",
+          "source_ids": [
+            1
+          ],
+          "source_ref": "eyJlbmQiOjk1LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjF9",
+          "why": "source_literal"
+        }
+      ],
+      "limits": {
+        "max_file_bytes": 2097152,
+        "max_files": 4096,
+        "max_preview_bytes": 1024,
+        "max_read_bytes": 8192,
+        "max_results": 3,
+        "max_scan_bytes": 67108864
+      },
+      "nodes": [],
+      "omissions": [
+        {
+          "count": 1,
+          "reason": "unsupported_semantics"
+        }
+      ],
+      "ownership": [],
+      "policy": "graph-free-file-v1",
+      "relationships": [],
+      "schema_version": 1,
+      "scope": {
+        "coverage": "complete",
+        "exhaustive": false,
+        "matching": "source_literal",
+        "relationships": "unsupported",
+        "source": "text_repository_files"
+      },
+      "selection": {
+        "candidate_count": 1,
+        "mode": "literal",
+        "omitted_candidates": 0
+      },
+      "snapshot": "829cca3477fcf30665d664678021f66aac4ec00969c7db8efcc6a5fe19b9cfab",
+      "sources": [
+        {
+          "content": "pub struct Config { pub strict: bool }\n\npub fn parse(config: Config) -> bool { config.strict }\n",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 95,
+          "end_line": 3,
+          "file": "src/api.rs",
+          "id": 1,
+          "source_ref": "eyJlbmQiOjk1LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjF9",
+          "start_byte": 0,
+          "start_line": 1
+        }
+      ],
+      "status": "partial",
+      "usage": {
+        "estimated_tokens": 555,
+        "evidence_bytes": 95,
+        "lookup_bytes": 259,
+        "lookup_files": 3,
+        "output_bytes": 2220,
+        "output_encoding": "mcp_result_json_utf8"
+      }
+    }
+  },
+  {
+    "content": [],
+    "isError": false,
+    "structuredContent": {
+      "anchors": [],
+      "items": [
+        {
+          "complete": true,
+          "depth": 0,
+          "extent": {
+            "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+            "end_byte": 95,
+            "file": "src/api.rs",
+            "start_byte": 0
+          },
+          "node_id": "src/api.rs::__file__#file",
+          "role": "anchor",
+          "source_ids": [
+            1
+          ],
+          "source_ref": "eyJlbmQiOjk1LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjF9",
+          "why": "source_literal"
+        },
+        {
+          "complete": true,
+          "depth": 0,
+          "extent": {
+            "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+            "end_byte": 103,
+            "file": "src/lib.rs",
+            "start_byte": 0
+          },
+          "node_id": "src/lib.rs::__file__#file",
+          "role": "anchor",
+          "source_ids": [
+            2
+          ],
+          "source_ref": "eyJlbmQiOjEwMywiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6MCwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0IjowLCJ2IjoxfQ",
+          "why": "source_literal"
+        }
+      ],
+      "limits": {
+        "max_file_bytes": 2097152,
+        "max_files": 4096,
+        "max_preview_bytes": 1024,
+        "max_read_bytes": 8192,
+        "max_results": 3,
+        "max_scan_bytes": 67108864
+      },
+      "nodes": [],
+      "omissions": [
+        {
+          "count": 1,
+          "reason": "unsupported_semantics"
+        }
+      ],
+      "ownership": [],
+      "policy": "graph-free-file-v1",
+      "relationships": [],
+      "schema_version": 1,
+      "scope": {
+        "coverage": "complete",
+        "exhaustive": false,
+        "matching": "source_literal",
+        "relationships": "unsupported",
+        "source": "text_repository_files"
+      },
+      "selection": {
+        "candidate_count": 2,
+        "mode": "literal",
+        "omitted_candidates": 0
+      },
+      "snapshot": "829cca3477fcf30665d664678021f66aac4ec00969c7db8efcc6a5fe19b9cfab",
+      "sources": [
+        {
+          "content": "pub struct Config { pub strict: bool }\n\npub fn parse(config: Config) -> bool { config.strict }\n",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 95,
+          "end_line": 3,
+          "file": "src/api.rs",
+          "id": 1,
+          "source_ref": "eyJlbmQiOjk1LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjF9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "pub mod api;\nuse crate::api::{parse, Config};\n\npub fn caller(config: Config) -> bool { parse(config) }\n",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 103,
+          "end_line": 4,
+          "file": "src/lib.rs",
+          "id": 2,
+          "source_ref": "eyJlbmQiOjEwMywiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6MCwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0IjowLCJ2IjoxfQ",
+          "start_byte": 0,
+          "start_line": 1
+        }
+      ],
+      "status": "partial",
+      "usage": {
+        "estimated_tokens": 903,
+        "evidence_bytes": 198,
+        "lookup_bytes": 259,
+        "lookup_files": 3,
+        "output_bytes": 3611,
+        "output_encoding": "mcp_result_json_utf8"
+      }
+    }
+  },
+  {
+    "content": [],
+    "isError": false,
+    "structuredContent": {
+      "anchors": [
+        {
+          "match_scope": [
+            "symbol_metadata"
+          ],
+          "matched_terms": [
+            "parse"
+          ],
+          "node_id": "src/api.rs::parse#function",
+          "score": 0
+        }
+      ],
+      "items": [
+        {
+          "complete": true,
+          "depth": 1,
+          "extent": {
+            "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+            "end_byte": 94,
+            "file": "src/api.rs",
+            "start_byte": 40
+          },
+          "node_id": "src/api.rs::parse#function",
+          "role": "related",
+          "source_ids": [
+            6
+          ],
+          "source_ref": "s:eyJlbmQiOjk0LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0Ijo0MCwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0Ijo0MCwidiI6Mn0",
+          "why": "proved relationship endpoint"
+        },
+        {
+          "complete": true,
+          "depth": 1,
+          "extent": {
+            "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+            "end_byte": 38,
+            "file": "src/api.rs",
+            "start_byte": 0
+          },
+          "node_id": "src/api.rs::Config#struct",
+          "role": "related",
+          "source_ids": [
+            7
+          ],
+          "source_ref": "s:eyJlbmQiOjM4LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "why": "proved relationship endpoint"
+        },
+        {
+          "complete": true,
+          "depth": 1,
+          "extent": {
+            "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+            "end_byte": 102,
+            "file": "src/lib.rs",
+            "start_byte": 47
+          },
+          "node_id": "src/lib.rs::caller#function",
+          "role": "related",
+          "source_ids": [
+            10
+          ],
+          "source_ref": "s:eyJlbmQiOjEwMiwiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6NDcsInJlcG8iOiIvVXNlcnMvYnJ1bW1lcnYvcGhsdXh4ZWQvbG9jaS8ud29ya3RyZWVzL3IwNS1kZW1hbmQtc2VtYW50aWNzLy5zY3JhdGNoL3IwNi1uYXZpZ2F0aW9uLXByb29mL3Jlc3VsdHMvZnVsbC1kZW1hbmQtZm9jdXNlZC8ub3duZWQvdmFyaWFudC0xLzEvZml4dHVyZXMvcnVzdF9pbXBhY3QiLCJzdGFydCI6NDcsInYiOjJ9",
+          "why": "proved relationship endpoint"
+        }
+      ],
+      "limits": {
+        "max_evidence_bytes": 8192,
+        "max_items": 12,
+        "max_output_bytes": 16384,
+        "max_parsed_files": 48,
+        "max_relationships": 12
+      },
+      "nodes": [
+        {
+          "file": "src/api.rs",
+          "id": "src/api.rs::parse#function",
+          "kind": "function",
+          "name": "parse"
+        },
+        {
+          "file": "src/api.rs",
+          "id": "src/api.rs::Config#struct",
+          "kind": "struct",
+          "name": "Config"
+        },
+        {
+          "file": "src/lib.rs",
+          "id": "src/lib.rs::caller#function",
+          "kind": "function",
+          "name": "caller"
+        }
+      ],
+      "omissions": [],
+      "ownership": [],
+      "policy": "focused-semantic-v1",
+      "proof_request": {
+        "node_id": "src/api.rs::parse#function",
+        "scope": "same_computed_slice"
+      },
+      "relationships": [
+        {
+          "edge": {
+            "directed": true,
+            "evidence": {
+              "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+              "file": "src/api.rs",
+              "line": 3
+            },
+            "from": "src/api.rs::parse#function",
+            "namespace": "loci",
+            "resolution": "exact",
+            "to": "src/api.rs::Config#struct",
+            "type": "uses_type"
+          },
+          "id": 1,
+          "proof": "complete",
+          "resolution_configuration": "unconditional",
+          "source_ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "traversed": "forward"
+        },
+        {
+          "edge": {
+            "directed": true,
+            "evidence": {
+              "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+              "file": "src/lib.rs",
+              "line": 4
+            },
+            "from": "src/lib.rs::caller#function",
+            "namespace": "loci",
+            "resolution": "import-resolved",
+            "to": "src/api.rs::parse#function",
+            "type": "references"
+          },
+          "id": 2,
+          "proof": "complete",
+          "resolution_configuration": "unconditional",
+          "source_ids": [
+            8,
+            9,
+            2,
+            4,
+            5,
+            10,
+            6
+          ],
+          "traversed": "reverse"
+        },
+        {
+          "edge": {
+            "directed": true,
+            "evidence": {
+              "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+              "file": "src/lib.rs",
+              "line": 4
+            },
+            "from": "src/lib.rs::caller#function",
+            "namespace": "loci",
+            "resolution": "import-resolved",
+            "to": "src/api.rs::parse#function",
+            "type": "calls"
+          },
+          "id": 3,
+          "proof": "complete",
+          "resolution_configuration": "unconditional",
+          "source_ids": [
+            11,
+            12,
+            10,
+            9,
+            2,
+            5,
+            4,
+            6
+          ],
+          "traversed": "reverse"
+        }
+      ],
+      "schema_version": 1,
+      "scope": {
+        "coverage": "complete",
+        "exhaustive": false,
+        "matching": "symbol_metadata",
+        "relationships": "known_static_relationships",
+        "source": "indexed_supported_source"
+      },
+      "selection": {
+        "candidate_count": 0,
+        "mode": "inferred",
+        "omitted_candidates": 0
+      },
+      "snapshot": "829cca3477fcf30665d664678021f66aac4ec00969c7db8efcc6a5fe19b9cfab",
+      "sources": [
+        {
+          "content": "Config",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 67,
+          "end_line": 3,
+          "file": "src/api.rs",
+          "id": 1,
+          "source_ref": "s:eyJlbmQiOjY3LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0Ijo2MSwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0Ijo2MSwidiI6Mn0",
+          "start_byte": 61,
+          "start_line": 3
+        },
+        {
+          "content": "pub fn parse(config: Config) -> bool { config.strict }\n",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 95,
+          "end_line": 3,
+          "file": "src/api.rs",
+          "id": 2,
+          "source_ref": "s:eyJlbmQiOjk1LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0Ijo0MCwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0Ijo0MCwidiI6Mn0",
+          "start_byte": 40,
+          "start_line": 3
+        },
+        {
+          "content": "pub struct Config { pub strict: bool }\n",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 39,
+          "end_line": 1,
+          "file": "src/api.rs",
+          "id": 3,
+          "source_ref": "s:eyJlbmQiOjM5LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "pub mod api;",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 12,
+          "end_line": 1,
+          "file": "src/lib.rs",
+          "id": 4,
+          "source_ref": "s:eyJlbmQiOjEyLCJmaWxlIjoic3JjL2xpYi5ycyIsImhhc2giOiI1ZmI3NDZiM2NhNWMzYzBkZWFjYTc2MjM4MjBkMWQwNTZkZmViYjIzMWY0YmI2OGJjZDNlMzUzZjczOWJkNzEwIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "[package]\nname = \"ledger\"\nversion = \"0.1.0\"\nedition = \"2021\"\n",
+          "content_hash": "734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9",
+          "end_byte": 61,
+          "end_line": 4,
+          "file": "Cargo.toml",
+          "id": 5,
+          "source_ref": "s:eyJlbmQiOjYxLCJmaWxlIjoiQ2FyZ28udG9tbCIsImhhc2giOiI3MzQyNDJhNDI0M2VkNTBmNzQ5NmM0OTViMjFmNDU2YWE1ZDA3Y2Y4MmIwMzZkZDFiMDkwNGE4Njc4ZjIyOGY5Iiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "pub fn parse(config: Config) -> bool { config.strict }",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 94,
+          "end_line": 3,
+          "file": "src/api.rs",
+          "id": 6,
+          "source_ref": "s:eyJlbmQiOjk0LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0Ijo0MCwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0Ijo0MCwidiI6Mn0",
+          "start_byte": 40,
+          "start_line": 3
+        },
+        {
+          "content": "pub struct Config { pub strict: bool }",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 38,
+          "end_line": 1,
+          "file": "src/api.rs",
+          "id": 7,
+          "source_ref": "s:eyJlbmQiOjM4LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "parse",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 92,
+          "end_line": 4,
+          "file": "src/lib.rs",
+          "id": 8,
+          "source_ref": "s:eyJlbmQiOjkyLCJmaWxlIjoic3JjL2xpYi5ycyIsImhhc2giOiI1ZmI3NDZiM2NhNWMzYzBkZWFjYTc2MjM4MjBkMWQwNTZkZmViYjIzMWY0YmI2OGJjZDNlMzUzZjczOWJkNzEwIiwib2Zmc2V0Ijo4NywicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0Ijo4NywidiI6Mn0",
+          "start_byte": 87,
+          "start_line": 4
+        },
+        {
+          "content": "pub mod api;\nuse crate::api::{parse, Config};",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 45,
+          "end_line": 2,
+          "file": "src/lib.rs",
+          "id": 9,
+          "source_ref": "s:eyJlbmQiOjQ1LCJmaWxlIjoic3JjL2xpYi5ycyIsImhhc2giOiI1ZmI3NDZiM2NhNWMzYzBkZWFjYTc2MjM4MjBkMWQwNTZkZmViYjIzMWY0YmI2OGJjZDNlMzUzZjczOWJkNzEwIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "pub fn caller(config: Config) -> bool { parse(config) }",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 102,
+          "end_line": 4,
+          "file": "src/lib.rs",
+          "id": 10,
+          "source_ref": "s:eyJlbmQiOjEwMiwiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6NDcsInJlcG8iOiIvVXNlcnMvYnJ1bW1lcnYvcGhsdXh4ZWQvbG9jaS8ud29ya3RyZWVzL3IwNS1kZW1hbmQtc2VtYW50aWNzLy5zY3JhdGNoL3IwNi1uYXZpZ2F0aW9uLXByb29mL3Jlc3VsdHMvZnVsbC1kZW1hbmQtZm9jdXNlZC8ub3duZWQvdmFyaWFudC0xLzEvZml4dHVyZXMvcnVzdF9pbXBhY3QiLCJzdGFydCI6NDcsInYiOjJ9",
+          "start_byte": 47,
+          "start_line": 4
+        },
+        {
+          "content": "parse(config)",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 100,
+          "end_line": 4,
+          "file": "src/lib.rs",
+          "id": 11,
+          "source_ref": "s:eyJlbmQiOjEwMCwiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6ODcsInJlcG8iOiIvVXNlcnMvYnJ1bW1lcnYvcGhsdXh4ZWQvbG9jaS8ud29ya3RyZWVzL3IwNS1kZW1hbmQtc2VtYW50aWNzLy5zY3JhdGNoL3IwNi1uYXZpZ2F0aW9uLXByb29mL3Jlc3VsdHMvZnVsbC1kZW1hbmQtZm9jdXNlZC8ub3duZWQvdmFyaWFudC0xLzEvZml4dHVyZXMvcnVzdF9pbXBhY3QiLCJzdGFydCI6ODcsInYiOjJ9",
+          "start_byte": 87,
+          "start_line": 4
+        },
+        {
+          "content": "pub fn caller(config: Config) -> bool { parse(config) }\n",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 103,
+          "end_line": 4,
+          "file": "src/lib.rs",
+          "id": 12,
+          "source_ref": "s:eyJlbmQiOjEwMywiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6NDcsInJlcG8iOiIvVXNlcnMvYnJ1bW1lcnYvcGhsdXh4ZWQvbG9jaS8ud29ya3RyZWVzL3IwNS1kZW1hbmQtc2VtYW50aWNzLy5zY3JhdGNoL3IwNi1uYXZpZ2F0aW9uLXByb29mL3Jlc3VsdHMvZnVsbC1kZW1hbmQtZm9jdXNlZC8ub3duZWQvdmFyaWFudC0xLzEvZml4dHVyZXMvcnVzdF9pbXBhY3QiLCJzdGFydCI6NDcsInYiOjJ9",
+          "start_byte": 47,
+          "start_line": 4
+        }
+      ],
+      "status": "ok",
+      "uncertainty": {
+        "configuration_meaning": "declared_possible does not establish active configuration",
+        "configuration_possible_count": 0,
+        "counts": [],
+        "examples": [],
+        "examples_omitted": 0,
+        "exhaustive": false,
+        "scope": "native_records_in_computed_slice"
+      },
+      "usage": {
+        "edges_traversed": 3,
+        "eligible_edges_considered": 6,
+        "estimated_tokens": 3163,
+        "evidence_bytes": 256,
+        "lookup_bytes": 0,
+        "lookup_files": 0,
+        "nodes_examined": 6,
+        "output_bytes": 12649,
+        "output_encoding": "mcp_result_json_utf8",
+        "relationships_delivered": 3,
+        "token_estimate_method": "utf8_bytes_div_4"
+      }
+    }
+  },
+  {
+    "content": [],
+    "isError": false,
+    "structuredContent": {
+      "anchors": [
+        {
+          "match_scope": [
+            "symbol_metadata"
+          ],
+          "matched_terms": [],
+          "node_id": "src/api.rs::Config#struct",
+          "score": 0
+        }
+      ],
+      "items": [
+        {
+          "complete": true,
+          "depth": 1,
+          "extent": {
+            "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+            "end_byte": 94,
+            "file": "src/api.rs",
+            "start_byte": 40
+          },
+          "node_id": "src/api.rs::parse#function",
+          "role": "related",
+          "source_ids": [
+            6
+          ],
+          "source_ref": "s:eyJlbmQiOjk0LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0Ijo0MCwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0Ijo0MCwidiI6Mn0",
+          "why": "proved relationship endpoint"
+        },
+        {
+          "complete": true,
+          "depth": 1,
+          "extent": {
+            "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+            "end_byte": 38,
+            "file": "src/api.rs",
+            "start_byte": 0
+          },
+          "node_id": "src/api.rs::Config#struct",
+          "role": "related",
+          "source_ids": [
+            7
+          ],
+          "source_ref": "s:eyJlbmQiOjM4LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "why": "proved relationship endpoint"
+        },
+        {
+          "complete": true,
+          "depth": 1,
+          "extent": {
+            "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+            "end_byte": 102,
+            "file": "src/lib.rs",
+            "start_byte": 47
+          },
+          "node_id": "src/lib.rs::caller#function",
+          "role": "related",
+          "source_ids": [
+            11
+          ],
+          "source_ref": "s:eyJlbmQiOjEwMiwiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6NDcsInJlcG8iOiIvVXNlcnMvYnJ1bW1lcnYvcGhsdXh4ZWQvbG9jaS8ud29ya3RyZWVzL3IwNS1kZW1hbmQtc2VtYW50aWNzLy5zY3JhdGNoL3IwNi1uYXZpZ2F0aW9uLXByb29mL3Jlc3VsdHMvZnVsbC1kZW1hbmQtZm9jdXNlZC8ub3duZWQvdmFyaWFudC0xLzEvZml4dHVyZXMvcnVzdF9pbXBhY3QiLCJzdGFydCI6NDcsInYiOjJ9",
+          "why": "proved relationship endpoint"
+        }
+      ],
+      "limits": {
+        "max_evidence_bytes": 8192,
+        "max_items": 12,
+        "max_output_bytes": 16384,
+        "max_parsed_files": 48,
+        "max_relationships": 12
+      },
+      "nodes": [
+        {
+          "file": "src/api.rs",
+          "id": "src/api.rs::parse#function",
+          "kind": "function",
+          "name": "parse"
+        },
+        {
+          "file": "src/api.rs",
+          "id": "src/api.rs::Config#struct",
+          "kind": "struct",
+          "name": "Config"
+        },
+        {
+          "file": "src/lib.rs",
+          "id": "src/lib.rs::caller#function",
+          "kind": "function",
+          "name": "caller"
+        },
+        {
+          "file": "src/lib.rs",
+          "id": "src/lib.rs::__file__#file",
+          "kind": "file",
+          "name": "lib.rs"
+        }
+      ],
+      "omissions": [],
+      "ownership": [],
+      "policy": "focused-semantic-v1",
+      "proof_request": {
+        "node_id": "src/api.rs::Config#struct",
+        "scope": "same_computed_slice"
+      },
+      "relationships": [
+        {
+          "edge": {
+            "directed": true,
+            "evidence": {
+              "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+              "file": "src/api.rs",
+              "line": 3
+            },
+            "from": "src/api.rs::parse#function",
+            "namespace": "loci",
+            "resolution": "exact",
+            "to": "src/api.rs::Config#struct",
+            "type": "uses_type"
+          },
+          "id": 1,
+          "proof": "complete",
+          "resolution_configuration": "unconditional",
+          "source_ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "traversed": "reverse"
+        },
+        {
+          "edge": {
+            "directed": true,
+            "evidence": {
+              "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+              "file": "src/lib.rs",
+              "line": 4
+            },
+            "from": "src/lib.rs::caller#function",
+            "namespace": "loci",
+            "resolution": "import-resolved",
+            "to": "src/api.rs::Config#struct",
+            "type": "uses_type"
+          },
+          "id": 2,
+          "proof": "complete",
+          "resolution_configuration": "unconditional",
+          "source_ids": [
+            8,
+            9,
+            10,
+            3,
+            4,
+            5,
+            11,
+            7
+          ],
+          "traversed": "reverse"
+        },
+        {
+          "edge": {
+            "directed": true,
+            "evidence": {
+              "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+              "file": "src/lib.rs",
+              "line": 4
+            },
+            "from": "src/lib.rs::__file__#file",
+            "namespace": "loci",
+            "resolution": "import-resolved",
+            "to": "src/api.rs::Config#struct",
+            "type": "references"
+          },
+          "id": 3,
+          "proof": "complete",
+          "resolution_configuration": "unconditional",
+          "source_ids": [
+            8,
+            10,
+            3,
+            4,
+            5,
+            7
+          ],
+          "traversed": "reverse"
+        }
+      ],
+      "schema_version": 1,
+      "scope": {
+        "coverage": "complete",
+        "exhaustive": false,
+        "matching": "symbol_metadata",
+        "relationships": "known_static_relationships",
+        "source": "indexed_supported_source"
+      },
+      "selection": {
+        "candidate_count": 0,
+        "mode": "inferred",
+        "omitted_candidates": 0
+      },
+      "snapshot": "829cca3477fcf30665d664678021f66aac4ec00969c7db8efcc6a5fe19b9cfab",
+      "sources": [
+        {
+          "content": "Config",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 67,
+          "end_line": 3,
+          "file": "src/api.rs",
+          "id": 1,
+          "source_ref": "s:eyJlbmQiOjY3LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0Ijo2MSwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0Ijo2MSwidiI6Mn0",
+          "start_byte": 61,
+          "start_line": 3
+        },
+        {
+          "content": "pub fn parse(config: Config) -> bool { config.strict }\n",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 95,
+          "end_line": 3,
+          "file": "src/api.rs",
+          "id": 2,
+          "source_ref": "s:eyJlbmQiOjk1LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0Ijo0MCwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0Ijo0MCwidiI6Mn0",
+          "start_byte": 40,
+          "start_line": 3
+        },
+        {
+          "content": "pub struct Config { pub strict: bool }\n",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 39,
+          "end_line": 1,
+          "file": "src/api.rs",
+          "id": 3,
+          "source_ref": "s:eyJlbmQiOjM5LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "pub mod api;",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 12,
+          "end_line": 1,
+          "file": "src/lib.rs",
+          "id": 4,
+          "source_ref": "s:eyJlbmQiOjEyLCJmaWxlIjoic3JjL2xpYi5ycyIsImhhc2giOiI1ZmI3NDZiM2NhNWMzYzBkZWFjYTc2MjM4MjBkMWQwNTZkZmViYjIzMWY0YmI2OGJjZDNlMzUzZjczOWJkNzEwIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "[package]\nname = \"ledger\"\nversion = \"0.1.0\"\nedition = \"2021\"\n",
+          "content_hash": "734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9",
+          "end_byte": 61,
+          "end_line": 4,
+          "file": "Cargo.toml",
+          "id": 5,
+          "source_ref": "s:eyJlbmQiOjYxLCJmaWxlIjoiQ2FyZ28udG9tbCIsImhhc2giOiI3MzQyNDJhNDI0M2VkNTBmNzQ5NmM0OTViMjFmNDU2YWE1ZDA3Y2Y4MmIwMzZkZDFiMDkwNGE4Njc4ZjIyOGY5Iiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "pub fn parse(config: Config) -> bool { config.strict }",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 94,
+          "end_line": 3,
+          "file": "src/api.rs",
+          "id": 6,
+          "source_ref": "s:eyJlbmQiOjk0LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0Ijo0MCwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0Ijo0MCwidiI6Mn0",
+          "start_byte": 40,
+          "start_line": 3
+        },
+        {
+          "content": "pub struct Config { pub strict: bool }",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 38,
+          "end_line": 1,
+          "file": "src/api.rs",
+          "id": 7,
+          "source_ref": "s:eyJlbmQiOjM4LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "Config",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 75,
+          "end_line": 4,
+          "file": "src/lib.rs",
+          "id": 8,
+          "source_ref": "s:eyJlbmQiOjc1LCJmaWxlIjoic3JjL2xpYi5ycyIsImhhc2giOiI1ZmI3NDZiM2NhNWMzYzBkZWFjYTc2MjM4MjBkMWQwNTZkZmViYjIzMWY0YmI2OGJjZDNlMzUzZjczOWJkNzEwIiwib2Zmc2V0Ijo2OSwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0Ijo2OSwidiI6Mn0",
+          "start_byte": 69,
+          "start_line": 4
+        },
+        {
+          "content": "pub fn caller(config: Config) -> bool { parse(config) }\n",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 103,
+          "end_line": 4,
+          "file": "src/lib.rs",
+          "id": 9,
+          "source_ref": "s:eyJlbmQiOjEwMywiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6NDcsInJlcG8iOiIvVXNlcnMvYnJ1bW1lcnYvcGhsdXh4ZWQvbG9jaS8ud29ya3RyZWVzL3IwNS1kZW1hbmQtc2VtYW50aWNzLy5zY3JhdGNoL3IwNi1uYXZpZ2F0aW9uLXByb29mL3Jlc3VsdHMvZnVsbC1kZW1hbmQtZm9jdXNlZC8ub3duZWQvdmFyaWFudC0xLzEvZml4dHVyZXMvcnVzdF9pbXBhY3QiLCJzdGFydCI6NDcsInYiOjJ9",
+          "start_byte": 47,
+          "start_line": 4
+        },
+        {
+          "content": "pub mod api;\nuse crate::api::{parse, Config};",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 45,
+          "end_line": 2,
+          "file": "src/lib.rs",
+          "id": 10,
+          "source_ref": "s:eyJlbmQiOjQ1LCJmaWxlIjoic3JjL2xpYi5ycyIsImhhc2giOiI1ZmI3NDZiM2NhNWMzYzBkZWFjYTc2MjM4MjBkMWQwNTZkZmViYjIzMWY0YmI2OGJjZDNlMzUzZjczOWJkNzEwIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "pub fn caller(config: Config) -> bool { parse(config) }",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 102,
+          "end_line": 4,
+          "file": "src/lib.rs",
+          "id": 11,
+          "source_ref": "s:eyJlbmQiOjEwMiwiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6NDcsInJlcG8iOiIvVXNlcnMvYnJ1bW1lcnYvcGhsdXh4ZWQvbG9jaS8ud29ya3RyZWVzL3IwNS1kZW1hbmQtc2VtYW50aWNzLy5zY3JhdGNoL3IwNi1uYXZpZ2F0aW9uLXByb29mL3Jlc3VsdHMvZnVsbC1kZW1hbmQtZm9jdXNlZC8ub3duZWQvdmFyaWFudC0xLzEvZml4dHVyZXMvcnVzdF9pbXBhY3QiLCJzdGFydCI6NDcsInYiOjJ9",
+          "start_byte": 47,
+          "start_line": 4
+        }
+      ],
+      "status": "ok",
+      "uncertainty": {
+        "configuration_meaning": "declared_possible does not establish active configuration",
+        "configuration_possible_count": 0,
+        "counts": [],
+        "examples": [],
+        "examples_omitted": 0,
+        "exhaustive": false,
+        "scope": "native_records_in_computed_slice"
+      },
+      "usage": {
+        "edges_traversed": 3,
+        "eligible_edges_considered": 6,
+        "estimated_tokens": 3026,
+        "evidence_bytes": 256,
+        "lookup_bytes": 0,
+        "lookup_files": 0,
+        "nodes_examined": 6,
+        "output_bytes": 12104,
+        "output_encoding": "mcp_result_json_utf8",
+        "relationships_delivered": 3,
+        "token_estimate_method": "utf8_bytes_div_4"
+      }
+    }
+  },
+  {
+    "content": [],
+    "isError": false,
+    "structuredContent": {
+      "anchors": [
+        {
+          "match_scope": [
+            "symbol_metadata"
+          ],
+          "matched_terms": [],
+          "node_id": "src/lib.rs::caller#function",
+          "score": 0
+        }
+      ],
+      "items": [
+        {
+          "complete": true,
+          "depth": 1,
+          "extent": {
+            "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+            "end_byte": 102,
+            "file": "src/lib.rs",
+            "start_byte": 47
+          },
+          "node_id": "src/lib.rs::caller#function",
+          "role": "related",
+          "source_ids": [
+            7
+          ],
+          "source_ref": "s:eyJlbmQiOjEwMiwiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6NDcsInJlcG8iOiIvVXNlcnMvYnJ1bW1lcnYvcGhsdXh4ZWQvbG9jaS8ud29ya3RyZWVzL3IwNS1kZW1hbmQtc2VtYW50aWNzLy5zY3JhdGNoL3IwNi1uYXZpZ2F0aW9uLXByb29mL3Jlc3VsdHMvZnVsbC1kZW1hbmQtZm9jdXNlZC8ub3duZWQvdmFyaWFudC0xLzEvZml4dHVyZXMvcnVzdF9pbXBhY3QiLCJzdGFydCI6NDcsInYiOjJ9",
+          "why": "proved relationship endpoint"
+        },
+        {
+          "complete": true,
+          "depth": 1,
+          "extent": {
+            "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+            "end_byte": 38,
+            "file": "src/api.rs",
+            "start_byte": 0
+          },
+          "node_id": "src/api.rs::Config#struct",
+          "role": "related",
+          "source_ids": [
+            8
+          ],
+          "source_ref": "s:eyJlbmQiOjM4LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "why": "proved relationship endpoint"
+        },
+        {
+          "complete": true,
+          "depth": 1,
+          "extent": {
+            "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+            "end_byte": 94,
+            "file": "src/api.rs",
+            "start_byte": 40
+          },
+          "node_id": "src/api.rs::parse#function",
+          "role": "related",
+          "source_ids": [
+            11
+          ],
+          "source_ref": "s:eyJlbmQiOjk0LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0Ijo0MCwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0Ijo0MCwidiI6Mn0",
+          "why": "proved relationship endpoint"
+        }
+      ],
+      "limits": {
+        "max_evidence_bytes": 8192,
+        "max_items": 12,
+        "max_output_bytes": 16384,
+        "max_parsed_files": 48,
+        "max_relationships": 12
+      },
+      "nodes": [
+        {
+          "file": "src/lib.rs",
+          "id": "src/lib.rs::caller#function",
+          "kind": "function",
+          "name": "caller"
+        },
+        {
+          "file": "src/api.rs",
+          "id": "src/api.rs::Config#struct",
+          "kind": "struct",
+          "name": "Config"
+        },
+        {
+          "file": "src/api.rs",
+          "id": "src/api.rs::parse#function",
+          "kind": "function",
+          "name": "parse"
+        }
+      ],
+      "omissions": [],
+      "ownership": [],
+      "policy": "focused-semantic-v1",
+      "proof_request": {
+        "node_id": "src/lib.rs::caller#function",
+        "scope": "same_computed_slice"
+      },
+      "relationships": [
+        {
+          "edge": {
+            "directed": true,
+            "evidence": {
+              "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+              "file": "src/lib.rs",
+              "line": 4
+            },
+            "from": "src/lib.rs::caller#function",
+            "namespace": "loci",
+            "resolution": "import-resolved",
+            "to": "src/api.rs::Config#struct",
+            "type": "uses_type"
+          },
+          "id": 1,
+          "proof": "complete",
+          "resolution_configuration": "unconditional",
+          "source_ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "traversed": "forward"
+        },
+        {
+          "edge": {
+            "directed": true,
+            "evidence": {
+              "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+              "file": "src/lib.rs",
+              "line": 4
+            },
+            "from": "src/lib.rs::caller#function",
+            "namespace": "loci",
+            "resolution": "import-resolved",
+            "to": "src/api.rs::parse#function",
+            "type": "references"
+          },
+          "id": 2,
+          "proof": "complete",
+          "resolution_configuration": "unconditional",
+          "source_ids": [
+            9,
+            3,
+            10,
+            5,
+            6,
+            7,
+            11
+          ],
+          "traversed": "forward"
+        },
+        {
+          "edge": {
+            "directed": true,
+            "evidence": {
+              "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+              "file": "src/lib.rs",
+              "line": 4
+            },
+            "from": "src/lib.rs::caller#function",
+            "namespace": "loci",
+            "resolution": "import-resolved",
+            "to": "src/api.rs::parse#function",
+            "type": "calls"
+          },
+          "id": 3,
+          "proof": "complete",
+          "resolution_configuration": "unconditional",
+          "source_ids": [
+            12,
+            2,
+            7,
+            3,
+            10,
+            6,
+            5,
+            11
+          ],
+          "traversed": "forward"
+        }
+      ],
+      "schema_version": 1,
+      "scope": {
+        "coverage": "complete",
+        "exhaustive": false,
+        "matching": "symbol_metadata",
+        "relationships": "known_static_relationships",
+        "source": "indexed_supported_source"
+      },
+      "selection": {
+        "candidate_count": 0,
+        "mode": "inferred",
+        "omitted_candidates": 0
+      },
+      "snapshot": "829cca3477fcf30665d664678021f66aac4ec00969c7db8efcc6a5fe19b9cfab",
+      "sources": [
+        {
+          "content": "Config",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 75,
+          "end_line": 4,
+          "file": "src/lib.rs",
+          "id": 1,
+          "source_ref": "s:eyJlbmQiOjc1LCJmaWxlIjoic3JjL2xpYi5ycyIsImhhc2giOiI1ZmI3NDZiM2NhNWMzYzBkZWFjYTc2MjM4MjBkMWQwNTZkZmViYjIzMWY0YmI2OGJjZDNlMzUzZjczOWJkNzEwIiwib2Zmc2V0Ijo2OSwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0Ijo2OSwidiI6Mn0",
+          "start_byte": 69,
+          "start_line": 4
+        },
+        {
+          "content": "pub fn caller(config: Config) -> bool { parse(config) }\n",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 103,
+          "end_line": 4,
+          "file": "src/lib.rs",
+          "id": 2,
+          "source_ref": "s:eyJlbmQiOjEwMywiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6NDcsInJlcG8iOiIvVXNlcnMvYnJ1bW1lcnYvcGhsdXh4ZWQvbG9jaS8ud29ya3RyZWVzL3IwNS1kZW1hbmQtc2VtYW50aWNzLy5zY3JhdGNoL3IwNi1uYXZpZ2F0aW9uLXByb29mL3Jlc3VsdHMvZnVsbC1kZW1hbmQtZm9jdXNlZC8ub3duZWQvdmFyaWFudC0xLzEvZml4dHVyZXMvcnVzdF9pbXBhY3QiLCJzdGFydCI6NDcsInYiOjJ9",
+          "start_byte": 47,
+          "start_line": 4
+        },
+        {
+          "content": "pub mod api;\nuse crate::api::{parse, Config};",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 45,
+          "end_line": 2,
+          "file": "src/lib.rs",
+          "id": 3,
+          "source_ref": "s:eyJlbmQiOjQ1LCJmaWxlIjoic3JjL2xpYi5ycyIsImhhc2giOiI1ZmI3NDZiM2NhNWMzYzBkZWFjYTc2MjM4MjBkMWQwNTZkZmViYjIzMWY0YmI2OGJjZDNlMzUzZjczOWJkNzEwIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "pub struct Config { pub strict: bool }\n",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 39,
+          "end_line": 1,
+          "file": "src/api.rs",
+          "id": 4,
+          "source_ref": "s:eyJlbmQiOjM5LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "pub mod api;",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 12,
+          "end_line": 1,
+          "file": "src/lib.rs",
+          "id": 5,
+          "source_ref": "s:eyJlbmQiOjEyLCJmaWxlIjoic3JjL2xpYi5ycyIsImhhc2giOiI1ZmI3NDZiM2NhNWMzYzBkZWFjYTc2MjM4MjBkMWQwNTZkZmViYjIzMWY0YmI2OGJjZDNlMzUzZjczOWJkNzEwIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "[package]\nname = \"ledger\"\nversion = \"0.1.0\"\nedition = \"2021\"\n",
+          "content_hash": "734242a4243ed50f7496c495b21f456aa5d07cf82b036dd1b0904a8678f228f9",
+          "end_byte": 61,
+          "end_line": 4,
+          "file": "Cargo.toml",
+          "id": 6,
+          "source_ref": "s:eyJlbmQiOjYxLCJmaWxlIjoiQ2FyZ28udG9tbCIsImhhc2giOiI3MzQyNDJhNDI0M2VkNTBmNzQ5NmM0OTViMjFmNDU2YWE1ZDA3Y2Y4MmIwMzZkZDFiMDkwNGE4Njc4ZjIyOGY5Iiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "pub fn caller(config: Config) -> bool { parse(config) }",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 102,
+          "end_line": 4,
+          "file": "src/lib.rs",
+          "id": 7,
+          "source_ref": "s:eyJlbmQiOjEwMiwiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6NDcsInJlcG8iOiIvVXNlcnMvYnJ1bW1lcnYvcGhsdXh4ZWQvbG9jaS8ud29ya3RyZWVzL3IwNS1kZW1hbmQtc2VtYW50aWNzLy5zY3JhdGNoL3IwNi1uYXZpZ2F0aW9uLXByb29mL3Jlc3VsdHMvZnVsbC1kZW1hbmQtZm9jdXNlZC8ub3duZWQvdmFyaWFudC0xLzEvZml4dHVyZXMvcnVzdF9pbXBhY3QiLCJzdGFydCI6NDcsInYiOjJ9",
+          "start_byte": 47,
+          "start_line": 4
+        },
+        {
+          "content": "pub struct Config { pub strict: bool }",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 38,
+          "end_line": 1,
+          "file": "src/api.rs",
+          "id": 8,
+          "source_ref": "s:eyJlbmQiOjM4LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0IjowLCJyZXBvIjoiL1VzZXJzL2JydW1tZXJ2L3BobHV4eGVkL2xvY2kvLndvcmt0cmVlcy9yMDUtZGVtYW5kLXNlbWFudGljcy8uc2NyYXRjaC9yMDYtbmF2aWdhdGlvbi1wcm9vZi9yZXN1bHRzL2Z1bGwtZGVtYW5kLWZvY3VzZWQvLm93bmVkL3ZhcmlhbnQtMS8xL2ZpeHR1cmVzL3J1c3RfaW1wYWN0Iiwic3RhcnQiOjAsInYiOjJ9",
+          "start_byte": 0,
+          "start_line": 1
+        },
+        {
+          "content": "parse",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 92,
+          "end_line": 4,
+          "file": "src/lib.rs",
+          "id": 9,
+          "source_ref": "s:eyJlbmQiOjkyLCJmaWxlIjoic3JjL2xpYi5ycyIsImhhc2giOiI1ZmI3NDZiM2NhNWMzYzBkZWFjYTc2MjM4MjBkMWQwNTZkZmViYjIzMWY0YmI2OGJjZDNlMzUzZjczOWJkNzEwIiwib2Zmc2V0Ijo4NywicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0Ijo4NywidiI6Mn0",
+          "start_byte": 87,
+          "start_line": 4
+        },
+        {
+          "content": "pub fn parse(config: Config) -> bool { config.strict }\n",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 95,
+          "end_line": 3,
+          "file": "src/api.rs",
+          "id": 10,
+          "source_ref": "s:eyJlbmQiOjk1LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0Ijo0MCwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0Ijo0MCwidiI6Mn0",
+          "start_byte": 40,
+          "start_line": 3
+        },
+        {
+          "content": "pub fn parse(config: Config) -> bool { config.strict }",
+          "content_hash": "8c5b5095c46766b0744100de2454790ee4e814c02187bea134131a736c9a4272",
+          "end_byte": 94,
+          "end_line": 3,
+          "file": "src/api.rs",
+          "id": 11,
+          "source_ref": "s:eyJlbmQiOjk0LCJmaWxlIjoic3JjL2FwaS5ycyIsImhhc2giOiI4YzViNTA5NWM0Njc2NmIwNzQ0MTAwZGUyNDU0NzkwZWU0ZTgxNGMwMjE4N2JlYTEzNDEzMWE3MzZjOWE0MjcyIiwib2Zmc2V0Ijo0MCwicmVwbyI6Ii9Vc2Vycy9icnVtbWVydi9waGx1eHhlZC9sb2NpLy53b3JrdHJlZXMvcjA1LWRlbWFuZC1zZW1hbnRpY3MvLnNjcmF0Y2gvcjA2LW5hdmlnYXRpb24tcHJvb2YvcmVzdWx0cy9mdWxsLWRlbWFuZC1mb2N1c2VkLy5vd25lZC92YXJpYW50LTEvMS9maXh0dXJlcy9ydXN0X2ltcGFjdCIsInN0YXJ0Ijo0MCwidiI6Mn0",
+          "start_byte": 40,
+          "start_line": 3
+        },
+        {
+          "content": "parse(config)",
+          "content_hash": "5fb746b3ca5c3c0deaca7623820d1d056dfebb231f4bb68bcd3e353f739bd710",
+          "end_byte": 100,
+          "end_line": 4,
+          "file": "src/lib.rs",
+          "id": 12,
+          "source_ref": "s:eyJlbmQiOjEwMCwiZmlsZSI6InNyYy9saWIucnMiLCJoYXNoIjoiNWZiNzQ2YjNjYTVjM2MwZGVhY2E3NjIzODIwZDFkMDU2ZGZlYmIyMzFmNGJiNjhiY2QzZTM1M2Y3MzliZDcxMCIsIm9mZnNldCI6ODcsInJlcG8iOiIvVXNlcnMvYnJ1bW1lcnYvcGhsdXh4ZWQvbG9jaS8ud29ya3RyZWVzL3IwNS1kZW1hbmQtc2VtYW50aWNzLy5zY3JhdGNoL3IwNi1uYXZpZ2F0aW9uLXByb29mL3Jlc3VsdHMvZnVsbC1kZW1hbmQtZm9jdXNlZC8ub3duZWQvdmFyaWFudC0xLzEvZml4dHVyZXMvcnVzdF9pbXBhY3QiLCJzdGFydCI6ODcsInYiOjJ9",
+          "start_byte": 87,
+          "start_line": 4
+        }
+      ],
+      "status": "ok",
+      "uncertainty": {
+        "configuration_meaning": "declared_possible does not establish active configuration",
+        "configuration_possible_count": 0,
+        "counts": [],
+        "examples": [],
+        "examples_omitted": 0,
+        "exhaustive": false,
+        "scope": "native_records_in_computed_slice"
+      },
+      "usage": {
+        "edges_traversed": 3,
+        "eligible_edges_considered": 6,
+        "estimated_tokens": 3165,
+        "evidence_bytes": 256,
+        "lookup_bytes": 0,
+        "lookup_files": 0,
+        "nodes_examined": 6,
+        "output_bytes": 12658,
+        "output_encoding": "mcp_result_json_utf8",
+        "relationships_delivered": 3,
+        "token_estimate_method": "utf8_bytes_div_4"
+      }
+    }
+  }
+]

@@ -65,3 +65,62 @@ adopted exact counts/reasons, scope/example cap and possible-configuration
 verification. Primary added a large-caller narrow/wide budget rejection control
 and independent replay/privileged-request/source-corruption control; all7 focused
 checks pass. These close the nontrivial behavior verification gap before scoring.
+
+## Targeted gate and final summarization assignment
+
+All three targeted pairs completed and independently replayed32 first/repeat
+case executions each. Source path recovered all seven motivating spans but lost
+two other Rust spans (26/28 vs21/28 lexical and28/28 demand). Focused16 delivered
+8/13 links vs7/13 R0.5; focused64 delivered13/13 with no integrity failures.
+The predeclared broader gate passes; same candidate/policy will run36 frozen
+cases. No scored miss changed the mechanism or scheduler.
+
+Navigation worker reuse: Sol/high/none retained graph-free source/harness and
+policy context, now owns only summarize.py. Contribution: accurately report
+source, proof and all requested costs from six immutable result directories;
+include source_selection and focused_proof phases, first/repeat, memory proxies,
+output/archive/store, and per-case changes. Acceptance: no new retrieval/scoring
+or measurements; summary values derive directly from retained JSON, no historical
+file edits. Root assesses output and writes final assessment.
+
+## Consumer packet audit assignment
+
+Summary worker returned summarize.py; primary executed after all six completed
+pairs. Adopted separate packet/session/native metrics and all new timing phases.
+All first/repeat and cross-pair focused capabilities agree. Primary retains the
+material absent metric: TypeScript has no separate forbidden-delivered counter;
+strict claim integrity and forbidden-proven counts are available and zero.
+
+Uncertainty worker reuse: Luna/high/none retained exact native uncertainty and
+consumer schema context. New exclusive scope consumer-checks.py/json/md, no
+runtime/scorer/result edits. Acceptance: independent raw-JSON comparison of
+actual R0.6 packet uncertainty counts/examples/configuration against each same-
+case native projection, with scoped omissions and bounded truncation honest.
+This closes the actual delivered-response evidence gap beyond the novel fixture.
+
+## Assessment and closeout
+
+All six pairs and960 replayed case executions verified. Consumer audit returned
+PASS for1456 uncertainty-bearing responses; adopted raw count/example/config
+matching and the qualification that36 empty source/proof selections still expose
+partial non-exhaustive uncertainty. No hidden native reasons were found. A
+preferred status-enum assertion was rejected as an unnecessary criterion; the
+actual scope/omission contract is preserved.
+
+Full source path185/187 recovers all7 motivating spans but loses2other Rust
+spans. Proof39→48→56 of59supported links;25Python/Go positives remain separately
+unsupported. Original20 gaps split11selection/9capacity; narrow recovers10but
+loses1existing call (net+9), wide recovers17and leaves3Rust selection losses.
+No policy tuning, extra focus calls, V2 implementation or production integration.
+
+RESULTS.md records matched costs, cross-pair timing drift, memory/storage/output,
+null task correctness and missing TypeScript delivered-forbidden counter. All49
+distinct development/harness tests passed across overlapping batches. Optional
+time -l wrappers exited1 on sandbox-denied sysctl after successful full replay;
+logs and replay.json preserve verification success and timing limitation.
+
+Preservation confirms both mains/R03/R04,3730historical hashes,15unchanged strict
+observer functions and candidate bytes d94471e. All owned stores/source exports/
+measurement worktrees removed by existing runner; artifacts retained. Closeout
+will publish only experiment/r06-navigation-proof to existing origin, verify the
+remote commit and stop at the architectural assessment.
