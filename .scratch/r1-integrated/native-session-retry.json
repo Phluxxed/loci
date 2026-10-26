@@ -1,0 +1,45 @@
+{
+  "status": "blocked_by_native_session_configuration_surface",
+  "request": "Use existing native sessions; keep frozen experiment unchanged; no nested Codex processes or sandbox/profile work.",
+  "freeze_identity": "4c20aff1be5e29ee7400d18c25421c890fcb30f626fd5d322250d208f2e93dfb",
+  "native_session_contracts": [
+    {
+      "name": "mcp__codex_tui__create_thread",
+      "description": "Create and start a separate Codex task only when the user explicitly asks for a new task. The task inherits the current working directory; omit model to inherit the current model.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__codex_tui__create_thread(args: {\n  model?: string;\n  // Maximum 1,000 UTF-8 bytes.\n  prompt: string;\n  title?: string;\n}): Promise<CallToolResult>; };\n```"
+    },
+    {
+      "name": "mcp__codex_tui__send_message_to_thread",
+      "description": "Send a follow-up prompt to an existing Codex task in the background. Omit model unless the user explicitly requests an override.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__codex_tui__send_message_to_thread(args: {\n  model?: string;\n  // Maximum 1,000 UTF-8 bytes.\n  prompt: string;\n  threadId: string;\n}): Promise<CallToolResult>; };\n```"
+    },
+    {
+      "name": "mcp__codex_tui__fork_thread",
+      "description": "Fork a Codex task without starting a new turn. Omit threadId to fork the calling task.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__codex_tui__fork_thread(args: { threadId?: string; }): Promise<CallToolResult>; };\n```"
+    },
+    {
+      "name": "mcp__codex_tui__create_worktree",
+      "description": "Create and attach a managed Git worktree on this task's host. Follow applicable user, repository, and skill instructions. Unless the user requests a new worktree, inspect list_worktrees and prefer reusing a suitable active worktree. Defaults to the repository's remote default branch, not the current branch; specify ref if the default cannot be determined or when continuing existing branch or PR work. The task stays in its existing checkout; use the returned workspaceRoot and request filesystem permissions when needed. Uncommitted changes are not copied. Returns an operationId to poll with get_worktree_creation_status before using paths. Do not duplicate pending creation. If registration fails, use the returned paths rather than creating another worktree.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__codex_tui__create_worktree(args: { allowAsync: true; ref?: string; }): Promise<CallToolResult>; };\n```"
+    }
+  ],
+  "native_create_thread_prompt_limit_bytes": 1000,
+  "frozen_prompt_bytes": {
+    "receipt-location": 1032,
+    "inventory-contract": 1048,
+    "dispatch-ambiguity": 1106,
+    "zero-quantity": 1268
+  },
+  "decisive_gap": "No native session operation exposed here accepts per-session MCP server command/env/enabled-tools/store configuration. All four frozen conditions require different configurations, with independent stores. Inherited production tools cannot represent source-only/integrated conditions unchanged.",
+  "other_constraints": "Native create_thread also inherits current working directory; unlike the frozen process launcher it has no cwd or explicit reasoning-effort arguments. Prompt-file indirection could preserve long task text but would not solve the per-session MCP configuration gap.",
+  "new_codex_processes_launched": 0,
+  "new_native_sessions_launched": 0,
+  "new_scored_results": 0,
+  "experiment_changes": [],
+  "sandbox_or_permission_changes": [],
+  "current_runtime_freeze_validation": "passed using existing r1.read_freeze; full implementation/config/host/orchestration bindings unchanged",
+  "next_required_information": "An existing exposed native-session operation supporting the frozen per-session MCP assignments. Asked user whether another mechanism is available; did not request permission to change the experiment.",
+  "telemetry": {
+    "correctness": null,
+    "provider_usage": null,
+    "elapsed_to_task_outcome": null
+  },
+  "prior_evidence_preserved": true
+}
