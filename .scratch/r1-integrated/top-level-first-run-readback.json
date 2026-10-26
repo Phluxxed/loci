@@ -1,0 +1,72 @@
+{
+  "status": "independent_posthoc_readback; frozen_runner_remains_unqualified",
+  "run_id": "receipt-location-native",
+  "thread_id": "01a176ca-a192-7cb1-8351-a0ca42d0d477",
+  "freeze_sha256": "4c20aff1be5e29ee7400d18c25421c890fcb30f626fd5d322250d208f2e93dfb",
+  "native_trace_sha256": "8573ceb603d97182e0ef89bbae5b03135f2afa97c7f6b92972d4b90d8ee0e30b",
+  "original_errors": [
+    "invalid native evidence: native rollout has no single fresh first-turn user message",
+    "native turn settings unavailable"
+  ],
+  "cause": {
+    "file": "benchmarks/complete_work/accounting.py",
+    "line": 412,
+    "check": "first_turn_users != 1",
+    "observed_user_messages": 2,
+    "bootstrap_user_row": 7,
+    "frozen_task_user_row": 13,
+    "frozen_task_prompt_sha256": "03284cda2e97094b042587609e67058d1914a9309f374589c4ffc6f0fe87bec1",
+    "explanation": "Host AGENTS/environment bootstrap is counted as another task message; exception occurs before reducer returns observed usage/context."
+  },
+  "verification": {
+    "exact_frozen_prompt": true,
+    "unforked_exec_session": true,
+    "single_recorded_turn": true,
+    "model_effort_match": true,
+    "all_six_native_protection_fields_match": true,
+    "all_command_cwds_match": true,
+    "per_response_turn_thread_usage_reconciles": true,
+    "final_response_usage_precedes_terminal": true,
+    "cli_turn_usage_agrees": true,
+    "independent_oracle_and_archived_replay_agree": true,
+    "freeze_runtime_validation_passed": true
+  },
+  "results": {
+    "correct": true,
+    "changes": [
+      "answer.json"
+    ],
+    "client_elapsed_ms": 22959.559,
+    "native_task_duration_ms": 21489,
+    "usage": {
+      "input_tokens": 118160,
+      "cached_input_tokens": 95232,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 934,
+      "reasoning_output_tokens": 124,
+      "total_tokens": 119094,
+      "uncached_input_tokens": 22928
+    },
+    "provider_reported_response_completions": 5,
+    "completed_item_types": {
+      "UserMessage": 1,
+      "AgentMessage": 2,
+      "CommandExecution": 4,
+      "Reasoning": 1,
+      "FileChange": 1
+    },
+    "shell_calls": 4,
+    "failed_shell_calls": 0,
+    "mcp_calls": 0,
+    "semantic_requests": 0,
+    "proof_requests": 0,
+    "optional_semantics_helped": null
+  },
+  "limits": [
+    "Posthoc readback does not overwrite original qualification or alter the frozen reducer.",
+    "Observed provider response usage is not complete billing or invisible retry telemetry.",
+    "This is one native-only task; no Loci condition or benefit comparison exists."
+  ],
+  "remaining_assignments": 15,
+  "continuation_blocker": "Frozen accounting reducer misclassifies bootstrap; it is pinned by host.orchestration_files, so a correction requires an explicit recorded compatibility amendment. Do not rerun the successful task."
+}

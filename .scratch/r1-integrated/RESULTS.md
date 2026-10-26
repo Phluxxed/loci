@@ -1,3 +1,5 @@
+> **Latest update:** The external top-level native run completed the first task correctly. The current blocker is the frozen accounting reader counting host bootstrap as task history. Provider usage and native settings are present and independently reconciled; 15 assignments remain unattempted. See [top-level-first-run.md](top-level-first-run.md). The report below preserves the initial closeout context.
+
 # Loci R1: implementation qualified; native pilot blocked
 
 **Recommendation: revise; do not advance to production.** The integrated
