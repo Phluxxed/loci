@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "scope": {
+    "experiment": "R0.5 retained demand-semantics outputs",
+    "case_id": "rust_unproven_contracts",
+    "source_only": true,
+    "production_changes": false,
+    "new_measurements": false
+  },
+  "artifacts": {
+    "full_packet": ".scratch/r05-demand-semantics/results/full-source-demand/artifacts/variant-1-suite-1/packets/rust_unproven_contracts.json",
+    "full_native_projection": ".scratch/r05-demand-semantics/results/full-source-demand/artifacts/variant-1-suite-1/case-indexes/rust_unproven_contracts.json.gz",
+    "full_inventory": ".scratch/r05-demand-semantics/results/full-source-demand/artifacts/variant-1-suite-1/inventories/rust_uncertainty.json",
+    "full_repository_index": ".scratch/r05-demand-semantics/results/full-source-demand/artifacts/variant-1-suite-1/indexes/rust_uncertainty.json.gz",
+    "targeted_packet": ".scratch/r05-demand-semantics/results/targeted-source-demand/artifacts/variant-1-suite-1/packets/rust_unproven_contracts.json",
+    "targeted_native_projection": ".scratch/r05-demand-semantics/results/targeted-source-demand/artifacts/variant-1-suite-1/case-indexes/rust_unproven_contracts.json.gz",
+    "source": "src/loci/demand_semantics.py"
+  },
+  "packet": {
+    "observed_call_index": 1,
+    "policy": "demand-semantic-v1",
+    "scope_coverage": "complete",
+    "scope_exhaustive": false,
+    "omissions": [],
+    "anchor": "src/lib.rs::probe#function",
+    "eligible_edges_considered": 9,
+    "relationships_delivered": 2,
+    "omitted_symbol_candidates": 5,
+    "parsed_paths": [
+      "src/lib.rs",
+      "src/model.rs",
+      "src/a.rs",
+      "src/b.rs",
+      "src/private_api.rs"
+    ],
+    "rust_closure_incomplete": false,
+    "delivered_relationships": [
+      {
+        "type": "uses_type",
+        "source": "src/lib.rs::probe#function",
+        "target": "src/model.rs::Thing#struct",
+        "line": 10,
+        "resolution_configuration": "unconditional",
+        "proof": "complete"
+      },
+      {
+        "type": "references",
+        "source": "src/lib.rs::probe#function",
+        "target": "src/model.rs::Thing#struct",
+        "line": 11,
+        "resolution_configuration": "unconditional",
+        "proof": "complete"
+      }
+    ]
+  },
+  "native_uncertainty": {
+    "imports": [
+      {
+        "line": 8,
+        "specifier": "std::fmt::Display",
+        "status": "unresolved",
+        "unresolved_reason": "external"
+      }
+    ],
+    "references": [
+      {
+        "line": 12,
+        "text": "Shared",
+        "status": "unresolved",
+        "unresolved_reason": "ambiguous_target",
+        "candidate_scope_file": "src/model.rs"
+      },
+      {
+        "line": 14,
+        "text": "Choice",
+        "status": "unresolved",
+        "unresolved_reason": "configuration_divergent",
+        "supporting_reexports": [
+          {
+            "file": "src/model.rs",
+            "line": 7,
+            "resolution_configuration": "declared_possible"
+          },
+          {
+            "file": "src/model.rs",
+            "line": 10,
+            "resolution_configuration": "declared_possible"
+          }
+        ]
+      },
+      {
+        "line": 15,
+        "text": "Hidden",
+        "status": "unresolved",
+        "unresolved_reason": "target_inaccessible",
+        "target_file": "src/private_api.rs"
+      },
+      {
+        "line": 16,
+        "text": "Display",
+        "status": "unresolved",
+        "unresolved_reason": "import_unresolved",
+        "import_unresolved_reason": "external"
+      }
+    ],
+    "types": [
+      {
+        "line": 19,
+        "text": "Thing",
+        "context": "annotation",
+        "status": "unresolved",
+        "unresolved_reason": "type_parameter"
+      },
+      {
+        "line": 19,
+        "text": "Thing",
+        "context": "return",
+        "status": "unresolved",
+        "unresolved_reason": "type_parameter"
+      }
+    ]
+  },
+  "full_corpus_unique_first_use_case_counts": {
+    "unique_cases": 36,
+    "unresolved_native_records": {
+      "imports": {
+        "external": 74
+      },
+      "symbol_references": {
+        "ambiguous_source": 37,
+        "ambiguous_target": 3,
+        "binding_shadowed": 3,
+        "configuration_divergent": 1,
+        "import_unresolved": 366,
+        "target_inaccessible": 1,
+        "target_not_indexed": 40,
+        "unsupported_reference": 1
+      },
+      "type_relations": {
+        "ambiguous_target": 1,
+        "binding_not_found": 174,
+        "binding_unindexed": 3,
+        "target_not_indexed": 7,
+        "type_parameter": 11,
+        "unsupported_owner": 94,
+        "unsupported_syntax": 19
+      }
+    },
+    "resolved_declared_possible_records": {
+      "imports": 3,
+      "symbol_references": 2,
+      "type_relations": 2
+    },
+    "unsupported_languages": {
+      "languages": ["python", "go"],
+      "authored_positive_links": 25,
+      "semantic_credit": 0
+    }
+  },
+  "interpretation": {
+    "primary_gap": "unresolved native records are not serialized as packet omissions or uncertainty records; the packet emits resolved materialized relationships only",
+    "closure_gap_evidence": "none for this case: all five local Rust source files were parsed and rust_closure_incomplete is false",
+    "selection_and_packing": "packet anchors probe, considers nine eligible edges, emits two, and omits five symbol candidates; omissions=[] does not enumerate unresolved records",
+    "minimal_consumer_mapping": [
+      "relation family and source identity/location",
+      "native status and separate unresolved_reason/import_unresolved_reason",
+      "candidate IDs and candidate scope/completeness",
+      "configuration status and relevant control files/hashes",
+      "source references for observation and support"
+    ],
+    "focused_check": "preserve complete source navigation and the two proofs, while exposing one external import, four unresolved references, two type_parameter observations, and Choice configuration divergence without claiming absence or exhaustiveness"
+  }
+}

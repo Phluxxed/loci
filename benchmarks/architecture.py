@@ -44,7 +44,7 @@ def validate_packets(packets: list[dict]) -> None:
             from benchmarks.architecture_cases import validate_graph_free_packet
             validate_graph_free_packet(payload)
             continue
-        if payload.get("policy") == "demand-semantic-v1":
+        if payload.get("policy") in {"demand-semantic-v1", "focused-semantic-v1", "focused-semantic-wide-v1"}:
             from benchmarks.architecture_cases import validate_demand_packet
             validate_demand_packet(payload)
             continue
@@ -99,7 +99,8 @@ def tree_bytes(root: Path) -> int:
 
 def acquire(service, repo: Path, request: dict, inventory: dict, rows: list,
             *, graph_free: bool, enrichment: bool, demand: bool = False,
-            trial: str = "first") -> tuple[list, dict]:
+            trial: str = "first", path_navigation: bool = False,
+            focused: bool = False) -> tuple[list, dict]:
     from benchmarks.architecture_cases import ACQUISITION_LIMITS as limits, next_acquisition_query
     packets, queries, asked = [], [], []
     continuations = source_bytes = output_bytes = 0
@@ -109,7 +110,16 @@ def acquire(service, repo: Path, request: dict, inventory: dict, rows: list,
             reason = "byte_admission_limit"
             break
         semantic = demand and len(queries) == 1
-        query = request["query"] if not asked or semantic else next_acquisition_query(inventory, packets, asked)
+        navigation = None
+        if path_navigation and asked:
+            from benchmarks.architecture_navigation import choose_next_query
+            with measure(rows, "repeat_source_selection" if trial == "repeat" else "source_selection",
+                         case_id=request["case_id"]) as row:
+                navigation = choose_next_query(inventory, packets, asked)
+                row["work"] = navigation["work"]
+            query = navigation["query"]
+        else:
+            query = request["query"] if not asked or semantic else next_acquisition_query(inventory, packets, asked)
         if query is None:
             reason = "discovery_exhausted"
             break
@@ -152,12 +162,40 @@ def acquire(service, repo: Path, request: dict, inventory: dict, rows: list,
         query_row = {"query": query, "packet_start": start, "packet_end": len(packets)}
         if semantic:
             query_row["operation"] = "semantic_context"
+        if navigation is not None:
+            query_row["navigation"] = navigation
         queries.append(query_row)
         asked.append(query)
-    return packets, {"queries": queries, "termination": reason,
+    base_query_count = len(queries)
+    proof_asked = []
+    if focused and any(q.get("operation") == "semantic_context" for q in queries):
+        from benchmarks.architecture_proof import MAX_FOCUSED_CALLS, next_proof_query
+        for _ in range(MAX_FOCUSED_CALLS):
+            if source_bytes >= limits["source_bytes"] or output_bytes >= limits["output_bytes"]:
+                break
+            query = next_proof_query(packets, proof_asked)
+            if query is None:
+                break
+            start = len(packets)
+            with measure(rows, "repeat_focused_proof" if trial == "repeat" else "focused_proof",
+                         case_id=request["case_id"], query=query) as row:
+                packet = service.proof_context(repo, query)
+                row["usage"] = packet["usage"]
+                row["work"] = service.proof_observer()
+            append(packet)
+            # Complete proof source is already linked in this response. No
+            # extra source hydration is required or credited to this operation.
+            queries.append({"query": query, "operation": "focused_proof",
+                            "packet_start": start, "packet_end": len(packets)})
+            proof_asked.append(query)
+    trace = {"queries": queries, "termination": reason,
         "continuation_calls": continuations, "source_bytes": source_bytes, "output_bytes": output_bytes,
         "soft_byte_limit_overshoot": {"source_bytes": max(0, source_bytes - limits["source_bytes"]),
                                       "output_bytes": max(0, output_bytes - limits["output_bytes"])}}
+    if focused:
+        trace.update(base_query_count=base_query_count, focused_calls=len(proof_asked),
+                     max_focused_calls=MAX_FOCUSED_CALLS)
+    return packets, trace
 
 
 def worker(config_path: Path) -> int:
@@ -169,17 +207,26 @@ def worker(config_path: Path) -> int:
     rows: list[dict] = []
     report: dict = {"status": "incomplete", "phases": rows, "cases": [], "indexes": {}}
     output = Path(config["artifacts"])
-    demand = config.get("architecture") == "demand"
-    graph_free = config.get("architecture") in {"graph-free", "demand"}
+    architecture = config.get("architecture")
+    focused = architecture in {"focused", "focused-wide"}
+    demand = architecture in {"demand", "focused", "focused-wide"}
+    graph_free = architecture in {"graph-free", "path", "demand", "focused", "focused-wide"}
     acquisition = config.get("operation") == "acquisition"
     try:
         with measure(rows, "runtime_setup"):
             if graph_free:
                 if demand:
-                    from loci.demand_semantics import DemandSource
-                    import loci.demand_semantics
-                    service = DemandSource(Path(config["store"]) / config["namespace"])
-                    loaded = Path(loci.demand_semantics.__file__).resolve()
+                    if focused:
+                        from loci.focused_proof import FocusedDemandSource
+                        import loci.focused_proof
+                        service = FocusedDemandSource(Path(config["store"]) / config["namespace"],
+                                                      wide=architecture == "focused-wide")
+                        loaded = Path(loci.focused_proof.__file__).resolve()
+                    else:
+                        from loci.demand_semantics import DemandSource
+                        import loci.demand_semantics
+                        service = DemandSource(Path(config["store"]) / config["namespace"])
+                        loaded = Path(loci.demand_semantics.__file__).resolve()
                 else:
                     from loci.graph_free import GraphFreeSource
                     import loci.graph_free
@@ -241,7 +288,8 @@ def worker(config_path: Path) -> int:
             case_id = request["case_id"]
             if acquisition:
                 packets, trace = acquire(service, repo, request, inventories[request["snapshot"]], rows,
-                                         graph_free=graph_free, enrichment=config["enrichment"] == "on", demand=demand)
+                    graph_free=graph_free, enrichment=config["enrichment"] == "on", demand=demand,
+                    path_navigation=architecture == "path", focused=focused)
                 case_file = output / "packets" / f"{case_id}.json"
                 write(case_file, packets)
                 case = {"case_id": case_id, "snapshot": request["snapshot"],
@@ -256,7 +304,8 @@ def worker(config_path: Path) -> int:
                     case["semantic_work"] = observer["work"]
                 if config.get("repeat_queries"):
                     repeated, repeat_trace = acquire(service, repo, request, inventories[request["snapshot"]], rows,
-                        graph_free=graph_free, enrichment=config["enrichment"] == "on", demand=demand, trial="repeat")
+                        graph_free=graph_free, enrichment=config["enrichment"] == "on", demand=demand, trial="repeat",
+                        path_navigation=architecture == "path", focused=focused)
                     repeat_file = output / "packets" / f"{case_id}.repeat.json"
                     write(repeat_file, repeated)
                     case.update(repeat_packets=str(repeat_file.relative_to(output)), repeat_acquisition=repeat_trace)
@@ -616,10 +665,12 @@ def preserve_evaluator(output: Path) -> dict:
 
 
 def acquisition_scores(corpus: dict, snapshots: dict, artifacts: Path, worker_result: dict,
-                       *, demand: bool, repeat: bool = False) -> list[dict]:
+                       *, demand: bool, repeat: bool = False,
+                       path_navigation: bool = False, focused: bool = False) -> list[dict]:
     """Same retained-source observer for execution and independent replay."""
     from benchmarks.architecture_cases import score_acquisition
     scores = []
+    config = json.loads((artifacts / "config.json").read_text())
     for case in worker_result["cases"]:
         packets = json.loads((artifacts / case["repeat_packets" if repeat else "packets"]).read_text())
         index_path = case.get("repeat_index" if repeat else "index", worker_result["indexes"][case["snapshot"]])
@@ -627,9 +678,19 @@ def acquisition_scores(corpus: dict, snapshots: dict, artifacts: Path, worker_re
         validate_packets(packets)
         inventory = json.loads((artifacts / "inventories" / f"{case['snapshot']}.json").read_text())
         trace = case["repeat_acquisition" if repeat else "acquisition"]
+        for query in trace["queries"]:
+            payload = packets[query["packet_start"]]["structuredContent"]
+            if query.get("operation") == "semantic_context" and payload.get("policy") != "demand-semantic-v1":
+                raise ValueError("initial semantic question changed its fixed packet policy")
+            if query.get("operation") == "focused_proof":
+                expected_policy = ("focused-semantic-wide-v1" if config["architecture"] == "focused-wide"
+                                   else "focused-semantic-v1")
+                if payload.get("policy") != expected_policy:
+                    raise ValueError("focused proof used the wrong fixed budget policy")
         repo = Path(snapshots[case["snapshot"]])
         scored = score_acquisition(corpus, case["case_id"], repo,
-                                   index, packets, trace, inventory, demand=demand)
+                                   index, packets, trace, inventory, demand=demand,
+                                   path_navigation=path_navigation, focused=focused)
         if demand:
             from benchmarks.architecture_structural import validate_structural
             violations = validate_structural(index, packets, repo)
@@ -809,7 +870,9 @@ def run(args) -> int:
                     binding = result["binding"]
                     if (Path(binding["base_dir"]) != store or binding["namespace"] != namespace
                             or result["service_source"] != str(implementation / "src/loci" /
-                                ({"graph-free": "graph_free.py", "demand": "demand_semantics.py"}.get(
+                                ({"graph-free": "graph_free.py", "path": "graph_free.py",
+                                  "demand": "demand_semantics.py", "focused": "focused_proof.py",
+                                  "focused-wide": "focused_proof.py"}.get(
                                     config["architecture"], "service.py")))):
                         raise ValueError("worker implementation/store identity mismatch")
                     entry["binding"] = binding
@@ -829,14 +892,18 @@ def run(args) -> int:
                     if operation == "acquisition":
                         with measure(report.setdefault("observer_phases", []), "proof_validation", run_id=label, trial="first"):
                             scores = acquisition_scores(corpus, snapshots, artifacts, result,
-                                                        demand=config["architecture"] == "demand")
+                                demand=config["architecture"] in {"demand", "focused", "focused-wide"},
+                                path_navigation=config["architecture"] == "path",
+                                focused=config["architecture"] in {"focused", "focused-wide"})
                     write(artifacts / "capability.json", scores)
                     entry["capability"] = str((artifacts / "capability.json").relative_to(output))
                     repeated_scores = []
                     if operation == "acquisition" and config["repeat_queries"]:
                         with measure(report["observer_phases"], "proof_validation", run_id=label, trial="repeat"):
                             repeated_scores = acquisition_scores(corpus, snapshots, artifacts, result,
-                                demand=config["architecture"] == "demand", repeat=True)
+                                demand=config["architecture"] in {"demand", "focused", "focused-wide"}, repeat=True,
+                                path_navigation=config["architecture"] == "path",
+                                focused=config["architecture"] in {"focused", "focused-wide"})
                         write(artifacts / "repeat-capability.json", repeated_scores)
                         entry["repeat_capability"] = str((artifacts / "repeat-capability.json").relative_to(output))
                         entry["repeat_legacy_packet_invalid_cases"] = [s["case_id"] for s in repeated_scores if not s["integrity_ok"]]
@@ -931,11 +998,15 @@ def verify(output: Path) -> int:
                 count += 1
             if result.get("operation") == "acquisition":
                 actual = acquisition_scores(corpus, snapshots, artifacts, worker_result,
-                                            demand=config["architecture"] == "demand")
+                    demand=config["architecture"] in {"demand", "focused", "focused-wide"},
+                    path_navigation=config["architecture"] == "path",
+                    focused=config["architecture"] in {"focused", "focused-wide"})
                 count += len(actual)
                 if config.get("repeat_queries"):
                     repeated = acquisition_scores(corpus, snapshots, artifacts, worker_result,
-                                                  demand=config["architecture"] == "demand", repeat=True)
+                        demand=config["architecture"] in {"demand", "focused", "focused-wide"}, repeat=True,
+                        path_navigation=config["architecture"] == "path",
+                        focused=config["architecture"] in {"focused", "focused-wide"})
                     if repeated != json.loads((artifacts / "repeat-capability.json").read_text()):
                         raise ValueError("independent repeated-query capability replay differs")
                     count += len(repeated)
@@ -960,8 +1031,8 @@ def main() -> int:
     execution.add_argument("--control-enrichment", choices=("on", "off"), default="on")
     execution.add_argument("--variant-enrichment", choices=("on", "off"), default="off")
     execution.add_argument("--operation", choices=("retrieval", "exact-source", "acquisition"), default="retrieval")
-    execution.add_argument("--control-architecture", choices=("graph", "graph-free", "demand"), default="graph")
-    execution.add_argument("--variant-architecture", choices=("graph", "graph-free", "demand"), default="graph")
+    execution.add_argument("--control-architecture", choices=("graph", "graph-free", "path", "demand", "focused", "focused-wide"), default="graph")
+    execution.add_argument("--variant-architecture", choices=("graph", "graph-free", "path", "demand", "focused", "focused-wide"), default="graph")
     execution.add_argument("--repeat-queries", action="store_true", help="repeat each acquisition sequence in the same worker and retain separate costs/proofs")
     execution.add_argument("--mechanism", help="actual mechanism under comparison, recorded in result metadata")
     execution.add_argument("--read-file", action="append", help="exact-source snapshot:relative/path; repeatable")

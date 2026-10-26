@@ -629,6 +629,12 @@ class DemandSource(GraphFreeSource):
         rust_controls: Any, rust_module_support: Any,
     ) -> dict[str, Any]:
         with _phase(work, "proofpacking"):
+            # R0.6 changes only optional focused delivery; default R0.5 policy
+            # and budgets remain identical for the retained control.
+            focus_id = getattr(self, "_proof_focus_id", None)
+            evidence_limit = getattr(self, "_proof_evidence_limit", MAX_EVIDENCE_BYTES)
+            output_limit = getattr(self, "_proof_output_limit", MAX_OUTPUT_BYTES)
+            proof_first = focus_id is not None
             symbols_by_id = {symbol.id: symbol for symbol in symbols}
             definitions = [symbol for symbol in symbols
                            if symbol.kind not in {"file", "crate", "package"}
@@ -648,6 +654,10 @@ class DemandSource(GraphFreeSource):
             requested_identifiers = {word.casefold() for word in _WORD.findall(query)}
             exact_named = [symbol for symbol in ranked_definitions
                            if symbol.name.casefold() in requested_identifiers]
+            if focus_id is not None:
+                exact_named = [symbol for symbol in symbols if symbol.id == focus_id]
+                if len(exact_named) != 1:
+                    raise GraphFreeError("UNKNOWN_PROOF_ID", "Focused identity is absent from the retained slice")
             anchors = exact_named[:3]
             if len(exact_named) > 1:
                 work["omissions"]["ambiguous_anchor"] = len(exact_named)
@@ -662,7 +672,7 @@ class DemandSource(GraphFreeSource):
                     work["omissions"]["ambiguous_anchor"] = len(anchors)
             anchor_ids = {symbol.id for symbol in anchors}
             packet: dict[str, Any] = {
-                "schema_version": 1, "policy": "demand-semantic-v1",
+                "schema_version": 1, "policy": getattr(self, "_proof_packet_policy", "demand-semantic-v1"),
                 "snapshot": self.inventory(root)["snapshot"], "status": "empty",
                 "scope": {"coverage": "partial" if work["omissions"] else "complete",
                           "exhaustive": False,
@@ -678,8 +688,8 @@ class DemandSource(GraphFreeSource):
                 "nodes": [], "items": [], "ownership": [], "relationships": [],
                 "sources": [], "omissions": [],
                 "limits": {"max_items": MAX_ITEMS, "max_relationships": MAX_RELATIONSHIPS,
-                           "max_evidence_bytes": MAX_EVIDENCE_BYTES,
-                           "max_output_bytes": MAX_OUTPUT_BYTES,
+                           "max_evidence_bytes": evidence_limit,
+                           "max_output_bytes": output_limit,
                            "max_parsed_files": MAX_PARSED_FILES},
                 "usage": {"lookup_bytes": work["bytes_discovered"],
                           "lookup_files": len(work["discovered_paths"]),
@@ -690,6 +700,19 @@ class DemandSource(GraphFreeSource):
                           "token_estimate_method": "utf8_bytes_div_4"},
             }
             omitted = dict(work["omissions"])
+            uncertainty = getattr(self, "_packet_uncertainty", None)
+            if uncertainty is not None:
+                packet["uncertainty"] = uncertainty
+                for entry in uncertainty["counts"]:
+                    if entry["status"] == "unresolved":
+                        reason = entry["consumer_reason"]
+                        omitted[reason] = omitted.get(reason, 0) + entry["count"]
+                if uncertainty["configuration_possible_count"]:
+                    omitted["configuration_dependent_relation"] = (
+                        omitted.get("configuration_dependent_relation", 0)
+                        + uncertainty["configuration_possible_count"])
+            if focus_id is not None:
+                packet["proof_request"] = {"node_id": focus_id, "scope": "same_computed_slice"}
             source_keys: dict[tuple[str, int, int], int] = {}
             node_ids: set[str] = set()
 
@@ -747,7 +770,7 @@ class DemandSource(GraphFreeSource):
                     })
                     add_node(symbol.id)
                     _account(packet, _unique_evidence_bytes(packet["sources"]))
-                    if packet["usage"]["output_bytes"] > MAX_OUTPUT_BYTES - 512:
+                    if packet["usage"]["output_bytes"] > output_limit - 512:
                         raise ValueError("item exceeds output budget")
                 except (UnicodeError, ValueError):
                     packet.clear()
@@ -761,10 +784,10 @@ class DemandSource(GraphFreeSource):
                     return False
                 return True
 
-            for symbol in anchors:
+            for symbol in ([] if proof_first else anchors):
                 add_item(symbol, "anchor", "matched question identifier")
             # An exact file query or a weak symbol query still gets source.
-            for file in ([] if exact_named else seeds[:2]):
+            for file in ([] if exact_named or proof_first else seeds[:2]):
                 if any(symbol.file_path == file for symbol in anchors):
                     continue
                 file_node = symbols_by_id.get(f"{file}::__file__#file")
@@ -803,6 +826,8 @@ class DemandSource(GraphFreeSource):
             for edge in edges:
                 key = (edge.type, edge.from_id, edge.to_id, edge.evidence.file,
                        edge.evidence.line, edge.evidence.content_hash)
+                if focus_id is not None and focus_id not in {edge.from_id, edge.to_id}:
+                    continue
                 if key not in eligible:
                     continue
                 depth, direction = eligible[key]
@@ -847,7 +872,7 @@ class DemandSource(GraphFreeSource):
                                if direction == 0 and edge.to_id not in anchor_ids
                                and edge.type in {"references", "references_type", "uses_type",
                                                  "extends", "implements"}]
-            for target_id in list(dict.fromkeys(outward_targets))[:3]:
+            for target_id in ([] if proof_first else list(dict.fromkeys(outward_targets))[:3]):
                 target = symbols_by_id.get(target_id)
                 if target is not None and target.byte_length > 0:
                     add_item(target, "related", "two-hop outward source candidate")
@@ -942,7 +967,23 @@ class DemandSource(GraphFreeSource):
                     add_node(edge.to_id)
                     evidence_bytes = _unique_evidence_bytes(packet["sources"])
                     _account(packet, evidence_bytes)
-                    if evidence_bytes > MAX_EVIDENCE_BYTES or packet["usage"]["output_bytes"] > MAX_OUTPUT_BYTES - 512:
+                    if evidence_bytes > evidence_limit or packet["usage"]["output_bytes"] > output_limit - 512:
+                        standalone = deepcopy(packet)
+                        standalone["relationships"] = [packet["relationships"][-1]]
+                        standalone["sources"] = [s for s in packet["sources"] if s["id"] in source_ids]
+                        standalone["nodes"] = [n for n in packet["nodes"] if n["id"] in {edge.from_id, edge.to_id}]
+                        standalone["anchors"] = [a for a in packet["anchors"] if a["node_id"] in {edge.from_id, edge.to_id}]
+                        standalone["items"] = []
+                        standalone["usage"]["relationships_delivered"] = 1
+                        standalone["usage"]["edges_traversed"] = 1
+                        _account(standalone, _unique_evidence_bytes(standalone["sources"]))
+                        work.setdefault("budget_rejections", []).append({
+                            "edge": edge.to_dict(), "evidence_bytes": evidence_bytes,
+                            "output_bytes": packet["usage"]["output_bytes"],
+                            "evidence_limit": evidence_limit, "output_limit": output_limit - 512,
+                            "standalone_evidence_bytes": standalone["usage"]["evidence_bytes"],
+                            "standalone_output_bytes": standalone["usage"]["output_bytes"],
+                        })
                         raise ValueError("proof exceeds packet budget")
                     for endpoint in (edge.from_id, edge.to_id):
                         symbol = symbols_by_id.get(endpoint)
@@ -964,7 +1005,7 @@ class DemandSource(GraphFreeSource):
 
             # A relation may exceed the strict packet proof budget. Its known
             # target remains useful source context, with no asserted edge.
-            for family in (reference_records, type_records, call_records):
+            for family in (() if proof_first else (reference_records, type_records, call_records)):
                 targets = [record.target_id for record in family
                            if getattr(record, "status", None) == "resolved"
                            and getattr(record, "source_id", getattr(record, "caller_id", None)) in anchor_ids

@@ -390,21 +390,47 @@ def validate_graph_free_packet(payload: dict) -> None:
 
 def score_acquisition(corpus: dict, case_id: str, repo: Path, index: dict,
                       packets: list[dict], acquisition: dict, inventory: dict,
-                      *, demand: bool = False) -> dict:
+                      *, demand: bool = False, path_navigation: bool = False,
+                      focused: bool = False) -> dict:
     """Replay queries and both checkpoints; preserve frozen semantic scoring."""
     case = next(c for c in corpus["cases"] if c["id"] == case_id)
     initial = next(r for r in requests(corpus) if r["case_id"] == case_id)["query"]
     validate_inventory(corpus, case["snapshot"], inventory)
     queries = acquisition["queries"]
-    if not queries or len(queries) > ACQUISITION_LIMITS["retrieval_calls"]:
+    base_count = acquisition.get("base_query_count", len(queries))
+    if not queries or not 1 <= base_count <= ACQUISITION_LIMITS["retrieval_calls"]:
         raise ValueError("acquisition query inventory violates call limit")
+    if focused:
+        from benchmarks.architecture_proof import MAX_FOCUSED_CALLS, next_proof_query
+        if not 0 <= len(queries) - base_count <= MAX_FOCUSED_CALLS:
+            raise ValueError("focused proof call inventory violates call limit")
+        if acquisition.get("focused_calls") != len(queries) - base_count:
+            raise ValueError("focused proof call accounting differs")
+    elif base_count != len(queries):
+        raise ValueError("unexpected focused calls")
     cursor = 0
     asked = []
+    proof_asked = []
     for n, row in enumerate(queries):
         semantic = row.get("operation") == "semantic_context"
-        if row.get("operation") is not None and not (demand and n == 1 and semantic):
+        proof = focused and n >= base_count
+        if row.get("operation") is not None and not (
+                demand and n == 1 and semantic or proof and row["operation"] == "focused_proof"):
             raise ValueError("semantic request is not the frozen second-slot policy")
-        expected = initial if n == 0 or semantic else next_acquisition_query(inventory, packets[:cursor], asked)
+        if proof:
+            expected = next_proof_query(packets[:cursor], proof_asked)
+            proof_asked.append(expected)
+            response = _payload(packets[row["packet_start"]])
+            if response.get("proof_request") != {"node_id": expected, "scope": "same_computed_slice"}:
+                raise ValueError("focused response identity differs from consumer request")
+        elif path_navigation and n:
+            from benchmarks.architecture_navigation import choose_next_query
+            navigation = choose_next_query(inventory, packets[:cursor], asked)
+            expected = navigation["query"]
+            if row.get("navigation") != navigation:
+                raise ValueError("path navigation provenance differs from observed source")
+        else:
+            expected = initial if n == 0 or semantic else next_acquisition_query(inventory, packets[:cursor], asked)
         if demand and n == 1 and not semantic:
             raise ValueError("demand second slot must ask semantic_context")
         if row["query"] != expected or row["packet_start"] != cursor or not cursor < row["packet_end"] <= len(packets):
@@ -438,7 +464,9 @@ def score_acquisition(corpus: dict, case_id: str, repo: Path, index: dict,
 def validate_demand_packet(payload: dict) -> None:
     """Native proof shapes and budgets remain mandatory for the new policy."""
     from loci.mcp_output_models import NormalSource, NormalRelationship, NormalNode, NormalItem
-    if (payload.get("schema_version") != 1 or payload.get("policy") != "demand-semantic-v1"
+    policy = payload.get("policy")
+    if (payload.get("schema_version") != 1 or policy not in {
+            "demand-semantic-v1", "focused-semantic-v1", "focused-semantic-wide-v1"}
             or payload.get("status") not in {"ok", "partial", "empty"}
             or not isinstance(payload.get("scope"), dict) or payload["scope"].get("exhaustive") is not False
             or not isinstance(payload.get("usage"), dict)):
@@ -461,8 +489,9 @@ def validate_demand_packet(payload: dict) -> None:
         if (relation["edge"]["from"] not in node_ids or relation["edge"]["to"] not in node_ids
                 or any(i not in source_ids for i in relation["source_ids"])):
             raise ValueError("demand proof references absent source/node")
-    if (payload["usage"].get("evidence_bytes", 8193) > 8192
-            or payload["usage"].get("output_bytes", 16385) > 16384):
+    evidence_limit, output_limit = (32768, 65536) if policy == "focused-semantic-wide-v1" else (8192, 16384)
+    if (payload["usage"].get("evidence_bytes", evidence_limit + 1) > evidence_limit
+            or payload["usage"].get("output_bytes", output_limit + 1) > output_limit):
         raise ValueError("demand semantic response exceeds fixed budget")
 
 def score_session_proof(corpus: dict, case_id: str, repo: Path, index: dict, packets: list[dict]) -> dict:
