@@ -389,7 +389,8 @@ def validate_graph_free_packet(payload: dict) -> None:
 
 
 def score_acquisition(corpus: dict, case_id: str, repo: Path, index: dict,
-                      packets: list[dict], acquisition: dict, inventory: dict) -> dict:
+                      packets: list[dict], acquisition: dict, inventory: dict,
+                      *, demand: bool = False) -> dict:
     """Replay queries and both checkpoints; preserve frozen semantic scoring."""
     case = next(c for c in corpus["cases"] if c["id"] == case_id)
     initial = next(r for r in requests(corpus) if r["case_id"] == case_id)["query"]
@@ -400,7 +401,12 @@ def score_acquisition(corpus: dict, case_id: str, repo: Path, index: dict,
     cursor = 0
     asked = []
     for n, row in enumerate(queries):
-        expected = initial if n == 0 else next_acquisition_query(inventory, packets[:cursor], asked)
+        semantic = row.get("operation") == "semantic_context"
+        if row.get("operation") is not None and not (demand and n == 1 and semantic):
+            raise ValueError("semantic request is not the frozen second-slot policy")
+        expected = initial if n == 0 or semantic else next_acquisition_query(inventory, packets[:cursor], asked)
+        if demand and n == 1 and not semantic:
+            raise ValueError("demand second slot must ask semantic_context")
         if row["query"] != expected or row["packet_start"] != cursor or not cursor < row["packet_end"] <= len(packets):
             raise ValueError("acquisition query is not the frozen gold-blind policy")
         cursor = row["packet_end"]
@@ -427,6 +433,37 @@ def score_acquisition(corpus: dict, case_id: str, repo: Path, index: dict,
     result["efficiency"]["discovery_output_bytes"] = discovery_bytes
     result["efficiency"]["total_delivered_bytes"] = result["efficiency"]["output_bytes"] + discovery_bytes
     return result
+
+
+def validate_demand_packet(payload: dict) -> None:
+    """Native proof shapes and budgets remain mandatory for the new policy."""
+    from loci.mcp_output_models import NormalSource, NormalRelationship, NormalNode, NormalItem
+    if (payload.get("schema_version") != 1 or payload.get("policy") != "demand-semantic-v1"
+            or payload.get("status") not in {"ok", "partial", "empty"}
+            or not isinstance(payload.get("scope"), dict) or payload["scope"].get("exhaustive") is not False
+            or not isinstance(payload.get("usage"), dict)):
+        raise ValueError("unknown demand semantic schema")
+    classes = {"sources": NormalSource, "relationships": NormalRelationship,
+               "nodes": NormalNode, "items": NormalItem}
+    for field, model in classes.items():
+        if not isinstance(payload.get(field), list):
+            raise ValueError(f"demand packet has no {field} list")
+        for value in payload[field]:
+            model.model_validate(value)
+    source_ids = {s["id"] for s in payload["sources"]}
+    node_ids = {n["id"] for n in payload["nodes"]}
+    if len(source_ids) != len(payload["sources"]) or len(node_ids) != len(payload["nodes"]):
+        raise ValueError("duplicate demand source/node identity")
+    if any(item["node_id"] not in node_ids or any(i not in source_ids for i in item["source_ids"])
+           for item in payload["items"]):
+        raise ValueError("demand item references absent source/node")
+    for relation in payload["relationships"]:
+        if (relation["edge"]["from"] not in node_ids or relation["edge"]["to"] not in node_ids
+                or any(i not in source_ids for i in relation["source_ids"])):
+            raise ValueError("demand proof references absent source/node")
+    if (payload["usage"].get("evidence_bytes", 8193) > 8192
+            or payload["usage"].get("output_bytes", 16385) > 16384):
+        raise ValueError("demand semantic response exceeds fixed budget")
 
 def score_session_proof(corpus: dict, case_id: str, repo: Path, index: dict, packets: list[dict]) -> dict:
     """Require unchanged strict support, using only actual same-case delivery."""

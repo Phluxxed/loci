@@ -44,6 +44,10 @@ def validate_packets(packets: list[dict]) -> None:
             from benchmarks.architecture_cases import validate_graph_free_packet
             validate_graph_free_packet(payload)
             continue
+        if payload.get("policy") == "demand-semantic-v1":
+            from benchmarks.architecture_cases import validate_demand_packet
+            validate_demand_packet(payload)
+            continue
         model = LociReadOutput if "source" in payload else LociRetrieveOutput
         model.model_validate(payload)
 
@@ -94,7 +98,8 @@ def tree_bytes(root: Path) -> int:
 
 
 def acquire(service, repo: Path, request: dict, inventory: dict, rows: list,
-            *, graph_free: bool, enrichment: bool) -> tuple[list, dict]:
+            *, graph_free: bool, enrichment: bool, demand: bool = False,
+            trial: str = "first") -> tuple[list, dict]:
     from benchmarks.architecture_cases import ACQUISITION_LIMITS as limits, next_acquisition_query
     packets, queries, asked = [], [], []
     continuations = source_bytes = output_bytes = 0
@@ -103,14 +108,21 @@ def acquire(service, repo: Path, request: dict, inventory: dict, rows: list,
         if source_bytes >= limits["source_bytes"] or output_bytes >= limits["output_bytes"]:
             reason = "byte_admission_limit"
             break
-        query = request["query"] if not asked else next_acquisition_query(inventory, packets, asked)
+        semantic = demand and len(queries) == 1
+        query = request["query"] if not asked or semantic else next_acquisition_query(inventory, packets, asked)
         if query is None:
             reason = "discovery_exhausted"
             break
         start = len(packets)
-        with measure(rows, "retrieval" if not asked else "followup", case_id=request["case_id"], query=query) as row:
-            packet = service.retrieve(repo, query, ensure_fresh=True, graph_enrichment=enrichment)
+        phase = "semantic_context" if semantic else "retrieval" if not asked else "followup"
+        if trial == "repeat":
+            phase = "repeat_" + phase
+        with measure(rows, phase, case_id=request["case_id"], query=query) as row:
+            packet = (service.semantic_context(repo, query) if semantic else
+                      service.retrieve(repo, query, ensure_fresh=True, graph_enrichment=enrichment))
             row["usage"] = packet.get("usage")
+            if semantic:
+                row["work"] = service.semantic_observer()["work"]
         def append(payload):
             nonlocal source_bytes, output_bytes
             envelope = {"content": [], "structuredContent": payload, "isError": False}
@@ -128,7 +140,8 @@ def acquire(service, repo: Path, request: dict, inventory: dict, rows: list,
                 if reference in seen:
                     raise ValueError("non-progressing acquisition continuation")
                 seen.add(reference)
-                with measure(rows, "continuation", case_id=request["case_id"]) as row:
+                with measure(rows, "repeat_continuation" if trial == "repeat" else "continuation",
+                             case_id=request["case_id"]) as row:
                     page = service.read(repo, reference, ensure_fresh=True)
                     row["usage"] = page.get("usage")
                 append(page)
@@ -136,7 +149,10 @@ def acquire(service, repo: Path, request: dict, inventory: dict, rows: list,
                 reference = page.get("next_source_ref") if not page["complete"] else None
                 if not page["complete"] and not reference:
                     raise ValueError("incomplete acquisition source without continuation")
-        queries.append({"query": query, "packet_start": start, "packet_end": len(packets)})
+        query_row = {"query": query, "packet_start": start, "packet_end": len(packets)}
+        if semantic:
+            query_row["operation"] = "semantic_context"
+        queries.append(query_row)
         asked.append(query)
     return packets, {"queries": queries, "termination": reason,
         "continuation_calls": continuations, "source_bytes": source_bytes, "output_bytes": output_bytes,
@@ -153,15 +169,22 @@ def worker(config_path: Path) -> int:
     rows: list[dict] = []
     report: dict = {"status": "incomplete", "phases": rows, "cases": [], "indexes": {}}
     output = Path(config["artifacts"])
-    graph_free = config.get("architecture") == "graph-free"
+    demand = config.get("architecture") == "demand"
+    graph_free = config.get("architecture") in {"graph-free", "demand"}
     acquisition = config.get("operation") == "acquisition"
     try:
         with measure(rows, "runtime_setup"):
             if graph_free:
-                from loci.graph_free import GraphFreeSource
-                import loci.graph_free
-                service = GraphFreeSource(Path(config["store"]) / config["namespace"])
-                loaded = Path(loci.graph_free.__file__).resolve()
+                if demand:
+                    from loci.demand_semantics import DemandSource
+                    import loci.demand_semantics
+                    service = DemandSource(Path(config["store"]) / config["namespace"])
+                    loaded = Path(loci.demand_semantics.__file__).resolve()
+                else:
+                    from loci.graph_free import GraphFreeSource
+                    import loci.graph_free
+                    service = GraphFreeSource(Path(config["store"]) / config["namespace"])
+                    loaded = Path(loci.graph_free.__file__).resolve()
                 resolution = {"base_dir": config["store"], "namespace": config["namespace"],
                               "store_id": config["namespace"]}
             else:
@@ -210,16 +233,40 @@ def worker(config_path: Path) -> int:
                         name: {"sha256": value, "size": (repo / name).stat().st_size}
                         for name, value in sorted(hashes.items()) if (repo / name).is_file()}}
                     write(output / "inventories" / f"{snapshot}.json", inventories[snapshot])
+        report["semantic_modules_before_questions"] = sorted(n for n in sys.modules if
+            n in {"loci.graph", "loci.parser"} or n.startswith(("loci.graph.", "loci.parser.")))
+        report["resources_before_questions"] = usage()
         for request in ([] if config.get("operation") == "exact-source" else config["requests"]):
             repo = Path(config["snapshots"][request["snapshot"]])
             case_id = request["case_id"]
             if acquisition:
                 packets, trace = acquire(service, repo, request, inventories[request["snapshot"]], rows,
-                                         graph_free=graph_free, enrichment=config["enrichment"] == "on")
+                                         graph_free=graph_free, enrichment=config["enrichment"] == "on", demand=demand)
                 case_file = output / "packets" / f"{case_id}.json"
                 write(case_file, packets)
-                report["cases"].append({"case_id": case_id, "snapshot": request["snapshot"],
-                                        "packets": str(case_file.relative_to(output)), "acquisition": trace})
+                case = {"case_id": case_id, "snapshot": request["snapshot"],
+                        "packets": str(case_file.relative_to(output)), "acquisition": trace}
+                if demand and any(q.get("operation") == "semantic_context" for q in trace["queries"]):
+                    observer = service.semantic_observer()
+                    sparse_file = output / "case-indexes" / f"{case_id}.json.gz"
+                    sparse_file.parent.mkdir(parents=True, exist_ok=True)
+                    sparse_file.write_bytes(gzip.compress(json.dumps(observer["index"], ensure_ascii=False,
+                        separators=(",", ":"), allow_nan=False).encode(), mtime=0))
+                    case["index"] = str(sparse_file.relative_to(output))
+                    case["semantic_work"] = observer["work"]
+                if config.get("repeat_queries"):
+                    repeated, repeat_trace = acquire(service, repo, request, inventories[request["snapshot"]], rows,
+                        graph_free=graph_free, enrichment=config["enrichment"] == "on", demand=demand, trial="repeat")
+                    repeat_file = output / "packets" / f"{case_id}.repeat.json"
+                    write(repeat_file, repeated)
+                    case.update(repeat_packets=str(repeat_file.relative_to(output)), repeat_acquisition=repeat_trace)
+                    if demand and any(q.get("operation") == "semantic_context" for q in repeat_trace["queries"]):
+                        observer = service.semantic_observer()
+                        repeated_index = output / "case-indexes" / f"{case_id}.repeat.json.gz"
+                        repeated_index.write_bytes(gzip.compress(json.dumps(observer["index"], ensure_ascii=False,
+                            separators=(",", ":"), allow_nan=False).encode(), mtime=0))
+                        case.update(repeat_index=str(repeated_index.relative_to(output)), repeat_semantic_work=observer["work"])
+                report["cases"].append(case)
                 write(output / "worker.json", report)
                 continue
             with measure(rows, "retrieval", case_id=case_id) as measurement:
@@ -568,6 +615,37 @@ def preserve_evaluator(output: Path) -> dict:
     return identities
 
 
+def acquisition_scores(corpus: dict, snapshots: dict, artifacts: Path, worker_result: dict,
+                       *, demand: bool, repeat: bool = False) -> list[dict]:
+    """Same retained-source observer for execution and independent replay."""
+    from benchmarks.architecture_cases import score_acquisition
+    scores = []
+    for case in worker_result["cases"]:
+        packets = json.loads((artifacts / case["repeat_packets" if repeat else "packets"]).read_text())
+        index_path = case.get("repeat_index" if repeat else "index", worker_result["indexes"][case["snapshot"]])
+        index = read_index(artifacts / index_path)
+        validate_packets(packets)
+        inventory = json.loads((artifacts / "inventories" / f"{case['snapshot']}.json").read_text())
+        trace = case["repeat_acquisition" if repeat else "acquisition"]
+        repo = Path(snapshots[case["snapshot"]])
+        scored = score_acquisition(corpus, case["case_id"], repo,
+                                   index, packets, trace, inventory, demand=demand)
+        if demand:
+            from benchmarks.architecture_structural import validate_structural
+            violations = validate_structural(index, packets, repo)
+            count = sum(r["edge"]["type"] in {"imports", "imports_type"}
+                for packet in packets for r in packet["structuredContent"].get("relationships", []))
+            scored["structural_proof"] = {"claims": count,
+                "verified": count if not violations else None, "violations": violations,
+                "qualification": "structural proof is separate from authored semantic dependency credit"}
+            if violations:
+                scored["integrity_ok"] = scored["acquisition_integrity_ok"] = False
+                scored["output_integrity"]["passed"] = False
+                scored["output_integrity"]["failures"].extend(violations)
+        scores.append(scored)
+    return scores
+
+
 def run(args) -> int:
     from benchmarks.architecture_cases import load_suite, prepare_snapshots, verify_snapshots, requests, score
     from benchmarks.architecture_reads import requests as read_requests, check_case
@@ -605,9 +683,10 @@ def run(args) -> int:
                          "deterministic continuation hydrates selected incomplete items only"],
               "primary_before": before}
     report["architectures"] = {arm: getattr(args, arm + "_architecture", "graph") for arm in ("control", "variant")}
-    if operation != "acquisition" and "graph-free" in report["architectures"].values():
+    if operation != "acquisition" and any(a != "graph" for a in report["architectures"].values()):
         raise ValueError("graph-free candidate requires explicit acquisition observer")
     report["graph_free"] = report["architectures"] if operation == "acquisition" else False
+    report["repeat_queries"] = bool(getattr(args, "repeat_queries", False))
     created: set[Path] = set()
     try:
         worktree_parent = primary / ".worktrees"
@@ -669,6 +748,7 @@ def run(args) -> int:
                                 if operation == "exact-source" else requests(corpus))
                     config = {"implementation": str(implementation), "revision": refs[arm],
                               "operation": operation,
+                              "repeat_queries": report["repeat_queries"],
                               "architecture": report["architectures"][arm],
                               "enrichment": "on" if operation == "exact-source" else getattr(args, arm + "_enrichment"), "store": str(store),
                               "namespace": namespace, "snapshots": snapshots,
@@ -729,14 +809,15 @@ def run(args) -> int:
                     binding = result["binding"]
                     if (Path(binding["base_dir"]) != store or binding["namespace"] != namespace
                             or result["service_source"] != str(implementation / "src/loci" /
-                                ("graph_free.py" if config["architecture"] == "graph-free" else "service.py"))):
+                                ({"graph-free": "graph_free.py", "demand": "demand_semantics.py"}.get(
+                                    config["architecture"], "service.py")))):
                         raise ValueError("worker implementation/store identity mismatch")
                     entry["binding"] = binding
                     entry["cases"] = [{"case_id": case["case_id"], "snapshot": case["snapshot"],
                                        "packets": str((artifacts / case["packets"]).relative_to(output))}
                                       for case in result["cases"]] if operation == "exact-source" else []
                     scores = []
-                    for case in result["cases"]:
+                    for case in ([] if operation == "acquisition" else result["cases"]):
                         packets = json.loads((artifacts / case["packets"]).read_text())
                         if operation == "exact-source":
                             request = next(r for r in config["requests"] if r["case_id"] == case["case_id"])
@@ -744,16 +825,23 @@ def run(args) -> int:
                         else:
                             index = read_index(artifacts / result["indexes"][case["snapshot"]])
                             validate_packets(packets)
-                            if operation == "acquisition":
-                                inventory = json.loads((artifacts / "inventories" / f"{case['snapshot']}.json").read_text())
-                                scores.append(score_acquisition(corpus, case["case_id"], Path(snapshots[case["snapshot"]]),
-                                    index, packets, case["acquisition"], inventory))
-                            else:
-                                scores.append(score(corpus, case["case_id"], Path(snapshots[case["snapshot"]]), index, packets))
+                            scores.append(score(corpus, case["case_id"], Path(snapshots[case["snapshot"]]), index, packets))
+                    if operation == "acquisition":
+                        with measure(report.setdefault("observer_phases", []), "proof_validation", run_id=label, trial="first"):
+                            scores = acquisition_scores(corpus, snapshots, artifacts, result,
+                                                        demand=config["architecture"] == "demand")
                     write(artifacts / "capability.json", scores)
                     entry["capability"] = str((artifacts / "capability.json").relative_to(output))
+                    repeated_scores = []
+                    if operation == "acquisition" and config["repeat_queries"]:
+                        with measure(report["observer_phases"], "proof_validation", run_id=label, trial="repeat"):
+                            repeated_scores = acquisition_scores(corpus, snapshots, artifacts, result,
+                                demand=config["architecture"] == "demand", repeat=True)
+                        write(artifacts / "repeat-capability.json", repeated_scores)
+                        entry["repeat_capability"] = str((artifacts / "repeat-capability.json").relative_to(output))
+                        entry["repeat_legacy_packet_invalid_cases"] = [s["case_id"] for s in repeated_scores if not s["integrity_ok"]]
                     entry["legacy_packet_invalid_cases"] = [item["case_id"] for item in scores if not item["integrity_ok"]]
-                    invalid_cases = [item["case_id"] for item in scores if not item.get("acquisition_integrity_ok", item["integrity_ok"])]
+                    invalid_cases = [item["case_id"] for item in scores + repeated_scores if not item.get("acquisition_integrity_ok", item["integrity_ok"])]
                     if invalid_cases:
                         entry.update(status="invalid", invalid_cases=invalid_cases,
                                      error="independent source/output/proof integrity check failed")
@@ -831,7 +919,7 @@ def verify(output: Path) -> int:
             if [case["case_id"] for case in worker_result["cases"]] != [request["case_id"] for request in config["requests"]]:
                 raise ValueError("retained read request inventory differs from worker receipt")
             actual = []
-            for case in worker_result["cases"]:
+            for case in ([] if result.get("operation") == "acquisition" else worker_result["cases"]):
                 packets = json.loads((artifacts / case["packets"]).read_text())
                 if direct:
                     request = next(r for r in config["requests"] if r["case_id"] == case["case_id"])
@@ -839,13 +927,18 @@ def verify(output: Path) -> int:
                 else:
                     index = read_index(artifacts / worker_result["indexes"][case["snapshot"]])
                     validate_packets(packets)
-                    if result.get("operation") == "acquisition":
-                        inventory = json.loads((artifacts / "inventories" / f"{case['snapshot']}.json").read_text())
-                        actual.append(score_acquisition(corpus, case["case_id"], Path(snapshots[case["snapshot"]]),
-                            index, packets, case["acquisition"], inventory))
-                    else:
-                        actual.append(score(corpus, case["case_id"], Path(snapshots[case["snapshot"]]), index, packets))
+                    actual.append(score(corpus, case["case_id"], Path(snapshots[case["snapshot"]]), index, packets))
                 count += 1
+            if result.get("operation") == "acquisition":
+                actual = acquisition_scores(corpus, snapshots, artifacts, worker_result,
+                                            demand=config["architecture"] == "demand")
+                count += len(actual)
+                if config.get("repeat_queries"):
+                    repeated = acquisition_scores(corpus, snapshots, artifacts, worker_result,
+                                                  demand=config["architecture"] == "demand", repeat=True)
+                    if repeated != json.loads((artifacts / "repeat-capability.json").read_text()):
+                        raise ValueError("independent repeated-query capability replay differs")
+                    count += len(repeated)
             if actual != json.loads((artifacts / "capability.json").read_text()):
                 raise ValueError("independent capability replay differs")
         if result.get("operation") == "acquisition" and comparisons(output, result["runs"]) != result["comparisons"]:
@@ -867,8 +960,9 @@ def main() -> int:
     execution.add_argument("--control-enrichment", choices=("on", "off"), default="on")
     execution.add_argument("--variant-enrichment", choices=("on", "off"), default="off")
     execution.add_argument("--operation", choices=("retrieval", "exact-source", "acquisition"), default="retrieval")
-    execution.add_argument("--control-architecture", choices=("graph", "graph-free"), default="graph")
-    execution.add_argument("--variant-architecture", choices=("graph", "graph-free"), default="graph")
+    execution.add_argument("--control-architecture", choices=("graph", "graph-free", "demand"), default="graph")
+    execution.add_argument("--variant-architecture", choices=("graph", "graph-free", "demand"), default="graph")
+    execution.add_argument("--repeat-queries", action="store_true", help="repeat each acquisition sequence in the same worker and retain separate costs/proofs")
     execution.add_argument("--mechanism", help="actual mechanism under comparison, recorded in result metadata")
     execution.add_argument("--read-file", action="append", help="exact-source snapshot:relative/path; repeatable")
     execution.add_argument("--read-negatives", action="store_true", help="run destructive-in-copy error probes on selected small files")
