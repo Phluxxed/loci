@@ -136,6 +136,13 @@ def test_optional_rust_dependency_remains_declared_possible(tmp_path: Path):
     assert any(item["resolution_configuration"] == "declared_possible"
                for item in packet["relationships"])
     assert not source.semantic_observer()["work"]["rust_closure_incomplete"]
+    control = root / "app/Cargo.toml"
+    control.write_text(control.read_text().replace(", optional = true", ""))
+    changed = source.semantic_context(root, "use_it")
+    assert not source.semantic_observer()["work"]["cache_hit"]
+    assert changed["relationships"]
+    assert all(item["resolution_configuration"] != "declared_possible"
+               for item in changed["relationships"])
 
 
 def test_root_package_question_in_nested_module_acquires_crate_root(tmp_path: Path):
