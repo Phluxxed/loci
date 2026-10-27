@@ -2,7 +2,10 @@
 
 The replacement uses a pinned source-only snapshot of the maintained
 kaggle_lab repository, rather than generated toy repositories. No replacement
-agent run has started. The existing four-condition native runner, subscription
+scored agent run has started. An unscored native probe closed successfully but
+the reader rejected a normal startup hook; the [reader repair and retained
+replay](startup-hook-repair.md) correct that classification without changing
+the freeze. The existing four-condition native runner, subscription
 authentication, Terra6.1/max model setting, Williams order, independent stores,
 native tool access, accounting and replay are retained.
 
@@ -92,7 +95,8 @@ PYTHONPATH=src:. /Users/brummerv/phluxxed/loci/.venv/bin/python -u \
   .scratch/r1-integrated/pilot-execute.py \
   --freeze .scratch/r1-integrated/real-repo-pilot/frozen-final/freeze.json \
   --gate .scratch/r1-integrated/qualification-gate.json \
-  --output-root .scratch/r1-integrated/real-repo-pilot/execution
+  --amendment .scratch/r1-integrated/startup-hook-instrumentation-amendment.json \
+  --output-root .scratch/r1-integrated/real-repo-pilot/execution-reader-v1
 ~~~
 
 If native qualification fails, its error/evidence are retained and measurement

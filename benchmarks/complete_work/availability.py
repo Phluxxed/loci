@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import re
 from copy import deepcopy
 from pathlib import Path
@@ -285,9 +286,10 @@ def audit_common_context(trace: Path, workspace: Path, observer: Path,
                          prompt: str, expected_tools: list[str]) -> dict:
     """Retain actual ordered instruction parts and native schemas, never headings alone.
 
-    Only the submitted task (checked exactly), runtime envelope identities, two
-    assigned paths, and explicitly named Loci declarations vary. A typed AGENTS
-    update is an instruction change; AGENTS text inside tool output is not.
+    Startup includes same-turn typed hooks assembled before the first model
+    activity, even when they follow task submission. Their content is retained.
+    Only explicit transport fields, assigned paths and declared Loci schemas
+    vary. Later instruction updates fail; AGENTS tool output is source text.
     """
     from .accounting import _native_bootstrap_user
 
@@ -319,11 +321,36 @@ def audit_common_context(trace: Path, workspace: Path, observer: Path,
              and r["payload"].get("type") == "task_started" and "turn_id" in r["payload"]]
     if len(turns) != 1:
         raise ValueError("common context requires exactly one fresh native turn")
+    model_started = False
+
+    def startup_hook(payload):
+        content = payload.get("content")
+        metadata = payload.get("internal_chat_message_metadata_passthrough")
+        if not isinstance(metadata, dict) or not isinstance(content, list) or not content:
+            return False
+        return (metadata.get("turn_id") == turns[0]
+                and metadata.get("content_item_kinds") == ["hooks.additional_context"] * len(content)
+                and isinstance(metadata.get("content_item_metadata"), list)
+                and len(metadata["content_item_metadata"]) == len(content)
+                and all(isinstance(item, dict)
+                        and item.get("provenance") == {"type": "harness", "hook": True}
+                        for item in metadata["content_item_metadata"]))
+
     for row in rows:
+        payload = row["payload"]
+        # Native completion events can precede the corresponding response item.
+        if (row.get("type") == "event_msg"
+                and payload.get("type") in {"item_started", "item_completed"}
+                and isinstance(payload.get("item"), dict)
+                and payload["item"].get("type") != "UserMessage"):
+            model_started = True
+        if row.get("type") == "token_usage_record":
+            model_started = True
         if row.get("type") != "response_item":
             continue
-        payload = row["payload"]
         kind, role = payload.get("type"), payload.get("role")
+        if kind in {"reasoning", "function_call", "custom_tool_call"} or (kind == "message" and role == "assistant"):
+            model_started = True
         if kind == "additional_tools":
             if task_seen or role != "developer" or not isinstance(payload.get("tools"), list):
                 raise ValueError("native tool schemas are missing or misplaced")
@@ -357,7 +384,7 @@ def audit_common_context(trace: Path, workspace: Path, observer: Path,
             value = deepcopy(payload)
             value["tools"] = common_tools
         elif kind == "message" and role in {"developer", "user"}:
-            if task_seen:
+            if task_seen and (model_started or role != "developer" or not startup_hook(payload)):
                 raise ValueError("native instruction update after submitted task")
             content = payload.get("content")
             if (not isinstance(content, list) or not content
@@ -387,7 +414,12 @@ def audit_common_context(trace: Path, workspace: Path, observer: Path,
             value.pop(key, None)
         metadata = value.get("internal_chat_message_metadata_passthrough")
         if isinstance(metadata, dict):
-            for key in ("turn_id", "thread_id"):
+            if "turn_id" in metadata and metadata["turn_id"] != turns[0]:
+                raise ValueError("native instruction belongs to another turn")
+            if "create_time" in metadata and (type(metadata["create_time"]) not in {int, float}
+                                               or not math.isfinite(metadata["create_time"])):
+                raise ValueError("invalid native instruction transport timestamp")
+            for key in ("turn_id", "thread_id", "create_time"):
                 metadata.pop(key, None)
         instructions.append(normalize(value))
     if not task_seen or not bootstrap_seen or not developer_messages or tool_envelopes != 1:

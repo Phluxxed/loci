@@ -116,6 +116,7 @@ def _instrumentation_changes(path: Path, frozen: dict) -> dict:
     root = Path(__file__).resolve().parents[2]
     allowed = {str(Path(__file__).resolve()),
                str(Path(__file__).with_name("accounting.py").resolve()),
+               str(Path(availability.__file__).resolve()),
                str(root / ".scratch/r1-integrated/pilot-execute.py")}
     policy = amendment.get("host_observation_policy")
     if policy is not None:
@@ -551,6 +552,7 @@ def preflight(freeze_path: Path, deterministic_gate: Path, destination: Path,
             write_json(config, manifest)
             executed = _execute_native(config, deterministic_gate, frozen, measured=False, amendment=amendment)
             thread = executed["thread_id"]
+            entry["thread_id"] = thread
             if executed["status"] != "closed" or not thread or thread in threads:
                 raise ValueError("native availability probe failed to close as a fresh session")
             threads.add(thread)
