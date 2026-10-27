@@ -1,0 +1,11 @@
+# Frozen pilot stopped by mid-run environment changes
+
+The first scored assignment closed, then evaluation stopped at `native configuration changed in effective fields: agents`. Preparation observed raw config hash e599c164…19f1 and the expected effective hash. Current config differs exactly by the addition of an `[agents.terra]` table: removing only that section in memory reproduces the entire preparation hash. The pinned global AGENTS.md also changed. No global files were changed during this investigation.
+
+The captured native trace independently confirms an instruction replacement during the attempt: initial bootstrap at 04:20:32.733 UTC; task at 04:20:32.842; another agents_md.instructions message at 04:21:04.393. This is an actual mid-turn instruction update. The unmodified accounting parser rejects this unsupported additional bootstrap. It must not be treated as an ordinary stable frozen trial or silently excised from history.
+
+`blocker.json` records the hashes and typed native message provenance. `blocked-index.json` preserves the runner state, and `native-rollout.jsonl` retains the raw session that the normal evaluator had not yet archived. The existing attempted source/output archive and verification blobs are retained alongside the pilot. The source implementation, frozen experiment, grader and native protections remain unchanged.
+
+One assignment attempted, 15 unattempted, zero qualified scored outcomes. Host elapsed time was 40,212.537 ms. Terra 6.1/max and native protection contexts match; the first-action catalog confirms no Loci tools for the native control. Provider usage rows exist in the retained raw trace, but qualified usage and correctness remain unknown. No grade was salvaged, no Codex process was launched, and no attempt was rerun during investigation.
+
+Stop this frozen pilot. Continuing with the new settings requires an explicitly authorized new prospective environment freeze and availability qualification before scored execution, with settings/instructions held stable. Do not broaden ignored config fields, overwrite this attempt, or resume against the old freeze. Earlier four-probe availability evidence remains valid for its recorded environment only.

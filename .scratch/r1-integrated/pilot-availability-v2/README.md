@@ -1,6 +1,6 @@
 # R1 native availability preflight — configuration handoff repair
 
-**Current status:** all four actual external probes passed full archive replay after the narrow [archive path repair](../archive-path-repair/README.md). That record retains the original failed final gate and the required instrumentation amendment. The 16 scored assignments are pending.
+**Current status:** stopped after the first scored attempt because the global agents configuration and AGENTS instructions changed during that session. See the [retained blocker evidence](../environment-drift-blocker/README.md). No qualified scored outcome or resumption under this freeze. The four earlier operational probes remain valid for their recorded environment; their archive replay correction is retained below.
 
 The prior rejection was reproduced: the global default model changed from `gpt-6-sol` to `gpt-6.1-sol`. Replacing that single value reconstructs the old raw file SHA256 exactly. The pilot explicitly supplies `gpt-6.1-terra` and `max`; its actual native contexts must match both.
 
