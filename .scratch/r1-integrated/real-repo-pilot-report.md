@@ -1,8 +1,10 @@
 # R1 replacement pilot: real-source inputs qualified, native execution pending
 
-Current state: [all four operational probes pass, but catalog drift blocks
-scoring](catalog-drift-report.md). The historical command below is not a
-qualified next step; do not rerun it unchanged.
+Current state: [capture and archive recovery are repaired and tested](capture-recovery-repair.md).
+The original failed probes remain retained. The amended capture protocol needs
+fresh top-level qualification before the 16 scored assignments. The current
+command and its explicit measurement-prefix amendment are in the linked report;
+the command below is historical and must not be rerun unchanged.
 
 The replacement uses a pinned source-only snapshot of the maintained
 kaggle_lab repository, rather than generated toy repositories. No replacement

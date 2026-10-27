@@ -1,5 +1,6 @@
 """Sequential frozen native pilot with validated, non-destructive resumption."""
 import argparse
+import copy
 import json
 import os
 from pathlib import Path
@@ -24,18 +25,25 @@ def require(condition, message):
         raise ValueError(message)
 
 
-def validate_prefix(index, frozen, root, verified):
+def validate_prefix(index, frozen, root, verified, *, completed_count=None):
     """Skip only completed assignments bound to retained, independently graded bytes."""
     require(index.get('freeze_sha256') == frozen['freeze_sha256'], 'index freeze differs')
     require(index.get('availability_gate') == verified, 'index availability gate differs')
     runs = index.get('runs')
     require(isinstance(runs, list) and len(runs) <= len(frozen['schedule']), 'invalid retained prefix')
-    run_root = Path(index['run_root']).resolve(strict=True)
+    run_root = Path(index['run_root']).resolve()
+    count = len(runs) if completed_count is None else completed_count
+    require(count in {len(runs), len(runs) - 1} and count >= 0, 'invalid completed prefix length')
+    require(all(entry.get('run_id') == scheduled['run_id']
+                for entry, scheduled in zip(runs, frozen['schedule'])),
+            'retained prefix differs from frozen schedule')
     threads = set(verified['threads'])
-    for entry, scheduled in zip(runs, frozen['schedule']):
+    for entry, scheduled in zip(runs[:count], frozen['schedule']):
         run_id = scheduled['run_id']
         require(entry.get('run_id') == run_id, 'retained prefix differs from frozen schedule')
         execution, result = entry.get('execution', {}), entry.get('evaluation', {})
+        require(not entry.get('evidence_error') and not entry.get('archive_error'),
+                'retained assignment has an unresolved observer or archive failure')
         thread = execution.get('thread_id')
         require(execution.get('status') == 'closed' and execution.get('exit_code') == 0,
                 'retained attempt did not close successfully')
@@ -62,9 +70,10 @@ def validate_prefix(index, frozen, root, verified):
         config = Path(entry['config'])
         expected_observer = run_root / run_id / 'observer'
         workspace = run_root / run_id / 'workspace'
-        require(config.resolve(strict=True) == expected_observer / 'run.json', 'retained config is outside assigned run')
+        require(config.resolve() == expected_observer / 'run.json', 'retained config is outside assigned run')
         archived_config = observer / 'run.json'
-        require(r0.digest(config) == r0.digest(archived_config), 'original and archived assignment differ')
+        if config.exists():
+            require(r0.digest(config) == r0.digest(archived_config), 'original and archived assignment differ')
         manifest = read(archived_config)
         require(manifest.get('run_id') == run_id and manifest.get('permission_overrides') == {},
                 'retained assignment identity or native permissions differ')
@@ -88,9 +97,13 @@ def validate_prefix(index, frozen, root, verified):
                 and original_qualification.get('config_sha256') == r0.digest(archived_config)
                 and original_qualification.get('native_trace_sha256') == r0.digest(trace),
                 'archived qualification bindings differ')
-        treatment = {'status': 'verified', **r1.audit_treatment(frozen, manifest, trace, verified)}
+        retained = {'retained_observer': observer} if frozen.get('common_context') else {}
+        treatment = {'status': 'verified', **r1.audit_treatment(frozen, manifest, trace, verified, **retained)}
+        treatment_path = Path(entry.get('treatment_result', observer / 'treatment.json'))
+        if 'treatment_result' in entry:
+            require(r0.digest(treatment_path) == entry['treatment_result_sha256'], 'retained treatment bytes differ')
         require(result.get('treatment_validity') == treatment
-                and read(observer / 'treatment.json') == treatment, 'retained tool catalog is unverified or differs')
+                and read(treatment_path) == treatment, 'retained tool catalog is unverified or differs')
         qualified_path = Path(entry['qualification_result'])
         require(r0.digest(qualified_path) == entry['qualification_result_sha256'], 'corrected qualification bytes differ')
         qualified = read(qualified_path)
@@ -126,6 +139,73 @@ def validate_prefix(index, frozen, root, verified):
     return run_root
 
 
+def record_results(entry, observer):
+    for label, relative in [('evaluation', 'evaluation/result.json'),
+                            ('qualification', 'qualification/result.json'),
+                            ('replay', 'replay/oracle.json'), ('treatment', 'treatment.json')]:
+        path = observer / relative
+        if path.is_file():
+            entry[label + '_result'] = str(path)
+            entry[label + '_result_sha256'] = r0.digest(path)
+
+
+def recover_tail(index, index_path, frozen, root, verified, amendment):
+    """Reprocess a closed observer failure from its immutable archive, never rerun it."""
+    runs = index['runs']
+    require(runs, 'no retained assignment to reprocess')
+    original = runs[-1]
+    execution = original.get('execution', {})
+    require(execution.get('status') == 'closed' and execution.get('exit_code') == 0,
+            'retained attempt did not close successfully; cannot reprocess or rerun')
+    validate_prefix(index, frozen, root, verified, completed_count=len(runs) - 1)
+    run_id = frozen['schedule'][len(runs) - 1]['run_id']
+    archive = root / 'archived-runs' / run_id
+    require(Path(original.get('archive', '')).resolve() == archive.resolve() and archive.is_dir(),
+            'complete original archive is required for reprocessing')
+    observer = archive / 'observer'
+    for relative in ('run.json', 'execution.json', 'source-before.json', 'qualification/result.json',
+                     'qualification/native-rollout.jsonl', 'qualification/source-after.json'):
+        require((observer / relative).is_file(), 'cannot reprocess: missing archived ' + relative)
+    require(read(observer / 'execution.json') == execution, 'archived execution differs')
+    qualified = read(observer / 'qualification/result.json')
+    require(qualified.get('status') == 'qualified_observations'
+            and qualified.get('accounting', {}).get('usage_status') == 'known',
+            'cannot reprocess incomplete or unknown original qualification')
+    threads = set(verified['threads']) | {entry.get('execution', {}).get('thread_id') for entry in runs[:-1]}
+    thread = execution.get('thread_id')
+    require(isinstance(thread, str) and thread and thread not in threads, 'missing or duplicate retained session')
+    config = observer / 'run.json'
+    derived = root / 'reprocessed' / run_id / uuid.uuid4().hex
+    derived.parent.mkdir(parents=True, exist_ok=True)
+    history = root / 'index-history'
+    history.mkdir(exist_ok=True)
+    checkpoint = history / ('execution-index-' + uuid.uuid4().hex + '.json')
+    shutil.copyfile(index_path, checkpoint)
+    try:
+        result = r1.evaluate(config, observer / 'qualification/native-rollout.jsonl', thread,
+                             amendment=amendment, retained_observer=observer, output=derived)
+        replay = r1.replay(config, derived / 'replay', retained_observer=observer)
+        require(all(replay.get(key) == result.get(key) for key in
+                    ('run_id', 'source_identity', 'oracle_sha256', 'correct', 'changes', 'unexpected_changes')),
+                'independent replay differs')
+        entry = copy.deepcopy(original)
+        entry.update(evaluation=result, replay_matches=True,
+                     recovery={'original_index': str(checkpoint), 'original_index_sha256': r0.digest(checkpoint)})
+        entry.pop('evidence_error', None)
+        entry.pop('archive_error', None)
+        record_results(entry, derived)
+        candidate = copy.deepcopy(index)
+        candidate['runs'][-1] = entry
+        validate_prefix(candidate, frozen, root, verified)
+    except Exception as exc:
+        derived.mkdir(parents=True, exist_ok=True)
+        write_json(derived / 'recovery-error.json', {'status': 'blocked', 'run_id': run_id,
+                   'error': f'{type(exc).__name__}: {exc}', 'original_index': str(checkpoint)})
+        raise ValueError(f'retained reprocessing failed; no native retry: {exc}; evidence: {derived}') from exc
+    write_json(index_path, candidate)
+    return candidate
+
+
 def run(freeze, gate, amendment, root, *, resume=False, check_only=False,
         availability_gate: Path | None = None):
     frozen = r1.read_freeze(freeze, amendment=amendment)
@@ -138,7 +218,15 @@ def run(freeze, gate, amendment, root, *, resume=False, check_only=False,
     if resume:
         require(index_path.is_file(), 'resume requires retained execution index')
         index = read(index_path)
-        run_root = validate_prefix(index, frozen, root, verified)
+        try:
+            run_root = validate_prefix(index, frozen, root, verified)
+        except (ValueError, OSError):
+            tail = index.get('runs', [])[-1] if index.get('runs') else {}
+            if check_only or not tail or not (tail.get('evidence_error') or tail.get('archive_error')
+                                            or not tail.get('evaluation')):
+                raise
+            index = recover_tail(index, index_path, frozen, root, verified, amendment)
+            run_root = validate_prefix(index, frozen, root, verified)
     else:
         require(not index_path.exists() and not (root / 'archived-runs').exists(),
                 'existing execution index/archive requires --resume')
@@ -152,20 +240,22 @@ def run(freeze, gate, amendment, root, *, resume=False, check_only=False,
     if run_root is None:
         run_root = Path(tempfile.mkdtemp(prefix='loci-r1-native-', dir='/private/tmp'))
         index['run_root'] = str(run_root)
+    run_root.mkdir(parents=True, exist_ok=True)
     index['status'] = 'running'
     index.pop('blocker_run', None)
     write_json(index_path, index)
     for scheduled in pending:
         run_id = scheduled['run_id']
-        manifest = r1.prepare(freeze, run_id, run_root / run_id, amendment=amendment,
-                              availability_gate=availability_gate)
-        config = Path(manifest['observer']) / 'run.json'
+        config = run_root / run_id / 'observer/run.json'
         entry = {'run_id': run_id, 'config': str(config)}
         result = None
+        index['runs'].append(entry)
+        write_json(index_path, index)
         try:
+            manifest = r1.prepare(freeze, run_id, run_root / run_id, amendment=amendment,
+                                  availability_gate=availability_gate)
             execution = r1.execute(config, gate, amendment=amendment, availability_gate=availability_gate)
             entry['execution'] = execution
-            index['runs'].append(entry)
             write_json(index_path, index)
             print(json.dumps({'run_id': run_id, 'execution_status': execution['status'],
                               'thread_id': execution['thread_id']}), flush=True)
@@ -183,21 +273,20 @@ def run(freeze, gate, amendment, root, *, resume=False, check_only=False,
                               'usage': result['accounting']['usage_status']}), flush=True)
         except Exception as exc:
             entry['evidence_error'] = f'{type(exc).__name__}: {exc}'
-            if not index['runs'] or index['runs'][-1] is not entry:
-                execution_path = Path(manifest['observer']) / 'execution.json'
-                entry['execution'] = read(execution_path) if execution_path.exists() else {'status': 'execution_exception'}
-                index['runs'].append(entry)
+            execution_path = config.parent / 'execution.json'
+            if 'execution' not in entry:
+                entry['execution'] = {'status': 'execution_exception'}
+                if execution_path.exists():
+                    try:
+                        entry['execution'] = read(execution_path)
+                    except (OSError, ValueError) as marker_error:
+                        entry['execution_error'] = f'{type(marker_error).__name__}: {marker_error}'
         archive = root / 'archived-runs' / run_id
         try:
             archive.parent.mkdir(exist_ok=True)
             shutil.copytree(run_root / run_id, archive)
             entry['archive'] = str(archive)
-            for label, relative in [('evaluation', 'evaluation/result.json'),
-                                    ('qualification', 'qualification/result.json'), ('replay', 'replay/oracle.json')]:
-                result_path = archive / 'observer' / relative
-                if result_path.exists():
-                    entry[label + '_result'] = str(result_path)
-                    entry[label + '_result_sha256'] = r0.digest(result_path)
+            record_results(entry, archive / 'observer')
         except Exception as exc:
             entry['archive_error'] = f'{type(exc).__name__}: {exc}'
         # Wrong answers remain valid outcomes. Missing native/accounting/archive
@@ -229,10 +318,19 @@ def run(freeze, gate, amendment, root, *, resume=False, check_only=False,
 def background(args, root):
     """Submit this runner once to the normal macOS user host; never fork Codex here."""
     frozen = r1.read_freeze(args.freeze, amendment=args.amendment)
-    if not args.preflight_only:
-        run(args.freeze, args.gate, args.amendment, root, resume=args.resume, check_only=True)
-    elif (root / 'availability/gate.json').exists():
-        r1.require_availability(frozen, root / 'availability/gate.json')
+    availability_gate = getattr(args, 'availability_gate', None) or root / 'availability/gate.json'
+    if args.resume:
+        run(args.freeze, args.gate, args.amendment, root, resume=True, check_only=True,
+            availability_gate=availability_gate)
+    else:
+        require(read(args.gate).get('status') == 'passed', 'deterministic gate must pass before execution')
+        if availability_gate.exists():
+            verified = r1.require_availability(frozen, availability_gate)
+            require(r0.digest(args.gate) == verified['deterministic_gate_sha256'],
+                    'availability gate belongs to another deterministic gate')
+        if not args.preflight_only:
+            require(not (root / 'execution-index.json').exists() and not (root / 'archived-runs').exists(),
+                    'existing execution index/archive requires --resume')
     folder = root.resolve() / 'background'
     folder.mkdir(parents=True, exist_ok=False)
     label = 'loci.r1.' + uuid.uuid4().hex
@@ -241,6 +339,8 @@ def background(args, root):
             '--output-root', str(root.resolve())]
     if args.amendment:
         argv += ['--amendment', str(args.amendment.resolve())]
+    if getattr(args, 'availability_gate', None):
+        argv += ['--availability-gate', str(args.availability_gate.resolve())]
     for flag in ('resume', 'preflight_only'):
         if getattr(args, flag):
             argv.append('--' + flag.replace('_', '-'))
@@ -278,8 +378,20 @@ def main(argv=None):
     parser.add_argument('--resume', action='store_true')
     parser.add_argument('--check-only', action='store_true')
     parser.add_argument('--background', action='store_true')
+    parser.add_argument('--availability-gate', type=Path)
+    parser.add_argument('--reprocess', action='store_true',
+                        help='Reprocess retained availability evidence only; never launch native work')
     args = parser.parse_args(argv)
     root = args.output_root if args.output_root is not None else args.freeze.parent
+    if args.reprocess:
+        if args.resume or args.check_only or args.preflight_only or args.background:
+            parser.error('--reprocess cannot be combined with execution or preflight flags')
+        destination = root / 'reprocessed-availability' / uuid.uuid4().hex
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        result = r1.reprocess_availability(args.freeze, args.gate,
+            args.availability_gate or root / 'availability/gate.json', destination, amendment=args.amendment)
+        print(json.dumps(result), flush=True)
+        return result
     if args.preflight_only and (args.check_only or args.resume):
         parser.error('--preflight-only cannot be combined with --check-only or --resume')
     if args.background:
@@ -290,7 +402,14 @@ def main(argv=None):
         return result
     if not args.check_only and not args.resume:
         try:
-            preflight = r1.preflight(args.freeze, args.gate, root / 'availability', amendment=args.amendment)
+            if args.availability_gate is None:
+                preflight = r1.preflight(args.freeze, args.gate, root / 'availability', amendment=args.amendment)
+            else:
+                frozen = r1.read_freeze(args.freeze, amendment=args.amendment)
+                verified = r1.require_availability(frozen, args.availability_gate)
+                require(r0.digest(args.gate) == verified['deterministic_gate_sha256'],
+                        'availability gate belongs to another deterministic gate')
+                preflight = read(args.availability_gate)
         except Exception as exc:
             root.mkdir(parents=True, exist_ok=True)
             rejected = {'status': 'blocked', 'stage': 'native_preflight', 'measured': False,
@@ -306,7 +425,7 @@ def main(argv=None):
             print(json.dumps(preflight), flush=True)
             return preflight
     result = run(args.freeze, args.gate, args.amendment, root,
-                 resume=args.resume, check_only=args.check_only)
+                 resume=args.resume, check_only=args.check_only, availability_gate=args.availability_gate)
     print(json.dumps(result), flush=True)
     return result
 

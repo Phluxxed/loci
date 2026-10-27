@@ -25,7 +25,8 @@ def test_background_submits_exact_runner_and_retains_host_rejection(tmp_path, mo
     args = argparse.Namespace(freeze=tmp_path / 'freeze.json', gate=tmp_path / 'gate.json',
                               amendment=tmp_path / 'amendment.json', resume=True, preflight_only=False)
     result = module['background'](args, tmp_path)
-    assert validations == [{'resume': True, 'check_only': True}]
+    assert validations == [{'resume': True, 'check_only': True,
+                            'availability_gate': tmp_path / 'availability/gate.json'}]
     assert result['status'] == ('submitted' if exit_code == 0 else 'blocked')
     assert len(calls) == 1 and calls[0][0][:2] == ['/bin/launchctl', 'bootstrap']
     assert calls[0][1].get('shell') is None

@@ -1,0 +1,92 @@
+{
+  "kind": "r1-capture-and-recovery-repair",
+  "measured": false,
+  "freeze_sha256": "36fe5f559905891e4079eaa6a81aeeaa8623c4e21420183683ef72ecc5803c04",
+  "freeze_file_sha256": "ccb052e4e5f0972955c2252fa5dcc12696d5f84a898ab64ec9fc731aea43628b",
+  "amendment_sha256": "32c72ba04d3704a6ea6c19db16add1ddb59636dee41694ad7ee397fa3219b3bb",
+  "model": "gpt-6.1-terra",
+  "effort": "max",
+  "scheduled_assignments": 16,
+  "scored_attempts": 0,
+  "tests": {
+    "tests": 251.0,
+    "errors": 0.0,
+    "failures": 0.0,
+    "skipped": 0.0,
+    "time": 37.877
+  },
+  "offline_runner_integration": {
+    "tests": 4,
+    "real_components": [
+      "freeze validation",
+      "preflight gate",
+      "prepare",
+      "native accounting",
+      "source and treatment checks",
+      "independent Node oracle",
+      "replay",
+      "archive and resume"
+    ],
+    "simulated_components": [
+      "native process and session delivery"
+    ],
+    "fault_injection": [
+      "checkpoint interruption",
+      "reader failure"
+    ],
+    "outcome": "passed; four probes and sixteen assignments, archive-only resume and independent replay; no repeated native delivery"
+  },
+  "operator_native_smoke": {
+    "status": "passed",
+    "common_count": 619,
+    "common_sha256": "d2462af6eae864f3a9c4c9e7504edf4c84d39bbdbee49b98238ddf74601860c5",
+    "retained_bytes": 882508,
+    "file_sha256": "4fa125607d3ee00b9e2283c973c9c1cdeffd38a09f73562d9ea76cc77588700c",
+    "raw_native_slice_sha256": "8228edfe4c63faaa99d84fe314870ed374a1cd47d13f87081f6b8980cf7b5ea1",
+    "native_access": {
+      "apply_patch": true,
+      "exec_command": true
+    },
+    "limitation": "Existing operator session; not a fresh top-level pilot or tool-availability probe."
+  },
+  "actual_retained_probes": [
+    {
+      "condition": "native",
+      "thread_id": "01a17cea-ce0f-73b2-a1d7-663d113d00e6",
+      "qualification": "qualified_observations",
+      "usage": "known",
+      "raw_replay_matches": true
+    },
+    {
+      "condition": "path-only",
+      "thread_id": "01a17ceb-71fb-7cd1-a2c5-84180f70a79d",
+      "qualification": "qualified_observations",
+      "usage": "known",
+      "raw_replay_matches": true
+    },
+    {
+      "condition": "integrated",
+      "thread_id": "01a17cec-d519-7171-8eab-f9fb8099d11d",
+      "qualification": "qualified_observations",
+      "usage": "known",
+      "raw_replay_matches": true
+    },
+    {
+      "condition": "eager",
+      "thread_id": "01a17cee-4aa2-7ea2-8880-7565215c6655",
+      "qualification": "qualified_observations",
+      "usage": "known",
+      "raw_replay_matches": true
+    }
+  ],
+  "legacy_drift_rejection": "rendered common startup context differs across availability probes: {\"eager\": {\"catalog_differ\": true, \"instructions_differ\": false}}",
+  "legacy_v2_reprocess": {
+    "status": "failed",
+    "error": "reader reprocessing: ValueError: legacy probes retained only catalog hashes, not the full catalog; cannot reconstruct or qualify capture v2"
+  },
+  "protected_original_files_verified": 26,
+  "protected_original_bytes_unchanged": true,
+  "fresh_output_root_unused": true,
+  "live_top_level_qualification": "pending; no native CLI or model launch during repair",
+  "publication": "Private source, task inputs, full catalogs and raw native traces stay local in ignored real-repo-pilot directory."
+}

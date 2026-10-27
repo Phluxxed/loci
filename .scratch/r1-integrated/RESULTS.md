@@ -1,4 +1,18 @@
-# Current real-source pilot: four operational checks pass, scoring blocked
+# Current real-source pilot: capture and recovery repaired; live qualification pending
+
+The [capture/recovery repair](capture-recovery-repair.md) passes 251 tests,
+including the actual four-probe/16-assignment runner with synthetic native
+delivery and real grading/replay. Its exact catalog capture also passed through
+real native helpers in the operator session. An explicit measurement-prefix
+amendment retains full catalogs and checks native write/readback. Archive-only
+resume and reader-only recovery preserve completed sessions and original errors.
+The original freeze and failed archives remain unchanged. Fresh normal-Terminal
+qualification and all 16 real-source scored assignments remain pending. No
+architecture or semantic-benefit result is claimed.
+
+---
+
+# Prior real-source preflight: four operational checks pass, scoring blocked
 
 The replacement Kaggle pilot has no scored results. All four native operational
 probes passed with known usage and matching actual instructions/native schemas.

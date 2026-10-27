@@ -9,6 +9,7 @@ import hashlib
 import json
 import math
 import re
+import shlex
 from copy import deepcopy
 from pathlib import Path
 
@@ -140,6 +141,96 @@ def context_policy(root_agents_md: str | None = None) -> dict:
             "instruction_updates": "reject"}
 
 
+def capture_policy(root_agents_md: str | None = None) -> dict:
+    """Explicit measurement-only successor; legacy freezes retain their policy."""
+    result = context_policy(root_agents_md)
+    result.update(schema="r1-common-context-v2", catalog_program="capture_program(catalog_destination)",
+                  measured_prefix="capture_prefix(catalog_destination)",
+                  common_catalog_export="private common-tool-catalog.json plus bounded count and SHA-256 receipt",
+                  catalog_capture={"filename": "common-tool-catalog.json", "encoding": "UTF-8 JSON.stringify plus LF",
+                                   "writer": "apply_patch", "readback": "isolated standard-library Python"})
+    return result
+
+
+def _capture_destination(destination: Path) -> Path:
+    destination = Path(destination)
+    if not destination.is_absolute() or destination.name != "common-tool-catalog.json" or "\n" in str(destination) or "\r" in str(destination):
+        raise ValueError("catalog destination must be an absolute common-tool-catalog.json path")
+    return destination
+
+
+def capture_check_command(destination: Path) -> str:
+    destination = _capture_destination(destination)
+    script = ("import hashlib,json,sys; "
+              "raw=open(sys.argv[1],'rb').read(); "
+              "assert raw.endswith(b'\\n'), 'catalog requires final LF'; "
+              "values=json.loads(raw); "
+              "assert isinstance(values,list), 'catalog must be an array'; "
+              "print(json.dumps({'count':len(values),'sha256':hashlib.sha256(raw[:-1]).hexdigest()},separators=(',',':')))")
+    return "python3 -I -c " + shlex.quote(script) + " " + shlex.quote(str(destination))
+
+
+def capture_program(destination: Path) -> str:
+    """Snapshot before native calls; keep complete descriptions out of output."""
+    destination = _capture_destination(destination)
+    setup = COMMON_CATALOG_PROGRAM.rsplit("text(", 1)[0]
+    return (setup
+            + "const serialized = JSON.stringify(common);\n"
+            + "const destination = " + json.dumps(str(destination)) + ";\n"
+            + 'try { await tools.apply_patch("*** Begin Patch\\n*** Add File: " + destination + "\\n+" + serialized + "\\n*** End Patch"); }\n'
+            + 'catch (_) { throw new Error("Catalog capture failed: native apply_patch could not write the observer artifact"); }\n'
+            + "let readback;\n"
+            + "try { readback = await tools.exec_command({cmd: " + json.dumps(capture_check_command(destination))
+            + ', max_output_tokens: 2000}); }\n'
+            + 'catch (_) { throw new Error("Catalog capture failed: native exec_command readback was unavailable"); }\n'
+            + 'if (!readback || readback.exit_code !== 0 || typeof readback.output !== "string") '
+            + 'throw new Error("Catalog capture failed: isolated Python readback did not exit successfully");\n'
+            + 'let verified; try { verified = JSON.parse(readback.output); } '
+            + 'catch (_) { throw new Error("Catalog capture failed: readback was not a bounded JSON receipt"); }\n'
+            + 'const fingerprint = sha256(serialized);\n'
+            + 'if (!verified || Object.keys(verified).sort().join(",") !== "count,sha256" '
+            + '|| verified.count !== common.length || verified.sha256 !== fingerprint) '
+            + 'throw new Error("Catalog capture failed: retained bytes differ from the first-call registry");\n'
+            + 'text({loci_runtime_catalog_v1: names, common_runtime_catalog_v1: {count: common.length, sha256: fingerprint}, '
+            + 'native_access_v1: {apply_patch: true, exec_command: true}});')
+
+
+def capture_prefix(destination: Path) -> str:
+    return ("The measurement step authorizes the exact observer file write and readback below. "
+            "Task edit restrictions apply to the task workspace, not this observer artifact.\n"
+            + COMMON_MEASURED_PREFIX.replace(COMMON_CATALOG_PROGRAM, capture_program(destination)).replace(
+                "it does not print the full catalog.",
+                "it retains a private observer artifact and does not print the full catalog."))
+
+
+def _catalog_artifact(path: Path) -> tuple[bytes, list[dict]]:
+    try:
+        raw = Path(path).read_bytes()
+        values = json.loads(raw.decode("utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise ValueError("retained common catalog artifact is missing or malformed") from exc
+    if (not raw.endswith(b"\n") or not isinstance(values, list) or not values
+            or any(not isinstance(t, dict) or set(t) != {"name", "description"}
+                   or not isinstance(t["name"], str) or not t["name"] or not isinstance(t["description"], str)
+                   or re.search(r"^mcp__loci__|(?:^|__)loci_[A-Za-z0-9_]+$", t["name"]) for t in values)):
+        raise ValueError("retained common catalog artifact has invalid metadata")
+    names = [t["name"] for t in values]
+    if names != sorted(set(names), key=lambda name: name.encode("utf-16-be", errors="surrogatepass")):
+        raise ValueError("retained common catalog artifact must be sorted and unique")
+    return raw, values
+
+
+def catalog_difference(left_path: Path, right_path: Path) -> dict:
+    _, left = _catalog_artifact(left_path)
+    _, right = _catalog_artifact(right_path)
+    left = {t["name"]: t["description"] for t in left}
+    right = {t["name"]: t["description"] for t in right}
+    digest = lambda description: hashlib.sha256(description.encode("utf-8", errors="surrogatepass")).hexdigest()
+    return {"added": sorted(right.keys() - left.keys()), "removed": sorted(left.keys() - right.keys()),
+            "changed": [{"name": name, "left_sha256": digest(left[name]), "right_sha256": digest(right[name])}
+                        for name in sorted(left.keys() & right.keys()) if left[name] != right[name]]}
+
+
 def policy() -> dict:
     return {"schema": "loci-native-availability-v1", "catalog_program": CATALOG_PROGRAM,
             "measured_prefix": MEASURED_PREFIX, "probe_files": dict(PROBE_FILES),
@@ -195,7 +286,7 @@ def _rows(trace: Path) -> tuple[bytes, list[dict]]:
     return raw, rows
 
 
-def _catalog_output(output: object, *, common_context: bool = False) -> dict:
+def _catalog_output(output: object, *, common_context: bool = False, capture: bool = False) -> dict:
     if isinstance(output, str):
         texts = [output]
     elif isinstance(output, list) and all(isinstance(b, dict) and b.get("type") == "input_text"
@@ -216,6 +307,8 @@ def _catalog_output(output: object, *, common_context: bool = False) -> dict:
                 keys = {"loci_runtime_catalog_v1"}
                 if common_context:
                     keys.add("common_runtime_catalog_v1")
+                if capture:
+                    keys.add("native_access_v1")
                 if set(value) != keys:
                     raise ValueError("malformed live catalog receipt")
                 receipts.append(value)
@@ -230,10 +323,65 @@ def _catalog_output(output: object, *, common_context: bool = False) -> dict:
                 or type(common["count"]) is not int or common["count"] <= 0
                 or not isinstance(common["sha256"], str) or not re.fullmatch(r"[a-f0-9]{64}", common["sha256"])):
             raise ValueError("common catalog must retain its count and full-description fingerprint")
+    if capture:
+        access = receipts[0]["native_access_v1"]
+        if (not isinstance(access, dict) or set(access) != {"apply_patch", "exec_command"}
+                or any(value is not True for value in access.values())):
+            raise ValueError("catalog capture lacks successful native access evidence")
     return receipts[0]
 
 
-def audit_catalog(trace: Path, expected_tools: list[str], *, common_context: bool = False) -> dict:
+def _audit_capture_events(events: list[tuple[str, dict]], destination: Path, raw: bytes) -> None:
+    """Allow exactly the declared write and isolated readback inside the first cell."""
+    expected_changes = {str(destination): {"type": "add", "content": raw.decode("utf-8")}}
+    expected_readback = {"count": len(json.loads(raw)), "sha256": hashlib.sha256(raw[:-1]).hexdigest()}
+    seen, completed, identities = set(), [], {}
+    for phase, item in events:
+        kind, identity = item["type"], item.get("id")
+        if kind == "CommandExecution" and completed != ["FileChange"]:
+            raise ValueError("catalog capture readback preceded its completed native write")
+        if (not isinstance(identity, str) or not identity or (phase, kind) in seen
+                or (kind in identities and identities[kind] != identity)
+                or (identity in identities.values() and identities.get(kind) != identity)):
+            raise ValueError("catalog capture has duplicated or unbound native operations")
+        identities[kind] = identity
+        seen.add((phase, kind))
+        if kind == "FileChange":
+            if item.get("changes") != expected_changes:
+                raise ValueError("catalog capture wrote an undeclared file or different bytes")
+        else:
+            command = item.get("command")
+            if (not isinstance(command, list) or len(command) != 3
+                    or command[0] not in {"/bin/zsh", "/bin/bash", "/bin/sh"}
+                    or command[1] not in {"-lc", "-c"} or command[2] != capture_check_command(destination)):
+                raise ValueError("catalog capture ran an undeclared native command")
+        if phase == "item_completed":
+            if item.get("status") != "completed":
+                raise ValueError("catalog capture native operation did not complete")
+            if kind == "FileChange":
+                if item.get("stderr") not in (None, ""):
+                    raise ValueError("catalog capture native write reported an error")
+            else:
+                try:
+                    checked = json.loads(item.get("aggregated_output", ""))
+                except (TypeError, json.JSONDecodeError) as exc:
+                    raise ValueError("catalog capture native readback has no JSON receipt") from exc
+                if type(item.get("exit_code")) is not int or item["exit_code"] != 0 or checked != expected_readback:
+                    raise ValueError("catalog capture native readback differs from retained bytes")
+            completed.append(kind)
+        elif (phase != "item_started" or ("item_completed", kind) in seen
+              or item.get("status") not in (None, "inProgress", "in_progress")):
+            raise ValueError("catalog capture native operation lifecycle is invalid")
+    if completed != ["FileChange", "CommandExecution"]:
+        raise ValueError("catalog capture requires exactly one native write followed by readback")
+
+
+def audit_catalog(trace: Path, expected_tools: list[str], *, common_context: bool = False,
+                  catalog_artifact: Path | None = None, catalog_destination: Path | None = None) -> dict:
+    capture = catalog_artifact is not None or catalog_destination is not None
+    if capture and (not common_context or catalog_artifact is None or catalog_destination is None):
+        raise ValueError("catalog capture requires common context, retained artifact and original destination")
+    fixed_program = capture_program(catalog_destination) if capture else COMMON_CATALOG_PROGRAM if common_context else CATALOG_PROGRAM
     expected = _expected(expected_tools)
     raw, rows = _rows(trace)
     calls = [(i, r["payload"]) for i, r in enumerate(rows)
@@ -244,7 +392,7 @@ def audit_catalog(trace: Path, expected_tools: list[str], *, common_context: boo
     index, call = calls[0]
     program = call.get("input") if call["type"] == "custom_tool_call" else call.get("arguments")
     if (call.get("name") not in {"exec", "functions.exec"} or not isinstance(program, str)
-            or program.strip() != (COMMON_CATALOG_PROGRAM if common_context else CATALOG_PROGRAM)):
+            or program.strip() != fixed_program):
         raise ValueError("first tool action is not the fixed live catalog program")
     identity = call.get("call_id")
     if not isinstance(identity, str) or not identity:
@@ -254,7 +402,7 @@ def audit_catalog(trace: Path, expected_tools: list[str], *, common_context: boo
     if any(p.get("name") in {"exec", "functions.exec"}
            and isinstance(p.get("input") if p["type"] == "custom_tool_call" else p.get("arguments"), str)
            and (p.get("input") if p["type"] == "custom_tool_call" else p.get("arguments")).strip()
-               == (COMMON_CATALOG_PROGRAM if common_context else CATALOG_PROGRAM)
+               == fixed_program
            for _, p in calls[1:]):
         raise ValueError("duplicated live catalog discovery")
     outputs = [(i, r["payload"]) for i, r in enumerate(rows)
@@ -263,15 +411,19 @@ def audit_catalog(trace: Path, expected_tools: list[str], *, common_context: boo
     if len(outputs) != 1 or outputs[0][0] <= index:
         raise ValueError("catalog lacks one joined native output")
     output_index, output = outputs[0]
+    capture_events = []
     for i, row in enumerate(rows[:output_index]):
         p = row["payload"]
         if (row.get("type") == "event_msg" and p.get("type") in {"item_started", "item_completed"}
                 and isinstance(p.get("item"), dict)
-                and p["item"].get("type") in {"McpToolCall", "CommandExecution"}):
-            raise ValueError("native task operation preceded catalog discovery")
+                and p["item"].get("type") in ({"McpToolCall", "CommandExecution", "FileChange"}
+                                             if capture else {"McpToolCall", "CommandExecution"})):
+            if not capture or i <= index or p["item"]["type"] == "McpToolCall":
+                raise ValueError("native task operation preceded catalog discovery")
+            capture_events.append((p["type"], p["item"]))
         if i > index and row.get("type") == "response_item" and p.get("type") in {"function_call", "custom_tool_call"}:
             raise ValueError("another tool action preceded catalog receipt")
-    receipt = _catalog_output(output.get("output"), common_context=common_context)
+    receipt = _catalog_output(output.get("output"), common_context=common_context, capture=capture)
     names = receipt["loci_runtime_catalog_v1"]
     if names != expected:
         raise ValueError("live catalog differs from expected tool set")
@@ -279,11 +431,21 @@ def audit_catalog(trace: Path, expected_tools: list[str], *, common_context: boo
               "trace_sha256": hashlib.sha256(raw).hexdigest()}
     if common_context:
         result["common_catalog"] = receipt["common_runtime_catalog_v1"]
+    if capture:
+        artifact_raw, values = _catalog_artifact(catalog_artifact)
+        common = result["common_catalog"]
+        if len(values) != common["count"] or hashlib.sha256(artifact_raw[:-1]).hexdigest() != common["sha256"]:
+            raise ValueError("retained common catalog artifact differs from first native receipt")
+        _audit_capture_events(capture_events, catalog_destination, artifact_raw)
+        result["catalog_artifact"] = {"filename": catalog_destination.name,
+                                      "sha256": hashlib.sha256(artifact_raw).hexdigest(), "bytes": len(artifact_raw)}
+        result["native_access_v1"] = receipt["native_access_v1"]
     return result
 
 
 def audit_common_context(trace: Path, workspace: Path, observer: Path,
-                         prompt: str, expected_tools: list[str]) -> dict:
+                         prompt: str, expected_tools: list[str], *, catalog_artifact: Path | None = None,
+                         catalog_destination: Path | None = None) -> dict:
     """Retain actual ordered instruction parts and native schemas, never headings alone.
 
     Startup includes same-turn typed hooks assembled before the first model
@@ -293,7 +455,8 @@ def audit_common_context(trace: Path, workspace: Path, observer: Path,
     """
     from .accounting import _native_bootstrap_user
 
-    catalog = audit_catalog(trace, expected_tools, common_context=True)
+    catalog = audit_catalog(trace, expected_tools, common_context=True,
+                            catalog_artifact=catalog_artifact, catalog_destination=catalog_destination)
     _, rows = _rows(trace)
     paths = {str(workspace): "{{r1.workspace}}", str(observer): "{{r1.observer}}"}
     if (len(paths) != 2 or any(not Path(path).is_absolute() for path in paths)
@@ -485,9 +648,11 @@ def _proof(packet: dict, node_id: str) -> None:
 
 def audit_probe(trace: Path, accounting: dict, condition: str, repo: Path,
                 expected_tools: list[str], *, fixture: Path | None = None,
-                common_context: bool = False) -> dict:
+                common_context: bool = False, catalog_artifact: Path | None = None,
+                catalog_destination: Path | None = None) -> dict:
     _condition(condition, expected_tools)
-    catalog = audit_catalog(trace, expected_tools, common_context=common_context)
+    catalog = audit_catalog(trace, expected_tools, common_context=common_context,
+                            catalog_artifact=catalog_artifact, catalog_destination=catalog_destination)
     _, rows = _rows(trace)
     for file, content in PROBE_FILES.items():
         try:

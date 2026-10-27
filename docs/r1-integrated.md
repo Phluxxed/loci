@@ -70,6 +70,10 @@ A [replacement using maintained repository source](../.scratch/r1-integrated/rea
 has qualified local inputs and a prospective gate for actual common instructions,
 native schemas and tool availability. All four operational probes passed, but
 [a common tool catalog mismatch](../.scratch/r1-integrated/catalog-drift-report.md)
-blocks scoring; none of its 16 assignments ran. New plans opt in with
-common_context=true; legacy freezes are preserved. Semantic/proof benefit remains
-unmeasured and advancement is on hold. This is not a production integration.
+blocked scoring. The [capture/recovery repair and current execution command](../.scratch/r1-integrated/capture-recovery-repair.md)
+retain full private catalogs, identify descriptor changes, and support archive-only
+resume and reader-only reprocessing. Its explicit measurement-prefix amendment
+preserves the original freeze and task inputs. The repair passes 251 tests and
+a real native-helper capture smoke check; fresh top-level qualification and all
+16 scored assignments remain pending. Semantic/proof benefit remains unmeasured
+and advancement is on hold. This is not a production integration.

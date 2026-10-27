@@ -192,7 +192,8 @@ def test_each_measured_trace_is_checked_before_oracle(host_gate, monkeypatch, ki
         'stages': [{'items': [{'type': 'UserMessage', 'content': [{'type': 'text', 'text': prompt}]}]}]}}
     monkeypatch.setattr(r0, 'qualify', lambda *a, **k: deepcopy(qualification))
     grades = []
-    def oracle(config, destination):
+    def oracle(config, destination, *, retained_observer=None):
+        assert retained_observer is None
         grades.append(config)
         destination.mkdir()
         return {'correct': True}
