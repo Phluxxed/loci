@@ -1,3 +1,5 @@
+**Validity correction:** actual native-host availability was never verified. The prior architecture recommendation is withdrawn; these are retained executions, not a qualified Loci comparison. See [correction](../availability-repair/validity-correction.json). Do not rerun the historical command.
+
 # R1 pilot: Terra 6.1 / max
 
 **Completed:** all 16 assignments are retained. See [results and recommendation](RESULTS.md). The command below is the original launch receipt; do not rerun completed assignments.

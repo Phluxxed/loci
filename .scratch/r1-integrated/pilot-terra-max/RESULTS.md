@@ -1,3 +1,13 @@
+# R1 native comparison: availability unverified; recommendation withdrawn
+
+The 16 Terra runs completed and their accounting and frozen grades remain retained. **They do not establish a valid Loci condition comparison:** no measured native-host check established that the assigned tools were discoverable and callable. The architecture recommendation previously derived from this comparison is withdrawn. Lack of tool use does not prove tool absence, particularly with deferred discovery.
+
+See the [validity correction](../availability-repair/validity-correction.json) and [availability repair](../availability-repair/README.md). The old scores are descriptive records only. Source/proof deterministic qualification remains separate and is not invalidated by this missing native-host gate.
+
+---
+
+## Prior report retained for history; comparative conclusions superseded
+
 # R1 native pilot completed: Terra 6.1 / max
 
 **Recommendation: revise; hold advancement.** The integrated implementation remains deterministically qualified, but this pilot provides no evidence that its optional semantics or focused proof improved agent work. None of the 16 agents discovered or invoked a Loci operation in recorded actions. Official completion scores differ, but the failed scores reflect nested answer representation or test-file allowlists rather than a demonstrated failure to acquire necessary source information. No candidate, evaluator, prompt, score or measured attempt was changed after execution.

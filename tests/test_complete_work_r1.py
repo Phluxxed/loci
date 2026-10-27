@@ -1,11 +1,12 @@
 """Prospective binding, native host command, and archived independent replay."""
 import json
+import hashlib
 from pathlib import Path
 import subprocess
 
 import pytest
 
-from benchmarks.complete_work import r0, r1
+from benchmarks.complete_work import availability, r0, r1
 from benchmarks.complete_work.evaluate import source_snapshot, write_json
 
 
@@ -28,7 +29,7 @@ def _freeze(tmp_path: Path) -> Path:
         tasks.append({'id':f'task-{number}', 'source':str(source),'prompt':str(prompt),
                       'oracle':str(oracle), 'criteria':{'allowed_changes':['answer.json']}})
     conditions = {name:{'command':'python','args':['-m','loci.integrated_mcp'],
-                         'env':{'LOCI_R1_STORE':'{store}'},'tools':['loci_retrieve','loci_read']}
+                         'env':{'LOCI_R1_STORE':'{store}'},'tools':availability.TOOLS_BY_CONDITION[name]}
                   for name in r1.CONDITIONS}
     plan = {'tasks':tasks,'native_config':str(config), 'conditions':conditions,
             'model':'gpt-6.1-sol','effort':'high',
@@ -38,6 +39,15 @@ def _freeze(tmp_path: Path) -> Path:
     write_json(plan_path,plan)
     r1.freeze(plan_path,tmp_path/'frozen')
     return tmp_path/'frozen/freeze.json'
+
+
+@pytest.fixture(autouse=True)
+def native_gate_for_existing_snapshot_unit_checks(monkeypatch):
+    # These existing tests isolate snapshots, pinning and the native launcher.
+    # Real fail-closed gate integration has separate no-bypass tests below.
+    monkeypatch.setattr(r1, 'require_availability', lambda frozen, gate: {
+        'path': '/unit-test-only/gate.json', 'sha256': 'f' * 64, 'threads': [],
+        'deterministic_gate_sha256': hashlib.sha256((json.dumps({'status': 'passed'}, indent=2, sort_keys=True) + '\n').encode()).hexdigest()})
 
 
 def test_freeze_is_balanced_and_source_copies_are_independent(tmp_path):
@@ -136,7 +146,7 @@ def _amended_freeze(tmp_path):
     path = _freeze(tmp_path)
     frozen = json.loads(path.read_text())
     name = str(Path(r1.__file__).with_name('accounting.py').resolve())
-    frozen['host']['orchestration_files'] = {name: '1' * 64}
+    frozen['host']['orchestration_files'][name] = '1' * 64
     frozen.pop('freeze_sha256')
     frozen['freeze_sha256'] = r1.identity(frozen)
     write_json(path, frozen)

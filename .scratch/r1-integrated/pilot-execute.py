@@ -5,7 +5,7 @@ from pathlib import Path
 import shutil
 import tempfile
 
-from benchmarks.complete_work import r0, r1
+from benchmarks.complete_work import availability, r0, r1
 from benchmarks.complete_work.evaluate import verify_snapshot, write_json
 
 
@@ -18,13 +18,14 @@ def require(condition, message):
         raise ValueError(message)
 
 
-def validate_prefix(index, frozen, root):
+def validate_prefix(index, frozen, root, verified):
     """Skip only completed assignments bound to retained, independently graded bytes."""
     require(index.get('freeze_sha256') == frozen['freeze_sha256'], 'index freeze differs')
+    require(index.get('availability_gate') == verified, 'index availability gate differs')
     runs = index.get('runs')
     require(isinstance(runs, list) and len(runs) <= len(frozen['schedule']), 'invalid retained prefix')
     run_root = Path(index['run_root']).resolve(strict=True)
-    threads = set()
+    threads = set(verified['threads'])
     for entry, scheduled in zip(runs, frozen['schedule']):
         run_id = scheduled['run_id']
         require(entry.get('run_id') == run_id, 'retained prefix differs from frozen schedule')
@@ -68,6 +69,8 @@ def validate_prefix(index, frozen, root):
         require(manifest['conditions']['freeze_sha256'] == frozen['freeze_sha256']
                 and manifest['r1']['argv'] == r1.command(frozen, scheduled['condition'], workspace, expected_observer),
                 'retained invocation or condition-local store differs')
+        require(manifest['r1'].get('availability_gate') == verified
+                and execution.get('availability_gate') == verified, 'retained availability gate differs')
         require(read(observer / 'execution.json') == execution, 'archived execution differs')
         original_qualification = read(observer / 'qualification/result.json')
         trace = observer / 'qualification/native-rollout.jsonl'
@@ -79,6 +82,10 @@ def validate_prefix(index, frozen, root):
                 and original_qualification.get('config_sha256') == r0.digest(archived_config)
                 and original_qualification.get('native_trace_sha256') == r0.digest(trace),
                 'archived qualification bindings differ')
+        treatment = {'status': 'verified', **availability.audit_catalog(
+            trace, frozen['conditions'][scheduled['condition']]['tools'])}
+        require(result.get('treatment_validity') == treatment
+                and read(observer / 'treatment.json') == treatment, 'retained tool catalog is unverified or differs')
         qualified_path = Path(entry['qualification_result'])
         require(r0.digest(qualified_path) == entry['qualification_result_sha256'], 'corrected qualification bytes differ')
         qualified = read(qualified_path)
@@ -114,18 +121,24 @@ def validate_prefix(index, frozen, root):
     return run_root
 
 
-def run(freeze, gate, amendment, root, *, resume=False, check_only=False):
+def run(freeze, gate, amendment, root, *, resume=False, check_only=False,
+        availability_gate: Path | None = None):
     frozen = r1.read_freeze(freeze, amendment=amendment)
     require(read(gate).get('status') == 'passed', 'deterministic gate must pass before execution')
+    availability_gate = availability_gate if availability_gate is not None else root / 'availability/gate.json'
+    verified = r1.require_availability(frozen, availability_gate)
+    require(r0.digest(gate) == verified['deterministic_gate_sha256'],
+            'availability gate belongs to another deterministic gate')
     index_path = root / 'execution-index.json'
     if resume:
         require(index_path.is_file(), 'resume requires retained execution index')
         index = read(index_path)
-        run_root = validate_prefix(index, frozen, root)
+        run_root = validate_prefix(index, frozen, root, verified)
     else:
         require(not index_path.exists() and not (root / 'archived-runs').exists(),
                 'existing execution index/archive requires --resume')
-        index = {'freeze_sha256': frozen['freeze_sha256'], 'runs': [], 'status': 'running'}
+        index = {'freeze_sha256': frozen['freeze_sha256'], 'availability_gate': verified,
+                 'runs': [], 'status': 'running'}
         run_root = None
     pending = frozen['schedule'][len(index['runs']):]
     if check_only:
@@ -139,12 +152,13 @@ def run(freeze, gate, amendment, root, *, resume=False, check_only=False):
     write_json(index_path, index)
     for scheduled in pending:
         run_id = scheduled['run_id']
-        manifest = r1.prepare(freeze, run_id, run_root / run_id, amendment=amendment)
+        manifest = r1.prepare(freeze, run_id, run_root / run_id, amendment=amendment,
+                              availability_gate=availability_gate)
         config = Path(manifest['observer']) / 'run.json'
         entry = {'run_id': run_id, 'config': str(config)}
         result = None
         try:
-            execution = r1.execute(config, gate, amendment=amendment)
+            execution = r1.execute(config, gate, amendment=amendment, availability_gate=availability_gate)
             entry['execution'] = execution
             index['runs'].append(entry)
             write_json(index_path, index)
@@ -203,14 +217,26 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--freeze', type=Path, required=True)
     parser.add_argument('--gate', type=Path, required=True)
-    parser.add_argument('--amendment', type=Path, required=True)
+    parser.add_argument('--amendment', type=Path)
+    parser.add_argument('--output-root', type=Path)
+    parser.add_argument('--preflight-only', action='store_true')
     parser.add_argument('--resume', action='store_true')
     parser.add_argument('--check-only', action='store_true')
     args = parser.parse_args(argv)
-    result = run(args.freeze, args.gate, args.amendment, Path(__file__).resolve().parent / 'pilot',
+    root = args.output_root if args.output_root is not None else args.freeze.parent
+    if args.preflight_only and (args.check_only or args.resume):
+        parser.error('--preflight-only cannot be combined with --check-only or --resume')
+    if not args.check_only and not args.resume:
+        preflight = r1.preflight(args.freeze, args.gate, root / 'availability', amendment=args.amendment)
+        if args.preflight_only or preflight.get('status') != 'passed':
+            print(json.dumps(preflight), flush=True)
+            return preflight
+    result = run(args.freeze, args.gate, args.amendment, root,
                  resume=args.resume, check_only=args.check_only)
     print(json.dumps(result), flush=True)
+    return result
 
 
 if __name__ == '__main__':
-    main()
+    outcome = main()
+    raise SystemExit(0 if outcome['status'] in {'complete', 'checked', 'passed'} else 1)

@@ -10,10 +10,12 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
+import tempfile
 import time
 
-from . import r0
+from . import availability, r0
 from .evaluate import restore_snapshot, source_snapshot, verify_snapshot, write_json
 
 
@@ -43,6 +45,12 @@ def freeze(plan_path: Path, destination: Path) -> dict:
         raise ValueError("all four conditions required")
     if set(plan["native_protection"]) != set(r0.PROTECTION_FIELDS):
         raise ValueError("complete existing native protection evidence required")
+    host = dict(plan["host"])
+    pins = dict(host.get("orchestration_files", {}))
+    for name in ("r0.py", "r1.py", "accounting.py", "evaluate.py", "availability.py"):
+        source = Path(__file__).with_name(name).resolve()
+        pins[str(source)] = r0.digest(source)
+    host["orchestration_files"] = pins
     destination = destination.resolve()
     destination.mkdir(parents=True, exist_ok=False)
     tasks = []
@@ -66,7 +74,7 @@ def freeze(plan_path: Path, destination: Path) -> dict:
              "native_protection": plan["native_protection"],
              "native_config": plan["native_config"],
              "native_config_sha256": r0.digest(Path(plan["native_config"])),
-             "host": plan["host"], "conditions": plan["conditions"],
+             "host": host, "conditions": plan["conditions"],
              "tasks": tasks, "measurements": MEASUREMENTS,
              "timeout_seconds": plan.get("timeout_seconds", 600),
              "schedule": [{"run_id": f"{task['id']}-{CONDITIONS[c]}",
@@ -76,7 +84,7 @@ def freeze(plan_path: Path, destination: Path) -> dict:
                           "secondary": "elapsed and observed tokens per correct task",
                           "unknowns": "retain; never impute missing usage as zero",
                           "claims": "small constructed-task pilot; no population generalization"},
-             "measured": False}
+             "availability": availability.policy(), "measured": False}
     bound["freeze_sha256"] = identity(bound)
     write_json(destination / "freeze.json", bound)
     return bound
@@ -154,14 +162,126 @@ def command(frozen: dict, condition: str, workspace: Path, observer: Path) -> li
                           "mcp_servers.loci.enabled_tools": settings["tools"]})
         for key, value in settings["env"].items():
             overrides["mcp_servers.loci.env." + key] = value.replace("{store}", str(observer / "loci-store"))
+        if frozen.get("availability"):
+            overrides["mcp_servers.loci.required"] = True
     for key, value in overrides.items():
         argv.extend(["-c", key + "=" + json.dumps(value)])
     return argv + ["-"]
 
 
+def _protocol(frozen: dict) -> None:
+    if frozen.get("availability") != availability.policy():
+        raise ValueError("native-host availability protocol is missing or changed; use a new freeze")
+    for name in ("r0.py", "r1.py", "accounting.py", "evaluate.py", "availability.py"):
+        source = Path(__file__).with_name(name).resolve()
+        if str(source) not in frozen["host"].get("orchestration_files", {}):
+            raise ValueError("native-host availability implementation is not pinned to this freeze")
+    for condition, tools in availability.TOOLS_BY_CONDITION.items():
+        if set(frozen["conditions"][condition]["tools"]) != set(tools):
+            raise ValueError("condition tool set differs from native-host availability protocol")
+
+
+def measured_prompt(frozen: dict, task: dict, condition: str) -> str:
+    _protocol(frozen)
+    return (availability.MEASURED_PREFIX + "Expected tools: "
+            + json.dumps(frozen["conditions"][condition]["tools"])
+            + "\n\nOriginal task follows:\n" + task["prompt"])
+
+
+def _verify_native_prompt(accounting: dict, expected: str) -> None:
+    messages = [item for stage in accounting.get("stages", []) for item in stage.get("items", [])
+                if item.get("type") == "UserMessage"]
+    if len(messages) != 1:
+        raise ValueError("native availability session must contain exactly one task message")
+    parts = messages[0].get("content")
+    if (not isinstance(parts, list) or any(not isinstance(part, dict) or not isinstance(part.get("text"), str)
+                                          for part in parts)
+            or "".join(part["text"] for part in parts) != expected):
+        raise ValueError("native task message differs from submitted frozen prompt")
+
+
+def require_availability(frozen: dict, gate: Path | None) -> dict:
+    """Recheck retained native-host evidence, not a passed flag or model assertion."""
+    _protocol(frozen)
+    if gate is None or not gate.is_file():
+        raise ValueError("verified native-host availability gate is required before measured work")
+    result = json.loads(gate.read_text())
+    if (result.get("kind") != "r1-native-host-availability" or result.get("status") != "passed"
+            or result.get("freeze_sha256") != frozen["freeze_sha256"]
+            or result.get("deterministic_gate_sha256") is None):
+        raise ValueError("native-host availability gate failed or belongs to another freeze")
+    probes = result.get("probes", [])
+    if len(probes) != 4 or {p.get("condition") for p in probes} != set(CONDITIONS):
+        raise ValueError("availability gate must verify all four conditions")
+    threads = set()
+    for probe in probes:
+        condition = probe["condition"]
+        files = probe["files"]
+        for record in files.values():
+            if r0.digest(Path(record["path"])) != record["sha256"]:
+                raise ValueError("availability evidence bytes changed")
+        manifest = json.loads(Path(files["config"]["path"]).read_text())
+        qualified = json.loads(Path(files["qualification"]["path"]).read_text())
+        executed = json.loads(Path(files["execution"]["path"]).read_text())
+        evidence = json.loads(Path(files["evidence"]["path"]).read_text())
+        thread = executed.get("thread_id")
+        if (not thread or thread in threads or executed.get("status") != "closed"
+                or executed.get("exit_code") != 0 or executed.get("measured") is not False
+                or executed.get("freeze_sha256") != frozen["freeze_sha256"]
+                or executed.get("gate_sha256") != result["deterministic_gate_sha256"]
+                or qualified.get("status") != "qualified_observations"
+                or qualified.get("thread_id") != thread
+                or qualified.get("config_sha256") != files["config"]["sha256"]
+                or qualified.get("native_trace_sha256") != files["trace"]["sha256"]
+                or qualified.get("source_before") != qualified.get("source_after")
+                or qualified.get("source_before") != manifest.get("source_identity")
+                or qualified.get("conditions") != manifest.get("conditions")
+                or manifest.get("native_config_sha256") != frozen["native_config_sha256"]
+                or qualified.get("native_config_sha256") != frozen["native_config_sha256"]
+                or manifest.get("permission_overrides") != {}
+                or manifest.get("conditions", {}).get("freeze_sha256") != frozen["freeze_sha256"]
+                or manifest["r1"].get("phase") != "availability"
+                or manifest["r1"].get("condition") != condition
+                or manifest["r1"]["argv"] != command(frozen, condition, Path(manifest["workspace"]), Path(manifest["observer"]))):
+            raise ValueError("availability probe assignment or qualification differs")
+        threads.add(thread)
+        # Use the archived fixture for byte checks, but preserve the original
+        # repository argument used by the actual native MCP calls.
+        workspace = Path(manifest["workspace"])
+        if Path(files["prompt"]["path"]).read_text() != availability.probe_prompt(
+                condition, workspace, frozen["conditions"][condition]["tools"]):
+            raise ValueError("native availability prompt differs from frozen protocol")
+        archived_workspace = Path(files["config"]["path"]).parent.parent / "workspace"
+        for name, content in availability.PROBE_FILES.items():
+            if (archived_workspace / name).read_bytes() != content.encode():
+                raise ValueError("archived availability fixture changed")
+        from .accounting import summarize_native
+        accounting = summarize_native(Path(files["trace"]["path"]), thread)
+        if (accounting != qualified["accounting"] or accounting.get("usage_status") != "known"
+                or accounting.get("native_errors") or not accounting.get("turn_contexts")):
+            raise ValueError("availability accounting differs from native trace")
+        _verify_native_prompt(accounting, availability.probe_prompt(
+            condition, workspace, frozen["conditions"][condition]["tools"]))
+        for context in accounting["turn_contexts"]:
+            if (context.get("model") != frozen["model"] or context.get("effort") != frozen["effort"]
+                    or context.get("cwd") != manifest["workspace"]
+                    or {field: context.get(field) for field in r0.PROTECTION_FIELDS} != frozen["native_protection"]):
+                raise ValueError("availability host settings differ")
+        # audit_probe checks fixture bytes as well. Retained probes are never
+        # silently remapped to live source: supply the retained fixture separately.
+        observed = availability.audit_probe(Path(files["trace"]["path"]), accounting,
+                                            condition, workspace, frozen["conditions"][condition]["tools"],
+                                            fixture=archived_workspace)
+        if observed != evidence:
+            raise ValueError("availability verdict differs from raw native evidence")
+    return {"path": str(gate.resolve()), "sha256": r0.digest(gate), "threads": sorted(threads),
+            "deterministic_gate_sha256": result["deterministic_gate_sha256"]}
+
+
 def prepare(freeze_path: Path, run_id: str, destination: Path,
-            *, amendment: Path | None = None) -> dict:
+            *, amendment: Path | None = None, availability_gate: Path | None = None) -> dict:
     frozen = read_freeze(freeze_path, amendment=amendment)
+    verified = require_availability(frozen, availability_gate)
     # The unchanged global SessionStart hook indexes any Git ancestor. An
     # exported source directory outside Git makes that hook take its existing
     # no-repository exit without changing hook settings or native permissions.
@@ -181,16 +301,18 @@ def prepare(freeze_path: Path, run_id: str, destination: Path,
                                       "freeze_sha256": frozen["freeze_sha256"]})
     observer, workspace = Path(manifest["observer"]), Path(manifest["workspace"])
     manifest["r1"] = {**scheduled, "freeze": str(freeze_path.resolve()),
-                      "argv": command(frozen, scheduled["condition"], workspace, observer)}
+                      "argv": command(frozen, scheduled["condition"], workspace, observer),
+                      "availability_gate": verified}
     if amendment is not None:
         manifest["r1"]["instrumentation_amendment"] = _amendment_record(amendment)
-    # Identical task text in all arms. Tool availability is host configuration.
-    (observer / "prompt.txt").write_text(task["prompt"])
+    # Identical discovery wrapper; original task text is unchanged in all arms.
+    (observer / "prompt.txt").write_text(measured_prompt(frozen, task, scheduled["condition"]))
     write_json(observer / "run.json", manifest)
     return manifest
 
 
-def execute(config: Path, gate: Path, *, amendment: Path | None = None) -> dict:
+def execute(config: Path, gate: Path, *, amendment: Path | None = None,
+            availability_gate: Path | None = None) -> dict:
     """Run exactly one fresh native thread; archive failure without substituting a run."""
     manifest = json.loads(config.read_text())
     frozen = read_freeze(Path(manifest["r1"]["freeze"]), amendment=amendment)
@@ -201,12 +323,28 @@ def execute(config: Path, gate: Path, *, amendment: Path | None = None) -> dict:
         raise ValueError("a passing deterministic qualification gate is required")
     if manifest["conditions"]["freeze_sha256"] != frozen["freeze_sha256"]:
         raise ValueError("run is not bound to this prospective freeze")
+    verified = require_availability(frozen, availability_gate)
+    if r0.digest(gate) != verified["deterministic_gate_sha256"]:
+        raise ValueError("deterministic gate differs from verified availability probes")
+    if manifest["r1"].get("availability_gate") != verified or manifest["r1"].get("phase") is not None:
+        raise ValueError("measured run availability gate differs from preparation")
     observer = Path(manifest["observer"])
     task = next(t for t in frozen["tasks"] if t["id"] == manifest["r1"]["task"])
-    if r0.digest(observer / "prompt.txt") != task["prompt_sha256"]:
+    if (observer / "prompt.txt").read_text() != measured_prompt(frozen, task, manifest["r1"]["condition"]):
         raise ValueError("run prompt changed after freeze")
     if manifest["r1"]["argv"] != command(frozen, manifest["r1"]["condition"], Path(manifest["workspace"]), observer):
         raise ValueError("native invocation changed after freeze")
+    return _execute_native(config, gate, frozen, measured=True, amendment=amendment)
+
+
+def _execute_native(config: Path, gate: Path, frozen: dict, *, measured: bool,
+                    amendment: Path | None = None) -> dict:
+    """One shared native launch path for unscored probes and gated measured runs."""
+    manifest = json.loads(config.read_text())
+    observer = Path(manifest["observer"])
+    marker = observer / "execution.json"
+    if marker.exists():
+        raise ValueError("run already attempted; no automatic retry")
     child_environment = dict(os.environ)
     for variable in ("OPENAI_API_KEY", "CODEX_API_KEY", "OPENAI_BASE_URL"):
         child_environment.pop(variable, None)
@@ -214,11 +352,10 @@ def execute(config: Path, gate: Path, *, amendment: Path | None = None) -> dict:
                            capture_output=True, text=True, check=False, env=child_environment)
     if login.returncode or "Logged in using ChatGPT" not in login.stdout + login.stderr:
         raise ValueError("existing ChatGPT subscription authentication required")
-    marker = observer / "execution.json"
-    if marker.exists():
-        raise ValueError("run already attempted; no automatic retry")
     record = {"run_id": manifest["run_id"], "status": "started", "gate_sha256": r0.digest(gate),
-              "freeze_sha256": frozen["freeze_sha256"], "measured": True}
+              "freeze_sha256": frozen["freeze_sha256"], "measured": measured}
+    if measured:
+        record["availability_gate"] = manifest["r1"]["availability_gate"]
     if amendment is not None:
         record["instrumentation_amendment"] = _amendment_record(amendment)
     write_json(marker, record)
@@ -242,6 +379,100 @@ def execute(config: Path, gate: Path, *, amendment: Path | None = None) -> dict:
             record["thread_id"] = event.get("thread_id")
     write_json(marker, record)
     return record
+
+
+def preflight(freeze_path: Path, deterministic_gate: Path, destination: Path,
+              *, amendment: Path | None = None) -> dict:
+    """Four unscored native sessions; never read a scored task or warm its store."""
+    frozen = read_freeze(freeze_path, amendment=amendment)
+    _protocol(frozen)
+    if json.loads(deterministic_gate.read_text()).get("status") != "passed":
+        raise ValueError("a passing deterministic qualification gate is required")
+    result_path = destination / "gate.json"
+    if result_path.exists():
+        verified = require_availability(frozen, result_path)
+        if r0.digest(deterministic_gate) != verified["deterministic_gate_sha256"]:
+            raise ValueError("deterministic gate differs from verified availability probes")
+        return json.loads(result_path.read_text())
+    destination.mkdir(parents=True, exist_ok=False)
+    result = {"kind": "r1-native-host-availability", "status": "running", "measured": False,
+              "freeze_sha256": frozen["freeze_sha256"], "probes": [],
+              "deterministic_gate_sha256": r0.digest(deterministic_gate)}
+    write_json(result_path, result)
+    run_root = Path(tempfile.mkdtemp(prefix="loci-r1-availability-", dir="/private/tmp"))
+    result["run_root"] = str(run_root)
+    write_json(result_path, result)
+    source = run_root / "fixture"
+    source.mkdir()
+    for name, content in availability.PROBE_FILES.items():
+        (source / name).write_text(content)
+    threads = set()
+    for condition in CONDITIONS:
+        run_id = "availability-" + condition
+        folder = run_root / run_id
+        entry = {"condition": condition, "status": "started"}
+        result["probes"].append(entry)
+        write_json(result_path, result)
+        try:
+            manifest = r0.prepare(source, folder, run_id=run_id,
+                                  arm="native" if condition == "native" else "loci",
+                                  native_config=Path(frozen["native_config"]),
+                                  conditions={"model": frozen["model"], "effort": frozen["effort"],
+                                              "native_protection": frozen["native_protection"],
+                                              "freeze_sha256": frozen["freeze_sha256"]})
+            observer, workspace = Path(manifest["observer"]), Path(manifest["workspace"])
+            config = observer / "run.json"
+            manifest["r1"] = {"phase": "availability", "condition": condition,
+                              "freeze": str(freeze_path.resolve()),
+                              "argv": command(frozen, condition, workspace, observer)}
+            (observer / "prompt.txt").write_text(availability.probe_prompt(
+                condition, workspace, frozen["conditions"][condition]["tools"]))
+            write_json(config, manifest)
+            executed = _execute_native(config, deterministic_gate, frozen, measured=False, amendment=amendment)
+            thread = executed["thread_id"]
+            if executed["status"] != "closed" or not thread or thread in threads:
+                raise ValueError("native availability probe failed to close as a fresh session")
+            threads.add(thread)
+            traces = list((Path.home() / ".codex/sessions").rglob("*" + thread + ".jsonl"))
+            if len(traces) != 1:
+                raise ValueError("unique native availability rollout unavailable")
+            qualified = r0.qualify(config, traces[0], thread_id=thread)
+            if qualified["status"] != "qualified_observations" or qualified["source_before"] != qualified["source_after"]:
+                raise ValueError("native availability probe was unqualified or modified its fixture")
+            _verify_native_prompt(qualified["accounting"], (observer / "prompt.txt").read_text())
+            evidence = availability.audit_probe(observer / "qualification/native-rollout.jsonl",
+                                               qualified["accounting"], condition, workspace,
+                                               frozen["conditions"][condition]["tools"])
+            write_json(observer / "availability.json", evidence)
+            entry.update(status="passed", thread_id=thread)
+        except Exception as exc:
+            entry.update(status="failed", error=f"{type(exc).__name__}: {exc}")
+            result["status"] = "failed"
+        finally:
+            # Retain even an incomplete probe. No replacement or automatic retry.
+            if folder.exists():
+                archive = destination / condition
+                shutil.copytree(folder, archive)
+                entry["archive"] = str(archive.resolve())
+                files = {"config": "run.json", "prompt": "prompt.txt", "execution": "execution.json",
+                         "qualification": "qualification/result.json",
+                         "trace": "qualification/native-rollout.jsonl", "evidence": "availability.json"}
+                entry["files"] = {label: {"path": str((archive / "observer" / relative).resolve()),
+                                                  "sha256": r0.digest(archive / "observer" / relative)}
+                                  for label, relative in files.items() if (archive / "observer" / relative).is_file()}
+            write_json(result_path, result)
+        print(json.dumps({"availability_condition": condition, "status": entry["status"],
+                          "thread_id": entry.get("thread_id"), "error": entry.get("error")}), flush=True)
+        if entry["status"] != "passed":
+            return result
+    result["status"] = "passed"
+    write_json(result_path, result)
+    try:
+        require_availability(frozen, result_path)
+    except Exception as exc:
+        result.update(status="failed", error=f"gate validation: {type(exc).__name__}: {exc}")
+        write_json(result_path, result)
+    return result
 
 
 def replay(config: Path, destination: Path) -> dict:
@@ -276,8 +507,24 @@ def evaluate(config: Path, trace: Path, thread_id: str,
     """Use R0's native accounting and independently grade the retained source copy."""
     manifest = json.loads(config.read_text())
     frozen = read_freeze(Path(manifest["r1"]["freeze"]), amendment=amendment)
+    _protocol(frozen)
+    gate_record = manifest["r1"].get("availability_gate", {})
+    verified = require_availability(frozen, Path(gate_record["path"]) if gate_record else None)
+    if verified != gate_record or thread_id in verified["threads"]:
+        raise ValueError("measured availability gate or fresh session differs")
     qualification = r0.qualify(config, trace, thread_id=thread_id)
     observer = Path(manifest["observer"])
+    try:
+        task = next(t for t in frozen["tasks"] if t["id"] == manifest["r1"]["task"])
+        _verify_native_prompt(qualification["accounting"], measured_prompt(frozen, task, manifest["r1"]["condition"]))
+        treatment = availability.audit_catalog(trace, frozen["conditions"][manifest["r1"]["condition"]]["tools"])
+        if qualification["status"] != "qualified_observations":
+            raise ValueError("native session qualification failed")
+    except ValueError as exc:
+        write_json(observer / "treatment.json", {"status": "invalid", "error": str(exc),
+                                                "native_trace_sha256": r0.digest(trace)})
+        raise ValueError("treatment invalid; no correctness grade: " + str(exc)) from exc
+    write_json(observer / "treatment.json", {"status": "verified", **treatment})
     oracle = replay(config, observer / "evaluation")
     result = {"run_id": manifest["run_id"], "condition": manifest["r1"]["condition"],
               "thread_id": thread_id, "freeze_sha256": frozen["freeze_sha256"],
@@ -289,6 +536,7 @@ def evaluate(config: Path, trace: Path, thread_id: str,
                                  "proof_requests": None, "status": "requires_captured_call_attribution"},
               "manual_review": "pending_arm_blinded_review", "measured": True,
               "instrumentation_amendment": _amendment_record(amendment),
+              "treatment_validity": {"status": "verified", **treatment},
               "limitations": qualification["limitations"][:3] + [
                   "Native tool availability follows unchanged host config; other MCP tools remain available.",
                   "Loci use, semantic/proof requests and evidence bytes require captured-call attribution; unavailable values remain unknown.",
@@ -310,6 +558,12 @@ def main() -> None:
     e = sub.add_parser("execute")
     e.add_argument("--config", type=Path, required=True)
     e.add_argument("--gate", type=Path, required=True)
+    e.add_argument("--availability-gate", type=Path, required=True)
+    p.add_argument("--availability-gate", type=Path, required=True)
+    probe = sub.add_parser("preflight")
+    probe.add_argument("--freeze", type=Path, required=True)
+    probe.add_argument("--gate", type=Path, required=True)
+    probe.add_argument("--destination", type=Path, required=True)
     q = sub.add_parser("evaluate")
     q.add_argument("--config", type=Path, required=True)
     q.add_argument("--trace", type=Path, required=True)
@@ -323,9 +577,13 @@ def main() -> None:
     if args.operation == "freeze":
         result = freeze(args.plan, args.destination)
     elif args.operation == "prepare":
-        result = prepare(args.freeze, args.run_id, args.destination, amendment=args.amendment)
+        result = prepare(args.freeze, args.run_id, args.destination, amendment=args.amendment,
+                         availability_gate=args.availability_gate)
     elif args.operation == "execute":
-        result = execute(args.config, args.gate, amendment=args.amendment)
+        result = execute(args.config, args.gate, amendment=args.amendment,
+                         availability_gate=args.availability_gate)
+    elif args.operation == "preflight":
+        result = preflight(args.freeze, args.gate, args.destination)
     elif args.operation == "evaluate":
         result = evaluate(args.config, args.trace, args.thread_id, amendment=args.amendment)
     else:
