@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import { pathToFileURL } from 'node:url';
+const root=process.argv[2];
+const answer=JSON.parse(fs.readFileSync(path.join(root,'answer.json'),'utf8'));
+assert.deepEqual(answer,{"registered_files": ["src/channels/audit.js", "src/channels/mail.js"], "selected_file": "src/channels/mail.js", "selected_output": "mail:hi", "unknown_kind_error": "unknown kind", "target_depends_on_runtime_kind": true, "legacy_reachable_from_dispatch": false});
+const load=async file => import(pathToFileURL(path.join(root,file)).href);
+const {dispatch}=await load('src/dispatch.js'); assert.equal(dispatch({kind:'mail',payload:' Hi '}),answer.selected_output); assert.equal(dispatch({kind:'audit',payload:3}),'audit:3'); assert.throws(()=>dispatch({kind:'legacy',payload:3}),{message:answer.unknown_kind_error}); assert.throws(()=>dispatch({kind:'toString',payload:3}),{message:answer.unknown_kind_error});
+console.log(JSON.stringify({status:'passed'}));

@@ -1,0 +1,1093 @@
+{
+  "schema_version": 1,
+  "kind": "r0-native-session-qualification",
+  "run_id": "receipt-location-eager",
+  "arm": "loci",
+  "thread_id": "01a17b2c-60b3-78e2-80d0-91f80ac0e779",
+  "status": "qualified_observations",
+  "measured": false,
+  "config_sha256": "62bcbb8a5afcf1fc9e29a39083cf2b5d425a8cf157d67d12197b5171e918a831",
+  "native_trace_sha256": "6699eceace6593e18d10419e430013c1d3d2f942a735014646af441291334b43",
+  "source_before": "06aa1c08236b174cf1a8c5d5d85722ae243698ca30dae62e347cfb0d8d3a3d17",
+  "source_after": "6594ff8615bfd07d44e1a4dc5e704ac775dee4ceee62b22c1bb523136807e719",
+  "conditions": {
+    "model": "gpt-6.1-terra",
+    "effort": "max",
+    "native_protection": {
+      "approval_policy": "on-request",
+      "approvals_reviewer": "auto_review",
+      "sandbox_policy": {
+        "type": "workspace-write",
+        "writable_roots": [
+          "/",
+          "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T"
+        ],
+        "network_access": true,
+        "exclude_tmpdir_env_var": false,
+        "exclude_slash_tmp": false
+      },
+      "permission_profile": {
+        "type": "managed",
+        "file_system": {
+          "type": "restricted",
+          "entries": [
+            {
+              "path": {
+                "type": "path",
+                "path": "/"
+              },
+              "access": "write"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/.claude"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/.claude/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/Downloads"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/Downloads/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/claude-otel"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/claude-otel/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/improvements"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/improvements/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/work"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/work/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "minimal"
+                }
+              },
+              "access": "read"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "tmpdir"
+                }
+              },
+              "access": "write"
+            }
+          ]
+        },
+        "network": "enabled"
+      },
+      "active_permission_profile": {
+        "id": "brummerv_filesystem_guard"
+      },
+      "file_system_sandbox_policy": {
+        "kind": "restricted",
+        "entries": [
+          {
+            "path": {
+              "type": "path",
+              "path": "/"
+            },
+            "access": "write"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/.claude"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/.claude/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/Downloads"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/Downloads/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/claude-otel"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/claude-otel/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/improvements"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/improvements/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/work"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/work/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "special",
+              "value": {
+                "kind": "minimal"
+              }
+            },
+            "access": "read"
+          },
+          {
+            "path": {
+              "type": "special",
+              "value": {
+                "kind": "tmpdir"
+              }
+            },
+            "access": "write"
+          }
+        ]
+      }
+    },
+    "freeze_sha256": "339b51aba273ae36fb56f0aac13ad6db9b33b128a476b9071149fd5e336fc91d"
+  },
+  "native_config_sha256": "98dd72e87fcde40d5f0fa78ea5d946a1f0fbf02976d334beacee080caea4a329",
+  "workspace": "/private/tmp/loci-r1-native-10k6jh6e/receipt-location-eager/workspace",
+  "observer": "/private/tmp/loci-r1-native-10k6jh6e/receipt-location-eager/observer",
+  "accounting": {
+    "schema_version": 1,
+    "accounting": "native-rollout-v1",
+    "thread_id": "01a17b2c-60b3-78e2-80d0-91f80ac0e779",
+    "stages": [
+      {
+        "stage_id": "turn-1",
+        "turn_id": "01a17b2c-6216-7d41-bc87-2a5bc965e62a",
+        "outcome": "completed",
+        "elapsed_ms": 32465,
+        "usage_status": "known",
+        "usage": {
+          "inputTokens": 98607,
+          "cachedInputTokens": 83840,
+          "outputTokens": 2583,
+          "reasoningOutputTokens": 1338,
+          "totalTokens": 101190,
+          "cacheWriteInputTokens": 0,
+          "uncachedInputTokens": 14767
+        },
+        "usage_updates": 4,
+        "observed_usage_delta": {
+          "inputTokens": 98607,
+          "cachedInputTokens": 83840,
+          "outputTokens": 2583,
+          "reasoningOutputTokens": 1338,
+          "totalTokens": 101190,
+          "cacheWriteInputTokens": 0
+        },
+        "usage_limitation": null,
+        "mcp_calls": 0,
+        "shell_calls": 6,
+        "file_change_calls": 0,
+        "context_compactions": 0,
+        "subagent_calls": 0,
+        "failed_shell_calls": 0,
+        "outer_tool_calls": 3,
+        "outer_tool_calls_status": "observed",
+        "model_requests": null,
+        "observed_completed_model_requests": 4,
+        "model_requests_status": "completion_lower_bound",
+        "upstream_responses": [
+          {
+            "threadId": "01a17b2c-60b3-78e2-80d0-91f80ac0e779",
+            "turnId": "01a17b2c-6216-7d41-bc87-2a5bc965e62a",
+            "responseId": "resp_07a5291c3722f8a4016ae00b5f836c8191aa1d75a950d3d3c9"
+          },
+          {
+            "threadId": "01a17b2c-60b3-78e2-80d0-91f80ac0e779",
+            "turnId": "01a17b2c-6216-7d41-bc87-2a5bc965e62a",
+            "responseId": "resp_07a5291c3722f8a4016ae00b6ae244819188fd841521a18b99"
+          },
+          {
+            "threadId": "01a17b2c-60b3-78e2-80d0-91f80ac0e779",
+            "turnId": "01a17b2c-6216-7d41-bc87-2a5bc965e62a",
+            "responseId": "resp_07a5291c3722f8a4016ae00b6df16481919a663f0f91af59d0"
+          },
+          {
+            "threadId": "01a17b2c-60b3-78e2-80d0-91f80ac0e779",
+            "turnId": "01a17b2c-6216-7d41-bc87-2a5bc965e62a",
+            "responseId": "resp_07a5291c3722f8a4016ae00b7c179c81918431558eaeb216a0"
+          }
+        ],
+        "first_event": {
+          "ordinal": 14,
+          "monotonic": null,
+          "utc": "2026-10-27T02:24:30.167Z"
+        },
+        "last_event": {
+          "ordinal": 52,
+          "monotonic": null,
+          "utc": "2026-10-27T02:25:01.017Z"
+        },
+        "operation_counts_status": "observed_items_only",
+        "items": [
+          {
+            "type": "UserMessage",
+            "id": "01a17b2c-67d5-7a40-9d27-572966525e0c",
+            "content": [
+              {
+                "type": "text",
+                "text": "Work only in the assigned workspace. Complete this assignment directly; do not delegate or spawn agents. Native file, search, shell and edit tools are available. Loci tools, when available, are optional; select them only if useful. Do not inspect sibling runs, observer folders, evaluator files, or other task copies. Do not change user/global configuration.\nWrite the requested structured result to answer.json. Do not add unrequested claims; cite exact relative source paths and symbols. Finish when the requested result and your directly relevant check are complete.\n\nA duplicate-invoice report mentions checkout's outbound Idempotency-Key. Locate the function that actually constructs that key, distinguish similarly named receipt helpers, and trace its route to the outbound header. Do not change source. Write answer.json with exactly these keys: owner_file, owner_symbol, outbound_file, outbound_symbol, call_chain (ordered symbols starting at checkout and ending at sendInvoice), example_key (accountId='acme', sequence=7).\n",
+                "text_elements": []
+              }
+            ],
+            "native_type": "UserMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:24:30.167Z",
+              "emitted_at_ms": 1793067870167,
+              "ordinal": 14,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_07a5291c3722f8a4016ae00b66c8e481918a1b98cd90eb1631",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:24:38.339Z",
+              "emitted_at_ms": 1793067878339,
+              "ordinal": 16,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_07a5291c3722f8a4016ae00b67e4bc819182bdf62b48dbb7b0",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:24:39.128Z",
+              "emitted_at_ms": 1793067879128,
+              "ordinal": 18,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "AgentMessage",
+            "id": "msg_07a5291c3722f8a4016ae00b67e4b881919c4d115fa799f941",
+            "content": [
+              {
+                "type": "Text",
+                "text": "I’ll trace the key from checkout through the invoice sender, then write and check the requested JSON without changing source files."
+              }
+            ],
+            "phase": "commentary",
+            "native_type": "AgentMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:24:39.515Z",
+              "emitted_at_ms": 1793067879515,
+              "ordinal": 20,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "commandExecution",
+            "id": "exec-2c545bf4-2615-438c-9f42-8606cad2563c",
+            "process_id": "74564",
+            "command": [
+              "/bin/zsh",
+              "-lc",
+              "rg -n -i 'idempotency|sendInvoice|checkout|receipt' . -g '!answer.json' -g '!node_modules' -g '!vendor'"
+            ],
+            "cwd": "file:///private/tmp/loci-r1-native-10k6jh6e/receipt-location-eager/workspace",
+            "parsed_cmd": [
+              {
+                "type": "search",
+                "cmd": "rg -n -i 'idempotency|sendInvoice|checkout|receipt' . -g '!answer.json' -g '!node_modules' -g '!vendor'",
+                "query": "idempotency|sendInvoice|checkout|receipt",
+                "path": "."
+              }
+            ],
+            "source": "unified_exec_startup",
+            "status": "completed",
+            "aggregated_output": "./src/reports/receipt.js:1:export function makeReceiptKey(row) { return `report:${row.id}`; }\n./src/billing/receipt.js:1:export function makeReceiptKey(invoice) {\n./src/billing/submit.js:1:import { makeReceiptKey } from './receipt.js';\n./src/billing/submit.js:2:import { sendInvoice } from '../transport/invoices.js';\n./src/billing/submit.js:4:  const key = makeReceiptKey(invoice);\n./src/billing/submit.js:5:  return sendInvoice(provider, invoice, key);\n./src/app.js:2:export async function checkout(invoice, provider) { return submitInvoice(invoice, provider); }\n./src/transport/invoices.js:1:export async function sendInvoice(provider, invoice, receiptKey) {\n./src/transport/invoices.js:2:  return provider.post('/invoices', invoice, { 'Idempotency-Key': receiptKey });\n./src/transport/receipt.js:1:export function makeReceiptKey(response) { return response.headers['x-receipt']; }\n",
+            "exit_code": 0,
+            "duration": {
+              "secs": 0,
+              "nanos": 6292
+            },
+            "native_type": "CommandExecution",
+            "exitCode": 0,
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:24:41.607Z",
+              "emitted_at_ms": 1793067881607,
+              "ordinal": 24,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "commandExecution",
+            "id": "exec-243ff9e1-b87f-46ac-bebc-0ea6a9bc446a",
+            "process_id": "16571",
+            "command": [
+              "/bin/zsh",
+              "-lc",
+              "pwd && rg --files -g '!answer.json' -g '!node_modules' -g '!vendor' | head -100"
+            ],
+            "cwd": "file:///private/tmp/loci-r1-native-10k6jh6e/receipt-location-eager/workspace",
+            "parsed_cmd": [
+              {
+                "type": "unknown",
+                "cmd": "pwd && rg --files -g '!answer.json' -g '!node_modules' -g '!vendor' | head -100"
+              }
+            ],
+            "source": "unified_exec_startup",
+            "status": "completed",
+            "aggregated_output": "/private/tmp/loci-r1-native-10k6jh6e/receipt-location-eager/workspace\nsrc/reports/receipt.js\nsrc/billing/receipt.js\nsrc/billing/retry.js\nsrc/billing/submit.js\nsrc/app.js\nsrc/transport/receipt.js\nsrc/transport/invoices.js\npackage.json\nREADME.md\n",
+            "exit_code": 0,
+            "duration": {
+              "secs": 0,
+              "nanos": 2375
+            },
+            "native_type": "CommandExecution",
+            "exitCode": 0,
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:24:41.617Z",
+              "emitted_at_ms": 1793067881617,
+              "ordinal": 25,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_07a5291c3722f8a4016ae00b6b7c948191853cfbc33bb4593e",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:24:42.676Z",
+              "emitted_at_ms": 1793067882676,
+              "ordinal": 28,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "commandExecution",
+            "id": "exec-1a3ded06-6779-4cc5-8aff-73adb9cb3a05",
+            "process_id": "46012",
+            "command": [
+              "/bin/zsh",
+              "-lc",
+              "for f in README.md package.json src/app.js src/billing/receipt.js src/billing/submit.js src/billing/retry.js src/transport/invoices.js src/transport/receipt.js src/reports/receipt.js; do printf '\\n%s\\n' \"$f\"; nl -ba \"$f\"; done"
+            ],
+            "cwd": "file:///private/tmp/loci-r1-native-10k6jh6e/receipt-location-eager/workspace",
+            "parsed_cmd": [
+              {
+                "type": "unknown",
+                "cmd": "for f in README.md package.json src/app.js src/billing/receipt.js src/billing/submit.js src/billing/retry.js src/transport/invoices.js src/transport/receipt.js src/reports/receipt.js; do printf '\\n%s\\n' \"$f\"; nl -ba \"$f\"; done"
+              }
+            ],
+            "source": "unified_exec_startup",
+            "status": "completed",
+            "aggregated_output": "\nREADME.md\n     1\tSmall inventory service fixture. No network or dependencies are required.\n\npackage.json\n     1\t{\"type\":\"module\",\"private\":true}\n\nsrc/app.js\n     1\timport { submitInvoice } from './billing/submit.js';\n     2\texport async function checkout(invoice, provider) { return submitInvoice(invoice, provider); }\n\nsrc/billing/receipt.js\n     1\texport function makeReceiptKey(invoice) {\n     2\t  return `invoice/${invoice.accountId}/${String(invoice.sequence).padStart(4, '0')}`;\n     3\t}\n\nsrc/billing/submit.js\n     1\timport { makeReceiptKey } from './receipt.js';\n     2\timport { sendInvoice } from '../transport/invoices.js';\n     3\texport async function submitInvoice(invoice, provider) {\n     4\t  const key = makeReceiptKey(invoice);\n     5\t  return sendInvoice(provider, invoice, key);\n     6\t}\n\nsrc/billing/retry.js\n     1\texport function retryDelay(attempt) { return Math.min(1000 * 2 ** attempt, 8000); }\n\nsrc/transport/invoices.js\n     1\texport async function sendInvoice(provider, invoice, receiptKey) {\n     2\t  return provider.post('/invoices', invoice, { 'Idempotency-Key': receiptKey });\n     3\t}\n\nsrc/transport/receipt.js\n     1\texport function makeReceiptKey(response) { return response.headers['x-receipt']; }\n\nsrc/reports/receipt.js\n     1\texport function makeReceiptKey(row) { return `report:${row.id}`; }\n",
+            "exit_code": 0,
+            "duration": {
+              "secs": 0,
+              "nanos": 15725667
+            },
+            "native_type": "CommandExecution",
+            "exitCode": 0,
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:24:44.673Z",
+              "emitted_at_ms": 1793067884673,
+              "ordinal": 32,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "commandExecution",
+            "id": "exec-7f7b07bc-eeef-479a-8fcf-10a3a8341be2",
+            "process_id": "17577",
+            "command": [
+              "/bin/zsh",
+              "-lc",
+              "ls -la && git status --short 2>/dev/null || true"
+            ],
+            "cwd": "file:///private/tmp/loci-r1-native-10k6jh6e/receipt-location-eager/workspace",
+            "parsed_cmd": [
+              {
+                "type": "unknown",
+                "cmd": "ls -la && git status --short 2>/dev/null || true"
+              }
+            ],
+            "source": "unified_exec_startup",
+            "status": "completed",
+            "aggregated_output": "total 16\ndrwxr-xr-x@ 5 brummerv  wheel  160 Oct 27 12:24 .\ndrwxr-xr-x@ 4 brummerv  wheel  128 Oct 27 12:24 ..\n-rw-r--r--@ 1 brummerv  wheel   74 Oct 27 12:24 README.md\n-rw-r--r--@ 1 brummerv  wheel   33 Oct 27 12:24 package.json\ndrwxr-xr-x@ 6 brummerv  wheel  192 Oct 27 12:24 src\n",
+            "exit_code": 0,
+            "duration": {
+              "secs": 0,
+              "nanos": 15632333
+            },
+            "native_type": "CommandExecution",
+            "exitCode": 0,
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:24:44.674Z",
+              "emitted_at_ms": 1793067884673,
+              "ordinal": 33,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_07a5291c3722f8a4016ae00b74cc4481919db4705d29e8bbd8",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:24:52.035Z",
+              "emitted_at_ms": 1793067892035,
+              "ordinal": 36,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_07a5291c3722f8a4016ae00b76901c8191a78bb2917ddf1ebb",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:24:53.783Z",
+              "emitted_at_ms": 1793067893783,
+              "ordinal": 38,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "AgentMessage",
+            "id": "msg_07a5291c3722f8a4016ae00b769bc88191b5f436b485ee1db6",
+            "content": [
+              {
+                "type": "Text",
+                "text": "The checkout path imports the billing receipt helper; the report and transport helpers with the same name are separate functions. I’ll record the qualified call sequence and verify the example against the outbound header."
+              }
+            ],
+            "phase": "commentary",
+            "native_type": "AgentMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:24:54.487Z",
+              "emitted_at_ms": 1793067894487,
+              "ordinal": 40,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "commandExecution",
+            "id": "exec-74a06e3f-7a37-4a10-82de-8916525dea1f",
+            "process_id": "99807",
+            "command": [
+              "/bin/zsh",
+              "-lc",
+              "cat > answer.json <<'EOF'\n{\n  \"owner_file\": \"src/billing/receipt.js\",\n  \"owner_symbol\": \"makeReceiptKey\",\n  \"outbound_file\": \"src/transport/invoices.js\",\n  \"outbound_symbol\": \"sendInvoice\",\n  \"call_chain\": [\n    \"src/app.js:checkout\",\n    \"src/billing/submit.js:submitInvoice\",\n    \"src/billing/receipt.js:makeReceiptKey\",\n    \"src/transport/invoices.js:sendInvoice\"\n  ],\n  \"example_key\": \"invoice/acme/0007\"\n}\nEOF"
+            ],
+            "cwd": "file:///private/tmp/loci-r1-native-10k6jh6e/receipt-location-eager/workspace",
+            "parsed_cmd": [
+              {
+                "type": "unknown",
+                "cmd": "cat > answer.json <<'EOF'\n{\n  \"owner_file\": \"src/billing/receipt.js\",\n  \"owner_symbol\": \"makeReceiptKey\",\n  \"outbound_file\": \"src/transport/invoices.js\",\n  \"outbound_symbol\": \"sendInvoice\",\n  \"call_chain\": [\n    \"src/app.js:checkout\",\n    \"src/billing/submit.js:submitInvoice\",\n    \"src/billing/receipt.js:makeReceiptKey\",\n    \"src/transport/invoices.js:sendInvoice\"\n  ],\n  \"example_key\": \"invoice/acme/0007\"\n}\nEOF"
+              }
+            ],
+            "source": "unified_exec_startup",
+            "status": "completed",
+            "aggregated_output": "",
+            "exit_code": 0,
+            "duration": {
+              "secs": 0,
+              "nanos": 2833
+            },
+            "native_type": "CommandExecution",
+            "exitCode": 0,
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:24:58.672Z",
+              "emitted_at_ms": 1793067898672,
+              "ordinal": 44,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "commandExecution",
+            "id": "exec-7c0f2a51-f81c-4feb-8278-959c4e37867c",
+            "process_id": "94597",
+            "command": [
+              "/bin/zsh",
+              "-lc",
+              "node --input-type=module <<'NODE'\nimport assert from 'node:assert/strict';\nimport { readFile } from 'node:fs/promises';\nimport { checkout } from './src/app.js';\nimport { makeReceiptKey } from './src/billing/receipt.js';\n\nconst answer = JSON.parse(await readFile('answer.json', 'utf8'));\nassert.deepEqual(Object.keys(answer), ['owner_file', 'owner_symbol', 'outbound_file', 'outbound_symbol', 'call_chain', 'example_key']);\nassert.deepEqual(answer.call_chain, ['src/app.js:checkout', 'src/billing/submit.js:submitInvoice', 'src/billing/receipt.js:makeReceiptKey', 'src/transport/invoices.js:sendInvoice']);\nconst invoice = { accountId: 'acme', sequence: 7 };\nlet sent;\nconst result = await checkout(invoice, { post: async (...args) => { sent = args; return 'sent'; } });\nassert.equal(result, 'sent');\nassert.equal(makeReceiptKey(invoice), answer.example_key);\nassert.deepEqual(sent, ['/invoices', invoice, { 'Idempotency-Key': answer.example_key }]);\nconsole.log('JSON structure and checkout outbound header verified');\nNODE"
+            ],
+            "cwd": "file:///private/tmp/loci-r1-native-10k6jh6e/receipt-location-eager/workspace",
+            "parsed_cmd": [
+              {
+                "type": "unknown",
+                "cmd": "node --input-type=module <<'NODE'\nimport assert from 'node:assert/strict';\nimport { readFile } from 'node:fs/promises';\nimport { checkout } from './src/app.js';\nimport { makeReceiptKey } from './src/billing/receipt.js';\n\nconst answer = JSON.parse(await readFile('answer.json', 'utf8'));\nassert.deepEqual(Object.keys(answer), ['owner_file', 'owner_symbol', 'outbound_file', 'outbound_symbol', 'call_chain', 'example_key']);\nassert.deepEqual(answer.call_chain, ['src/app.js:checkout', 'src/billing/submit.js:submitInvoice', 'src/billing/receipt.js:makeReceiptKey', 'src/transport/invoices.js:sendInvoice']);\nconst invoice = { accountId: 'acme', sequence: 7 };\nlet sent;\nconst result = await checkout(invoice, { post: async (...args) => { sent = args; return 'sent'; } });\nassert.equal(result, 'sent');\nassert.equal(makeReceiptKey(invoice), answer.example_key);\nassert.deepEqual(sent, ['/invoices', invoice, { 'Idempotency-Key': answer.example_key }]);\nconsole.log('JSON structure and checkout outbound header verified');\nNODE"
+              }
+            ],
+            "source": "unified_exec_startup",
+            "status": "completed",
+            "aggregated_output": "JSON structure and checkout outbound header verified\n",
+            "exit_code": 0,
+            "duration": {
+              "secs": 0,
+              "nanos": 3000
+            },
+            "native_type": "CommandExecution",
+            "exitCode": 0,
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:24:58.830Z",
+              "emitted_at_ms": 1793067898830,
+              "ordinal": 45,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_07a5291c3722f8a4016ae00b7ce6908191b15855c64df35e40",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:25:00.144Z",
+              "emitted_at_ms": 1793067900143,
+              "ordinal": 48,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "AgentMessage",
+            "id": "msg_07a5291c3722f8a4016ae00b7cf3c4819187561160b73b8908",
+            "content": [
+              {
+                "type": "Text",
+                "text": "Created [answer.json](/private/tmp/loci-r1-native-10k6jh6e/receipt-location-eager/workspace/answer.json). Verified the example key reaches the outbound `Idempotency-Key` header through `checkout`."
+              }
+            ],
+            "phase": "final_answer",
+            "native_type": "AgentMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:25:01.012Z",
+              "emitted_at_ms": 1793067901012,
+              "ordinal": 50,
+              "monotonic": null
+            }
+          }
+        ],
+        "raw_tool_calls": [
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_07a5291c3722f8a4016ae00b68530081919242b966589ce3eb",
+            "status": "completed",
+            "call_id": "call_8bc3ea7d7348435d92c7aebc0ec012ce",
+            "name": "exec",
+            "input": "const r = await Promise.allSettled([\n  tools.exec_command({cmd:\"pwd && rg --files -g '!answer.json' -g '!node_modules' -g '!vendor' | head -100\",workdir:\"/private/tmp/loci-r1-native-10k6jh6e/receipt-location-eager/workspace\",max_output_tokens:4000,yield_time_ms:10000}),\n  tools.exec_command({cmd:\"rg -n -i 'idempotency|sendInvoice|checkout|receipt' . -g '!answer.json' -g '!node_modules' -g '!vendor'\",\"workdir\":\"/private/tmp/loci-r1-native-10k6jh6e/receipt-location-eager/workspace\",max_output_tokens:12000,yield_time_ms:10000})\n]); for (let i=0;i<r.length;i++){let x=r[i];text(JSON.stringify({stage:i===0?\"workspace_files\":\"target_search\",status:x.status,...(x.status===\"fulfilled\"?{exit_code:x.value.exit_code,output:x.value.output}:{error:String(x.reason)})}));}\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b2c-6216-7d41-bc87-2a5bc965e62a",
+              "create_time": 1793067880.3264155
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b2c-9495-73a1-8966-ebfcdb7ce505",
+              "call_id": "call_8bc3ea7d7348435d92c7aebc0ec012ce",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"stage\":\"workspace_files\",\"status\":\"fulfilled\",\"exit_code\":0,\"output\":\"/private/tmp/loci-r1-native-10k6jh6e/receipt-location-eager/workspace\\nsrc/reports/receipt.js\\nsrc/billing/receipt.js\\nsrc/billing/retry.js\\nsrc/billing/submit.js\\nsrc/app.js\\nsrc/transport/receipt.js\\nsrc/transport/invoices.js\\npackage.json\\nREADME.md\\n\"}"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"stage\":\"target_search\",\"status\":\"fulfilled\",\"exit_code\":0,\"output\":\"./src/reports/receipt.js:1:export function makeReceiptKey(row) { return `report:${row.id}`; }\\n./src/billing/receipt.js:1:export function makeReceiptKey(invoice) {\\n./src/billing/submit.js:1:import { makeReceiptKey } from './receipt.js';\\n./src/billing/submit.js:2:import { sendInvoice } from '../transport/invoices.js';\\n./src/billing/submit.js:4:  const key = makeReceiptKey(invoice);\\n./src/billing/submit.js:5:  return sendInvoice(provider, invoice, key);\\n./src/app.js:2:export async function checkout(invoice, provider) { return submitInvoice(invoice, provider); }\\n./src/transport/invoices.js:1:export async function sendInvoice(provider, invoice, receiptKey) {\\n./src/transport/invoices.js:2:  return provider.post('/invoices', invoice, { 'Idempotency-Key': receiptKey });\\n./src/transport/receipt.js:1:export function makeReceiptKey(response) { return response.headers['x-receipt']; }\\n\"}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b2c-6216-7d41-bc87-2a5bc965e62a",
+                "create_time": 1793067881.621394
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_07a5291c3722f8a4016ae00b6b88d48191b82152e03173453b",
+            "status": "completed",
+            "call_id": "call_40c85ffc23b745b2a24b637645e0b094",
+            "name": "exec",
+            "input": "const r = await Promise.allSettled([\n  tools.exec_command({cmd:\"for f in README.md package.json src/app.js src/billing/receipt.js src/billing/submit.js src/billing/retry.js src/transport/invoices.js src/transport/receipt.js src/reports/receipt.js; do printf '\\\\n%s\\\\n' \\\"$f\\\"; nl -ba \\\"$f\\\"; done\",workdir:\"/private/tmp/loci-r1-native-10k6jh6e/receipt-location-eager/workspace\",max_output_tokens:6000,yield_time_ms:10000}),\n  tools.exec_command({cmd:\"ls -la && git status --short 2>/dev/null || true\",workdir:\"/private/tmp/loci-r1-native-10k6jh6e/receipt-location-eager/workspace\",max_output_tokens:1000,yield_time_ms:10000})\n]); for (let i=0;i<r.length;i++){let x=r[i];text(JSON.stringify({stage:i===0?\"source_trace\":\"workspace_state\",status:x.status,...(x.status===\"fulfilled\"?{exit_code:x.value.exit_code,output:x.value.output}:{error:String(x.reason)})}));}\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b2c-6216-7d41-bc87-2a5bc965e62a",
+              "create_time": 1793067883.5423033
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b2c-a086-76d2-ad22-da8e513b0ba8",
+              "call_id": "call_40c85ffc23b745b2a24b637645e0b094",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"stage\":\"source_trace\",\"status\":\"fulfilled\",\"exit_code\":0,\"output\":\"\\nREADME.md\\n     1\\tSmall inventory service fixture. No network or dependencies are required.\\n\\npackage.json\\n     1\\t{\\\"type\\\":\\\"module\\\",\\\"private\\\":true}\\n\\nsrc/app.js\\n     1\\timport { submitInvoice } from './billing/submit.js';\\n     2\\texport async function checkout(invoice, provider) { return submitInvoice(invoice, provider); }\\n\\nsrc/billing/receipt.js\\n     1\\texport function makeReceiptKey(invoice) {\\n     2\\t  return `invoice/${invoice.accountId}/${String(invoice.sequence).padStart(4, '0')}`;\\n     3\\t}\\n\\nsrc/billing/submit.js\\n     1\\timport { makeReceiptKey } from './receipt.js';\\n     2\\timport { sendInvoice } from '../transport/invoices.js';\\n     3\\texport async function submitInvoice(invoice, provider) {\\n     4\\t  const key = makeReceiptKey(invoice);\\n     5\\t  return sendInvoice(provider, invoice, key);\\n     6\\t}\\n\\nsrc/billing/retry.js\\n     1\\texport function retryDelay(attempt) { return Math.min(1000 * 2 ** attempt, 8000); }\\n\\nsrc/transport/invoices.js\\n     1\\texport async function sendInvoice(provider, invoice, receiptKey) {\\n     2\\t  return provider.post('/invoices', invoice, { 'Idempotency-Key': receiptKey });\\n     3\\t}\\n\\nsrc/transport/receipt.js\\n     1\\texport function makeReceiptKey(response) { return response.headers['x-receipt']; }\\n\\nsrc/reports/receipt.js\\n     1\\texport function makeReceiptKey(row) { return `report:${row.id}`; }\\n\"}"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"stage\":\"workspace_state\",\"status\":\"fulfilled\",\"exit_code\":0,\"output\":\"total 16\\ndrwxr-xr-x@ 5 brummerv  wheel  160 Oct 27 12:24 .\\ndrwxr-xr-x@ 4 brummerv  wheel  128 Oct 27 12:24 ..\\n-rw-r--r--@ 1 brummerv  wheel   74 Oct 27 12:24 README.md\\n-rw-r--r--@ 1 brummerv  wheel   33 Oct 27 12:24 package.json\\ndrwxr-xr-x@ 6 brummerv  wheel  192 Oct 27 12:24 src\\n\"}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b2c-6216-7d41-bc87-2a5bc965e62a",
+                "create_time": 1793067884.678426
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_07a5291c3722f8a4016ae00b774c0081919e3c00fbeeb55243",
+            "status": "completed",
+            "call_id": "call_2b37c7687ada47e682d1aa2923bab2cc",
+            "name": "exec",
+            "input": "const dir = \"/private/tmp/loci-r1-native-10k6jh6e/receipt-location-eager/workspace\";\nconst write = await tools.exec_command({\n  cmd: \"cat > answer.json <<'EOF'\\n{\\n  \\\"owner_file\\\": \\\"src/billing/receipt.js\\\",\\n  \\\"owner_symbol\\\": \\\"makeReceiptKey\\\",\\n  \\\"outbound_file\\\": \\\"src/transport/invoices.js\\\",\\n  \\\"outbound_symbol\\\": \\\"sendInvoice\\\",\\n  \\\"call_chain\\\": [\\n    \\\"src/app.js:checkout\\\",\\n    \\\"src/billing/submit.js:submitInvoice\\\",\\n    \\\"src/billing/receipt.js:makeReceiptKey\\\",\\n    \\\"src/transport/invoices.js:sendInvoice\\\"\\n  ],\\n  \\\"example_key\\\": \\\"invoice/acme/0007\\\"\\n}\\nEOF\",\n  workdir: dir, max_output_tokens: 1000, yield_time_ms: 10000\n});\ntext(JSON.stringify({stage:\"write_answer\",status:write.exit_code===0?\"ok\":\"error\",exit_code:write.exit_code,output:write.output}));\nif (write.exit_code!==0) exit();\nconst check = await tools.exec_command({\n  cmd: \"node --input-type=module <<'NODE'\\nimport assert from 'node:assert/strict';\\nimport { readFile } from 'node:fs/promises';\\nimport { checkout } from './src/app.js';\\nimport { makeReceiptKey } from './src/billing/receipt.js';\\n\\nconst answer = JSON.parse(await readFile('answer.json', 'utf8'));\\nassert.deepEqual(Object.keys(answer), ['owner_file', 'owner_symbol', 'outbound_file', 'outbound_symbol', 'call_chain', 'example_key']);\\nassert.deepEqual(answer.call_chain, ['src/app.js:checkout', 'src/billing/submit.js:submitInvoice', 'src/billing/receipt.js:makeReceiptKey', 'src/transport/invoices.js:sendInvoice']);\\nconst invoice = { accountId: 'acme', sequence: 7 };\\nlet sent;\\nconst result = await checkout(invoice, { post: async (...args) => { sent = args; return 'sent'; } });\\nassert.equal(result, 'sent');\\nassert.equal(makeReceiptKey(invoice), answer.example_key);\\nassert.deepEqual(sent, ['/invoices', invoice, { 'Idempotency-Key': answer.example_key }]);\\nconsole.log('JSON structure and checkout outbound header verified');\\nNODE\",\n  workdir: dir, max_output_tokens: 1000, yield_time_ms: 10000\n});\ntext(JSON.stringify({stage:\"verify_answer\",status:check.exit_code===0?\"ok\":\"error\",exit_code:check.exit_code,output:check.output}));\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b2c-6216-7d41-bc87-2a5bc965e62a",
+              "create_time": 1793067895.2988768
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b2c-d7d2-7130-85f5-2787befb05cf",
+              "call_id": "call_2b37c7687ada47e682d1aa2923bab2cc",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.3 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"stage\":\"write_answer\",\"status\":\"ok\",\"exit_code\":0,\"output\":\"\"}"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"stage\":\"verify_answer\",\"status\":\"ok\",\"exit_code\":0,\"output\":\"JSON structure and checkout outbound header verified\\n\"}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b2c-6216-7d41-bc87-2a5bc965e62a",
+                "create_time": 1793067898.834261
+              }
+            }
+          }
+        ],
+        "late_items_after_abort": 0,
+        "post_abort_cleanup_ms": null
+      }
+    ],
+    "usage_status": "known",
+    "usage": {
+      "inputTokens": 98607,
+      "cachedInputTokens": 83840,
+      "outputTokens": 2583,
+      "reasoningOutputTokens": 1338,
+      "totalTokens": 101190,
+      "cacheWriteInputTokens": 0,
+      "uncachedInputTokens": 14767
+    },
+    "observed_cumulative_usage": {
+      "inputTokens": 98607,
+      "cachedInputTokens": 83840,
+      "outputTokens": 2583,
+      "reasoningOutputTokens": 1338,
+      "totalTokens": 101190,
+      "cacheWriteInputTokens": 0
+    },
+    "usage_errors": [],
+    "capture_errors": [],
+    "operation_totals": {
+      "mcp_calls": 0,
+      "shell_calls": 6,
+      "file_change_calls": 0,
+      "context_compactions": 0,
+      "subagent_calls": 0,
+      "failed_shell_calls": 0
+    },
+    "phase_groups": {},
+    "limitations": [
+      "Usage updates are not proven model-request counts; unique raw response completions are a lower bound that may omit failed upstream requests/retries.",
+      "Raw outer-call availability is explicit; nested operation counts are distinct.",
+      "Behavioral quality and rework attribution require the independent oracle/review.",
+      "MCP source/delivery receipts are joined separately; item presence is not model reliance."
+    ],
+    "native_provenance": {
+      "rollout_path": "/private/tmp/loci-r1-native-10k6jh6e/receipt-location-eager/observer/qualification/native-rollout.jsonl",
+      "session_id": "01a17b2c-60b3-78e2-80d0-91f80ac0e779",
+      "cwd": "/private/tmp/loci-r1-native-10k6jh6e/receipt-location-eager/workspace",
+      "cli_version": "0.164.0",
+      "source": "exec",
+      "thread_source": "user",
+      "bootstrap_message_rows": [
+        7
+      ]
+    },
+    "turn_contexts": [
+      {
+        "turn_id": "01a17b2c-6216-7d41-bc87-2a5bc965e62a",
+        "cwd": "/private/tmp/loci-r1-native-10k6jh6e/receipt-location-eager/workspace",
+        "model": "gpt-6.1-terra",
+        "effort": "max",
+        "approval_policy": "on-request",
+        "approvals_reviewer": "auto_review",
+        "sandbox_policy": {
+          "type": "workspace-write",
+          "writable_roots": [
+            "/",
+            "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T"
+          ],
+          "network_access": true,
+          "exclude_tmpdir_env_var": false,
+          "exclude_slash_tmp": false
+        },
+        "permission_profile": {
+          "type": "managed",
+          "file_system": {
+            "type": "restricted",
+            "entries": [
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/"
+                },
+                "access": "write"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/.claude"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/.claude/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/Downloads"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/Downloads/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/claude-otel"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/claude-otel/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/improvements"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/improvements/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/work"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/work/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "special",
+                  "value": {
+                    "kind": "minimal"
+                  }
+                },
+                "access": "read"
+              },
+              {
+                "path": {
+                  "type": "special",
+                  "value": {
+                    "kind": "tmpdir"
+                  }
+                },
+                "access": "write"
+              }
+            ]
+          },
+          "network": "enabled"
+        },
+        "active_permission_profile": {
+          "id": "brummerv_filesystem_guard"
+        },
+        "file_system_sandbox_policy": {
+          "kind": "restricted",
+          "entries": [
+            {
+              "path": {
+                "type": "path",
+                "path": "/"
+              },
+              "access": "write"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/.claude"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/.claude/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/Downloads"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/Downloads/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/claude-otel"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/claude-otel/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/improvements"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/improvements/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/work"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/work/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "minimal"
+                }
+              },
+              "access": "read"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "tmpdir"
+                }
+              },
+              "access": "write"
+            }
+          ]
+        }
+      }
+    ],
+    "native_errors": []
+  },
+  "errors": [],
+  "limitations": [
+    "Experimental separation uses independent source copies and fresh native sessions; no additional access-control layer.",
+    "Native-only navigation is an audited instruction policy, not a hidden-tool capability boundary.",
+    "Observed response usage does not prove complete billing or invisible upstream retry accounting.",
+    "This readback neither launches nor authorizes a measured pilot; independent grading and a prospective freeze remain necessary."
+  ]
+}

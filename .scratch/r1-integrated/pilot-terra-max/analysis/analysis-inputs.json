@@ -1,0 +1,28 @@
+{
+  "freeze_sha256": "339b51aba273ae36fb56f0aac13ad6db9b33b128a476b9071149fd5e336fc91d",
+  "execution_index_sha256": "c92e3d8eb453eab777fffe7e067cdff48e8811d5d5ef81bbb8cd5ec4c66a29e6",
+  "runs": 16,
+  "arm_blinding": "Randomized opaque case order and source/answer/oracle packets omit condition labels, telemetry and native traces. Reviewer is instructed not to inspect key or index. All scores remain frozen.",
+  "delegations": [
+    {
+      "task": "archive_replay",
+      "scope": "analysis/independent-replay only; existing r1 replay on remapped archived observer, hash and closed trace checks",
+      "model": "configured default",
+      "effort": "high",
+      "fork": "none",
+      "acceptance": "16 unchanged frozen-oracle outcomes agree, source and config/trace hashes validate; no model or MCP launch",
+      "result_locator": "analysis/independent-replay/summary.json",
+      "primary_disposition": "adopted: all16 independent replays and native trace readbacks match; preserve runtime=False/billing limits"
+    },
+    {
+      "task": "blinded_result_review",
+      "scope": "analysis/blinded packets; output analysis/manual-review.json only",
+      "model": "configured default",
+      "effort": "high",
+      "fork": "none",
+      "acceptance": "all 16 reviewed against prompts/source and frozen exact oracle; distinguish substantive misses, format strictness and hidden allowlist constraints; no scoring changes or model/MCP launch",
+      "result_locator": "analysis/manual-review.json",
+      "primary_disposition": "adopted: all16 blinded source/behavior checks complete; retain unchanged official score and prompt/schema/allowlist qualifications"
+    }
+  ]
+}

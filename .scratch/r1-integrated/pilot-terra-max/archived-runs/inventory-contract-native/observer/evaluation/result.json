@@ -1,0 +1,1074 @@
+{
+  "run_id": "inventory-contract-native",
+  "condition": "native",
+  "thread_id": "01a17b2f-2bed-7ba1-9c54-3e44e85c1d18",
+  "freeze_sha256": "339b51aba273ae36fb56f0aac13ad6db9b33b128a476b9071149fd5e336fc91d",
+  "source_identity": "0afb28b5f34a3b18c1baba3ed0727c5bfec94ea688508234cda362aa6040411b",
+  "oracle_sha256": "cd98dad14bb8877d725339bbc7ff46ffcb9b22ed6231b185c000026ddf19363e",
+  "changes": [
+    "answer.json"
+  ],
+  "unexpected_changes": [],
+  "correct": false,
+  "oracle_stdout": "",
+  "oracle_stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n    files: [\n+     {\n+       path: 'src/entry.js',\n+       symbol: 'importStock'\n+     },\n+     {\n+       path: 'src/input/csv.js',\n+       symbol: 'parseStock'\n+     },\n+     {\n+       path: 'src/domain/stock.js',\n+       symbol: 'normalizeStock'\n+     },\n+     {\n+       path: 'src/domain/sku.js',\n+       symbol: 'canonicalSku'\n+     },\n+     {\n+       path: 'src/output/wire.js',\n+       symbol: 'wireStock'\n+     }\n-     'src/entry.js',\n-     'src/input/csv.js',\n-     'src/domain/stock.js',\n-     'src/domain/sku.js',\n-     'src/output/wire.js'\n    ],\n    invalid_numeric: 'invalid count',\n    output: {\n      product_code: 'AB-2',\n      schema: 2,\n\n    at file:///Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/frozen-final/inventory-contract/oracle.mjs:7:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:569:25)\n    at async node:internal/modules/esm/loader:650:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: {\n    files: [\n      { path: 'src/entry.js', symbol: 'importStock' },\n      { path: 'src/input/csv.js', symbol: 'parseStock' },\n      { path: 'src/domain/stock.js', symbol: 'normalizeStock' },\n      { path: 'src/domain/sku.js', symbol: 'canonicalSku' },\n      { path: 'src/output/wire.js', symbol: 'wireStock' }\n    ],\n    output: { product_code: 'AB-2', units: 0, schema: 2 },\n    invalid_numeric: 'invalid count',\n    reserved_applied_before_clamp: true\n  },\n  expected: {\n    files: [\n      'src/entry.js',\n      'src/input/csv.js',\n      'src/domain/stock.js',\n      'src/domain/sku.js',\n      'src/output/wire.js'\n    ],\n    output: { product_code: 'AB-2', units: 0, schema: 2 },\n    invalid_numeric: 'invalid count',\n    reserved_applied_before_clamp: true\n  },\n  operator: 'deepStrictEqual',\n  diff: 'simple'\n}\n\nNode.js v26.5.0\n",
+  "qualification_status": "qualified_observations",
+  "accounting": {
+    "schema_version": 1,
+    "accounting": "native-rollout-v1",
+    "thread_id": "01a17b2f-2bed-7ba1-9c54-3e44e85c1d18",
+    "stages": [
+      {
+        "stage_id": "turn-1",
+        "turn_id": "01a17b2f-2d2f-7521-b397-9b05b0db1a54",
+        "outcome": "completed",
+        "elapsed_ms": 33516,
+        "usage_status": "known",
+        "usage": {
+          "inputTokens": 121278,
+          "cachedInputTokens": 95872,
+          "outputTokens": 2528,
+          "reasoningOutputTokens": 1381,
+          "totalTokens": 123806,
+          "cacheWriteInputTokens": 0,
+          "uncachedInputTokens": 25406
+        },
+        "usage_updates": 5,
+        "observed_usage_delta": {
+          "inputTokens": 121278,
+          "cachedInputTokens": 95872,
+          "outputTokens": 2528,
+          "reasoningOutputTokens": 1381,
+          "totalTokens": 123806,
+          "cacheWriteInputTokens": 0
+        },
+        "usage_limitation": null,
+        "mcp_calls": 0,
+        "shell_calls": 9,
+        "file_change_calls": 1,
+        "context_compactions": 0,
+        "subagent_calls": 0,
+        "failed_shell_calls": 0,
+        "outer_tool_calls": 4,
+        "outer_tool_calls_status": "observed",
+        "model_requests": null,
+        "observed_completed_model_requests": 5,
+        "model_requests_status": "completion_lower_bound",
+        "upstream_responses": [
+          {
+            "threadId": "01a17b2f-2bed-7ba1-9c54-3e44e85c1d18",
+            "turnId": "01a17b2f-2d2f-7521-b397-9b05b0db1a54",
+            "responseId": "resp_0a669c375e8e4ada016ae00c16a1b481919c0e228e6bdb6d98"
+          },
+          {
+            "threadId": "01a17b2f-2bed-7ba1-9c54-3e44e85c1d18",
+            "turnId": "01a17b2f-2d2f-7521-b397-9b05b0db1a54",
+            "responseId": "resp_0a669c375e8e4ada016ae00c1c483481919c26a28ce6040252"
+          },
+          {
+            "threadId": "01a17b2f-2bed-7ba1-9c54-3e44e85c1d18",
+            "turnId": "01a17b2f-2d2f-7521-b397-9b05b0db1a54",
+            "responseId": "resp_0a669c375e8e4ada016ae00c20c9ec81918a582a289c1c4a4f"
+          },
+          {
+            "threadId": "01a17b2f-2bed-7ba1-9c54-3e44e85c1d18",
+            "turnId": "01a17b2f-2d2f-7521-b397-9b05b0db1a54",
+            "responseId": "resp_0a669c375e8e4ada016ae00c2ba5b48191b488cb361028b4dd"
+          },
+          {
+            "threadId": "01a17b2f-2bed-7ba1-9c54-3e44e85c1d18",
+            "turnId": "01a17b2f-2d2f-7521-b397-9b05b0db1a54",
+            "responseId": "resp_0a669c375e8e4ada016ae00c343a048191a10a257a7726047f"
+          }
+        ],
+        "first_event": {
+          "ordinal": 14,
+          "monotonic": null,
+          "utc": "2026-10-27T02:27:33.234Z"
+        },
+        "last_event": {
+          "ordinal": 60,
+          "monotonic": null,
+          "utc": "2026-10-27T02:28:05.132Z"
+        },
+        "operation_counts_status": "observed_items_only",
+        "items": [
+          {
+            "type": "UserMessage",
+            "id": "01a17b2f-32f1-7c60-95ae-e6f6dee065ca",
+            "content": [
+              {
+                "type": "text",
+                "text": "Work only in the assigned workspace. Complete this assignment directly; do not delegate or spawn agents. Native file, search, shell and edit tools are available. Loci tools, when available, are optional; select them only if useful. Do not inspect sibling runs, observer folders, evaluator files, or other task copies. Do not change user/global configuration.\nWrite the requested structured result to answer.json. Do not add unrequested claims; cite exact relative source paths and symbols. Finish when the requested result and your directly relevant check are complete.\n\nA client consumes importStock's returned object. Trace the active input/domain/output contract, including reserved stock, SKU normalization, and negative availability. Do not change source. Write answer.json with exactly these keys: files (ordered active pipeline files beginning with entry.js, then csv.js, stock.js, sku.js, wire.js), output (the exact object for ' ab-2 ,5,8'), invalid_numeric (the exact error message for 'x,no,1'), reserved_applied_before_clamp (boolean).\n",
+                "text_elements": []
+              }
+            ],
+            "native_type": "UserMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:27:33.234Z",
+              "emitted_at_ms": 1793068053234,
+              "ordinal": 14,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0a669c375e8e4ada016ae00c1a563481918b2360ae3bff62c2",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:27:37.566Z",
+              "emitted_at_ms": 1793068057566,
+              "ordinal": 16,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "AgentMessage",
+            "id": "msg_0a669c375e8e4ada016ae00c1a5e948191ae59d36ffeb7b94f",
+            "content": [
+              {
+                "type": "Text",
+                "text": "I’ll trace the five named files in order, then write and check `answer.json` against the active code path."
+              }
+            ],
+            "phase": "commentary",
+            "native_type": "AgentMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:27:37.840Z",
+              "emitted_at_ms": 1793068057840,
+              "ordinal": 18,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "commandExecution",
+            "id": "exec-788afb37-5ee5-45f2-880f-be75298b0f14",
+            "process_id": "45505",
+            "command": [
+              "/bin/zsh",
+              "-lc",
+              "pwd && rg --files -g 'entry.js' -g 'csv.js' -g 'stock.js' -g 'sku.js' -g 'wire.js' -g 'AGENTS.md' -g 'package.json' -g 'answer.json'"
+            ],
+            "cwd": "file:///private/tmp/loci-r1-native-10k6jh6e/inventory-contract-native/workspace",
+            "parsed_cmd": [
+              {
+                "type": "unknown",
+                "cmd": "pwd && rg --files -g 'entry.js' -g 'csv.js' -g 'stock.js' -g 'sku.js' -g 'wire.js' -g 'AGENTS.md' -g 'package.json' -g 'answer.json'"
+              }
+            ],
+            "source": "unified_exec_startup",
+            "status": "completed",
+            "aggregated_output": "/private/tmp/loci-r1-native-10k6jh6e/inventory-contract-native/workspace\nsrc/entry.js\nsrc/domain/sku.js\nsrc/domain/stock.js\nsrc/output/csv.js\nsrc/output/wire.js\nsrc/input/csv.js\npackage.json\n",
+            "exit_code": 0,
+            "duration": {
+              "secs": 0,
+              "nanos": 6541
+            },
+            "native_type": "CommandExecution",
+            "exitCode": 0,
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:27:38.795Z",
+              "emitted_at_ms": 1793068058795,
+              "ordinal": 22,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0a669c375e8e4ada016ae00c1e9a308191a246168ca07b27fe",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:27:41.812Z",
+              "emitted_at_ms": 1793068061812,
+              "ordinal": 25,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "commandExecution",
+            "id": "exec-59e2214a-7f4a-4770-bce2-b9e111310c7d",
+            "process_id": "51705",
+            "command": [
+              "/bin/zsh",
+              "-lc",
+              "cat 'src/domain/stock.js'"
+            ],
+            "cwd": "file:///private/tmp/loci-r1-native-10k6jh6e/inventory-contract-native/workspace",
+            "parsed_cmd": [
+              {
+                "type": "read",
+                "cmd": "cat src/domain/stock.js",
+                "name": "stock.js",
+                "path": "src/domain/stock.js"
+              }
+            ],
+            "source": "unified_exec_startup",
+            "status": "completed",
+            "aggregated_output": "import { canonicalSku } from './sku.js';\nexport function normalizeStock(row) {\n  if (![row.available, row.reserved].every(Number.isFinite)) throw new Error('invalid count');\n  return { sku: canonicalSku(row.sku), count: Math.max(0, row.available - row.reserved) };\n}\n",
+            "exit_code": 0,
+            "duration": {
+              "secs": 0,
+              "nanos": 18560375
+            },
+            "native_type": "CommandExecution",
+            "exitCode": 0,
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:27:43.287Z",
+              "emitted_at_ms": 1793068063287,
+              "ordinal": 29,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "commandExecution",
+            "id": "exec-20c7c7be-6bfe-4d5b-ad7d-3c7f8d78970a",
+            "process_id": "31566",
+            "command": [
+              "/bin/zsh",
+              "-lc",
+              "cat 'src/input/csv.js'"
+            ],
+            "cwd": "file:///private/tmp/loci-r1-native-10k6jh6e/inventory-contract-native/workspace",
+            "parsed_cmd": [
+              {
+                "type": "read",
+                "cmd": "cat src/input/csv.js",
+                "name": "csv.js",
+                "path": "src/input/csv.js"
+              }
+            ],
+            "source": "unified_exec_startup",
+            "status": "completed",
+            "aggregated_output": "export function parseStock(text) {\n  const [sku, available, reserved] = text.trim().split(',');\n  return { sku, available: Number(available), reserved: Number(reserved) };\n}\n",
+            "exit_code": 0,
+            "duration": {
+              "secs": 0,
+              "nanos": 55031208
+            },
+            "native_type": "CommandExecution",
+            "exitCode": 0,
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:27:43.334Z",
+              "emitted_at_ms": 1793068063334,
+              "ordinal": 30,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "commandExecution",
+            "id": "exec-815aabd4-383e-4ead-be10-dc087e3440cd",
+            "process_id": "10577",
+            "command": [
+              "/bin/zsh",
+              "-lc",
+              "cat 'src/output/wire.js'"
+            ],
+            "cwd": "file:///private/tmp/loci-r1-native-10k6jh6e/inventory-contract-native/workspace",
+            "parsed_cmd": [
+              {
+                "type": "read",
+                "cmd": "cat src/output/wire.js",
+                "name": "wire.js",
+                "path": "src/output/wire.js"
+              }
+            ],
+            "source": "unified_exec_startup",
+            "status": "completed",
+            "aggregated_output": "export function wireStock(item) { return { product_code: item.sku, units: item.count, schema: 2 }; }\n",
+            "exit_code": 0,
+            "duration": {
+              "secs": 0,
+              "nanos": 99654834
+            },
+            "native_type": "CommandExecution",
+            "exitCode": 0,
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:27:43.382Z",
+              "emitted_at_ms": 1793068063382,
+              "ordinal": 31,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "commandExecution",
+            "id": "exec-6fdb4187-1229-4d08-9b7c-63d476571c81",
+            "process_id": "28923",
+            "command": [
+              "/bin/zsh",
+              "-lc",
+              "cat 'src/output/csv.js'"
+            ],
+            "cwd": "file:///private/tmp/loci-r1-native-10k6jh6e/inventory-contract-native/workspace",
+            "parsed_cmd": [
+              {
+                "type": "read",
+                "cmd": "cat src/output/csv.js",
+                "name": "csv.js",
+                "path": "src/output/csv.js"
+              }
+            ],
+            "source": "unified_exec_startup",
+            "status": "completed",
+            "aggregated_output": "export function wireStock(item) { return `${item.sku},${item.count}`; }\n",
+            "exit_code": 0,
+            "duration": {
+              "secs": 0,
+              "nanos": 144342750
+            },
+            "native_type": "CommandExecution",
+            "exitCode": 0,
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:27:43.431Z",
+              "emitted_at_ms": 1793068063431,
+              "ordinal": 32,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "commandExecution",
+            "id": "exec-722024e0-5fd4-49df-a1e7-156718cf23bb",
+            "process_id": "58117",
+            "command": [
+              "/bin/zsh",
+              "-lc",
+              "cat 'package.json'"
+            ],
+            "cwd": "file:///private/tmp/loci-r1-native-10k6jh6e/inventory-contract-native/workspace",
+            "parsed_cmd": [
+              {
+                "type": "read",
+                "cmd": "cat package.json",
+                "name": "package.json",
+                "path": "package.json"
+              }
+            ],
+            "source": "unified_exec_startup",
+            "status": "completed",
+            "aggregated_output": "{\"type\":\"module\",\"private\":true}\n",
+            "exit_code": 0,
+            "duration": {
+              "secs": 0,
+              "nanos": 186530083
+            },
+            "native_type": "CommandExecution",
+            "exitCode": 0,
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:27:43.461Z",
+              "emitted_at_ms": 1793068063461,
+              "ordinal": 33,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "commandExecution",
+            "id": "exec-eaa7e3be-caa5-4ec6-b38b-930fcfaf5e5b",
+            "process_id": "21970",
+            "command": [
+              "/bin/zsh",
+              "-lc",
+              "cat 'src/entry.js'"
+            ],
+            "cwd": "file:///private/tmp/loci-r1-native-10k6jh6e/inventory-contract-native/workspace",
+            "parsed_cmd": [
+              {
+                "type": "read",
+                "cmd": "cat src/entry.js",
+                "name": "entry.js",
+                "path": "src/entry.js"
+              }
+            ],
+            "source": "unified_exec_startup",
+            "status": "completed",
+            "aggregated_output": "import { parseStock } from './input/csv.js';\nimport { normalizeStock } from './domain/stock.js';\nimport { wireStock } from './output/wire.js';\nexport function importStock(text) { return wireStock(normalizeStock(parseStock(text))); }\n",
+            "exit_code": 0,
+            "duration": {
+              "secs": 0,
+              "nanos": 201939500
+            },
+            "native_type": "CommandExecution",
+            "exitCode": 0,
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:27:43.470Z",
+              "emitted_at_ms": 1793068063470,
+              "ordinal": 34,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "commandExecution",
+            "id": "exec-79d846e2-f2c9-41ef-a8a9-30ab7ebc4d73",
+            "process_id": "3172",
+            "command": [
+              "/bin/zsh",
+              "-lc",
+              "cat 'src/domain/sku.js'"
+            ],
+            "cwd": "file:///private/tmp/loci-r1-native-10k6jh6e/inventory-contract-native/workspace",
+            "parsed_cmd": [
+              {
+                "type": "read",
+                "cmd": "cat src/domain/sku.js",
+                "name": "sku.js",
+                "path": "src/domain/sku.js"
+              }
+            ],
+            "source": "unified_exec_startup",
+            "status": "completed",
+            "aggregated_output": "export function canonicalSku(value) { return value.trim().toUpperCase(); }\n",
+            "exit_code": 0,
+            "duration": {
+              "secs": 0,
+              "nanos": 213077584
+            },
+            "native_type": "CommandExecution",
+            "exitCode": 0,
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:27:43.483Z",
+              "emitted_at_ms": 1793068063483,
+              "ordinal": 35,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0a669c375e8e4ada016ae00c2713d48191960ed5efe6b8e96c",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:27:50.325Z",
+              "emitted_at_ms": 1793068070325,
+              "ordinal": 38,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0a669c375e8e4ada016ae00c28ca6c8191acae972b93b78256",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:27:52.006Z",
+              "emitted_at_ms": 1793068072006,
+              "ordinal": 40,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "AgentMessage",
+            "id": "msg_0a669c375e8e4ada016ae00c28cc348191baf55248a6c858fe",
+            "content": [
+              {
+                "type": "Text",
+                "text": "The active path uses `src/input/csv.js`; the similarly named output CSV module is not imported. Reserved stock is subtracted before the result is clamped to zero."
+              }
+            ],
+            "phase": "commentary",
+            "native_type": "AgentMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:27:52.348Z",
+              "emitted_at_ms": 1793068072348,
+              "ordinal": 42,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "fileChange",
+            "id": "exec-e033a9bc-cb78-45c0-bf36-f34b154e55a5",
+            "changes": {
+              "/private/tmp/loci-r1-native-10k6jh6e/inventory-contract-native/workspace/answer.json": {
+                "type": "add",
+                "content": "{\n  \"files\": [\n    { \"path\": \"src/entry.js\", \"symbol\": \"importStock\" },\n    { \"path\": \"src/input/csv.js\", \"symbol\": \"parseStock\" },\n    { \"path\": \"src/domain/stock.js\", \"symbol\": \"normalizeStock\" },\n    { \"path\": \"src/domain/sku.js\", \"symbol\": \"canonicalSku\" },\n    { \"path\": \"src/output/wire.js\", \"symbol\": \"wireStock\" }\n  ],\n  \"output\": {\n    \"product_code\": \"AB-2\",\n    \"units\": 0,\n    \"schema\": 2\n  },\n  \"invalid_numeric\": \"invalid count\",\n  \"reserved_applied_before_clamp\": true\n}\n"
+              }
+            },
+            "status": "completed",
+            "stdout": "Success. Updated the following files:\nA answer.json\n",
+            "stderr": "",
+            "native_type": "FileChange",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:27:54.218Z",
+              "emitted_at_ms": 1793068074218,
+              "ordinal": 46,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0a669c375e8e4ada016ae00c30a2b0819185d0e3102a3396c7",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:27:59.849Z",
+              "emitted_at_ms": 1793068079849,
+              "ordinal": 49,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "commandExecution",
+            "id": "exec-878ae660-995a-4f6d-9e53-1b4d31f55dfb",
+            "process_id": "43753",
+            "command": [
+              "/bin/zsh",
+              "-lc",
+              "node --input-type=module <<'NODE'\nimport assert from 'node:assert/strict';\nimport { readFile } from 'node:fs/promises';\nimport { importStock } from './src/entry.js';\n\nconst answer = JSON.parse(await readFile('answer.json', 'utf8'));\nassert.deepEqual(Object.keys(answer), ['files', 'output', 'invalid_numeric', 'reserved_applied_before_clamp']);\nconst expectedFiles = [\n  ['src/entry.js', 'importStock'],\n  ['src/input/csv.js', 'parseStock'],\n  ['src/domain/stock.js', 'normalizeStock'],\n  ['src/domain/sku.js', 'canonicalSku'],\n  ['src/output/wire.js', 'wireStock']\n];\nassert.deepEqual(answer.files, expectedFiles.map(([path, symbol]) => ({ path, symbol })));\nfor (const [path, symbol] of expectedFiles) {\n  const module = await import(`./${path}`);\n  assert.equal(typeof module[symbol], 'function');\n}\nassert.deepEqual(answer.output, importStock(' ab-2 ,5,8'));\nassert.deepEqual(answer.output, { product_code: 'AB-2', units: 0, schema: 2 });\nassert.throws(() => importStock('x,no,1'), error => error.message === answer.invalid_numeric && error.message === 'invalid count');\nassert.equal(answer.reserved_applied_before_clamp, true);\nassert.equal(importStock('x,9,8').units, 1);\nassert.equal(importStock('x,-2,-5').units, 3);\nconsole.log('answer.json verified against the active pipeline and requested examples');\nNODE"
+            ],
+            "cwd": "file:///private/tmp/loci-r1-native-10k6jh6e/inventory-contract-native/workspace",
+            "parsed_cmd": [
+              {
+                "type": "unknown",
+                "cmd": "node --input-type=module <<'NODE'\nimport assert from 'node:assert/strict';\nimport { readFile } from 'node:fs/promises';\nimport { importStock } from './src/entry.js';\n\nconst answer = JSON.parse(await readFile('answer.json', 'utf8'));\nassert.deepEqual(Object.keys(answer), ['files', 'output', 'invalid_numeric', 'reserved_applied_before_clamp']);\nconst expectedFiles = [\n  ['src/entry.js', 'importStock'],\n  ['src/input/csv.js', 'parseStock'],\n  ['src/domain/stock.js', 'normalizeStock'],\n  ['src/domain/sku.js', 'canonicalSku'],\n  ['src/output/wire.js', 'wireStock']\n];\nassert.deepEqual(answer.files, expectedFiles.map(([path, symbol]) => ({ path, symbol })));\nfor (const [path, symbol] of expectedFiles) {\n  const module = await import(`./${path}`);\n  assert.equal(typeof module[symbol], 'function');\n}\nassert.deepEqual(answer.output, importStock(' ab-2 ,5,8'));\nassert.deepEqual(answer.output, { product_code: 'AB-2', units: 0, schema: 2 });\nassert.throws(() => importStock('x,no,1'), error => error.message === answer.invalid_numeric && error.message === 'invalid count');\nassert.equal(answer.reserved_applied_before_clamp, true);\nassert.equal(importStock('x,9,8').units, 1);\nassert.equal(importStock('x,-2,-5').units, 3);\nconsole.log('answer.json verified against the active pipeline and requested examples');\nNODE"
+              }
+            ],
+            "source": "unified_exec_startup",
+            "status": "completed",
+            "aggregated_output": "answer.json verified against the active pipeline and requested examples\n",
+            "exit_code": 0,
+            "duration": {
+              "secs": 0,
+              "nanos": 2458
+            },
+            "native_type": "CommandExecution",
+            "exitCode": 0,
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:28:02.946Z",
+              "emitted_at_ms": 1793068082946,
+              "ordinal": 53,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0a669c375e8e4ada016ae00c3595588191be287b991483d97d",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:28:04.795Z",
+              "emitted_at_ms": 1793068084795,
+              "ordinal": 56,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "AgentMessage",
+            "id": "msg_0a669c375e8e4ada016ae00c35a08c81919dc5072fc1fb5897",
+            "content": [
+              {
+                "type": "Text",
+                "text": "Wrote [answer.json](/private/tmp/loci-r1-native-10k6jh6e/inventory-contract-native/workspace/answer.json) and verified it against the active pipeline and requested examples."
+              }
+            ],
+            "phase": "final_answer",
+            "native_type": "AgentMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T02:28:05.126Z",
+              "emitted_at_ms": 1793068085126,
+              "ordinal": 58,
+              "monotonic": null
+            }
+          }
+        ],
+        "raw_tool_calls": [
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0a669c375e8e4ada016ae00c1aa6a881918fd2552cdcbbd5c7",
+            "status": "completed",
+            "call_id": "call_eb922eef7f8d44c6a47e354b0ff4a1e8",
+            "name": "exec",
+            "input": "const r = await tools.exec_command({cmd:\"pwd && rg --files -g 'entry.js' -g 'csv.js' -g 'stock.js' -g 'sku.js' -g 'wire.js' -g 'AGENTS.md' -g 'package.json' -g 'answer.json'\",\"workdir\":\"/private/tmp/loci-r1-native-10k6jh6e/inventory-contract-native/workspace\",\"yield_time_ms\":10000,\"max_output_tokens\":4000}); text(r.output);\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b2f-2d2f-7521-b397-9b05b0db1a54",
+              "create_time": 1793068058.6529818
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b2f-48b0-7232-a964-e13813338228",
+              "call_id": "call_eb922eef7f8d44c6a47e354b0ff4a1e8",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "/private/tmp/loci-r1-native-10k6jh6e/inventory-contract-native/workspace\nsrc/entry.js\nsrc/domain/sku.js\nsrc/domain/stock.js\nsrc/output/csv.js\nsrc/output/wire.js\nsrc/input/csv.js\npackage.json\n"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b2f-2d2f-7521-b397-9b05b0db1a54",
+                "create_time": 1793068058.800431
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0a669c375e8e4ada016ae00c1ea7548191a79305af3e7fcf70",
+            "status": "completed",
+            "call_id": "call_2c9dc5f9c06b481ba57d1913d7c25f18",
+            "name": "exec",
+            "input": "const paths = [\"src/entry.js\",\"src/input/csv.js\",\"src/domain/stock.js\",\"src/domain/sku.js\",\"src/output/wire.js\",\"src/output/csv.js\",\"package.json\"];\nconst results = await Promise.allSettled(paths.map(path => tools.exec_command({cmd:`cat '${path}'`,workdir:\"/private/tmp/loci-r1-native-10k6jh6e/inventory-contract-native/workspace\",yield_time_ms:10000,max_output_tokens:5000})));\nfor (let i = 0; i < paths.length; i++) {\n  const r = results[i];\n  text(JSON.stringify(r.status === \"fulfilled\" ? {path:paths[i],status:\"ok\",exit_code:r.value.exit_code,output:r.value.output} : {path:paths[i],status:\"error\",error:String(r.reason)}));\n}\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b2f-2d2f-7521-b397-9b05b0db1a54",
+              "create_time": 1793068062.6560824
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b2f-5b02-7f52-9744-ba70f145d804",
+              "call_id": "call_2c9dc5f9c06b481ba57d1913d7c25f18",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.4 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"path\":\"src/entry.js\",\"status\":\"ok\",\"exit_code\":0,\"output\":\"import { parseStock } from './input/csv.js';\\nimport { normalizeStock } from './domain/stock.js';\\nimport { wireStock } from './output/wire.js';\\nexport function importStock(text) { return wireStock(normalizeStock(parseStock(text))); }\\n\"}"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"path\":\"src/input/csv.js\",\"status\":\"ok\",\"exit_code\":0,\"output\":\"export function parseStock(text) {\\n  const [sku, available, reserved] = text.trim().split(',');\\n  return { sku, available: Number(available), reserved: Number(reserved) };\\n}\\n\"}"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"path\":\"src/domain/stock.js\",\"status\":\"ok\",\"exit_code\":0,\"output\":\"import { canonicalSku } from './sku.js';\\nexport function normalizeStock(row) {\\n  if (![row.available, row.reserved].every(Number.isFinite)) throw new Error('invalid count');\\n  return { sku: canonicalSku(row.sku), count: Math.max(0, row.available - row.reserved) };\\n}\\n\"}"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"path\":\"src/domain/sku.js\",\"status\":\"ok\",\"exit_code\":0,\"output\":\"export function canonicalSku(value) { return value.trim().toUpperCase(); }\\n\"}"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"path\":\"src/output/wire.js\",\"status\":\"ok\",\"exit_code\":0,\"output\":\"export function wireStock(item) { return { product_code: item.sku, units: item.count, schema: 2 }; }\\n\"}"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"path\":\"src/output/csv.js\",\"status\":\"ok\",\"exit_code\":0,\"output\":\"export function wireStock(item) { return `${item.sku},${item.count}`; }\\n\"}"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"path\":\"package.json\",\"status\":\"ok\",\"exit_code\":0,\"output\":\"{\\\"type\\\":\\\"module\\\",\\\"private\\\":true}\\n\"}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b2f-2d2f-7521-b397-9b05b0db1a54",
+                "create_time": 1793068063.490761
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0a669c375e8e4ada016ae00c2928ec8191ae26580ec4884361",
+            "status": "completed",
+            "call_id": "call_6c7b0c530065489cb13344692eb659a7",
+            "name": "exec",
+            "input": "const patch = \"*** Begin Patch\\n*** Add File: answer.json\\n+{\\n+  \\\"files\\\": [\\n+    { \\\"path\\\": \\\"src/entry.js\\\", \\\"symbol\\\": \\\"importStock\\\" },\\n+    { \\\"path\\\": \\\"src/input/csv.js\\\", \\\"symbol\\\": \\\"parseStock\\\" },\\n+    { \\\"path\\\": \\\"src/domain/stock.js\\\", \\\"symbol\\\": \\\"normalizeStock\\\" },\\n+    { \\\"path\\\": \\\"src/domain/sku.js\\\", \\\"symbol\\\": \\\"canonicalSku\\\" },\\n+    { \\\"path\\\": \\\"src/output/wire.js\\\", \\\"symbol\\\": \\\"wireStock\\\" }\\n+  ],\\n+  \\\"output\\\": {\\n+    \\\"product_code\\\": \\\"AB-2\\\",\\n+    \\\"units\\\": 0,\\n+    \\\"schema\\\": 2\\n+  },\\n+  \\\"invalid_numeric\\\": \\\"invalid count\\\",\\n+  \\\"reserved_applied_before_clamp\\\": true\\n+}\\n*** End Patch\";\ntext(await tools.apply_patch(patch));\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b2f-2d2f-7521-b397-9b05b0db1a54",
+              "create_time": 1793068073.1619031
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b2f-84ef-7273-aea5-3285e3623ebe",
+              "call_id": "call_6c7b0c530065489cb13344692eb659a7",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b2f-2d2f-7521-b397-9b05b0db1a54",
+                "create_time": 1793068074.223874
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0a669c375e8e4ada016ae00c30acd0819194f80c2af55b4882",
+            "status": "completed",
+            "call_id": "call_132f02a8f099400e8b749eeec966580a",
+            "name": "exec",
+            "input": "const r = await tools.exec_command({\n  cmd: \"node --input-type=module <<'NODE'\\nimport assert from 'node:assert/strict';\\nimport { readFile } from 'node:fs/promises';\\nimport { importStock } from './src/entry.js';\\n\\nconst answer = JSON.parse(await readFile('answer.json', 'utf8'));\\nassert.deepEqual(Object.keys(answer), ['files', 'output', 'invalid_numeric', 'reserved_applied_before_clamp']);\\nconst expectedFiles = [\\n  ['src/entry.js', 'importStock'],\\n  ['src/input/csv.js', 'parseStock'],\\n  ['src/domain/stock.js', 'normalizeStock'],\\n  ['src/domain/sku.js', 'canonicalSku'],\\n  ['src/output/wire.js', 'wireStock']\\n];\\nassert.deepEqual(answer.files, expectedFiles.map(([path, symbol]) => ({ path, symbol })));\\nfor (const [path, symbol] of expectedFiles) {\\n  const module = await import(`./${path}`);\\n  assert.equal(typeof module[symbol], 'function');\\n}\\nassert.deepEqual(answer.output, importStock(' ab-2 ,5,8'));\\nassert.deepEqual(answer.output, { product_code: 'AB-2', units: 0, schema: 2 });\\nassert.throws(() => importStock('x,no,1'), error => error.message === answer.invalid_numeric && error.message === 'invalid count');\\nassert.equal(answer.reserved_applied_before_clamp, true);\\nassert.equal(importStock('x,9,8').units, 1);\\nassert.equal(importStock('x,-2,-5').units, 3);\\nconsole.log('answer.json verified against the active pipeline and requested examples');\\nNODE\",\n  workdir: \"/private/tmp/loci-r1-native-10k6jh6e/inventory-contract-native/workspace\",\n  yield_time_ms: 10000,\n  max_output_tokens: 2000\n}); text(JSON.stringify({status:r.exit_code === 0 ? \"ok\" : \"error\",exit_code:r.exit_code,output:r.output}));\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b2f-2d2f-7521-b397-9b05b0db1a54",
+              "create_time": 1793068080.6775942
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b2f-a707-71d1-86e2-79f42d0ef93d",
+              "call_id": "call_132f02a8f099400e8b749eeec966580a",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"status\":\"ok\",\"exit_code\":0,\"output\":\"answer.json verified against the active pipeline and requested examples\\n\"}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b2f-2d2f-7521-b397-9b05b0db1a54",
+                "create_time": 1793068082.951943
+              }
+            }
+          }
+        ],
+        "late_items_after_abort": 0,
+        "post_abort_cleanup_ms": null
+      }
+    ],
+    "usage_status": "known",
+    "usage": {
+      "inputTokens": 121278,
+      "cachedInputTokens": 95872,
+      "outputTokens": 2528,
+      "reasoningOutputTokens": 1381,
+      "totalTokens": 123806,
+      "cacheWriteInputTokens": 0,
+      "uncachedInputTokens": 25406
+    },
+    "observed_cumulative_usage": {
+      "inputTokens": 121278,
+      "cachedInputTokens": 95872,
+      "outputTokens": 2528,
+      "reasoningOutputTokens": 1381,
+      "totalTokens": 123806,
+      "cacheWriteInputTokens": 0
+    },
+    "usage_errors": [],
+    "capture_errors": [],
+    "operation_totals": {
+      "mcp_calls": 0,
+      "shell_calls": 9,
+      "file_change_calls": 1,
+      "context_compactions": 0,
+      "subagent_calls": 0,
+      "failed_shell_calls": 0
+    },
+    "phase_groups": {},
+    "limitations": [
+      "Usage updates are not proven model-request counts; unique raw response completions are a lower bound that may omit failed upstream requests/retries.",
+      "Raw outer-call availability is explicit; nested operation counts are distinct.",
+      "Behavioral quality and rework attribution require the independent oracle/review.",
+      "MCP source/delivery receipts are joined separately; item presence is not model reliance."
+    ],
+    "native_provenance": {
+      "rollout_path": "/private/tmp/loci-r1-native-10k6jh6e/inventory-contract-native/observer/qualification/native-rollout.jsonl",
+      "session_id": "01a17b2f-2bed-7ba1-9c54-3e44e85c1d18",
+      "cwd": "/private/tmp/loci-r1-native-10k6jh6e/inventory-contract-native/workspace",
+      "cli_version": "0.164.0",
+      "source": "exec",
+      "thread_source": "user",
+      "bootstrap_message_rows": [
+        7
+      ]
+    },
+    "turn_contexts": [
+      {
+        "turn_id": "01a17b2f-2d2f-7521-b397-9b05b0db1a54",
+        "cwd": "/private/tmp/loci-r1-native-10k6jh6e/inventory-contract-native/workspace",
+        "model": "gpt-6.1-terra",
+        "effort": "max",
+        "approval_policy": "on-request",
+        "approvals_reviewer": "auto_review",
+        "sandbox_policy": {
+          "type": "workspace-write",
+          "writable_roots": [
+            "/",
+            "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T"
+          ],
+          "network_access": true,
+          "exclude_tmpdir_env_var": false,
+          "exclude_slash_tmp": false
+        },
+        "permission_profile": {
+          "type": "managed",
+          "file_system": {
+            "type": "restricted",
+            "entries": [
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/"
+                },
+                "access": "write"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/.claude"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/.claude/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/Downloads"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/Downloads/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/claude-otel"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/claude-otel/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/improvements"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/improvements/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/work"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/work/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "special",
+                  "value": {
+                    "kind": "minimal"
+                  }
+                },
+                "access": "read"
+              },
+              {
+                "path": {
+                  "type": "special",
+                  "value": {
+                    "kind": "tmpdir"
+                  }
+                },
+                "access": "write"
+              }
+            ]
+          },
+          "network": "enabled"
+        },
+        "active_permission_profile": {
+          "id": "brummerv_filesystem_guard"
+        },
+        "file_system_sandbox_policy": {
+          "kind": "restricted",
+          "entries": [
+            {
+              "path": {
+                "type": "path",
+                "path": "/"
+              },
+              "access": "write"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/.claude"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/.claude/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/Downloads"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/Downloads/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/claude-otel"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/claude-otel/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/improvements"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/improvements/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/work"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/work/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "minimal"
+                }
+              },
+              "access": "read"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "tmpdir"
+                }
+              },
+              "access": "write"
+            }
+          ]
+        }
+      }
+    ],
+    "native_errors": []
+  },
+  "host_execution": {
+    "run_id": "inventory-contract-native",
+    "status": "closed",
+    "gate_sha256": "eb0d0daa6a60961cf8a3b5b86efa4ef4bc8b2a0c95bb631c877bc5e707a76981",
+    "freeze_sha256": "339b51aba273ae36fb56f0aac13ad6db9b33b128a476b9071149fd5e336fc91d",
+    "measured": true,
+    "exit_code": 0,
+    "elapsed_ms": 34768.7,
+    "thread_id": "01a17b2f-2bed-7ba1-9c54-3e44e85c1d18"
+  },
+  "loci_telemetry": {
+    "source_bytes": null,
+    "semantic_requests": null,
+    "proof_requests": null,
+    "status": "requires_captured_call_attribution"
+  },
+  "manual_review": "pending_arm_blinded_review",
+  "measured": true,
+  "instrumentation_amendment": null,
+  "limitations": [
+    "Experimental separation uses independent source copies and fresh native sessions; no additional access-control layer.",
+    "Native-only navigation is an audited instruction policy, not a hidden-tool capability boundary.",
+    "Observed response usage does not prove complete billing or invisible upstream retry accounting.",
+    "Native tool availability follows unchanged host config; other MCP tools remain available.",
+    "Loci use, semantic/proof requests and evidence bytes require captured-call attribution; unavailable values remain unknown.",
+    "Small independently constructed tasks do not establish ordinary-repository population effects."
+  ]
+}

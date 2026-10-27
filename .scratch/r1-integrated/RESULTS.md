@@ -1,3 +1,17 @@
+# Current R1 closeout: native Terra pilot complete
+
+**Recommendation: revise; hold advancement.** All 16 top-level native Terra 6.1 / max assignments completed with qualified, known usage. Independent archive replay agrees on every official outcome. Official task completions: integrated 3/4, path-only 2/4, eager 2/4, native 1/4. **No agent discovered or invoked a Loci tool**, so these differences do not demonstrate semantic/proof benefit.
+
+Blinded review found the eight frozen failures were six nested-answer representation mismatches and two additional test files outside an agent-hidden allowlist; independent source/behavior checks found no substantive miss. Frozen scores, prompts and evaluators remain unchanged. See the [complete per-task result, elapsed/token/tool comparison and evidence-backed recommendation](pilot-terra-max/RESULTS.md). All 16 executions, independent replay, blinded review and telemetry are retained under `pilot-terra-max/`.
+
+The prior launch/accounting blockers are resolved for this run. Python/Go semantics remain unsupported, the earlier deterministic acquisition limitations remain, and the small pilot establishes no architecture superiority. No production integration or post-score tuning occurred. Earlier Sol attempts remain separate because model/effort and environment identities differ.
+
+---
+
+## Historical implementation and launch-recovery record
+
+The following report records earlier states; current measured outcomes and recommendation are above.
+
 > **Instrumentation repair complete:** The original first native thread now qualifies with known usage and unchanged successful grading/replay. The original freeze and rejected receipt are preserved. Explicit amendment and resume support are ready; check-only validates assignment2 next and15 pending. See [instrumentation-repair.md](instrumentation-repair.md). No pilot task was launched during repair.
 
 > **Latest update:** The external top-level native run completed the first task correctly. The current blocker is the frozen accounting reader counting host bootstrap as task history. Provider usage and native settings are present and independently reconciled; 15 assignments remain unattempted. See [top-level-first-run.md](top-level-first-run.md). The report below preserves the initial closeout context.

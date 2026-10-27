@@ -1,0 +1,5 @@
+Wrote [answer.json](/private/tmp/loci-r1-native-10k6jh6e/dispatch-ambiguity-native/workspace/answer.json) and verified it against the running code.
+
+`src/registry.js::registry` registers `src/channels/audit.js::handle` and `src/channels/mail.js::handle`. For the supplied event, `src/dispatch.js::dispatch` selects the mail handler and returns `mail:hi`, using `src/codec.js::encode`.
+
+When `kind` is known only at runtime, the selected handler remains unknown until that value is supplied; an unregistered kind throws `unknown kind`. The legacy handler is called by `src/preview.js::preview` and is not reachable through the registry used by dispatch.

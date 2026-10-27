@@ -1,0 +1,5 @@
+Created and verified [answer.json](/private/tmp/loci-r1-native-10k6jh6e/dispatch-ambiguity-eager/workspace/answer.json).
+
+The `registry` in [src/registry.js](/private/tmp/loci-r1-native-10k6jh6e/dispatch-ambiguity-eager/workspace/src/registry.js:3) contains `handle` from [src/channels/audit.js](/private/tmp/loci-r1-native-10k6jh6e/dispatch-ambiguity-eager/workspace/src/channels/audit.js:1) and [src/channels/mail.js](/private/tmp/loci-r1-native-10k6jh6e/dispatch-ambiguity-eager/workspace/src/channels/mail.js:2). For the given event, `dispatch` selects the mail handler and returns `mail:hi`.
+
+[src/dispatch.js](/private/tmp/loci-r1-native-10k6jh6e/dispatch-ambiguity-eager/workspace/src/dispatch.js:2) selects the handler from the runtime `kind`, or throws `unknown kind`. The legacy `handle` in [src/channels/legacy.js](/private/tmp/loci-r1-native-10k6jh6e/dispatch-ambiguity-eager/workspace/src/channels/legacy.js:1) is used by `preview` in [src/preview.js](/private/tmp/loci-r1-native-10k6jh6e/dispatch-ambiguity-eager/workspace/src/preview.js:2); it is not registered for dispatch.

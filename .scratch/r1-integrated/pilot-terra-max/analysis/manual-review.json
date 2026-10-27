@@ -1,0 +1,1363 @@
+{
+  "review_type": "independent_arm_blinded_diagnostic",
+  "scope": "All 16 opaque cases from blinded/cases.json; no arm mapping or other pilot records read.",
+  "score_boundary": "Frozen oracle and packet allowed-change results are retained as separate dimensions. Semantic/source and independent behavior assessments do not change frozen scores. No aggregate alternative score is defined.",
+  "method": {
+    "source_review": "Read one complete source and frozen oracle per task family, all candidate answers/quantity changes/tests, and byte-hash verified every other reference in each family matches. Compared candidate and reference trees to verify all changed-file lists.",
+    "frozen_oracle_command": "node blinded/<case>/oracle.mjs blinded/<case>/candidate",
+    "independent_behavior_command": "node --input-type=module -e <task check source> blinded/<case>/candidate",
+    "independent_behavior_check_sources": {
+      "receipt-location": "import assert from 'node:assert/strict'; import {pathToFileURL} from 'node:url'; import path from 'node:path';\nconst load=async f=>import(pathToFileURL(path.join(process.argv[1],f)).href);\nconst {checkout}=await load('src/app.js'); const {makeReceiptKey}=await load('src/billing/receipt.js');\nassert.equal(makeReceiptKey({accountId:'acme',sequence:7}),'invoice/acme/0007');\nconst invoice={accountId:'acme',sequence:7}; let captured;\nconst result=await checkout(invoice,{post:(...args)=>{captured=args;return 'provider-result';}});\nassert.equal(result,'provider-result'); assert.deepEqual(captured,['/invoices',invoice,{'Idempotency-Key':'invoice/acme/0007'}]);\nassert.equal((await load('src/reports/receipt.js')).makeReceiptKey({id:7}),'report:7');\nassert.equal((await load('src/transport/receipt.js')).makeReceiptKey({headers:{'x-receipt':'response-receipt'}}),'response-receipt');\nconsole.log(JSON.stringify({status:'passed',checks:['actual checkout outbound path/body/header and result','owner key for required example','report and response helper distinction']}));",
+      "inventory-contract": "import assert from 'node:assert/strict'; import {pathToFileURL} from 'node:url'; import path from 'node:path';\nconst load=async f=>import(pathToFileURL(path.join(process.argv[1],f)).href);\nconst {importStock}=await load('src/entry.js'); const {parseStock}=await load('src/input/csv.js');\nconst {normalizeStock}=await load('src/domain/stock.js'); const {canonicalSku}=await load('src/domain/sku.js'); const {wireStock}=await load('src/output/wire.js');\nassert.deepEqual(parseStock(' ab-2 ,5,8'),{sku:'ab-2 ',available:5,reserved:8});\nassert.equal(canonicalSku(' ab-2 '),'AB-2'); assert.deepEqual(normalizeStock({sku:' ab-2 ',available:5,reserved:8}),{sku:'AB-2',count:0});\nassert.deepEqual(wireStock({sku:'AB-2',count:0}),{product_code:'AB-2',units:0,schema:2});\nfor(const [input,units] of [[' ab-2 ,5,8',0],[' q ,8,2',6],[' q ,-5,2',0],[' q ,-5,-8',3]]) assert.deepEqual(importStock(input),{product_code:input.includes('ab-2')?'AB-2':'Q',units,schema:2});\nfor(const input of ['x,no,1','x,1,no','x,Infinity,0']) assert.throws(()=>importStock(input),{message:'invalid count'});\nconsole.log(JSON.stringify({status:'passed',checks:['active parser/domain/SKU/wire contracts','reserved subtraction before clamp including negative inputs','required full output and exact invalid count error']}));",
+      "dispatch-ambiguity": "import assert from 'node:assert/strict'; import {pathToFileURL} from 'node:url'; import path from 'node:path';\nconst load=async f=>import(pathToFileURL(path.join(process.argv[1],f)).href);\nconst {dispatch}=await load('src/dispatch.js'); const {registry}=await load('src/registry.js');\nassert.equal(Object.getPrototypeOf(registry),null); assert.deepEqual(Object.keys(registry).sort(),['audit','mail']);\nassert.equal(registry.mail,(await load('src/channels/mail.js')).handle); assert.equal(registry.audit,(await load('src/channels/audit.js')).handle);\nassert.equal(dispatch({kind:'mail',payload:' Hi '}),'mail:hi'); assert.equal(dispatch({kind:'audit',payload:{a:1}}),'audit:{\"a\":1}');\nfor(const kind of ['legacy','toString','__proto__','missing']) assert.throws(()=>dispatch({kind,payload:3}),{message:'unknown kind'});\nassert.equal((await load('src/preview.js')).preview('x'),'legacy:x');\nconsole.log(JSON.stringify({status:'passed',checks:['registry keys, null prototype, exact registered function identities','mail selection/output and audit alternate output','unknown kinds including inherited names rejected','legacy available to preview but absent from dispatch registry']}));",
+      "zero-quantity": "import assert from 'node:assert/strict'; import {pathToFileURL} from 'node:url'; import path from 'node:path';\nconst load=async f=>import(pathToFileURL(path.join(process.argv[1],f)).href);\nconst {lineFromRequest}=await load('src/api.js'); const {parseQuantity}=await load('src/quantity.js'); const cli=(await load('src/cli.js')).parseQuantity;\nconst good=[0,'0',' 0 ',1,'2',23,' 42 ','1e2'];\nfor(const value of good){ assert.equal(parseQuantity(value),Number(value)); assert.deepEqual(lineFromRequest({sku:' A ',quantity:value}),{sku:'A',quantity:Number(value),active:Number(value)>0}); }\nconst bad=[-1,'-1',0.5,'0.5',NaN,Infinity,-Infinity,'Infinity','NaN','',' ','\\t\\n','\\u00a0',true,false,null,undefined,'oops'];\nfor(const value of bad){for(const run of [()=>parseQuantity(value),()=>lineFromRequest({sku:'A',quantity:value})]) assert.throws(run,e=>e instanceof Error && e.name==='Error' && e.message==='invalid quantity');}\nfor(const [input,expected] of [[0,1],['0',1],['4',4],['oops',1]]) assert.equal(cli(input),expected);\nconsole.log(JSON.stringify({status:'passed',checks:['shared parser and API for numeric/string zero and positive integer compatibility','direct parser and API rejection for every required invalid class including Unicode whitespace','Error class and exact message','CLI legacy examples unchanged']}));"
+    },
+    "runtime": "Node.js v26.5.0"
+  },
+  "cases": [
+    {
+      "case_id": "case-01",
+      "task_id": "receipt-location",
+      "frozen_oracle": {
+        "status": "failed",
+        "exit_code": 1,
+        "failure_stage": "initial answer deepStrictEqual, before runtime assertions",
+        "reason": "Exact nested representation differs; source fact values are correct.",
+        "output": "",
+        "oracle_sha256_matches_packet": true
+      },
+      "exact_schema": {
+        "top_level_keys_match_prompt": true,
+        "matches_frozen_answer": false,
+        "violations": [
+          {
+            "field": "call_chain",
+            "expected": [
+              "checkout",
+              "submitInvoice",
+              "makeReceiptKey",
+              "sendInvoice"
+            ],
+            "observed_form": "file-qualified symbol strings",
+            "issue": "Frozen deep equality rejects the representation; the ordered source functions themselves are correct."
+          }
+        ],
+        "constraints_explicit_in_visible_prompt": {
+          "exact_top_level_keys": true,
+          "nested_element_serialization": false
+        }
+      },
+      "allowed_changes": {
+        "allowed": [
+          "answer.json"
+        ],
+        "actual": [
+          "answer.json"
+        ],
+        "matches_packet_changed_files": true,
+        "violations": [],
+        "status": "compliant",
+        "constraints_explicit_in_visible_prompt": true,
+        "prompt_basis": "Prompt explicitly says do not change source; only answer.json was changed."
+      },
+      "behavioral_source_assessment": {
+        "necessary_source_facts_correct": true,
+        "status": "passes_prompt_required_behavior_in_reviewed_snapshot",
+        "evidence": [
+          {
+            "source": "src/app.js:checkout",
+            "fact": "Invokes submitInvoice(invoice, provider)."
+          },
+          {
+            "source": "src/billing/submit.js:submitInvoice",
+            "fact": "Imports billing makeReceiptKey; computes key then passes it as third argument to sendInvoice."
+          },
+          {
+            "source": "src/billing/receipt.js:makeReceiptKey",
+            "fact": "Constructs invoice/accountId/sequence with four-character zero padding; required example is invoice/acme/0007."
+          },
+          {
+            "source": "src/transport/invoices.js:sendInvoice",
+            "fact": "Passes receiptKey to provider.post as Idempotency-Key."
+          },
+          {
+            "source": "src/reports/receipt.js:makeReceiptKey; src/transport/receipt.js:makeReceiptKey",
+            "fact": "Other same-named helpers create report:id and read response x-receipt respectively; neither is the imported billing owner."
+          }
+        ],
+        "independent_checks": {
+          "status": "passed",
+          "checks": [
+            "actual checkout outbound path/body/header and result",
+            "owner key for required example",
+            "report and response helper distinction"
+          ]
+        },
+        "candidate_test_result": null,
+        "unsupported_claims": [],
+        "missed_required_source_facts": []
+      },
+      "qualifications": [
+        "Correct owner path distinguishes similarly named helpers, but the answer does not separately explain the other helpers; the required six-key schema offers no dedicated explanatory field.",
+        "The displayed call_chain is a task-prescribed ordered trace: makeReceiptKey returns to submitInvoice before sendInvoice; it is not a direct edge from makeReceiptKey to sendInvoice.",
+        "Prompt says ordered symbols and exactly the listed top-level keys, but does not show an array element JSON schema or explicitly ban path qualification/objects. Its shared instruction asks for exact paths and symbols. Frozen bare-symbol serialization is stricter than semantic identification.",
+        "Frozen oracle exits at answer equality, so its later runtime assertion is not executed on this candidate. Independent behavioral evidence below is separate and does not change that failure."
+      ],
+      "limitations": [
+        "Arm identity remained blinded throughout this review.",
+        "Only supplied prompt/reference/candidate/oracle/criteria packets were consulted; no traces or original execution chronology were read.",
+        "This is a diagnostic assessment, not a replacement or aggregate alternative official score."
+      ]
+    },
+    {
+      "case_id": "case-02",
+      "task_id": "receipt-location",
+      "frozen_oracle": {
+        "status": "failed",
+        "exit_code": 1,
+        "failure_stage": "initial answer deepStrictEqual, before runtime assertions",
+        "reason": "Exact nested representation differs; source fact values are correct.",
+        "output": "",
+        "oracle_sha256_matches_packet": true
+      },
+      "exact_schema": {
+        "top_level_keys_match_prompt": true,
+        "matches_frozen_answer": false,
+        "violations": [
+          {
+            "field": "call_chain",
+            "expected": [
+              "checkout",
+              "submitInvoice",
+              "makeReceiptKey",
+              "sendInvoice"
+            ],
+            "observed_form": "file/symbol objects",
+            "issue": "Frozen deep equality rejects the representation; the ordered source functions themselves are correct."
+          }
+        ],
+        "constraints_explicit_in_visible_prompt": {
+          "exact_top_level_keys": true,
+          "nested_element_serialization": false
+        }
+      },
+      "allowed_changes": {
+        "allowed": [
+          "answer.json"
+        ],
+        "actual": [
+          "answer.json"
+        ],
+        "matches_packet_changed_files": true,
+        "violations": [],
+        "status": "compliant",
+        "constraints_explicit_in_visible_prompt": true,
+        "prompt_basis": "Prompt explicitly says do not change source; only answer.json was changed."
+      },
+      "behavioral_source_assessment": {
+        "necessary_source_facts_correct": true,
+        "status": "passes_prompt_required_behavior_in_reviewed_snapshot",
+        "evidence": [
+          {
+            "source": "src/app.js:checkout",
+            "fact": "Invokes submitInvoice(invoice, provider)."
+          },
+          {
+            "source": "src/billing/submit.js:submitInvoice",
+            "fact": "Imports billing makeReceiptKey; computes key then passes it as third argument to sendInvoice."
+          },
+          {
+            "source": "src/billing/receipt.js:makeReceiptKey",
+            "fact": "Constructs invoice/accountId/sequence with four-character zero padding; required example is invoice/acme/0007."
+          },
+          {
+            "source": "src/transport/invoices.js:sendInvoice",
+            "fact": "Passes receiptKey to provider.post as Idempotency-Key."
+          },
+          {
+            "source": "src/reports/receipt.js:makeReceiptKey; src/transport/receipt.js:makeReceiptKey",
+            "fact": "Other same-named helpers create report:id and read response x-receipt respectively; neither is the imported billing owner."
+          }
+        ],
+        "independent_checks": {
+          "status": "passed",
+          "checks": [
+            "actual checkout outbound path/body/header and result",
+            "owner key for required example",
+            "report and response helper distinction"
+          ]
+        },
+        "candidate_test_result": null,
+        "unsupported_claims": [],
+        "missed_required_source_facts": []
+      },
+      "qualifications": [
+        "Correct owner path distinguishes similarly named helpers, but the answer does not separately explain the other helpers; the required six-key schema offers no dedicated explanatory field.",
+        "The displayed call_chain is a task-prescribed ordered trace: makeReceiptKey returns to submitInvoice before sendInvoice; it is not a direct edge from makeReceiptKey to sendInvoice.",
+        "Prompt says ordered symbols and exactly the listed top-level keys, but does not show an array element JSON schema or explicitly ban path qualification/objects. Its shared instruction asks for exact paths and symbols. Frozen bare-symbol serialization is stricter than semantic identification.",
+        "Frozen oracle exits at answer equality, so its later runtime assertion is not executed on this candidate. Independent behavioral evidence below is separate and does not change that failure."
+      ],
+      "limitations": [
+        "Arm identity remained blinded throughout this review.",
+        "Only supplied prompt/reference/candidate/oracle/criteria packets were consulted; no traces or original execution chronology were read.",
+        "This is a diagnostic assessment, not a replacement or aggregate alternative official score."
+      ]
+    },
+    {
+      "case_id": "case-03",
+      "task_id": "receipt-location",
+      "frozen_oracle": {
+        "status": "failed",
+        "exit_code": 1,
+        "failure_stage": "initial answer deepStrictEqual, before runtime assertions",
+        "reason": "Exact nested representation differs; source fact values are correct.",
+        "output": "",
+        "oracle_sha256_matches_packet": true
+      },
+      "exact_schema": {
+        "top_level_keys_match_prompt": true,
+        "matches_frozen_answer": false,
+        "violations": [
+          {
+            "field": "call_chain",
+            "expected": [
+              "checkout",
+              "submitInvoice",
+              "makeReceiptKey",
+              "sendInvoice"
+            ],
+            "observed_form": "file/symbol objects",
+            "issue": "Frozen deep equality rejects the representation; the ordered source functions themselves are correct."
+          }
+        ],
+        "constraints_explicit_in_visible_prompt": {
+          "exact_top_level_keys": true,
+          "nested_element_serialization": false
+        }
+      },
+      "allowed_changes": {
+        "allowed": [
+          "answer.json"
+        ],
+        "actual": [
+          "answer.json"
+        ],
+        "matches_packet_changed_files": true,
+        "violations": [],
+        "status": "compliant",
+        "constraints_explicit_in_visible_prompt": true,
+        "prompt_basis": "Prompt explicitly says do not change source; only answer.json was changed."
+      },
+      "behavioral_source_assessment": {
+        "necessary_source_facts_correct": true,
+        "status": "passes_prompt_required_behavior_in_reviewed_snapshot",
+        "evidence": [
+          {
+            "source": "src/app.js:checkout",
+            "fact": "Invokes submitInvoice(invoice, provider)."
+          },
+          {
+            "source": "src/billing/submit.js:submitInvoice",
+            "fact": "Imports billing makeReceiptKey; computes key then passes it as third argument to sendInvoice."
+          },
+          {
+            "source": "src/billing/receipt.js:makeReceiptKey",
+            "fact": "Constructs invoice/accountId/sequence with four-character zero padding; required example is invoice/acme/0007."
+          },
+          {
+            "source": "src/transport/invoices.js:sendInvoice",
+            "fact": "Passes receiptKey to provider.post as Idempotency-Key."
+          },
+          {
+            "source": "src/reports/receipt.js:makeReceiptKey; src/transport/receipt.js:makeReceiptKey",
+            "fact": "Other same-named helpers create report:id and read response x-receipt respectively; neither is the imported billing owner."
+          }
+        ],
+        "independent_checks": {
+          "status": "passed",
+          "checks": [
+            "actual checkout outbound path/body/header and result",
+            "owner key for required example",
+            "report and response helper distinction"
+          ]
+        },
+        "candidate_test_result": null,
+        "unsupported_claims": [],
+        "missed_required_source_facts": []
+      },
+      "qualifications": [
+        "Correct owner path distinguishes similarly named helpers, but the answer does not separately explain the other helpers; the required six-key schema offers no dedicated explanatory field.",
+        "The displayed call_chain is a task-prescribed ordered trace: makeReceiptKey returns to submitInvoice before sendInvoice; it is not a direct edge from makeReceiptKey to sendInvoice.",
+        "Prompt says ordered symbols and exactly the listed top-level keys, but does not show an array element JSON schema or explicitly ban path qualification/objects. Its shared instruction asks for exact paths and symbols. Frozen bare-symbol serialization is stricter than semantic identification.",
+        "Frozen oracle exits at answer equality, so its later runtime assertion is not executed on this candidate. Independent behavioral evidence below is separate and does not change that failure."
+      ],
+      "limitations": [
+        "Arm identity remained blinded throughout this review.",
+        "Only supplied prompt/reference/candidate/oracle/criteria packets were consulted; no traces or original execution chronology were read.",
+        "This is a diagnostic assessment, not a replacement or aggregate alternative official score."
+      ]
+    },
+    {
+      "case_id": "case-04",
+      "task_id": "inventory-contract",
+      "frozen_oracle": {
+        "status": "passed",
+        "exit_code": 0,
+        "failure_stage": null,
+        "reason": null,
+        "output": "{\"status\":\"passed\"}",
+        "oracle_sha256_matches_packet": true
+      },
+      "exact_schema": {
+        "top_level_keys_match_prompt": true,
+        "matches_frozen_answer": true,
+        "violations": [],
+        "constraints_explicit_in_visible_prompt": {
+          "exact_top_level_keys": true,
+          "nested_element_serialization": "No mismatch requiring qualification"
+        }
+      },
+      "allowed_changes": {
+        "allowed": [
+          "answer.json"
+        ],
+        "actual": [
+          "answer.json"
+        ],
+        "matches_packet_changed_files": true,
+        "violations": [],
+        "status": "compliant",
+        "constraints_explicit_in_visible_prompt": true,
+        "prompt_basis": "Prompt explicitly says do not change source; only answer.json was changed."
+      },
+      "behavioral_source_assessment": {
+        "necessary_source_facts_correct": true,
+        "status": "passes_prompt_required_behavior_in_reviewed_snapshot",
+        "evidence": [
+          {
+            "source": "src/entry.js:importStock",
+            "fact": "Imports CSV parseStock, domain normalizeStock, output wireStock and composes them in that order."
+          },
+          {
+            "source": "src/input/csv.js:parseStock",
+            "fact": "Trims full text, splits CSV, converts available and reserved with Number."
+          },
+          {
+            "source": "src/domain/stock.js:normalizeStock",
+            "fact": "Checks both counts with Number.isFinite; throws invalid count; computes Math.max(0, available - reserved). Calls canonicalSku."
+          },
+          {
+            "source": "src/domain/sku.js:canonicalSku",
+            "fact": "Trims and uppercases SKU."
+          },
+          {
+            "source": "src/output/wire.js:wireStock",
+            "fact": "Returns product_code, units, schema:2; required input produces AB-2,0,2."
+          }
+        ],
+        "independent_checks": {
+          "status": "passed",
+          "checks": [
+            "active parser/domain/SKU/wire contracts",
+            "reserved subtraction before clamp including negative inputs",
+            "required full output and exact invalid count error"
+          ]
+        },
+        "candidate_test_result": null,
+        "unsupported_claims": [],
+        "missed_required_source_facts": []
+      },
+      "qualifications": [],
+      "limitations": [
+        "Arm identity remained blinded throughout this review.",
+        "Only supplied prompt/reference/candidate/oracle/criteria packets were consulted; no traces or original execution chronology were read.",
+        "This is a diagnostic assessment, not a replacement or aggregate alternative official score."
+      ]
+    },
+    {
+      "case_id": "case-05",
+      "task_id": "dispatch-ambiguity",
+      "frozen_oracle": {
+        "status": "passed",
+        "exit_code": 0,
+        "failure_stage": null,
+        "reason": null,
+        "output": "{\"status\":\"passed\"}",
+        "oracle_sha256_matches_packet": true
+      },
+      "exact_schema": {
+        "top_level_keys_match_prompt": true,
+        "matches_frozen_answer": true,
+        "violations": [],
+        "constraints_explicit_in_visible_prompt": {
+          "exact_top_level_keys": true,
+          "nested_element_serialization": "No mismatch requiring qualification"
+        }
+      },
+      "allowed_changes": {
+        "allowed": [
+          "answer.json"
+        ],
+        "actual": [
+          "answer.json"
+        ],
+        "matches_packet_changed_files": true,
+        "violations": [],
+        "status": "compliant",
+        "constraints_explicit_in_visible_prompt": true,
+        "prompt_basis": "Prompt explicitly says do not change source; only answer.json was changed."
+      },
+      "behavioral_source_assessment": {
+        "necessary_source_facts_correct": true,
+        "status": "passes_prompt_required_behavior_in_reviewed_snapshot",
+        "evidence": [
+          {
+            "source": "src/registry.js:registry",
+            "fact": "Null-prototype registry contains only mail and audit imported from corresponding channel files."
+          },
+          {
+            "source": "src/dispatch.js:dispatch",
+            "fact": "Looks up registry[event.kind], throws Error(unknown kind) for absent entry, otherwise invokes selected handler with payload."
+          },
+          {
+            "source": "src/channels/mail.js:handle; src/codec.js:encode",
+            "fact": "Mail output uses String(payload).trim().toLowerCase(), yielding mail:hi."
+          },
+          {
+            "source": "src/preview.js:preview; src/channels/legacy.js:handle",
+            "fact": "Legacy is imported only by preview, absent from dispatch registry in this snapshot."
+          }
+        ],
+        "independent_checks": {
+          "status": "passed",
+          "checks": [
+            "registry keys, null prototype, exact registered function identities",
+            "mail selection/output and audit alternate output",
+            "unknown kinds including inherited names rejected",
+            "legacy available to preview but absent from dispatch registry"
+          ]
+        },
+        "candidate_test_result": null,
+        "unsupported_claims": [],
+        "missed_required_source_facts": []
+      },
+      "qualifications": [
+        "The answer correctly preserves runtime uncertainty: without kind, static source identifies two registered possibilities rather than one unconditional target.",
+        "Reachability claim is about the supplied source snapshot and registry initialization. The exported registry is mutable, so this does not establish impossibility under hypothetical external mutation. No such mutation is present in the reviewed source."
+      ],
+      "limitations": [
+        "Arm identity remained blinded throughout this review.",
+        "Only supplied prompt/reference/candidate/oracle/criteria packets were consulted; no traces or original execution chronology were read.",
+        "This is a diagnostic assessment, not a replacement or aggregate alternative official score."
+      ]
+    },
+    {
+      "case_id": "case-06",
+      "task_id": "zero-quantity",
+      "frozen_oracle": {
+        "status": "passed",
+        "exit_code": 0,
+        "failure_stage": null,
+        "reason": null,
+        "output": "{\"status\":\"passed\"}",
+        "oracle_sha256_matches_packet": true
+      },
+      "exact_schema": {
+        "top_level_keys_match_prompt": true,
+        "matches_frozen_answer": true,
+        "violations": [],
+        "constraints_explicit_in_visible_prompt": {
+          "exact_top_level_keys": true,
+          "nested_element_serialization": "No mismatch requiring qualification"
+        }
+      },
+      "allowed_changes": {
+        "allowed": [
+          "answer.json",
+          "src/quantity.js"
+        ],
+        "actual": [
+          "answer.json",
+          "src/quantity.js"
+        ],
+        "matches_packet_changed_files": true,
+        "violations": [],
+        "status": "compliant",
+        "constraints_explicit_in_visible_prompt": false,
+        "prompt_basis": "Exact file allowlist is packet criteria only; prompt identifies shared API parser, protects CLI, requests smallest source change and relevant check."
+      },
+      "behavioral_source_assessment": {
+        "necessary_source_facts_correct": true,
+        "status": "passes_prompt_required_behavior_in_reviewed_snapshot",
+        "evidence": [
+          {
+            "source": "src/api.js:lineFromRequest",
+            "fact": "Uses shared parseQuantity from src/quantity.js then buildLine from src/line.js."
+          },
+          {
+            "source": "src/quantity.js:parseQuantity",
+            "fact": "Changes nonpositive rejection to negative rejection and separately excludes empty/whitespace-only string coercion to zero; required invalid classes still produce Error(invalid quantity)."
+          },
+          {
+            "source": "src/line.js:buildLine",
+            "fact": "Trims sku and sets active to quantity > 0; zero yields {sku:A,quantity:0,active:false}."
+          },
+          {
+            "source": "src/cli.js:parseQuantity",
+            "fact": "Byte-identical to reference; retains parseInt(value,10) || 1 and returns 1 for zero."
+          }
+        ],
+        "independent_checks": {
+          "status": "passed",
+          "checks": [
+            "shared parser and API for numeric/string zero and positive integer compatibility",
+            "direct parser and API rejection for every required invalid class including Unicode whitespace",
+            "Error class and exact message",
+            "CLI legacy examples unchanged"
+          ]
+        },
+        "candidate_test_result": null,
+        "unsupported_claims": [],
+        "missed_required_source_facts": []
+      },
+      "qualifications": [
+        "Independent checks cover the prompt-specified numeric/string inputs and rejected classes, not every possible JavaScript object/coercion input. Object/array/BigInt/Symbol contracts are not specified, and are not promoted into new requirements.",
+        "The packet does not contain execution traces; this review proves behavior now, but cannot independently attest that the original candidate ran its requested relevant check."
+      ],
+      "limitations": [
+        "Arm identity remained blinded throughout this review.",
+        "Only supplied prompt/reference/candidate/oracle/criteria packets were consulted; no traces or original execution chronology were read.",
+        "This is a diagnostic assessment, not a replacement or aggregate alternative official score."
+      ]
+    },
+    {
+      "case_id": "case-07",
+      "task_id": "zero-quantity",
+      "frozen_oracle": {
+        "status": "passed",
+        "exit_code": 0,
+        "failure_stage": null,
+        "reason": null,
+        "output": "{\"status\":\"passed\"}",
+        "oracle_sha256_matches_packet": true
+      },
+      "exact_schema": {
+        "top_level_keys_match_prompt": true,
+        "matches_frozen_answer": true,
+        "violations": [],
+        "constraints_explicit_in_visible_prompt": {
+          "exact_top_level_keys": true,
+          "nested_element_serialization": "No mismatch requiring qualification"
+        }
+      },
+      "allowed_changes": {
+        "allowed": [
+          "answer.json",
+          "src/quantity.js"
+        ],
+        "actual": [
+          "answer.json",
+          "src/quantity.js",
+          "test/api-quantity.test.js"
+        ],
+        "matches_packet_changed_files": true,
+        "violations": [
+          "test/api-quantity.test.js"
+        ],
+        "status": "violated_packet_allowlist",
+        "constraints_explicit_in_visible_prompt": false,
+        "prompt_basis": "Exact file allowlist is packet criteria only; prompt identifies shared API parser, protects CLI, requests smallest source change and relevant check."
+      },
+      "behavioral_source_assessment": {
+        "necessary_source_facts_correct": true,
+        "status": "passes_prompt_required_behavior_in_reviewed_snapshot",
+        "evidence": [
+          {
+            "source": "src/api.js:lineFromRequest",
+            "fact": "Uses shared parseQuantity from src/quantity.js then buildLine from src/line.js."
+          },
+          {
+            "source": "src/quantity.js:parseQuantity",
+            "fact": "Changes nonpositive rejection to negative rejection and separately excludes empty/whitespace-only string coercion to zero; required invalid classes still produce Error(invalid quantity)."
+          },
+          {
+            "source": "src/line.js:buildLine",
+            "fact": "Trims sku and sets active to quantity > 0; zero yields {sku:A,quantity:0,active:false}."
+          },
+          {
+            "source": "src/cli.js:parseQuantity",
+            "fact": "Byte-identical to reference; retains parseInt(value,10) || 1 and returns 1 for zero."
+          }
+        ],
+        "independent_checks": {
+          "status": "passed",
+          "checks": [
+            "shared parser and API for numeric/string zero and positive integer compatibility",
+            "direct parser and API rejection for every required invalid class including Unicode whitespace",
+            "Error class and exact message",
+            "CLI legacy examples unchanged"
+          ]
+        },
+        "candidate_test_result": {
+          "status": "passed",
+          "command": "node --test candidate/test/api-quantity.test.js",
+          "exit_code": 0
+        },
+        "unsupported_claims": [],
+        "missed_required_source_facts": []
+      },
+      "qualifications": [
+        "Independent checks cover the prompt-specified numeric/string inputs and rejected classes, not every possible JavaScript object/coercion input. Object/array/BigInt/Symbol contracts are not specified, and are not promoted into new requirements.",
+        "The packet does not contain execution traces; this review proves behavior now, but cannot independently attest that the original candidate ran its requested relevant check.",
+        "Added test is a focused behavioral regression check and passes when executed below. It violates the packet allowlist, which permits only answer.json and src/quantity.js. The visible prompt does not expose that allowlist or expressly prohibit adding a test; it asks for the smallest correct source change and a relevant check. Do not equate this evaluator policy violation with a functional defect or an explicit forbidden-test instruction."
+      ],
+      "limitations": [
+        "Arm identity remained blinded throughout this review.",
+        "Only supplied prompt/reference/candidate/oracle/criteria packets were consulted; no traces or original execution chronology were read.",
+        "This is a diagnostic assessment, not a replacement or aggregate alternative official score."
+      ]
+    },
+    {
+      "case_id": "case-08",
+      "task_id": "zero-quantity",
+      "frozen_oracle": {
+        "status": "passed",
+        "exit_code": 0,
+        "failure_stage": null,
+        "reason": null,
+        "output": "{\"status\":\"passed\"}",
+        "oracle_sha256_matches_packet": true
+      },
+      "exact_schema": {
+        "top_level_keys_match_prompt": true,
+        "matches_frozen_answer": true,
+        "violations": [],
+        "constraints_explicit_in_visible_prompt": {
+          "exact_top_level_keys": true,
+          "nested_element_serialization": "No mismatch requiring qualification"
+        }
+      },
+      "allowed_changes": {
+        "allowed": [
+          "answer.json",
+          "src/quantity.js"
+        ],
+        "actual": [
+          "answer.json",
+          "src/quantity.js",
+          "test/api-quantity.test.js"
+        ],
+        "matches_packet_changed_files": true,
+        "violations": [
+          "test/api-quantity.test.js"
+        ],
+        "status": "violated_packet_allowlist",
+        "constraints_explicit_in_visible_prompt": false,
+        "prompt_basis": "Exact file allowlist is packet criteria only; prompt identifies shared API parser, protects CLI, requests smallest source change and relevant check."
+      },
+      "behavioral_source_assessment": {
+        "necessary_source_facts_correct": true,
+        "status": "passes_prompt_required_behavior_in_reviewed_snapshot",
+        "evidence": [
+          {
+            "source": "src/api.js:lineFromRequest",
+            "fact": "Uses shared parseQuantity from src/quantity.js then buildLine from src/line.js."
+          },
+          {
+            "source": "src/quantity.js:parseQuantity",
+            "fact": "Changes nonpositive rejection to negative rejection and separately excludes empty/whitespace-only string coercion to zero; required invalid classes still produce Error(invalid quantity)."
+          },
+          {
+            "source": "src/line.js:buildLine",
+            "fact": "Trims sku and sets active to quantity > 0; zero yields {sku:A,quantity:0,active:false}."
+          },
+          {
+            "source": "src/cli.js:parseQuantity",
+            "fact": "Byte-identical to reference; retains parseInt(value,10) || 1 and returns 1 for zero."
+          }
+        ],
+        "independent_checks": {
+          "status": "passed",
+          "checks": [
+            "shared parser and API for numeric/string zero and positive integer compatibility",
+            "direct parser and API rejection for every required invalid class including Unicode whitespace",
+            "Error class and exact message",
+            "CLI legacy examples unchanged"
+          ]
+        },
+        "candidate_test_result": {
+          "status": "passed",
+          "command": "node --test candidate/test/api-quantity.test.js",
+          "exit_code": 0
+        },
+        "unsupported_claims": [],
+        "missed_required_source_facts": []
+      },
+      "qualifications": [
+        "Independent checks cover the prompt-specified numeric/string inputs and rejected classes, not every possible JavaScript object/coercion input. Object/array/BigInt/Symbol contracts are not specified, and are not promoted into new requirements.",
+        "The packet does not contain execution traces; this review proves behavior now, but cannot independently attest that the original candidate ran its requested relevant check.",
+        "Added test is a focused behavioral regression check and passes when executed below. It violates the packet allowlist, which permits only answer.json and src/quantity.js. The visible prompt does not expose that allowlist or expressly prohibit adding a test; it asks for the smallest correct source change and a relevant check. Do not equate this evaluator policy violation with a functional defect or an explicit forbidden-test instruction."
+      ],
+      "limitations": [
+        "Arm identity remained blinded throughout this review.",
+        "Only supplied prompt/reference/candidate/oracle/criteria packets were consulted; no traces or original execution chronology were read.",
+        "This is a diagnostic assessment, not a replacement or aggregate alternative official score."
+      ]
+    },
+    {
+      "case_id": "case-09",
+      "task_id": "inventory-contract",
+      "frozen_oracle": {
+        "status": "failed",
+        "exit_code": 1,
+        "failure_stage": "initial answer deepStrictEqual, before runtime assertions",
+        "reason": "Exact nested representation differs; source fact values are correct.",
+        "output": "",
+        "oracle_sha256_matches_packet": true
+      },
+      "exact_schema": {
+        "top_level_keys_match_prompt": true,
+        "matches_frozen_answer": false,
+        "violations": [
+          {
+            "field": "files",
+            "expected": "Array of five relative path strings",
+            "observed_form": "Array of path/symbol objects",
+            "issue": "All five active paths and symbols are correct and ordered; frozen deep equality rejects object elements."
+          }
+        ],
+        "constraints_explicit_in_visible_prompt": {
+          "exact_top_level_keys": true,
+          "nested_element_serialization": false
+        }
+      },
+      "allowed_changes": {
+        "allowed": [
+          "answer.json"
+        ],
+        "actual": [
+          "answer.json"
+        ],
+        "matches_packet_changed_files": true,
+        "violations": [],
+        "status": "compliant",
+        "constraints_explicit_in_visible_prompt": true,
+        "prompt_basis": "Prompt explicitly says do not change source; only answer.json was changed."
+      },
+      "behavioral_source_assessment": {
+        "necessary_source_facts_correct": true,
+        "status": "passes_prompt_required_behavior_in_reviewed_snapshot",
+        "evidence": [
+          {
+            "source": "src/entry.js:importStock",
+            "fact": "Imports CSV parseStock, domain normalizeStock, output wireStock and composes them in that order."
+          },
+          {
+            "source": "src/input/csv.js:parseStock",
+            "fact": "Trims full text, splits CSV, converts available and reserved with Number."
+          },
+          {
+            "source": "src/domain/stock.js:normalizeStock",
+            "fact": "Checks both counts with Number.isFinite; throws invalid count; computes Math.max(0, available - reserved). Calls canonicalSku."
+          },
+          {
+            "source": "src/domain/sku.js:canonicalSku",
+            "fact": "Trims and uppercases SKU."
+          },
+          {
+            "source": "src/output/wire.js:wireStock",
+            "fact": "Returns product_code, units, schema:2; required input produces AB-2,0,2."
+          }
+        ],
+        "independent_checks": {
+          "status": "passed",
+          "checks": [
+            "active parser/domain/SKU/wire contracts",
+            "reserved subtraction before clamp including negative inputs",
+            "required full output and exact invalid count error"
+          ]
+        },
+        "candidate_test_result": null,
+        "unsupported_claims": [],
+        "missed_required_source_facts": []
+      },
+      "qualifications": [
+        "Prompt specifies files and the five-file order plus exact top-level keys, but does not explicitly declare string element types. The shared instruction asks for paths and symbols. The frozen string-array representation is stricter than semantic identification.",
+        "Frozen oracle exits at answer equality, so its later runtime assertions are not executed on this candidate. Independent behavioral evidence is separate and does not change that failure."
+      ],
+      "limitations": [
+        "Arm identity remained blinded throughout this review.",
+        "Only supplied prompt/reference/candidate/oracle/criteria packets were consulted; no traces or original execution chronology were read.",
+        "This is a diagnostic assessment, not a replacement or aggregate alternative official score."
+      ]
+    },
+    {
+      "case_id": "case-10",
+      "task_id": "receipt-location",
+      "frozen_oracle": {
+        "status": "failed",
+        "exit_code": 1,
+        "failure_stage": "initial answer deepStrictEqual, before runtime assertions",
+        "reason": "Exact nested representation differs; source fact values are correct.",
+        "output": "",
+        "oracle_sha256_matches_packet": true
+      },
+      "exact_schema": {
+        "top_level_keys_match_prompt": true,
+        "matches_frozen_answer": false,
+        "violations": [
+          {
+            "field": "call_chain",
+            "expected": [
+              "checkout",
+              "submitInvoice",
+              "makeReceiptKey",
+              "sendInvoice"
+            ],
+            "observed_form": "file-qualified symbol strings",
+            "issue": "Frozen deep equality rejects the representation; the ordered source functions themselves are correct."
+          }
+        ],
+        "constraints_explicit_in_visible_prompt": {
+          "exact_top_level_keys": true,
+          "nested_element_serialization": false
+        }
+      },
+      "allowed_changes": {
+        "allowed": [
+          "answer.json"
+        ],
+        "actual": [
+          "answer.json"
+        ],
+        "matches_packet_changed_files": true,
+        "violations": [],
+        "status": "compliant",
+        "constraints_explicit_in_visible_prompt": true,
+        "prompt_basis": "Prompt explicitly says do not change source; only answer.json was changed."
+      },
+      "behavioral_source_assessment": {
+        "necessary_source_facts_correct": true,
+        "status": "passes_prompt_required_behavior_in_reviewed_snapshot",
+        "evidence": [
+          {
+            "source": "src/app.js:checkout",
+            "fact": "Invokes submitInvoice(invoice, provider)."
+          },
+          {
+            "source": "src/billing/submit.js:submitInvoice",
+            "fact": "Imports billing makeReceiptKey; computes key then passes it as third argument to sendInvoice."
+          },
+          {
+            "source": "src/billing/receipt.js:makeReceiptKey",
+            "fact": "Constructs invoice/accountId/sequence with four-character zero padding; required example is invoice/acme/0007."
+          },
+          {
+            "source": "src/transport/invoices.js:sendInvoice",
+            "fact": "Passes receiptKey to provider.post as Idempotency-Key."
+          },
+          {
+            "source": "src/reports/receipt.js:makeReceiptKey; src/transport/receipt.js:makeReceiptKey",
+            "fact": "Other same-named helpers create report:id and read response x-receipt respectively; neither is the imported billing owner."
+          }
+        ],
+        "independent_checks": {
+          "status": "passed",
+          "checks": [
+            "actual checkout outbound path/body/header and result",
+            "owner key for required example",
+            "report and response helper distinction"
+          ]
+        },
+        "candidate_test_result": null,
+        "unsupported_claims": [],
+        "missed_required_source_facts": []
+      },
+      "qualifications": [
+        "Correct owner path distinguishes similarly named helpers, but the answer does not separately explain the other helpers; the required six-key schema offers no dedicated explanatory field.",
+        "The displayed call_chain is a task-prescribed ordered trace: makeReceiptKey returns to submitInvoice before sendInvoice; it is not a direct edge from makeReceiptKey to sendInvoice.",
+        "Prompt says ordered symbols and exactly the listed top-level keys, but does not show an array element JSON schema or explicitly ban path qualification/objects. Its shared instruction asks for exact paths and symbols. Frozen bare-symbol serialization is stricter than semantic identification.",
+        "Frozen oracle exits at answer equality, so its later runtime assertion is not executed on this candidate. Independent behavioral evidence below is separate and does not change that failure."
+      ],
+      "limitations": [
+        "Arm identity remained blinded throughout this review.",
+        "Only supplied prompt/reference/candidate/oracle/criteria packets were consulted; no traces or original execution chronology were read.",
+        "This is a diagnostic assessment, not a replacement or aggregate alternative official score."
+      ]
+    },
+    {
+      "case_id": "case-11",
+      "task_id": "inventory-contract",
+      "frozen_oracle": {
+        "status": "failed",
+        "exit_code": 1,
+        "failure_stage": "initial answer deepStrictEqual, before runtime assertions",
+        "reason": "Exact nested representation differs; source fact values are correct.",
+        "output": "",
+        "oracle_sha256_matches_packet": true
+      },
+      "exact_schema": {
+        "top_level_keys_match_prompt": true,
+        "matches_frozen_answer": false,
+        "violations": [
+          {
+            "field": "files",
+            "expected": "Array of five relative path strings",
+            "observed_form": "Array of path/symbol objects",
+            "issue": "All five active paths and symbols are correct and ordered; frozen deep equality rejects object elements."
+          }
+        ],
+        "constraints_explicit_in_visible_prompt": {
+          "exact_top_level_keys": true,
+          "nested_element_serialization": false
+        }
+      },
+      "allowed_changes": {
+        "allowed": [
+          "answer.json"
+        ],
+        "actual": [
+          "answer.json"
+        ],
+        "matches_packet_changed_files": true,
+        "violations": [],
+        "status": "compliant",
+        "constraints_explicit_in_visible_prompt": true,
+        "prompt_basis": "Prompt explicitly says do not change source; only answer.json was changed."
+      },
+      "behavioral_source_assessment": {
+        "necessary_source_facts_correct": true,
+        "status": "passes_prompt_required_behavior_in_reviewed_snapshot",
+        "evidence": [
+          {
+            "source": "src/entry.js:importStock",
+            "fact": "Imports CSV parseStock, domain normalizeStock, output wireStock and composes them in that order."
+          },
+          {
+            "source": "src/input/csv.js:parseStock",
+            "fact": "Trims full text, splits CSV, converts available and reserved with Number."
+          },
+          {
+            "source": "src/domain/stock.js:normalizeStock",
+            "fact": "Checks both counts with Number.isFinite; throws invalid count; computes Math.max(0, available - reserved). Calls canonicalSku."
+          },
+          {
+            "source": "src/domain/sku.js:canonicalSku",
+            "fact": "Trims and uppercases SKU."
+          },
+          {
+            "source": "src/output/wire.js:wireStock",
+            "fact": "Returns product_code, units, schema:2; required input produces AB-2,0,2."
+          }
+        ],
+        "independent_checks": {
+          "status": "passed",
+          "checks": [
+            "active parser/domain/SKU/wire contracts",
+            "reserved subtraction before clamp including negative inputs",
+            "required full output and exact invalid count error"
+          ]
+        },
+        "candidate_test_result": null,
+        "unsupported_claims": [],
+        "missed_required_source_facts": []
+      },
+      "qualifications": [
+        "Prompt specifies files and the five-file order plus exact top-level keys, but does not explicitly declare string element types. The shared instruction asks for paths and symbols. The frozen string-array representation is stricter than semantic identification.",
+        "Frozen oracle exits at answer equality, so its later runtime assertions are not executed on this candidate. Independent behavioral evidence is separate and does not change that failure."
+      ],
+      "limitations": [
+        "Arm identity remained blinded throughout this review.",
+        "Only supplied prompt/reference/candidate/oracle/criteria packets were consulted; no traces or original execution chronology were read.",
+        "This is a diagnostic assessment, not a replacement or aggregate alternative official score."
+      ]
+    },
+    {
+      "case_id": "case-12",
+      "task_id": "dispatch-ambiguity",
+      "frozen_oracle": {
+        "status": "passed",
+        "exit_code": 0,
+        "failure_stage": null,
+        "reason": null,
+        "output": "{\"status\":\"passed\"}",
+        "oracle_sha256_matches_packet": true
+      },
+      "exact_schema": {
+        "top_level_keys_match_prompt": true,
+        "matches_frozen_answer": true,
+        "violations": [],
+        "constraints_explicit_in_visible_prompt": {
+          "exact_top_level_keys": true,
+          "nested_element_serialization": "No mismatch requiring qualification"
+        }
+      },
+      "allowed_changes": {
+        "allowed": [
+          "answer.json"
+        ],
+        "actual": [
+          "answer.json"
+        ],
+        "matches_packet_changed_files": true,
+        "violations": [],
+        "status": "compliant",
+        "constraints_explicit_in_visible_prompt": true,
+        "prompt_basis": "Prompt explicitly says do not change source; only answer.json was changed."
+      },
+      "behavioral_source_assessment": {
+        "necessary_source_facts_correct": true,
+        "status": "passes_prompt_required_behavior_in_reviewed_snapshot",
+        "evidence": [
+          {
+            "source": "src/registry.js:registry",
+            "fact": "Null-prototype registry contains only mail and audit imported from corresponding channel files."
+          },
+          {
+            "source": "src/dispatch.js:dispatch",
+            "fact": "Looks up registry[event.kind], throws Error(unknown kind) for absent entry, otherwise invokes selected handler with payload."
+          },
+          {
+            "source": "src/channels/mail.js:handle; src/codec.js:encode",
+            "fact": "Mail output uses String(payload).trim().toLowerCase(), yielding mail:hi."
+          },
+          {
+            "source": "src/preview.js:preview; src/channels/legacy.js:handle",
+            "fact": "Legacy is imported only by preview, absent from dispatch registry in this snapshot."
+          }
+        ],
+        "independent_checks": {
+          "status": "passed",
+          "checks": [
+            "registry keys, null prototype, exact registered function identities",
+            "mail selection/output and audit alternate output",
+            "unknown kinds including inherited names rejected",
+            "legacy available to preview but absent from dispatch registry"
+          ]
+        },
+        "candidate_test_result": null,
+        "unsupported_claims": [],
+        "missed_required_source_facts": []
+      },
+      "qualifications": [
+        "The answer correctly preserves runtime uncertainty: without kind, static source identifies two registered possibilities rather than one unconditional target.",
+        "Reachability claim is about the supplied source snapshot and registry initialization. The exported registry is mutable, so this does not establish impossibility under hypothetical external mutation. No such mutation is present in the reviewed source."
+      ],
+      "limitations": [
+        "Arm identity remained blinded throughout this review.",
+        "Only supplied prompt/reference/candidate/oracle/criteria packets were consulted; no traces or original execution chronology were read.",
+        "This is a diagnostic assessment, not a replacement or aggregate alternative official score."
+      ]
+    },
+    {
+      "case_id": "case-13",
+      "task_id": "zero-quantity",
+      "frozen_oracle": {
+        "status": "passed",
+        "exit_code": 0,
+        "failure_stage": null,
+        "reason": null,
+        "output": "{\"status\":\"passed\"}",
+        "oracle_sha256_matches_packet": true
+      },
+      "exact_schema": {
+        "top_level_keys_match_prompt": true,
+        "matches_frozen_answer": true,
+        "violations": [],
+        "constraints_explicit_in_visible_prompt": {
+          "exact_top_level_keys": true,
+          "nested_element_serialization": "No mismatch requiring qualification"
+        }
+      },
+      "allowed_changes": {
+        "allowed": [
+          "answer.json",
+          "src/quantity.js"
+        ],
+        "actual": [
+          "answer.json",
+          "src/quantity.js"
+        ],
+        "matches_packet_changed_files": true,
+        "violations": [],
+        "status": "compliant",
+        "constraints_explicit_in_visible_prompt": false,
+        "prompt_basis": "Exact file allowlist is packet criteria only; prompt identifies shared API parser, protects CLI, requests smallest source change and relevant check."
+      },
+      "behavioral_source_assessment": {
+        "necessary_source_facts_correct": true,
+        "status": "passes_prompt_required_behavior_in_reviewed_snapshot",
+        "evidence": [
+          {
+            "source": "src/api.js:lineFromRequest",
+            "fact": "Uses shared parseQuantity from src/quantity.js then buildLine from src/line.js."
+          },
+          {
+            "source": "src/quantity.js:parseQuantity",
+            "fact": "Changes nonpositive rejection to negative rejection and adds invalidZero guard allowing numeric zero and nonempty zero-valued strings; required invalid classes still produce Error(invalid quantity)."
+          },
+          {
+            "source": "src/line.js:buildLine",
+            "fact": "Trims sku and sets active to quantity > 0; zero yields {sku:A,quantity:0,active:false}."
+          },
+          {
+            "source": "src/cli.js:parseQuantity",
+            "fact": "Byte-identical to reference; retains parseInt(value,10) || 1 and returns 1 for zero."
+          }
+        ],
+        "independent_checks": {
+          "status": "passed",
+          "checks": [
+            "shared parser and API for numeric/string zero and positive integer compatibility",
+            "direct parser and API rejection for every required invalid class including Unicode whitespace",
+            "Error class and exact message",
+            "CLI legacy examples unchanged"
+          ]
+        },
+        "candidate_test_result": null,
+        "unsupported_claims": [],
+        "missed_required_source_facts": []
+      },
+      "qualifications": [
+        "Independent checks cover the prompt-specified numeric/string inputs and rejected classes, not every possible JavaScript object/coercion input. Object/array/BigInt/Symbol contracts are not specified, and are not promoted into new requirements.",
+        "The packet does not contain execution traces; this review proves behavior now, but cannot independently attest that the original candidate ran its requested relevant check."
+      ],
+      "limitations": [
+        "Arm identity remained blinded throughout this review.",
+        "Only supplied prompt/reference/candidate/oracle/criteria packets were consulted; no traces or original execution chronology were read.",
+        "This is a diagnostic assessment, not a replacement or aggregate alternative official score."
+      ]
+    },
+    {
+      "case_id": "case-14",
+      "task_id": "inventory-contract",
+      "frozen_oracle": {
+        "status": "passed",
+        "exit_code": 0,
+        "failure_stage": null,
+        "reason": null,
+        "output": "{\"status\":\"passed\"}",
+        "oracle_sha256_matches_packet": true
+      },
+      "exact_schema": {
+        "top_level_keys_match_prompt": true,
+        "matches_frozen_answer": true,
+        "violations": [],
+        "constraints_explicit_in_visible_prompt": {
+          "exact_top_level_keys": true,
+          "nested_element_serialization": "No mismatch requiring qualification"
+        }
+      },
+      "allowed_changes": {
+        "allowed": [
+          "answer.json"
+        ],
+        "actual": [
+          "answer.json"
+        ],
+        "matches_packet_changed_files": true,
+        "violations": [],
+        "status": "compliant",
+        "constraints_explicit_in_visible_prompt": true,
+        "prompt_basis": "Prompt explicitly says do not change source; only answer.json was changed."
+      },
+      "behavioral_source_assessment": {
+        "necessary_source_facts_correct": true,
+        "status": "passes_prompt_required_behavior_in_reviewed_snapshot",
+        "evidence": [
+          {
+            "source": "src/entry.js:importStock",
+            "fact": "Imports CSV parseStock, domain normalizeStock, output wireStock and composes them in that order."
+          },
+          {
+            "source": "src/input/csv.js:parseStock",
+            "fact": "Trims full text, splits CSV, converts available and reserved with Number."
+          },
+          {
+            "source": "src/domain/stock.js:normalizeStock",
+            "fact": "Checks both counts with Number.isFinite; throws invalid count; computes Math.max(0, available - reserved). Calls canonicalSku."
+          },
+          {
+            "source": "src/domain/sku.js:canonicalSku",
+            "fact": "Trims and uppercases SKU."
+          },
+          {
+            "source": "src/output/wire.js:wireStock",
+            "fact": "Returns product_code, units, schema:2; required input produces AB-2,0,2."
+          }
+        ],
+        "independent_checks": {
+          "status": "passed",
+          "checks": [
+            "active parser/domain/SKU/wire contracts",
+            "reserved subtraction before clamp including negative inputs",
+            "required full output and exact invalid count error"
+          ]
+        },
+        "candidate_test_result": null,
+        "unsupported_claims": [],
+        "missed_required_source_facts": []
+      },
+      "qualifications": [],
+      "limitations": [
+        "Arm identity remained blinded throughout this review.",
+        "Only supplied prompt/reference/candidate/oracle/criteria packets were consulted; no traces or original execution chronology were read.",
+        "This is a diagnostic assessment, not a replacement or aggregate alternative official score."
+      ]
+    },
+    {
+      "case_id": "case-15",
+      "task_id": "dispatch-ambiguity",
+      "frozen_oracle": {
+        "status": "passed",
+        "exit_code": 0,
+        "failure_stage": null,
+        "reason": null,
+        "output": "{\"status\":\"passed\"}",
+        "oracle_sha256_matches_packet": true
+      },
+      "exact_schema": {
+        "top_level_keys_match_prompt": true,
+        "matches_frozen_answer": true,
+        "violations": [],
+        "constraints_explicit_in_visible_prompt": {
+          "exact_top_level_keys": true,
+          "nested_element_serialization": "No mismatch requiring qualification"
+        }
+      },
+      "allowed_changes": {
+        "allowed": [
+          "answer.json"
+        ],
+        "actual": [
+          "answer.json"
+        ],
+        "matches_packet_changed_files": true,
+        "violations": [],
+        "status": "compliant",
+        "constraints_explicit_in_visible_prompt": true,
+        "prompt_basis": "Prompt explicitly says do not change source; only answer.json was changed."
+      },
+      "behavioral_source_assessment": {
+        "necessary_source_facts_correct": true,
+        "status": "passes_prompt_required_behavior_in_reviewed_snapshot",
+        "evidence": [
+          {
+            "source": "src/registry.js:registry",
+            "fact": "Null-prototype registry contains only mail and audit imported from corresponding channel files."
+          },
+          {
+            "source": "src/dispatch.js:dispatch",
+            "fact": "Looks up registry[event.kind], throws Error(unknown kind) for absent entry, otherwise invokes selected handler with payload."
+          },
+          {
+            "source": "src/channels/mail.js:handle; src/codec.js:encode",
+            "fact": "Mail output uses String(payload).trim().toLowerCase(), yielding mail:hi."
+          },
+          {
+            "source": "src/preview.js:preview; src/channels/legacy.js:handle",
+            "fact": "Legacy is imported only by preview, absent from dispatch registry in this snapshot."
+          }
+        ],
+        "independent_checks": {
+          "status": "passed",
+          "checks": [
+            "registry keys, null prototype, exact registered function identities",
+            "mail selection/output and audit alternate output",
+            "unknown kinds including inherited names rejected",
+            "legacy available to preview but absent from dispatch registry"
+          ]
+        },
+        "candidate_test_result": null,
+        "unsupported_claims": [],
+        "missed_required_source_facts": []
+      },
+      "qualifications": [
+        "The answer correctly preserves runtime uncertainty: without kind, static source identifies two registered possibilities rather than one unconditional target.",
+        "Reachability claim is about the supplied source snapshot and registry initialization. The exported registry is mutable, so this does not establish impossibility under hypothetical external mutation. No such mutation is present in the reviewed source."
+      ],
+      "limitations": [
+        "Arm identity remained blinded throughout this review.",
+        "Only supplied prompt/reference/candidate/oracle/criteria packets were consulted; no traces or original execution chronology were read.",
+        "This is a diagnostic assessment, not a replacement or aggregate alternative official score."
+      ]
+    },
+    {
+      "case_id": "case-16",
+      "task_id": "dispatch-ambiguity",
+      "frozen_oracle": {
+        "status": "passed",
+        "exit_code": 0,
+        "failure_stage": null,
+        "reason": null,
+        "output": "{\"status\":\"passed\"}",
+        "oracle_sha256_matches_packet": true
+      },
+      "exact_schema": {
+        "top_level_keys_match_prompt": true,
+        "matches_frozen_answer": true,
+        "violations": [],
+        "constraints_explicit_in_visible_prompt": {
+          "exact_top_level_keys": true,
+          "nested_element_serialization": "No mismatch requiring qualification"
+        }
+      },
+      "allowed_changes": {
+        "allowed": [
+          "answer.json"
+        ],
+        "actual": [
+          "answer.json"
+        ],
+        "matches_packet_changed_files": true,
+        "violations": [],
+        "status": "compliant",
+        "constraints_explicit_in_visible_prompt": true,
+        "prompt_basis": "Prompt explicitly says do not change source; only answer.json was changed."
+      },
+      "behavioral_source_assessment": {
+        "necessary_source_facts_correct": true,
+        "status": "passes_prompt_required_behavior_in_reviewed_snapshot",
+        "evidence": [
+          {
+            "source": "src/registry.js:registry",
+            "fact": "Null-prototype registry contains only mail and audit imported from corresponding channel files."
+          },
+          {
+            "source": "src/dispatch.js:dispatch",
+            "fact": "Looks up registry[event.kind], throws Error(unknown kind) for absent entry, otherwise invokes selected handler with payload."
+          },
+          {
+            "source": "src/channels/mail.js:handle; src/codec.js:encode",
+            "fact": "Mail output uses String(payload).trim().toLowerCase(), yielding mail:hi."
+          },
+          {
+            "source": "src/preview.js:preview; src/channels/legacy.js:handle",
+            "fact": "Legacy is imported only by preview, absent from dispatch registry in this snapshot."
+          }
+        ],
+        "independent_checks": {
+          "status": "passed",
+          "checks": [
+            "registry keys, null prototype, exact registered function identities",
+            "mail selection/output and audit alternate output",
+            "unknown kinds including inherited names rejected",
+            "legacy available to preview but absent from dispatch registry"
+          ]
+        },
+        "candidate_test_result": null,
+        "unsupported_claims": [],
+        "missed_required_source_facts": []
+      },
+      "qualifications": [
+        "The answer correctly preserves runtime uncertainty: without kind, static source identifies two registered possibilities rather than one unconditional target.",
+        "Reachability claim is about the supplied source snapshot and registry initialization. The exported registry is mutable, so this does not establish impossibility under hypothetical external mutation. No such mutation is present in the reviewed source."
+      ],
+      "limitations": [
+        "Arm identity remained blinded throughout this review.",
+        "Only supplied prompt/reference/candidate/oracle/criteria packets were consulted; no traces or original execution chronology were read.",
+        "This is a diagnostic assessment, not a replacement or aggregate alternative official score."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "run_id": "receipt-location-path-only",
+  "source_identity": "6594ff8615bfd07d44e1a4dc5e704ac775dee4ceee62b22c1bb523136807e719",
+  "oracle_sha256": "e62e90d225a9f3f02ffdf40551f3cfd4618bdd77be8008976b02d0d4dadfc888",
+  "changes": [
+    "answer.json"
+  ],
+  "unexpected_changes": [],
+  "correct": false,
+  "oracle_stdout": "",
+  "oracle_stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n    call_chain: [\n+     'src/app.js:checkout',\n+     'src/billing/submit.js:submitInvoice',\n+     'src/billing/receipt.js:makeReceiptKey',\n+     'src/transport/invoices.js:sendInvoice'\n-     'checkout',\n-     'submitInvoice',\n-     'makeReceiptKey',\n-     'sendInvoice'\n    ],\n    example_key: 'invoice/acme/0007',\n    outbound_file: 'src/transport/invoices.js',\n    outbound_symbol: 'sendInvoice',\n    owner_file: 'src/billing/receipt.js',\n\n    at file:///Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot/frozen-final/receipt-location/oracle.mjs:7:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:569:25)\n    at async node:internal/modules/esm/loader:650:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: {\n    owner_file: 'src/billing/receipt.js',\n    owner_symbol: 'makeReceiptKey',\n    outbound_file: 'src/transport/invoices.js',\n    outbound_symbol: 'sendInvoice',\n    call_chain: [\n      'src/app.js:checkout',\n      'src/billing/submit.js:submitInvoice',\n      'src/billing/receipt.js:makeReceiptKey',\n      'src/transport/invoices.js:sendInvoice'\n    ],\n    example_key: 'invoice/acme/0007'\n  },\n  expected: {\n    owner_file: 'src/billing/receipt.js',\n    owner_symbol: 'makeReceiptKey',\n    outbound_file: 'src/transport/invoices.js',\n    outbound_symbol: 'sendInvoice',\n    call_chain: [ 'checkout', 'submitInvoice', 'makeReceiptKey', 'sendInvoice' ],\n    example_key: 'invoice/acme/0007'\n  },\n  operator: 'deepStrictEqual',\n  diff: 'simple'\n}\n\nNode.js v26.5.0\n"
+}
