@@ -20,6 +20,7 @@ PROTECTION_FIELDS = (
     "approval_policy", "approvals_reviewer", "sandbox_policy", "permission_profile",
     "active_permission_profile", "file_system_sandbox_policy",
 )
+HOST_OBSERVATION_POLICY = "r1-personal-host-observations-v1"
 
 
 def digest(path: Path) -> str:
@@ -40,7 +41,14 @@ def native_config_binding(raw: bytes) -> dict:
             "effective_sha256": fingerprint(effective), "field_sha256": fields}
 
 
-def check_native_config(path: Path, expected_raw_sha256: str, binding: dict | None = None) -> dict:
+def native_config_contract(binding: dict) -> str:
+    fields = {key: value for key, value in binding["field_sha256"].items()
+              if key not in {"model", "model_reasoning_effort", "agents"}}
+    return hashlib.sha256(json.dumps(fields, sort_keys=True).encode()).hexdigest()
+
+
+def check_native_config(path: Path, expected_raw_sha256: str, binding: dict | None = None,
+                        *, host_observations: bool = False) -> dict:
     """Legacy raw pins stay strict; versioned R1 pins ignore only overridden defaults."""
     raw = path.read_bytes()
     raw_sha256 = hashlib.sha256(raw).hexdigest()
@@ -60,12 +68,17 @@ def check_native_config(path: Path, expected_raw_sha256: str, binding: dict | No
     current = native_config_binding(raw)
     changed = sorted(key for key in binding["field_sha256"].keys() | current["field_sha256"].keys()
                      if binding["field_sha256"].get(key) != current["field_sha256"].get(key))
-    if current["effective_sha256"] != binding["effective_sha256"]:
-        relevant = [key for key in changed if key not in {"model", "model_reasoning_effort"}]
+    excluded = {"model", "model_reasoning_effort"} | ({"agents"} if host_observations else set())
+    relevant = [key for key in changed if key not in excluded]
+    if relevant or (not host_observations and current["effective_sha256"] != binding["effective_sha256"]):
         raise ValueError("native configuration changed in effective fields: " + ", ".join(relevant))
-    return {"raw_sha256": raw_sha256, "effective_sha256": current["effective_sha256"],
+    observed = {"raw_sha256": raw_sha256, "effective_sha256": current["effective_sha256"],
             "overridden_default_changes": [key for key in changed if key in {"model", "model_reasoning_effort"}],
             "raw_changed": raw_sha256 != expected_raw_sha256}
+    if host_observations:
+        observed.update(contract_sha256=native_config_contract(current),
+                        observed_only_changes=[key for key in changed if key == "agents"])
+    return observed
 
 
 def disjoint(*paths: Path) -> bool:
@@ -74,7 +87,7 @@ def disjoint(*paths: Path) -> bool:
 
 
 def prepare(source: Path, destination: Path, *, run_id: str, arm: str,
-            native_config: Path, conditions: dict) -> dict:
+            native_config: Path, conditions: dict, host_observations: bool = False) -> dict:
     """Copy a prepared source export; keep all results outside the task snapshot."""
     if arm not in {"native", "loci"} or not run_id:
         raise ValueError("explicit run identity and native/loci assignment required")
@@ -83,7 +96,8 @@ def prepare(source: Path, destination: Path, *, run_id: str, arm: str,
     native_config = native_config.resolve(strict=True)
     binding = conditions.get("native_config_binding")
     if binding is not None:
-        observed = check_native_config(native_config, binding["raw_sha256"], binding)
+        observed = check_native_config(native_config, binding["raw_sha256"], binding,
+                                       host_observations=host_observations)
     else:
         observed = {"raw_sha256": digest(native_config)}
     if not disjoint(source, destination):
@@ -107,7 +121,7 @@ def prepare(source: Path, destination: Path, *, run_id: str, arm: str,
     return manifest
 
 
-def qualify(config: Path, trace: Path, *, thread_id: str) -> dict:
+def qualify(config: Path, trace: Path, *, thread_id: str, host_observations: bool = False) -> dict:
     """Archive one closed native trace and replayable source; retain unknowns."""
     manifest = json.loads(config.read_text())
     if manifest.get("kind") != "r0-native-session-input" or manifest.get("permission_overrides") != {}:
@@ -122,7 +136,8 @@ def qualify(config: Path, trace: Path, *, thread_id: str) -> dict:
     archived = output / "native-rollout.jsonl"
     archived.write_bytes(raw)
     try:
-        accounting = summarize_native(archived, thread_id)
+        accounting = (summarize_native(archived, thread_id, allow_instruction_updates=True)
+                      if host_observations else summarize_native(archived, thread_id))
     except (ValueError, KeyError, TypeError) as exc:
         accounting = {"usage_status": "unknown", "usage": None, "stages": [],
                       "turn_contexts": [], "native_errors": [f"invalid native evidence: {exc}"]}
@@ -136,7 +151,7 @@ def qualify(config: Path, trace: Path, *, thread_id: str) -> dict:
     try:
         config_validation = check_native_config(Path(manifest["native_config"]),
                                                binding["raw_sha256"] if binding else manifest["native_config_sha256"],
-                                               binding)
+                                               binding, host_observations=host_observations)
     except (ValueError, KeyError, TypeError) as exc:
         errors.append("native configuration changed during qualification: " + str(exc))
     contexts = accounting.get("turn_contexts", [])

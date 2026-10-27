@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from collections import Counter
 from datetime import datetime
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -238,7 +239,8 @@ def _native_bootstrap_user(payload: dict, turn_id: str) -> bool:
     return True
 
 
-def summarize_native(rollout_path: Path, thread_id: str) -> dict:
+def summarize_native(rollout_path: Path, thread_id: str, *,
+                     allow_instruction_updates: bool = False) -> dict:
     """Reduce one fresh native rollout, retaining only safe metadata in the report.
 
     The original JSONL remains the source for full provenance and tool outputs.
@@ -274,6 +276,7 @@ def summarize_native(rollout_path: Path, thread_id: str) -> dict:
     usage_positions: dict[str, list[int]] = {}
     first_turn_users = 0
     bootstrap_rows: list[int] = []
+    instruction_updates: list[dict] = []
     active: str | None = None
     response_records: dict[str, tuple[str, dict, dict, dict]] = {}
     call_records: dict[tuple[str, str, str], dict] = {}
@@ -387,15 +390,45 @@ def summarize_native(rollout_path: Path, thread_id: str) -> dict:
             continue
         if kind == "response_item":
             if active is None:
+                metadata = payload.get("internal_chat_message_metadata_passthrough")
+                kinds = metadata.get("content_item_kinds") if isinstance(metadata, dict) else None
+                if (allow_instruction_updates and isinstance(metadata, dict)
+                        and isinstance(kinds, list) and "agents_md.instructions" in kinds):
+                    raise ValueError("native instruction update outside active turn")
                 native_errors.append("native response item appeared outside an active turn")
                 continue
             metadata = payload.get("internal_chat_message_metadata_passthrough")
             attributed = metadata.get("turn_id") if isinstance(metadata, dict) else None
             if attributed is not None and attributed != active:
                 raise ValueError("native response item has foreign turn attribution")
+            if (allow_instruction_updates and isinstance(metadata, dict)
+                    and metadata.get("content_item_kinds") == ["agents_md.instructions"]
+                    and (payload.get("type") != "message" or payload.get("role") != "user")):
+                raise ValueError("native instruction update provenance is malformed or misplaced")
             if payload.get("type") == "message":
                 if payload.get("role") == "user":
-                    if _native_bootstrap_user(payload, active):
+                    kinds = metadata.get("content_item_kinds") if isinstance(metadata, dict) else None
+                    if allow_instruction_updates and kinds == ["agents_md.instructions"]:
+                        content = payload.get("content")
+                        provenance = metadata.get("content_item_metadata")
+                        if (not bootstrap_rows or first_turn_users != 1
+                                or attributed != active
+                                or payload.get("thread_id", thread_id) != thread_id
+                                or metadata.get("thread_id", thread_id) != thread_id
+                                or provenance != [{"provenance": {"type": "agents_md"}}]
+                                or not isinstance(content, list) or len(content) != 1
+                                or not isinstance(content[0], dict)
+                                or content[0].get("type") != "input_text"
+                                or not isinstance(content[0].get("text"), str)
+                                or not content[0]["text"]
+                                or not isinstance(row.get("timestamp"), str) or not row["timestamp"]):
+                            raise ValueError("native instruction update provenance is malformed or misplaced")
+                        instruction_updates.append({
+                            "row": index, "timestamp": row["timestamp"], "turn_id": active,
+                            "content_sha256": hashlib.sha256(content[0]["text"].encode("utf-8")).hexdigest(),
+                            "provenance": provenance,
+                        })
+                    elif _native_bootstrap_user(payload, active):
                         if active != next(iter(started)) or first_turn_users or bootstrap_rows:
                             raise ValueError("native bootstrap is duplicated or misplaced")
                         bootstrap_rows.append(index)
@@ -481,6 +514,8 @@ def summarize_native(rollout_path: Path, thread_id: str) -> dict:
         "thread_source": meta["thread_source"],
         "bootstrap_message_rows": bootstrap_rows,
     }
+    if instruction_updates:
+        result["native_provenance"]["instruction_updates"] = instruction_updates
     result["turn_contexts"] = [contexts[turn] for turn in started]
     result["native_errors"] = native_errors
     for stage in result["stages"]:

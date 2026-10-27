@@ -1,10 +1,15 @@
 """Sequential frozen native pilot with validated, non-destructive resumption."""
 import argparse
 import json
+import os
 from pathlib import Path
+import plistlib
 import shutil
+import subprocess
+import sys
 import tempfile
 import traceback
+import uuid
 
 from benchmarks.complete_work import availability, r0, r1
 from benchmarks.complete_work.evaluate import verify_snapshot, write_json
@@ -210,8 +215,58 @@ def run(freeze, gate, amendment, root, *, resume=False, check_only=False,
     else:
         index['status'] = 'complete'
         write_json(index_path, index)
-    return {'status': index['status'], 'attempted': len(index['runs']),
-            'scheduled': len(frozen['schedule']), 'run_root': str(run_root)}
+    outcome = {'status': index['status'], 'attempted': len(index['runs']),
+               'scheduled': len(frozen['schedule']), 'run_root': str(run_root)}
+    if index['status'] == 'blocked':
+        failed = index['runs'][-1]
+        outcome['blocker'] = {key: failed[key] for key in
+                              ('run_id', 'evidence_error', 'archive_error', 'archive') if key in failed}
+        if failed.get('evaluation'):
+            outcome['blocker']['qualification_status'] = failed['evaluation'].get('qualification_status')
+            outcome['blocker']['usage_status'] = failed['evaluation'].get('accounting', {}).get('usage_status')
+    return outcome
+
+
+def background(args, root):
+    """Submit this runner once to the normal macOS user host; never fork Codex here."""
+    frozen = r1.read_freeze(args.freeze, amendment=args.amendment)
+    if not args.preflight_only:
+        run(args.freeze, args.gate, args.amendment, root, resume=args.resume, check_only=True)
+    elif (root / 'availability/gate.json').exists():
+        r1.require_availability(frozen, root / 'availability/gate.json')
+    folder = root.resolve() / 'background'
+    folder.mkdir(parents=True, exist_ok=False)
+    label = 'loci.r1.' + uuid.uuid4().hex
+    argv = [sys.executable, '-u', str(Path(__file__).resolve()),
+            '--freeze', str(args.freeze.resolve()), '--gate', str(args.gate.resolve()),
+            '--output-root', str(root.resolve())]
+    if args.amendment:
+        argv += ['--amendment', str(args.amendment.resolve())]
+    for flag in ('resume', 'preflight_only'):
+        if getattr(args, flag):
+            argv.append('--' + flag.replace('_', '-'))
+    checkout = Path(__file__).resolve().parents[2]
+    job = {'Label': label, 'ProgramArguments': argv, 'WorkingDirectory': str(checkout),
+           'RunAtLoad': True, 'KeepAlive': False,
+           'EnvironmentVariables': {'PYTHONPATH': str(checkout / 'src') + ':' + str(checkout),
+                                    'PATH': os.environ.get('PATH', '/usr/bin:/bin:/usr/sbin:/sbin')},
+           'StandardOutPath': str(folder / 'stdout.jsonl'), 'StandardErrorPath': str(folder / 'stderr.log')}
+    descriptor = folder / 'job.plist'
+    descriptor.write_bytes(plistlib.dumps(job))
+    result = {'status': 'submitting', 'label': label, 'domain': f'gui/{os.getuid()}',
+              'descriptor': str(descriptor), 'freeze_sha256': frozen['freeze_sha256'],
+              'stdout': job['StandardOutPath'], 'stderr': job['StandardErrorPath'],
+              'native_protections': 'unchanged; every child still undergoes native qualification'}
+    write_json(folder / 'submission.json', result)
+    try:
+        submitted = subprocess.run(['/bin/launchctl', 'bootstrap', result['domain'], str(descriptor)],
+                                   capture_output=True, text=True, check=False)
+        result.update(status='submitted' if submitted.returncode == 0 else 'blocked',
+                      exit_code=submitted.returncode, host_stdout=submitted.stdout, host_stderr=submitted.stderr)
+    except OSError as exc:
+        result.update(status='blocked', error=f'{type(exc).__name__}: {exc}')
+    write_json(folder / 'submission.json', result)
+    return result
 
 
 def main(argv=None):
@@ -223,10 +278,17 @@ def main(argv=None):
     parser.add_argument('--preflight-only', action='store_true')
     parser.add_argument('--resume', action='store_true')
     parser.add_argument('--check-only', action='store_true')
+    parser.add_argument('--background', action='store_true')
     args = parser.parse_args(argv)
     root = args.output_root if args.output_root is not None else args.freeze.parent
     if args.preflight_only and (args.check_only or args.resume):
         parser.error('--preflight-only cannot be combined with --check-only or --resume')
+    if args.background:
+        if args.check_only:
+            parser.error('--background cannot be combined with --check-only')
+        result = background(args, root)
+        print(json.dumps(result), flush=True)
+        return result
     if not args.check_only and not args.resume:
         try:
             preflight = r1.preflight(args.freeze, args.gate, root / 'availability', amendment=args.amendment)
@@ -252,4 +314,4 @@ def main(argv=None):
 
 if __name__ == '__main__':
     outcome = main()
-    raise SystemExit(0 if outcome['status'] in {'complete', 'checked', 'passed'} else 1)
+    raise SystemExit(0 if outcome['status'] in {'complete', 'checked', 'passed', 'submitted'} else 1)

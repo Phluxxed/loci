@@ -371,6 +371,8 @@ def test_treatment_failure_archives_attempt_without_replay_or_grade(pilot, monke
     index = pilot['runner'].read(pilot['root'] / 'execution-index.json')
     failed = index['runs'][0]
     assert 'first tool action' in failed['evidence_error'] and 'evaluation' not in failed
+    assert result['blocker']['evidence_error'] == failed['evidence_error']
+    assert result['blocker']['archive'] == failed['archive']
     assert (Path(failed['archive']) / 'observer/qualification/native-rollout.jsonl').is_file()
     assert not (Path(failed['archive']) / 'observer/evaluation/result.json').exists()
     with pytest.raises(ValueError):

@@ -108,10 +108,10 @@ def _episode() -> list[dict]:
     return rows
 
 
-def _summarize(tmp_path: Path, rows: list[dict]) -> dict:
+def _summarize(tmp_path: Path, rows: list[dict], *, allow_instruction_updates=False) -> dict:
     path = tmp_path / "rollout.jsonl"
     path.write_text("".join(json.dumps(row) + "\n" for row in rows))
-    return summarize_native(path, THREAD)
+    return summarize_native(path, THREAD, allow_instruction_updates=allow_instruction_updates)
 
 
 def test_two_native_turns_reconcile_usage_and_keep_inner_outer_evidence(tmp_path: Path) -> None:
@@ -317,3 +317,79 @@ def test_bootstrap_does_not_turn_missing_final_usage_into_known(tmp_path):
     result = _summarize(tmp_path, rows)
     assert result["usage_status"] == "unknown" and result["usage"] is None
     assert result["native_errors"] == ["final response usage is missing for turn turn-a"]
+
+
+def _instruction_update(turn=TURNS[0]):
+    return _response("message", turn, role="user", content=[
+        {"type": "input_text", "text": "replacement host guidance"},
+    ], internal_chat_message_metadata_passthrough={
+        "turn_id": turn, "content_item_kinds": ["agents_md.instructions"],
+        "content_item_metadata": [{"provenance": {"type": "agents_md"}}],
+    })
+
+
+def test_instruction_update_opt_in_preserves_accounting(tmp_path):
+    rows = _episode()
+    rows.insert(2, _bootstrap())
+    without = _summarize(tmp_path, rows)
+    assert _summarize(tmp_path, rows, allow_instruction_updates=True) == without
+    rows.insert(5, _instruction_update())
+    with pytest.raises(ValueError, match="bootstrap provenance"):
+        _summarize(tmp_path, rows)
+    result = _summarize(tmp_path, rows, allow_instruction_updates=True)
+    assert result["usage"] == without["usage"]
+    assert result["operation_totals"] == without["operation_totals"]
+    assert [s["elapsed_ms"] for s in result["stages"]] == [2000, 1000]
+    assert result["native_provenance"]["instruction_updates"] == [{
+        "row": 5, "timestamp": "2026-10-22T00:00:00Z", "turn_id": TURNS[0],
+        "content_sha256": hashlib.sha256(b"replacement host guidance").hexdigest(),
+        "provenance": [{"provenance": {"type": "agents_md"}}],
+    }]
+
+
+@pytest.mark.parametrize("mutation", [
+    lambda p: p["internal_chat_message_metadata_passthrough"].pop("turn_id"),
+    lambda p: p["internal_chat_message_metadata_passthrough"].update(turn_id="foreign"),
+    lambda p: p["internal_chat_message_metadata_passthrough"]["content_item_metadata"][0].update(provenance={"type": "user"}),
+    lambda p: p["internal_chat_message_metadata_passthrough"]["content_item_kinds"].append("user.text"),
+    lambda p: p["content"][0].update(text=""),
+    lambda p: p.update(role="assistant"),
+])
+def test_instruction_update_rejects_spoofing(tmp_path, mutation):
+    rows = _episode()
+    rows.insert(2, _bootstrap())
+    update = _instruction_update()
+    mutation(update["payload"])
+    rows.insert(5, update)
+    with pytest.raises(ValueError):
+        _summarize(tmp_path, rows, allow_instruction_updates=True)
+
+
+def test_instruction_update_cannot_hide_extra_task_or_occur_outside_turn(tmp_path):
+    rows = _episode()
+    rows.insert(2, _bootstrap())
+    rows.insert(5, _instruction_update())
+    rows.insert(6, _response("message", TURNS[0], role="user", content=[]))
+    with pytest.raises(ValueError, match="single fresh first-turn user"):
+        _summarize(tmp_path, rows, allow_instruction_updates=True)
+    rows = _episode()
+    rows.insert(2, _bootstrap())
+    rows.append(_instruction_update(TURNS[1]))
+    with pytest.raises(ValueError, match="outside active turn"):
+        _summarize(tmp_path, rows, allow_instruction_updates=True)
+
+
+def test_saved_instruction_update_trace_requires_opt_in():
+    path = (Path(__file__).resolve().parents[1] / ".scratch/r1-integrated"
+            / "environment-drift-blocker/native-rollout.jsonl")
+    thread = "01a17b96-9ebc-7980-a2ec-686848bbb21a"
+    before = hashlib.sha256(path.read_bytes()).hexdigest()
+    with pytest.raises(ValueError, match="bootstrap provenance"):
+        summarize_native(path, thread)
+    result = summarize_native(path, thread, allow_instruction_updates=True)
+    assert result["usage_status"] == "known" and result["native_errors"] == []
+    assert result["usage"]["totalTokens"] == 153656
+    assert result["stages"][0]["elapsed_ms"] == 38482
+    assert result["stages"][0]["shell_calls"] == 5
+    assert result["native_provenance"]["instruction_updates"][0]["row"] == 58
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == before

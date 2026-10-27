@@ -104,6 +104,11 @@ def _instrumentation_changes(path: Path, frozen: dict) -> dict:
     allowed = {str(Path(__file__).resolve()),
                str(Path(__file__).with_name("accounting.py").resolve()),
                str(root / ".scratch/r1-integrated/pilot-execute.py")}
+    policy = amendment.get("host_observation_policy")
+    if policy is not None:
+        if policy != r0.HOST_OBSERVATION_POLICY:
+            raise ValueError("unsupported host observation policy")
+        allowed.add(str(Path(r0.__file__).resolve()))
     changes = amendment.get("changes")
     original = frozen["host"].get("orchestration_files", {})
     if not isinstance(changes, dict) or not changes or set(changes) - allowed:
@@ -131,13 +136,22 @@ def read_freeze(path: Path, *, runtime: bool = True, amendment: Path | None = No
         raise ValueError("prospective freeze changed")
     frozen["freeze_sha256"] = claimed
     changes = {} if amendment is None else _instrumentation_changes(amendment, frozen)
+    observe_host = (amendment is not None and json.loads(amendment.read_text()).get(
+        "host_observation_policy") == r0.HOST_OBSERVATION_POLICY)
+    observations = {"policy": r0.HOST_OBSERVATION_POLICY, "startup_instructions": []} if observe_host else None
     if runtime:
-        r0.check_native_config(Path(frozen["native_config"]), frozen["native_config_sha256"],
-                               frozen.get("native_config_binding"))
+        validation = r0.check_native_config(Path(frozen["native_config"]), frozen["native_config_sha256"],
+                               frozen.get("native_config_binding"), host_observations=observe_host)
+        if observe_host:
+            observations["config_validation"] = validation
     if runtime and r0.digest(Path(frozen["host"]["executable"])) != frozen["host"]["sha256"]:
         raise ValueError("native executable changed after freeze")
     for name, expected in frozen["host"].get("startup_context_files", {}).items() if runtime else ():
-        if r0.digest(Path(name)) != expected:
+        observed = r0.digest(Path(name))
+        if observe_host and Path(name) == Path(frozen["native_config"]).parent / "AGENTS.md":
+            observations["startup_instructions"].append({"path": name, "frozen_sha256": expected,
+                                                        "observed_sha256": observed, "changed": observed != expected})
+        elif observed != expected:
             raise ValueError("shared startup context changed after freeze")
     for name, expected in frozen["host"].get("orchestration_files", {}).items() if runtime else ():
         expected = changes.get(name, {}).get("after_sha256", expected)
@@ -147,6 +161,8 @@ def read_freeze(path: Path, *, runtime: bool = True, amendment: Path | None = No
         for name, expected in condition.get("implementation_files", {}).items():
             if r0.digest(Path(name)) != expected:
                 raise ValueError("condition implementation changed after freeze")
+    if observe_host:
+        frozen["host_observations"] = observations
     return frozen
 
 
@@ -257,7 +273,9 @@ def require_availability(frozen: dict, gate: Path | None) -> dict:
         if "native_config_binding" in frozen:
             for artifact in (manifest, qualified):
                 validation = artifact.get("config_validation", {})
-                if validation.get("effective_sha256") != frozen["native_config_binding"]["effective_sha256"]:
+                if (validation.get("effective_sha256") != frozen["native_config_binding"]["effective_sha256"]
+                        and not (frozen.get("host_observations") and validation.get("contract_sha256")
+                                 == r0.native_config_contract(frozen["native_config_binding"]))):
                     raise ValueError("availability effective native configuration differs")
             if manifest["config_validation"].get("raw_sha256") != manifest["native_config_sha256"]:
                 raise ValueError("availability preparation configuration receipt differs")
@@ -275,7 +293,8 @@ def require_availability(frozen: dict, gate: Path | None) -> dict:
             if (archived_workspace / name).read_bytes() != content.encode():
                 raise ValueError("archived availability fixture changed")
         from .accounting import summarize_native
-        accounting = summarize_native(Path(files["trace"]["path"]), thread)
+        accounting = (summarize_native(Path(files["trace"]["path"]), thread, allow_instruction_updates=True)
+                      if frozen.get("host_observations") else summarize_native(Path(files["trace"]["path"]), thread))
         # Qualification read the live trace before copying it into this archive.
         # Reconstruct that exact provenance path; every other field must replay
         # identically, and the archived trace bytes were hash-checked above.
@@ -322,11 +341,13 @@ def prepare(freeze_path: Path, run_id: str, destination: Path,
     manifest = r0.prepare(Path(task["source"]), destination, run_id=run_id,
                           arm="native" if scheduled["condition"] == "native" else "loci",
                           native_config=Path(frozen["native_config"]),
-                          conditions=_run_conditions(frozen))
+                          conditions=_run_conditions(frozen), host_observations=bool(frozen.get("host_observations")))
     observer, workspace = Path(manifest["observer"]), Path(manifest["workspace"])
     manifest["r1"] = {**scheduled, "freeze": str(freeze_path.resolve()),
                       "argv": command(frozen, scheduled["condition"], workspace, observer),
                       "availability_gate": verified}
+    if frozen.get("host_observations"):
+        manifest["r1"]["host_observations"] = frozen["host_observations"]
     if amendment is not None:
         manifest["r1"]["instrumentation_amendment"] = _amendment_record(amendment)
     # Identical discovery wrapper; original task text is unchanged in all arms.
@@ -441,7 +462,7 @@ def preflight(freeze_path: Path, deterministic_gate: Path, destination: Path,
             manifest = r0.prepare(source, folder, run_id=run_id,
                                   arm="native" if condition == "native" else "loci",
                                   native_config=Path(frozen["native_config"]),
-                                  conditions=_run_conditions(frozen))
+                                  conditions=_run_conditions(frozen), host_observations=bool(frozen.get("host_observations")))
             observer, workspace = Path(manifest["observer"]), Path(manifest["workspace"])
             config = observer / "run.json"
             manifest["r1"] = {"phase": "availability", "condition": condition,
@@ -458,7 +479,8 @@ def preflight(freeze_path: Path, deterministic_gate: Path, destination: Path,
             traces = list((Path.home() / ".codex/sessions").rglob("*" + thread + ".jsonl"))
             if len(traces) != 1:
                 raise ValueError("unique native availability rollout unavailable")
-            qualified = r0.qualify(config, traces[0], thread_id=thread)
+            qualified = (r0.qualify(config, traces[0], thread_id=thread, host_observations=True)
+                         if frozen.get("host_observations") else r0.qualify(config, traces[0], thread_id=thread))
             if qualified["status"] != "qualified_observations" or qualified["source_before"] != qualified["source_after"]:
                 raise ValueError("native availability probe was unqualified or modified its fixture")
             _verify_native_prompt(qualified["accounting"], (observer / "prompt.txt").read_text())
@@ -534,7 +556,8 @@ def evaluate(config: Path, trace: Path, thread_id: str,
     verified = require_availability(frozen, Path(gate_record["path"]) if gate_record else None)
     if verified != gate_record or thread_id in verified["threads"]:
         raise ValueError("measured availability gate or fresh session differs")
-    qualification = r0.qualify(config, trace, thread_id=thread_id)
+    qualification = (r0.qualify(config, trace, thread_id=thread_id, host_observations=True)
+                     if frozen.get("host_observations") else r0.qualify(config, trace, thread_id=thread_id))
     observer = Path(manifest["observer"])
     try:
         task = next(t for t in frozen["tasks"] if t["id"] == manifest["r1"]["task"])
@@ -563,6 +586,9 @@ def evaluate(config: Path, trace: Path, thread_id: str,
                   "Native tool availability follows unchanged host config; other MCP tools remain available.",
                   "Loci use, semantic/proof requests and evidence bytes require captured-call attribution; unavailable values remain unknown.",
                   "Small independently constructed tasks do not establish ordinary-repository population effects."]}
+    if frozen.get("host_observations"):
+        result["host_observations"] = frozen["host_observations"]
+        result["limitations"].append("Personal host instructions are observed covariates; they may change during a session. This run does not establish fixed instruction exposure.")
     write_json(observer / "evaluation" / "result.json", result)
     return result
 
