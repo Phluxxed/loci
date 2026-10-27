@@ -1,0 +1,66 @@
+{
+  "status": "passed",
+  "kind": "no-launch-model-revision-validation",
+  "freeze_sha256": "339b51aba273ae36fb56f0aac13ad6db9b33b128a476b9071149fd5e336fc91d",
+  "runtime_pins": "passed",
+  "source_prompt_oracle_identities": "all four preserved and verified",
+  "condition_commands": [
+    {
+      "condition": "native",
+      "model": "gpt-6.1-terra",
+      "effort": "max",
+      "tools": []
+    },
+    {
+      "condition": "path-only",
+      "model": "gpt-6.1-terra",
+      "effort": "max",
+      "tools": [
+        "loci_read",
+        "loci_retrieve"
+      ]
+    },
+    {
+      "condition": "integrated",
+      "model": "gpt-6.1-terra",
+      "effort": "max",
+      "tools": [
+        "loci_proof",
+        "loci_read",
+        "loci_retrieve",
+        "loci_semantic"
+      ]
+    },
+    {
+      "condition": "eager",
+      "model": "gpt-6.1-terra",
+      "effort": "max",
+      "tools": [
+        "loci_read",
+        "loci_retrieve"
+      ]
+    }
+  ],
+  "runner_preflight": {
+    "status": "checked",
+    "next_run_id": "receipt-location-native",
+    "pending": 16,
+    "retained": 0
+  },
+  "original_freeze_and_11_run_index": "unchanged",
+  "global_configuration": "read-only; current hash pinned; drift disclosed",
+  "pilot_launches": 0,
+  "subscription_model_access": "untested",
+  "note": "Not measured results; no causal comparison with earlier Sol environment.",
+  "independent_review": {
+    "task": "/root/terra_freeze_check",
+    "scope": "read-only freeze, preserved inputs, existing runner API and artifact verification",
+    "model_selection": "configured default",
+    "reasoning_effort": "high",
+    "fork": "none",
+    "acceptance": "exact requested model and effort, original scientific inputs, explicit current environment pins, independent result root, original freeze/index preservation, no model launch",
+    "result": "passed; 180 runtime pins, four source/prompt/oracle identities verified",
+    "primary_disposition": "adopted; no blocker for preparation; retain environment drift and untested subscription access qualifications",
+    "credential_pattern_review": "no hits in four new artifacts"
+  }
+}
