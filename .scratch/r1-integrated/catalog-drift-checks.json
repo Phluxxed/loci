@@ -1,0 +1,127 @@
+{
+  "kind": "r1-unscored-catalog-drift-diagnosis",
+  "status": "blocked",
+  "measured": false,
+  "scored_attempts": 0,
+  "new_native_sessions": 0,
+  "freeze_sha256": "36fe5f559905891e4079eaa6a81aeeaa8623c4e21420183683ef72ecc5803c04",
+  "original_gate_sha256": "989ba0f6f7ecb4d7a34ba99bdb57c1f9cb50476e9ac3f486b820740a26734a08",
+  "operational_probes_passed": 4,
+  "instructions_and_native_schemas_equal": true,
+  "only_common_difference": "catalog.sha256: eager differs from the identical native/path-only/integrated catalog hashes",
+  "retained_catalog_payload": "count and aggregate SHA only; full descriptors not captured",
+  "historical_descriptor_recovery": "not found in these four traces, observer artifacts, stderr or default local per-thread SQLite records",
+  "independent_raw_gate_replay": {
+    "status": "rejected_as_required",
+    "error": "rendered common startup context differs across availability probes"
+  },
+  "runs": [
+    {
+      "condition": "native",
+      "thread_id": "01a17cea-ce0f-73b2-a1d7-663d113d00e6",
+      "execution": "closed",
+      "operational_probe": "passed",
+      "qualification": "qualified_observations",
+      "usage_status": "known",
+      "usage": {
+        "inputTokens": 49112,
+        "cachedInputTokens": 23552,
+        "outputTokens": 1801,
+        "reasoningOutputTokens": 104,
+        "totalTokens": 50913,
+        "cacheWriteInputTokens": 0,
+        "uncachedInputTokens": 25560
+      },
+      "elapsed_ms": 41815.808,
+      "qualified_loci_calls": 0,
+      "common_catalog": {
+        "count": 608,
+        "sha256": "e653a4c4fa810cdd4c6692fa5e24b7f1257892ed46dd80146435c2490f5e51a0"
+      },
+      "instructions_sha256": "b8d5e6d81953c17ebae5213b3452e5dcf399f44f32e1d68725190b62d153381d",
+      "trace_sha256": "c8f8c9eee321697ee29abc0f2badfd93d4f80dcba95b20d1f61443c2643e9aaa"
+    },
+    {
+      "condition": "path-only",
+      "thread_id": "01a17ceb-71fb-7cd1-a2c5-84180f70a79d",
+      "execution": "closed",
+      "operational_probe": "passed",
+      "qualification": "qualified_observations",
+      "usage_status": "known",
+      "usage": {
+        "inputTokens": 276516,
+        "cachedInputTokens": 249216,
+        "outputTokens": 7207,
+        "reasoningOutputTokens": 2597,
+        "totalTokens": 283723,
+        "cacheWriteInputTokens": 0,
+        "uncachedInputTokens": 27300
+      },
+      "elapsed_ms": 90785.57,
+      "qualified_loci_calls": 2,
+      "common_catalog": {
+        "count": 608,
+        "sha256": "e653a4c4fa810cdd4c6692fa5e24b7f1257892ed46dd80146435c2490f5e51a0"
+      },
+      "instructions_sha256": "b8d5e6d81953c17ebae5213b3452e5dcf399f44f32e1d68725190b62d153381d",
+      "trace_sha256": "8859267cd8e27a43adaef36eca7e64bd5da4ecb457ec8de13cba751aff8e821d"
+    },
+    {
+      "condition": "integrated",
+      "thread_id": "01a17cec-d519-7171-8eab-f9fb8099d11d",
+      "execution": "closed",
+      "operational_probe": "passed",
+      "qualification": "qualified_observations",
+      "usage_status": "known",
+      "usage": {
+        "inputTokens": 358921,
+        "cachedInputTokens": 334592,
+        "outputTokens": 7169,
+        "reasoningOutputTokens": 2869,
+        "totalTokens": 366090,
+        "cacheWriteInputTokens": 0,
+        "uncachedInputTokens": 24329
+      },
+      "elapsed_ms": 95500.931,
+      "qualified_loci_calls": 4,
+      "common_catalog": {
+        "count": 608,
+        "sha256": "e653a4c4fa810cdd4c6692fa5e24b7f1257892ed46dd80146435c2490f5e51a0"
+      },
+      "instructions_sha256": "b8d5e6d81953c17ebae5213b3452e5dcf399f44f32e1d68725190b62d153381d",
+      "trace_sha256": "b315a4e8bfc91cf64aedc21d14e090d0b9a95022949ea768ca98acc020de1039"
+    },
+    {
+      "condition": "eager",
+      "thread_id": "01a17cee-4aa2-7ea2-8880-7565215c6655",
+      "execution": "closed",
+      "operational_probe": "passed",
+      "qualification": "qualified_observations",
+      "usage_status": "known",
+      "usage": {
+        "inputTokens": 343216,
+        "cachedInputTokens": 290688,
+        "outputTokens": 6663,
+        "reasoningOutputTokens": 3105,
+        "totalTokens": 349879,
+        "cacheWriteInputTokens": 0,
+        "uncachedInputTokens": 52528
+      },
+      "elapsed_ms": 96415.907,
+      "qualified_loci_calls": 2,
+      "common_catalog": {
+        "count": 608,
+        "sha256": "24116802358a3b9eb3e1815ac9914f814ed19205a98c0ad9559e546cffde7901"
+      },
+      "instructions_sha256": "b8d5e6d81953c17ebae5213b3452e5dcf399f44f32e1d68725190b62d153381d",
+      "trace_sha256": "23035ac2a1b530ac24ecf898be24256d8e1508754c4b69dac8263709d4097949"
+    }
+  ],
+  "limits": [
+    "Equal counts do not establish equal names or descriptions.",
+    "The changed descriptor and temporal-versus-condition cause are unknown.",
+    "Unscored probes do not establish task correctness or semantic benefit.",
+    "Current captures cannot reconstruct historical descriptor arrays from their hashes."
+  ],
+  "next_evidence_needed": "A session-attributed complete sorted common {name,description} snapshot that reproduces the fixed first-call hash, captured outside model context through a verified existing passive native facility. Such a facility has not been established; no blind retry or frozen-prompt change authorized by this diagnosis."
+}

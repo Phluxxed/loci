@@ -1,5 +1,9 @@
 # R1 startup reader repair
 
+Subsequent result: all four probes passed this reader, but an
+[unresolved common catalog difference](catalog-drift-report.md) blocked the gate.
+The command below is retained history, not a new retry recommendation.
+
 The normal Terminal native probe closed successfully and its observation
 accounting qualified. The harness then incorrectly rejected a standard Code
 Mode startup instruction. No scored assignment started.

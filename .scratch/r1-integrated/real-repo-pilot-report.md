@@ -1,5 +1,9 @@
 # R1 replacement pilot: real-source inputs qualified, native execution pending
 
+Current state: [all four operational probes pass, but catalog drift blocks
+scoring](catalog-drift-report.md). The historical command below is not a
+qualified next step; do not rerun it unchanged.
+
 The replacement uses a pinned source-only snapshot of the maintained
 kaggle_lab repository, rather than generated toy repositories. No replacement
 scored agent run has started. An unscored native probe closed successfully but

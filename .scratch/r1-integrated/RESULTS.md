@@ -1,4 +1,18 @@
-# Current interpretation: Astra found task and evaluation design failure
+# Current real-source pilot: four operational checks pass, scoring blocked
+
+The replacement Kaggle pilot has no scored results. All four native operational
+probes passed with known usage and matching actual instructions/native schemas.
+The eager common-tool catalog fingerprint differs from the identical other three
+fingerprints, despite equal counts. The retained aggregate hashes lack the
+underlying catalogs needed to identify the difference. The original evidence
+is preserved, the gate remains blocked and no unchanged retry is recommended.
+See [the precise blocker and retained setup costs](catalog-drift-report.md) and
+[machine evidence](catalog-drift-checks.json). Architecture advancement remains
+on hold; no semantic-benefit or architecture ranking follows from these probes.
+
+---
+
+# Earlier interpretation: Astra found task and evaluation design failure
 
 The user-requested [Astra validity review](astra-evaluation-review/REVIEW.md) supersedes the earlier broad **adoption failure** interpretation. All four repositories are approximately 1 KB; rubric assumptions trigger all seven frozen failures; native versus Loci-enabled runs also receive systematically different unrelated skills context (+9,836 bytes). Availability and recorded non-use remain established, but the pilot did not identify R1's engineering utility or a general product adoption defect. Primary responsibility lies in task selection, evaluator design and the lead's interpretation.
 

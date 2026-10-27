@@ -68,7 +68,8 @@ broad adoption failure.
 
 A [replacement using maintained repository source](../.scratch/r1-integrated/real-repo-pilot-report.md)
 has qualified local inputs and a prospective gate for actual common instructions,
-native schemas and tool availability. Native execution remains pending. New plans
-opt in with common_context=true; legacy freezes are preserved. Semantic/proof
-benefit remains unmeasured and advancement is on hold. This is not a production
-integration.
+native schemas and tool availability. All four operational probes passed, but
+[a common tool catalog mismatch](../.scratch/r1-integrated/catalog-drift-report.md)
+blocks scoring; none of its 16 assignments ran. New plans opt in with
+common_context=true; legacy freezes are preserved. Semantic/proof benefit remains
+unmeasured and advancement is on hold. This is not a production integration.
