@@ -1,0 +1,19 @@
+User-reported external Terminal attempt, retained verbatim except terminal prompt:
+
+cd /Users/brummerv/phluxxed/loci/.worktrees/r1-integrated
+PYTHONPATH=src:. /Users/brummerv/phluxxed/loci/.venv/bin/python -u \
+  .scratch/r1-integrated/pilot-execute.py \
+  --freeze .scratch/r1-integrated/pilot-availability-v1/freeze.json \
+  --gate .scratch/r1-integrated/qualification-gate.json \
+  --output-root .scratch/r1-integrated/pilot-availability-v1 \
+  --preflight-only
+Traceback (most recent call last):
+  File "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot-execute.py", line 241, in <module>
+    outcome = main()
+  File "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot-execute.py", line 230, in main
+    preflight = r1.preflight(args.freeze, args.gate, root / 'availability', amendment=args.amendment)
+  File "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/benchmarks/complete_work/r1.py", line 387, in preflight
+    frozen = read_freeze(freeze_path, amendment=amendment)
+  File "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/benchmarks/complete_work/r1.py", line 133, in read_freeze
+    raise ValueError("native configuration changed after freeze")
+ValueError: native configuration changed after freeze

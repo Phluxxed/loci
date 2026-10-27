@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import shutil
 import tempfile
+import traceback
 
 from benchmarks.complete_work import availability, r0, r1
 from benchmarks.complete_work.evaluate import verify_snapshot, write_json
@@ -227,7 +228,19 @@ def main(argv=None):
     if args.preflight_only and (args.check_only or args.resume):
         parser.error('--preflight-only cannot be combined with --check-only or --resume')
     if not args.check_only and not args.resume:
-        preflight = r1.preflight(args.freeze, args.gate, root / 'availability', amendment=args.amendment)
+        try:
+            preflight = r1.preflight(args.freeze, args.gate, root / 'availability', amendment=args.amendment)
+        except Exception as exc:
+            root.mkdir(parents=True, exist_ok=True)
+            rejected = {'status': 'blocked', 'stage': 'native_preflight', 'measured': False,
+                        'error': f'{type(exc).__name__}: {exc}', 'traceback': traceback.format_exc(),
+                        'freeze': str(args.freeze.resolve())}
+            with tempfile.NamedTemporaryFile(mode='w', prefix='preflight-rejection-', suffix='.json',
+                                             dir=root, delete=False) as stream:
+                json.dump(rejected, stream, indent=2)
+                evidence = stream.name
+            preflight = {key: value for key, value in rejected.items() if key != 'traceback'}
+            preflight['evidence'] = evidence
         if args.preflight_only or preflight.get('status') != 'passed':
             print(json.dumps(preflight), flush=True)
             return preflight

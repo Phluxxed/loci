@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 import shutil
 import subprocess
+import runpy
+import sys
 
 import pytest
 
@@ -66,9 +68,7 @@ def host_gate(tmp_path, monkeypatch):
         manifest = r0.prepare(source, folder, run_id='availability-' + condition,
                               arm='native' if condition == 'native' else 'loci',
                               native_config=Path(frozen['native_config']),
-                              conditions={'model': frozen['model'], 'effort': frozen['effort'],
-                                          'native_protection': frozen['native_protection'],
-                                          'freeze_sha256': frozen['freeze_sha256']})
+                              conditions=r1._run_conditions(frozen))
         observer, workspace = Path(manifest['observer']), Path(manifest['workspace'])
         manifest['r1'] = {'phase': 'availability', 'condition': condition,
                           'freeze': str(path.resolve()), 'argv': r1.command(frozen, condition, workspace, observer)}
@@ -103,6 +103,7 @@ def host_gate(tmp_path, monkeypatch):
                    'config_sha256': r0.digest(observer / 'run.json'), 'native_trace_sha256': r0.digest(trace),
                    'source_before': manifest['source_identity'], 'source_after': manifest['source_identity'],
                    'native_config_sha256': frozen['native_config_sha256'], 'conditions': manifest['conditions'],
+                   'config_validation': manifest['config_validation'],
                    'accounting': account})
         evidence = availability.audit_probe(trace, account, condition, workspace, frozen['conditions'][condition]['tools'])
         write_json(observer / 'availability.json', evidence)
@@ -135,6 +136,18 @@ def test_gate_reaudits_all_operations_and_retained_fixture_after_live_removal(ho
     assert prompt.endswith(frozen['tasks'][0]['prompt'])
     assert availability.CATALOG_PROGRAM in prompt
     assert 'mcp_servers.loci.required=true' in manifest['r1']['argv']
+
+
+def test_preparation_accepts_only_pinned_cli_defaults_drift_after_probe(host_gate, tmp_path):
+    path, frozen, gate_path, _, _ = host_gate
+    config = Path(frozen['native_config'])
+    config.write_text(config.read_text() + 'model="other-default"\nmodel_reasoning_effort="low"\n')
+    manifest = r1.prepare(path, 'task-0-integrated', tmp_path / 'measured', availability_gate=gate_path)
+    assert manifest['native_config_sha256'] != frozen['native_config_sha256']
+    assert manifest['config_validation']['overridden_default_changes'] == ['model', 'model_reasoning_effort']
+    argv = manifest['r1']['argv']
+    assert argv[argv.index('-m') + 1] == frozen['model']
+    assert 'model_reasoning_effort=' + json.dumps(frozen['effort']) in argv
 
 
 @pytest.mark.parametrize('mutation', ['failed', 'wrong_freeze', 'missing_condition', 'changed_trace', 'changed_fixture', 'wrong_verdict', 'wrong_prompt'])
@@ -239,3 +252,38 @@ def test_preflight_failure_is_unscored_archived_and_stops_without_retry(tmp_path
     with pytest.raises(ValueError, match='availability gate failed'):
         r1.preflight(path, gate, destination)
     assert len(calls) == 1
+
+
+def test_actual_cli_handoff_survives_default_drift_up_to_process_boundary(tmp_path, monkeypatch):
+    path = _freeze(tmp_path)
+    frozen = r1.read_freeze(path)
+    native_config = Path(frozen['native_config'])
+    native_config.write_text(native_config.read_text() + 'model="changed-default"\nmodel_reasoning_effort="max"\n')
+    gate = tmp_path / 'deterministic.json'; write_json(gate, {'status': 'passed'})
+    output = tmp_path / 'cli-receipts'
+    seen = []
+    class InterceptedBeforeProcessCreation(Exception):
+        pass
+    def intercept(argv, **kwargs):
+        if argv[1:] == ['login', 'status']:
+            return subprocess.CompletedProcess(argv, 0, 'Logged in using ChatGPT', '')
+        seen.append((argv, kwargs))
+        raise InterceptedBeforeProcessCreation('offline check: native process was not started')
+    monkeypatch.setattr(subprocess, 'run', intercept)
+    script = Path(__file__).resolve().parents[1] / '.scratch/r1-integrated/pilot-execute.py'
+    monkeypatch.setattr(sys, 'argv', [str(script), '--freeze', str(path), '--gate', str(gate),
+                                    '--output-root', str(output), '--preflight-only'])
+    with pytest.raises(SystemExit) as stopped:
+        runpy.run_path(str(script), run_name='__main__')
+    assert stopped.value.code == 1 and len(seen) == 1
+    argv, kwargs = seen[0]
+    assert argv[argv.index('-m') + 1] == frozen['model']
+    assert 'model_reasoning_effort=' + json.dumps(frozen['effort']) in argv
+    assert all(key not in kwargs['env'] for key in ['OPENAI_API_KEY', 'CODEX_API_KEY', 'OPENAI_BASE_URL'])
+    assert availability.CATALOG_PROGRAM.encode() in kwargs['input']
+    result = json.loads((output / 'availability/gate.json').read_text())
+    assert result['status'] == 'failed' and 'InterceptedBeforeProcessCreation' in result['probes'][0]['error']
+    config = json.loads((output / 'availability/native/observer/run.json').read_text())
+    assert config['native_config_sha256'] != frozen['native_config_sha256']
+    assert config['config_validation']['effective_sha256'] == frozen['native_config_binding']['effective_sha256']
+    assert not (output / 'execution-index.json').exists()

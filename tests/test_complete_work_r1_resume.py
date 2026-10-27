@@ -23,6 +23,25 @@ def test_preflight_cli_exit_code_matches_gate_outcome(monkeypatch, status, exit_
     assert stopped.value.code == exit_code
 
 
+def test_preflight_startup_rejection_is_retained_without_a_probe_or_overwrite(tmp_path, monkeypatch):
+    def reject(*args, **kwargs):
+        raise ValueError('native configuration changed in effective fields: permissions')
+    monkeypatch.setattr(r1, 'preflight', reject)
+    monkeypatch.setattr(sys, 'argv', ['pilot-execute.py', '--freeze', str(tmp_path / 'freeze.json'),
+                                    '--gate', 'gate.json', '--output-root', str(tmp_path), '--preflight-only'])
+    for _ in range(2):
+        with pytest.raises(SystemExit) as stopped:
+            runpy.run_path(str(SCRIPT), run_name='__main__')
+        assert stopped.value.code == 1
+    receipts = list(tmp_path.glob('preflight-rejection-*.json'))
+    assert len(receipts) == 2
+    for receipt in receipts:
+        data = json.loads(receipt.read_text())
+        assert data['status'] == 'blocked' and data['measured'] is False
+        assert 'permissions' in data['error'] and data['traceback']
+    assert not (tmp_path / 'availability').exists()
+
+
 SCRIPT = Path(__file__).resolve().parents[1] / '.scratch/r1-integrated/pilot-execute.py'
 
 

@@ -69,11 +69,13 @@ def freeze(plan_path: Path, destination: Path) -> dict:
                       "prompt_sha256": r0.digest(root / "prompt.txt"),
                       "oracle": str(oracle), "oracle_sha256": r0.digest(oracle),
                       "criteria": task["criteria"]})
+    config_binding = r0.native_config_binding(Path(plan["native_config"]).read_bytes())
     bound = {"schema_version": 1, "kind": "r1-prospective-native-pilot",
              "model": plan["model"], "effort": plan["effort"],
              "native_protection": plan["native_protection"],
              "native_config": plan["native_config"],
-             "native_config_sha256": r0.digest(Path(plan["native_config"])),
+             "native_config_sha256": config_binding["raw_sha256"],
+             "native_config_binding": config_binding,
              "host": host, "conditions": plan["conditions"],
              "tasks": tasks, "measurements": MEASUREMENTS,
              "timeout_seconds": plan.get("timeout_seconds", 600),
@@ -129,8 +131,9 @@ def read_freeze(path: Path, *, runtime: bool = True, amendment: Path | None = No
         raise ValueError("prospective freeze changed")
     frozen["freeze_sha256"] = claimed
     changes = {} if amendment is None else _instrumentation_changes(amendment, frozen)
-    if runtime and r0.digest(Path(frozen["native_config"])) != frozen["native_config_sha256"]:
-        raise ValueError("native configuration changed after freeze")
+    if runtime:
+        r0.check_native_config(Path(frozen["native_config"]), frozen["native_config_sha256"],
+                               frozen.get("native_config_binding"))
     if runtime and r0.digest(Path(frozen["host"]["executable"])) != frozen["host"]["sha256"]:
         raise ValueError("native executable changed after freeze")
     for name, expected in frozen["host"].get("startup_context_files", {}).items() if runtime else ():
@@ -188,6 +191,14 @@ def measured_prompt(frozen: dict, task: dict, condition: str) -> str:
             + "\n\nOriginal task follows:\n" + task["prompt"])
 
 
+def _run_conditions(frozen: dict) -> dict:
+    conditions = {"model": frozen["model"], "effort": frozen["effort"],
+                  "native_protection": frozen["native_protection"], "freeze_sha256": frozen["freeze_sha256"]}
+    if "native_config_binding" in frozen:
+        conditions["native_config_binding"] = frozen["native_config_binding"]
+    return conditions
+
+
 def _verify_native_prompt(accounting: dict, expected: str) -> None:
     messages = [item for stage in accounting.get("stages", []) for item in stage.get("items", [])
                 if item.get("type") == "UserMessage"]
@@ -236,14 +247,22 @@ def require_availability(frozen: dict, gate: Path | None) -> dict:
                 or qualified.get("source_before") != qualified.get("source_after")
                 or qualified.get("source_before") != manifest.get("source_identity")
                 or qualified.get("conditions") != manifest.get("conditions")
-                or manifest.get("native_config_sha256") != frozen["native_config_sha256"]
-                or qualified.get("native_config_sha256") != frozen["native_config_sha256"]
+                or qualified.get("native_config_sha256") != manifest.get("native_config_sha256")
                 or manifest.get("permission_overrides") != {}
-                or manifest.get("conditions", {}).get("freeze_sha256") != frozen["freeze_sha256"]
+                or manifest.get("conditions") != _run_conditions(frozen)
                 or manifest["r1"].get("phase") != "availability"
                 or manifest["r1"].get("condition") != condition
                 or manifest["r1"]["argv"] != command(frozen, condition, Path(manifest["workspace"]), Path(manifest["observer"]))):
             raise ValueError("availability probe assignment or qualification differs")
+        if "native_config_binding" in frozen:
+            for artifact in (manifest, qualified):
+                validation = artifact.get("config_validation", {})
+                if validation.get("effective_sha256") != frozen["native_config_binding"]["effective_sha256"]:
+                    raise ValueError("availability effective native configuration differs")
+            if manifest["config_validation"].get("raw_sha256") != manifest["native_config_sha256"]:
+                raise ValueError("availability preparation configuration receipt differs")
+        elif manifest.get("native_config_sha256") != frozen["native_config_sha256"]:
+            raise ValueError("availability native configuration differs")
         threads.add(thread)
         # Use the archived fixture for byte checks, but preserve the original
         # repository argument used by the actual native MCP calls.
@@ -296,9 +315,7 @@ def prepare(freeze_path: Path, run_id: str, destination: Path,
     manifest = r0.prepare(Path(task["source"]), destination, run_id=run_id,
                           arm="native" if scheduled["condition"] == "native" else "loci",
                           native_config=Path(frozen["native_config"]),
-                          conditions={"model": frozen["model"], "effort": frozen["effort"],
-                                      "native_protection": frozen["native_protection"],
-                                      "freeze_sha256": frozen["freeze_sha256"]})
+                          conditions=_run_conditions(frozen))
     observer, workspace = Path(manifest["observer"]), Path(manifest["workspace"])
     manifest["r1"] = {**scheduled, "freeze": str(freeze_path.resolve()),
                       "argv": command(frozen, scheduled["condition"], workspace, observer),
@@ -321,7 +338,7 @@ def execute(config: Path, gate: Path, *, amendment: Path | None = None,
     permission = json.loads(gate.read_text())
     if permission.get("status") != "passed":
         raise ValueError("a passing deterministic qualification gate is required")
-    if manifest["conditions"]["freeze_sha256"] != frozen["freeze_sha256"]:
+    if manifest["conditions"] != _run_conditions(frozen):
         raise ValueError("run is not bound to this prospective freeze")
     verified = require_availability(frozen, availability_gate)
     if r0.digest(gate) != verified["deterministic_gate_sha256"]:
@@ -417,9 +434,7 @@ def preflight(freeze_path: Path, deterministic_gate: Path, destination: Path,
             manifest = r0.prepare(source, folder, run_id=run_id,
                                   arm="native" if condition == "native" else "loci",
                                   native_config=Path(frozen["native_config"]),
-                                  conditions={"model": frozen["model"], "effort": frozen["effort"],
-                                              "native_protection": frozen["native_protection"],
-                                              "freeze_sha256": frozen["freeze_sha256"]})
+                                  conditions=_run_conditions(frozen))
             observer, workspace = Path(manifest["observer"]), Path(manifest["workspace"])
             config = observer / "run.json"
             manifest["r1"] = {"phase": "availability", "condition": condition,

@@ -1,0 +1,56 @@
+{
+  "version": "v2",
+  "kind": "offline-cli-handoff-check",
+  "argv": [
+    "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot-execute.py",
+    "--freeze",
+    "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot-availability-v2/freeze.json",
+    "--gate",
+    "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/qualification-gate.json",
+    "--output-root",
+    "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/config-handoff-repair/offline-cli-v2",
+    "--preflight-only"
+  ],
+  "exit_code": 1,
+  "stdout": "{\"availability_condition\": \"native\", \"status\": \"failed\", \"thread_id\": null, \"error\": \"InterceptedBeforeProcessCreation: offline validation only: no Codex process was created\"}\n{\"kind\": \"r1-native-host-availability\", \"status\": \"failed\", \"measured\": false, \"freeze_sha256\": \"0a747227d868595fa728c095dcc0d3b26fcd3b1fbfcab938b2543bbdc3e735c6\", \"probes\": [{\"condition\": \"native\", \"status\": \"failed\", \"error\": \"InterceptedBeforeProcessCreation: offline validation only: no Codex process was created\", \"archive\": \"/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/config-handoff-repair/offline-cli-v2/availability/native\", \"files\": {\"config\": {\"path\": \"/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/config-handoff-repair/offline-cli-v2/availability/native/observer/run.json\", \"sha256\": \"1451784076d6e14ee7f077ff359d2832a59fb405729518bc1295e22cdc6b4b61\"}, \"prompt\": {\"path\": \"/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/config-handoff-repair/offline-cli-v2/availability/native/observer/prompt.txt\", \"sha256\": \"61f1b84c3cf242e6320d2fd12ec6c854ce90f53ac67271833001389686d34c6e\"}, \"execution\": {\"path\": \"/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/config-handoff-repair/offline-cli-v2/availability/native/observer/execution.json\", \"sha256\": \"511b40786004925d54f96d220801584c5fec1aebe428228fbcd6913310f9d511\"}}}], \"deterministic_gate_sha256\": \"eb0d0daa6a60961cf8a3b5b86efa4ef4bc8b2a0c95bb631c877bc5e707a76981\", \"run_root\": \"/private/tmp/loci-r1-availability-bm0ryrj4\"}\n",
+  "subprocess_observations": [
+    {
+      "operation": "login-status",
+      "mocked": true
+    },
+    {
+      "operation": "native-exec-boundary",
+      "argv": [
+        "/Users/brummerv/.codex/packages/standalone/releases/0.164.0-aarch64-apple-darwin/bin/codex",
+        "exec",
+        "--json",
+        "--color",
+        "never",
+        "--skip-git-repo-check",
+        "-C",
+        "/private/tmp/loci-r1-availability-bm0ryrj4/availability-native/workspace",
+        "-m",
+        "gpt-6.1-terra",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-o",
+        "/private/tmp/loci-r1-availability-bm0ryrj4/availability-native/observer/final.txt",
+        "-c",
+        "mcp_servers.loci.enabled=false",
+        "-c",
+        "forced_login_method=\"chatgpt\"",
+        "-c",
+        "model_provider=\"openai\"",
+        "-"
+      ],
+      "cwd": "/private/tmp/loci-r1-availability-bm0ryrj4/availability-native/workspace",
+      "prompt_sha256": "61f1b84c3cf242e6320d2fd12ec6c854ce90f53ac67271833001389686d34c6e",
+      "api_environment_removed": true,
+      "process_created": false
+    }
+  ],
+  "actual_codex_processes": 0,
+  "native_authentication_verified": false,
+  "native_mcp_availability_verified": false,
+  "scope": "Same CLI entrypoint/config path; output root isolated; Codex subprocesses intercepted."
+}

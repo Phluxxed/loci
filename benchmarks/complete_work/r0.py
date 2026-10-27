@@ -9,6 +9,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import tomllib
 from urllib.parse import unquote, urlsplit
 
 from .accounting import summarize_native
@@ -25,6 +26,48 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def native_config_binding(raw: bytes) -> dict:
+    """Bind all TOML settings except the two root defaults pinned by R1's CLI."""
+    values = tomllib.loads(raw.decode("utf-8"))
+
+    def fingerprint(value):
+        return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False,
+                                        separators=(",", ":"), allow_nan=False).encode()).hexdigest()
+    fields = {key: fingerprint(value) for key, value in values.items()}
+    effective = {key: value for key, value in values.items()
+                 if key not in {"model", "model_reasoning_effort"}}
+    return {"schema": "r1-cli-model-defaults-v1", "raw_sha256": hashlib.sha256(raw).hexdigest(),
+            "effective_sha256": fingerprint(effective), "field_sha256": fields}
+
+
+def check_native_config(path: Path, expected_raw_sha256: str, binding: dict | None = None) -> dict:
+    """Legacy raw pins stay strict; versioned R1 pins ignore only overridden defaults."""
+    raw = path.read_bytes()
+    raw_sha256 = hashlib.sha256(raw).hexdigest()
+    if binding is None:
+        if raw_sha256 != expected_raw_sha256:
+            raise ValueError("native configuration changed after freeze")
+        return {"raw_sha256": raw_sha256, "effective_sha256": None,
+                "overridden_default_changes": [], "raw_changed": False}
+    if (not isinstance(binding, dict) or set(binding) != {"schema", "raw_sha256", "effective_sha256", "field_sha256"}
+            or binding.get("schema") != "r1-cli-model-defaults-v1"
+            or binding.get("raw_sha256") != expected_raw_sha256
+            or not isinstance(binding.get("field_sha256"), dict)):
+        raise ValueError("invalid native configuration binding")
+    for value in [binding["raw_sha256"], binding["effective_sha256"], *binding["field_sha256"].values()]:
+        if not isinstance(value, str) or len(value) != 64 or any(c not in "0123456789abcdef" for c in value):
+            raise ValueError("invalid native configuration binding digest")
+    current = native_config_binding(raw)
+    changed = sorted(key for key in binding["field_sha256"].keys() | current["field_sha256"].keys()
+                     if binding["field_sha256"].get(key) != current["field_sha256"].get(key))
+    if current["effective_sha256"] != binding["effective_sha256"]:
+        relevant = [key for key in changed if key not in {"model", "model_reasoning_effort"}]
+        raise ValueError("native configuration changed in effective fields: " + ", ".join(relevant))
+    return {"raw_sha256": raw_sha256, "effective_sha256": current["effective_sha256"],
+            "overridden_default_changes": [key for key in changed if key in {"model", "model_reasoning_effort"}],
+            "raw_changed": raw_sha256 != expected_raw_sha256}
+
+
 def disjoint(*paths: Path) -> bool:
     return all(not a.is_relative_to(b) and not b.is_relative_to(a)
                for i, a in enumerate(paths) for b in paths[i + 1:])
@@ -38,6 +81,11 @@ def prepare(source: Path, destination: Path, *, run_id: str, arm: str,
     source = source.resolve(strict=True)
     destination = destination.resolve()
     native_config = native_config.resolve(strict=True)
+    binding = conditions.get("native_config_binding")
+    if binding is not None:
+        observed = check_native_config(native_config, binding["raw_sha256"], binding)
+    else:
+        observed = {"raw_sha256": digest(native_config)}
     if not disjoint(source, destination):
         raise ValueError("source and destination must be disjoint")
     destination.mkdir(parents=True, exist_ok=False)
@@ -50,9 +98,11 @@ def prepare(source: Path, destination: Path, *, run_id: str, arm: str,
         "schema_version": 1, "kind": "r0-native-session-input", "run_id": run_id,
         "arm": arm, "workspace": str(destination / "workspace"),
         "observer": str(observer), "source_identity": snapshot["sha256"],
-        "native_config": str(native_config), "native_config_sha256": digest(native_config),
+        "native_config": str(native_config), "native_config_sha256": observed["raw_sha256"],
         "conditions": conditions, "permission_overrides": {}, "measured": False,
     }
+    if binding is not None:
+        manifest["config_validation"] = observed
     write_json(observer / "run.json", manifest)
     return manifest
 
@@ -81,8 +131,14 @@ def qualify(config: Path, trace: Path, *, thread_id: str) -> dict:
     after = source_snapshot(workspace, observer / "source-history")
     write_json(output / "source-after.json", after)
     errors = list(accounting.get("native_errors", []))
-    if digest(Path(manifest["native_config"])) != manifest["native_config_sha256"]:
-        errors.append("native configuration changed during qualification")
+    binding = manifest["conditions"].get("native_config_binding")
+    config_validation = None
+    try:
+        config_validation = check_native_config(Path(manifest["native_config"]),
+                                               binding["raw_sha256"] if binding else manifest["native_config_sha256"],
+                                               binding)
+    except (ValueError, KeyError, TypeError) as exc:
+        errors.append("native configuration changed during qualification: " + str(exc))
     contexts = accounting.get("turn_contexts", [])
     expected = manifest["conditions"].get("native_protection")
     if not contexts:
@@ -126,6 +182,8 @@ def qualify(config: Path, trace: Path, *, thread_id: str) -> dict:
             "This readback neither launches nor authorizes a measured pilot; independent grading and a prospective freeze remain necessary.",
         ],
     }
+    if binding is not None:
+        result["config_validation"] = config_validation
     write_json(output / "result.json", result)
     return result
 
