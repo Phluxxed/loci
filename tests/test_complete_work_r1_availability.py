@@ -96,6 +96,7 @@ def host_gate(tmp_path, monkeypatch):
         qualified.mkdir()
         trace = qualified / 'native-rollout.jsonl'
         _write(trace, rows)
+        account['native_provenance'] = {'rollout_path': str(trace)}
         thread = 'probe-' + condition
         write_json(observer / 'execution.json', {'thread_id': thread, 'status': 'closed', 'exit_code': 0,
                    'measured': False, 'freeze_sha256': frozen['freeze_sha256'], 'gate_sha256': 'd' * 64})
@@ -118,7 +119,11 @@ def host_gate(tmp_path, monkeypatch):
         originals.append(folder)
     gate_path = directory / 'gate.json'
     write_json(gate_path, gate)
-    monkeypatch.setattr(accounting, 'summarize_native', lambda trace, thread: deepcopy(captured[str(trace.resolve())]))
+    def replay_accounting(trace, thread):
+        result = deepcopy(captured[str(trace.resolve())])
+        result['native_provenance']['rollout_path'] = str(trace)
+        return result
+    monkeypatch.setattr(accounting, 'summarize_native', replay_accounting)
     monkeypatch.setattr(subprocess, 'run', lambda *a, **k: pytest.fail('native launch forbidden'))
     return path, frozen, gate_path, gate, originals
 
@@ -287,3 +292,34 @@ def test_actual_cli_handoff_survives_default_drift_up_to_process_boundary(tmp_pa
     assert config['native_config_sha256'] != frozen['native_config_sha256']
     assert config['config_validation']['effective_sha256'] == frozen['native_config_binding']['effective_sha256']
     assert not (output / 'execution-index.json').exists()
+
+
+def test_real_native_probes_replay_after_archive_relocation(tmp_path, monkeypatch):
+    """Real accounting and MCP audits; the live probe directories are unnecessary."""
+    root = Path(__file__).resolve().parents[1] / '.scratch/r1-integrated/pilot-availability-v2'
+    frozen = r1.read_freeze(root / 'freeze.json', runtime=False)
+    gate = json.loads((root / 'availability/gate.json').read_text())
+    gate['status'] = 'passed'
+    gate.pop('error', None)
+    gate_path = tmp_path / 'replayed-gate.json'
+    write_json(gate_path, gate)
+    monkeypatch.setattr(subprocess, 'run', lambda *a, **k: pytest.fail('native launch forbidden'))
+    verified = r1.require_availability(frozen, gate_path)
+    assert len(verified['threads']) == 4
+
+
+@pytest.mark.parametrize('mutation', ['rollout_path', 'session_id', 'usage'])
+def test_archived_gate_rejects_changed_qualification_accounting(host_gate, mutation):
+    _, frozen, gate_path, gate, _ = host_gate
+    entry = gate['probes'][0]
+    qualification = Path(entry['files']['qualification']['path'])
+    value = json.loads(qualification.read_text())
+    if mutation == 'usage':
+        value['accounting']['usage'] = {'input_tokens': 999999}
+    else:
+        value['accounting']['native_provenance'][mutation] = 'forged'
+    write_json(qualification, value)
+    entry['files']['qualification']['sha256'] = r0.digest(qualification)
+    write_json(gate_path, gate)
+    with pytest.raises(ValueError, match='accounting differs'):
+        r1.require_availability(frozen, gate_path)

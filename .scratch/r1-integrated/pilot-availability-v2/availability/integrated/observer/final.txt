@@ -1,0 +1,7 @@
+**The Loci availability probe passed.** The live catalog matched all four expected tools, and each operation completed through this Codex host.
+
+- `loci_retrieve` and the hash-bound `loci_read` returned matching content and hashes for the complete 102-byte [entry.ts](/private/tmp/loci-r1-availability-ujjoju0f/availability-integrated/workspace/entry.ts) fixture. Retrieval reported `partial` because it does not provide semantic relationships.
+- `loci_semantic` returned the `entry.ts::entry#function` anchor. `loci_proof` reported a complete, import-resolved `uses_type` relationship from `entry` to `model.ts::Public#type`.
+- The proof sources show `entry` importing and using `Public`, and [model.ts](/private/tmp/loci-r1-availability-ujjoju0f/availability-integrated/workspace/model.ts) defining `Public` as `Middle`.
+
+The semantic result is bounded and non-exhaustive; its selection omitted one candidate.

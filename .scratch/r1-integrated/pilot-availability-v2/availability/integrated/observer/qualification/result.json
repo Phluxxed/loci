@@ -1,0 +1,1990 @@
+{
+  "schema_version": 1,
+  "kind": "r0-native-session-qualification",
+  "run_id": "availability-integrated",
+  "arm": "loci",
+  "thread_id": "01a17b82-7750-7b93-a9eb-fa1340bab53b",
+  "status": "qualified_observations",
+  "measured": false,
+  "config_sha256": "0519a1b974cd2eed40f849e5a48ab3f7e4ea4bf20d8cdf8b45cd04026ca8bc72",
+  "native_trace_sha256": "f21799ec6134333f2916f8ba45d2d3d4f2f1049a4db6761a762287eb3f9aeaaf",
+  "source_before": "666d11781d19c5af6fe7894dc1d42e2844bafff0409a9978f2ec62e15d84f0ff",
+  "source_after": "666d11781d19c5af6fe7894dc1d42e2844bafff0409a9978f2ec62e15d84f0ff",
+  "conditions": {
+    "model": "gpt-6.1-terra",
+    "effort": "max",
+    "native_protection": {
+      "approval_policy": "on-request",
+      "approvals_reviewer": "auto_review",
+      "sandbox_policy": {
+        "type": "workspace-write",
+        "writable_roots": [
+          "/",
+          "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T"
+        ],
+        "network_access": true,
+        "exclude_tmpdir_env_var": false,
+        "exclude_slash_tmp": false
+      },
+      "permission_profile": {
+        "type": "managed",
+        "file_system": {
+          "type": "restricted",
+          "entries": [
+            {
+              "path": {
+                "type": "path",
+                "path": "/"
+              },
+              "access": "write"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/.claude"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/.claude/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/Downloads"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/Downloads/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/claude-otel"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/claude-otel/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/improvements"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/improvements/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/work"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/work/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "minimal"
+                }
+              },
+              "access": "read"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "tmpdir"
+                }
+              },
+              "access": "write"
+            }
+          ]
+        },
+        "network": "enabled"
+      },
+      "active_permission_profile": {
+        "id": "brummerv_filesystem_guard"
+      },
+      "file_system_sandbox_policy": {
+        "kind": "restricted",
+        "entries": [
+          {
+            "path": {
+              "type": "path",
+              "path": "/"
+            },
+            "access": "write"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/.claude"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/.claude/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/Downloads"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/Downloads/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/claude-otel"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/claude-otel/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/improvements"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/improvements/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/work"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/work/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "special",
+              "value": {
+                "kind": "minimal"
+              }
+            },
+            "access": "read"
+          },
+          {
+            "path": {
+              "type": "special",
+              "value": {
+                "kind": "tmpdir"
+              }
+            },
+            "access": "write"
+          }
+        ]
+      }
+    },
+    "freeze_sha256": "0a747227d868595fa728c095dcc0d3b26fcd3b1fbfcab938b2543bbdc3e735c6",
+    "native_config_binding": {
+      "schema": "r1-cli-model-defaults-v1",
+      "raw_sha256": "0353fc7b94b3a66303648814809c4d7f84745eb032d9f9b92beb1934eebd64d1",
+      "effective_sha256": "1144414951be6350ae99a43a4fcfb1256694c17f16920408d8d790ec2111e48d",
+      "field_sha256": {
+        "model": "c8eeff274672ae39221a0febbb1db6d6c7a979673419a2635c2d1f0f499a8f04",
+        "model_reasoning_effort": "b57c4299afe3cda154124bdb96ceaf618a9d8d9cd8d2c8f6580ff26faa5fe5ca",
+        "model_context_window": "ad1e2e29fe1631ddf7bedaadffe63c4efd61e6909a1ed0648e7b9645bd27dab5",
+        "model_auto_compact_token_limit": "e6ba348d1464969bb4210f401b255b6de57b81fddc375b944ac4fe2fb698bc95",
+        "service_tier": "1080a60800d9e5bddc69f51489c636a776bacaadb5368f46db4aa0947c67e3ba",
+        "plan_mode_reasoning_effort": "e5c4eb89c17b3350875c064ac177103d77081d68860beaffbdb826c88462eb41",
+        "approval_policy": "112f9f74261331ef91d859af60ec297cdd2cfdbc99811d74a8002f4fcb71fb4a",
+        "approvals_reviewer": "f83d332e375a1a7db6babce3b70e263ea815a07685d3cfaa2ffc641455ee8d25",
+        "default_permissions": "9c08e418cb514da9dc6a34f2fd53927da6723713a8cf649fc4d09d0953e36faa",
+        "developer_instructions": "b81a536c573f07708ee5aae6e203b7757c42985984b5a4e8ff7a8ed58a5a1571",
+        "notify": "09928d31161e6998648aaabfe61e4dc0351473dde87bdfced2689282b6beb5d6",
+        "agents": "fee67260299ab214b3908cdc4f7b9ffb53d3654dca8c93816502b6bd4a7d6611",
+        "permissions": "4c0c54b700b1be8523e5801611b47e84ab3a29e8f2e240838a40cdd561a35f09",
+        "projects": "2f9fc4ea487ac946665332cc4ab370378a57625ce2f6acc3c898f4dabc6f3ddb",
+        "otel": "86ff2534d6158ad2fba9ccea91139cb5f9abc1ebdb110a0058947e050651535a",
+        "tui": "c3ac8d12f5a0f8bab72a8df93c873b2a0a752cc654efd1ae5576af2139fcb1ff",
+        "plugins": "5ea7a32c3f441de100c99c50d373d3121a91a16c82ad85236148a8b0125f9c88",
+        "hooks": "5c78c907ac5b0d71c3d49c9c1ccf968294e968b473ab2d68287601465771c514",
+        "notice": "97f2fe6a31e33287559f344a16f9bcc5a5befa581b986f75ff423ed5b2ad29cd",
+        "features": "2f806baaa1d6257aceca9d08158fe2887bfdb6023516c144f3658f329b4b0007",
+        "memories": "e3b654f3522801b6062cb54b57289a2af085bd1e96e7409ee007efd231452e12",
+        "mcp_servers": "43019dcc907af7dbde0addda15d4d6f798a7687c243796b7aa69df8114166e88",
+        "marketplaces": "2bf6f3f400e57770f07c2e9d64adc2c0a9f9796cafe6d6c28b09b47b85cbbd41",
+        "desktop": "aa6b9cc0bfd3a4cd469fce52fb8de20ae71f67b1dd820306ca89fbaf17d0fdd0",
+        "shell_environment_policy": "55c0fc8e982d9dd0d451c6c3bc442a0668341278e7cb6b6d9f346a2ad88a6895",
+        "apps": "4ac7980d4c76878d55fb2c5dd4b8f0afe71972932449f8225dd842557c5ec914",
+        "skills": "b0936d993dc8808917c340f46496acde153bd8d41da18b1492cb4bbc4a0fe363"
+      }
+    }
+  },
+  "native_config_sha256": "e599c164441845c9741e2a9310b59bab9a73e6cae592fc4caba2bc4e118e19f1",
+  "workspace": "/private/tmp/loci-r1-availability-ujjoju0f/availability-integrated/workspace",
+  "observer": "/private/tmp/loci-r1-availability-ujjoju0f/availability-integrated/observer",
+  "accounting": {
+    "schema_version": 1,
+    "accounting": "native-rollout-v1",
+    "thread_id": "01a17b82-7750-7b93-a9eb-fa1340bab53b",
+    "stages": [
+      {
+        "stage_id": "turn-1",
+        "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+        "outcome": "completed",
+        "elapsed_ms": 68908,
+        "usage_status": "known",
+        "usage": {
+          "inputTokens": 328707,
+          "cachedInputTokens": 299648,
+          "outputTokens": 4917,
+          "reasoningOutputTokens": 2895,
+          "totalTokens": 333624,
+          "cacheWriteInputTokens": 0,
+          "uncachedInputTokens": 29059
+        },
+        "usage_updates": 11,
+        "observed_usage_delta": {
+          "inputTokens": 328707,
+          "cachedInputTokens": 299648,
+          "outputTokens": 4917,
+          "reasoningOutputTokens": 2895,
+          "totalTokens": 333624,
+          "cacheWriteInputTokens": 0
+        },
+        "usage_limitation": null,
+        "mcp_calls": 4,
+        "shell_calls": 0,
+        "file_change_calls": 0,
+        "context_compactions": 0,
+        "subagent_calls": 0,
+        "failed_shell_calls": 0,
+        "outer_tool_calls": 10,
+        "outer_tool_calls_status": "observed",
+        "model_requests": null,
+        "observed_completed_model_requests": 11,
+        "model_requests_status": "completion_lower_bound",
+        "upstream_responses": [
+          {
+            "threadId": "01a17b82-7750-7b93-a9eb-fa1340bab53b",
+            "turnId": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+            "responseId": "resp_0ce685be701bdc8b016ae02169d7bc8191bff08f333167df54"
+          },
+          {
+            "threadId": "01a17b82-7750-7b93-a9eb-fa1340bab53b",
+            "turnId": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+            "responseId": "resp_0ce685be701bdc8b016ae0216c33dc819185ca5229531b76ca"
+          },
+          {
+            "threadId": "01a17b82-7750-7b93-a9eb-fa1340bab53b",
+            "turnId": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+            "responseId": "resp_0ce685be701bdc8b016ae02170e944819192fc8c8952abdf8f"
+          },
+          {
+            "threadId": "01a17b82-7750-7b93-a9eb-fa1340bab53b",
+            "turnId": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+            "responseId": "resp_0ce685be701bdc8b016ae0217399e881919013d51dfeb73e60"
+          },
+          {
+            "threadId": "01a17b82-7750-7b93-a9eb-fa1340bab53b",
+            "turnId": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+            "responseId": "resp_0ce685be701bdc8b016ae0217dff6c81919c2b91c50b96b346"
+          },
+          {
+            "threadId": "01a17b82-7750-7b93-a9eb-fa1340bab53b",
+            "turnId": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+            "responseId": "resp_0ce685be701bdc8b016ae0218295788191a9459aef1d233f5f"
+          },
+          {
+            "threadId": "01a17b82-7750-7b93-a9eb-fa1340bab53b",
+            "turnId": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+            "responseId": "resp_0ce685be701bdc8b016ae02185e7388191ac52381317995bb1"
+          },
+          {
+            "threadId": "01a17b82-7750-7b93-a9eb-fa1340bab53b",
+            "turnId": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+            "responseId": "resp_0ce685be701bdc8b016ae02187967081918d22a9a487a43155"
+          },
+          {
+            "threadId": "01a17b82-7750-7b93-a9eb-fa1340bab53b",
+            "turnId": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+            "responseId": "resp_0ce685be701bdc8b016ae0218ecd1481918daba6e551d20c5d"
+          },
+          {
+            "threadId": "01a17b82-7750-7b93-a9eb-fa1340bab53b",
+            "turnId": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+            "responseId": "resp_0ce685be701bdc8b016ae0219ef8a8819185c3b2bb568e0942"
+          },
+          {
+            "threadId": "01a17b82-7750-7b93-a9eb-fa1340bab53b",
+            "turnId": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+            "responseId": "resp_0ce685be701bdc8b016ae021a4389881918c6d0145b3954a1d"
+          }
+        ],
+        "first_event": {
+          "ordinal": 14,
+          "monotonic": null,
+          "utc": "2026-10-27T03:58:32.501Z"
+        },
+        "last_event": {
+          "ordinal": 90,
+          "monotonic": null,
+          "utc": "2026-10-27T03:59:40.086Z"
+        },
+        "operation_counts_status": "observed_items_only",
+        "items": [
+          {
+            "type": "UserMessage",
+            "id": "01a17b82-8033-7610-81c3-7bf43ec54a5a",
+            "content": [
+              {
+                "type": "text",
+                "text": "Before doing the task, your first model tool action must be functions.exec executing exactly this program, without additions or changes:\nconst names = ALL_TOOLS.filter(t => /^mcp__loci__/.test(t.name) || /(?:^|__)loci_[A-Za-z0-9_]+$/.test(t.name)).map(t => t.name).sort();\ntext({loci_runtime_catalog_v1: names});\nCompare the returned live Loci tool names with the expected tools below (qualified as mcp__loci__NAME). If discovery is unavailable or the set differs, stop and report the availability failure. Otherwise continue the original task; Loci use is optional.\nExpected tools: [\"loci_proof\", \"loci_read\", \"loci_retrieve\", \"loci_semantic\"]\nThis is only an availability probe. Use only the fixture repository \"/private/tmp/loci-r1-availability-ujjoju0f/availability-integrated/workspace\". Do not inspect or copy any pilot task.\nAfter the catalog, inspect each discovered tool's complete live description and input declaration. Invoke every expected operation through this Codex host's tools. Call loci_retrieve with query entry.ts, then loci_read with a source_ref returned by that retrieve. Check returned source against the fixture. Do not use a local MCP client, import or call a server directly, launch another host, use shell source reads as proof, or fabricate success JSON. Stop on any error.\nCall loci_semantic with query entry and anchor_file entry.ts, then loci_proof with the entry anchor node_id actually returned by semantic. Inspect the proof sources and the entry-to-Public type relationship.\nFinish after the calls; report any availability failure accurately.\n",
+                "text_elements": []
+              }
+            ],
+            "native_type": "UserMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:58:32.501Z",
+              "emitted_at_ms": 1793073512501,
+              "ordinal": 14,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0ce685be701bdc8b016ae0216add648191a389f92ac4303e24",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:58:34.050Z",
+              "emitted_at_ms": 1793073514050,
+              "ordinal": 16,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "AgentMessage",
+            "id": "msg_0ce685be701bdc8b016ae0216aec208191b47a2e9a942525bb",
+            "content": [
+              {
+                "type": "Text",
+                "text": "I’ll check the live Loci catalog first, then run the requested fixture-only operations if it matches."
+              }
+            ],
+            "phase": "commentary",
+            "native_type": "AgentMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:58:34.423Z",
+              "emitted_at_ms": 1793073514423,
+              "ordinal": 18,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0ce685be701bdc8b016ae0216ecdd081918db5f68fa5fe9332",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:58:38.012Z",
+              "emitted_at_ms": 1793073518012,
+              "ordinal": 24,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0ce685be701bdc8b016ae0217252388191aa56e9e612b6aa0e",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:58:41.500Z",
+              "emitted_at_ms": 1793073521500,
+              "ordinal": 30,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0ce685be701bdc8b016ae02178a914819189081bb5668f5558",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:58:47.868Z",
+              "emitted_at_ms": 1793073527868,
+              "ordinal": 36,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "AgentMessage",
+            "id": "msg_0ce685be701bdc8b016ae02178b55481919e071b6c954b2cf6",
+            "content": [
+              {
+                "type": "Text",
+                "text": "The catalog matches all four expected tools, and I’ve inspected their live contracts. I’ll retrieve the fixture’s `entry.ts` and follow its returned source reference."
+              }
+            ],
+            "phase": "commentary",
+            "native_type": "AgentMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:58:48.299Z",
+              "emitted_at_ms": 1793073528299,
+              "ordinal": 38,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "mcpToolCall",
+            "id": "exec-0363e0a6-c94a-4d45-80a0-03bbb35f70a1",
+            "server": "loci",
+            "tool": "loci_retrieve",
+            "arguments": {
+              "repo": "/private/tmp/loci-r1-availability-ujjoju0f/availability-integrated/workspace",
+              "query": "entry.ts"
+            },
+            "status": "completed",
+            "result": {
+              "content": [],
+              "structuredContent": {
+                "schema_version": 1,
+                "policy": "graph-free-file-v1",
+                "snapshot": "567f4dbb512945f99257447222e7f5e01cdec76c03bfb1a7c357d95e673cf1fd",
+                "status": "partial",
+                "scope": {
+                  "coverage": "complete",
+                  "exhaustive": false,
+                  "matching": "exact_file",
+                  "source": "text_repository_files",
+                  "relationships": "unsupported"
+                },
+                "selection": {
+                  "mode": "file",
+                  "candidate_count": 1,
+                  "omitted_candidates": 0
+                },
+                "anchors": [],
+                "items": [
+                  {
+                    "node_id": "entry.ts::__file__#file",
+                    "role": "anchor",
+                    "depth": 0,
+                    "why": "exact_file",
+                    "source_ids": [
+                      1
+                    ],
+                    "complete": true,
+                    "extent": {
+                      "file": "entry.ts",
+                      "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a",
+                      "start_byte": 0,
+                      "end_byte": 102
+                    },
+                    "source_ref": "eyJlbmQiOjEwMiwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjAsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjAsInYiOjF9"
+                  }
+                ],
+                "sources": [
+                  {
+                    "id": 1,
+                    "file": "entry.ts",
+                    "start_byte": 0,
+                    "end_byte": 102,
+                    "start_line": 1,
+                    "end_line": 2,
+                    "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a",
+                    "content": "import type { Public } from './model';\nexport function entry(value: Public): Public { return value; }\n",
+                    "source_ref": "eyJlbmQiOjEwMiwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjAsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjAsInYiOjF9"
+                  }
+                ],
+                "nodes": [],
+                "ownership": [],
+                "relationships": [],
+                "omissions": [
+                  {
+                    "reason": "unsupported_semantics",
+                    "count": 1
+                  }
+                ],
+                "limits": {
+                  "max_files": 4096,
+                  "max_file_bytes": 2097152,
+                  "max_scan_bytes": 67108864,
+                  "max_results": 3,
+                  "max_preview_bytes": 1024,
+                  "max_read_bytes": 8192
+                },
+                "usage": {
+                  "lookup_bytes": 102,
+                  "lookup_files": 1,
+                  "estimated_tokens": 552,
+                  "output_bytes": 2207,
+                  "evidence_bytes": 102,
+                  "output_encoding": "mcp_result_json_utf8"
+                },
+                "navigation": {
+                  "meaning": "source path candidates; not resolved relationships",
+                  "exhaustive": false,
+                  "candidates": [
+                    {
+                      "path": "model.ts",
+                      "reason": "relative_import_alternative",
+                      "observed_in": "entry.ts"
+                    }
+                  ],
+                  "omitted_candidates": 0
+                }
+              },
+              "isError": false
+            },
+            "duration": {
+              "secs": 0,
+              "nanos": 35497250
+            },
+            "native_type": "McpToolCall",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:58:52.401Z",
+              "emitted_at_ms": 1793073532401,
+              "ordinal": 41,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0ce685be701bdc8b016ae0217fd284819195a7d7ec32885494",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:58:55.051Z",
+              "emitted_at_ms": 1793073535051,
+              "ordinal": 45,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "mcpToolCall",
+            "id": "exec-f31a8542-d3d0-471f-bafd-80cbc65cc064",
+            "server": "loci",
+            "tool": "loci_read",
+            "arguments": {
+              "repo": "/private/tmp/loci-r1-availability-ujjoju0f/availability-integrated/workspace",
+              "source_ref": "eyJlbmQiOjEwMiwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjAsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjAsInYiOjF9"
+            },
+            "status": "completed",
+            "result": {
+              "content": [],
+              "structuredContent": {
+                "schema_version": 1,
+                "status": "ok",
+                "source": {
+                  "id": 1,
+                  "file": "entry.ts",
+                  "start_byte": 0,
+                  "end_byte": 102,
+                  "start_line": 1,
+                  "end_line": 2,
+                  "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a",
+                  "content": "import type { Public } from './model';\nexport function entry(value: Public): Public { return value; }\n",
+                  "source_ref": "eyJlbmQiOjEwMiwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjAsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjAsInYiOjF9"
+                },
+                "complete": true,
+                "next_source_ref": null,
+                "usage": {
+                  "output_bytes": 812,
+                  "evidence_bytes": 102,
+                  "output_encoding": "mcp_result_json_utf8"
+                }
+              },
+              "isError": false
+            },
+            "duration": {
+              "secs": 0,
+              "nanos": 51290500
+            },
+            "native_type": "McpToolCall",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:58:57.271Z",
+              "emitted_at_ms": 1793073537271,
+              "ordinal": 49,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0ce685be701bdc8b016ae0218484188191b93f6aef8925c3f3",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:58:59.732Z",
+              "emitted_at_ms": 1793073539732,
+              "ordinal": 52,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0ce685be701bdc8b016ae0218685e4819183eb570f01a8a843",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:59:01.688Z",
+              "emitted_at_ms": 1793073541688,
+              "ordinal": 58,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0ce685be701bdc8b016ae0218da7a081919a654f88bf27cd87",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:59:08.858Z",
+              "emitted_at_ms": 1793073548858,
+              "ordinal": 64,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0ce685be701bdc8b016ae02195892c819185f89f026ae04970",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:59:16.821Z",
+              "emitted_at_ms": 1793073556821,
+              "ordinal": 70,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0ce685be701bdc8b016ae0219add208191ab8138f275f3bf32",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:59:22.069Z",
+              "emitted_at_ms": 1793073562069,
+              "ordinal": 72,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "mcpToolCall",
+            "id": "exec-490a95f4-17eb-4cd9-8b33-2d52d31fdb19",
+            "server": "loci",
+            "tool": "loci_semantic",
+            "arguments": {
+              "repo": "/private/tmp/loci-r1-availability-ujjoju0f/availability-integrated/workspace",
+              "query": "entry",
+              "anchor_file": "entry.ts"
+            },
+            "status": "completed",
+            "result": {
+              "content": [],
+              "structuredContent": {
+                "schema_version": 1,
+                "policy": "demand-semantic-v1",
+                "snapshot": "567f4dbb512945f99257447222e7f5e01cdec76c03bfb1a7c357d95e673cf1fd",
+                "status": "ok",
+                "scope": {
+                  "coverage": "complete",
+                  "exhaustive": false,
+                  "matching": "symbol_metadata",
+                  "source": "indexed_supported_source",
+                  "relationships": "known_static_relationships"
+                },
+                "selection": {
+                  "mode": "inferred",
+                  "candidate_count": 4,
+                  "omitted_candidates": 1
+                },
+                "anchors": [
+                  {
+                    "node_id": "entry.ts::entry#function",
+                    "score": 130,
+                    "matched_terms": [
+                      "entry"
+                    ],
+                    "match_scope": [
+                      "symbol_metadata"
+                    ]
+                  }
+                ],
+                "nodes": [
+                  {
+                    "id": "entry.ts::entry#function",
+                    "name": "entry",
+                    "kind": "function",
+                    "file": "entry.ts"
+                  },
+                  {
+                    "id": "model.ts::Public#type",
+                    "name": "Public",
+                    "kind": "type",
+                    "file": "model.ts"
+                  },
+                  {
+                    "id": "model.ts::Middle#type",
+                    "name": "Middle",
+                    "kind": "type",
+                    "file": "model.ts"
+                  }
+                ],
+                "items": [
+                  {
+                    "node_id": "entry.ts::entry#function",
+                    "role": "anchor",
+                    "depth": 0,
+                    "why": "matched question identifier",
+                    "source_ids": [
+                      1
+                    ],
+                    "complete": true,
+                    "extent": {
+                      "file": "entry.ts",
+                      "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a",
+                      "start_byte": 46,
+                      "end_byte": 101
+                    },
+                    "source_ref": "s:eyJlbmQiOjEwMSwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjQ2LCJyZXBvIjoiL3ByaXZhdGUvdG1wL2xvY2ktcjEtYXZhaWxhYmlsaXR5LXVqam9qdTBmL2F2YWlsYWJpbGl0eS1pbnRlZ3JhdGVkL3dvcmtzcGFjZSIsInN0YXJ0Ijo0NiwidiI6Mn0"
+                  },
+                  {
+                    "node_id": "model.ts::Public#type",
+                    "role": "related",
+                    "depth": 1,
+                    "why": "two-hop outward source candidate",
+                    "source_ids": [
+                      2
+                    ],
+                    "complete": true,
+                    "extent": {
+                      "file": "model.ts",
+                      "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba",
+                      "start_byte": 61,
+                      "end_byte": 82
+                    },
+                    "source_ref": "s:eyJlbmQiOjgyLCJmaWxlIjoibW9kZWwudHMiLCJoYXNoIjoiZmM3NmVlOTRkYzFmNGYwNjMxNTgwMDk5ZjRmN2U0ZmM3OTZjOTZiYmM0MzRjZmFiNDk0MTY5YjU3MGM0MTBiYSIsIm9mZnNldCI6NjEsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjYxLCJ2IjoyfQ"
+                  },
+                  {
+                    "node_id": "model.ts::Middle#type",
+                    "role": "related",
+                    "depth": 1,
+                    "why": "two-hop outward source candidate",
+                    "source_ids": [
+                      3
+                    ],
+                    "complete": true,
+                    "extent": {
+                      "file": "model.ts",
+                      "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba",
+                      "start_byte": 34,
+                      "end_byte": 53
+                    },
+                    "source_ref": "s:eyJlbmQiOjUzLCJmaWxlIjoibW9kZWwudHMiLCJoYXNoIjoiZmM3NmVlOTRkYzFmNGYwNjMxNTgwMDk5ZjRmN2U0ZmM3OTZjOTZiYmM0MzRjZmFiNDk0MTY5YjU3MGM0MTBiYSIsIm9mZnNldCI6MzQsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjM0LCJ2IjoyfQ"
+                  }
+                ],
+                "ownership": [],
+                "relationships": [
+                  {
+                    "id": 1,
+                    "edge": {
+                      "from": "entry.ts::entry#function",
+                      "to": "model.ts::Public#type",
+                      "type": "uses_type",
+                      "directed": true,
+                      "namespace": "loci",
+                      "resolution": "import-resolved",
+                      "evidence": {
+                        "file": "entry.ts",
+                        "line": 2,
+                        "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a"
+                      }
+                    },
+                    "traversed": "forward",
+                    "source_ids": [
+                      4,
+                      5,
+                      6,
+                      7,
+                      1,
+                      2
+                    ],
+                    "proof": "complete",
+                    "resolution_configuration": null
+                  },
+                  {
+                    "id": 2,
+                    "edge": {
+                      "from": "model.ts::Public#type",
+                      "to": "model.ts::Middle#type",
+                      "type": "uses_type",
+                      "directed": true,
+                      "namespace": "loci",
+                      "resolution": "exact",
+                      "evidence": {
+                        "file": "model.ts",
+                        "line": 3,
+                        "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba"
+                      }
+                    },
+                    "traversed": "forward",
+                    "source_ids": [
+                      8,
+                      7,
+                      9,
+                      2,
+                      3
+                    ],
+                    "proof": "complete",
+                    "resolution_configuration": null
+                  }
+                ],
+                "sources": [
+                  {
+                    "id": 1,
+                    "file": "entry.ts",
+                    "start_byte": 46,
+                    "end_byte": 101,
+                    "start_line": 2,
+                    "end_line": 2,
+                    "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a",
+                    "content": "function entry(value: Public): Public { return value; }",
+                    "source_ref": "s:eyJlbmQiOjEwMSwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjQ2LCJyZXBvIjoiL3ByaXZhdGUvdG1wL2xvY2ktcjEtYXZhaWxhYmlsaXR5LXVqam9qdTBmL2F2YWlsYWJpbGl0eS1pbnRlZ3JhdGVkL3dvcmtzcGFjZSIsInN0YXJ0Ijo0NiwidiI6Mn0"
+                  },
+                  {
+                    "id": 2,
+                    "file": "model.ts",
+                    "start_byte": 61,
+                    "end_byte": 82,
+                    "start_line": 3,
+                    "end_line": 3,
+                    "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba",
+                    "content": "type Public = Middle;",
+                    "source_ref": "s:eyJlbmQiOjgyLCJmaWxlIjoibW9kZWwudHMiLCJoYXNoIjoiZmM3NmVlOTRkYzFmNGYwNjMxNTgwMDk5ZjRmN2U0ZmM3OTZjOTZiYmM0MzRjZmFiNDk0MTY5YjU3MGM0MTBiYSIsIm9mZnNldCI6NjEsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjYxLCJ2IjoyfQ"
+                  },
+                  {
+                    "id": 3,
+                    "file": "model.ts",
+                    "start_byte": 34,
+                    "end_byte": 53,
+                    "start_line": 2,
+                    "end_line": 2,
+                    "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba",
+                    "content": "type Middle = Base;",
+                    "source_ref": "s:eyJlbmQiOjUzLCJmaWxlIjoibW9kZWwudHMiLCJoYXNoIjoiZmM3NmVlOTRkYzFmNGYwNjMxNTgwMDk5ZjRmN2U0ZmM3OTZjOTZiYmM0MzRjZmFiNDk0MTY5YjU3MGM0MTBiYSIsIm9mZnNldCI6MzQsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjM0LCJ2IjoyfQ"
+                  },
+                  {
+                    "id": 4,
+                    "file": "entry.ts",
+                    "start_byte": 68,
+                    "end_byte": 74,
+                    "start_line": 2,
+                    "end_line": 2,
+                    "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a",
+                    "content": "Public",
+                    "source_ref": "s:eyJlbmQiOjc0LCJmaWxlIjoiZW50cnkudHMiLCJoYXNoIjoiZWI0YjBhZGZhMGQzOGU3YmNlZWE5NzJiNWZjMjIxNThjNjAxYzAzM2M5ZGQxYTk5MzcyMzE3NjY1YWIyM2Q4YSIsIm9mZnNldCI6NjgsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjY4LCJ2IjoyfQ"
+                  },
+                  {
+                    "id": 5,
+                    "file": "entry.ts",
+                    "start_byte": 39,
+                    "end_byte": 102,
+                    "start_line": 2,
+                    "end_line": 2,
+                    "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a",
+                    "content": "export function entry(value: Public): Public { return value; }\n",
+                    "source_ref": "s:eyJlbmQiOjEwMiwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjM5LCJyZXBvIjoiL3ByaXZhdGUvdG1wL2xvY2ktcjEtYXZhaWxhYmlsaXR5LXVqam9qdTBmL2F2YWlsYWJpbGl0eS1pbnRlZ3JhdGVkL3dvcmtzcGFjZSIsInN0YXJ0IjozOSwidiI6Mn0"
+                  },
+                  {
+                    "id": 6,
+                    "file": "entry.ts",
+                    "start_byte": 0,
+                    "end_byte": 39,
+                    "start_line": 1,
+                    "end_line": 1,
+                    "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a",
+                    "content": "import type { Public } from './model';\n",
+                    "source_ref": "s:eyJlbmQiOjM5LCJmaWxlIjoiZW50cnkudHMiLCJoYXNoIjoiZWI0YjBhZGZhMGQzOGU3YmNlZWE5NzJiNWZjMjIxNThjNjAxYzAzM2M5ZGQxYTk5MzcyMzE3NjY1YWIyM2Q4YSIsIm9mZnNldCI6MCwicmVwbyI6Ii9wcml2YXRlL3RtcC9sb2NpLXIxLWF2YWlsYWJpbGl0eS11ampvanUwZi9hdmFpbGFiaWxpdHktaW50ZWdyYXRlZC93b3Jrc3BhY2UiLCJzdGFydCI6MCwidiI6Mn0"
+                  },
+                  {
+                    "id": 7,
+                    "file": "model.ts",
+                    "start_byte": 54,
+                    "end_byte": 83,
+                    "start_line": 3,
+                    "end_line": 3,
+                    "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba",
+                    "content": "export type Public = Middle;\n",
+                    "source_ref": "s:eyJlbmQiOjgzLCJmaWxlIjoibW9kZWwudHMiLCJoYXNoIjoiZmM3NmVlOTRkYzFmNGYwNjMxNTgwMDk5ZjRmN2U0ZmM3OTZjOTZiYmM0MzRjZmFiNDk0MTY5YjU3MGM0MTBiYSIsIm9mZnNldCI6NTQsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjU0LCJ2IjoyfQ"
+                  },
+                  {
+                    "id": 8,
+                    "file": "model.ts",
+                    "start_byte": 75,
+                    "end_byte": 81,
+                    "start_line": 3,
+                    "end_line": 3,
+                    "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba",
+                    "content": "Middle",
+                    "source_ref": "s:eyJlbmQiOjgxLCJmaWxlIjoibW9kZWwudHMiLCJoYXNoIjoiZmM3NmVlOTRkYzFmNGYwNjMxNTgwMDk5ZjRmN2U0ZmM3OTZjOTZiYmM0MzRjZmFiNDk0MTY5YjU3MGM0MTBiYSIsIm9mZnNldCI6NzUsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjc1LCJ2IjoyfQ"
+                  },
+                  {
+                    "id": 9,
+                    "file": "model.ts",
+                    "start_byte": 27,
+                    "end_byte": 54,
+                    "start_line": 2,
+                    "end_line": 2,
+                    "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba",
+                    "content": "export type Middle = Base;\n",
+                    "source_ref": "s:eyJlbmQiOjU0LCJmaWxlIjoibW9kZWwudHMiLCJoYXNoIjoiZmM3NmVlOTRkYzFmNGYwNjMxNTgwMDk5ZjRmN2U0ZmM3OTZjOTZiYmM0MzRjZmFiNDk0MTY5YjU3MGM0MTBiYSIsIm9mZnNldCI6MjcsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjI3LCJ2IjoyfQ"
+                  }
+                ],
+                "omissions": [],
+                "limits": {
+                  "max_items": 12,
+                  "max_relationships": 12,
+                  "max_evidence_bytes": 8192,
+                  "max_output_bytes": 16384,
+                  "max_parsed_files": 48
+                },
+                "usage": {
+                  "lookup_bytes": 236,
+                  "lookup_files": 3,
+                  "nodes_examined": 6,
+                  "eligible_edges_considered": 5,
+                  "edges_traversed": 2,
+                  "relationships_delivered": 2,
+                  "estimated_tokens": 2178,
+                  "output_bytes": 8710,
+                  "token_estimate_method": "utf8_bytes_div_4",
+                  "evidence_bytes": 158,
+                  "output_encoding": "mcp_result_json_utf8"
+                },
+                "uncertainty": {
+                  "scope": "native_records_in_computed_slice",
+                  "exhaustive": false,
+                  "counts": [],
+                  "configuration_possible_count": 0,
+                  "configuration_meaning": "declared_possible does not establish active configuration",
+                  "examples": [],
+                  "examples_omitted": 0
+                }
+              },
+              "isError": false
+            },
+            "duration": {
+              "secs": 0,
+              "nanos": 266046209
+            },
+            "native_type": "McpToolCall",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:59:25.620Z",
+              "emitted_at_ms": 1793073565620,
+              "ordinal": 76,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0ce685be701bdc8b016ae021a1b6ec81918473cdd84f0e2468",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:59:28.896Z",
+              "emitted_at_ms": 1793073568896,
+              "ordinal": 79,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "mcpToolCall",
+            "id": "exec-03341d64-afe1-4939-9684-ad1fae8bbfd8",
+            "server": "loci",
+            "tool": "loci_proof",
+            "arguments": {
+              "repo": "/private/tmp/loci-r1-availability-ujjoju0f/availability-integrated/workspace",
+              "node_id": "entry.ts::entry#function"
+            },
+            "status": "completed",
+            "result": {
+              "content": [],
+              "structuredContent": {
+                "schema_version": 1,
+                "policy": "focused-semantic-v1",
+                "snapshot": "567f4dbb512945f99257447222e7f5e01cdec76c03bfb1a7c357d95e673cf1fd",
+                "status": "ok",
+                "scope": {
+                  "coverage": "complete",
+                  "exhaustive": false,
+                  "matching": "symbol_metadata",
+                  "source": "indexed_supported_source",
+                  "relationships": "known_static_relationships"
+                },
+                "selection": {
+                  "mode": "inferred",
+                  "candidate_count": 0,
+                  "omitted_candidates": 0
+                },
+                "anchors": [
+                  {
+                    "node_id": "entry.ts::entry#function",
+                    "score": 0,
+                    "matched_terms": [
+                      "entry"
+                    ],
+                    "match_scope": [
+                      "symbol_metadata"
+                    ]
+                  }
+                ],
+                "nodes": [
+                  {
+                    "id": "entry.ts::entry#function",
+                    "name": "entry",
+                    "kind": "function",
+                    "file": "entry.ts"
+                  },
+                  {
+                    "id": "model.ts::Public#type",
+                    "name": "Public",
+                    "kind": "type",
+                    "file": "model.ts"
+                  }
+                ],
+                "items": [
+                  {
+                    "node_id": "entry.ts::entry#function",
+                    "role": "related",
+                    "depth": 1,
+                    "why": "proved relationship endpoint",
+                    "source_ids": [
+                      5
+                    ],
+                    "complete": true,
+                    "extent": {
+                      "file": "entry.ts",
+                      "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a",
+                      "start_byte": 46,
+                      "end_byte": 101
+                    },
+                    "source_ref": "s:eyJlbmQiOjEwMSwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjQ2LCJyZXBvIjoiL3ByaXZhdGUvdG1wL2xvY2ktcjEtYXZhaWxhYmlsaXR5LXVqam9qdTBmL2F2YWlsYWJpbGl0eS1pbnRlZ3JhdGVkL3dvcmtzcGFjZSIsInN0YXJ0Ijo0NiwidiI6Mn0"
+                  },
+                  {
+                    "node_id": "model.ts::Public#type",
+                    "role": "related",
+                    "depth": 1,
+                    "why": "proved relationship endpoint",
+                    "source_ids": [
+                      6
+                    ],
+                    "complete": true,
+                    "extent": {
+                      "file": "model.ts",
+                      "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba",
+                      "start_byte": 61,
+                      "end_byte": 82
+                    },
+                    "source_ref": "s:eyJlbmQiOjgyLCJmaWxlIjoibW9kZWwudHMiLCJoYXNoIjoiZmM3NmVlOTRkYzFmNGYwNjMxNTgwMDk5ZjRmN2U0ZmM3OTZjOTZiYmM0MzRjZmFiNDk0MTY5YjU3MGM0MTBiYSIsIm9mZnNldCI6NjEsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjYxLCJ2IjoyfQ"
+                  }
+                ],
+                "ownership": [],
+                "relationships": [
+                  {
+                    "id": 1,
+                    "edge": {
+                      "from": "entry.ts::entry#function",
+                      "to": "model.ts::Public#type",
+                      "type": "uses_type",
+                      "directed": true,
+                      "namespace": "loci",
+                      "resolution": "import-resolved",
+                      "evidence": {
+                        "file": "entry.ts",
+                        "line": 2,
+                        "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a"
+                      }
+                    },
+                    "traversed": "forward",
+                    "source_ids": [
+                      1,
+                      2,
+                      3,
+                      4,
+                      5,
+                      6
+                    ],
+                    "proof": "complete",
+                    "resolution_configuration": null
+                  }
+                ],
+                "sources": [
+                  {
+                    "id": 1,
+                    "file": "entry.ts",
+                    "start_byte": 68,
+                    "end_byte": 74,
+                    "start_line": 2,
+                    "end_line": 2,
+                    "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a",
+                    "content": "Public",
+                    "source_ref": "s:eyJlbmQiOjc0LCJmaWxlIjoiZW50cnkudHMiLCJoYXNoIjoiZWI0YjBhZGZhMGQzOGU3YmNlZWE5NzJiNWZjMjIxNThjNjAxYzAzM2M5ZGQxYTk5MzcyMzE3NjY1YWIyM2Q4YSIsIm9mZnNldCI6NjgsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjY4LCJ2IjoyfQ"
+                  },
+                  {
+                    "id": 2,
+                    "file": "entry.ts",
+                    "start_byte": 39,
+                    "end_byte": 102,
+                    "start_line": 2,
+                    "end_line": 2,
+                    "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a",
+                    "content": "export function entry(value: Public): Public { return value; }\n",
+                    "source_ref": "s:eyJlbmQiOjEwMiwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjM5LCJyZXBvIjoiL3ByaXZhdGUvdG1wL2xvY2ktcjEtYXZhaWxhYmlsaXR5LXVqam9qdTBmL2F2YWlsYWJpbGl0eS1pbnRlZ3JhdGVkL3dvcmtzcGFjZSIsInN0YXJ0IjozOSwidiI6Mn0"
+                  },
+                  {
+                    "id": 3,
+                    "file": "entry.ts",
+                    "start_byte": 0,
+                    "end_byte": 39,
+                    "start_line": 1,
+                    "end_line": 1,
+                    "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a",
+                    "content": "import type { Public } from './model';\n",
+                    "source_ref": "s:eyJlbmQiOjM5LCJmaWxlIjoiZW50cnkudHMiLCJoYXNoIjoiZWI0YjBhZGZhMGQzOGU3YmNlZWE5NzJiNWZjMjIxNThjNjAxYzAzM2M5ZGQxYTk5MzcyMzE3NjY1YWIyM2Q4YSIsIm9mZnNldCI6MCwicmVwbyI6Ii9wcml2YXRlL3RtcC9sb2NpLXIxLWF2YWlsYWJpbGl0eS11ampvanUwZi9hdmFpbGFiaWxpdHktaW50ZWdyYXRlZC93b3Jrc3BhY2UiLCJzdGFydCI6MCwidiI6Mn0"
+                  },
+                  {
+                    "id": 4,
+                    "file": "model.ts",
+                    "start_byte": 54,
+                    "end_byte": 83,
+                    "start_line": 3,
+                    "end_line": 3,
+                    "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba",
+                    "content": "export type Public = Middle;\n",
+                    "source_ref": "s:eyJlbmQiOjgzLCJmaWxlIjoibW9kZWwudHMiLCJoYXNoIjoiZmM3NmVlOTRkYzFmNGYwNjMxNTgwMDk5ZjRmN2U0ZmM3OTZjOTZiYmM0MzRjZmFiNDk0MTY5YjU3MGM0MTBiYSIsIm9mZnNldCI6NTQsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjU0LCJ2IjoyfQ"
+                  },
+                  {
+                    "id": 5,
+                    "file": "entry.ts",
+                    "start_byte": 46,
+                    "end_byte": 101,
+                    "start_line": 2,
+                    "end_line": 2,
+                    "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a",
+                    "content": "function entry(value: Public): Public { return value; }",
+                    "source_ref": "s:eyJlbmQiOjEwMSwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjQ2LCJyZXBvIjoiL3ByaXZhdGUvdG1wL2xvY2ktcjEtYXZhaWxhYmlsaXR5LXVqam9qdTBmL2F2YWlsYWJpbGl0eS1pbnRlZ3JhdGVkL3dvcmtzcGFjZSIsInN0YXJ0Ijo0NiwidiI6Mn0"
+                  },
+                  {
+                    "id": 6,
+                    "file": "model.ts",
+                    "start_byte": 61,
+                    "end_byte": 82,
+                    "start_line": 3,
+                    "end_line": 3,
+                    "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba",
+                    "content": "type Public = Middle;",
+                    "source_ref": "s:eyJlbmQiOjgyLCJmaWxlIjoibW9kZWwudHMiLCJoYXNoIjoiZmM3NmVlOTRkYzFmNGYwNjMxNTgwMDk5ZjRmN2U0ZmM3OTZjOTZiYmM0MzRjZmFiNDk0MTY5YjU3MGM0MTBiYSIsIm9mZnNldCI6NjEsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjYxLCJ2IjoyfQ"
+                  }
+                ],
+                "omissions": [],
+                "limits": {
+                  "max_items": 12,
+                  "max_relationships": 12,
+                  "max_evidence_bytes": 8192,
+                  "max_output_bytes": 16384,
+                  "max_parsed_files": 48
+                },
+                "usage": {
+                  "lookup_bytes": 0,
+                  "lookup_files": 0,
+                  "nodes_examined": 6,
+                  "eligible_edges_considered": 5,
+                  "edges_traversed": 1,
+                  "relationships_delivered": 1,
+                  "estimated_tokens": 1559,
+                  "output_bytes": 6235,
+                  "token_estimate_method": "utf8_bytes_div_4",
+                  "evidence_bytes": 131,
+                  "output_encoding": "mcp_result_json_utf8"
+                },
+                "uncertainty": {
+                  "scope": "native_records_in_computed_slice",
+                  "exhaustive": false,
+                  "counts": [],
+                  "configuration_possible_count": 0,
+                  "configuration_meaning": "declared_possible does not establish active configuration",
+                  "examples": [],
+                  "examples_omitted": 0
+                },
+                "proof_request": {
+                  "node_id": "entry.ts::entry#function",
+                  "scope": "same_computed_slice"
+                }
+              },
+              "isError": false
+            },
+            "duration": {
+              "secs": 0,
+              "nanos": 45006959
+            },
+            "native_type": "McpToolCall",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:59:30.869Z",
+              "emitted_at_ms": 1793073570869,
+              "ordinal": 83,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0ce685be701bdc8b016ae021aafa7481918b098d4b98808e45",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:59:38.185Z",
+              "emitted_at_ms": 1793073578185,
+              "ordinal": 86,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "AgentMessage",
+            "id": "msg_0ce685be701bdc8b016ae021aafa74819185fa5836e58bd4fb",
+            "content": [
+              {
+                "type": "Text",
+                "text": "**The Loci availability probe passed.** The live catalog matched all four expected tools, and each operation completed through this Codex host.\n\n- `loci_retrieve` and the hash-bound `loci_read` returned matching content and hashes for the complete 102-byte [entry.ts](/private/tmp/loci-r1-availability-ujjoju0f/availability-integrated/workspace/entry.ts) fixture. Retrieval reported `partial` because it does not provide semantic relationships.\n- `loci_semantic` returned the `entry.ts::entry#function` anchor. `loci_proof` reported a complete, import-resolved `uses_type` relationship from `entry` to `model.ts::Public#type`.\n- The proof sources show `entry` importing and using `Public`, and [model.ts](/private/tmp/loci-r1-availability-ujjoju0f/availability-integrated/workspace/model.ts) defining `Public` as `Middle`.\n\nThe semantic result is bounded and non-exhaustive; its selection omitted one candidate."
+              }
+            ],
+            "phase": "final_answer",
+            "native_type": "AgentMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:59:40.079Z",
+              "emitted_at_ms": 1793073580079,
+              "ordinal": 88,
+              "monotonic": null
+            }
+          }
+        ],
+        "raw_tool_calls": [
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0ce685be701bdc8b016ae0216b43448191a48ca342eba63067",
+            "status": "completed",
+            "call_id": "call_f16bad7192174dc1b708ec2e94c9b572",
+            "name": "exec",
+            "input": "const names = ALL_TOOLS.filter(t => /^mcp__loci__/.test(t.name) || /(?:^|__)loci_[A-Za-z0-9_]+$/.test(t.name)).map(t => t.name).sort();\ntext({loci_runtime_catalog_v1: names});\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+              "create_time": 1793073515.2697504
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b82-897a-7bb2-8ed2-56d23766c425",
+              "call_id": "call_f16bad7192174dc1b708ec2e94c9b572",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"loci_runtime_catalog_v1\":[\"mcp__loci__loci_proof\",\"mcp__loci__loci_read\",\"mcp__loci__loci_retrieve\",\"mcp__loci__loci_semantic\"]}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+                "create_time": 1793073514.874844
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0ce685be701bdc8b016ae0216ed8a881918467cae76957c12f",
+            "status": "completed",
+            "call_id": "call_c85e69a21d88442f94ccb32c34adbec1",
+            "name": "exec",
+            "input": "const name = \"mcp__loci__loci_retrieve\";\nconst matches = ALL_TOOLS.filter(t => t.name === name);\nif (matches.length !== 1) text({status: matches.length ? \"error_multiple_matches\" : \"no_match\", name, count: matches.length});\nelse text(matches[0]);\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+              "create_time": 1793073518.8493674
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b82-97e0-7ee1-b537-95fdcf86cd28",
+              "call_id": "call_c85e69a21d88442f94ccb32c34adbec1",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"name\":\"mcp__loci__loci_retrieve\",\"description\":\"Find source with loci_retrieve; use loci_read for incomplete source_ref extents. Navigation candidates are paths to inspect, not resolved relationships. Results are in structuredContent, with exact source hashes and explicit omissions. Request loci_semantic only when static relationships help the task. Use loci_proof for focused evidence on a node ID returned by the most recent semantic request or its proof followups. Proof is bounded and non-exhaustive. Preserve unresolved observations and configuration uncertainty.\\n\\nFind bounded current source by words or exact relative file path.\\n\\nAlternatively re-anchor one previously returned node_id in seed_ids.\\nNavigation candidates are source paths, including alternatives; inspect\\nthem with another retrieval. This operation performs no semantic parsing.\\nExpand incomplete items with loci_read using the unchanged source_ref.\\n\\n\\nexec tool declaration:\\n```ts\\ndeclare const tools: { mcp__loci__loci_retrieve(args: { query?: string; repo: string; seed_ids?: Array<string> | null; }): Promise<CallToolResult>; };\\n```\"}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+                "create_time": 1793073518.560226
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0ce685be701bdc8b016ae021726ad08191ace0576bf17058af",
+            "status": "completed",
+            "call_id": "call_0eb165665d8f4f0ba40ef2b0de60099f",
+            "name": "exec",
+            "input": "const names = [\"mcp__loci__loci_read\", \"mcp__loci__loci_semantic\", \"mcp__loci__loci_proof\"];\nfor (const name of names) {\n  const matches = ALL_TOOLS.filter(t => t.name === name);\n  if (matches.length !== 1) text({status: matches.length ? \"error_multiple_matches\" : \"no_match\", name, count: matches.length});\n  else text(matches[0]);\n}\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+              "create_time": 1793073522.4199374
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b82-a62c-7d43-bb30-c2b19f43bdc7",
+              "call_id": "call_0eb165665d8f4f0ba40ef2b0de60099f",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"name\":\"mcp__loci__loci_read\",\"description\":\"Find source with loci_retrieve; use loci_read for incomplete source_ref extents. Navigation candidates are paths to inspect, not resolved relationships. Results are in structuredContent, with exact source hashes and explicit omissions. Request loci_semantic only when static relationships help the task. Use loci_proof for focused evidence on a node ID returned by the most recent semantic request or its proof followups. Proof is bounded and non-exhaustive. Preserve unresolved observations and configuration uncertainty.\\n\\nRead a returned hash-bound source extent; follow next_source_ref until complete.\\n\\nSOURCE_STALE requires new retrieval or semantic acquisition. Works with\\nboth ordinary source and semantic proof source references.\\n\\n\\nexec tool declaration:\\n```ts\\ndeclare const tools: { mcp__loci__loci_read(args: { repo: string; source_ref: string; }): Promise<CallToolResult>; };\\n```\"}"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"name\":\"mcp__loci__loci_semantic\",\"description\":\"Find source with loci_retrieve; use loci_read for incomplete source_ref extents. Navigation candidates are paths to inspect, not resolved relationships. Results are in structuredContent, with exact source hashes and explicit omissions. Request loci_semantic only when static relationships help the task. Use loci_proof for focused evidence on a node ID returned by the most recent semantic request or its proof followups. Proof is bounded and non-exhaustive. Preserve unresolved observations and configuration uncertainty.\\n\\nRequest bounded static JS/TS/Rust relationships for a source question.\\n\\nOptionally anchor to a repository-relative file already located.\\nIncludes complete source proof for emitted relationships and native\\nuncertainty; omissions and empty output never prove absence. Python\\nand Go semantics are unsupported. Retains one slice for followup proof.\\n\\n\\nexec tool declaration:\\n```ts\\ndeclare const tools: { mcp__loci__loci_semantic(args: { anchor_file?: string | null; query: string; repo: string; }): Promise<CallToolResult>; };\\n```\"}"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"name\":\"mcp__loci__loci_proof\",\"description\":\"Find source with loci_retrieve; use loci_read for incomplete source_ref extents. Navigation candidates are paths to inspect, not resolved relationships. Results are in structuredContent, with exact source hashes and explicit omissions. Request loci_semantic only when static relationships help the task. Use loci_proof for focused evidence on a node ID returned by the most recent semantic request or its proof followups. Proof is bounded and non-exhaustive. Preserve unresolved observations and configuration uncertainty.\\n\\nRequest focused proof for one previously delivered semantic node ID.\\n\\nReuses the most recent computed slice without new resolution. Can\\nfollow IDs returned by proof itself. Repository changes require a\\nfresh loci_semantic request. Missing proof remains unknown.\\n\\n\\nexec tool declaration:\\n```ts\\ndeclare const tools: { mcp__loci__loci_proof(args: { node_id: string; repo: string; }): Promise<CallToolResult>; };\\n```\"}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+                "create_time": 1793073522.220167
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0ce685be701bdc8b016ae0217925088191b75519644258566a",
+            "status": "completed",
+            "call_id": "call_b00999591cee4eb28084ea82b6831175",
+            "name": "exec",
+            "input": "const key = \"loci_fixture_retrieve_v1\";\ntry {\n  const result = await tools.mcp__loci__loci_retrieve({repo: \"/private/tmp/loci-r1-availability-ujjoju0f/availability-integrated/workspace\", query: \"entry.ts\"});\n  store(key, result);\n  text({operation: \"loci_retrieve\", execution: \"completed\", isError: result?.isError ?? false, recovery_key: key, result});\n} catch (error) {\n  text({operation: \"loci_retrieve\", execution: \"error\", error: String(error), recovery_key: key});\n}\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+              "create_time": 1793073529.147057
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b82-cdfe-74e1-9d87-65ba41a8fa5b",
+              "call_id": "call_b00999591cee4eb28084ea82b6831175",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"operation\":\"loci_retrieve\",\"execution\":\"completed\",\"isError\":false,\"recovery_key\":\"loci_fixture_retrieve_v1\",\"result\":{\"content\":[],\"structuredContent\":{\"schema_version\":1,\"policy\":\"graph-free-file-v1\",\"snapshot\":\"567f4dbb512945f99257447222e7f5e01cdec76c03bfb1a7c357d95e673cf1fd\",\"status\":\"partial\",\"scope\":{\"coverage\":\"complete\",\"exhaustive\":false,\"matching\":\"exact_file\",\"source\":\"text_repository_files\",\"relationships\":\"unsupported\"},\"selection\":{\"mode\":\"file\",\"candidate_count\":1,\"omitted_candidates\":0},\"anchors\":[],\"items\":[{\"node_id\":\"entry.ts::__file__#file\",\"role\":\"anchor\",\"depth\":0,\"why\":\"exact_file\",\"source_ids\":[1],\"complete\":true,\"extent\":{\"file\":\"entry.ts\",\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"start_byte\":0,\"end_byte\":102},\"source_ref\":\"eyJlbmQiOjEwMiwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjAsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjAsInYiOjF9\"}],\"sources\":[{\"id\":1,\"file\":\"entry.ts\",\"start_byte\":0,\"end_byte\":102,\"start_line\":1,\"end_line\":2,\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"content\":\"import type { Public } from './model';\\nexport function entry(value: Public): Public { return value; }\\n\",\"source_ref\":\"eyJlbmQiOjEwMiwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjAsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjAsInYiOjF9\"}],\"nodes\":[],\"ownership\":[],\"relationships\":[],\"omissions\":[{\"reason\":\"unsupported_semantics\",\"count\":1}],\"limits\":{\"max_files\":4096,\"max_file_bytes\":2097152,\"max_scan_bytes\":67108864,\"max_results\":3,\"max_preview_bytes\":1024,\"max_read_bytes\":8192},\"usage\":{\"lookup_bytes\":102,\"lookup_files\":1,\"estimated_tokens\":552,\"output_bytes\":2207,\"evidence_bytes\":102,\"output_encoding\":\"mcp_result_json_utf8\"},\"navigation\":{\"meaning\":\"source path candidates; not resolved relationships\",\"exhaustive\":false,\"candidates\":[{\"path\":\"model.ts\",\"reason\":\"relative_import_alternative\",\"observed_in\":\"entry.ts\"}],\"omitted_candidates\":0}},\"isError\":false}}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+                "create_time": 1793073532.414519
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0ce685be701bdc8b016ae0217fe00c8191804a9c2b8bd83197",
+            "status": "completed",
+            "call_id": "call_4059884822554102a868b68bc774dad7",
+            "name": "exec",
+            "input": "const previous = load(\"loci_fixture_retrieve_v1\");\nconst sc = previous?.structuredContent;\nconst item = Array.isArray(sc?.items) ? sc.items.find(x => x?.extent?.file === \"entry.ts\" && typeof x.source_ref === \"string\") : undefined;\nif (previous?.isError || !sc || typeof sc.status !== \"string\" || !item) {\n  text({operation: \"loci_read\", execution: \"not_started\", error: \"invalid retrieve result or missing entry.ts source_ref\", recovery_key: \"loci_fixture_retrieve_v1\"});\n} else {\n  const key = \"loci_fixture_read_v1\";\n  try {\n    const result = await tools.mcp__loci__loci_read({repo: \"/private/tmp/loci-r1-availability-ujjoju0f/availability-integrated/workspace\", source_ref: item.source_ref});\n    store(key, result);\n    text({operation: \"loci_read\", execution: \"completed\", isError: result?.isError ?? false, recovery_key: key, result});\n  } catch (error) {\n    text({operation: \"loci_read\", execution: \"error\", error: String(error)});\n  }\n}\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+              "create_time": 1793073535.8768404
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b82-e104-7780-ba2f-8b3602f673df",
+              "call_id": "call_4059884822554102a868b68bc774dad7",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"operation\":\"loci_read\",\"execution\":\"completed\",\"isError\":false,\"recovery_key\":\"loci_fixture_read_v1\",\"result\":{\"content\":[],\"structuredContent\":{\"schema_version\":1,\"status\":\"ok\",\"source\":{\"id\":1,\"file\":\"entry.ts\",\"start_byte\":0,\"end_byte\":102,\"start_line\":1,\"end_line\":2,\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"content\":\"import type { Public } from './model';\\nexport function entry(value: Public): Public { return value; }\\n\",\"source_ref\":\"eyJlbmQiOjEwMiwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjAsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjAsInYiOjF9\"},\"complete\":true,\"next_source_ref\":null,\"usage\":{\"output_bytes\":812,\"evidence_bytes\":102,\"output_encoding\":\"mcp_result_json_utf8\"}},\"isError\":false}}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+                "create_time": 1793073537.284499
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0ce685be701bdc8b016ae0218490608191b10c61c8c0b15617",
+            "status": "completed",
+            "call_id": "call_6d2c9d71a45746e5bf4caa18df74c7d3",
+            "name": "exec",
+            "input": "const names = ALL_TOOLS.filter(t => /(?:file|read).*(?:file|text|workspace)|(?:file|text|workspace).*(?:file|read)/i.test(t.name + \" \" + t.description)).map(t => t.name).sort();\ntext({status: \"ok\", count: names.length, candidates: names.slice(0, 40), omitted: Math.max(0, names.length - 40)});\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+              "create_time": 1793073540.5659823
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b82-edef-7181-a7f6-0f9356fd0101",
+              "call_id": "call_6d2c9d71a45746e5bf4caa18df74c7d3",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"status\":\"ok\",\"count\":348,\"candidates\":[\"list_mcp_resource_templates\",\"list_mcp_resources\",\"mcp__agent_browser__agent_browser_back\",\"mcp__agent_browser__agent_browser_check\",\"mcp__agent_browser__agent_browser_click\",\"mcp__agent_browser__agent_browser_close\",\"mcp__agent_browser__agent_browser_confirm\",\"mcp__agent_browser__agent_browser_console\",\"mcp__agent_browser__agent_browser_cookies_clear\",\"mcp__agent_browser__agent_browser_cookies_get\",\"mcp__agent_browser__agent_browser_cookies_set\",\"mcp__agent_browser__agent_browser_cookies_set_curl\",\"mcp__agent_browser__agent_browser_dblclick\",\"mcp__agent_browser__agent_browser_deny\",\"mcp__agent_browser__agent_browser_device\",\"mcp__agent_browser__agent_browser_dialog_accept\",\"mcp__agent_browser__agent_browser_dialog_dismiss\",\"mcp__agent_browser__agent_browser_dialog_status\",\"mcp__agent_browser__agent_browser_diff_screenshot\",\"mcp__agent_browser__agent_browser_diff_snapshot\",\"mcp__agent_browser__agent_browser_diff_url\",\"mcp__agent_browser__agent_browser_download\",\"mcp__agent_browser__agent_browser_drag\",\"mcp__agent_browser__agent_browser_errors\",\"mcp__agent_browser__agent_browser_eval\",\"mcp__agent_browser__agent_browser_fill\",\"mcp__agent_browser__agent_browser_find\",\"mcp__agent_browser__agent_browser_focus\",\"mcp__agent_browser__agent_browser_forward\",\"mcp__agent_browser__agent_browser_frame_main\",\"mcp__agent_browser__agent_browser_frame_switch\",\"mcp__agent_browser__agent_browser_get_attr\",\"mcp__agent_browser__agent_browser_get_box\",\"mcp__agent_browser__agent_browser_get_count\",\"mcp__agent_browser__agent_browser_get_html\",\"mcp__agent_browser__agent_browser_get_styles\",\"mcp__agent_browser__agent_browser_get_text\",\"mcp__agent_browser__agent_browser_get_title\",\"mcp__agent_browser__agent_browser_get_url\",\"mcp__agent_browser__agent_browser_get_value\"],\"omitted\":308}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+                "create_time": 1793073540.591117
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0ce685be701bdc8b016ae02186927c8191b6f55df60db93f18",
+            "status": "completed",
+            "call_id": "call_aa0369be52b54d8a89b962e4531f3b97",
+            "name": "exec",
+            "input": "const names = ALL_TOOLS.filter(t => /(?:read_file|file_read|filesystem|local_file|workspace_file|file_contents|file_content)/i.test(t.name)).map(t => t.name).sort();\ntext({status: \"ok\", count: names.length, candidates: names.slice(0, 80), omitted: Math.max(0, names.length - 80)});\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+              "create_time": 1793073542.5746565
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b82-f4be-7912-835a-2ae522da5d44",
+              "call_id": "call_aa0369be52b54d8a89b962e4531f3b97",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"status\":\"ok\",\"count\":0,\"candidates\":[],\"omitted\":0}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+                "create_time": 1793073542.334644
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0ce685be701bdc8b016ae0218dc0a08191b43246ae3047602b",
+            "status": "completed",
+            "call_id": "call_5bbd5252562744cda86f5a956c97d51c",
+            "name": "exec",
+            "input": "const names = ALL_TOOLS.filter(t => /^mcp__agent_browser__agent_browser_(?:open|goto|navigate|get_text|snapshot)$/.test(t.name)).map(t => t.name).sort();\ntext({status: \"ok\", count: names.length, candidates: names});\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+              "create_time": 1793073549.7546833
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b83-10ca-76a0-a739-f721ca8edf29",
+              "call_id": "call_5bbd5252562744cda86f5a956c97d51c",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"status\":\"ok\",\"count\":3,\"candidates\":[\"mcp__agent_browser__agent_browser_get_text\",\"mcp__agent_browser__agent_browser_open\",\"mcp__agent_browser__agent_browser_snapshot\"]}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+                "create_time": 1793073549.51491
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0ce685be701bdc8b016ae0219af5208191933b89f4c9b3cdaf",
+            "status": "completed",
+            "call_id": "call_8b3e74cb4af745d2b75bdd7ccd9bc7f7",
+            "name": "exec",
+            "input": "const retrieved = load(\"loci_fixture_retrieve_v1\");\nconst read = load(\"loci_fixture_read_v1\");\nconst a = retrieved?.structuredContent?.sources?.find(x => x?.file === \"entry.ts\");\nconst b = read?.structuredContent?.source;\nconst checks = {\n  retrieved_source: !!a,\n  read_ok: !read?.isError && read?.structuredContent?.status === \"ok\",\n  read_complete: read?.structuredContent?.complete === true && read?.structuredContent?.next_source_ref === null,\n  file_matches: a?.file === \"entry.ts\" && b?.file === \"entry.ts\",\n  source_matches: typeof a?.content === \"string\" && a.content === b?.content,\n  hash_matches: typeof a?.content_hash === \"string\" && a.content_hash === b?.content_hash,\n  extent_matches: a?.start_byte === 0 && a?.start_byte === b?.start_byte && a?.end_byte === b?.end_byte,\n  source_ref_matches: typeof a?.source_ref === \"string\" && a.source_ref === b?.source_ref\n};\nif (!Object.values(checks).every(Boolean)) {\n  text({operation: \"fixture_source_check\", execution: \"error\", checks, recovery_keys: [\"loci_fixture_retrieve_v1\", \"loci_fixture_read_v1\"]});\n} else {\n  text({operation: \"fixture_source_check\", execution: \"completed\", checks, file: b.file, content_hash: b.content_hash, bytes: b.end_byte - b.start_byte});\n  const key = \"loci_fixture_semantic_v1\";\n  try {\n    const result = await tools.mcp__loci__loci_semantic({repo: \"/private/tmp/loci-r1-availability-ujjoju0f/availability-integrated/workspace\", query: \"entry\", anchor_file: \"entry.ts\"});\n    store(key, result);\n    text({operation: \"loci_semantic\", execution: \"completed\", isError: result?.isError ?? false, recovery_key: key, result});\n  } catch (error) {\n    text({operation: \"loci_semantic\", execution: \"error\", error: String(error)});\n  }\n}\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+              "create_time": 1793073562.959628
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b83-4fd1-7691-8643-bfc77282ad43",
+              "call_id": "call_8b3e74cb4af745d2b75bdd7ccd9bc7f7",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.3 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"operation\":\"fixture_source_check\",\"execution\":\"completed\",\"checks\":{\"retrieved_source\":true,\"read_ok\":true,\"read_complete\":true,\"file_matches\":true,\"source_matches\":true,\"hash_matches\":true,\"extent_matches\":true,\"source_ref_matches\":true},\"file\":\"entry.ts\",\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"bytes\":102}"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"operation\":\"loci_semantic\",\"execution\":\"completed\",\"isError\":false,\"recovery_key\":\"loci_fixture_semantic_v1\",\"result\":{\"content\":[],\"structuredContent\":{\"schema_version\":1,\"policy\":\"demand-semantic-v1\",\"snapshot\":\"567f4dbb512945f99257447222e7f5e01cdec76c03bfb1a7c357d95e673cf1fd\",\"status\":\"ok\",\"scope\":{\"coverage\":\"complete\",\"exhaustive\":false,\"matching\":\"symbol_metadata\",\"source\":\"indexed_supported_source\",\"relationships\":\"known_static_relationships\"},\"selection\":{\"mode\":\"inferred\",\"candidate_count\":4,\"omitted_candidates\":1},\"anchors\":[{\"node_id\":\"entry.ts::entry#function\",\"score\":130,\"matched_terms\":[\"entry\"],\"match_scope\":[\"symbol_metadata\"]}],\"nodes\":[{\"id\":\"entry.ts::entry#function\",\"name\":\"entry\",\"kind\":\"function\",\"file\":\"entry.ts\"},{\"id\":\"model.ts::Public#type\",\"name\":\"Public\",\"kind\":\"type\",\"file\":\"model.ts\"},{\"id\":\"model.ts::Middle#type\",\"name\":\"Middle\",\"kind\":\"type\",\"file\":\"model.ts\"}],\"items\":[{\"node_id\":\"entry.ts::entry#function\",\"role\":\"anchor\",\"depth\":0,\"why\":\"matched question identifier\",\"source_ids\":[1],\"complete\":true,\"extent\":{\"file\":\"entry.ts\",\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"start_byte\":46,\"end_byte\":101},\"source_ref\":\"s:eyJlbmQiOjEwMSwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjQ2LCJyZXBvIjoiL3ByaXZhdGUvdG1wL2xvY2ktcjEtYXZhaWxhYmlsaXR5LXVqam9qdTBmL2F2YWlsYWJpbGl0eS1pbnRlZ3JhdGVkL3dvcmtzcGFjZSIsInN0YXJ0Ijo0NiwidiI6Mn0\"},{\"node_id\":\"model.ts::Public#type\",\"role\":\"related\",\"depth\":1,\"why\":\"two-hop outward source candidate\",\"source_ids\":[2],\"complete\":true,\"extent\":{\"file\":\"model.ts\",\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\",\"start_byte\":61,\"end_byte\":82},\"source_ref\":\"s:eyJlbmQiOjgyLCJmaWxlIjoibW9kZWwudHMiLCJoYXNoIjoiZmM3NmVlOTRkYzFmNGYwNjMxNTgwMDk5ZjRmN2U0ZmM3OTZjOTZiYmM0MzRjZmFiNDk0MTY5YjU3MGM0MTBiYSIsIm9mZnNldCI6NjEsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjYxLCJ2IjoyfQ\"},{\"node_id\":\"model.ts::Middle#type\",\"role\":\"related\",\"depth\":1,\"why\":\"two-hop outward source candidate\",\"source_ids\":[3],\"complete\":true,\"extent\":{\"file\":\"model.ts\",\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\",\"start_byte\":34,\"end_byte\":53},\"source_ref\":\"s:eyJlbmQiOjUzLCJmaWxlIjoibW9kZWwudHMiLCJoYXNoIjoiZmM3NmVlOTRkYzFmNGYwNjMxNTgwMDk5ZjRmN2U0ZmM3OTZjOTZiYmM0MzRjZmFiNDk0MTY5YjU3MGM0MTBiYSIsIm9mZnNldCI6MzQsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjM0LCJ2IjoyfQ\"}],\"ownership\":[],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"entry.ts::entry#function\",\"to\":\"model.ts::Public#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"entry.ts\",\"line\":2,\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\"}},\"traversed\":\"forward\",\"source_ids\":[4,5,6,7,1,2],\"proof\":\"complete\",\"resolution_configuration\":null},{\"id\":2,\"edge\":{\"from\":\"model.ts::Public#type\",\"to\":\"model.ts::Middle#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"model.ts\",\"line\":3,\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\"}},\"traversed\":\"forward\",\"source_ids\":[8,7,9,2,3],\"proof\":\"complete\",\"resolution_configuration\":null}],\"sources\":[{\"id\":1,\"file\":\"entry.ts\",\"start_byte\":46,\"end_byte\":101,\"start_line\":2,\"end_line\":2,\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"content\":\"function entry(value: Public): Public { return value; }\",\"source_ref\":\"s:eyJlbmQiOjEwMSwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjQ2LCJyZXBvIjoiL3ByaXZhdGUvdG1wL2xvY2ktcjEtYXZhaWxhYmlsaXR5LXVqam9qdTBmL2F2YWlsYWJpbGl0eS1pbnRlZ3JhdGVkL3dvcmtzcGFjZSIsInN0YXJ0Ijo0NiwidiI6Mn0\"},{\"id\":2,\"file\":\"model.ts\",\"start_byte\":61,\"end_byte\":82,\"start_line\":3,\"end_line\":3,\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\",\"content\":\"type Public = Middle;\",\"source_ref\":\"s:eyJlbmQiOjgyLCJmaWxlIjoibW9kZWwudHMiLCJoYXNoIjoiZmM3NmVlOTRkYzFmNGYwNjMxNTgwMDk5ZjRmN2U0ZmM3OTZjOTZiYmM0MzRjZmFiNDk0MTY5YjU3MGM0MTBiYSIsIm9mZnNldCI6NjEsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjYxLCJ2IjoyfQ\"},{\"id\":3,\"file\":\"model.ts\",\"start_byte\":34,\"end_byte\":53,\"start_line\":2,\"end_line\":2,\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\",\"content\":\"type Middle = Base;\",\"source_ref\":\"s:eyJlbmQiOjUzLCJmaWxlIjoibW9kZWwudHMiLCJoYXNoIjoiZmM3NmVlOTRkYzFmNGYwNjMxNTgwMDk5ZjRmN2U0ZmM3OTZjOTZiYmM0MzRjZmFiNDk0MTY5YjU3MGM0MTBiYSIsIm9mZnNldCI6MzQsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjM0LCJ2IjoyfQ\"},{\"id\":4,\"file\":\"entry.ts\",\"start_byte\":68,\"end_byte\":74,\"start_line\":2,\"end_line\":2,\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"content\":\"Public\",\"source_ref\":\"s:eyJlbmQiOjc0LCJmaWxlIjoiZW50cnkudHMiLCJoYXNoIjoiZWI0YjBhZGZhMGQzOGU3YmNlZWE5NzJiNWZjMjIxNThjNjAxYzAzM2M5ZGQxYTk5MzcyMzE3NjY1YWIyM2Q4YSIsIm9mZnNldCI6NjgsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjY4LCJ2IjoyfQ\"},{\"id\":5,\"file\":\"entry.ts\",\"start_byte\":39,\"end_byte\":102,\"start_line\":2,\"end_line\":2,\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"content\":\"export function entry(value: Public): Public { return value; }\\n\",\"source_ref\":\"s:eyJlbmQiOjEwMiwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjM5LCJyZXBvIjoiL3ByaXZhdGUvdG1wL2xvY2ktcjEtYXZhaWxhYmlsaXR5LXVqam9qdTBmL2F2YWlsYWJpbGl0eS1pbnRlZ3JhdGVkL3dvcmtzcGFjZSIsInN0YXJ0IjozOSwidiI6Mn0\"},{\"id\":6,\"file\":\"entry.ts\",\"start_byte\":0,\"end_byte\":39,\"start_line\":1,\"end_line\":1,\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"content\":\"import type { Public } from './model';\\n\",\"source_ref\":\"s:eyJlbmQiOjM5LCJmaWxlIjoiZW50cnkudHMiLCJoYXNoIjoiZWI0YjBhZGZhMGQzOGU3YmNlZWE5NzJiNWZjMjIxNThjNjAxYzAzM2M5ZGQxYTk5MzcyMzE3NjY1YWIyM2Q4YSIsIm9mZnNldCI6MCwicmVwbyI6Ii9wcml2YXRlL3RtcC9sb2NpLXIxLWF2YWlsYWJpbGl0eS11ampvanUwZi9hdmFpbGFiaWxpdHktaW50ZWdyYXRlZC93b3Jrc3BhY2UiLCJzdGFydCI6MCwidiI6Mn0\"},{\"id\":7,\"file\":\"model.ts\",\"start_byte\":54,\"end_byte\":83,\"start_line\":3,\"end_line\":3,\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\",\"content\":\"export type Public = Middle;\\n\",\"source_ref\":\"s:eyJlbmQiOjgzLCJmaWxlIjoibW9kZWwudHMiLCJoYXNoIjoiZmM3NmVlOTRkYzFmNGYwNjMxNTgwMDk5ZjRmN2U0ZmM3OTZjOTZiYmM0MzRjZmFiNDk0MTY5YjU3MGM0MTBiYSIsIm9mZnNldCI6NTQsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjU0LCJ2IjoyfQ\"},{\"id\":8,\"file\":\"model.ts\",\"start_byte\":75,\"end_byte\":81,\"start_line\":3,\"end_line\":3,\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\",\"content\":\"Middle\",\"source_ref\":\"s:eyJlbmQiOjgxLCJmaWxlIjoibW9kZWwudHMiLCJoYXNoIjoiZmM3NmVlOTRkYzFmNGYwNjMxNTgwMDk5ZjRmN2U0ZmM3OTZjOTZiYmM0MzRjZmFiNDk0MTY5YjU3MGM0MTBiYSIsIm9mZnNldCI6NzUsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjc1LCJ2IjoyfQ\"},{\"id\":9,\"file\":\"model.ts\",\"start_byte\":27,\"end_byte\":54,\"start_line\":2,\"end_line\":2,\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\",\"content\":\"export type Middle = Base;\\n\",\"source_ref\":\"s:eyJlbmQiOjU0LCJmaWxlIjoibW9kZWwudHMiLCJoYXNoIjoiZmM3NmVlOTRkYzFmNGYwNjMxNTgwMDk5ZjRmN2U0ZmM3OTZjOTZiYmM0MzRjZmFiNDk0MTY5YjU3MGM0MTBiYSIsIm9mZnNldCI6MjcsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjI3LCJ2IjoyfQ\"}],\"omissions\":[],\"limits\":{\"max_items\":12,\"max_relationships\":12,\"max_evidence_bytes\":8192,\"max_output_bytes\":16384,\"max_parsed_files\":48},\"usage\":{\"lookup_bytes\":236,\"lookup_files\":3,\"nodes_examined\":6,\"eligible_edges_considered\":5,\"edges_traversed\":2,\"relationships_delivered\":2,\"estimated_tokens\":2178,\"output_bytes\":8710,\"token_estimate_method\":\"utf8_bytes_div_4\",\"evidence_bytes\":158,\"output_encoding\":\"mcp_result_json_utf8\"},\"uncertainty\":{\"scope\":\"native_records_in_computed_slice\",\"exhaustive\":false,\"counts\":[],\"configuration_possible_count\":0,\"configuration_meaning\":\"declared_possible does not establish active configuration\",\"examples\":[],\"examples_omitted\":0}},\"isError\":false}}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+                "create_time": 1793073565.649683
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0ce685be701bdc8b016ae021a1cff08191a18964f999b38ed6",
+            "status": "completed",
+            "call_id": "call_5caf6c00bf594d02822ba2a1ee5973f8",
+            "name": "exec",
+            "input": "const semantic = load(\"loci_fixture_semantic_v1\");\nconst sc = semantic?.structuredContent;\nconst anchor = Array.isArray(sc?.anchors) && Array.isArray(sc?.nodes)\n  ? sc.anchors.find(a => sc.nodes.some(n => n.id === a?.node_id && n.file === \"entry.ts\" && n.name === \"entry\" && n.kind === \"function\"))\n  : undefined;\nif (semantic?.isError || sc?.status !== \"ok\" || typeof anchor?.node_id !== \"string\") {\n  text({operation: \"loci_proof\", execution: \"not_started\", error: \"invalid semantic result or entry anchor missing\", recovery_key: \"loci_fixture_semantic_v1\"});\n} else {\n  const key = \"loci_fixture_proof_v1\";\n  try {\n    const result = await tools.mcp__loci__loci_proof({repo: \"/private/tmp/loci-r1-availability-ujjoju0f/availability-integrated/workspace\", node_id: anchor.node_id});\n    store(key, result);\n    text({operation: \"loci_proof\", execution: \"completed\", node_id: anchor.node_id, isError: result?.isError ?? false, recovery_key: key, result});\n  } catch (error) {\n    text({operation: \"loci_proof\", execution: \"error\", node_id: anchor.node_id, error: String(error)});\n  }\n}\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+              "create_time": 1793073569.8142722
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b83-6443-7a53-9379-51ad296306c8",
+              "call_id": "call_5caf6c00bf594d02822ba2a1ee5973f8",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"operation\":\"loci_proof\",\"execution\":\"completed\",\"node_id\":\"entry.ts::entry#function\",\"isError\":false,\"recovery_key\":\"loci_fixture_proof_v1\",\"result\":{\"content\":[],\"structuredContent\":{\"schema_version\":1,\"policy\":\"focused-semantic-v1\",\"snapshot\":\"567f4dbb512945f99257447222e7f5e01cdec76c03bfb1a7c357d95e673cf1fd\",\"status\":\"ok\",\"scope\":{\"coverage\":\"complete\",\"exhaustive\":false,\"matching\":\"symbol_metadata\",\"source\":\"indexed_supported_source\",\"relationships\":\"known_static_relationships\"},\"selection\":{\"mode\":\"inferred\",\"candidate_count\":0,\"omitted_candidates\":0},\"anchors\":[{\"node_id\":\"entry.ts::entry#function\",\"score\":0,\"matched_terms\":[\"entry\"],\"match_scope\":[\"symbol_metadata\"]}],\"nodes\":[{\"id\":\"entry.ts::entry#function\",\"name\":\"entry\",\"kind\":\"function\",\"file\":\"entry.ts\"},{\"id\":\"model.ts::Public#type\",\"name\":\"Public\",\"kind\":\"type\",\"file\":\"model.ts\"}],\"items\":[{\"node_id\":\"entry.ts::entry#function\",\"role\":\"related\",\"depth\":1,\"why\":\"proved relationship endpoint\",\"source_ids\":[5],\"complete\":true,\"extent\":{\"file\":\"entry.ts\",\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"start_byte\":46,\"end_byte\":101},\"source_ref\":\"s:eyJlbmQiOjEwMSwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjQ2LCJyZXBvIjoiL3ByaXZhdGUvdG1wL2xvY2ktcjEtYXZhaWxhYmlsaXR5LXVqam9qdTBmL2F2YWlsYWJpbGl0eS1pbnRlZ3JhdGVkL3dvcmtzcGFjZSIsInN0YXJ0Ijo0NiwidiI6Mn0\"},{\"node_id\":\"model.ts::Public#type\",\"role\":\"related\",\"depth\":1,\"why\":\"proved relationship endpoint\",\"source_ids\":[6],\"complete\":true,\"extent\":{\"file\":\"model.ts\",\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\",\"start_byte\":61,\"end_byte\":82},\"source_ref\":\"s:eyJlbmQiOjgyLCJmaWxlIjoibW9kZWwudHMiLCJoYXNoIjoiZmM3NmVlOTRkYzFmNGYwNjMxNTgwMDk5ZjRmN2U0ZmM3OTZjOTZiYmM0MzRjZmFiNDk0MTY5YjU3MGM0MTBiYSIsIm9mZnNldCI6NjEsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjYxLCJ2IjoyfQ\"}],\"ownership\":[],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"entry.ts::entry#function\",\"to\":\"model.ts::Public#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"entry.ts\",\"line\":2,\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\"}},\"traversed\":\"forward\",\"source_ids\":[1,2,3,4,5,6],\"proof\":\"complete\",\"resolution_configuration\":null}],\"sources\":[{\"id\":1,\"file\":\"entry.ts\",\"start_byte\":68,\"end_byte\":74,\"start_line\":2,\"end_line\":2,\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"content\":\"Public\",\"source_ref\":\"s:eyJlbmQiOjc0LCJmaWxlIjoiZW50cnkudHMiLCJoYXNoIjoiZWI0YjBhZGZhMGQzOGU3YmNlZWE5NzJiNWZjMjIxNThjNjAxYzAzM2M5ZGQxYTk5MzcyMzE3NjY1YWIyM2Q4YSIsIm9mZnNldCI6NjgsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjY4LCJ2IjoyfQ\"},{\"id\":2,\"file\":\"entry.ts\",\"start_byte\":39,\"end_byte\":102,\"start_line\":2,\"end_line\":2,\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"content\":\"export function entry(value: Public): Public { return value; }\\n\",\"source_ref\":\"s:eyJlbmQiOjEwMiwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjM5LCJyZXBvIjoiL3ByaXZhdGUvdG1wL2xvY2ktcjEtYXZhaWxhYmlsaXR5LXVqam9qdTBmL2F2YWlsYWJpbGl0eS1pbnRlZ3JhdGVkL3dvcmtzcGFjZSIsInN0YXJ0IjozOSwidiI6Mn0\"},{\"id\":3,\"file\":\"entry.ts\",\"start_byte\":0,\"end_byte\":39,\"start_line\":1,\"end_line\":1,\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"content\":\"import type { Public } from './model';\\n\",\"source_ref\":\"s:eyJlbmQiOjM5LCJmaWxlIjoiZW50cnkudHMiLCJoYXNoIjoiZWI0YjBhZGZhMGQzOGU3YmNlZWE5NzJiNWZjMjIxNThjNjAxYzAzM2M5ZGQxYTk5MzcyMzE3NjY1YWIyM2Q4YSIsIm9mZnNldCI6MCwicmVwbyI6Ii9wcml2YXRlL3RtcC9sb2NpLXIxLWF2YWlsYWJpbGl0eS11ampvanUwZi9hdmFpbGFiaWxpdHktaW50ZWdyYXRlZC93b3Jrc3BhY2UiLCJzdGFydCI6MCwidiI6Mn0\"},{\"id\":4,\"file\":\"model.ts\",\"start_byte\":54,\"end_byte\":83,\"start_line\":3,\"end_line\":3,\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\",\"content\":\"export type Public = Middle;\\n\",\"source_ref\":\"s:eyJlbmQiOjgzLCJmaWxlIjoibW9kZWwudHMiLCJoYXNoIjoiZmM3NmVlOTRkYzFmNGYwNjMxNTgwMDk5ZjRmN2U0ZmM3OTZjOTZiYmM0MzRjZmFiNDk0MTY5YjU3MGM0MTBiYSIsIm9mZnNldCI6NTQsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjU0LCJ2IjoyfQ\"},{\"id\":5,\"file\":\"entry.ts\",\"start_byte\":46,\"end_byte\":101,\"start_line\":2,\"end_line\":2,\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"content\":\"function entry(value: Public): Public { return value; }\",\"source_ref\":\"s:eyJlbmQiOjEwMSwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjQ2LCJyZXBvIjoiL3ByaXZhdGUvdG1wL2xvY2ktcjEtYXZhaWxhYmlsaXR5LXVqam9qdTBmL2F2YWlsYWJpbGl0eS1pbnRlZ3JhdGVkL3dvcmtzcGFjZSIsInN0YXJ0Ijo0NiwidiI6Mn0\"},{\"id\":6,\"file\":\"model.ts\",\"start_byte\":61,\"end_byte\":82,\"start_line\":3,\"end_line\":3,\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\",\"content\":\"type Public = Middle;\",\"source_ref\":\"s:eyJlbmQiOjgyLCJmaWxlIjoibW9kZWwudHMiLCJoYXNoIjoiZmM3NmVlOTRkYzFmNGYwNjMxNTgwMDk5ZjRmN2U0ZmM3OTZjOTZiYmM0MzRjZmFiNDk0MTY5YjU3MGM0MTBiYSIsIm9mZnNldCI6NjEsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LWludGVncmF0ZWQvd29ya3NwYWNlIiwic3RhcnQiOjYxLCJ2IjoyfQ\"}],\"omissions\":[],\"limits\":{\"max_items\":12,\"max_relationships\":12,\"max_evidence_bytes\":8192,\"max_output_bytes\":16384,\"max_parsed_files\":48},\"usage\":{\"lookup_bytes\":0,\"lookup_files\":0,\"nodes_examined\":6,\"eligible_edges_considered\":5,\"edges_traversed\":1,\"relationships_delivered\":1,\"estimated_tokens\":1559,\"output_bytes\":6235,\"token_estimate_method\":\"utf8_bytes_div_4\",\"evidence_bytes\":131,\"output_encoding\":\"mcp_result_json_utf8\"},\"uncertainty\":{\"scope\":\"native_records_in_computed_slice\",\"exhaustive\":false,\"counts\":[],\"configuration_possible_count\":0,\"configuration_meaning\":\"declared_possible does not establish active configuration\",\"examples\":[],\"examples_omitted\":0},\"proof_request\":{\"node_id\":\"entry.ts::entry#function\",\"scope\":\"same_computed_slice\"}},\"isError\":false}}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+                "create_time": 1793073570.883528
+              }
+            }
+          }
+        ],
+        "late_items_after_abort": 0,
+        "post_abort_cleanup_ms": null
+      }
+    ],
+    "usage_status": "known",
+    "usage": {
+      "inputTokens": 328707,
+      "cachedInputTokens": 299648,
+      "outputTokens": 4917,
+      "reasoningOutputTokens": 2895,
+      "totalTokens": 333624,
+      "cacheWriteInputTokens": 0,
+      "uncachedInputTokens": 29059
+    },
+    "observed_cumulative_usage": {
+      "inputTokens": 328707,
+      "cachedInputTokens": 299648,
+      "outputTokens": 4917,
+      "reasoningOutputTokens": 2895,
+      "totalTokens": 333624,
+      "cacheWriteInputTokens": 0
+    },
+    "usage_errors": [],
+    "capture_errors": [],
+    "operation_totals": {
+      "mcp_calls": 4,
+      "shell_calls": 0,
+      "file_change_calls": 0,
+      "context_compactions": 0,
+      "subagent_calls": 0,
+      "failed_shell_calls": 0
+    },
+    "phase_groups": {},
+    "limitations": [
+      "Usage updates are not proven model-request counts; unique raw response completions are a lower bound that may omit failed upstream requests/retries.",
+      "Raw outer-call availability is explicit; nested operation counts are distinct.",
+      "Behavioral quality and rework attribution require the independent oracle/review.",
+      "MCP source/delivery receipts are joined separately; item presence is not model reliance."
+    ],
+    "native_provenance": {
+      "rollout_path": "/private/tmp/loci-r1-availability-ujjoju0f/availability-integrated/observer/qualification/native-rollout.jsonl",
+      "session_id": "01a17b82-7750-7b93-a9eb-fa1340bab53b",
+      "cwd": "/private/tmp/loci-r1-availability-ujjoju0f/availability-integrated/workspace",
+      "cli_version": "0.164.0",
+      "source": "exec",
+      "thread_source": "user",
+      "bootstrap_message_rows": [
+        7
+      ]
+    },
+    "turn_contexts": [
+      {
+        "turn_id": "01a17b82-7b7d-7131-aa79-53300aabbcd2",
+        "cwd": "/private/tmp/loci-r1-availability-ujjoju0f/availability-integrated/workspace",
+        "model": "gpt-6.1-terra",
+        "effort": "max",
+        "approval_policy": "on-request",
+        "approvals_reviewer": "auto_review",
+        "sandbox_policy": {
+          "type": "workspace-write",
+          "writable_roots": [
+            "/",
+            "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T"
+          ],
+          "network_access": true,
+          "exclude_tmpdir_env_var": false,
+          "exclude_slash_tmp": false
+        },
+        "permission_profile": {
+          "type": "managed",
+          "file_system": {
+            "type": "restricted",
+            "entries": [
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/"
+                },
+                "access": "write"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/.claude"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/.claude/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/Downloads"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/Downloads/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/claude-otel"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/claude-otel/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/improvements"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/improvements/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/work"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/work/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "special",
+                  "value": {
+                    "kind": "minimal"
+                  }
+                },
+                "access": "read"
+              },
+              {
+                "path": {
+                  "type": "special",
+                  "value": {
+                    "kind": "tmpdir"
+                  }
+                },
+                "access": "write"
+              }
+            ]
+          },
+          "network": "enabled"
+        },
+        "active_permission_profile": {
+          "id": "brummerv_filesystem_guard"
+        },
+        "file_system_sandbox_policy": {
+          "kind": "restricted",
+          "entries": [
+            {
+              "path": {
+                "type": "path",
+                "path": "/"
+              },
+              "access": "write"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/.claude"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/.claude/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/Downloads"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/Downloads/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/claude-otel"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/claude-otel/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/improvements"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/improvements/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/work"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/work/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "minimal"
+                }
+              },
+              "access": "read"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "tmpdir"
+                }
+              },
+              "access": "write"
+            }
+          ]
+        }
+      }
+    ],
+    "native_errors": []
+  },
+  "errors": [],
+  "limitations": [
+    "Experimental separation uses independent source copies and fresh native sessions; no additional access-control layer.",
+    "Native-only navigation is an audited instruction policy, not a hidden-tool capability boundary.",
+    "Observed response usage does not prove complete billing or invisible upstream retry accounting.",
+    "This readback neither launches nor authorizes a measured pilot; independent grading and a prospective freeze remain necessary."
+  ],
+  "config_validation": {
+    "raw_sha256": "e599c164441845c9741e2a9310b59bab9a73e6cae592fc4caba2bc4e118e19f1",
+    "effective_sha256": "1144414951be6350ae99a43a4fcfb1256694c17f16920408d8d790ec2111e48d",
+    "overridden_default_changes": [
+      "model"
+    ],
+    "raw_changed": true
+  }
+}

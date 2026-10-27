@@ -1,0 +1,10 @@
+The Loci availability probe passed: the live catalog contained exactly `mcp__loci__loci_retrieve` and `mcp__loci__loci_read`, and both calls succeeded through this host.
+
+For the fixture repository, `loci_retrieve` returned `entry.ts` with a **partial** status because of cycle and alternative-path omissions. `loci_read` returned the complete source for the retrieved reference. Its content, byte range, and hash matched the retrieve result:
+
+```ts
+import type { Public } from './model';
+export function entry(value: Public): Public { return value; }
+```
+
+The source comparison was between the two Loci responses; no independent filesystem read was used.

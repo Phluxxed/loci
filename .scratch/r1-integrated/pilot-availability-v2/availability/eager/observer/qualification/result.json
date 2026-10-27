@@ -1,0 +1,1452 @@
+{
+  "schema_version": 1,
+  "kind": "r0-native-session-qualification",
+  "run_id": "availability-eager",
+  "arm": "loci",
+  "thread_id": "01a17b83-8bca-7642-a6e4-83e221bcc949",
+  "status": "qualified_observations",
+  "measured": false,
+  "config_sha256": "db645c2dd17df13ac331c4737c451bfbe03b7234aa9852cff82a7ae6c03db917",
+  "native_trace_sha256": "d201b38676df29ec2d946f7d8f05af24370c1f0c2eebaddd5760b8fed34a4a1b",
+  "source_before": "666d11781d19c5af6fe7894dc1d42e2844bafff0409a9978f2ec62e15d84f0ff",
+  "source_after": "666d11781d19c5af6fe7894dc1d42e2844bafff0409a9978f2ec62e15d84f0ff",
+  "conditions": {
+    "model": "gpt-6.1-terra",
+    "effort": "max",
+    "native_protection": {
+      "approval_policy": "on-request",
+      "approvals_reviewer": "auto_review",
+      "sandbox_policy": {
+        "type": "workspace-write",
+        "writable_roots": [
+          "/",
+          "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T"
+        ],
+        "network_access": true,
+        "exclude_tmpdir_env_var": false,
+        "exclude_slash_tmp": false
+      },
+      "permission_profile": {
+        "type": "managed",
+        "file_system": {
+          "type": "restricted",
+          "entries": [
+            {
+              "path": {
+                "type": "path",
+                "path": "/"
+              },
+              "access": "write"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/.claude"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/.claude/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/Downloads"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/Downloads/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/claude-otel"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/claude-otel/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/improvements"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/improvements/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/work"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/work/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "minimal"
+                }
+              },
+              "access": "read"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "tmpdir"
+                }
+              },
+              "access": "write"
+            }
+          ]
+        },
+        "network": "enabled"
+      },
+      "active_permission_profile": {
+        "id": "brummerv_filesystem_guard"
+      },
+      "file_system_sandbox_policy": {
+        "kind": "restricted",
+        "entries": [
+          {
+            "path": {
+              "type": "path",
+              "path": "/"
+            },
+            "access": "write"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/.claude"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/.claude/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/Downloads"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/Downloads/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/claude-otel"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/claude-otel/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/improvements"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/improvements/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/work"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/work/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "special",
+              "value": {
+                "kind": "minimal"
+              }
+            },
+            "access": "read"
+          },
+          {
+            "path": {
+              "type": "special",
+              "value": {
+                "kind": "tmpdir"
+              }
+            },
+            "access": "write"
+          }
+        ]
+      }
+    },
+    "freeze_sha256": "0a747227d868595fa728c095dcc0d3b26fcd3b1fbfcab938b2543bbdc3e735c6",
+    "native_config_binding": {
+      "schema": "r1-cli-model-defaults-v1",
+      "raw_sha256": "0353fc7b94b3a66303648814809c4d7f84745eb032d9f9b92beb1934eebd64d1",
+      "effective_sha256": "1144414951be6350ae99a43a4fcfb1256694c17f16920408d8d790ec2111e48d",
+      "field_sha256": {
+        "model": "c8eeff274672ae39221a0febbb1db6d6c7a979673419a2635c2d1f0f499a8f04",
+        "model_reasoning_effort": "b57c4299afe3cda154124bdb96ceaf618a9d8d9cd8d2c8f6580ff26faa5fe5ca",
+        "model_context_window": "ad1e2e29fe1631ddf7bedaadffe63c4efd61e6909a1ed0648e7b9645bd27dab5",
+        "model_auto_compact_token_limit": "e6ba348d1464969bb4210f401b255b6de57b81fddc375b944ac4fe2fb698bc95",
+        "service_tier": "1080a60800d9e5bddc69f51489c636a776bacaadb5368f46db4aa0947c67e3ba",
+        "plan_mode_reasoning_effort": "e5c4eb89c17b3350875c064ac177103d77081d68860beaffbdb826c88462eb41",
+        "approval_policy": "112f9f74261331ef91d859af60ec297cdd2cfdbc99811d74a8002f4fcb71fb4a",
+        "approvals_reviewer": "f83d332e375a1a7db6babce3b70e263ea815a07685d3cfaa2ffc641455ee8d25",
+        "default_permissions": "9c08e418cb514da9dc6a34f2fd53927da6723713a8cf649fc4d09d0953e36faa",
+        "developer_instructions": "b81a536c573f07708ee5aae6e203b7757c42985984b5a4e8ff7a8ed58a5a1571",
+        "notify": "09928d31161e6998648aaabfe61e4dc0351473dde87bdfced2689282b6beb5d6",
+        "agents": "fee67260299ab214b3908cdc4f7b9ffb53d3654dca8c93816502b6bd4a7d6611",
+        "permissions": "4c0c54b700b1be8523e5801611b47e84ab3a29e8f2e240838a40cdd561a35f09",
+        "projects": "2f9fc4ea487ac946665332cc4ab370378a57625ce2f6acc3c898f4dabc6f3ddb",
+        "otel": "86ff2534d6158ad2fba9ccea91139cb5f9abc1ebdb110a0058947e050651535a",
+        "tui": "c3ac8d12f5a0f8bab72a8df93c873b2a0a752cc654efd1ae5576af2139fcb1ff",
+        "plugins": "5ea7a32c3f441de100c99c50d373d3121a91a16c82ad85236148a8b0125f9c88",
+        "hooks": "5c78c907ac5b0d71c3d49c9c1ccf968294e968b473ab2d68287601465771c514",
+        "notice": "97f2fe6a31e33287559f344a16f9bcc5a5befa581b986f75ff423ed5b2ad29cd",
+        "features": "2f806baaa1d6257aceca9d08158fe2887bfdb6023516c144f3658f329b4b0007",
+        "memories": "e3b654f3522801b6062cb54b57289a2af085bd1e96e7409ee007efd231452e12",
+        "mcp_servers": "43019dcc907af7dbde0addda15d4d6f798a7687c243796b7aa69df8114166e88",
+        "marketplaces": "2bf6f3f400e57770f07c2e9d64adc2c0a9f9796cafe6d6c28b09b47b85cbbd41",
+        "desktop": "aa6b9cc0bfd3a4cd469fce52fb8de20ae71f67b1dd820306ca89fbaf17d0fdd0",
+        "shell_environment_policy": "55c0fc8e982d9dd0d451c6c3bc442a0668341278e7cb6b6d9f346a2ad88a6895",
+        "apps": "4ac7980d4c76878d55fb2c5dd4b8f0afe71972932449f8225dd842557c5ec914",
+        "skills": "b0936d993dc8808917c340f46496acde153bd8d41da18b1492cb4bbc4a0fe363"
+      }
+    }
+  },
+  "native_config_sha256": "e599c164441845c9741e2a9310b59bab9a73e6cae592fc4caba2bc4e118e19f1",
+  "workspace": "/private/tmp/loci-r1-availability-ujjoju0f/availability-eager/workspace",
+  "observer": "/private/tmp/loci-r1-availability-ujjoju0f/availability-eager/observer",
+  "accounting": {
+    "schema_version": 1,
+    "accounting": "native-rollout-v1",
+    "thread_id": "01a17b83-8bca-7642-a6e4-83e221bcc949",
+    "stages": [
+      {
+        "stage_id": "turn-1",
+        "turn_id": "01a17b83-9020-74a1-afa7-a776a5fd8392",
+        "outcome": "completed",
+        "elapsed_ms": 37596,
+        "usage_status": "known",
+        "usage": {
+          "inputTokens": 167623,
+          "cachedInputTokens": 156544,
+          "outputTokens": 2564,
+          "reasoningOutputTokens": 1377,
+          "totalTokens": 170187,
+          "cacheWriteInputTokens": 0,
+          "uncachedInputTokens": 11079
+        },
+        "usage_updates": 6,
+        "observed_usage_delta": {
+          "inputTokens": 167623,
+          "cachedInputTokens": 156544,
+          "outputTokens": 2564,
+          "reasoningOutputTokens": 1377,
+          "totalTokens": 170187,
+          "cacheWriteInputTokens": 0
+        },
+        "usage_limitation": null,
+        "mcp_calls": 2,
+        "shell_calls": 0,
+        "file_change_calls": 0,
+        "context_compactions": 0,
+        "subagent_calls": 0,
+        "failed_shell_calls": 0,
+        "outer_tool_calls": 5,
+        "outer_tool_calls_status": "observed",
+        "model_requests": null,
+        "observed_completed_model_requests": 6,
+        "model_requests_status": "completion_lower_bound",
+        "upstream_responses": [
+          {
+            "threadId": "01a17b83-8bca-7642-a6e4-83e221bcc949",
+            "turnId": "01a17b83-9020-74a1-afa7-a776a5fd8392",
+            "responseId": "resp_0d83914831fb2103016ae021b0b6bc8191a78a1b4f6a68ec6b"
+          },
+          {
+            "threadId": "01a17b83-8bca-7642-a6e4-83e221bcc949",
+            "turnId": "01a17b83-9020-74a1-afa7-a776a5fd8392",
+            "responseId": "resp_0d83914831fb2103016ae021b2f718819185d36a315a700bf1"
+          },
+          {
+            "threadId": "01a17b83-8bca-7642-a6e4-83e221bcc949",
+            "turnId": "01a17b83-9020-74a1-afa7-a776a5fd8392",
+            "responseId": "resp_0d83914831fb2103016ae021b7d6688191b7378788008c4973"
+          },
+          {
+            "threadId": "01a17b83-8bca-7642-a6e4-83e221bcc949",
+            "turnId": "01a17b83-9020-74a1-afa7-a776a5fd8392",
+            "responseId": "resp_0d83914831fb2103016ae021b9ed688191b86af38b139d5d1c"
+          },
+          {
+            "threadId": "01a17b83-8bca-7642-a6e4-83e221bcc949",
+            "turnId": "01a17b83-9020-74a1-afa7-a776a5fd8392",
+            "responseId": "resp_0d83914831fb2103016ae021c464088191bcac8dd3efdde645"
+          },
+          {
+            "threadId": "01a17b83-8bca-7642-a6e4-83e221bcc949",
+            "turnId": "01a17b83-9020-74a1-afa7-a776a5fd8392",
+            "responseId": "resp_0d83914831fb2103016ae021ce40e481919dc5494719bb9482"
+          }
+        ],
+        "first_event": {
+          "ordinal": 14,
+          "monotonic": null,
+          "utc": "2026-10-27T03:59:43.249Z"
+        },
+        "last_event": {
+          "ordinal": 54,
+          "monotonic": null,
+          "utc": "2026-10-27T04:00:19.603Z"
+        },
+        "operation_counts_status": "observed_items_only",
+        "items": [
+          {
+            "type": "UserMessage",
+            "id": "01a17b83-948f-7461-a4f0-fcbb9e31a2ba",
+            "content": [
+              {
+                "type": "text",
+                "text": "Before doing the task, your first model tool action must be functions.exec executing exactly this program, without additions or changes:\nconst names = ALL_TOOLS.filter(t => /^mcp__loci__/.test(t.name) || /(?:^|__)loci_[A-Za-z0-9_]+$/.test(t.name)).map(t => t.name).sort();\ntext({loci_runtime_catalog_v1: names});\nCompare the returned live Loci tool names with the expected tools below (qualified as mcp__loci__NAME). If discovery is unavailable or the set differs, stop and report the availability failure. Otherwise continue the original task; Loci use is optional.\nExpected tools: [\"loci_read\", \"loci_retrieve\"]\nThis is only an availability probe. Use only the fixture repository \"/private/tmp/loci-r1-availability-ujjoju0f/availability-eager/workspace\". Do not inspect or copy any pilot task.\nAfter the catalog, inspect each discovered tool's complete live description and input declaration. Invoke every expected operation through this Codex host's tools. Call loci_retrieve with query entry.ts, then loci_read with a source_ref returned by that retrieve. Check returned source against the fixture. Do not use a local MCP client, import or call a server directly, launch another host, use shell source reads as proof, or fabricate success JSON. Stop on any error.\nFinish after the calls; report any availability failure accurately.\n",
+                "text_elements": []
+              }
+            ],
+            "native_type": "UserMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:59:43.249Z",
+              "emitted_at_ms": 1793073583249,
+              "ordinal": 14,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0d83914831fb2103016ae021b1fce4819182b910e2fa1b8aba",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:59:45.221Z",
+              "emitted_at_ms": 1793073585221,
+              "ordinal": 16,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0d83914831fb2103016ae021b658348191862cc4eb4c5ed365",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:59:49.526Z",
+              "emitted_at_ms": 1793073589526,
+              "ordinal": 22,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "AgentMessage",
+            "id": "msg_0d83914831fb2103016ae021b658348191b789f3edcea74d83",
+            "content": [
+              {
+                "type": "Text",
+                "text": "The live catalog matches the two expected Loci tools. I’ll inspect their contracts, then run the retrieve and read calls against the fixture."
+              }
+            ],
+            "phase": "commentary",
+            "native_type": "AgentMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:59:49.944Z",
+              "emitted_at_ms": 1793073589944,
+              "ordinal": 24,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0d83914831fb2103016ae021c17cf881919301878521bb4f22",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T04:00:00.718Z",
+              "emitted_at_ms": 1793073600718,
+              "ordinal": 34,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0d83914831fb2103016ae021c1bb4481919e177467ae8fddca",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T04:00:00.936Z",
+              "emitted_at_ms": 1793073600936,
+              "ordinal": 36,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "mcpToolCall",
+            "id": "exec-1d0a6ffa-931d-4022-83c1-5437345a4063",
+            "server": "loci",
+            "tool": "loci_retrieve",
+            "arguments": {
+              "repo": "/private/tmp/loci-r1-availability-ujjoju0f/availability-eager/workspace",
+              "query": "entry.ts"
+            },
+            "status": "completed",
+            "result": {
+              "content": [],
+              "structuredContent": {
+                "schema_version": 1,
+                "policy": "normal-graph-v1",
+                "snapshot": "34e55515c73ae5958ec748aca9c862133e4a07639f6ff085126f75c68a891db2",
+                "status": "partial",
+                "selection": {
+                  "mode": "file",
+                  "candidate_count": 1,
+                  "omitted_candidates": 0
+                },
+                "scope": {
+                  "source": "indexed_supported_source",
+                  "coverage": "partial",
+                  "matching": "exact_file",
+                  "relationships": "known_static_relationships",
+                  "exhaustive": false
+                },
+                "anchors": [
+                  {
+                    "node_id": "entry.ts::__file__#file",
+                    "score": 0.0,
+                    "matched_terms": [],
+                    "match_scope": [
+                      "file_path"
+                    ]
+                  }
+                ],
+                "nodes": [
+                  {
+                    "id": "entry.ts::__file__#file",
+                    "name": "entry.ts",
+                    "kind": "file",
+                    "file": "entry.ts"
+                  },
+                  {
+                    "id": "model.ts::Public#type",
+                    "name": "Public",
+                    "kind": "type",
+                    "file": "model.ts"
+                  },
+                  {
+                    "id": "model.ts::__file__#file",
+                    "name": "model.ts",
+                    "kind": "file",
+                    "file": "model.ts"
+                  },
+                  {
+                    "id": "entry.ts::entry#function",
+                    "name": "entry",
+                    "kind": "function",
+                    "file": "entry.ts"
+                  },
+                  {
+                    "id": "model.ts::Base#type",
+                    "name": "Base",
+                    "kind": "type",
+                    "file": "model.ts"
+                  },
+                  {
+                    "id": "model.ts::Middle#type",
+                    "name": "Middle",
+                    "kind": "type",
+                    "file": "model.ts"
+                  }
+                ],
+                "items": [
+                  {
+                    "node_id": "entry.ts::__file__#file",
+                    "role": "anchor",
+                    "depth": 0,
+                    "why": "Explicit source identity",
+                    "source_ids": [
+                      1
+                    ],
+                    "complete": true,
+                    "extent": {
+                      "file": "entry.ts",
+                      "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a",
+                      "start_byte": 0,
+                      "end_byte": 102
+                    },
+                    "source_ref": "sr1_krdbk46qsusydadqpyria3qhuu"
+                  },
+                  {
+                    "node_id": "model.ts::Public#type",
+                    "role": "related",
+                    "depth": 1,
+                    "why": "Selected by references_type",
+                    "source_ids": [
+                      2
+                    ],
+                    "complete": true,
+                    "extent": {
+                      "file": "model.ts",
+                      "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba",
+                      "start_byte": 61,
+                      "end_byte": 82
+                    },
+                    "source_ref": "sr1_e65nu3ntayjom5lhaclxc7lfxe"
+                  },
+                  {
+                    "node_id": "entry.ts::entry#function",
+                    "role": "related",
+                    "depth": 0,
+                    "why": "Validated ownership context",
+                    "source_ids": [
+                      1
+                    ],
+                    "complete": true,
+                    "extent": {
+                      "file": "entry.ts",
+                      "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a",
+                      "start_byte": 46,
+                      "end_byte": 101
+                    },
+                    "source_ref": "sr1_bxazyd67diiv776jt5j7z5rbcu"
+                  },
+                  {
+                    "node_id": "model.ts::Base#type",
+                    "role": "related",
+                    "depth": 1,
+                    "why": "Validated ownership context",
+                    "source_ids": [
+                      4
+                    ],
+                    "complete": true,
+                    "extent": {
+                      "file": "model.ts",
+                      "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba",
+                      "start_byte": 7,
+                      "end_byte": 26
+                    },
+                    "source_ref": "sr1_iv6cx52gjqkhh7l3qrtxfum4uq"
+                  },
+                  {
+                    "node_id": "model.ts::Middle#type",
+                    "role": "related",
+                    "depth": 1,
+                    "why": "Validated ownership context",
+                    "source_ids": [
+                      5
+                    ],
+                    "complete": true,
+                    "extent": {
+                      "file": "model.ts",
+                      "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba",
+                      "start_byte": 34,
+                      "end_byte": 53
+                    },
+                    "source_ref": "sr1_u5uda3dd6e744c7qdjo7icv7we"
+                  }
+                ],
+                "ownership": [
+                  {
+                    "owner_id": "model.ts::__file__#file",
+                    "member_id": "model.ts::Public#type",
+                    "basis": "indexed_file"
+                  },
+                  {
+                    "owner_id": "entry.ts::__file__#file",
+                    "member_id": "entry.ts::entry#function",
+                    "basis": "indexed_file"
+                  },
+                  {
+                    "owner_id": "model.ts::__file__#file",
+                    "member_id": "model.ts::Base#type",
+                    "basis": "indexed_file"
+                  },
+                  {
+                    "owner_id": "model.ts::__file__#file",
+                    "member_id": "model.ts::Middle#type",
+                    "basis": "indexed_file"
+                  }
+                ],
+                "relationships": [
+                  {
+                    "id": 1,
+                    "edge": {
+                      "from": "entry.ts::__file__#file",
+                      "to": "model.ts::Public#type",
+                      "type": "references_type",
+                      "directed": true,
+                      "namespace": "loci",
+                      "resolution": "import-resolved",
+                      "evidence": {
+                        "file": "entry.ts",
+                        "line": 2,
+                        "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a"
+                      }
+                    },
+                    "traversed": "forward",
+                    "source_ids": [
+                      1,
+                      3
+                    ],
+                    "proof": "complete",
+                    "resolution_configuration": null
+                  },
+                  {
+                    "id": 2,
+                    "edge": {
+                      "from": "entry.ts::__file__#file",
+                      "to": "model.ts::__file__#file",
+                      "type": "imports_type",
+                      "directed": true,
+                      "namespace": "loci",
+                      "resolution": "import-resolved",
+                      "evidence": {
+                        "file": "entry.ts",
+                        "line": 1,
+                        "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a"
+                      }
+                    },
+                    "traversed": "forward",
+                    "source_ids": [
+                      1
+                    ],
+                    "proof": "complete",
+                    "resolution_configuration": null
+                  },
+                  {
+                    "id": 3,
+                    "edge": {
+                      "from": "entry.ts::entry#function",
+                      "to": "model.ts::Public#type",
+                      "type": "uses_type",
+                      "directed": true,
+                      "namespace": "loci",
+                      "resolution": "import-resolved",
+                      "evidence": {
+                        "file": "entry.ts",
+                        "line": 2,
+                        "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a"
+                      }
+                    },
+                    "traversed": "forward",
+                    "source_ids": [
+                      1,
+                      3
+                    ],
+                    "proof": "complete",
+                    "resolution_configuration": null
+                  },
+                  {
+                    "id": 4,
+                    "edge": {
+                      "from": "model.ts::Middle#type",
+                      "to": "model.ts::Base#type",
+                      "type": "uses_type",
+                      "directed": true,
+                      "namespace": "loci",
+                      "resolution": "exact",
+                      "evidence": {
+                        "file": "model.ts",
+                        "line": 2,
+                        "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba"
+                      }
+                    },
+                    "traversed": "forward",
+                    "source_ids": [
+                      5,
+                      6,
+                      7
+                    ],
+                    "proof": "complete",
+                    "resolution_configuration": null
+                  },
+                  {
+                    "id": 5,
+                    "edge": {
+                      "from": "model.ts::Public#type",
+                      "to": "model.ts::Middle#type",
+                      "type": "uses_type",
+                      "directed": true,
+                      "namespace": "loci",
+                      "resolution": "exact",
+                      "evidence": {
+                        "file": "model.ts",
+                        "line": 3,
+                        "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba"
+                      }
+                    },
+                    "traversed": "forward",
+                    "source_ids": [
+                      2,
+                      3,
+                      6
+                    ],
+                    "proof": "complete",
+                    "resolution_configuration": null
+                  }
+                ],
+                "sources": [
+                  {
+                    "id": 1,
+                    "file": "entry.ts",
+                    "start_byte": 0,
+                    "end_byte": 102,
+                    "start_line": 1,
+                    "end_line": 2,
+                    "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a",
+                    "content": "import type { Public } from './model';\nexport function entry(value: Public): Public { return value; }\n",
+                    "source_ref": "sr1_krdbk46qsusydadqpyria3qhuu"
+                  },
+                  {
+                    "id": 2,
+                    "file": "model.ts",
+                    "start_byte": 61,
+                    "end_byte": 82,
+                    "start_line": 3,
+                    "end_line": 3,
+                    "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba",
+                    "content": "type Public = Middle;",
+                    "source_ref": "sr1_e65nu3ntayjom5lhaclxc7lfxe"
+                  },
+                  {
+                    "id": 3,
+                    "file": "model.ts",
+                    "start_byte": 54,
+                    "end_byte": 83,
+                    "start_line": 3,
+                    "end_line": 3,
+                    "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba",
+                    "content": "export type Public = Middle;\n",
+                    "source_ref": "sr1_z63a7qqh72p7ivr4xea2ukmfuq"
+                  },
+                  {
+                    "id": 4,
+                    "file": "model.ts",
+                    "start_byte": 7,
+                    "end_byte": 26,
+                    "start_line": 1,
+                    "end_line": 1,
+                    "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba",
+                    "content": "type Base = string;",
+                    "source_ref": "sr1_iv6cx52gjqkhh7l3qrtxfum4uq"
+                  },
+                  {
+                    "id": 5,
+                    "file": "model.ts",
+                    "start_byte": 34,
+                    "end_byte": 53,
+                    "start_line": 2,
+                    "end_line": 2,
+                    "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba",
+                    "content": "type Middle = Base;",
+                    "source_ref": "sr1_u5uda3dd6e744c7qdjo7icv7we"
+                  },
+                  {
+                    "id": 6,
+                    "file": "model.ts",
+                    "start_byte": 27,
+                    "end_byte": 54,
+                    "start_line": 2,
+                    "end_line": 2,
+                    "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba",
+                    "content": "export type Middle = Base;\n",
+                    "source_ref": "sr1_uolt2tnz3chnjn7c7a2d7r4cya"
+                  },
+                  {
+                    "id": 7,
+                    "file": "model.ts",
+                    "start_byte": 0,
+                    "end_byte": 27,
+                    "start_line": 1,
+                    "end_line": 1,
+                    "content_hash": "fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba",
+                    "content": "export type Base = string;\n",
+                    "source_ref": "sr1_3jx2yopfcxlw7c5cgua5wejusy"
+                  }
+                ],
+                "omissions": [
+                  {
+                    "reason": "cycle",
+                    "count": 2
+                  },
+                  {
+                    "reason": "alternative_path",
+                    "count": 6
+                  }
+                ],
+                "limits": {
+                  "max_hops": 2,
+                  "max_nodes": 64,
+                  "max_neighbors": 32,
+                  "max_items": 12,
+                  "max_anchors": 3,
+                  "max_explicit_anchors": 5,
+                  "max_owner_members": 3,
+                  "max_evidence_bytes": 8192,
+                  "max_output_bytes": 16384,
+                  "max_anchor_source_bytes": 1024,
+                  "max_related_source_bytes": 768,
+                  "max_lookup_bytes": 33554432,
+                  "max_lookup_files": 4096,
+                  "max_literal_matches": 256
+                },
+                "usage": {
+                  "nodes_examined": 6,
+                  "eligible_edges_considered": 10,
+                  "edges_traversed": 8,
+                  "relationships_delivered": 5,
+                  "lookup_bytes": 0,
+                  "lookup_files": 0,
+                  "evidence_bytes": 185,
+                  "output_bytes": 7478,
+                  "estimated_tokens": 1870,
+                  "token_estimate_method": "utf8_bytes_div_4",
+                  "output_encoding": "mcp_result_json_utf8"
+                }
+              },
+              "isError": false
+            },
+            "duration": {
+              "secs": 0,
+              "nanos": 134711792
+            },
+            "native_type": "McpToolCall",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T04:00:03.073Z",
+              "emitted_at_ms": 1793073603073,
+              "ordinal": 40,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0d83914831fb2103016ae021ca1de48191b74aabd25e6b106f",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T04:00:09.302Z",
+              "emitted_at_ms": 1793073609302,
+              "ordinal": 43,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "mcpToolCall",
+            "id": "exec-a3a48461-7272-4622-bac1-cc45149a86bc",
+            "server": "loci",
+            "tool": "loci_read",
+            "arguments": {
+              "repo": "/private/tmp/loci-r1-availability-ujjoju0f/availability-eager/workspace",
+              "source_ref": "sr1_krdbk46qsusydadqpyria3qhuu"
+            },
+            "status": "completed",
+            "result": {
+              "content": [],
+              "structuredContent": {
+                "schema_version": 1,
+                "status": "ok",
+                "source": {
+                  "id": 1,
+                  "file": "entry.ts",
+                  "start_byte": 0,
+                  "end_byte": 102,
+                  "start_line": 1,
+                  "end_line": 2,
+                  "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a",
+                  "content": "import type { Public } from './model';\nexport function entry(value: Public): Public { return value; }\n",
+                  "source_ref": "sr1_krdbk46qsusydadqpyria3qhuu"
+                },
+                "complete": true,
+                "next_source_ref": null,
+                "usage": {
+                  "evidence_bytes": 102,
+                  "output_bytes": 554,
+                  "output_encoding": "mcp_result_json_utf8"
+                }
+              },
+              "isError": false
+            },
+            "duration": {
+              "secs": 0,
+              "nanos": 8752917
+            },
+            "native_type": "McpToolCall",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T04:00:12.941Z",
+              "emitted_at_ms": 1793073612941,
+              "ordinal": 46,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0d83914831fb2103016ae021d2d1348191a674a72f85fe6b08",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T04:00:17.997Z",
+              "emitted_at_ms": 1793073617997,
+              "ordinal": 50,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "AgentMessage",
+            "id": "msg_0d83914831fb2103016ae021d2d1308191a9dff7ce0debd4f5",
+            "content": [
+              {
+                "type": "Text",
+                "text": "The Loci availability probe passed: the live catalog contained exactly `mcp__loci__loci_retrieve` and `mcp__loci__loci_read`, and both calls succeeded through this host.\n\nFor the fixture repository, `loci_retrieve` returned `entry.ts` with a **partial** status because of cycle and alternative-path omissions. `loci_read` returned the complete source for the retrieved reference. Its content, byte range, and hash matched the retrieve result:\n\n```ts\nimport type { Public } from './model';\nexport function entry(value: Public): Public { return value; }\n```\n\nThe source comparison was between the two Loci responses; no independent filesystem read was used."
+              }
+            ],
+            "phase": "final_answer",
+            "native_type": "AgentMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T04:00:19.597Z",
+              "emitted_at_ms": 1793073619597,
+              "ordinal": 52,
+              "monotonic": null
+            }
+          }
+        ],
+        "raw_tool_calls": [
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0d83914831fb2103016ae021b20e74819182a569e3980d8ed7",
+            "status": "completed",
+            "call_id": "call_38e765da1e7c475885a5aa8506854459",
+            "name": "exec",
+            "input": "const names = ALL_TOOLS.filter(t => /^mcp__loci__/.test(t.name) || /(?:^|__)loci_[A-Za-z0-9_]+$/.test(t.name)).map(t => t.name).sort();\ntext({loci_runtime_catalog_v1: names});\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b83-9020-74a1-afa7-a776a5fd8392",
+              "create_time": 1793073586.0734437
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b83-9de0-7892-b4d0-0faefe0cfbb1",
+              "call_id": "call_38e765da1e7c475885a5aa8506854459",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"loci_runtime_catalog_v1\":[\"mcp__loci__loci_read\",\"mcp__loci__loci_retrieve\"]}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b83-9020-74a1-afa7-a776a5fd8392",
+                "create_time": 1793073585.63234
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0d83914831fb2103016ae021b6c9348191a7a56b4be797ba83",
+            "status": "completed",
+            "call_id": "call_80926a5a965a4a529559cf68a0ef36c8",
+            "name": "exec",
+            "input": "const matches = ALL_TOOLS.filter(t => t.name === \"mcp__loci__loci_retrieve\");\nif (matches.length !== 1) {\n  text({status: matches.length ? \"ambiguous\" : \"no_match\", count: matches.length});\n} else {\n  text(matches[0]);\n}\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b83-9020-74a1-afa7-a776a5fd8392",
+              "create_time": 1793073590.792241
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b83-b0cb-7550-9662-77bb00a92f0d",
+              "call_id": "call_80926a5a965a4a529559cf68a0ef36c8",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"name\":\"mcp__loci__loci_retrieve\",\"description\":\"Retrieve deterministic bounded source context and expand exact returned source extents from the loci cache. Successful results are in structuredContent; content is empty. In Code Mode, store the raw result under a unique key before displaying result.structuredContent ?? result. Recover a display mistake from that saved result.\\n\\nRetrieve deterministic bounded static source context.\\n\\nProvide a query or up to five exact seed IDs returned earlier. An exact\\nindexed relative file path in ``query`` selects that file; other queries\\nselect bounded source candidates. The repository refreshes automatically.\\nResults include source, relationship proof, ambiguity and omissions. Use\\nan incomplete item's short ``source_ref`` with ``loci_read`` to hydrate its\\nexact source, or pass a returned node ID as a seed to re-anchor under the\\nsame fixed policy. Relationships are static and non-exhaustive.\\n\\n\\nexec tool declaration:\\n```ts\\ndeclare const tools: { mcp__loci__loci_retrieve(args: { query?: string; repo: string; seed_ids?: Array<string> | null; }): Promise<CallToolResult<{ anchors: Array<{ match_scope: Array<string>; matched_terms: Array<string>; node_id: string; score: number; }>; items: Array<{ complete: boolean; depth: number; extent: { content_hash: string; end_byte: number; file: string; start_byte: number; }; node_id: string; role: \\\"anchor\\\" | \\\"related\\\"; source_ids: Array<number>; source_ref: string; why: string; }>; limits: { max_anchor_source_bytes: 1024; max_anchors: 3; max_evidence_bytes: 8192; max_explicit_anchors: 5; max_hops: 2; max_items: 12; max_literal_matches: 256; max_lookup_bytes: 33554432; max_lookup_files: 4096; max_neighbors: 32; max_nodes: 64; max_output_bytes: 16384; max_owner_members: 3; max_related_source_bytes: 768; }; nodes: Array<{ file: string | null; id: string; kind: string; name: string; }>; omissions: Array<{ count: number; reason: \\\"no_anchor\\\" | \\\"anchor_limit\\\" | \\\"ambiguous_anchor\\\" | \\\"lookup_limit\\\" | \\\"node_limit\\\" | \\\"neighbor_limit\\\" | \\\"item_limit\\\" | \\\"hop_limit\\\" | \\\"cycle\\\" | \\\"alternative_path\\\" | \\\"ownership_limit\\\" | \\\"unsupported_semantics\\\" | \\\"unresolved_relation\\\" | \\\"ambiguous_relation\\\" | \\\"external_relation\\\" | \\\"inaccessible_relation\\\" | \\\"source_unavailable\\\" | \\\"source_stale\\\" | \\\"source_preview\\\" | \\\"proof_unavailable\\\" | \\\"evidence_budget\\\" | \\\"output_budget\\\"; }>; ownership: Array<{ basis: \\\"indexed_file\\\" | \\\"go_package\\\" | \\\"rust_crate\\\" | \\\"swift_module\\\"; member_id: string; owner_id: string; }>; policy: \\\"normal-graph-v1\\\"; relationships: Array<{ edge: { directed: true; evidence: { content_hash: string; file: string; line: number; }; from: string; namespace: \\\"loci\\\"; resolution: \\\"exact\\\" | \\\"declared\\\" | \\\"import-resolved\\\"; to: string; type: string; }; id: number; proof: \\\"complete\\\"; resolution_configuration: \\\"unconditional\\\" | \\\"declared_possible\\\" | null; source_ids: Array<number>; traversed: \\\"forward\\\" | \\\"reverse\\\"; }>; schema_version: 1; scope: {\\n  coverage: \\\"complete\\\" | \\\"partial\\\" | \\\"unknown\\\";\\n  exhaustive: false;\\n  matching: \\\"explicit_ids\\\" | \\\"exact_file\\\" | \\\"symbol_metadata\\\" | \\\"source_literal\\\";\\n  // Evidence domain of any returned relationships: known static source relationships. Not an execution-stage report or a guarantee that relationships were searched for or selected.\\n  relationships: \\\"known_static_relationships\\\";\\n  source: \\\"indexed_supported_source\\\";\\n}; selection: { candidate_count: number; mode: \\\"explicit\\\" | \\\"inferred\\\" | \\\"file\\\" | \\\"literal\\\"; omitted_candidates: number; }; snapshot: string; sources: Array<{ content: string; content_hash: string; end_byte: number; end_line: number; file: string; id: number; source_ref: string; start_byte: number; start_line: number; }>; status: \\\"ok\\\" | \\\"partial\\\" | \\\"empty\\\"; usage: { edges_traversed: number; eligible_edges_considered: number; estimated_tokens: number; evidence_bytes: number; lookup_bytes: number; lookup_files: number; nodes_examined: number; output_bytes: number; output_encoding: \\\"mcp_result_json_utf8\\\"; relationships_delivered: number; token_estimate_method: \\\"utf8_bytes_div_4\\\"; }; } | { error: { code: string; details: { [key: string]: unknown; }; message: string; }; }>>; };\\n```\"}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b83-9020-74a1-afa7-a776a5fd8392",
+                "create_time": 1793073590.475956
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0d83914831fb2103016ae021b8fca4819194ee0305b68741f3",
+            "status": "completed",
+            "call_id": "call_5146f49a53de4096b788ff8811b9e2da",
+            "name": "exec",
+            "input": "const matches = ALL_TOOLS.filter(t => t.name === \"mcp__loci__loci_read\");\nif (matches.length !== 1) {\n  text({status: matches.length ? \"ambiguous\" : \"no_match\", count: matches.length});\n} else {\n  text(matches[0]);\n}\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b83-9020-74a1-afa7-a776a5fd8392",
+              "create_time": 1793073592.9979942
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b83-b94c-7532-8b8b-95fa3dab7a99",
+              "call_id": "call_5146f49a53de4096b788ff8811b9e2da",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"name\":\"mcp__loci__loci_read\",\"description\":\"Retrieve deterministic bounded source context and expand exact returned source extents from the loci cache. Successful results are in structuredContent; content is empty. In Code Mode, store the raw result under a unique key before displaying result.structuredContent ?? result. Recover a display mistake from that saved result.\\n\\nExpand one exact source extent named by a returned ``source_ref``.\\n\\nPass the returned short handle unchanged. Follow ``next_source_ref``\\nuntil it is null to page an incomplete extent. An unknown or expired\\nhandle requires fresh ``loci_retrieve`` context in the same repository.\\n``SOURCE_STALE`` means the indexed source changed; make a fresh\\n``loci_retrieve`` request instead of reusing the old locator.\\n\\n\\nexec tool declaration:\\n```ts\\ndeclare const tools: { mcp__loci__loci_read(args: { repo: string; source_ref: string; }): Promise<CallToolResult<{ complete: boolean; next_source_ref: string | null; schema_version: 1; source: { content: string; content_hash: string; end_byte: number; end_line: number; file: string; id: number; source_ref: string; start_byte: number; start_line: number; }; status: \\\"ok\\\"; usage: { evidence_bytes: number; output_bytes: number; output_encoding: \\\"mcp_result_json_utf8\\\"; }; } | { error: { code: string; details: { [key: string]: unknown; }; message: string; }; }>>; };\\n```\"}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b83-9020-74a1-afa7-a776a5fd8392",
+                "create_time": 1793073592.652404
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0d83914831fb2103016ae021c1d2a081918562c0dd57bd5de2",
+            "status": "completed",
+            "call_id": "call_e27ce57c6f584b38b37aaad55db913c0",
+            "name": "exec",
+            "input": "const key = \"loci_availability_retrieve_v1\";\ntry {\n  const result = await tools.mcp__loci__loci_retrieve({\n    repo: \"/private/tmp/loci-r1-availability-ujjoju0f/availability-eager/workspace\",\n    query: \"entry.ts\"\n  });\n  store(key, result);\n  const data = result?.structuredContent;\n  if (result?.isError || !data || typeof data !== \"object\" || data.error) {\n    text({stage: \"loci_retrieve\", execution: \"error\", recovery_key: key, result: data ?? result});\n  } else if (![\"ok\", \"partial\", \"empty\"].includes(data.status) || !Array.isArray(data.items) || !Array.isArray(data.sources)) {\n    text({stage: \"loci_retrieve\", execution: \"shape_error\", recovery_key: key, result: data});\n  } else {\n    text({stage: \"loci_retrieve\", execution: \"success\", recovery_key: key, result: data});\n  }\n} catch (error) {\n  text({stage: \"loci_retrieve\", execution: \"error\", error: String(error)});\n}\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b83-9020-74a1-afa7-a776a5fd8392",
+              "create_time": 1793073601.826796
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b83-e216-76b1-b653-10713289e23a",
+              "call_id": "call_e27ce57c6f584b38b37aaad55db913c0",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"stage\":\"loci_retrieve\",\"execution\":\"success\",\"recovery_key\":\"loci_availability_retrieve_v1\",\"result\":{\"schema_version\":1,\"policy\":\"normal-graph-v1\",\"snapshot\":\"34e55515c73ae5958ec748aca9c862133e4a07639f6ff085126f75c68a891db2\",\"status\":\"partial\",\"selection\":{\"mode\":\"file\",\"candidate_count\":1,\"omitted_candidates\":0},\"scope\":{\"source\":\"indexed_supported_source\",\"coverage\":\"partial\",\"matching\":\"exact_file\",\"relationships\":\"known_static_relationships\",\"exhaustive\":false},\"anchors\":[{\"node_id\":\"entry.ts::__file__#file\",\"score\":0,\"matched_terms\":[],\"match_scope\":[\"file_path\"]}],\"nodes\":[{\"id\":\"entry.ts::__file__#file\",\"name\":\"entry.ts\",\"kind\":\"file\",\"file\":\"entry.ts\"},{\"id\":\"model.ts::Public#type\",\"name\":\"Public\",\"kind\":\"type\",\"file\":\"model.ts\"},{\"id\":\"model.ts::__file__#file\",\"name\":\"model.ts\",\"kind\":\"file\",\"file\":\"model.ts\"},{\"id\":\"entry.ts::entry#function\",\"name\":\"entry\",\"kind\":\"function\",\"file\":\"entry.ts\"},{\"id\":\"model.ts::Base#type\",\"name\":\"Base\",\"kind\":\"type\",\"file\":\"model.ts\"},{\"id\":\"model.ts::Middle#type\",\"name\":\"Middle\",\"kind\":\"type\",\"file\":\"model.ts\"}],\"items\":[{\"node_id\":\"entry.ts::__file__#file\",\"role\":\"anchor\",\"depth\":0,\"why\":\"Explicit source identity\",\"source_ids\":[1],\"complete\":true,\"extent\":{\"file\":\"entry.ts\",\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"start_byte\":0,\"end_byte\":102},\"source_ref\":\"sr1_krdbk46qsusydadqpyria3qhuu\"},{\"node_id\":\"model.ts::Public#type\",\"role\":\"related\",\"depth\":1,\"why\":\"Selected by references_type\",\"source_ids\":[2],\"complete\":true,\"extent\":{\"file\":\"model.ts\",\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\",\"start_byte\":61,\"end_byte\":82},\"source_ref\":\"sr1_e65nu3ntayjom5lhaclxc7lfxe\"},{\"node_id\":\"entry.ts::entry#function\",\"role\":\"related\",\"depth\":0,\"why\":\"Validated ownership context\",\"source_ids\":[1],\"complete\":true,\"extent\":{\"file\":\"entry.ts\",\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"start_byte\":46,\"end_byte\":101},\"source_ref\":\"sr1_bxazyd67diiv776jt5j7z5rbcu\"},{\"node_id\":\"model.ts::Base#type\",\"role\":\"related\",\"depth\":1,\"why\":\"Validated ownership context\",\"source_ids\":[4],\"complete\":true,\"extent\":{\"file\":\"model.ts\",\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\",\"start_byte\":7,\"end_byte\":26},\"source_ref\":\"sr1_iv6cx52gjqkhh7l3qrtxfum4uq\"},{\"node_id\":\"model.ts::Middle#type\",\"role\":\"related\",\"depth\":1,\"why\":\"Validated ownership context\",\"source_ids\":[5],\"complete\":true,\"extent\":{\"file\":\"model.ts\",\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\",\"start_byte\":34,\"end_byte\":53},\"source_ref\":\"sr1_u5uda3dd6e744c7qdjo7icv7we\"}],\"ownership\":[{\"owner_id\":\"model.ts::__file__#file\",\"member_id\":\"model.ts::Public#type\",\"basis\":\"indexed_file\"},{\"owner_id\":\"entry.ts::__file__#file\",\"member_id\":\"entry.ts::entry#function\",\"basis\":\"indexed_file\"},{\"owner_id\":\"model.ts::__file__#file\",\"member_id\":\"model.ts::Base#type\",\"basis\":\"indexed_file\"},{\"owner_id\":\"model.ts::__file__#file\",\"member_id\":\"model.ts::Middle#type\",\"basis\":\"indexed_file\"}],\"relationships\":[{\"id\":1,\"edge\":{\"from\":\"entry.ts::__file__#file\",\"to\":\"model.ts::Public#type\",\"type\":\"references_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"entry.ts\",\"line\":2,\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\"}},\"traversed\":\"forward\",\"source_ids\":[1,3],\"proof\":\"complete\",\"resolution_configuration\":null},{\"id\":2,\"edge\":{\"from\":\"entry.ts::__file__#file\",\"to\":\"model.ts::__file__#file\",\"type\":\"imports_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"entry.ts\",\"line\":1,\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\"}},\"traversed\":\"forward\",\"source_ids\":[1],\"proof\":\"complete\",\"resolution_configuration\":null},{\"id\":3,\"edge\":{\"from\":\"entry.ts::entry#function\",\"to\":\"model.ts::Public#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"import-resolved\",\"evidence\":{\"file\":\"entry.ts\",\"line\":2,\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\"}},\"traversed\":\"forward\",\"source_ids\":[1,3],\"proof\":\"complete\",\"resolution_configuration\":null},{\"id\":4,\"edge\":{\"from\":\"model.ts::Middle#type\",\"to\":\"model.ts::Base#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"model.ts\",\"line\":2,\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\"}},\"traversed\":\"forward\",\"source_ids\":[5,6,7],\"proof\":\"complete\",\"resolution_configuration\":null},{\"id\":5,\"edge\":{\"from\":\"model.ts::Public#type\",\"to\":\"model.ts::Middle#type\",\"type\":\"uses_type\",\"directed\":true,\"namespace\":\"loci\",\"resolution\":\"exact\",\"evidence\":{\"file\":\"model.ts\",\"line\":3,\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\"}},\"traversed\":\"forward\",\"source_ids\":[2,3,6],\"proof\":\"complete\",\"resolution_configuration\":null}],\"sources\":[{\"id\":1,\"file\":\"entry.ts\",\"start_byte\":0,\"end_byte\":102,\"start_line\":1,\"end_line\":2,\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"content\":\"import type { Public } from './model';\\nexport function entry(value: Public): Public { return value; }\\n\",\"source_ref\":\"sr1_krdbk46qsusydadqpyria3qhuu\"},{\"id\":2,\"file\":\"model.ts\",\"start_byte\":61,\"end_byte\":82,\"start_line\":3,\"end_line\":3,\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\",\"content\":\"type Public = Middle;\",\"source_ref\":\"sr1_e65nu3ntayjom5lhaclxc7lfxe\"},{\"id\":3,\"file\":\"model.ts\",\"start_byte\":54,\"end_byte\":83,\"start_line\":3,\"end_line\":3,\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\",\"content\":\"export type Public = Middle;\\n\",\"source_ref\":\"sr1_z63a7qqh72p7ivr4xea2ukmfuq\"},{\"id\":4,\"file\":\"model.ts\",\"start_byte\":7,\"end_byte\":26,\"start_line\":1,\"end_line\":1,\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\",\"content\":\"type Base = string;\",\"source_ref\":\"sr1_iv6cx52gjqkhh7l3qrtxfum4uq\"},{\"id\":5,\"file\":\"model.ts\",\"start_byte\":34,\"end_byte\":53,\"start_line\":2,\"end_line\":2,\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\",\"content\":\"type Middle = Base;\",\"source_ref\":\"sr1_u5uda3dd6e744c7qdjo7icv7we\"},{\"id\":6,\"file\":\"model.ts\",\"start_byte\":27,\"end_byte\":54,\"start_line\":2,\"end_line\":2,\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\",\"content\":\"export type Middle = Base;\\n\",\"source_ref\":\"sr1_uolt2tnz3chnjn7c7a2d7r4cya\"},{\"id\":7,\"file\":\"model.ts\",\"start_byte\":0,\"end_byte\":27,\"start_line\":1,\"end_line\":1,\"content_hash\":\"fc76ee94dc1f4f0631580099f4f7e4fc796c96bbc434cfab494169b570c410ba\",\"content\":\"export type Base = string;\\n\",\"source_ref\":\"sr1_3jx2yopfcxlw7c5cgua5wejusy\"}],\"omissions\":[{\"reason\":\"cycle\",\"count\":2},{\"reason\":\"alternative_path\",\"count\":6}],\"limits\":{\"max_hops\":2,\"max_nodes\":64,\"max_neighbors\":32,\"max_items\":12,\"max_anchors\":3,\"max_explicit_anchors\":5,\"max_owner_members\":3,\"max_evidence_bytes\":8192,\"max_output_bytes\":16384,\"max_anchor_source_bytes\":1024,\"max_related_source_bytes\":768,\"max_lookup_bytes\":33554432,\"max_lookup_files\":4096,\"max_literal_matches\":256},\"usage\":{\"nodes_examined\":6,\"eligible_edges_considered\":10,\"edges_traversed\":8,\"relationships_delivered\":5,\"lookup_bytes\":0,\"lookup_files\":0,\"evidence_bytes\":185,\"output_bytes\":7478,\"estimated_tokens\":1870,\"token_estimate_method\":\"utf8_bytes_div_4\",\"output_encoding\":\"mcp_result_json_utf8\"}}}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b83-9020-74a1-afa7-a776a5fd8392",
+                "create_time": 1793073603.094766
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0d83914831fb2103016ae021ca29d0819183d1d2d925a6d645",
+            "status": "completed",
+            "call_id": "call_cab4dce0f68b405e947566133715af9e",
+            "name": "exec",
+            "input": "const retrieved = load(\"loci_availability_retrieve_v1\")?.structuredContent;\nconst anchor = retrieved?.items?.find(item => item.role === \"anchor\" && item.extent?.file === \"entry.ts\");\nconst expected = retrieved?.sources?.find(source => source.file === \"entry.ts\" && source.source_ref === anchor?.source_ref);\nif (!anchor || !expected || typeof anchor.source_ref !== \"string\") {\n  text({stage: \"loci_read\", execution: \"shape_error\", error: \"No entry.ts anchor and matching source in the retrieve result.\", recovery_key: \"loci_availability_retrieve_v1\"});\n} else {\n  const key = \"loci_availability_read_v1\";\n  try {\n    const result = await tools.mcp__loci__loci_read({\n      repo: \"/private/tmp/loci-r1-availability-ujjoju0f/availability-eager/workspace\",\n      source_ref: anchor.source_ref\n    });\n    store(key, result);\n    const data = result?.structuredContent;\n    if (result?.isError || !data || typeof data !== \"object\" || data.error) {\n      text({stage: \"loci_read\", execution: \"error\", recovery_key: key, result: data ?? result});\n    } else if (data.status !== \"ok\" || data.schema_version !== 1 || typeof data.complete !== \"boolean\" || !data.source || typeof data.source.content !== \"string\") {\n      text({stage: \"loci_read\", execution: \"shape_error\", recovery_key: key, result: data});\n    } else {\n      const source = data.source;\n      const fields = [\"file\", \"start_byte\", \"end_byte\", \"start_line\", \"end_line\", \"content_hash\", \"content\", \"source_ref\"];\n      const mismatches = fields.filter(field => source[field] !== expected[field]);\n      text({\n        stage: \"loci_read\",\n        execution: mismatches.length ? \"comparison_failed\" : \"success\",\n        fixture_check: {against: \"entry.ts source returned by loci_retrieve for the fixture repository\", matched_fields: fields.filter(field => !mismatches.includes(field)), mismatches},\n        recovery_key: key,\n        result: data\n      });\n    }\n  } catch (error) {\n    text({stage: \"loci_read\", execution: \"error\", error: String(error)});\n  }\n}\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b83-9020-74a1-afa7-a776a5fd8392",
+              "create_time": 1793073610.1664114
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b84-08bd-7f91-a019-2ca94b239253",
+              "call_id": "call_cab4dce0f68b405e947566133715af9e",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"stage\":\"loci_read\",\"execution\":\"success\",\"fixture_check\":{\"against\":\"entry.ts source returned by loci_retrieve for the fixture repository\",\"matched_fields\":[\"file\",\"start_byte\",\"end_byte\",\"start_line\",\"end_line\",\"content_hash\",\"content\",\"source_ref\"],\"mismatches\":[]},\"recovery_key\":\"loci_availability_read_v1\",\"result\":{\"schema_version\":1,\"status\":\"ok\",\"source\":{\"id\":1,\"file\":\"entry.ts\",\"start_byte\":0,\"end_byte\":102,\"start_line\":1,\"end_line\":2,\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"content\":\"import type { Public } from './model';\\nexport function entry(value: Public): Public { return value; }\\n\",\"source_ref\":\"sr1_krdbk46qsusydadqpyria3qhuu\"},\"complete\":true,\"next_source_ref\":null,\"usage\":{\"evidence_bytes\":102,\"output_bytes\":554,\"output_encoding\":\"mcp_result_json_utf8\"}}}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b83-9020-74a1-afa7-a776a5fd8392",
+                "create_time": 1793073612.989637
+              }
+            }
+          }
+        ],
+        "late_items_after_abort": 0,
+        "post_abort_cleanup_ms": null
+      }
+    ],
+    "usage_status": "known",
+    "usage": {
+      "inputTokens": 167623,
+      "cachedInputTokens": 156544,
+      "outputTokens": 2564,
+      "reasoningOutputTokens": 1377,
+      "totalTokens": 170187,
+      "cacheWriteInputTokens": 0,
+      "uncachedInputTokens": 11079
+    },
+    "observed_cumulative_usage": {
+      "inputTokens": 167623,
+      "cachedInputTokens": 156544,
+      "outputTokens": 2564,
+      "reasoningOutputTokens": 1377,
+      "totalTokens": 170187,
+      "cacheWriteInputTokens": 0
+    },
+    "usage_errors": [],
+    "capture_errors": [],
+    "operation_totals": {
+      "mcp_calls": 2,
+      "shell_calls": 0,
+      "file_change_calls": 0,
+      "context_compactions": 0,
+      "subagent_calls": 0,
+      "failed_shell_calls": 0
+    },
+    "phase_groups": {},
+    "limitations": [
+      "Usage updates are not proven model-request counts; unique raw response completions are a lower bound that may omit failed upstream requests/retries.",
+      "Raw outer-call availability is explicit; nested operation counts are distinct.",
+      "Behavioral quality and rework attribution require the independent oracle/review.",
+      "MCP source/delivery receipts are joined separately; item presence is not model reliance."
+    ],
+    "native_provenance": {
+      "rollout_path": "/private/tmp/loci-r1-availability-ujjoju0f/availability-eager/observer/qualification/native-rollout.jsonl",
+      "session_id": "01a17b83-8bca-7642-a6e4-83e221bcc949",
+      "cwd": "/private/tmp/loci-r1-availability-ujjoju0f/availability-eager/workspace",
+      "cli_version": "0.164.0",
+      "source": "exec",
+      "thread_source": "user",
+      "bootstrap_message_rows": [
+        7
+      ]
+    },
+    "turn_contexts": [
+      {
+        "turn_id": "01a17b83-9020-74a1-afa7-a776a5fd8392",
+        "cwd": "/private/tmp/loci-r1-availability-ujjoju0f/availability-eager/workspace",
+        "model": "gpt-6.1-terra",
+        "effort": "max",
+        "approval_policy": "on-request",
+        "approvals_reviewer": "auto_review",
+        "sandbox_policy": {
+          "type": "workspace-write",
+          "writable_roots": [
+            "/",
+            "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T"
+          ],
+          "network_access": true,
+          "exclude_tmpdir_env_var": false,
+          "exclude_slash_tmp": false
+        },
+        "permission_profile": {
+          "type": "managed",
+          "file_system": {
+            "type": "restricted",
+            "entries": [
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/"
+                },
+                "access": "write"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/.claude"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/.claude/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/Downloads"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/Downloads/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/claude-otel"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/claude-otel/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/improvements"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/improvements/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/work"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/work/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "special",
+                  "value": {
+                    "kind": "minimal"
+                  }
+                },
+                "access": "read"
+              },
+              {
+                "path": {
+                  "type": "special",
+                  "value": {
+                    "kind": "tmpdir"
+                  }
+                },
+                "access": "write"
+              }
+            ]
+          },
+          "network": "enabled"
+        },
+        "active_permission_profile": {
+          "id": "brummerv_filesystem_guard"
+        },
+        "file_system_sandbox_policy": {
+          "kind": "restricted",
+          "entries": [
+            {
+              "path": {
+                "type": "path",
+                "path": "/"
+              },
+              "access": "write"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/.claude"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/.claude/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/Downloads"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/Downloads/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/claude-otel"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/claude-otel/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/improvements"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/improvements/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/work"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/work/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "minimal"
+                }
+              },
+              "access": "read"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "tmpdir"
+                }
+              },
+              "access": "write"
+            }
+          ]
+        }
+      }
+    ],
+    "native_errors": []
+  },
+  "errors": [],
+  "limitations": [
+    "Experimental separation uses independent source copies and fresh native sessions; no additional access-control layer.",
+    "Native-only navigation is an audited instruction policy, not a hidden-tool capability boundary.",
+    "Observed response usage does not prove complete billing or invisible upstream retry accounting.",
+    "This readback neither launches nor authorizes a measured pilot; independent grading and a prospective freeze remain necessary."
+  ],
+  "config_validation": {
+    "raw_sha256": "e599c164441845c9741e2a9310b59bab9a73e6cae592fc4caba2bc4e118e19f1",
+    "effective_sha256": "1144414951be6350ae99a43a4fcfb1256694c17f16920408d8d790ec2111e48d",
+    "overridden_default_changes": [
+      "model"
+    ],
+    "raw_changed": true
+  }
+}

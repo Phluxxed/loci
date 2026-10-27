@@ -276,7 +276,14 @@ def require_availability(frozen: dict, gate: Path | None) -> dict:
                 raise ValueError("archived availability fixture changed")
         from .accounting import summarize_native
         accounting = summarize_native(Path(files["trace"]["path"]), thread)
-        if (accounting != qualified["accounting"] or accounting.get("usage_status") != "known"
+        # Qualification read the live trace before copying it into this archive.
+        # Reconstruct that exact provenance path; every other field must replay
+        # identically, and the archived trace bytes were hash-checked above.
+        qualification_accounting = {**accounting, "native_provenance": {
+            **accounting["native_provenance"],
+            "rollout_path": str(Path(manifest["observer"]) / "qualification/native-rollout.jsonl"),
+        }}
+        if (qualification_accounting != qualified["accounting"] or accounting.get("usage_status") != "known"
                 or accounting.get("native_errors") or not accounting.get("turn_contexts")):
             raise ValueError("availability accounting differs from native trace")
         _verify_native_prompt(accounting, availability.probe_prompt(

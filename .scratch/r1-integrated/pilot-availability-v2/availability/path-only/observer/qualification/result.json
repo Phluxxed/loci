@@ -1,0 +1,1230 @@
+{
+  "schema_version": 1,
+  "kind": "r0-native-session-qualification",
+  "run_id": "availability-path-only",
+  "arm": "loci",
+  "thread_id": "01a17b81-931d-77b2-affe-2628efb7fb9f",
+  "status": "qualified_observations",
+  "measured": false,
+  "config_sha256": "6e44e77d7735eab2c8759b1370c99fa23b9317477cfdac4be7dbb98d476885f9",
+  "native_trace_sha256": "de04e3c3c069f763d706aff738e21d033c473265247aaa20ef0b385acbda8693",
+  "source_before": "666d11781d19c5af6fe7894dc1d42e2844bafff0409a9978f2ec62e15d84f0ff",
+  "source_after": "666d11781d19c5af6fe7894dc1d42e2844bafff0409a9978f2ec62e15d84f0ff",
+  "conditions": {
+    "model": "gpt-6.1-terra",
+    "effort": "max",
+    "native_protection": {
+      "approval_policy": "on-request",
+      "approvals_reviewer": "auto_review",
+      "sandbox_policy": {
+        "type": "workspace-write",
+        "writable_roots": [
+          "/",
+          "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T"
+        ],
+        "network_access": true,
+        "exclude_tmpdir_env_var": false,
+        "exclude_slash_tmp": false
+      },
+      "permission_profile": {
+        "type": "managed",
+        "file_system": {
+          "type": "restricted",
+          "entries": [
+            {
+              "path": {
+                "type": "path",
+                "path": "/"
+              },
+              "access": "write"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/.claude"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/.claude/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/Downloads"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/Downloads/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/claude-otel"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/claude-otel/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/improvements"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/improvements/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/work"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/work/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "minimal"
+                }
+              },
+              "access": "read"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "tmpdir"
+                }
+              },
+              "access": "write"
+            }
+          ]
+        },
+        "network": "enabled"
+      },
+      "active_permission_profile": {
+        "id": "brummerv_filesystem_guard"
+      },
+      "file_system_sandbox_policy": {
+        "kind": "restricted",
+        "entries": [
+          {
+            "path": {
+              "type": "path",
+              "path": "/"
+            },
+            "access": "write"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/.claude"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/.claude/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/Downloads"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/Downloads/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/claude-otel"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/claude-otel/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/improvements"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/improvements/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/work"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/work/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "special",
+              "value": {
+                "kind": "minimal"
+              }
+            },
+            "access": "read"
+          },
+          {
+            "path": {
+              "type": "special",
+              "value": {
+                "kind": "tmpdir"
+              }
+            },
+            "access": "write"
+          }
+        ]
+      }
+    },
+    "freeze_sha256": "0a747227d868595fa728c095dcc0d3b26fcd3b1fbfcab938b2543bbdc3e735c6",
+    "native_config_binding": {
+      "schema": "r1-cli-model-defaults-v1",
+      "raw_sha256": "0353fc7b94b3a66303648814809c4d7f84745eb032d9f9b92beb1934eebd64d1",
+      "effective_sha256": "1144414951be6350ae99a43a4fcfb1256694c17f16920408d8d790ec2111e48d",
+      "field_sha256": {
+        "model": "c8eeff274672ae39221a0febbb1db6d6c7a979673419a2635c2d1f0f499a8f04",
+        "model_reasoning_effort": "b57c4299afe3cda154124bdb96ceaf618a9d8d9cd8d2c8f6580ff26faa5fe5ca",
+        "model_context_window": "ad1e2e29fe1631ddf7bedaadffe63c4efd61e6909a1ed0648e7b9645bd27dab5",
+        "model_auto_compact_token_limit": "e6ba348d1464969bb4210f401b255b6de57b81fddc375b944ac4fe2fb698bc95",
+        "service_tier": "1080a60800d9e5bddc69f51489c636a776bacaadb5368f46db4aa0947c67e3ba",
+        "plan_mode_reasoning_effort": "e5c4eb89c17b3350875c064ac177103d77081d68860beaffbdb826c88462eb41",
+        "approval_policy": "112f9f74261331ef91d859af60ec297cdd2cfdbc99811d74a8002f4fcb71fb4a",
+        "approvals_reviewer": "f83d332e375a1a7db6babce3b70e263ea815a07685d3cfaa2ffc641455ee8d25",
+        "default_permissions": "9c08e418cb514da9dc6a34f2fd53927da6723713a8cf649fc4d09d0953e36faa",
+        "developer_instructions": "b81a536c573f07708ee5aae6e203b7757c42985984b5a4e8ff7a8ed58a5a1571",
+        "notify": "09928d31161e6998648aaabfe61e4dc0351473dde87bdfced2689282b6beb5d6",
+        "agents": "fee67260299ab214b3908cdc4f7b9ffb53d3654dca8c93816502b6bd4a7d6611",
+        "permissions": "4c0c54b700b1be8523e5801611b47e84ab3a29e8f2e240838a40cdd561a35f09",
+        "projects": "2f9fc4ea487ac946665332cc4ab370378a57625ce2f6acc3c898f4dabc6f3ddb",
+        "otel": "86ff2534d6158ad2fba9ccea91139cb5f9abc1ebdb110a0058947e050651535a",
+        "tui": "c3ac8d12f5a0f8bab72a8df93c873b2a0a752cc654efd1ae5576af2139fcb1ff",
+        "plugins": "5ea7a32c3f441de100c99c50d373d3121a91a16c82ad85236148a8b0125f9c88",
+        "hooks": "5c78c907ac5b0d71c3d49c9c1ccf968294e968b473ab2d68287601465771c514",
+        "notice": "97f2fe6a31e33287559f344a16f9bcc5a5befa581b986f75ff423ed5b2ad29cd",
+        "features": "2f806baaa1d6257aceca9d08158fe2887bfdb6023516c144f3658f329b4b0007",
+        "memories": "e3b654f3522801b6062cb54b57289a2af085bd1e96e7409ee007efd231452e12",
+        "mcp_servers": "43019dcc907af7dbde0addda15d4d6f798a7687c243796b7aa69df8114166e88",
+        "marketplaces": "2bf6f3f400e57770f07c2e9d64adc2c0a9f9796cafe6d6c28b09b47b85cbbd41",
+        "desktop": "aa6b9cc0bfd3a4cd469fce52fb8de20ae71f67b1dd820306ca89fbaf17d0fdd0",
+        "shell_environment_policy": "55c0fc8e982d9dd0d451c6c3bc442a0668341278e7cb6b6d9f346a2ad88a6895",
+        "apps": "4ac7980d4c76878d55fb2c5dd4b8f0afe71972932449f8225dd842557c5ec914",
+        "skills": "b0936d993dc8808917c340f46496acde153bd8d41da18b1492cb4bbc4a0fe363"
+      }
+    }
+  },
+  "native_config_sha256": "e599c164441845c9741e2a9310b59bab9a73e6cae592fc4caba2bc4e118e19f1",
+  "workspace": "/private/tmp/loci-r1-availability-ujjoju0f/availability-path-only/workspace",
+  "observer": "/private/tmp/loci-r1-availability-ujjoju0f/availability-path-only/observer",
+  "accounting": {
+    "schema_version": 1,
+    "accounting": "native-rollout-v1",
+    "thread_id": "01a17b81-931d-77b2-affe-2628efb7fb9f",
+    "stages": [
+      {
+        "stage_id": "turn-1",
+        "turn_id": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+        "outcome": "completed",
+        "elapsed_ms": 56711,
+        "usage_status": "known",
+        "usage": {
+          "inputTokens": 192286,
+          "cachedInputTokens": 172032,
+          "outputTokens": 4223,
+          "reasoningOutputTokens": 2672,
+          "totalTokens": 196509,
+          "cacheWriteInputTokens": 0,
+          "uncachedInputTokens": 20254
+        },
+        "usage_updates": 7,
+        "observed_usage_delta": {
+          "inputTokens": 192286,
+          "cachedInputTokens": 172032,
+          "outputTokens": 4223,
+          "reasoningOutputTokens": 2672,
+          "totalTokens": 196509,
+          "cacheWriteInputTokens": 0
+        },
+        "usage_limitation": null,
+        "mcp_calls": 2,
+        "shell_calls": 0,
+        "file_change_calls": 0,
+        "context_compactions": 0,
+        "subagent_calls": 0,
+        "failed_shell_calls": 0,
+        "outer_tool_calls": 6,
+        "outer_tool_calls_status": "observed",
+        "model_requests": null,
+        "observed_completed_model_requests": 7,
+        "model_requests_status": "completion_lower_bound",
+        "upstream_responses": [
+          {
+            "threadId": "01a17b81-931d-77b2-affe-2628efb7fb9f",
+            "turnId": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+            "responseId": "resp_0642fb2fe5b361c3016ae0212f7bd88191b2444cf674529f85"
+          },
+          {
+            "threadId": "01a17b81-931d-77b2-affe-2628efb7fb9f",
+            "turnId": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+            "responseId": "resp_0642fb2fe5b361c3016ae02132449c81918f4216a60a1c899c"
+          },
+          {
+            "threadId": "01a17b81-931d-77b2-affe-2628efb7fb9f",
+            "turnId": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+            "responseId": "resp_0642fb2fe5b361c3016ae02136a28c8191a29904d8d8331253"
+          },
+          {
+            "threadId": "01a17b81-931d-77b2-affe-2628efb7fb9f",
+            "turnId": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+            "responseId": "resp_0642fb2fe5b361c3016ae021382da88191b93a0977862b4fec"
+          },
+          {
+            "threadId": "01a17b81-931d-77b2-affe-2628efb7fb9f",
+            "turnId": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+            "responseId": "resp_0642fb2fe5b361c3016ae02144fe508191a8bbca0252ed2960"
+          },
+          {
+            "threadId": "01a17b81-931d-77b2-affe-2628efb7fb9f",
+            "turnId": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+            "responseId": "resp_0642fb2fe5b361c3016ae0214be8388191b1481948500cf1e9"
+          },
+          {
+            "threadId": "01a17b81-931d-77b2-affe-2628efb7fb9f",
+            "turnId": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+            "responseId": "resp_0642fb2fe5b361c3016ae02163b9348191a83b2f2dc8001390"
+          }
+        ],
+        "first_event": {
+          "ordinal": 14,
+          "monotonic": null,
+          "utc": "2026-10-27T03:57:34.174Z"
+        },
+        "last_event": {
+          "ordinal": 66,
+          "monotonic": null,
+          "utc": "2026-10-27T03:58:29.321Z"
+        },
+        "operation_counts_status": "observed_items_only",
+        "items": [
+          {
+            "type": "UserMessage",
+            "id": "01a17b81-9c5c-7050-9347-4b02525f64fd",
+            "content": [
+              {
+                "type": "text",
+                "text": "Before doing the task, your first model tool action must be functions.exec executing exactly this program, without additions or changes:\nconst names = ALL_TOOLS.filter(t => /^mcp__loci__/.test(t.name) || /(?:^|__)loci_[A-Za-z0-9_]+$/.test(t.name)).map(t => t.name).sort();\ntext({loci_runtime_catalog_v1: names});\nCompare the returned live Loci tool names with the expected tools below (qualified as mcp__loci__NAME). If discovery is unavailable or the set differs, stop and report the availability failure. Otherwise continue the original task; Loci use is optional.\nExpected tools: [\"loci_read\", \"loci_retrieve\"]\nThis is only an availability probe. Use only the fixture repository \"/private/tmp/loci-r1-availability-ujjoju0f/availability-path-only/workspace\". Do not inspect or copy any pilot task.\nAfter the catalog, inspect each discovered tool's complete live description and input declaration. Invoke every expected operation through this Codex host's tools. Call loci_retrieve with query entry.ts, then loci_read with a source_ref returned by that retrieve. Check returned source against the fixture. Do not use a local MCP client, import or call a server directly, launch another host, use shell source reads as proof, or fabricate success JSON. Stop on any error.\nFinish after the calls; report any availability failure accurately.\n",
+                "text_elements": []
+              }
+            ],
+            "native_type": "UserMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:57:34.174Z",
+              "emitted_at_ms": 1793073454174,
+              "ordinal": 14,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0642fb2fe5b361c3016ae02130f9588191ab3edaecd84c08ab",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:57:36.157Z",
+              "emitted_at_ms": 1793073456157,
+              "ordinal": 16,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "AgentMessage",
+            "id": "msg_0642fb2fe5b361c3016ae021310ec08191b6c9071a180f3e57",
+            "content": [
+              {
+                "type": "Text",
+                "text": "I’ll check the live Loci catalog first, then exercise the two operations against the specified fixture if the catalog matches."
+              }
+            ],
+            "phase": "commentary",
+            "native_type": "AgentMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:57:36.651Z",
+              "emitted_at_ms": 1793073456651,
+              "ordinal": 18,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0642fb2fe5b361c3016ae021356f948191ab4a9447ceac1209",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:57:40.620Z",
+              "emitted_at_ms": 1793073460620,
+              "ordinal": 24,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0642fb2fe5b361c3016ae0213fc54081919e6d7d437252ba6a",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:57:50.975Z",
+              "emitted_at_ms": 1793073470975,
+              "ordinal": 34,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0642fb2fe5b361c3016ae02141d0d081919878abb2e1aa07d1",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:57:52.998Z",
+              "emitted_at_ms": 1793073472998,
+              "ordinal": 36,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "AgentMessage",
+            "id": "msg_0642fb2fe5b361c3016ae02141dc9c81918c8faae197a36ac8",
+            "content": [
+              {
+                "type": "Text",
+                "text": "The catalog matches the two expected tools, and both live declarations are available. I’ll retrieve `entry.ts` and use its returned reference for the read."
+              }
+            ],
+            "phase": "commentary",
+            "native_type": "AgentMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:57:53.373Z",
+              "emitted_at_ms": 1793073473373,
+              "ordinal": 38,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "mcpToolCall",
+            "id": "exec-2acc8e30-8085-4b87-a9ec-c22022404d5e",
+            "server": "loci",
+            "tool": "loci_retrieve",
+            "arguments": {
+              "repo": "/private/tmp/loci-r1-availability-ujjoju0f/availability-path-only/workspace",
+              "query": "entry.ts"
+            },
+            "status": "completed",
+            "result": {
+              "content": [],
+              "structuredContent": {
+                "schema_version": 1,
+                "policy": "graph-free-file-v1",
+                "snapshot": "2825d65e524f3c9fb9f3b7463f88851ecbd71ebd9b6181d1c0b8d88e5bfc03ab",
+                "status": "partial",
+                "scope": {
+                  "coverage": "complete",
+                  "exhaustive": false,
+                  "matching": "exact_file",
+                  "source": "text_repository_files",
+                  "relationships": "unsupported"
+                },
+                "selection": {
+                  "mode": "file",
+                  "candidate_count": 1,
+                  "omitted_candidates": 0
+                },
+                "anchors": [],
+                "items": [
+                  {
+                    "node_id": "entry.ts::__file__#file",
+                    "role": "anchor",
+                    "depth": 0,
+                    "why": "exact_file",
+                    "source_ids": [
+                      1
+                    ],
+                    "complete": true,
+                    "extent": {
+                      "file": "entry.ts",
+                      "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a",
+                      "start_byte": 0,
+                      "end_byte": 102
+                    },
+                    "source_ref": "eyJlbmQiOjEwMiwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjAsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LXBhdGgtb25seS93b3Jrc3BhY2UiLCJzdGFydCI6MCwidiI6MX0"
+                  }
+                ],
+                "sources": [
+                  {
+                    "id": 1,
+                    "file": "entry.ts",
+                    "start_byte": 0,
+                    "end_byte": 102,
+                    "start_line": 1,
+                    "end_line": 2,
+                    "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a",
+                    "content": "import type { Public } from './model';\nexport function entry(value: Public): Public { return value; }\n",
+                    "source_ref": "eyJlbmQiOjEwMiwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjAsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LXBhdGgtb25seS93b3Jrc3BhY2UiLCJzdGFydCI6MCwidiI6MX0"
+                  }
+                ],
+                "nodes": [],
+                "ownership": [],
+                "relationships": [],
+                "omissions": [
+                  {
+                    "reason": "unsupported_semantics",
+                    "count": 1
+                  }
+                ],
+                "limits": {
+                  "max_files": 4096,
+                  "max_file_bytes": 2097152,
+                  "max_scan_bytes": 67108864,
+                  "max_results": 3,
+                  "max_preview_bytes": 1024,
+                  "max_read_bytes": 8192
+                },
+                "usage": {
+                  "lookup_bytes": 102,
+                  "lookup_files": 1,
+                  "estimated_tokens": 552,
+                  "output_bytes": 2205,
+                  "evidence_bytes": 102,
+                  "output_encoding": "mcp_result_json_utf8"
+                },
+                "navigation": {
+                  "meaning": "source path candidates; not resolved relationships",
+                  "exhaustive": false,
+                  "candidates": [
+                    {
+                      "path": "model.ts",
+                      "reason": "relative_import_alternative",
+                      "observed_in": "entry.ts"
+                    }
+                  ],
+                  "omitted_candidates": 0
+                }
+              },
+              "isError": false
+            },
+            "duration": {
+              "secs": 0,
+              "nanos": 69971375
+            },
+            "native_type": "McpToolCall",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:57:55.668Z",
+              "emitted_at_ms": 1793073475668,
+              "ordinal": 42,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0642fb2fe5b361c3016ae0214863648191875fab188a64d801",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:57:59.567Z",
+              "emitted_at_ms": 1793073479567,
+              "ordinal": 45,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "mcpToolCall",
+            "id": "exec-32d54586-667f-4c8a-8c4a-da3ddb464c29",
+            "server": "loci",
+            "tool": "loci_read",
+            "arguments": {
+              "repo": "/private/tmp/loci-r1-availability-ujjoju0f/availability-path-only/workspace",
+              "source_ref": "eyJlbmQiOjEwMiwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjAsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LXBhdGgtb25seS93b3Jrc3BhY2UiLCJzdGFydCI6MCwidiI6MX0"
+            },
+            "status": "completed",
+            "result": {
+              "content": [],
+              "structuredContent": {
+                "schema_version": 1,
+                "status": "ok",
+                "source": {
+                  "id": 1,
+                  "file": "entry.ts",
+                  "start_byte": 0,
+                  "end_byte": 102,
+                  "start_line": 1,
+                  "end_line": 2,
+                  "content_hash": "eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a",
+                  "content": "import type { Public } from './model';\nexport function entry(value: Public): Public { return value; }\n",
+                  "source_ref": "eyJlbmQiOjEwMiwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjAsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LXBhdGgtb25seS93b3Jrc3BhY2UiLCJzdGFydCI6MCwidiI6MX0"
+                },
+                "complete": true,
+                "next_source_ref": null,
+                "usage": {
+                  "output_bytes": 811,
+                  "evidence_bytes": 102,
+                  "output_encoding": "mcp_result_json_utf8"
+                }
+              },
+              "isError": false
+            },
+            "duration": {
+              "secs": 0,
+              "nanos": 52538333
+            },
+            "native_type": "McpToolCall",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:58:02.552Z",
+              "emitted_at_ms": 1793073482552,
+              "ordinal": 49,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0642fb2fe5b361c3016ae02153874881918ce4b0e5c8963a01",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:58:10.731Z",
+              "emitted_at_ms": 1793073490731,
+              "ordinal": 52,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0642fb2fe5b361c3016ae0215ac21c819191a68f3a26baa7d6",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:58:17.967Z",
+              "emitted_at_ms": 1793073497967,
+              "ordinal": 54,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0642fb2fe5b361c3016ae0216000e48191b40bc7a210d570f7",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:58:23.205Z",
+              "emitted_at_ms": 1793073503205,
+              "ordinal": 56,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0642fb2fe5b361c3016ae0216594548191a9507be4667b480d",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:58:28.815Z",
+              "emitted_at_ms": 1793073508814,
+              "ordinal": 62,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "AgentMessage",
+            "id": "msg_0642fb2fe5b361c3016ae0216594548191aac9e10494e8d7cf",
+            "content": [
+              {
+                "type": "Text",
+                "text": "The Loci catalog matched the expected tools, and both operations succeeded against the fixture repository.\n\n`loci_read` returned the complete 102-byte `entry.ts` source; its content and reported hash matched the retrieval result. The retrieval reported `partial` because semantic relationships are unsupported, while the source itself was complete."
+              }
+            ],
+            "phase": "final_answer",
+            "native_type": "AgentMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T03:58:29.313Z",
+              "emitted_at_ms": 1793073509313,
+              "ordinal": 64,
+              "monotonic": null
+            }
+          }
+        ],
+        "raw_tool_calls": [
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0642fb2fe5b361c3016ae02131763481918d1bccaf94be4d09",
+            "status": "completed",
+            "call_id": "call_ec3bbcc4a5284a9e8fb484e6d116de1d",
+            "name": "exec",
+            "input": "const names = ALL_TOOLS.filter(t => /^mcp__loci__/.test(t.name) || /(?:^|__)loci_[A-Za-z0-9_]+$/.test(t.name)).map(t => t.name).sort();\ntext({loci_runtime_catalog_v1: names});\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+              "create_time": 1793073457.4637532
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b81-a74b-75a3-8551-b0f2772a0faa",
+              "call_id": "call_ec3bbcc4a5284a9e8fb484e6d116de1d",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"loci_runtime_catalog_v1\":[\"mcp__loci__loci_read\",\"mcp__loci__loci_retrieve\"]}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+                "create_time": 1793073456.97179
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0642fb2fe5b361c3016ae021357b708191abac2927c727c317",
+            "status": "completed",
+            "call_id": "call_36faa11b5e04497bad016dfe54e333d7",
+            "name": "exec",
+            "input": "const matches = ALL_TOOLS.filter(t => t.name === \"mcp__loci__loci_retrieve\");\nif (matches.length !== 1) {\n  text({status: matches.length ? \"error\" : \"no_match\", name: \"mcp__loci__loci_retrieve\", count: matches.length});\n} else {\n  text(matches[0]);\n}\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+              "create_time": 1793073461.4853432
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b81-b835-7161-9bbf-55f86aad099d",
+              "call_id": "call_36faa11b5e04497bad016dfe54e333d7",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"name\":\"mcp__loci__loci_retrieve\",\"description\":\"Find source with loci_retrieve; use loci_read for incomplete source_ref extents. Navigation candidates are paths to inspect, not resolved relationships. Results are in structuredContent, with exact source hashes and explicit omissions. Only source navigation is available.\\n\\nFind bounded current source by words or exact relative file path.\\n\\nAlternatively re-anchor one previously returned node_id in seed_ids.\\nNavigation candidates are source paths, including alternatives; inspect\\nthem with another retrieval. This operation performs no semantic parsing.\\nExpand incomplete items with loci_read using the unchanged source_ref.\\n\\n\\nexec tool declaration:\\n```ts\\ndeclare const tools: { mcp__loci__loci_retrieve(args: { query?: string; repo: string; seed_ids?: Array<string> | null; }): Promise<CallToolResult>; };\\n```\"}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+                "create_time": 1793073461.30168
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0642fb2fe5b361c3016ae0213739c08191bd78883edb563d58",
+            "status": "completed",
+            "call_id": "call_7097893a47044eaa8120a930cbb0dda2",
+            "name": "exec",
+            "input": "const matches = ALL_TOOLS.filter(t => t.name === \"mcp__loci__loci_read\");\nif (matches.length !== 1) {\n  text({status: matches.length ? \"error\" : \"no_match\", name: \"mcp__loci__loci_read\", count: matches.length});\n} else {\n  text(matches[0]);\n}\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+              "create_time": 1793073463.2310503
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b81-be80-74c3-8d59-f4981e6b7d20",
+              "call_id": "call_7097893a47044eaa8120a930cbb0dda2",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"name\":\"mcp__loci__loci_read\",\"description\":\"Find source with loci_retrieve; use loci_read for incomplete source_ref extents. Navigation candidates are paths to inspect, not resolved relationships. Results are in structuredContent, with exact source hashes and explicit omissions. Only source navigation is available.\\n\\nRead a returned hash-bound source extent; follow next_source_ref until complete.\\n\\nSOURCE_STALE requires new retrieval or semantic acquisition. Works with\\nboth ordinary source and semantic proof source references.\\n\\n\\nexec tool declaration:\\n```ts\\ndeclare const tools: { mcp__loci__loci_read(args: { repo: string; source_ref: string; }): Promise<CallToolResult>; };\\n```\"}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+                "create_time": 1793073462.912863
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0642fb2fe5b361c3016ae0214237b88191b11ac6bc7b993a96",
+            "status": "completed",
+            "call_id": "call_d390d94cec674d699a28fbf10b12a0a8",
+            "name": "exec",
+            "input": "const key = \"loci_availability_retrieve_v1\";\ntry {\n  const result = await tools.mcp__loci__loci_retrieve({\n    repo: \"/private/tmp/loci-r1-availability-ujjoju0f/availability-path-only/workspace\",\n    query: \"entry.ts\"\n  });\n  store(key, result);\n  const serialized = JSON.stringify(result);\n  if (!result || typeof result !== \"object\" || !Array.isArray(result.content) || (result.isError !== undefined && typeof result.isError !== \"boolean\")) {\n    text({tool: \"mcp__loci__loci_retrieve\", status: \"shape_error\", recovery_key: key});\n  } else if (serialized.length <= 24000) {\n    text({tool: \"mcp__loci__loci_retrieve\", status: result.isError ? \"error\" : \"executed\", recovery_key: key, result});\n  } else {\n    text({tool: \"mcp__loci__loci_retrieve\", status: result.isError ? \"error\" : \"inspect_required\", recovery_key: key, serialized_length: serialized.length, first_part: serialized.slice(0, 12000)});\n  }\n} catch (error) {\n  text({tool: \"mcp__loci__loci_retrieve\", status: \"error\", error: String(error)});\n}\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+              "create_time": 1793073474.2200105
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b81-f05f-7643-9883-70b361829573",
+              "call_id": "call_d390d94cec674d699a28fbf10b12a0a8",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"tool\":\"mcp__loci__loci_retrieve\",\"status\":\"executed\",\"recovery_key\":\"loci_availability_retrieve_v1\",\"result\":{\"content\":[],\"structuredContent\":{\"schema_version\":1,\"policy\":\"graph-free-file-v1\",\"snapshot\":\"2825d65e524f3c9fb9f3b7463f88851ecbd71ebd9b6181d1c0b8d88e5bfc03ab\",\"status\":\"partial\",\"scope\":{\"coverage\":\"complete\",\"exhaustive\":false,\"matching\":\"exact_file\",\"source\":\"text_repository_files\",\"relationships\":\"unsupported\"},\"selection\":{\"mode\":\"file\",\"candidate_count\":1,\"omitted_candidates\":0},\"anchors\":[],\"items\":[{\"node_id\":\"entry.ts::__file__#file\",\"role\":\"anchor\",\"depth\":0,\"why\":\"exact_file\",\"source_ids\":[1],\"complete\":true,\"extent\":{\"file\":\"entry.ts\",\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"start_byte\":0,\"end_byte\":102},\"source_ref\":\"eyJlbmQiOjEwMiwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjAsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LXBhdGgtb25seS93b3Jrc3BhY2UiLCJzdGFydCI6MCwidiI6MX0\"}],\"sources\":[{\"id\":1,\"file\":\"entry.ts\",\"start_byte\":0,\"end_byte\":102,\"start_line\":1,\"end_line\":2,\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"content\":\"import type { Public } from './model';\\nexport function entry(value: Public): Public { return value; }\\n\",\"source_ref\":\"eyJlbmQiOjEwMiwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjAsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LXBhdGgtb25seS93b3Jrc3BhY2UiLCJzdGFydCI6MCwidiI6MX0\"}],\"nodes\":[],\"ownership\":[],\"relationships\":[],\"omissions\":[{\"reason\":\"unsupported_semantics\",\"count\":1}],\"limits\":{\"max_files\":4096,\"max_file_bytes\":2097152,\"max_scan_bytes\":67108864,\"max_results\":3,\"max_preview_bytes\":1024,\"max_read_bytes\":8192},\"usage\":{\"lookup_bytes\":102,\"lookup_files\":1,\"estimated_tokens\":552,\"output_bytes\":2205,\"evidence_bytes\":102,\"output_encoding\":\"mcp_result_json_utf8\"},\"navigation\":{\"meaning\":\"source path candidates; not resolved relationships\",\"exhaustive\":false,\"candidates\":[{\"path\":\"model.ts\",\"reason\":\"relative_import_alternative\",\"observed_in\":\"entry.ts\"}],\"omitted_candidates\":0}},\"isError\":false}}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+                "create_time": 1793073475.67948
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0642fb2fe5b361c3016ae02148740c8191b189771844cb7e2c",
+            "status": "completed",
+            "call_id": "call_925121834f604ad0ab1183fab6327c5d",
+            "name": "exec",
+            "input": "const previous = load(\"loci_availability_retrieve_v1\");\nconst data = previous && previous.structuredContent;\nconst item = data && Array.isArray(data.items)\n  ? data.items.find(candidate => candidate && candidate.extent && candidate.extent.file === \"entry.ts\" && typeof candidate.source_ref === \"string\")\n  : undefined;\nif (!previous || previous.isError || !data || !item) {\n  text({tool: \"mcp__loci__loci_read\", status: \"shape_error\", error: \"The retrieve result has no usable entry.ts source_ref.\", recovery_key: \"loci_availability_retrieve_v1\"});\n} else {\n  const key = \"loci_availability_read_v1\";\n  try {\n    const result = await tools.mcp__loci__loci_read({\n      repo: \"/private/tmp/loci-r1-availability-ujjoju0f/availability-path-only/workspace\",\n      source_ref: item.source_ref\n    });\n    store(key, result);\n    const serialized = JSON.stringify(result);\n    if (!result || typeof result !== \"object\" || !Array.isArray(result.content) || (result.isError !== undefined && typeof result.isError !== \"boolean\")) {\n      text({tool: \"mcp__loci__loci_read\", status: \"shape_error\", recovery_key: key});\n    } else if (serialized.length <= 24000) {\n      text({tool: \"mcp__loci__loci_read\", status: result.isError ? \"error\" : \"executed\", recovery_key: key, result});\n    } else {\n      text({tool: \"mcp__loci__loci_read\", status: result.isError ? \"error\" : \"inspect_required\", recovery_key: key, serialized_length: serialized.length, first_part: serialized.slice(0, 12000)});\n    }\n  } catch (error) {\n    text({tool: \"mcp__loci__loci_read\", status: \"error\", error: String(error)});\n  }\n}\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+              "create_time": 1793073480.463447
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b82-0b40-7891-810d-f37e6f93c329",
+              "call_id": "call_925121834f604ad0ab1183fab6327c5d",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"tool\":\"mcp__loci__loci_read\",\"status\":\"executed\",\"recovery_key\":\"loci_availability_read_v1\",\"result\":{\"content\":[],\"structuredContent\":{\"schema_version\":1,\"status\":\"ok\",\"source\":{\"id\":1,\"file\":\"entry.ts\",\"start_byte\":0,\"end_byte\":102,\"start_line\":1,\"end_line\":2,\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\",\"content\":\"import type { Public } from './model';\\nexport function entry(value: Public): Public { return value; }\\n\",\"source_ref\":\"eyJlbmQiOjEwMiwiZmlsZSI6ImVudHJ5LnRzIiwiaGFzaCI6ImViNGIwYWRmYTBkMzhlN2JjZWVhOTcyYjVmYzIyMTU4YzYwMWMwMzNjOWRkMWE5OTM3MjMxNzY2NWFiMjNkOGEiLCJvZmZzZXQiOjAsInJlcG8iOiIvcHJpdmF0ZS90bXAvbG9jaS1yMS1hdmFpbGFiaWxpdHktdWpqb2p1MGYvYXZhaWxhYmlsaXR5LXBhdGgtb25seS93b3Jrc3BhY2UiLCJzdGFydCI6MCwidiI6MX0\"},\"complete\":true,\"next_source_ref\":null,\"usage\":{\"output_bytes\":811,\"evidence_bytes\":102,\"output_encoding\":\"mcp_result_json_utf8\"}},\"isError\":false}}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+                "create_time": 1793073482.560863
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0642fb2fe5b361c3016ae02160050c819185f0614b0457623b",
+            "status": "completed",
+            "call_id": "call_6e61f573ccaf4950838a831c60997222",
+            "name": "exec",
+            "input": "const retrieved = load(\"loci_availability_retrieve_v1\");\nconst read = load(\"loci_availability_read_v1\");\nconst retrieval = retrieved && retrieved.structuredContent;\nconst reading = read && read.structuredContent;\nconst preview = retrieval && Array.isArray(retrieval.sources)\n  ? retrieval.sources.find(source => source && source.file === \"entry.ts\")\n  : undefined;\nconst source = reading && reading.source;\nif (!retrieved || retrieved.isError || !read || read.isError || !retrieval || !reading ||\n    !preview || !source || typeof preview.content !== \"string\" || typeof source.content !== \"string\") {\n  text({tool: \"fixture_comparison\", status: \"shape_error\", recovery_keys: [\"loci_availability_retrieve_v1\", \"loci_availability_read_v1\"]});\n} else {\n  const checks = {\n    read_status_ok: reading.status === \"ok\",\n    read_complete: reading.complete === true && reading.next_source_ref === null,\n    fixture_file: preview.file === \"entry.ts\" && source.file === \"entry.ts\",\n    matching_content: preview.content === source.content,\n    matching_hash: typeof preview.content_hash === \"string\" && preview.content_hash === source.content_hash,\n    matching_extent: preview.start_byte === source.start_byte && preview.end_byte === source.end_byte,\n    matching_source_ref: preview.source_ref === source.source_ref,\n    complete_ascii_extent: source.start_byte === 0 && /^[\\x00-\\x7f]*$/.test(source.content) && source.end_byte === source.content.length\n  };\n  text({\n    tool: \"fixture_comparison\",\n    status: Object.values(checks).every(Boolean) ? \"ok\" : \"error\",\n    checks,\n    retrieval_status: retrieval.status,\n    retrieval_omissions: retrieval.omissions,\n    read_status: reading.status,\n    file: source.file,\n    bytes: source.end_byte,\n    content_hash: source.content_hash\n  });\n}\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+              "create_time": 1793073504.021842
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17b82-68a3-77a2-91a2-3bf670996c44",
+              "call_id": "call_6e61f573ccaf4950838a831c60997222",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"tool\":\"fixture_comparison\",\"status\":\"ok\",\"checks\":{\"read_status_ok\":true,\"read_complete\":true,\"fixture_file\":true,\"matching_content\":true,\"matching_hash\":true,\"matching_extent\":true,\"matching_source_ref\":true,\"complete_ascii_extent\":true},\"retrieval_status\":\"partial\",\"retrieval_omissions\":[{\"reason\":\"unsupported_semantics\",\"count\":1}],\"read_status\":\"ok\",\"file\":\"entry.ts\",\"bytes\":102,\"content_hash\":\"eb4b0adfa0d38e7bceea972b5fc22158c601c033c9dd1a99372317665ab23d8a\"}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+                "create_time": 1793073506.46787
+              }
+            }
+          }
+        ],
+        "late_items_after_abort": 0,
+        "post_abort_cleanup_ms": null
+      }
+    ],
+    "usage_status": "known",
+    "usage": {
+      "inputTokens": 192286,
+      "cachedInputTokens": 172032,
+      "outputTokens": 4223,
+      "reasoningOutputTokens": 2672,
+      "totalTokens": 196509,
+      "cacheWriteInputTokens": 0,
+      "uncachedInputTokens": 20254
+    },
+    "observed_cumulative_usage": {
+      "inputTokens": 192286,
+      "cachedInputTokens": 172032,
+      "outputTokens": 4223,
+      "reasoningOutputTokens": 2672,
+      "totalTokens": 196509,
+      "cacheWriteInputTokens": 0
+    },
+    "usage_errors": [],
+    "capture_errors": [],
+    "operation_totals": {
+      "mcp_calls": 2,
+      "shell_calls": 0,
+      "file_change_calls": 0,
+      "context_compactions": 0,
+      "subagent_calls": 0,
+      "failed_shell_calls": 0
+    },
+    "phase_groups": {},
+    "limitations": [
+      "Usage updates are not proven model-request counts; unique raw response completions are a lower bound that may omit failed upstream requests/retries.",
+      "Raw outer-call availability is explicit; nested operation counts are distinct.",
+      "Behavioral quality and rework attribution require the independent oracle/review.",
+      "MCP source/delivery receipts are joined separately; item presence is not model reliance."
+    ],
+    "native_provenance": {
+      "rollout_path": "/private/tmp/loci-r1-availability-ujjoju0f/availability-path-only/observer/qualification/native-rollout.jsonl",
+      "session_id": "01a17b81-931d-77b2-affe-2628efb7fb9f",
+      "cwd": "/private/tmp/loci-r1-availability-ujjoju0f/availability-path-only/workspace",
+      "cli_version": "0.164.0",
+      "source": "exec",
+      "thread_source": "user",
+      "bootstrap_message_rows": [
+        7
+      ]
+    },
+    "turn_contexts": [
+      {
+        "turn_id": "01a17b81-96f4-7f80-b12a-53698dd22cc7",
+        "cwd": "/private/tmp/loci-r1-availability-ujjoju0f/availability-path-only/workspace",
+        "model": "gpt-6.1-terra",
+        "effort": "max",
+        "approval_policy": "on-request",
+        "approvals_reviewer": "auto_review",
+        "sandbox_policy": {
+          "type": "workspace-write",
+          "writable_roots": [
+            "/",
+            "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T"
+          ],
+          "network_access": true,
+          "exclude_tmpdir_env_var": false,
+          "exclude_slash_tmp": false
+        },
+        "permission_profile": {
+          "type": "managed",
+          "file_system": {
+            "type": "restricted",
+            "entries": [
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/"
+                },
+                "access": "write"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/.claude"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/.claude/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/Downloads"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/Downloads/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/claude-otel"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/claude-otel/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/improvements"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/improvements/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/work"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/work/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "special",
+                  "value": {
+                    "kind": "minimal"
+                  }
+                },
+                "access": "read"
+              },
+              {
+                "path": {
+                  "type": "special",
+                  "value": {
+                    "kind": "tmpdir"
+                  }
+                },
+                "access": "write"
+              }
+            ]
+          },
+          "network": "enabled"
+        },
+        "active_permission_profile": {
+          "id": "brummerv_filesystem_guard"
+        },
+        "file_system_sandbox_policy": {
+          "kind": "restricted",
+          "entries": [
+            {
+              "path": {
+                "type": "path",
+                "path": "/"
+              },
+              "access": "write"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/.claude"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/.claude/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/Downloads"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/Downloads/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/claude-otel"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/claude-otel/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/improvements"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/improvements/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/work"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/work/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "minimal"
+                }
+              },
+              "access": "read"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "tmpdir"
+                }
+              },
+              "access": "write"
+            }
+          ]
+        }
+      }
+    ],
+    "native_errors": []
+  },
+  "errors": [],
+  "limitations": [
+    "Experimental separation uses independent source copies and fresh native sessions; no additional access-control layer.",
+    "Native-only navigation is an audited instruction policy, not a hidden-tool capability boundary.",
+    "Observed response usage does not prove complete billing or invisible upstream retry accounting.",
+    "This readback neither launches nor authorizes a measured pilot; independent grading and a prospective freeze remain necessary."
+  ],
+  "config_validation": {
+    "raw_sha256": "e599c164441845c9741e2a9310b59bab9a73e6cae592fc4caba2bc4e118e19f1",
+    "effective_sha256": "1144414951be6350ae99a43a4fcfb1256694c17f16920408d8d790ec2111e48d",
+    "overridden_default_changes": [
+      "model"
+    ],
+    "raw_changed": true
+  }
+}
