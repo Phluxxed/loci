@@ -1,3 +1,13 @@
+# Current interpretation: Astra found task and evaluation design failure
+
+The user-requested [Astra validity review](astra-evaluation-review/REVIEW.md) supersedes the earlier broad **adoption failure** interpretation. All four repositories are approximately 1 KB; rubric assumptions trigger all seven frozen failures; native versus Loci-enabled runs also receive systematically different unrelated skills context (+9,836 bytes). Availability and recorded non-use remain established, but the pilot did not identify R1's engineering utility or a general product adoption defect. Primary responsibility lies in task selection, evaluator design and the lead's interpretation.
+
+Frozen scores, raw runs, hashes and the original published report are preserved. Holding an advancement claim for insufficient evidence remains defensible; product/workflow redesign is not justified by these cases. [Reproduced source sizes and context hashes](astra-evaluation-review/checks.json). No replacement tasks, scoring changes, new pilot, implementation or runtime-cause investigation occurred during review.
+
+---
+
+## Original completed-pilot report and earlier history
+
 # Current R1 closeout: availability-qualified pilot complete
 
 **Recommendation: revise / hold advancement.** All 16 Terra 6.1/max assignments completed with known usage, verified per-session tool catalogs and matching independent replay. Frozen scores: native 3/4, path-only 2/4, integrated 3/4, eager 1/4. Separate operational probes exercised the enabled tools. No scored session invoked Loci, semantics or proof, so these scores establish no architecture benefit. Blinded review identifies four representation failures and three hidden file-allowlist failures; official scores remain unchanged.
