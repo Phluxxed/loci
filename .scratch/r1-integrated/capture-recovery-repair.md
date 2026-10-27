@@ -1,5 +1,15 @@
 # R1 capture and recovery repair
 
+Current execution amendment: [capture plus personal-host observations](capture-host-observation-amendment.json).
+The original capture amendment omitted the existing personal-host policy and
+rejected a later global AGENTS.md edit before launching a probe. The new amendment
+records the current personal instructions while preserving the actual cross-arm
+context checks. It changes no runtime code, task inputs or native settings.
+Current installed-host validation and 51 focused checks pass; the runner
+integration uses the published policy selectors with personal instructions
+changed after freezing. [Verification](host-observation-checks.json).
+The original amendment and rejected attempt remain preserved.
+
 The harness repair passes 251 tests, including the complete four-probe and
 16-assignment runner flow with synthetic native delivery and real accounting,
 grading and replay. The exact capture program also passed through the current
@@ -77,7 +87,7 @@ PYTHONPATH=src:. /Users/brummerv/phluxxed/loci/.venv/bin/python -u \
   .scratch/r1-integrated/pilot-execute.py \
   --freeze .scratch/r1-integrated/real-repo-pilot/frozen-final/freeze.json \
   --gate .scratch/r1-integrated/qualification-gate.json \
-  --amendment .scratch/r1-integrated/capture-recovery-instrumentation-amendment.json \
+  --amendment .scratch/r1-integrated/capture-host-observation-amendment.json \
   --output-root .scratch/r1-integrated/real-repo-pilot/execution-capture-v2
 ~~~
 

@@ -1,5 +1,12 @@
 # Current real-source pilot: capture and recovery repaired; live qualification pending
 
+The current [host-observation amendment](capture-host-observation-amendment.json)
+also enables the existing handling of changed personal instructions. It passes
+current installed-host validation and 51 focused checks, including the full
+runner with the published policy selectors. The previous preflight rejection is
+preserved; no additional native session has been launched. See the updated
+[execution command](capture-recovery-repair.md).
+
 The [capture/recovery repair](capture-recovery-repair.md) passes 251 tests,
 including the actual four-probe/16-assignment runner with synthetic native
 delivery and real grading/replay. Its exact catalog capture also passed through

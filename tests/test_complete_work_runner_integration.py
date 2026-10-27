@@ -21,6 +21,7 @@ from loci.integrated import IntegratedSource
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / '.scratch/r1-integrated/pilot-execute.py'
+ACTIVE_AMENDMENT = SCRIPT.with_name('capture-host-observation-amendment.json')
 PROTECTIONS = {
     'approval_policy': 'on-request', 'approvals_reviewer': 'auto_review',
     'sandbox_policy': {'type': 'workspace-write'}, 'permission_profile': {'type': 'managed'},
@@ -40,6 +41,8 @@ def bytes_under(root):
 def _freeze(tmp_path):
     config = tmp_path / 'config.toml'
     config.write_text('approval_policy="on-request"\n')
+    global_agents = tmp_path / 'AGENTS.md'
+    global_agents.write_text('Personal instructions when the experiment was frozen.\n')
     host = tmp_path / 'native-process-delivery-only'
     host.write_text('This fixture is never executed.\n')
     tasks = []
@@ -64,19 +67,27 @@ def _freeze(tmp_path):
     plan = {'tasks': tasks, 'native_config': str(config), 'conditions': conditions,
             'model': 'gpt-6.1-terra', 'effort': 'max', 'native_protection': PROTECTIONS,
             'common_context': True, 'host': {'executable': str(host), 'sha256': r0.digest(host),
+                'startup_context_files': {str(global_agents): r0.digest(global_agents)},
                 'orchestration_files': {str(SCRIPT): '1' * 64}}}
     plan_path = tmp_path / 'plan.json'
     write_json(plan_path, plan)
     frozen = r1.freeze(plan_path, tmp_path / 'frozen')
+    # Exercise the policy selectors in the amendment actually supplied to the
+    # operator, including a personal-instruction change after the freeze.
+    active = json.loads(ACTIVE_AMENDMENT.read_text())
+    claimed = active.pop('amendment_sha256')
+    assert r1.identity(active) == claimed
     amendment = {'schema_version': 1, 'kind': 'r1-instrumentation-amendment',
                  'freeze_sha256': frozen['freeze_sha256'],
-                 'catalog_capture_policy': 'r1-common-context-v2',
+                 'host_observation_policy': active['host_observation_policy'],
+                 'catalog_capture_policy': active['catalog_capture_policy'],
                  'catalog_capture_policy_sha256': r1.identity(availability.capture_policy(
                      frozen['common_context']['root_agents_md'])),
                  'changes': {str(SCRIPT): {'before_sha256': '1' * 64, 'after_sha256': r0.digest(SCRIPT)}}}
     amendment['amendment_sha256'] = r1.identity(amendment)
     amendment_path = tmp_path / 'instrumentation-amendment.json'
     write_json(amendment_path, amendment)
+    global_agents.write_text('Current personal instructions shared by all conditions.\n')
     gate = tmp_path / 'deterministic-gate.json'
     write_json(gate, {'status': 'passed', 'fixture': 'independent frozen gate'})
     return tmp_path / 'frozen/freeze.json', amendment_path, gate
@@ -152,7 +163,9 @@ class NativeDelivery:
                 response('additional_tools', role='developer', id='startup-envelope', tools=schemas),
                 response('message', role='developer', content=[text('Common developer instructions.'),
                          text('Preserve native tools and permissions.')]),
-                response('message', role='user', content=[text('Shared fixture repository instructions.\n'),
+                response('message', role='user', content=[text(
+                         (Path(manifest['native_config']).parent / 'AGENTS.md').read_text()
+                         + 'Shared fixture repository instructions.\n'),
                          text('Workspace: ' + str(workspace) + '\nObserver: ' + str(observer))],
                          internal_chat_message_metadata_passthrough=bootstrap_metadata),
                 response('message', role='user', content=[text(prompt)]),
@@ -246,6 +259,9 @@ def integrated_runner(tmp_path, monkeypatch):
 
 def test_first_preflight_measured_checkpoint_resume_and_archive_only_readback(integrated_runner, monkeypatch):
     runner, native, root, argv, freeze, amendment, gate = integrated_runner
+    effective = r1.read_freeze(freeze, amendment=amendment)
+    assert effective['host_observations']['startup_instructions'][0]['changed'] is True
+    assert effective['capture_context']['schema'] == 'r1-common-context-v2'
     frozen_bytes = freeze.read_bytes()
     preflight = runner.main(argv + ['--preflight-only'])
     assert preflight['status'] == 'passed'
