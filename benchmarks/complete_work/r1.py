@@ -45,6 +45,17 @@ def freeze(plan_path: Path, destination: Path) -> dict:
         raise ValueError("all four conditions required")
     if set(plan["native_protection"]) != set(r0.PROTECTION_FIELDS):
         raise ValueError("complete existing native protection evidence required")
+    if "common_context" in plan and type(plan["common_context"]) is not bool:
+        raise ValueError("common_context must explicitly opt in with true or false")
+    root_agents = None
+    if plan.get("common_context"):
+        instructions = []
+        for task in plan["tasks"]:
+            path = Path(task["source"]) / "AGENTS.md"
+            instructions.append(path.read_bytes().decode("utf-8") if path.exists() else None)
+        if any(content != instructions[0] for content in instructions):
+            raise ValueError("common context requires identical root AGENTS.md in every task source")
+        root_agents = instructions[0]
     host = dict(plan["host"])
     pins = dict(host.get("orchestration_files", {}))
     for name in ("r0.py", "r1.py", "accounting.py", "evaluate.py", "availability.py"):
@@ -87,6 +98,8 @@ def freeze(plan_path: Path, destination: Path) -> dict:
                           "unknowns": "retain; never impute missing usage as zero",
                           "claims": "small constructed-task pilot; no population generalization"},
              "availability": availability.policy(), "measured": False}
+    if plan.get("common_context"):
+        bound["common_context"] = availability.context_policy(root_agents)
     bound["freeze_sha256"] = identity(bound)
     write_json(destination / "freeze.json", bound)
     return bound
@@ -175,6 +188,8 @@ def command(frozen: dict, condition: str, workspace: Path, observer: Path) -> li
             "-o", str(observer / "final.txt")]
     overrides = {"mcp_servers.loci.enabled": condition != "native",
                  "forced_login_method": "chatgpt", "model_provider": "openai"}
+    if _common_context(frozen):
+        overrides.update(frozen["common_context"]["cli_overrides"])
     if condition != "native":
         overrides.update({"mcp_servers.loci.command": settings["command"],
                           "mcp_servers.loci.args": settings["args"],
@@ -188,7 +203,33 @@ def command(frozen: dict, condition: str, workspace: Path, observer: Path) -> li
     return argv + ["-"]
 
 
+def _common_context(frozen: dict) -> bool:
+    if "common_context" not in frozen:
+        return False
+    context = frozen["common_context"]
+    if (not isinstance(context, dict) or "root_agents_md" not in context
+            or context != availability.context_policy(context["root_agents_md"])):
+        raise ValueError("prospective common-context policy is missing or changed; use a new freeze")
+    return True
+
+
+def _probe_prompt(frozen: dict, condition: str, workspace: Path) -> str:
+    return availability.probe_prompt(condition, workspace, frozen["conditions"][condition]["tools"],
+                                     common_context=_common_context(frozen))
+
+
+def _probe_agents(frozen: dict, workspace: Path) -> None:
+    """Root instructions are part of the probe fixture, never stripped on readback."""
+    if not _common_context(frozen):
+        return
+    path = workspace / "AGENTS.md"
+    expected = frozen["common_context"]["root_agents_md"]
+    if (path.exists() if expected is None else not path.is_file() or path.read_bytes() != expected.encode("utf-8")):
+        raise ValueError("availability root AGENTS.md differs from frozen task instructions")
+
+
 def _protocol(frozen: dict) -> None:
+    _common_context(frozen)
     if frozen.get("availability") != availability.policy():
         raise ValueError("native-host availability protocol is missing or changed; use a new freeze")
     for name in ("r0.py", "r1.py", "accounting.py", "evaluate.py", "availability.py"):
@@ -202,9 +243,12 @@ def _protocol(frozen: dict) -> None:
 
 def measured_prompt(frozen: dict, task: dict, condition: str) -> str:
     _protocol(frozen)
-    return (availability.MEASURED_PREFIX + "Expected tools: "
+    common = _common_context(frozen)
+    prefix = availability.COMMON_MEASURED_PREFIX if common else availability.MEASURED_PREFIX
+    card = "\nCapability card: " + frozen["common_context"]["capability_cards"][condition] if common else ""
+    return (prefix + "Expected tools: "
             + json.dumps(frozen["conditions"][condition]["tools"])
-            + "\n\nOriginal task follows:\n" + task["prompt"])
+            + card + "\n\nOriginal task follows:\n" + task["prompt"])
 
 
 def _run_conditions(frozen: dict) -> dict:
@@ -227,6 +271,23 @@ def _verify_native_prompt(accounting: dict, expected: str) -> None:
         raise ValueError("native task message differs from submitted frozen prompt")
 
 
+def audit_treatment(frozen: dict, manifest: dict, trace: Path, verified: dict) -> dict:
+    """One retained-evidence check for grading and completed-prefix readback."""
+    condition = manifest["r1"]["condition"]
+    treatment = availability.audit_catalog(trace, frozen["conditions"][condition]["tools"],
+                                            common_context=_common_context(frozen))
+    if _common_context(frozen):
+        task = next(task for task in frozen["tasks"] if task["id"] == manifest["r1"]["task"])
+        context = availability.audit_common_context(trace, Path(manifest["workspace"]), Path(manifest["observer"]),
+            measured_prompt(frozen, task, condition), frozen["conditions"][condition]["tools"])
+        baseline = verified["common_context"]
+        if (context["common_sha256"] != baseline["common_sha256"]
+                or context["loci_contracts_sha256"] != baseline["loci_contracts_sha256"][condition]):
+            raise ValueError("measured rendered startup context differs from qualified probes")
+        treatment["common_context"] = context
+    return treatment
+
+
 def require_availability(frozen: dict, gate: Path | None) -> dict:
     """Recheck retained native-host evidence, not a passed flag or model assertion."""
     _protocol(frozen)
@@ -241,6 +302,7 @@ def require_availability(frozen: dict, gate: Path | None) -> dict:
     if len(probes) != 4 or {p.get("condition") for p in probes} != set(CONDITIONS):
         raise ValueError("availability gate must verify all four conditions")
     threads = set()
+    contexts = {}
     for probe in probes:
         condition = probe["condition"]
         files = probe["files"]
@@ -285,13 +347,14 @@ def require_availability(frozen: dict, gate: Path | None) -> dict:
         # Use the archived fixture for byte checks, but preserve the original
         # repository argument used by the actual native MCP calls.
         workspace = Path(manifest["workspace"])
-        if Path(files["prompt"]["path"]).read_text() != availability.probe_prompt(
-                condition, workspace, frozen["conditions"][condition]["tools"]):
+        expected_prompt = _probe_prompt(frozen, condition, workspace)
+        if Path(files["prompt"]["path"]).read_text() != expected_prompt:
             raise ValueError("native availability prompt differs from frozen protocol")
         archived_workspace = Path(files["config"]["path"]).parent.parent / "workspace"
         for name, content in availability.PROBE_FILES.items():
             if (archived_workspace / name).read_bytes() != content.encode():
                 raise ValueError("archived availability fixture changed")
+        _probe_agents(frozen, archived_workspace)
         from .accounting import summarize_native
         accounting = (summarize_native(Path(files["trace"]["path"]), thread, allow_instruction_updates=True)
                       if frozen.get("host_observations") else summarize_native(Path(files["trace"]["path"]), thread))
@@ -305,8 +368,7 @@ def require_availability(frozen: dict, gate: Path | None) -> dict:
         if (qualification_accounting != qualified["accounting"] or accounting.get("usage_status") != "known"
                 or accounting.get("native_errors") or not accounting.get("turn_contexts")):
             raise ValueError("availability accounting differs from native trace")
-        _verify_native_prompt(accounting, availability.probe_prompt(
-            condition, workspace, frozen["conditions"][condition]["tools"]))
+        _verify_native_prompt(accounting, expected_prompt)
         for context in accounting["turn_contexts"]:
             if (context.get("model") != frozen["model"] or context.get("effort") != frozen["effort"]
                     or context.get("cwd") != manifest["workspace"]
@@ -316,11 +378,26 @@ def require_availability(frozen: dict, gate: Path | None) -> dict:
         # silently remapped to live source: supply the retained fixture separately.
         observed = availability.audit_probe(Path(files["trace"]["path"]), accounting,
                                             condition, workspace, frozen["conditions"][condition]["tools"],
-                                            fixture=archived_workspace)
+                                            fixture=archived_workspace, common_context=_common_context(frozen))
+        if _common_context(frozen):
+            observed["common_context"] = availability.audit_common_context(
+                Path(files["trace"]["path"]), workspace, Path(manifest["observer"]), expected_prompt,
+                frozen["conditions"][condition]["tools"])
+            contexts[condition] = observed["common_context"]
         if observed != evidence:
             raise ValueError("availability verdict differs from raw native evidence")
-    return {"path": str(gate.resolve()), "sha256": r0.digest(gate), "threads": sorted(threads),
-            "deterministic_gate_sha256": result["deterministic_gate_sha256"]}
+    verified = {"path": str(gate.resolve()), "sha256": r0.digest(gate), "threads": sorted(threads),
+                "deterministic_gate_sha256": result["deterministic_gate_sha256"]}
+    if _common_context(frozen):
+        baseline = contexts["native"]["common"]
+        if any(context["common"] != baseline for context in contexts.values()):
+            raise ValueError("rendered common startup context differs across availability probes")
+        verified["common_context"] = {
+            "common_sha256": contexts["native"]["common_sha256"],
+            "loci_contracts_sha256": {condition: context["loci_contracts_sha256"]
+                                      for condition, context in contexts.items()},
+        }
+    return verified
 
 
 def prepare(freeze_path: Path, run_id: str, destination: Path,
@@ -451,6 +528,8 @@ def preflight(freeze_path: Path, deterministic_gate: Path, destination: Path,
     source.mkdir()
     for name, content in availability.PROBE_FILES.items():
         (source / name).write_text(content)
+    if _common_context(frozen) and frozen["common_context"]["root_agents_md"] is not None:
+        (source / "AGENTS.md").write_bytes(frozen["common_context"]["root_agents_md"].encode("utf-8"))
     threads = set()
     for condition in CONDITIONS:
         run_id = "availability-" + condition
@@ -468,8 +547,7 @@ def preflight(freeze_path: Path, deterministic_gate: Path, destination: Path,
             manifest["r1"] = {"phase": "availability", "condition": condition,
                               "freeze": str(freeze_path.resolve()),
                               "argv": command(frozen, condition, workspace, observer)}
-            (observer / "prompt.txt").write_text(availability.probe_prompt(
-                condition, workspace, frozen["conditions"][condition]["tools"]))
+            (observer / "prompt.txt").write_text(_probe_prompt(frozen, condition, workspace))
             write_json(config, manifest)
             executed = _execute_native(config, deterministic_gate, frozen, measured=False, amendment=amendment)
             thread = executed["thread_id"]
@@ -486,7 +564,13 @@ def preflight(freeze_path: Path, deterministic_gate: Path, destination: Path,
             _verify_native_prompt(qualified["accounting"], (observer / "prompt.txt").read_text())
             evidence = availability.audit_probe(observer / "qualification/native-rollout.jsonl",
                                                qualified["accounting"], condition, workspace,
-                                               frozen["conditions"][condition]["tools"])
+                                               frozen["conditions"][condition]["tools"],
+                                               common_context=_common_context(frozen))
+            if _common_context(frozen):
+                _probe_agents(frozen, workspace)
+                evidence["common_context"] = availability.audit_common_context(
+                    observer / "qualification/native-rollout.jsonl", workspace, observer,
+                    (observer / "prompt.txt").read_text(), frozen["conditions"][condition]["tools"])
             write_json(observer / "availability.json", evidence)
             entry.update(status="passed", thread_id=thread)
         except Exception as exc:
@@ -562,7 +646,7 @@ def evaluate(config: Path, trace: Path, thread_id: str,
     try:
         task = next(t for t in frozen["tasks"] if t["id"] == manifest["r1"]["task"])
         _verify_native_prompt(qualification["accounting"], measured_prompt(frozen, task, manifest["r1"]["condition"]))
-        treatment = availability.audit_catalog(trace, frozen["conditions"][manifest["r1"]["condition"]]["tools"])
+        treatment = audit_treatment(frozen, manifest, trace, verified)
         if qualification["status"] != "qualified_observations":
             raise ValueError("native session qualification failed")
     except ValueError as exc:

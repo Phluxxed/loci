@@ -11,7 +11,7 @@ import tempfile
 import traceback
 import uuid
 
-from benchmarks.complete_work import availability, r0, r1
+from benchmarks.complete_work import r0, r1
 from benchmarks.complete_work.evaluate import verify_snapshot, write_json
 
 
@@ -88,8 +88,7 @@ def validate_prefix(index, frozen, root, verified):
                 and original_qualification.get('config_sha256') == r0.digest(archived_config)
                 and original_qualification.get('native_trace_sha256') == r0.digest(trace),
                 'archived qualification bindings differ')
-        treatment = {'status': 'verified', **availability.audit_catalog(
-            trace, frozen['conditions'][scheduled['condition']]['tools'])}
+        treatment = {'status': 'verified', **r1.audit_treatment(frozen, manifest, trace, verified)}
         require(result.get('treatment_validity') == treatment
                 and read(observer / 'treatment.json') == treatment, 'retained tool catalog is unverified or differs')
         qualified_path = Path(entry['qualification_result'])

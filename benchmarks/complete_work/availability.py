@@ -8,6 +8,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from copy import deepcopy
 from pathlib import Path
 
 
@@ -33,6 +34,110 @@ TOOLS_BY_CONDITION = {
     "integrated": ["loci_retrieve", "loci_read", "loci_semantic", "loci_proof"],
 }
 
+# An opt-in policy for new freezes. Keep the original protocol above byte-for-
+# byte usable by retained runs; these controls do not change user configuration.
+CATALOG_SHA256_PROGRAM = """function sha256(text) {
+  const bytes = [];
+  for (let i = 0; i < text.length; i++) {
+    let c = text.codePointAt(i);
+    if (c > 0xffff) i++;
+    else if (c >= 0xd800 && c <= 0xdfff) c = 0xfffd;
+    if (c < 0x80) bytes.push(c);
+    else if (c < 0x800) bytes.push(0xc0 | c >>> 6, 0x80 | c & 63);
+    else if (c < 0x10000) bytes.push(0xe0 | c >>> 12, 0x80 | c >>> 6 & 63, 0x80 | c & 63);
+    else bytes.push(0xf0 | c >>> 18, 0x80 | c >>> 12 & 63, 0x80 | c >>> 6 & 63, 0x80 | c & 63);
+  }
+  const bits = bytes.length * 8;
+  bytes.push(0x80);
+  while (bytes.length % 64 !== 56) bytes.push(0);
+  const high = Math.floor(bits / 0x100000000), low = bits >>> 0;
+  for (const word of [high, low]) for (let shift = 24; shift >= 0; shift -= 8) bytes.push(word >>> shift & 255);
+  const k = [0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+    0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+    0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+    0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+    0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+    0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+    0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+    0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  const state = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const rotate = (x, n) => x >>> n | x << (32 - n);
+  const w = new Int32Array(64);
+  for (let offset = 0; offset < bytes.length; offset += 64) {
+    for (let i = 0; i < 16; i++) {
+      const j = offset + i * 4;
+      w[i] = bytes[j] << 24 | bytes[j + 1] << 16 | bytes[j + 2] << 8 | bytes[j + 3];
+    }
+    for (let i = 16; i < 64; i++) {
+      const x = w[i - 15], y = w[i - 2];
+      w[i] = (w[i - 16] + (rotate(x, 7) ^ rotate(x, 18) ^ x >>> 3)
+        + w[i - 7] + (rotate(y, 17) ^ rotate(y, 19) ^ y >>> 10)) | 0;
+    }
+    let [a,b,c,d,e,f,g,h] = state;
+    for (let i = 0; i < 64; i++) {
+      const t1 = (h + (rotate(e, 6) ^ rotate(e, 11) ^ rotate(e, 25))
+        + ((e & f) ^ (~e & g)) + k[i] + w[i]) | 0;
+      const t2 = ((rotate(a, 2) ^ rotate(a, 13) ^ rotate(a, 22)) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+      h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+    }
+    const block = [a,b,c,d,e,f,g,h];
+    for (let i = 0; i < 8; i++) state[i] = (state[i] + block[i]) | 0;
+  }
+  return state.map(word => (word >>> 0).toString(16).padStart(8, '0')).join('');
+}
+"""
+COMMON_CATALOG_PROGRAM = (
+    CATALOG_SHA256_PROGRAM
+    + 'const isLoci = t => /^mcp__loci__/.test(t.name) || /(?:^|__)loci_[A-Za-z0-9_]+$/.test(t.name);\n'
+    'const names = ALL_TOOLS.filter(isLoci).map(t => t.name).sort();\n'
+    'const common = ALL_TOOLS.filter(t => !isLoci(t)).map(({name, description}) => ({name, description}))'
+    '.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);\n'
+    'if (common.some((t, i) => typeof t.name !== "string" || !t.name || typeof t.description !== "string"'
+    ' || (i > 0 && t.name === common[i - 1].name))) throw new Error("Invalid common tool metadata");\n'
+    'text({loci_runtime_catalog_v1: names, common_runtime_catalog_v1: {count: common.length, sha256: sha256(JSON.stringify(common))}});'
+)
+COMMON_MEASURED_PREFIX = (
+    "Before doing the task, your first model tool action must be functions.exec executing exactly "
+    "this program, without additions or changes:\n" + COMMON_CATALOG_PROGRAM + "\n"
+    "Compare the returned live Loci tool names with the expected tools below (qualified as "
+    "mcp__loci__NAME). If discovery is unavailable or the set differs, stop and report the "
+    "availability failure. Otherwise continue the original task; Loci use is optional. "
+    "All normal native tools remain available. The bounded common catalog receipt fingerprints "
+    "every complete tool name and description; it does not print the full catalog.\n"
+)
+SOURCE_CARD = (
+    "loci_retrieve finds bounded current source by words or an exact relative file path; "
+    "it can re-anchor one previously returned node_id in seed_ids. It does no semantic parsing. "
+    "Use loci_read with a returned hash-bound source_ref and follow next_source_ref until complete. "
+    "Source-path candidates are alternatives to inspect, not resolved relationships."
+)
+CAPABILITY_CARDS = {
+    "native": "Use the normal native tools. No Loci tools are enabled.",
+    "path-only": SOURCE_CARD,
+    "integrated": SOURCE_CARD + " Optional loci_semantic supplies bounded static JS/TS/Rust relationships; "
+                  "Python and Go semantics are unsupported. Optional loci_proof follows node IDs "
+                  "actually delivered by the most recent semantic request or its proof followups. "
+                  "Preserve ambiguity and omissions; missing proof never proves absence.",
+    "eager": "Production loci_retrieve performs deterministic bounded static source and graph selection. "
+             "Use words, an exact indexed relative file path, or up to five previously delivered seed IDs. "
+             "Results include exact source, static relationship proof, ambiguity and omissions; "
+             "relationships are non-exhaustive. Expand returned source_ref extents with loci_read, "
+             "following next_source_ref. No separate semantic or proof endpoints are enabled.",
+}
+
+
+def context_policy(root_agents_md: str | None = None) -> dict:
+    if root_agents_md is not None and not isinstance(root_agents_md, str):
+        raise ValueError("common root AGENTS.md must be text or absent")
+    return {"schema": "r1-common-context-v1", "cli_overrides": {"skills.include_instructions": False},
+            "catalog_program": COMMON_CATALOG_PROGRAM, "measured_prefix": COMMON_MEASURED_PREFIX,
+            "capability_cards": dict(CAPABILITY_CARDS), "root_agents_md": root_agents_md,
+            "path_substitutions": ["workspace", "observer"],
+            "allowed_loci_schema_namespace": "mcp__loci",
+            "common_catalog_encoding": "SHA-256 of UTF-8 JSON.stringify of full name/description objects sorted by name",
+            "common_catalog_export": "count and cryptographic fingerprint only; full descriptions are not exported",
+            "instruction_updates": "reject"}
+
 
 def policy() -> dict:
     return {"schema": "loci-native-availability-v1", "catalog_program": CATALOG_PROGRAM,
@@ -48,10 +153,12 @@ def _expected(tools: list[str]) -> list[str]:
     return sorted("mcp__loci__" + t for t in tools)
 
 
-def probe_prompt(condition: str, repo: Path, expected_tools: list[str]) -> str:
+def probe_prompt(condition: str, repo: Path, expected_tools: list[str], *, common_context: bool = False) -> str:
     _condition(condition, expected_tools)
-    prompt = (MEASURED_PREFIX + "Expected tools: " + json.dumps(expected_tools) + "\n"
-              "This is only an availability probe. Use only the fixture repository "
+    prefix = COMMON_MEASURED_PREFIX if common_context else MEASURED_PREFIX
+    card = "Capability card: " + CAPABILITY_CARDS[condition] + "\n" if common_context else ""
+    prompt = (prefix + "Expected tools: " + json.dumps(expected_tools) + "\n" + card
+              + "This is only an availability probe. Use only the fixture repository "
               + json.dumps(str(repo.resolve())) + ". Do not inspect or copy any pilot task.\n")
     if not expected_tools:
         return prompt + "The catalog must contain no Loci tools. Make no Loci calls, then finish.\n"
@@ -87,7 +194,7 @@ def _rows(trace: Path) -> tuple[bytes, list[dict]]:
     return raw, rows
 
 
-def _catalog_output(output: object) -> list[str]:
+def _catalog_output(output: object, *, common_context: bool = False) -> dict:
     if isinstance(output, str):
         texts = [output]
     elif isinstance(output, list) and all(isinstance(b, dict) and b.get("type") == "input_text"
@@ -105,18 +212,27 @@ def _catalog_output(output: object) -> list[str]:
             except json.JSONDecodeError:
                 continue
             if isinstance(value, dict) and "loci_runtime_catalog_v1" in value:
-                if set(value) != {"loci_runtime_catalog_v1"}:
+                keys = {"loci_runtime_catalog_v1"}
+                if common_context:
+                    keys.add("common_runtime_catalog_v1")
+                if set(value) != keys:
                     raise ValueError("malformed live catalog receipt")
-                receipts.append(value["loci_runtime_catalog_v1"])
-    if len(receipts) != 1 or not isinstance(receipts[0], list):
+                receipts.append(value)
+    if len(receipts) != 1 or not isinstance(receipts[0]["loci_runtime_catalog_v1"], list):
         raise ValueError("missing or duplicated live catalog receipt")
-    names = receipts[0]
+    names = receipts[0]["loci_runtime_catalog_v1"]
     if any(not isinstance(t, str) for t in names) or names != sorted(set(names)):
         raise ValueError("live catalog must be sorted and unique")
-    return names
+    if common_context:
+        common = receipts[0]["common_runtime_catalog_v1"]
+        if (not isinstance(common, dict) or set(common) != {"count", "sha256"}
+                or type(common["count"]) is not int or common["count"] <= 0
+                or not isinstance(common["sha256"], str) or not re.fullmatch(r"[a-f0-9]{64}", common["sha256"])):
+            raise ValueError("common catalog must retain its count and full-description fingerprint")
+    return receipts[0]
 
 
-def audit_catalog(trace: Path, expected_tools: list[str]) -> dict:
+def audit_catalog(trace: Path, expected_tools: list[str], *, common_context: bool = False) -> dict:
     expected = _expected(expected_tools)
     raw, rows = _rows(trace)
     calls = [(i, r["payload"]) for i, r in enumerate(rows)
@@ -127,7 +243,7 @@ def audit_catalog(trace: Path, expected_tools: list[str]) -> dict:
     index, call = calls[0]
     program = call.get("input") if call["type"] == "custom_tool_call" else call.get("arguments")
     if (call.get("name") not in {"exec", "functions.exec"} or not isinstance(program, str)
-            or program.strip() != CATALOG_PROGRAM):
+            or program.strip() != (COMMON_CATALOG_PROGRAM if common_context else CATALOG_PROGRAM)):
         raise ValueError("first tool action is not the fixed live catalog program")
     identity = call.get("call_id")
     if not isinstance(identity, str) or not identity:
@@ -136,7 +252,8 @@ def audit_catalog(trace: Path, expected_tools: list[str]) -> dict:
         raise ValueError("duplicated catalog call identity")
     if any(p.get("name") in {"exec", "functions.exec"}
            and isinstance(p.get("input") if p["type"] == "custom_tool_call" else p.get("arguments"), str)
-           and (p.get("input") if p["type"] == "custom_tool_call" else p.get("arguments")).strip() == CATALOG_PROGRAM
+           and (p.get("input") if p["type"] == "custom_tool_call" else p.get("arguments")).strip()
+               == (COMMON_CATALOG_PROGRAM if common_context else CATALOG_PROGRAM)
            for _, p in calls[1:]):
         raise ValueError("duplicated live catalog discovery")
     outputs = [(i, r["payload"]) for i, r in enumerate(rows)
@@ -153,11 +270,134 @@ def audit_catalog(trace: Path, expected_tools: list[str]) -> dict:
             raise ValueError("native task operation preceded catalog discovery")
         if i > index and row.get("type") == "response_item" and p.get("type") in {"function_call", "custom_tool_call"}:
             raise ValueError("another tool action preceded catalog receipt")
-    names = _catalog_output(output.get("output"))
+    receipt = _catalog_output(output.get("output"), common_context=common_context)
+    names = receipt["loci_runtime_catalog_v1"]
     if names != expected:
         raise ValueError("live catalog differs from expected tool set")
-    return {"tools": names, "row": index, "output_row": output_index, "call_id": identity,
-            "trace_sha256": hashlib.sha256(raw).hexdigest()}
+    result = {"tools": names, "row": index, "output_row": output_index, "call_id": identity,
+              "trace_sha256": hashlib.sha256(raw).hexdigest()}
+    if common_context:
+        result["common_catalog"] = receipt["common_runtime_catalog_v1"]
+    return result
+
+
+def audit_common_context(trace: Path, workspace: Path, observer: Path,
+                         prompt: str, expected_tools: list[str]) -> dict:
+    """Retain actual ordered instruction parts and native schemas, never headings alone.
+
+    Only the submitted task (checked exactly), runtime envelope identities, two
+    assigned paths, and explicitly named Loci declarations vary. A typed AGENTS
+    update is an instruction change; AGENTS text inside tool output is not.
+    """
+    from .accounting import _native_bootstrap_user
+
+    catalog = audit_catalog(trace, expected_tools, common_context=True)
+    _, rows = _rows(trace)
+    paths = {str(workspace): "{{r1.workspace}}", str(observer): "{{r1.observer}}"}
+    if (len(paths) != 2 or any(not Path(path).is_absolute() for path in paths)
+            or workspace == observer or workspace in observer.parents or observer in workspace.parents):
+        raise ValueError("invalid assigned context paths")
+
+    def normalize(value):
+        if isinstance(value, str):
+            if any(marker in value for marker in paths.values()):
+                raise ValueError("reserved context path marker in native input")
+            for path, marker in paths.items():
+                value = value.replace(path, marker)
+            return value
+        if isinstance(value, list):
+            return [normalize(item) for item in value]
+        if isinstance(value, dict):
+            return {key: normalize(item) for key, item in value.items()}
+        return value
+
+    expected = set(_expected(expected_tools))
+    instructions, loci_contracts = [], []
+    task_seen = bootstrap_seen = False
+    tool_envelopes = developer_messages = 0
+    turns = [r["payload"]["turn_id"] for r in rows if r.get("type") == "event_msg"
+             and r["payload"].get("type") == "task_started" and "turn_id" in r["payload"]]
+    if len(turns) != 1:
+        raise ValueError("common context requires exactly one fresh native turn")
+    for row in rows:
+        if row.get("type") != "response_item":
+            continue
+        payload = row["payload"]
+        kind, role = payload.get("type"), payload.get("role")
+        if kind == "additional_tools":
+            if task_seen or role != "developer" or not isinstance(payload.get("tools"), list):
+                raise ValueError("native tool schemas are missing or misplaced")
+            tool_envelopes += 1
+            common_tools = []
+            declared_loci = []
+            for tool in payload["tools"]:
+                if not isinstance(tool, dict) or not isinstance(tool.get("name"), str):
+                    raise ValueError("malformed native tool declaration")
+                name = tool["name"]
+                if name == "mcp__loci" and tool.get("type") == "namespace":
+                    children = tool.get("tools")
+                    if (not isinstance(children, list) or not children
+                            or any(not isinstance(child, dict) or not isinstance(child.get("name"), str)
+                                   for child in children)):
+                        raise ValueError("malformed native Loci namespace")
+                    names = ["mcp__loci__" + child["name"] for child in children]
+                    if not names or len(names) != len(set(names)) or set(names) != expected:
+                        raise ValueError("native Loci namespace differs from declared treatment")
+                    loci_contracts.append(tool)
+                    declared_loci.extend(names)
+                elif name.startswith("mcp__loci__"):
+                    if name not in expected:
+                        raise ValueError("unexpected native Loci tool declaration")
+                    loci_contracts.append(tool)
+                    declared_loci.append(name)
+                else:
+                    common_tools.append(tool)
+            if declared_loci and (len(declared_loci) != len(set(declared_loci)) or set(declared_loci) != expected):
+                raise ValueError("native Loci declarations differ from declared treatment")
+            value = deepcopy(payload)
+            value["tools"] = common_tools
+        elif kind == "message" and role in {"developer", "user"}:
+            if task_seen:
+                raise ValueError("native instruction update after submitted task")
+            content = payload.get("content")
+            if (not isinstance(content, list) or not content
+                    or any(not isinstance(c, dict) or c.get("type") != "input_text"
+                           or not isinstance(c.get("text"), str) for c in content)):
+                raise ValueError("malformed native instruction content")
+            if role == "user":
+                if _native_bootstrap_user(payload, turns[0]):
+                    if bootstrap_seen:
+                        raise ValueError("duplicate native bootstrap instructions")
+                    bootstrap_seen = True
+                else:
+                    if not bootstrap_seen or "".join(c["text"] for c in content) != prompt:
+                        raise ValueError("native submitted task differs from frozen prompt")
+                    task_seen = True
+                    instructions.append({"type": "submitted_task", "role": "user"})
+                    continue
+            else:
+                developer_messages += 1
+            value = deepcopy(payload)
+        elif kind == "message" and role not in {"assistant"}:
+            raise ValueError("unexpected native instruction role")
+        else:
+            continue
+        # These are event identities, not delivered instruction text or schemas.
+        for key in ("id", "thread_id"):
+            value.pop(key, None)
+        metadata = value.get("internal_chat_message_metadata_passthrough")
+        if isinstance(metadata, dict):
+            for key in ("turn_id", "thread_id"):
+                metadata.pop(key, None)
+        instructions.append(normalize(value))
+    if not task_seen or not bootstrap_seen or not developer_messages or tool_envelopes != 1:
+        raise ValueError("incomplete native common startup context")
+    common = {"instructions": instructions, "catalog": catalog["common_catalog"]}
+    contracts = normalize(loci_contracts)
+    digest = lambda value: hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    return {"schema": "r1-rendered-common-context-v1", "common": common,
+            "common_sha256": digest(common), "loci_contracts": contracts,
+            "loci_contracts_sha256": digest(contracts)}
 
 
 def _sources(packet: dict, *, read: bool = False) -> dict:
@@ -212,9 +452,10 @@ def _proof(packet: dict, node_id: str) -> None:
 
 
 def audit_probe(trace: Path, accounting: dict, condition: str, repo: Path,
-                expected_tools: list[str], *, fixture: Path | None = None) -> dict:
+                expected_tools: list[str], *, fixture: Path | None = None,
+                common_context: bool = False) -> dict:
     _condition(condition, expected_tools)
-    catalog = audit_catalog(trace, expected_tools)
+    catalog = audit_catalog(trace, expected_tools, common_context=common_context)
     _, rows = _rows(trace)
     for file, content in PROBE_FILES.items():
         try:

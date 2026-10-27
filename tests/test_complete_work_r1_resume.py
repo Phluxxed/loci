@@ -234,6 +234,22 @@ def test_check_only_is_read_only_and_does_not_prepare_or_launch(pilot):
     assert {str(path): path.read_bytes() for path in pilot['root'].rglob('*') if path.is_file()} == before
 
 
+def test_resume_rechecks_shared_context_gate_before_any_launch(pilot, monkeypatch):
+    first = pilot['retain'](0)
+    pilot['save']([first])
+    seen = []
+    def reject_context(frozen, manifest, trace, verified):
+        seen.append((manifest['run_id'], trace, verified))
+        raise ValueError('measured rendered startup context differs from qualified probes')
+    monkeypatch.setattr(r1, 'audit_treatment', reject_context)
+    before = {str(path): path.read_bytes() for path in pilot['root'].rglob('*') if path.is_file()}
+    with pytest.raises(ValueError, match='startup context differs'):
+        pilot['run'](resume=True, check_only=True)
+    assert len(seen) == 1 and seen[0][0] == first['run_id']
+    assert all(not values for values in pilot['calls'].values())
+    assert {str(path): path.read_bytes() for path in pilot['root'].rglob('*') if path.is_file()} == before
+
+
 @pytest.mark.parametrize('violation', ['order', 'unqualified', 'unknown_usage', 'failed_attempt', 'changed_result', 'pending_attempt', 'wrong_store'])
 def test_invalid_prefix_is_rejected_before_launch(pilot, violation):
     first = pilot['retain'](0)

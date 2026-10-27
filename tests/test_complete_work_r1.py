@@ -10,7 +10,7 @@ from benchmarks.complete_work import availability, r0, r1
 from benchmarks.complete_work.evaluate import source_snapshot, write_json
 
 
-def _freeze(tmp_path: Path) -> Path:
+def _freeze(tmp_path: Path, *, common_context=False, root_agents_md=None) -> Path:
     config = tmp_path / 'config.toml'
     config.write_text('default_permissions="existing"\n')
     host = tmp_path / 'codex'
@@ -22,6 +22,8 @@ def _freeze(tmp_path: Path) -> Path:
         source = folder / 'source'
         source.mkdir()
         (source / 'original.js').write_text('export const n=1;\n')
+        if root_agents_md is not None:
+            (source / 'AGENTS.md').write_bytes(root_agents_md.encode())
         prompt = folder / 'prompt.txt'
         prompt.write_text('Read original.js; write answer.json.\n')
         oracle = folder / 'oracle.mjs'
@@ -35,6 +37,8 @@ def _freeze(tmp_path: Path) -> Path:
             'model':'gpt-6.1-sol','effort':'high',
             'native_protection':{field:None for field in r0.PROTECTION_FIELDS},
             'host':{'executable':str(host),'sha256':r0.digest(host)}}
+    if common_context:
+        plan['common_context'] = True
     plan_path = tmp_path / 'plan.json'
     write_json(plan_path,plan)
     r1.freeze(plan_path,tmp_path/'frozen')

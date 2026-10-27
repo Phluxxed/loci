@@ -1,5 +1,6 @@
 """Shared-entrypoint availability gates; native launches are always blocked or mocked."""
 from copy import deepcopy
+import hashlib
 import json
 from pathlib import Path
 import shutil
@@ -14,6 +15,39 @@ from benchmarks.complete_work.evaluate import write_json
 from loci.integrated import IntegratedSource
 from tests.test_complete_work_r1 import _freeze
 from tests.test_complete_work_availability import _trace, _write
+
+
+def _startup_rows(rows, workspace, observer, prompt, tools):
+    """Offline native-shaped context; no host process is involved."""
+    def response(kind, **fields):
+        return {'type': 'response_item', 'payload': {'type': kind, **fields}}
+    content = lambda text: {'type': 'input_text', 'text': text}
+    rows = deepcopy(rows)
+    rows[0]['payload']['content'] = [content(prompt)]
+    rows[1]['payload']['input'] = availability.COMMON_CATALOG_PROGRAM
+    common = [{'name': 'exec_command', 'description': 'Run a native shell command.'}]
+    rows[2]['payload']['output'] = json.dumps({
+        'loci_runtime_catalog_v1': sorted('mcp__loci__' + tool for tool in tools),
+        'common_runtime_catalog_v1': {'count': len(common), 'sha256': hashlib.sha256(
+            json.dumps(common, ensure_ascii=False, separators=(',', ':')).encode()).hexdigest()}})
+    schemas = [{'type': 'namespace', 'name': 'functions', 'description': 'Native tools.', 'tools': [
+        {'type': 'function', 'name': 'exec', 'description': 'Run Code Mode.',
+         'parameters': {'type': 'object', 'properties': {'code': {'type': 'string'}}}}]}]
+    schemas += [{'type': 'function', 'name': 'mcp__loci__' + tool, 'description': tool,
+                 'parameters': {'type': 'object'}} for tool in tools]
+    header = [
+        {'type': 'event_msg', 'payload': {'type': 'task_started', 'turn_id': 'turn'}},
+        response('additional_tools', role='developer', id='variable-envelope-id', tools=schemas),
+        response('message', role='developer', content=[content('Common developer instructions.'),
+                  content('Keep all native tools and existing permissions.')]),
+        response('message', role='user', content=[content('Common root AGENTS instructions.'),
+                  content('Workspace: ' + str(workspace) + '\nObserver: ' + str(observer))],
+                  internal_chat_message_metadata_passthrough={
+                      'turn_id': 'turn', 'content_item_kinds': ['agents_md.instructions', 'environments.environment_context'],
+                      'content_item_metadata': [{'provenance': {'type': 'agents_md'}},
+                                                {'provenance': {'type': 'harness', 'hook': False}}]}),
+    ]
+    return header + rows
 
 
 def test_prepare_cannot_expose_task_before_native_availability(tmp_path):
@@ -50,13 +84,16 @@ def test_unpinned_availability_validator_cannot_authorize_preparation(tmp_path):
 
 
 @pytest.fixture
-def host_gate(tmp_path, monkeypatch):
-    path = _freeze(tmp_path)
+def host_gate(tmp_path, monkeypatch, request):
+    path = _freeze(tmp_path, **getattr(request, 'param', {}))
     frozen = r1.read_freeze(path)
     source = tmp_path / 'probe-source'
     source.mkdir()
     for name, content in availability.PROBE_FILES.items():
         (source / name).write_text(content)
+    common = r1._common_context(frozen)
+    if common and frozen['common_context']['root_agents_md'] is not None:
+        (source / 'AGENTS.md').write_bytes(frozen['common_context']['root_agents_md'].encode())
     directory = tmp_path / 'retained-probes'
     directory.mkdir()
     gate = {'kind': 'r1-native-host-availability', 'status': 'passed',
@@ -73,7 +110,7 @@ def host_gate(tmp_path, monkeypatch):
         manifest['r1'] = {'phase': 'availability', 'condition': condition,
                           'freeze': str(path.resolve()), 'argv': r1.command(frozen, condition, workspace, observer)}
         write_json(observer / 'run.json', manifest)
-        (observer / 'prompt.txt').write_text(availability.probe_prompt(condition, workspace, frozen['conditions'][condition]['tools']))
+        (observer / 'prompt.txt').write_text(r1._probe_prompt(frozen, condition, workspace))
         packets = []
         if condition != 'native':
             service = IntegratedSource(tmp_path / ('packet-store-' + condition))
@@ -88,6 +125,9 @@ def host_gate(tmp_path, monkeypatch):
                             ('loci_proof', {'node_id': node}, service.proof_context(workspace, node))]
         probe_data = _trace(observer, (workspace, packets), condition)
         _, rows, account, _, _ = probe_data
+        if common:
+            rows = _startup_rows(rows, workspace, observer, (observer / 'prompt.txt').read_text(),
+                                 frozen['conditions'][condition]['tools'])
         account.update(usage_status='known', native_errors=[], turn_contexts=[{
             **frozen['native_protection'], 'cwd': str(workspace), 'model': frozen['model'], 'effort': frozen['effort']}])
         account['stages'][0]['items'].insert(0, {'type': 'UserMessage', 'content': [{
@@ -106,7 +146,12 @@ def host_gate(tmp_path, monkeypatch):
                    'native_config_sha256': frozen['native_config_sha256'], 'conditions': manifest['conditions'],
                    'config_validation': manifest['config_validation'],
                    'accounting': account})
-        evidence = availability.audit_probe(trace, account, condition, workspace, frozen['conditions'][condition]['tools'])
+        evidence = availability.audit_probe(trace, account, condition, workspace, frozen['conditions'][condition]['tools'],
+                                             common_context=common)
+        if common:
+            evidence['common_context'] = availability.audit_common_context(
+                trace, workspace, observer, (observer / 'prompt.txt').read_text(),
+                frozen['conditions'][condition]['tools'])
         write_json(observer / 'availability.json', evidence)
         archive = directory / condition
         shutil.copytree(folder, archive)

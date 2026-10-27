@@ -61,4 +61,14 @@ introduced.
 
 ## Evaluation status
 
-The [completed experimental pilot](../.scratch/r1-integrated/pilot-availability-v2/analysis/REPORT.md) verified all four condition catalogs and separate positive operational probes, but recorded no voluntary task-level Loci use. The mechanisms remain deterministically qualified; agent-level semantic/proof benefit is unmeasured. Recommendation: revise / hold advancement. This is not a production integration.
+The completed pilot verified tool callability but recorded no voluntary task-level
+Loci use on tiny fixtures. Its [corrected interpretation](../.scratch/r1-integrated/astra-evaluation-review/REVIEW.md)
+identifies task/rubric and unrelated-context problems; it does not establish a
+broad adoption failure.
+
+A [replacement using maintained repository source](../.scratch/r1-integrated/real-repo-pilot-report.md)
+has qualified local inputs and a prospective gate for actual common instructions,
+native schemas and tool availability. Native execution remains pending. New plans
+opt in with common_context=true; legacy freezes are preserved. Semantic/proof
+benefit remains unmeasured and advancement is on hold. This is not a production
+integration.
