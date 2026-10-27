@@ -1,0 +1,438 @@
+{
+  "method": "Blinded review of listed case files, prompts, candidate/reference sources and frozen Node oracles; no arm identity or other analysis read. Source trees hashed by sorted relative path and file content: all four reference copies per task matched. Frozen oracles run unchanged; supplemental Node checks for strict-equality failures. No aggregate alternate score.",
+  "coverage_summary": {
+    "dispatch-ambiguity": "Four cases: source and oracle support registry-dependent selection and distinct legacy path.",
+    "zero-quantity": "Four cases: specified runtime checks pass; three added a test file outside case.json allowed_changes, a restriction not explicitly stated in visible prompt and not enforced by the frozen Node oracle.",
+    "inventory-contract": "Four cases: claims and behavior supported; one fails strict equality because file/symbol objects replace expected path strings.",
+    "receipt-location": "Four cases: owner, key and outbound behavior supported; three fail strict equality on chain representation. Similar helpers are not explicitly described in answers; a linear chain can obscure sibling calls."
+  },
+  "cases": [
+    {
+      "case_id": "case-01",
+      "task_id": "dispatch-ambiguity",
+      "actual_changes": [
+        "answer.json"
+      ],
+      "frozen_oracle": {
+        "command": "node <case>/oracle.mjs <case>/candidate",
+        "outcome": "passed: answer equality and runtime assertions",
+        "exit_code": 0
+      },
+      "explicit_constraints": "prompt.txt: exact top-level keys; directly relevant check; no global configuration changes; do not change source or claim one unconditional static target.",
+      "hidden_allowed_change_restriction": "case.json allows only answer.json; observed changes comply.",
+      "unresolved_uncertainty_or_errors": [],
+      "source_claim_accuracy": "All submitted claims supported: runtime lookup selects mail or audit; legacy is outside registry; input mail normalizes to mail:hi and unknown kind throws.",
+      "evidence": [
+        "reference-source/src/dispatch.js:1-5",
+        "reference-source/src/registry.js:1-3",
+        "reference-source/src/channels/mail.js:1-2",
+        "reference-source/src/codec.js:1",
+        "reference-source/src/preview.js:1-2"
+      ],
+      "behavior": "Frozen oracle exercised mail, audit, legacy and toString.",
+      "classification": "supported claims; no source edits"
+    },
+    {
+      "case_id": "case-02",
+      "task_id": "zero-quantity",
+      "actual_changes": [
+        "answer.json",
+        "src/quantity.js",
+        "test/quantity.test.js"
+      ],
+      "frozen_oracle": {
+        "command": "node <case>/oracle.mjs <case>/candidate",
+        "outcome": "passed: answer equality and runtime assertions",
+        "exit_code": 0
+      },
+      "explicit_constraints": "prompt.txt: exact top-level keys; directly relevant check; no global configuration changes; change shared API parser, preserve CLI, specified accepted and rejected inputs, smallest correct source change.",
+      "hidden_allowed_change_restriction": "case.json criteria permits only answer.json and src/quantity.js; added test/quantity.test.js falls outside it. The visible prompt asks for a relevant check and does not explicitly ban a test file. The frozen Node oracle itself does not check file allowlist and passed.",
+      "unresolved_uncertainty_or_errors": [],
+      "source_claim_accuracy": "Changed API parser path and reported line and error are correct; CLI parser unchanged.",
+      "evidence": [
+        "candidate/src/api.js:1-3",
+        "candidate/src/quantity.js:1-6",
+        "candidate/src/line.js:1",
+        "candidate/src/cli.js:1"
+      ],
+      "behavior": "Frozen oracle exercised 0, string 0, positive integers, negatives, fractions, non-finite numbers, blank strings, booleans, null, undefined and nonnumeric strings; CLI string zero remains 1.",
+      "classification": "requested source behavior verified"
+    },
+    {
+      "case_id": "case-03",
+      "task_id": "inventory-contract",
+      "actual_changes": [
+        "answer.json"
+      ],
+      "frozen_oracle": {
+        "command": "node <case>/oracle.mjs <case>/candidate",
+        "outcome": "failed: strict answer deep equality; runtime assertions not reached",
+        "exit_code": 1
+      },
+      "explicit_constraints": "prompt.txt: exact top-level keys; directly relevant check; no global configuration changes; do not change source; ordered active pipeline and exact output.",
+      "hidden_allowed_change_restriction": "case.json allows only answer.json; observed changes comply.",
+      "unresolved_uncertainty_or_errors": [],
+      "source_claim_accuracy": "Pipeline, output, invalid numeric message, and subtraction before clamp are correct.",
+      "evidence": [
+        "reference-source/src/entry.js:1-4",
+        "reference-source/src/input/csv.js:1-4",
+        "reference-source/src/domain/stock.js:1-5",
+        "reference-source/src/domain/sku.js:1",
+        "reference-source/src/output/wire.js:1"
+      ],
+      "behavior": "Negative availability returns AB-2/0/schema 2; z,8,2 returns Z/6/schema 2; invalid numeric throws invalid count. Separately verified because equality failure prevented oracle runtime assertions.",
+      "classification": "representation-only strict equality failure: path/symbol objects instead of path strings; all paths and symbols correct"
+    },
+    {
+      "case_id": "case-04",
+      "task_id": "inventory-contract",
+      "actual_changes": [
+        "answer.json"
+      ],
+      "frozen_oracle": {
+        "command": "node <case>/oracle.mjs <case>/candidate",
+        "outcome": "passed: answer equality and runtime assertions",
+        "exit_code": 0
+      },
+      "explicit_constraints": "prompt.txt: exact top-level keys; directly relevant check; no global configuration changes; do not change source; ordered active pipeline and exact output.",
+      "hidden_allowed_change_restriction": "case.json allows only answer.json; observed changes comply.",
+      "unresolved_uncertainty_or_errors": [
+        "The general preamble asks for exact paths and symbols, while the task calls the files field ordered files and exact top-level keys; this answer supplies paths only, so symbol citations are absent within that field."
+      ],
+      "source_claim_accuracy": "Pipeline, output, invalid numeric message, and subtraction before clamp are correct.",
+      "evidence": [
+        "reference-source/src/entry.js:1-4",
+        "reference-source/src/input/csv.js:1-4",
+        "reference-source/src/domain/stock.js:1-5",
+        "reference-source/src/domain/sku.js:1",
+        "reference-source/src/output/wire.js:1"
+      ],
+      "behavior": "Negative availability returns AB-2/0/schema 2; z,8,2 returns Z/6/schema 2; invalid numeric throws invalid count. Frozen oracle verified.",
+      "classification": "supported claims; exact path-string representation accepted"
+    },
+    {
+      "case_id": "case-05",
+      "task_id": "zero-quantity",
+      "actual_changes": [
+        "answer.json",
+        "src/quantity.js"
+      ],
+      "frozen_oracle": {
+        "command": "node <case>/oracle.mjs <case>/candidate",
+        "outcome": "passed: answer equality and runtime assertions",
+        "exit_code": 0
+      },
+      "explicit_constraints": "prompt.txt: exact top-level keys; directly relevant check; no global configuration changes; change shared API parser, preserve CLI, specified accepted and rejected inputs, smallest correct source change.",
+      "hidden_allowed_change_restriction": "case.json permits answer.json and src/quantity.js; observed changes stay within it.",
+      "unresolved_uncertainty_or_errors": [],
+      "source_claim_accuracy": "Changed API parser path and reported line and error are correct; CLI parser unchanged.",
+      "evidence": [
+        "candidate/src/api.js:1-3",
+        "candidate/src/quantity.js:1-6",
+        "candidate/src/line.js:1",
+        "candidate/src/cli.js:1"
+      ],
+      "behavior": "Frozen oracle exercised 0, string 0, positive integers, negatives, fractions, non-finite numbers, blank strings, booleans, null, undefined and nonnumeric strings; CLI string zero remains 1.",
+      "classification": "requested source behavior verified"
+    },
+    {
+      "case_id": "case-06",
+      "task_id": "dispatch-ambiguity",
+      "actual_changes": [
+        "answer.json"
+      ],
+      "frozen_oracle": {
+        "command": "node <case>/oracle.mjs <case>/candidate",
+        "outcome": "passed: answer equality and runtime assertions",
+        "exit_code": 0
+      },
+      "explicit_constraints": "prompt.txt: exact top-level keys; directly relevant check; no global configuration changes; do not change source or claim one unconditional static target.",
+      "hidden_allowed_change_restriction": "case.json allows only answer.json; observed changes comply.",
+      "unresolved_uncertainty_or_errors": [],
+      "source_claim_accuracy": "All submitted claims supported: runtime lookup selects mail or audit; legacy is outside registry; input mail normalizes to mail:hi and unknown kind throws.",
+      "evidence": [
+        "reference-source/src/dispatch.js:1-5",
+        "reference-source/src/registry.js:1-3",
+        "reference-source/src/channels/mail.js:1-2",
+        "reference-source/src/codec.js:1",
+        "reference-source/src/preview.js:1-2"
+      ],
+      "behavior": "Frozen oracle exercised mail, audit, legacy and toString.",
+      "classification": "supported claims; no source edits"
+    },
+    {
+      "case_id": "case-07",
+      "task_id": "zero-quantity",
+      "actual_changes": [
+        "answer.json",
+        "src/quantity.js",
+        "test/quantity.test.js"
+      ],
+      "frozen_oracle": {
+        "command": "node <case>/oracle.mjs <case>/candidate",
+        "outcome": "passed: answer equality and runtime assertions",
+        "exit_code": 0
+      },
+      "explicit_constraints": "prompt.txt: exact top-level keys; directly relevant check; no global configuration changes; change shared API parser, preserve CLI, specified accepted and rejected inputs, smallest correct source change.",
+      "hidden_allowed_change_restriction": "case.json criteria permits only answer.json and src/quantity.js; added test/quantity.test.js falls outside it. The visible prompt asks for a relevant check and does not explicitly ban a test file. The frozen Node oracle itself does not check file allowlist and passed.",
+      "unresolved_uncertainty_or_errors": [],
+      "source_claim_accuracy": "Changed API parser path and reported line and error are correct; CLI parser unchanged.",
+      "evidence": [
+        "candidate/src/api.js:1-3",
+        "candidate/src/quantity.js:1-6",
+        "candidate/src/line.js:1",
+        "candidate/src/cli.js:1"
+      ],
+      "behavior": "Frozen oracle exercised 0, string 0, positive integers, negatives, fractions, non-finite numbers, blank strings, booleans, null, undefined and nonnumeric strings; CLI string zero remains 1.",
+      "classification": "requested source behavior verified"
+    },
+    {
+      "case_id": "case-08",
+      "task_id": "receipt-location",
+      "actual_changes": [
+        "answer.json"
+      ],
+      "frozen_oracle": {
+        "command": "node <case>/oracle.mjs <case>/candidate",
+        "outcome": "failed: strict answer deep equality; runtime assertions not reached",
+        "exit_code": 1
+      },
+      "explicit_constraints": "prompt.txt: exact top-level keys; directly relevant check; no global configuration changes; do not change source; trace checkout to outbound header and distinguish similarly named helpers.",
+      "hidden_allowed_change_restriction": "case.json allows only answer.json; observed changes comply.",
+      "unresolved_uncertainty_or_errors": [
+        "Answer identifies the active owner but does not explicitly describe what the similarly named report and transport helpers do; exact requested top-level keys provide no dedicated comparison field.",
+        "A linear list including makeReceiptKey can suggest a nested call chain; actual sibling calls from submitInvoice are shown in source.",
+        "makeReceiptKey is recorded as key_from on the submitInvoice object rather than as a separate call_chain entry; the actual key-producing call is accurately represented but the required ordered-symbol representation is ambiguous."
+      ],
+      "source_claim_accuracy": "Correct key owner and outbound header owner, example, and route. submitInvoice calls makeReceiptKey and then sendInvoice; makeReceiptKey does not itself call sendInvoice. Other same-named helpers produce a report key or read a response header, respectively.",
+      "evidence": [
+        "reference-source/src/app.js:1-2",
+        "reference-source/src/billing/submit.js:1-5",
+        "reference-source/src/billing/receipt.js:1-3",
+        "reference-source/src/transport/invoices.js:1-2",
+        "reference-source/src/reports/receipt.js:1",
+        "reference-source/src/transport/receipt.js:1"
+      ],
+      "behavior": "checkout with acme and 7 posts /invoices with Idempotency-Key invoice/acme/0007. Separately verified because equality failure prevented oracle runtime assertions.",
+      "classification": "representation-only strict equality failure"
+    },
+    {
+      "case_id": "case-09",
+      "task_id": "dispatch-ambiguity",
+      "actual_changes": [
+        "answer.json"
+      ],
+      "frozen_oracle": {
+        "command": "node <case>/oracle.mjs <case>/candidate",
+        "outcome": "passed: answer equality and runtime assertions",
+        "exit_code": 0
+      },
+      "explicit_constraints": "prompt.txt: exact top-level keys; directly relevant check; no global configuration changes; do not change source or claim one unconditional static target.",
+      "hidden_allowed_change_restriction": "case.json allows only answer.json; observed changes comply.",
+      "unresolved_uncertainty_or_errors": [],
+      "source_claim_accuracy": "All submitted claims supported: runtime lookup selects mail or audit; legacy is outside registry; input mail normalizes to mail:hi and unknown kind throws.",
+      "evidence": [
+        "reference-source/src/dispatch.js:1-5",
+        "reference-source/src/registry.js:1-3",
+        "reference-source/src/channels/mail.js:1-2",
+        "reference-source/src/codec.js:1",
+        "reference-source/src/preview.js:1-2"
+      ],
+      "behavior": "Frozen oracle exercised mail, audit, legacy and toString.",
+      "classification": "supported claims; no source edits"
+    },
+    {
+      "case_id": "case-10",
+      "task_id": "receipt-location",
+      "actual_changes": [
+        "answer.json"
+      ],
+      "frozen_oracle": {
+        "command": "node <case>/oracle.mjs <case>/candidate",
+        "outcome": "passed: answer equality and runtime assertions",
+        "exit_code": 0
+      },
+      "explicit_constraints": "prompt.txt: exact top-level keys; directly relevant check; no global configuration changes; do not change source; trace checkout to outbound header and distinguish similarly named helpers.",
+      "hidden_allowed_change_restriction": "case.json allows only answer.json; observed changes comply.",
+      "unresolved_uncertainty_or_errors": [
+        "Answer identifies the active owner but does not explicitly describe what the similarly named report and transport helpers do; exact requested top-level keys provide no dedicated comparison field.",
+        "A linear list including makeReceiptKey can suggest a nested call chain; actual sibling calls from submitInvoice are shown in source.",
+        "The general preamble requests exact relative source paths and symbols; checkout and submitInvoice appear as symbols without their paths in the submitted chain."
+      ],
+      "source_claim_accuracy": "Correct key owner and outbound header owner, example, and route. submitInvoice calls makeReceiptKey and then sendInvoice; makeReceiptKey does not itself call sendInvoice. Other same-named helpers produce a report key or read a response header, respectively.",
+      "evidence": [
+        "reference-source/src/app.js:1-2",
+        "reference-source/src/billing/submit.js:1-5",
+        "reference-source/src/billing/receipt.js:1-3",
+        "reference-source/src/transport/invoices.js:1-2",
+        "reference-source/src/reports/receipt.js:1",
+        "reference-source/src/transport/receipt.js:1"
+      ],
+      "behavior": "checkout with acme and 7 posts /invoices with Idempotency-Key invoice/acme/0007. Frozen oracle verified.",
+      "classification": "supported claims; exact symbol-string representation accepted"
+    },
+    {
+      "case_id": "case-11",
+      "task_id": "dispatch-ambiguity",
+      "actual_changes": [
+        "answer.json"
+      ],
+      "frozen_oracle": {
+        "command": "node <case>/oracle.mjs <case>/candidate",
+        "outcome": "passed: answer equality and runtime assertions",
+        "exit_code": 0
+      },
+      "explicit_constraints": "prompt.txt: exact top-level keys; directly relevant check; no global configuration changes; do not change source or claim one unconditional static target.",
+      "hidden_allowed_change_restriction": "case.json allows only answer.json; observed changes comply.",
+      "unresolved_uncertainty_or_errors": [],
+      "source_claim_accuracy": "All submitted claims supported: runtime lookup selects mail or audit; legacy is outside registry; input mail normalizes to mail:hi and unknown kind throws.",
+      "evidence": [
+        "reference-source/src/dispatch.js:1-5",
+        "reference-source/src/registry.js:1-3",
+        "reference-source/src/channels/mail.js:1-2",
+        "reference-source/src/codec.js:1",
+        "reference-source/src/preview.js:1-2"
+      ],
+      "behavior": "Frozen oracle exercised mail, audit, legacy and toString.",
+      "classification": "supported claims; no source edits"
+    },
+    {
+      "case_id": "case-12",
+      "task_id": "receipt-location",
+      "actual_changes": [
+        "answer.json"
+      ],
+      "frozen_oracle": {
+        "command": "node <case>/oracle.mjs <case>/candidate",
+        "outcome": "failed: strict answer deep equality; runtime assertions not reached",
+        "exit_code": 1
+      },
+      "explicit_constraints": "prompt.txt: exact top-level keys; directly relevant check; no global configuration changes; do not change source; trace checkout to outbound header and distinguish similarly named helpers.",
+      "hidden_allowed_change_restriction": "case.json allows only answer.json; observed changes comply.",
+      "unresolved_uncertainty_or_errors": [
+        "Answer identifies the active owner but does not explicitly describe what the similarly named report and transport helpers do; exact requested top-level keys provide no dedicated comparison field.",
+        "A linear list including makeReceiptKey can suggest a nested call chain; actual sibling calls from submitInvoice are shown in source."
+      ],
+      "source_claim_accuracy": "Correct key owner and outbound header owner, example, and route. submitInvoice calls makeReceiptKey and then sendInvoice; makeReceiptKey does not itself call sendInvoice. Other same-named helpers produce a report key or read a response header, respectively.",
+      "evidence": [
+        "reference-source/src/app.js:1-2",
+        "reference-source/src/billing/submit.js:1-5",
+        "reference-source/src/billing/receipt.js:1-3",
+        "reference-source/src/transport/invoices.js:1-2",
+        "reference-source/src/reports/receipt.js:1",
+        "reference-source/src/transport/receipt.js:1"
+      ],
+      "behavior": "checkout with acme and 7 posts /invoices with Idempotency-Key invoice/acme/0007. Separately verified because equality failure prevented oracle runtime assertions.",
+      "classification": "representation-only strict equality failure"
+    },
+    {
+      "case_id": "case-13",
+      "task_id": "receipt-location",
+      "actual_changes": [
+        "answer.json"
+      ],
+      "frozen_oracle": {
+        "command": "node <case>/oracle.mjs <case>/candidate",
+        "outcome": "failed: strict answer deep equality; runtime assertions not reached",
+        "exit_code": 1
+      },
+      "explicit_constraints": "prompt.txt: exact top-level keys; directly relevant check; no global configuration changes; do not change source; trace checkout to outbound header and distinguish similarly named helpers.",
+      "hidden_allowed_change_restriction": "case.json allows only answer.json; observed changes comply.",
+      "unresolved_uncertainty_or_errors": [
+        "Answer identifies the active owner but does not explicitly describe what the similarly named report and transport helpers do; exact requested top-level keys provide no dedicated comparison field.",
+        "A linear list including makeReceiptKey can suggest a nested call chain; actual sibling calls from submitInvoice are shown in source."
+      ],
+      "source_claim_accuracy": "Correct key owner and outbound header owner, example, and route. submitInvoice calls makeReceiptKey and then sendInvoice; makeReceiptKey does not itself call sendInvoice. Other same-named helpers produce a report key or read a response header, respectively.",
+      "evidence": [
+        "reference-source/src/app.js:1-2",
+        "reference-source/src/billing/submit.js:1-5",
+        "reference-source/src/billing/receipt.js:1-3",
+        "reference-source/src/transport/invoices.js:1-2",
+        "reference-source/src/reports/receipt.js:1",
+        "reference-source/src/transport/receipt.js:1"
+      ],
+      "behavior": "checkout with acme and 7 posts /invoices with Idempotency-Key invoice/acme/0007. Separately verified because equality failure prevented oracle runtime assertions.",
+      "classification": "representation-only strict equality failure"
+    },
+    {
+      "case_id": "case-14",
+      "task_id": "inventory-contract",
+      "actual_changes": [
+        "answer.json"
+      ],
+      "frozen_oracle": {
+        "command": "node <case>/oracle.mjs <case>/candidate",
+        "outcome": "passed: answer equality and runtime assertions",
+        "exit_code": 0
+      },
+      "explicit_constraints": "prompt.txt: exact top-level keys; directly relevant check; no global configuration changes; do not change source; ordered active pipeline and exact output.",
+      "hidden_allowed_change_restriction": "case.json allows only answer.json; observed changes comply.",
+      "unresolved_uncertainty_or_errors": [
+        "The general preamble asks for exact paths and symbols, while the task calls the files field ordered files and exact top-level keys; this answer supplies paths only, so symbol citations are absent within that field."
+      ],
+      "source_claim_accuracy": "Pipeline, output, invalid numeric message, and subtraction before clamp are correct.",
+      "evidence": [
+        "reference-source/src/entry.js:1-4",
+        "reference-source/src/input/csv.js:1-4",
+        "reference-source/src/domain/stock.js:1-5",
+        "reference-source/src/domain/sku.js:1",
+        "reference-source/src/output/wire.js:1"
+      ],
+      "behavior": "Negative availability returns AB-2/0/schema 2; z,8,2 returns Z/6/schema 2; invalid numeric throws invalid count. Frozen oracle verified.",
+      "classification": "supported claims; exact path-string representation accepted"
+    },
+    {
+      "case_id": "case-15",
+      "task_id": "inventory-contract",
+      "actual_changes": [
+        "answer.json"
+      ],
+      "frozen_oracle": {
+        "command": "node <case>/oracle.mjs <case>/candidate",
+        "outcome": "passed: answer equality and runtime assertions",
+        "exit_code": 0
+      },
+      "explicit_constraints": "prompt.txt: exact top-level keys; directly relevant check; no global configuration changes; do not change source; ordered active pipeline and exact output.",
+      "hidden_allowed_change_restriction": "case.json allows only answer.json; observed changes comply.",
+      "unresolved_uncertainty_or_errors": [
+        "The general preamble asks for exact paths and symbols, while the task calls the files field ordered files and exact top-level keys; this answer supplies paths only, so symbol citations are absent within that field."
+      ],
+      "source_claim_accuracy": "Pipeline, output, invalid numeric message, and subtraction before clamp are correct.",
+      "evidence": [
+        "reference-source/src/entry.js:1-4",
+        "reference-source/src/input/csv.js:1-4",
+        "reference-source/src/domain/stock.js:1-5",
+        "reference-source/src/domain/sku.js:1",
+        "reference-source/src/output/wire.js:1"
+      ],
+      "behavior": "Negative availability returns AB-2/0/schema 2; z,8,2 returns Z/6/schema 2; invalid numeric throws invalid count. Frozen oracle verified.",
+      "classification": "supported claims; exact path-string representation accepted"
+    },
+    {
+      "case_id": "case-16",
+      "task_id": "zero-quantity",
+      "actual_changes": [
+        "answer.json",
+        "src/quantity.js",
+        "test/quantity.test.js"
+      ],
+      "frozen_oracle": {
+        "command": "node <case>/oracle.mjs <case>/candidate",
+        "outcome": "passed: answer equality and runtime assertions",
+        "exit_code": 0
+      },
+      "explicit_constraints": "prompt.txt: exact top-level keys; directly relevant check; no global configuration changes; change shared API parser, preserve CLI, specified accepted and rejected inputs, smallest correct source change.",
+      "hidden_allowed_change_restriction": "case.json criteria permits only answer.json and src/quantity.js; added test/quantity.test.js falls outside it. The visible prompt asks for a relevant check and does not explicitly ban a test file. The frozen Node oracle itself does not check file allowlist and passed.",
+      "unresolved_uncertainty_or_errors": [],
+      "source_claim_accuracy": "Changed API parser path and reported line and error are correct; CLI parser unchanged.",
+      "evidence": [
+        "candidate/src/api.js:1-3",
+        "candidate/src/quantity.js:1-6",
+        "candidate/src/line.js:1",
+        "candidate/src/cli.js:1"
+      ],
+      "behavior": "Frozen oracle exercised 0, string 0, positive integers, negatives, fractions, non-finite numbers, blank strings, booleans, null, undefined and nonnumeric strings; CLI string zero remains 1.",
+      "classification": "requested source behavior verified"
+    }
+  ]
+}

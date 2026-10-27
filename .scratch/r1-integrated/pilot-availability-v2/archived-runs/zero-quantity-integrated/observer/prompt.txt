@@ -1,0 +1,11 @@
+Before doing the task, your first model tool action must be functions.exec executing exactly this program, without additions or changes:
+const names = ALL_TOOLS.filter(t => /^mcp__loci__/.test(t.name) || /(?:^|__)loci_[A-Za-z0-9_]+$/.test(t.name)).map(t => t.name).sort();
+text({loci_runtime_catalog_v1: names});
+Compare the returned live Loci tool names with the expected tools below (qualified as mcp__loci__NAME). If discovery is unavailable or the set differs, stop and report the availability failure. Otherwise continue the original task; Loci use is optional.
+Expected tools: ["loci_proof", "loci_read", "loci_retrieve", "loci_semantic"]
+
+Original task follows:
+Work only in the assigned workspace. Complete this assignment directly; do not delegate or spawn agents. Native file, search, shell and edit tools are available. Loci tools, when available, are optional; select them only if useful. Do not inspect sibling runs, observer folders, evaluator files, or other task copies. Do not change user/global configuration.
+Write the requested structured result to answer.json. Do not add unrequested claims; cite exact relative source paths and symbols. Finish when the requested result and your directly relevant check are complete.
+
+The request API must accept an integer zero quantity as an inactive line. Fix the shared API quantity parser to accept numeric 0 and the string '0', while keeping positive integer behavior and rejecting negative values, fractions, non-finite numbers, empty or whitespace-only strings, booleans, null, undefined, and nonnumeric strings with Error('invalid quantity'). The similarly named CLI parser is a separate legacy contract; leave it unchanged. Make the smallest correct source change and run a relevant check. Write answer.json with exactly these keys: changed_file (the API parser path), zero_result (lineFromRequest({sku:' A ',quantity:'0'})), error_message (the invalid-input error text).

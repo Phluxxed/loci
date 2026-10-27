@@ -1,0 +1,22 @@
+{
+  "owner_file": "src/billing/receipt.js",
+  "owner_symbol": "makeReceiptKey",
+  "outbound_file": "src/transport/invoices.js",
+  "outbound_symbol": "sendInvoice",
+  "call_chain": [
+    {
+      "file": "src/app.js",
+      "symbol": "checkout"
+    },
+    {
+      "file": "src/billing/submit.js",
+      "symbol": "submitInvoice",
+      "key_from": "src/billing/receipt.js:makeReceiptKey"
+    },
+    {
+      "file": "src/transport/invoices.js",
+      "symbol": "sendInvoice"
+    }
+  ],
+  "example_key": "invoice/acme/0007"
+}

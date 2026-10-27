@@ -1,3 +1,13 @@
+# Current R1 closeout: availability-qualified pilot complete
+
+**Recommendation: revise / hold advancement.** All 16 Terra 6.1/max assignments completed with known usage, verified per-session tool catalogs and matching independent replay. Frozen scores: native 3/4, path-only 2/4, integrated 3/4, eager 1/4. Separate operational probes exercised the enabled tools. No scored session invoked Loci, semantics or proof, so these scores establish no architecture benefit. Blinded review identifies four representation failures and three hidden file-allowlist failures; official scores remain unchanged.
+
+See the [complete task-by-task costs, diagnostics and recommendation](pilot-availability-v2/analysis/REPORT.md), [machine comparison](pilot-availability-v2/analysis/comparison.json) and [independent replay](pilot-availability-v2/analysis/independent-replay/summary.json). The first run retains an observed instruction update; no fixed instruction exposure claim is made. Earlier cohorts and failed attempts below remain separate. Automatic external dispatch from this managed host remains blocked; the user completed the pilot via the existing normal Terminal route.
+
+---
+
+## Historical closeouts and withdrawn earlier comparison
+
 # R1 native comparison: availability unverified; recommendation withdrawn
 
 The 16 Terra runs completed and their accounting and frozen grades remain retained. **They do not establish a valid Loci condition comparison:** no measured native-host check established that the assigned tools were discoverable and callable. The architecture recommendation previously derived from this comparison is withdrawn. Lack of tool use does not prove tool absence, particularly with deferred discovery.

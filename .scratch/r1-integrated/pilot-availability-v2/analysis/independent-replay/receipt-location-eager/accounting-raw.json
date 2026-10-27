@@ -1,0 +1,1029 @@
+{
+  "schema_version": 1,
+  "accounting": "native-rollout-v1",
+  "thread_id": "01a17bda-5ed2-77b1-ac84-94d0d0a4d758",
+  "stages": [
+    {
+      "stage_id": "turn-1",
+      "turn_id": "01a17bda-63ad-7e42-9d69-175cc9079520",
+      "outcome": "completed",
+      "elapsed_ms": 48163,
+      "usage_status": "known",
+      "usage": {
+        "inputTokens": 196359,
+        "cachedInputTokens": 142464,
+        "outputTokens": 3075,
+        "reasoningOutputTokens": 1608,
+        "totalTokens": 199434,
+        "cacheWriteInputTokens": 0,
+        "uncachedInputTokens": 53895
+      },
+      "usage_updates": 7,
+      "observed_usage_delta": {
+        "inputTokens": 196359,
+        "cachedInputTokens": 142464,
+        "outputTokens": 3075,
+        "reasoningOutputTokens": 1608,
+        "totalTokens": 199434,
+        "cacheWriteInputTokens": 0
+      },
+      "usage_limitation": null,
+      "mcp_calls": 0,
+      "shell_calls": 7,
+      "file_change_calls": 1,
+      "context_compactions": 0,
+      "subagent_calls": 0,
+      "failed_shell_calls": 1,
+      "outer_tool_calls": 6,
+      "outer_tool_calls_status": "observed",
+      "model_requests": null,
+      "observed_completed_model_requests": 7,
+      "model_requests_status": "completion_lower_bound",
+      "upstream_responses": [
+        {
+          "threadId": "01a17bda-5ed2-77b1-ac84-94d0d0a4d758",
+          "turnId": "01a17bda-63ad-7e42-9d69-175cc9079520",
+          "responseId": "resp_0107061d5dc762d5016ae037eb0c90819197708e9891e66f55"
+        },
+        {
+          "threadId": "01a17bda-5ed2-77b1-ac84-94d0d0a4d758",
+          "turnId": "01a17bda-63ad-7e42-9d69-175cc9079520",
+          "responseId": "resp_0107061d5dc762d5016ae037ecf5548191ae51eb3f0b5bdf9e"
+        },
+        {
+          "threadId": "01a17bda-5ed2-77b1-ac84-94d0d0a4d758",
+          "turnId": "01a17bda-63ad-7e42-9d69-175cc9079520",
+          "responseId": "resp_0107061d5dc762d5016ae037f3d7c88191a0ca26b5aed67b57"
+        },
+        {
+          "threadId": "01a17bda-5ed2-77b1-ac84-94d0d0a4d758",
+          "turnId": "01a17bda-63ad-7e42-9d69-175cc9079520",
+          "responseId": "resp_0107061d5dc762d5016ae037f6bd748191aeace49511527cf8"
+        },
+        {
+          "threadId": "01a17bda-5ed2-77b1-ac84-94d0d0a4d758",
+          "turnId": "01a17bda-63ad-7e42-9d69-175cc9079520",
+          "responseId": "resp_0107061d5dc762d5016ae037fe7aa48191bc531344091f2fb9"
+        },
+        {
+          "threadId": "01a17bda-5ed2-77b1-ac84-94d0d0a4d758",
+          "turnId": "01a17bda-63ad-7e42-9d69-175cc9079520",
+          "responseId": "resp_0107061d5dc762d5016ae0380e58a481918f5e95c08640d4ca"
+        },
+        {
+          "threadId": "01a17bda-5ed2-77b1-ac84-94d0d0a4d758",
+          "turnId": "01a17bda-63ad-7e42-9d69-175cc9079520",
+          "responseId": "resp_0107061d5dc762d5016ae038148a988191a50f8da194563504"
+        }
+      ],
+      "first_event": {
+        "ordinal": 14,
+        "monotonic": null,
+        "utc": "2026-10-27T05:34:33.610Z"
+      },
+      "last_event": {
+        "ordinal": 68,
+        "monotonic": null,
+        "utc": "2026-10-27T05:35:20.415Z"
+      },
+      "operation_counts_status": "observed_items_only",
+      "items": [
+        {
+          "type": "UserMessage",
+          "id": "01a17bda-6889-7553-946a-d76460db9e45",
+          "content": [
+            {
+              "type": "text",
+              "text": "Before doing the task, your first model tool action must be functions.exec executing exactly this program, without additions or changes:\nconst names = ALL_TOOLS.filter(t => /^mcp__loci__/.test(t.name) || /(?:^|__)loci_[A-Za-z0-9_]+$/.test(t.name)).map(t => t.name).sort();\ntext({loci_runtime_catalog_v1: names});\nCompare the returned live Loci tool names with the expected tools below (qualified as mcp__loci__NAME). If discovery is unavailable or the set differs, stop and report the availability failure. Otherwise continue the original task; Loci use is optional.\nExpected tools: [\"loci_read\", \"loci_retrieve\"]\n\nOriginal task follows:\nWork only in the assigned workspace. Complete this assignment directly; do not delegate or spawn agents. Native file, search, shell and edit tools are available. Loci tools, when available, are optional; select them only if useful. Do not inspect sibling runs, observer folders, evaluator files, or other task copies. Do not change user/global configuration.\nWrite the requested structured result to answer.json. Do not add unrequested claims; cite exact relative source paths and symbols. Finish when the requested result and your directly relevant check are complete.\n\nA duplicate-invoice report mentions checkout's outbound Idempotency-Key. Locate the function that actually constructs that key, distinguish similarly named receipt helpers, and trace its route to the outbound header. Do not change source. Write answer.json with exactly these keys: owner_file, owner_symbol, outbound_file, outbound_symbol, call_chain (ordered symbols starting at checkout and ending at sendInvoice), example_key (accountId='acme', sequence=7).\n",
+              "text_elements": []
+            }
+          ],
+          "native_type": "UserMessage",
+          "capture_boundary": "item/completed",
+          "capture_started": null,
+          "capture_completed": {
+            "utc": "2026-10-27T05:34:33.610Z",
+            "emitted_at_ms": 1793079273610,
+            "ordinal": 14,
+            "monotonic": null
+          }
+        },
+        {
+          "type": "Reasoning",
+          "id": "rs_0107061d5dc762d5016ae037f2361081918b51616061200df7",
+          "summary_text": [],
+          "raw_content": [],
+          "native_type": "Reasoning",
+          "capture_boundary": "item/completed",
+          "capture_started": null,
+          "capture_completed": {
+            "utc": "2026-10-27T05:34:41.366Z",
+            "emitted_at_ms": 1793079281365,
+            "ordinal": 20,
+            "monotonic": null
+          }
+        },
+        {
+          "type": "AgentMessage",
+          "id": "msg_0107061d5dc762d5016ae037f23f688191a8afeb90978b53eb",
+          "content": [
+            {
+              "type": "Text",
+              "text": "The live Loci tool set matches the expected set. I’ll trace the checkout key through to `sendInvoice`, then write and check `answer.json` in the assigned workspace."
+            }
+          ],
+          "phase": "commentary",
+          "native_type": "AgentMessage",
+          "capture_boundary": "item/completed",
+          "capture_started": null,
+          "capture_completed": {
+            "utc": "2026-10-27T05:34:41.484Z",
+            "emitted_at_ms": 1793079281484,
+            "ordinal": 22,
+            "monotonic": null
+          }
+        },
+        {
+          "type": "commandExecution",
+          "id": "exec-875e0b38-40ab-4e59-b29a-e312a801f97f",
+          "process_id": "97287",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "pwd && git status --short && rg --files -g 'AGENTS.md' -g '!node_modules' -g '!vendor' | head -80"
+          ],
+          "cwd": "file:///private/tmp/loci-r1-native-q7rb_mxw/receipt-location-eager/workspace",
+          "parsed_cmd": [
+            {
+              "type": "unknown",
+              "cmd": "pwd && git status --short && rg --files -g 'AGENTS.md' -g '!node_modules' -g '!vendor' | head -80"
+            }
+          ],
+          "source": "unified_exec_startup",
+          "status": "failed",
+          "aggregated_output": "/private/tmp/loci-r1-native-q7rb_mxw/receipt-location-eager/workspace\nfatal: not a git repository (or any of the parent directories): .git\n",
+          "exit_code": 128,
+          "duration": {
+            "secs": 0,
+            "nanos": 7084
+          },
+          "native_type": "CommandExecution",
+          "exitCode": 128,
+          "capture_boundary": "item/completed",
+          "capture_started": null,
+          "capture_completed": {
+            "utc": "2026-10-27T05:34:42.482Z",
+            "emitted_at_ms": 1793079282482,
+            "ordinal": 26,
+            "monotonic": null
+          }
+        },
+        {
+          "type": "commandExecution",
+          "id": "exec-85005c39-7a0b-4a1c-947e-a1003441e4ba",
+          "process_id": "52575",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "rg -n -i 'idempotency.?key|sendInvoice|accountId|receipt' . -g '!answer.json' -g '!node_modules' -g '!vendor'"
+          ],
+          "cwd": "file:///private/tmp/loci-r1-native-q7rb_mxw/receipt-location-eager/workspace",
+          "parsed_cmd": [
+            {
+              "type": "search",
+              "cmd": "rg -n -i 'idempotency.?key|sendInvoice|accountId|receipt' . -g '!answer.json' -g '!node_modules' -g '!vendor'",
+              "query": "idempotency.?key|sendInvoice|accountId|receipt",
+              "path": "."
+            }
+          ],
+          "source": "unified_exec_startup",
+          "status": "completed",
+          "aggregated_output": "./src/reports/receipt.js:1:export function makeReceiptKey(row) { return `report:${row.id}`; }\n./src/transport/receipt.js:1:export function makeReceiptKey(response) { return response.headers['x-receipt']; }\n./src/transport/invoices.js:1:export async function sendInvoice(provider, invoice, receiptKey) {\n./src/transport/invoices.js:2:  return provider.post('/invoices', invoice, { 'Idempotency-Key': receiptKey });\n./src/billing/submit.js:1:import { makeReceiptKey } from './receipt.js';\n./src/billing/submit.js:2:import { sendInvoice } from '../transport/invoices.js';\n./src/billing/submit.js:4:  const key = makeReceiptKey(invoice);\n./src/billing/submit.js:5:  return sendInvoice(provider, invoice, key);\n./src/billing/receipt.js:1:export function makeReceiptKey(invoice) {\n./src/billing/receipt.js:2:  return `invoice/${invoice.accountId}/${String(invoice.sequence).padStart(4, '0')}`;\n",
+          "exit_code": 0,
+          "duration": {
+            "secs": 0,
+            "nanos": 2458
+          },
+          "native_type": "CommandExecution",
+          "exitCode": 0,
+          "capture_boundary": "item/completed",
+          "capture_started": null,
+          "capture_completed": {
+            "utc": "2026-10-27T05:34:42.486Z",
+            "emitted_at_ms": 1793079282486,
+            "ordinal": 27,
+            "monotonic": null
+          }
+        },
+        {
+          "type": "Reasoning",
+          "id": "rs_0107061d5dc762d5016ae037f4ef448191958390aa00e7ffc4",
+          "summary_text": [],
+          "raw_content": [],
+          "native_type": "Reasoning",
+          "capture_boundary": "item/completed",
+          "capture_started": null,
+          "capture_completed": {
+            "utc": "2026-10-27T05:34:44.053Z",
+            "emitted_at_ms": 1793079284053,
+            "ordinal": 30,
+            "monotonic": null
+          }
+        },
+        {
+          "type": "commandExecution",
+          "id": "exec-55f52cd1-f435-4002-a8cf-3145ae02a246",
+          "process_id": "58499",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "find . -name AGENTS.md -print"
+          ],
+          "cwd": "file:///private/tmp/loci-r1-native-q7rb_mxw/receipt-location-eager/workspace",
+          "parsed_cmd": [
+            {
+              "type": "search",
+              "cmd": "find . -name AGENTS.md -print",
+              "query": "AGENTS.md",
+              "path": "."
+            }
+          ],
+          "source": "unified_exec_startup",
+          "status": "completed",
+          "aggregated_output": "",
+          "exit_code": 0,
+          "duration": {
+            "secs": 0,
+            "nanos": 7827209
+          },
+          "native_type": "CommandExecution",
+          "exitCode": 0,
+          "capture_boundary": "item/completed",
+          "capture_started": null,
+          "capture_completed": {
+            "utc": "2026-10-27T05:34:45.368Z",
+            "emitted_at_ms": 1793079285368,
+            "ordinal": 34,
+            "monotonic": null
+          }
+        },
+        {
+          "type": "commandExecution",
+          "id": "exec-682cd9b6-5c4b-43f2-a4bc-cf3b7172e148",
+          "process_id": "70264",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "rg -n 'checkout|submit|makeReceiptKey|sendInvoice|Idempotency-Key' . -g '!answer.json' -g '!node_modules' -g '!vendor'"
+          ],
+          "cwd": "file:///private/tmp/loci-r1-native-q7rb_mxw/receipt-location-eager/workspace",
+          "parsed_cmd": [
+            {
+              "type": "search",
+              "cmd": "rg -n 'checkout|submit|makeReceiptKey|sendInvoice|Idempotency-Key' . -g '!answer.json' -g '!node_modules' -g '!vendor'",
+              "query": "checkout|submit|makeReceiptKey|sendInvoice|Idempotency-Key",
+              "path": "."
+            }
+          ],
+          "source": "unified_exec_startup",
+          "status": "completed",
+          "aggregated_output": "./src/reports/receipt.js:1:export function makeReceiptKey(row) { return `report:${row.id}`; }\n./src/billing/receipt.js:1:export function makeReceiptKey(invoice) {\n./src/billing/submit.js:1:import { makeReceiptKey } from './receipt.js';\n./src/billing/submit.js:2:import { sendInvoice } from '../transport/invoices.js';\n./src/billing/submit.js:3:export async function submitInvoice(invoice, provider) {\n./src/billing/submit.js:4:  const key = makeReceiptKey(invoice);\n./src/billing/submit.js:5:  return sendInvoice(provider, invoice, key);\n./src/app.js:1:import { submitInvoice } from './billing/submit.js';\n./src/app.js:2:export async function checkout(invoice, provider) { return submitInvoice(invoice, provider); }\n./src/transport/receipt.js:1:export function makeReceiptKey(response) { return response.headers['x-receipt']; }\n./src/transport/invoices.js:1:export async function sendInvoice(provider, invoice, receiptKey) {\n./src/transport/invoices.js:2:  return provider.post('/invoices', invoice, { 'Idempotency-Key': receiptKey });\n",
+          "exit_code": 0,
+          "duration": {
+            "secs": 0,
+            "nanos": 20084584
+          },
+          "native_type": "CommandExecution",
+          "exitCode": 0,
+          "capture_boundary": "item/completed",
+          "capture_started": null,
+          "capture_completed": {
+            "utc": "2026-10-27T05:34:45.381Z",
+            "emitted_at_ms": 1793079285381,
+            "ordinal": 35,
+            "monotonic": null
+          }
+        },
+        {
+          "type": "commandExecution",
+          "id": "exec-4b0235fc-3ff7-48a7-a373-16beffbf2bf4",
+          "process_id": "10696",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "rg --files --hidden -g '!node_modules' -g '!vendor' -g '!.git'"
+          ],
+          "cwd": "file:///private/tmp/loci-r1-native-q7rb_mxw/receipt-location-eager/workspace",
+          "parsed_cmd": [
+            {
+              "type": "list_files",
+              "cmd": "rg --files --hidden -g '!node_modules' -g '!vendor' -g '!.git'",
+              "path": null
+            }
+          ],
+          "source": "unified_exec_startup",
+          "status": "completed",
+          "aggregated_output": "src/reports/receipt.js\nsrc/billing/receipt.js\nsrc/billing/retry.js\nsrc/billing/submit.js\nsrc/app.js\nsrc/transport/receipt.js\nsrc/transport/invoices.js\npackage.json\nREADME.md\n",
+          "exit_code": 0,
+          "duration": {
+            "secs": 0,
+            "nanos": 30963958
+          },
+          "native_type": "CommandExecution",
+          "exitCode": 0,
+          "capture_boundary": "item/completed",
+          "capture_started": null,
+          "capture_completed": {
+            "utc": "2026-10-27T05:34:45.396Z",
+            "emitted_at_ms": 1793079285396,
+            "ordinal": 36,
+            "monotonic": null
+          }
+        },
+        {
+          "type": "Reasoning",
+          "id": "rs_0107061d5dc762d5016ae037fd2218819199dcec0313b24993",
+          "summary_text": [],
+          "raw_content": [],
+          "native_type": "Reasoning",
+          "capture_boundary": "item/completed",
+          "capture_started": null,
+          "capture_completed": {
+            "utc": "2026-10-27T05:34:52.280Z",
+            "emitted_at_ms": 1793079292280,
+            "ordinal": 39,
+            "monotonic": null
+          }
+        },
+        {
+          "type": "commandExecution",
+          "id": "exec-77e258f9-0e2f-4976-944e-d5eadc9dd420",
+          "process_id": "22923",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "for file in README.md package.json src/app.js src/billing/submit.js src/billing/receipt.js src/billing/retry.js src/transport/invoices.js src/transport/receipt.js src/reports/receipt.js; do printf '\\n%s\\n' \"$file\"; nl -ba \"$file\"; done"
+          ],
+          "cwd": "file:///private/tmp/loci-r1-native-q7rb_mxw/receipt-location-eager/workspace",
+          "parsed_cmd": [
+            {
+              "type": "unknown",
+              "cmd": "for file in README.md package.json src/app.js src/billing/submit.js src/billing/receipt.js src/billing/retry.js src/transport/invoices.js src/transport/receipt.js src/reports/receipt.js; do printf '\\n%s\\n' \"$file\"; nl -ba \"$file\"; done"
+            }
+          ],
+          "source": "unified_exec_startup",
+          "status": "completed",
+          "aggregated_output": "\nREADME.md\n     1\tSmall inventory service fixture. No network or dependencies are required.\n\npackage.json\n     1\t{\"type\":\"module\",\"private\":true}\n\nsrc/app.js\n     1\timport { submitInvoice } from './billing/submit.js';\n     2\texport async function checkout(invoice, provider) { return submitInvoice(invoice, provider); }\n\nsrc/billing/submit.js\n     1\timport { makeReceiptKey } from './receipt.js';\n     2\timport { sendInvoice } from '../transport/invoices.js';\n     3\texport async function submitInvoice(invoice, provider) {\n     4\t  const key = makeReceiptKey(invoice);\n     5\t  return sendInvoice(provider, invoice, key);\n     6\t}\n\nsrc/billing/receipt.js\n     1\texport function makeReceiptKey(invoice) {\n     2\t  return `invoice/${invoice.accountId}/${String(invoice.sequence).padStart(4, '0')}`;\n     3\t}\n\nsrc/billing/retry.js\n     1\texport function retryDelay(attempt) { return Math.min(1000 * 2 ** attempt, 8000); }\n\nsrc/transport/invoices.js\n     1\texport async function sendInvoice(provider, invoice, receiptKey) {\n     2\t  return provider.post('/invoices', invoice, { 'Idempotency-Key': receiptKey });\n     3\t}\n\nsrc/transport/receipt.js\n     1\texport function makeReceiptKey(response) { return response.headers['x-receipt']; }\n\nsrc/reports/receipt.js\n     1\texport function makeReceiptKey(row) { return `report:${row.id}`; }\n",
+          "exit_code": 0,
+          "duration": {
+            "secs": 0,
+            "nanos": 3591792
+          },
+          "native_type": "CommandExecution",
+          "exitCode": 0,
+          "capture_boundary": "item/completed",
+          "capture_started": null,
+          "capture_completed": {
+            "utc": "2026-10-27T05:34:53.135Z",
+            "emitted_at_ms": 1793079293135,
+            "ordinal": 43,
+            "monotonic": null
+          }
+        },
+        {
+          "type": "Reasoning",
+          "id": "rs_0107061d5dc762d5016ae0380a09f881919d68b8acc9fee76d",
+          "summary_text": [],
+          "raw_content": [],
+          "native_type": "Reasoning",
+          "capture_boundary": "item/completed",
+          "capture_started": null,
+          "capture_completed": {
+            "utc": "2026-10-27T05:35:05.206Z",
+            "emitted_at_ms": 1793079305206,
+            "ordinal": 46,
+            "monotonic": null
+          }
+        },
+        {
+          "type": "Reasoning",
+          "id": "rs_0107061d5dc762d5016ae0380bbb988191b001365f6b5e7943",
+          "summary_text": [],
+          "raw_content": [],
+          "native_type": "Reasoning",
+          "capture_boundary": "item/completed",
+          "capture_started": null,
+          "capture_completed": {
+            "utc": "2026-10-27T05:35:06.853Z",
+            "emitted_at_ms": 1793079306853,
+            "ordinal": 48,
+            "monotonic": null
+          }
+        },
+        {
+          "type": "AgentMessage",
+          "id": "msg_0107061d5dc762d5016ae0380bc8448191ad360ed999105482",
+          "content": [
+            {
+              "type": "Text",
+              "text": "The billing helper constructs the key; the report and transport helpers with the same name do different things. `checkout` passes the invoice to `submitInvoice`, which calls the billing helper and then passes its result to `sendInvoice`."
+            }
+          ],
+          "phase": "commentary",
+          "native_type": "AgentMessage",
+          "capture_boundary": "item/completed",
+          "capture_started": null,
+          "capture_completed": {
+            "utc": "2026-10-27T05:35:07.501Z",
+            "emitted_at_ms": 1793079307501,
+            "ordinal": 50,
+            "monotonic": null
+          }
+        },
+        {
+          "type": "fileChange",
+          "id": "exec-d44dcd1f-e248-404b-9081-1aea56e19fd8",
+          "changes": {
+            "/private/tmp/loci-r1-native-q7rb_mxw/receipt-location-eager/workspace/answer.json": {
+              "type": "add",
+              "content": "{\n  \"owner_file\": \"src/billing/receipt.js\",\n  \"owner_symbol\": \"makeReceiptKey\",\n  \"outbound_file\": \"src/transport/invoices.js\",\n  \"outbound_symbol\": \"sendInvoice\",\n  \"call_chain\": [\n    {\"file\": \"src/app.js\", \"symbol\": \"checkout\"},\n    {\"file\": \"src/billing/submit.js\", \"symbol\": \"submitInvoice\"},\n    {\"file\": \"src/billing/receipt.js\", \"symbol\": \"makeReceiptKey\"},\n    {\"file\": \"src/transport/invoices.js\", \"symbol\": \"sendInvoice\"}\n  ],\n  \"example_key\": \"invoice/acme/0007\"\n}\n"
+            }
+          },
+          "status": "completed",
+          "stdout": "Success. Updated the following files:\nA answer.json\n",
+          "stderr": "",
+          "native_type": "FileChange",
+          "capture_boundary": "item/completed",
+          "capture_started": null,
+          "capture_completed": {
+            "utc": "2026-10-27T05:35:08.943Z",
+            "emitted_at_ms": 1793079308943,
+            "ordinal": 54,
+            "monotonic": null
+          }
+        },
+        {
+          "type": "Reasoning",
+          "id": "rs_0107061d5dc762d5016ae03810adb08191b30662d9b0251888",
+          "summary_text": [],
+          "raw_content": [],
+          "native_type": "Reasoning",
+          "capture_boundary": "item/completed",
+          "capture_started": null,
+          "capture_completed": {
+            "utc": "2026-10-27T05:35:11.800Z",
+            "emitted_at_ms": 1793079311800,
+            "ordinal": 57,
+            "monotonic": null
+          }
+        },
+        {
+          "type": "commandExecution",
+          "id": "exec-65689a26-eaf6-4122-9659-1d679c9265f2",
+          "process_id": "65212",
+          "command": [
+            "/bin/zsh",
+            "-lc",
+            "node --input-type=module <<'NODE'\nimport assert from 'node:assert/strict';\nimport { readFile } from 'node:fs/promises';\nimport { checkout } from './src/app.js';\nimport { makeReceiptKey as reportKey } from './src/reports/receipt.js';\nimport { makeReceiptKey as transportKey } from './src/transport/receipt.js';\n\nconst answer = JSON.parse(await readFile('answer.json', 'utf8'));\nassert.deepEqual(Object.keys(answer), ['owner_file', 'owner_symbol', 'outbound_file', 'outbound_symbol', 'call_chain', 'example_key']);\nassert.deepEqual(answer.call_chain.map(({ symbol }) => symbol), ['checkout', 'submitInvoice', 'makeReceiptKey', 'sendInvoice']);\nfor (const { file, symbol } of answer.call_chain) {\n  const module = await import('./' + file);\n  assert.equal(typeof module[symbol], 'function', file + ':' + symbol);\n}\nassert.deepEqual(answer.call_chain[2], { file: answer.owner_file, symbol: answer.owner_symbol });\nassert.deepEqual(answer.call_chain[3], { file: answer.outbound_file, symbol: answer.outbound_symbol });\n\nconst invoice = { accountId: 'acme', sequence: 7 };\nlet outbound;\nconst result = await checkout(invoice, { post: async (...args) => { outbound = args; return 'sent'; } });\nassert.equal(result, 'sent');\nassert.deepEqual(outbound, ['/invoices', invoice, { 'Idempotency-Key': answer.example_key }]);\nassert.equal(answer.example_key, 'invoice/acme/0007');\nassert.equal(reportKey({ id: 'row1' }), 'report:row1');\nassert.equal(transportKey({ headers: { 'x-receipt': 'upstream-receipt' } }), 'upstream-receipt');\nconsole.log('PASS: answer schema, symbol paths, checkout outbound header, and distinct receipt helpers');\nNODE"
+          ],
+          "cwd": "file:///private/tmp/loci-r1-native-q7rb_mxw/receipt-location-eager/workspace",
+          "parsed_cmd": [
+            {
+              "type": "unknown",
+              "cmd": "node --input-type=module <<'NODE'\nimport assert from 'node:assert/strict';\nimport { readFile } from 'node:fs/promises';\nimport { checkout } from './src/app.js';\nimport { makeReceiptKey as reportKey } from './src/reports/receipt.js';\nimport { makeReceiptKey as transportKey } from './src/transport/receipt.js';\n\nconst answer = JSON.parse(await readFile('answer.json', 'utf8'));\nassert.deepEqual(Object.keys(answer), ['owner_file', 'owner_symbol', 'outbound_file', 'outbound_symbol', 'call_chain', 'example_key']);\nassert.deepEqual(answer.call_chain.map(({ symbol }) => symbol), ['checkout', 'submitInvoice', 'makeReceiptKey', 'sendInvoice']);\nfor (const { file, symbol } of answer.call_chain) {\n  const module = await import('./' + file);\n  assert.equal(typeof module[symbol], 'function', file + ':' + symbol);\n}\nassert.deepEqual(answer.call_chain[2], { file: answer.owner_file, symbol: answer.owner_symbol });\nassert.deepEqual(answer.call_chain[3], { file: answer.outbound_file, symbol: answer.outbound_symbol });\n\nconst invoice = { accountId: 'acme', sequence: 7 };\nlet outbound;\nconst result = await checkout(invoice, { post: async (...args) => { outbound = args; return 'sent'; } });\nassert.equal(result, 'sent');\nassert.deepEqual(outbound, ['/invoices', invoice, { 'Idempotency-Key': answer.example_key }]);\nassert.equal(answer.example_key, 'invoice/acme/0007');\nassert.equal(reportKey({ id: 'row1' }), 'report:row1');\nassert.equal(transportKey({ headers: { 'x-receipt': 'upstream-receipt' } }), 'upstream-receipt');\nconsole.log('PASS: answer schema, symbol paths, checkout outbound header, and distinct receipt helpers');\nNODE"
+            }
+          ],
+          "source": "unified_exec_startup",
+          "status": "completed",
+          "aggregated_output": "PASS: answer schema, symbol paths, checkout outbound header, and distinct receipt helpers\n",
+          "exit_code": 0,
+          "duration": {
+            "secs": 0,
+            "nanos": 6375
+          },
+          "native_type": "CommandExecution",
+          "exitCode": 0,
+          "capture_boundary": "item/completed",
+          "capture_started": null,
+          "capture_completed": {
+            "utc": "2026-10-27T05:35:15.093Z",
+            "emitted_at_ms": 1793079315093,
+            "ordinal": 61,
+            "monotonic": null
+          }
+        },
+        {
+          "type": "Reasoning",
+          "id": "rs_0107061d5dc762d5016ae038179f3c8191b930c509704a6f7d",
+          "summary_text": [],
+          "raw_content": [],
+          "native_type": "Reasoning",
+          "capture_boundary": "item/completed",
+          "capture_started": null,
+          "capture_completed": {
+            "utc": "2026-10-27T05:35:18.744Z",
+            "emitted_at_ms": 1793079318744,
+            "ordinal": 64,
+            "monotonic": null
+          }
+        },
+        {
+          "type": "AgentMessage",
+          "id": "msg_0107061d5dc762d5016ae03817acb88191ad541da67977729a",
+          "content": [
+            {
+              "type": "Text",
+              "text": "Wrote [answer.json](/private/tmp/loci-r1-native-q7rb_mxw/receipt-location-eager/workspace/answer.json).\n\nThe key is constructed by `makeReceiptKey` in [src/billing/receipt.js](/private/tmp/loci-r1-native-q7rb_mxw/receipt-location-eager/workspace/src/billing/receipt.js). The similarly named helpers in [src/reports/receipt.js](/private/tmp/loci-r1-native-q7rb_mxw/receipt-location-eager/workspace/src/reports/receipt.js) and [src/transport/receipt.js](/private/tmp/loci-r1-native-q7rb_mxw/receipt-location-eager/workspace/src/transport/receipt.js) produce a report key and read a response header, respectively.\n\nVerified the checkout route with a mock provider: it sends `invoice/acme/0007` as the `Idempotency-Key`."
+            }
+          ],
+          "phase": "final_answer",
+          "native_type": "AgentMessage",
+          "capture_boundary": "item/completed",
+          "capture_started": null,
+          "capture_completed": {
+            "utc": "2026-10-27T05:35:20.389Z",
+            "emitted_at_ms": 1793079320389,
+            "ordinal": 66,
+            "monotonic": null
+          }
+        }
+      ],
+      "raw_tool_calls": [
+        {
+          "type": "custom_tool_call",
+          "id": "ctc_0107061d5dc762d5016ae037ebf76c8191bbcdd41fba50e9cd",
+          "status": "completed",
+          "call_id": "call_ef3ce0c8a8d040bc9216bd3719357c05",
+          "name": "exec",
+          "input": "const names = ALL_TOOLS.filter(t => /^mcp__loci__/.test(t.name) || /(?:^|__)loci_[A-Za-z0-9_]+$/.test(t.name)).map(t => t.name).sort();\ntext({loci_runtime_catalog_v1: names});\n",
+          "internal_chat_message_metadata_passthrough": {
+            "turn_id": "01a17bda-63ad-7e42-9d69-175cc9079520",
+            "create_time": 1793079275.9722373
+          },
+          "output_item": {
+            "type": "custom_tool_call_output",
+            "id": "ctco_01a17bda-7017-72d3-b063-0c65021455f1",
+            "call_id": "call_ef3ce0c8a8d040bc9216bd3719357c05",
+            "output": [
+              {
+                "type": "input_text",
+                "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+              },
+              {
+                "type": "input_text",
+                "text": "{\"loci_runtime_catalog_v1\":[\"mcp__loci__loci_read\",\"mcp__loci__loci_retrieve\"]}"
+              }
+            ],
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17bda-63ad-7e42-9d69-175cc9079520",
+              "create_time": 1793079275.543847
+            }
+          }
+        },
+        {
+          "type": "custom_tool_call",
+          "id": "ctc_0107061d5dc762d5016ae037f2633481918003c7c2f50005e0",
+          "status": "completed",
+          "call_id": "call_1bb69d55cb954b6c828aec5f836d00e6",
+          "name": "exec",
+          "input": "const commands = [\n  {label:\"workspace\", cmd:\"pwd && git status --short && rg --files -g 'AGENTS.md' -g '!node_modules' -g '!vendor' | head -80\"},\n  {label:\"references\", cmd:\"rg -n -i 'idempotency.?key|sendInvoice|accountId|receipt' . -g '!answer.json' -g '!node_modules' -g '!vendor'\", max_output_tokens:14000}\n];\nconst results = await Promise.allSettled(commands.map(async ({label, ...args}) => ({label, ...(await tools.exec_command(args))})));\nfor (const r of results) text(r.status === \"fulfilled\" ? r.value : {error:String(r.reason)});\n",
+          "internal_chat_message_metadata_passthrough": {
+            "turn_id": "01a17bda-63ad-7e42-9d69-175cc9079520",
+            "create_time": 1793079282.3912423
+          },
+          "output_item": {
+            "type": "custom_tool_call_output",
+            "id": "ctco_01a17bda-8b3b-7353-a02d-9899ebd01976",
+            "call_id": "call_1bb69d55cb954b6c828aec5f836d00e6",
+            "output": [
+              {
+                "type": "input_text",
+                "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+              },
+              {
+                "type": "input_text",
+                "text": "{\"label\":\"workspace\",\"chunk_id\":\"2c7b5b\",\"wall_time_seconds\":0.000007084,\"exit_code\":128,\"original_token_count\":35,\"output\":\"/private/tmp/loci-r1-native-q7rb_mxw/receipt-location-eager/workspace\\nfatal: not a git repository (or any of the parent directories): .git\\n\"}"
+              },
+              {
+                "type": "input_text",
+                "text": "{\"label\":\"references\",\"chunk_id\":\"4fb087\",\"wall_time_seconds\":0.000002458,\"exit_code\":0,\"original_token_count\":222,\"output\":\"./src/reports/receipt.js:1:export function makeReceiptKey(row) { return `report:${row.id}`; }\\n./src/transport/receipt.js:1:export function makeReceiptKey(response) { return response.headers['x-receipt']; }\\n./src/transport/invoices.js:1:export async function sendInvoice(provider, invoice, receiptKey) {\\n./src/transport/invoices.js:2:  return provider.post('/invoices', invoice, { 'Idempotency-Key': receiptKey });\\n./src/billing/submit.js:1:import { makeReceiptKey } from './receipt.js';\\n./src/billing/submit.js:2:import { sendInvoice } from '../transport/invoices.js';\\n./src/billing/submit.js:4:  const key = makeReceiptKey(invoice);\\n./src/billing/submit.js:5:  return sendInvoice(provider, invoice, key);\\n./src/billing/receipt.js:1:export function makeReceiptKey(invoice) {\\n./src/billing/receipt.js:2:  return `invoice/${invoice.accountId}/${String(invoice.sequence).padStart(4, '0')}`;\\n\"}"
+              }
+            ],
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17bda-63ad-7e42-9d69-175cc9079520",
+              "create_time": 1793079282.491748
+            }
+          }
+        },
+        {
+          "type": "custom_tool_call",
+          "id": "ctc_0107061d5dc762d5016ae037f5084c81918ce82f0033780169",
+          "status": "completed",
+          "call_id": "call_20f8fea3063c4adc913feed516bbe3e9",
+          "name": "exec",
+          "input": "const commands = [\n  {label:\"files\", cmd:\"rg --files --hidden -g '!node_modules' -g '!vendor' -g '!.git'\"},\n  {label:\"entrypoints\", cmd:\"rg -n 'checkout|submit|makeReceiptKey|sendInvoice|Idempotency-Key' . -g '!answer.json' -g '!node_modules' -g '!vendor'\"},\n  {label:\"instructions\", cmd:\"find . -name AGENTS.md -print\"}\n];\nconst results = await Promise.allSettled(commands.map(async ({label, ...args}) => ({label, ...(await tools.exec_command(args))})));\nfor (const r of results) text(r.status === \"fulfilled\" ? r.value : {error:String(r.reason)});\n",
+          "internal_chat_message_metadata_passthrough": {
+            "turn_id": "01a17bda-63ad-7e42-9d69-175cc9079520",
+            "create_time": 1793079285.0380356
+          },
+          "output_item": {
+            "type": "custom_tool_call_output",
+            "id": "ctco_01a17bda-969a-73b2-b90c-efc6d2af104f",
+            "call_id": "call_20f8fea3063c4adc913feed516bbe3e9",
+            "output": [
+              {
+                "type": "input_text",
+                "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+              },
+              {
+                "type": "input_text",
+                "text": "{\"label\":\"files\",\"chunk_id\":\"788516\",\"wall_time_seconds\":0.0309705,\"exit_code\":0,\"original_token_count\":44,\"output\":\"src/reports/receipt.js\\nsrc/billing/receipt.js\\nsrc/billing/retry.js\\nsrc/billing/submit.js\\nsrc/app.js\\nsrc/transport/receipt.js\\nsrc/transport/invoices.js\\npackage.json\\nREADME.md\\n\"}"
+              },
+              {
+                "type": "input_text",
+                "text": "{\"label\":\"entrypoints\",\"chunk_id\":\"bd0c88\",\"wall_time_seconds\":0.02009575,\"exit_code\":0,\"original_token_count\":259,\"output\":\"./src/reports/receipt.js:1:export function makeReceiptKey(row) { return `report:${row.id}`; }\\n./src/billing/receipt.js:1:export function makeReceiptKey(invoice) {\\n./src/billing/submit.js:1:import { makeReceiptKey } from './receipt.js';\\n./src/billing/submit.js:2:import { sendInvoice } from '../transport/invoices.js';\\n./src/billing/submit.js:3:export async function submitInvoice(invoice, provider) {\\n./src/billing/submit.js:4:  const key = makeReceiptKey(invoice);\\n./src/billing/submit.js:5:  return sendInvoice(provider, invoice, key);\\n./src/app.js:1:import { submitInvoice } from './billing/submit.js';\\n./src/app.js:2:export async function checkout(invoice, provider) { return submitInvoice(invoice, provider); }\\n./src/transport/receipt.js:1:export function makeReceiptKey(response) { return response.headers['x-receipt']; }\\n./src/transport/invoices.js:1:export async function sendInvoice(provider, invoice, receiptKey) {\\n./src/transport/invoices.js:2:  return provider.post('/invoices', invoice, { 'Idempotency-Key': receiptKey });\\n\"}"
+              },
+              {
+                "type": "input_text",
+                "text": "{\"label\":\"instructions\",\"chunk_id\":\"3dc2e5\",\"wall_time_seconds\":0.007826542,\"exit_code\":0,\"original_token_count\":0,\"output\":\"\"}"
+              }
+            ],
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17bda-63ad-7e42-9d69-175cc9079520",
+              "create_time": 1793079285.402609
+            }
+          }
+        },
+        {
+          "type": "custom_tool_call",
+          "id": "ctc_0107061d5dc762d5016ae037fd2d388191a81e863ce44f03db",
+          "status": "completed",
+          "call_id": "call_e590285ac3dd42d092d179b823031156",
+          "name": "exec",
+          "input": "const result = await tools.exec_command({cmd:\"for file in README.md package.json src/app.js src/billing/submit.js src/billing/receipt.js src/billing/retry.js src/transport/invoices.js src/transport/receipt.js src/reports/receipt.js; do printf '\\\\n%s\\\\n' \\\"$file\\\"; nl -ba \\\"$file\\\"; done\",\"max_output_tokens\":6000});\ntext(result);\n",
+          "internal_chat_message_metadata_passthrough": {
+            "turn_id": "01a17bda-63ad-7e42-9d69-175cc9079520",
+            "create_time": 1793079293.1792092
+          },
+          "output_item": {
+            "type": "custom_tool_call_output",
+            "id": "ctco_01a17bda-b4d6-7941-bfa0-e76fe65a521f",
+            "call_id": "call_e590285ac3dd42d092d179b823031156",
+            "output": [
+              {
+                "type": "input_text",
+                "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+              },
+              {
+                "type": "input_text",
+                "text": "{\"chunk_id\":\"b2a9af\",\"wall_time_seconds\":0.003599792,\"exit_code\":0,\"original_token_count\":333,\"output\":\"\\nREADME.md\\n     1\\tSmall inventory service fixture. No network or dependencies are required.\\n\\npackage.json\\n     1\\t{\\\"type\\\":\\\"module\\\",\\\"private\\\":true}\\n\\nsrc/app.js\\n     1\\timport { submitInvoice } from './billing/submit.js';\\n     2\\texport async function checkout(invoice, provider) { return submitInvoice(invoice, provider); }\\n\\nsrc/billing/submit.js\\n     1\\timport { makeReceiptKey } from './receipt.js';\\n     2\\timport { sendInvoice } from '../transport/invoices.js';\\n     3\\texport async function submitInvoice(invoice, provider) {\\n     4\\t  const key = makeReceiptKey(invoice);\\n     5\\t  return sendInvoice(provider, invoice, key);\\n     6\\t}\\n\\nsrc/billing/receipt.js\\n     1\\texport function makeReceiptKey(invoice) {\\n     2\\t  return `invoice/${invoice.accountId}/${String(invoice.sequence).padStart(4, '0')}`;\\n     3\\t}\\n\\nsrc/billing/retry.js\\n     1\\texport function retryDelay(attempt) { return Math.min(1000 * 2 ** attempt, 8000); }\\n\\nsrc/transport/invoices.js\\n     1\\texport async function sendInvoice(provider, invoice, receiptKey) {\\n     2\\t  return provider.post('/invoices', invoice, { 'Idempotency-Key': receiptKey });\\n     3\\t}\\n\\nsrc/transport/receipt.js\\n     1\\texport function makeReceiptKey(response) { return response.headers['x-receipt']; }\\n\\nsrc/reports/receipt.js\\n     1\\texport function makeReceiptKey(row) { return `report:${row.id}`; }\\n\"}"
+              }
+            ],
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17bda-63ad-7e42-9d69-175cc9079520",
+              "create_time": 1793079293.142347
+            }
+          }
+        },
+        {
+          "type": "custom_tool_call",
+          "id": "ctc_0107061d5dc762d5016ae0380c683c8191a3d67937de26f432",
+          "status": "completed",
+          "call_id": "call_b05e5b2aca1c40ea9e5425ea4e62263c",
+          "name": "exec",
+          "input": "const patch = \"*** Begin Patch\\n*** Add File: answer.json\\n+{\\n+  \\\"owner_file\\\": \\\"src/billing/receipt.js\\\",\\n+  \\\"owner_symbol\\\": \\\"makeReceiptKey\\\",\\n+  \\\"outbound_file\\\": \\\"src/transport/invoices.js\\\",\\n+  \\\"outbound_symbol\\\": \\\"sendInvoice\\\",\\n+  \\\"call_chain\\\": [\\n+    {\\\"file\\\": \\\"src/app.js\\\", \\\"symbol\\\": \\\"checkout\\\"},\\n+    {\\\"file\\\": \\\"src/billing/submit.js\\\", \\\"symbol\\\": \\\"submitInvoice\\\"},\\n+    {\\\"file\\\": \\\"src/billing/receipt.js\\\", \\\"symbol\\\": \\\"makeReceiptKey\\\"},\\n+    {\\\"file\\\": \\\"src/transport/invoices.js\\\", \\\"symbol\\\": \\\"sendInvoice\\\"}\\n+  ],\\n+  \\\"example_key\\\": \\\"invoice/acme/0007\\\"\\n+}\\n*** End Patch\";\ntext(await tools.apply_patch(patch));\n",
+          "internal_chat_message_metadata_passthrough": {
+            "turn_id": "01a17bda-63ad-7e42-9d69-175cc9079520",
+            "create_time": 1793079308.409735
+          },
+          "output_item": {
+            "type": "custom_tool_call_output",
+            "id": "ctco_01a17bda-f29a-7eb3-b629-0294770b1570",
+            "call_id": "call_b05e5b2aca1c40ea9e5425ea4e62263c",
+            "output": [
+              {
+                "type": "input_text",
+                "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+              },
+              {
+                "type": "input_text",
+                "text": "{}"
+              }
+            ],
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17bda-63ad-7e42-9d69-175cc9079520",
+              "create_time": 1793079308.95461
+            }
+          }
+        },
+        {
+          "type": "custom_tool_call",
+          "id": "ctc_0107061d5dc762d5016ae03810b9a88191a87d26a6e9502785",
+          "status": "completed",
+          "call_id": "call_32f84a0e56f64e85950b95b157c53ed7",
+          "name": "exec",
+          "input": "const result = await tools.exec_command({\n  cmd: `node --input-type=module <<'NODE'\nimport assert from 'node:assert/strict';\nimport { readFile } from 'node:fs/promises';\nimport { checkout } from './src/app.js';\nimport { makeReceiptKey as reportKey } from './src/reports/receipt.js';\nimport { makeReceiptKey as transportKey } from './src/transport/receipt.js';\n\nconst answer = JSON.parse(await readFile('answer.json', 'utf8'));\nassert.deepEqual(Object.keys(answer), ['owner_file', 'owner_symbol', 'outbound_file', 'outbound_symbol', 'call_chain', 'example_key']);\nassert.deepEqual(answer.call_chain.map(({ symbol }) => symbol), ['checkout', 'submitInvoice', 'makeReceiptKey', 'sendInvoice']);\nfor (const { file, symbol } of answer.call_chain) {\n  const module = await import('./' + file);\n  assert.equal(typeof module[symbol], 'function', file + ':' + symbol);\n}\nassert.deepEqual(answer.call_chain[2], { file: answer.owner_file, symbol: answer.owner_symbol });\nassert.deepEqual(answer.call_chain[3], { file: answer.outbound_file, symbol: answer.outbound_symbol });\n\nconst invoice = { accountId: 'acme', sequence: 7 };\nlet outbound;\nconst result = await checkout(invoice, { post: async (...args) => { outbound = args; return 'sent'; } });\nassert.equal(result, 'sent');\nassert.deepEqual(outbound, ['/invoices', invoice, { 'Idempotency-Key': answer.example_key }]);\nassert.equal(answer.example_key, 'invoice/acme/0007');\nassert.equal(reportKey({ id: 'row1' }), 'report:row1');\nassert.equal(transportKey({ headers: { 'x-receipt': 'upstream-receipt' } }), 'upstream-receipt');\nconsole.log('PASS: answer schema, symbol paths, checkout outbound header, and distinct receipt helpers');\nNODE`,\n  max_output_tokens: 1000\n});\ntext(result);\n",
+          "internal_chat_message_metadata_passthrough": {
+            "turn_id": "01a17bda-63ad-7e42-9d69-175cc9079520",
+            "create_time": 1793079312.7271664
+          },
+          "output_item": {
+            "type": "custom_tool_call_output",
+            "id": "ctco_01a17bdb-0a9a-7152-9c37-1f9745df575a",
+            "call_id": "call_32f84a0e56f64e85950b95b157c53ed7",
+            "output": [
+              {
+                "type": "input_text",
+                "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+              },
+              {
+                "type": "input_text",
+                "text": "{\"chunk_id\":\"85933c\",\"wall_time_seconds\":0.000006375,\"exit_code\":0,\"original_token_count\":23,\"output\":\"PASS: answer schema, symbol paths, checkout outbound header, and distinct receipt helpers\\n\"}"
+              }
+            ],
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17bda-63ad-7e42-9d69-175cc9079520",
+              "create_time": 1793079315.098561
+            }
+          }
+        }
+      ],
+      "late_items_after_abort": 0,
+      "post_abort_cleanup_ms": null
+    }
+  ],
+  "usage_status": "known",
+  "usage": {
+    "inputTokens": 196359,
+    "cachedInputTokens": 142464,
+    "outputTokens": 3075,
+    "reasoningOutputTokens": 1608,
+    "totalTokens": 199434,
+    "cacheWriteInputTokens": 0,
+    "uncachedInputTokens": 53895
+  },
+  "observed_cumulative_usage": {
+    "inputTokens": 196359,
+    "cachedInputTokens": 142464,
+    "outputTokens": 3075,
+    "reasoningOutputTokens": 1608,
+    "totalTokens": 199434,
+    "cacheWriteInputTokens": 0
+  },
+  "usage_errors": [],
+  "capture_errors": [],
+  "operation_totals": {
+    "mcp_calls": 0,
+    "shell_calls": 7,
+    "file_change_calls": 1,
+    "context_compactions": 0,
+    "subagent_calls": 0,
+    "failed_shell_calls": 1
+  },
+  "phase_groups": {},
+  "limitations": [
+    "Usage updates are not proven model-request counts; unique raw response completions are a lower bound that may omit failed upstream requests/retries.",
+    "Raw outer-call availability is explicit; nested operation counts are distinct.",
+    "Behavioral quality and rework attribution require the independent oracle/review.",
+    "MCP source/delivery receipts are joined separately; item presence is not model reliance."
+  ],
+  "native_provenance": {
+    "rollout_path": "/Users/brummerv/phluxxed/loci/.worktrees/r1-integrated/.scratch/r1-integrated/pilot-availability-v2/archived-runs/receipt-location-eager/observer/qualification/native-rollout.jsonl",
+    "session_id": "01a17bda-5ed2-77b1-ac84-94d0d0a4d758",
+    "cwd": "/private/tmp/loci-r1-native-q7rb_mxw/receipt-location-eager/workspace",
+    "cli_version": "0.164.0",
+    "source": "exec",
+    "thread_source": "user",
+    "bootstrap_message_rows": [
+      7
+    ]
+  },
+  "turn_contexts": [
+    {
+      "turn_id": "01a17bda-63ad-7e42-9d69-175cc9079520",
+      "cwd": "/private/tmp/loci-r1-native-q7rb_mxw/receipt-location-eager/workspace",
+      "model": "gpt-6.1-terra",
+      "effort": "max",
+      "approval_policy": "on-request",
+      "approvals_reviewer": "auto_review",
+      "sandbox_policy": {
+        "type": "workspace-write",
+        "writable_roots": [
+          "/",
+          "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T"
+        ],
+        "network_access": true,
+        "exclude_tmpdir_env_var": false,
+        "exclude_slash_tmp": false
+      },
+      "permission_profile": {
+        "type": "managed",
+        "file_system": {
+          "type": "restricted",
+          "entries": [
+            {
+              "path": {
+                "type": "path",
+                "path": "/"
+              },
+              "access": "write"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/.claude"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/.claude/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/Downloads"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/Downloads/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/claude-otel"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/claude-otel/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/improvements"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/improvements/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/work"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/work/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "minimal"
+                }
+              },
+              "access": "read"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "tmpdir"
+                }
+              },
+              "access": "write"
+            }
+          ]
+        },
+        "network": "enabled"
+      },
+      "active_permission_profile": {
+        "id": "brummerv_filesystem_guard"
+      },
+      "file_system_sandbox_policy": {
+        "kind": "restricted",
+        "entries": [
+          {
+            "path": {
+              "type": "path",
+              "path": "/"
+            },
+            "access": "write"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/.claude"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/.claude/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/Downloads"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/Downloads/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/claude-otel"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/claude-otel/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/improvements"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/improvements/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/work"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/work/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "special",
+              "value": {
+                "kind": "minimal"
+              }
+            },
+            "access": "read"
+          },
+          {
+            "path": {
+              "type": "special",
+              "value": {
+                "kind": "tmpdir"
+              }
+            },
+            "access": "write"
+          }
+        ]
+      }
+    }
+  ],
+  "native_errors": []
+}

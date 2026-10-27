@@ -1,0 +1,13 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import { pathToFileURL } from 'node:url';
+const root=process.argv[2];
+const answer=JSON.parse(fs.readFileSync(path.join(root,'answer.json'),'utf8'));
+assert.deepEqual(answer,{"changed_file": "src/quantity.js", "zero_result": {"sku": "A", "quantity": 0, "active": false}, "error_message": "invalid quantity"});
+const load=async file => import(pathToFileURL(path.join(root,file)).href);
+const {lineFromRequest}=await load('src/api.js');
+for(const value of [0,'0',1,'2',23]) assert.deepEqual(lineFromRequest({sku:' A ',quantity:value}),{sku:'A',quantity:Number(value),active:Number(value)>0});
+for(const value of [-1,'-1',0.5,'0.5',NaN,Infinity,-Infinity,'',' ','\t',true,false,null,undefined,'oops']) assert.throws(()=>lineFromRequest({sku:'A',quantity:value}),{message:'invalid quantity'});
+const {parseQuantity}=await load('src/cli.js'); assert.equal(parseQuantity('0'),1);
+console.log(JSON.stringify({status:'passed'}));

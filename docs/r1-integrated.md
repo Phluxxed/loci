@@ -58,3 +58,7 @@ at a time, at file granularity. Semantic IDs can also be re-anchored to source.
 The production graph policy and diagnostics are not exposed by this server.
 No planner, automatic semantic router, new graph or persistent proof store is
 introduced.
+
+## Evaluation status
+
+The [completed experimental pilot](../.scratch/r1-integrated/pilot-availability-v2/analysis/REPORT.md) verified all four condition catalogs and separate positive operational probes, but recorded no voluntary task-level Loci use. The mechanisms remain deterministically qualified; agent-level semantic/proof benefit is unmeasured. Recommendation: revise / hold advancement. This is not a production integration.

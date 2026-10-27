@@ -1,0 +1,1056 @@
+{
+  "schema_version": 1,
+  "kind": "r0-native-session-qualification",
+  "run_id": "dispatch-ambiguity-eager",
+  "arm": "loci",
+  "thread_id": "01a17bdf-376f-79e2-9b92-5a4446db15ca",
+  "status": "qualified_observations",
+  "measured": false,
+  "config_sha256": "cff7c19baff197ae6e0ad47260204c1ed3222e308cf1ee17bd6ec77bc4f85d36",
+  "native_trace_sha256": "40a9eac0740c0bfba23262e3d6db53d8d139327a8c98fc6841a44cf3f66cc90f",
+  "source_before": "536fb3f88376327f457c750e5cb0d9a839f702f03eada1532f0611c401cbb002",
+  "source_after": "bb21e783bc51db93eef817d6c4b465cf699ee1c8a45a19b0b6b31dd3ebecac90",
+  "conditions": {
+    "model": "gpt-6.1-terra",
+    "effort": "max",
+    "native_protection": {
+      "approval_policy": "on-request",
+      "approvals_reviewer": "auto_review",
+      "sandbox_policy": {
+        "type": "workspace-write",
+        "writable_roots": [
+          "/",
+          "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T"
+        ],
+        "network_access": true,
+        "exclude_tmpdir_env_var": false,
+        "exclude_slash_tmp": false
+      },
+      "permission_profile": {
+        "type": "managed",
+        "file_system": {
+          "type": "restricted",
+          "entries": [
+            {
+              "path": {
+                "type": "path",
+                "path": "/"
+              },
+              "access": "write"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/.claude"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/.claude/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/Downloads"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/Downloads/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/claude-otel"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/claude-otel/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/improvements"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/improvements/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/work"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/work/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "minimal"
+                }
+              },
+              "access": "read"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "tmpdir"
+                }
+              },
+              "access": "write"
+            }
+          ]
+        },
+        "network": "enabled"
+      },
+      "active_permission_profile": {
+        "id": "brummerv_filesystem_guard"
+      },
+      "file_system_sandbox_policy": {
+        "kind": "restricted",
+        "entries": [
+          {
+            "path": {
+              "type": "path",
+              "path": "/"
+            },
+            "access": "write"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/.claude"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/.claude/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/Downloads"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/Downloads/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/claude-otel"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/claude-otel/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/improvements"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/improvements/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "path",
+              "path": "/Users/brummerv/work"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "glob_pattern",
+              "pattern": "/Users/brummerv/work/**"
+            },
+            "access": "deny"
+          },
+          {
+            "path": {
+              "type": "special",
+              "value": {
+                "kind": "minimal"
+              }
+            },
+            "access": "read"
+          },
+          {
+            "path": {
+              "type": "special",
+              "value": {
+                "kind": "tmpdir"
+              }
+            },
+            "access": "write"
+          }
+        ]
+      }
+    },
+    "freeze_sha256": "0a747227d868595fa728c095dcc0d3b26fcd3b1fbfcab938b2543bbdc3e735c6",
+    "native_config_binding": {
+      "schema": "r1-cli-model-defaults-v1",
+      "raw_sha256": "0353fc7b94b3a66303648814809c4d7f84745eb032d9f9b92beb1934eebd64d1",
+      "effective_sha256": "1144414951be6350ae99a43a4fcfb1256694c17f16920408d8d790ec2111e48d",
+      "field_sha256": {
+        "model": "c8eeff274672ae39221a0febbb1db6d6c7a979673419a2635c2d1f0f499a8f04",
+        "model_reasoning_effort": "b57c4299afe3cda154124bdb96ceaf618a9d8d9cd8d2c8f6580ff26faa5fe5ca",
+        "model_context_window": "ad1e2e29fe1631ddf7bedaadffe63c4efd61e6909a1ed0648e7b9645bd27dab5",
+        "model_auto_compact_token_limit": "e6ba348d1464969bb4210f401b255b6de57b81fddc375b944ac4fe2fb698bc95",
+        "service_tier": "1080a60800d9e5bddc69f51489c636a776bacaadb5368f46db4aa0947c67e3ba",
+        "plan_mode_reasoning_effort": "e5c4eb89c17b3350875c064ac177103d77081d68860beaffbdb826c88462eb41",
+        "approval_policy": "112f9f74261331ef91d859af60ec297cdd2cfdbc99811d74a8002f4fcb71fb4a",
+        "approvals_reviewer": "f83d332e375a1a7db6babce3b70e263ea815a07685d3cfaa2ffc641455ee8d25",
+        "default_permissions": "9c08e418cb514da9dc6a34f2fd53927da6723713a8cf649fc4d09d0953e36faa",
+        "developer_instructions": "b81a536c573f07708ee5aae6e203b7757c42985984b5a4e8ff7a8ed58a5a1571",
+        "notify": "09928d31161e6998648aaabfe61e4dc0351473dde87bdfced2689282b6beb5d6",
+        "agents": "fee67260299ab214b3908cdc4f7b9ffb53d3654dca8c93816502b6bd4a7d6611",
+        "permissions": "4c0c54b700b1be8523e5801611b47e84ab3a29e8f2e240838a40cdd561a35f09",
+        "projects": "2f9fc4ea487ac946665332cc4ab370378a57625ce2f6acc3c898f4dabc6f3ddb",
+        "otel": "86ff2534d6158ad2fba9ccea91139cb5f9abc1ebdb110a0058947e050651535a",
+        "tui": "c3ac8d12f5a0f8bab72a8df93c873b2a0a752cc654efd1ae5576af2139fcb1ff",
+        "plugins": "5ea7a32c3f441de100c99c50d373d3121a91a16c82ad85236148a8b0125f9c88",
+        "hooks": "5c78c907ac5b0d71c3d49c9c1ccf968294e968b473ab2d68287601465771c514",
+        "notice": "97f2fe6a31e33287559f344a16f9bcc5a5befa581b986f75ff423ed5b2ad29cd",
+        "features": "2f806baaa1d6257aceca9d08158fe2887bfdb6023516c144f3658f329b4b0007",
+        "memories": "e3b654f3522801b6062cb54b57289a2af085bd1e96e7409ee007efd231452e12",
+        "mcp_servers": "43019dcc907af7dbde0addda15d4d6f798a7687c243796b7aa69df8114166e88",
+        "marketplaces": "2bf6f3f400e57770f07c2e9d64adc2c0a9f9796cafe6d6c28b09b47b85cbbd41",
+        "desktop": "aa6b9cc0bfd3a4cd469fce52fb8de20ae71f67b1dd820306ca89fbaf17d0fdd0",
+        "shell_environment_policy": "55c0fc8e982d9dd0d451c6c3bc442a0668341278e7cb6b6d9f346a2ad88a6895",
+        "apps": "4ac7980d4c76878d55fb2c5dd4b8f0afe71972932449f8225dd842557c5ec914",
+        "skills": "b0936d993dc8808917c340f46496acde153bd8d41da18b1492cb4bbc4a0fe363"
+      }
+    }
+  },
+  "native_config_sha256": "c1b4cb33f778ac0653f9849d390579595aa6cfc848a8a78f1f17b5282d3500d8",
+  "workspace": "/private/tmp/loci-r1-native-q7rb_mxw/dispatch-ambiguity-eager/workspace",
+  "observer": "/private/tmp/loci-r1-native-q7rb_mxw/dispatch-ambiguity-eager/observer",
+  "accounting": {
+    "schema_version": 1,
+    "accounting": "native-rollout-v1",
+    "thread_id": "01a17bdf-376f-79e2-9b92-5a4446db15ca",
+    "stages": [
+      {
+        "stage_id": "turn-1",
+        "turn_id": "01a17bdf-3e37-76a3-994b-c07fc4879b16",
+        "outcome": "completed",
+        "elapsed_ms": 38577,
+        "usage_status": "known",
+        "usage": {
+          "inputTokens": 135195,
+          "cachedInputTokens": 112896,
+          "outputTokens": 2435,
+          "reasoningOutputTokens": 1243,
+          "totalTokens": 137630,
+          "cacheWriteInputTokens": 0,
+          "uncachedInputTokens": 22299
+        },
+        "usage_updates": 5,
+        "observed_usage_delta": {
+          "inputTokens": 135195,
+          "cachedInputTokens": 112896,
+          "outputTokens": 2435,
+          "reasoningOutputTokens": 1243,
+          "totalTokens": 137630,
+          "cacheWriteInputTokens": 0
+        },
+        "usage_limitation": null,
+        "mcp_calls": 0,
+        "shell_calls": 3,
+        "file_change_calls": 0,
+        "context_compactions": 0,
+        "subagent_calls": 0,
+        "failed_shell_calls": 0,
+        "outer_tool_calls": 4,
+        "outer_tool_calls_status": "observed",
+        "model_requests": null,
+        "observed_completed_model_requests": 5,
+        "model_requests_status": "completion_lower_bound",
+        "upstream_responses": [
+          {
+            "threadId": "01a17bdf-376f-79e2-9b92-5a4446db15ca",
+            "turnId": "01a17bdf-3e37-76a3-994b-c07fc4879b16",
+            "responseId": "resp_0ddb4f0e73ce1b36016ae03929cfc0819199230cf0a87f82bf"
+          },
+          {
+            "threadId": "01a17bdf-376f-79e2-9b92-5a4446db15ca",
+            "turnId": "01a17bdf-3e37-76a3-994b-c07fc4879b16",
+            "responseId": "resp_0ddb4f0e73ce1b36016ae0392c635c81918ea2e1a446f8e692"
+          },
+          {
+            "threadId": "01a17bdf-376f-79e2-9b92-5a4446db15ca",
+            "turnId": "01a17bdf-3e37-76a3-994b-c07fc4879b16",
+            "responseId": "resp_0ddb4f0e73ce1b36016ae039309e008191aeb862b7928e3900"
+          },
+          {
+            "threadId": "01a17bdf-376f-79e2-9b92-5a4446db15ca",
+            "turnId": "01a17bdf-3e37-76a3-994b-c07fc4879b16",
+            "responseId": "resp_0ddb4f0e73ce1b36016ae03933ca30819197c88809b272d59b"
+          },
+          {
+            "threadId": "01a17bdf-376f-79e2-9b92-5a4446db15ca",
+            "turnId": "01a17bdf-3e37-76a3-994b-c07fc4879b16",
+            "responseId": "resp_0ddb4f0e73ce1b36016ae039468c288191ae5248f2637e2d58"
+          }
+        ],
+        "first_event": {
+          "ordinal": 14,
+          "monotonic": null,
+          "utc": "2026-10-27T05:39:51.840Z"
+        },
+        "last_event": {
+          "ordinal": 53,
+          "monotonic": null,
+          "utc": "2026-10-27T05:40:28.937Z"
+        },
+        "operation_counts_status": "observed_items_only",
+        "items": [
+          {
+            "type": "UserMessage",
+            "id": "01a17bdf-439f-7fd2-a090-86bc433e56fa",
+            "content": [
+              {
+                "type": "text",
+                "text": "Before doing the task, your first model tool action must be functions.exec executing exactly this program, without additions or changes:\nconst names = ALL_TOOLS.filter(t => /^mcp__loci__/.test(t.name) || /(?:^|__)loci_[A-Za-z0-9_]+$/.test(t.name)).map(t => t.name).sort();\ntext({loci_runtime_catalog_v1: names});\nCompare the returned live Loci tool names with the expected tools below (qualified as mcp__loci__NAME). If discovery is unavailable or the set differs, stop and report the availability failure. Otherwise continue the original task; Loci use is optional.\nExpected tools: [\"loci_read\", \"loci_retrieve\"]\n\nOriginal task follows:\nWork only in the assigned workspace. Complete this assignment directly; do not delegate or spawn agents. Native file, search, shell and edit tools are available. Loci tools, when available, are optional; select them only if useful. Do not inspect sibling runs, observer folders, evaluator files, or other task copies. Do not change user/global configuration.\nWrite the requested structured result to answer.json. Do not add unrequested claims; cite exact relative source paths and symbols. Finish when the requested result and your directly relevant check are complete.\n\ndispatch obtains a same-named handler through a registry lookup. Identify which handlers are possible in this source snapshot, which handler is selected for event {kind:'mail', payload:' Hi '}, and what remains unknown if kind is supplied only at runtime. Do not claim one unconditional static call target. Do not change source. Write answer.json with exactly these keys: registered_files (sorted), selected_file, selected_output, unknown_kind_error, target_depends_on_runtime_kind (boolean), legacy_reachable_from_dispatch (boolean).\n",
+                "text_elements": []
+              }
+            ],
+            "native_type": "UserMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T05:39:51.840Z",
+              "emitted_at_ms": 1793079591840,
+              "ordinal": 14,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0ddb4f0e73ce1b36016ae0392b25088191963afb56042e3017",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T05:39:54.304Z",
+              "emitted_at_ms": 1793079594304,
+              "ordinal": 16,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "AgentMessage",
+            "id": "msg_0ddb4f0e73ce1b36016ae0392b36fc8191a9460d23cc92a961",
+            "content": [
+              {
+                "type": "Text",
+                "text": "I’ll check the live Loci catalog first, then trace the dispatch path in the assigned workspace and write the requested result."
+              }
+            ],
+            "phase": "commentary",
+            "native_type": "AgentMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T05:39:54.582Z",
+              "emitted_at_ms": 1793079594582,
+              "ordinal": 18,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0ddb4f0e73ce1b36016ae0392eed5c8191b78bca0a341711de",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T05:39:58.045Z",
+              "emitted_at_ms": 1793079598045,
+              "ordinal": 24,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "commandExecution",
+            "id": "exec-a2b3c742-8b6b-421e-be84-bf4faca10668",
+            "process_id": "67842",
+            "command": [
+              "/bin/zsh",
+              "-lc",
+              "pwd && rg --files -g '!answer.json' -g '!node_modules' -g '!vendor' -g '!dist' -g '!build' | sort"
+            ],
+            "cwd": "file:///private/tmp/loci-r1-native-q7rb_mxw/dispatch-ambiguity-eager/workspace",
+            "parsed_cmd": [
+              {
+                "type": "unknown",
+                "cmd": "pwd && rg --files -g '!answer.json' -g '!node_modules' -g '!vendor' -g '!dist' -g '!build' | sort"
+              }
+            ],
+            "source": "unified_exec_startup",
+            "status": "completed",
+            "aggregated_output": "/private/tmp/loci-r1-native-q7rb_mxw/dispatch-ambiguity-eager/workspace\nREADME.md\npackage.json\nsrc/channels/audit.js\nsrc/channels/legacy.js\nsrc/channels/mail.js\nsrc/codec.js\nsrc/dispatch.js\nsrc/preview.js\nsrc/registry.js\n",
+            "exit_code": 0,
+            "duration": {
+              "secs": 0,
+              "nanos": 7167
+            },
+            "native_type": "CommandExecution",
+            "exitCode": 0,
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T05:39:59.203Z",
+              "emitted_at_ms": 1793079599203,
+              "ordinal": 28,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0ddb4f0e73ce1b36016ae0393230d08191a1afa1e4d857b1a1",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T05:40:01.316Z",
+              "emitted_at_ms": 1793079601316,
+              "ordinal": 31,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "commandExecution",
+            "id": "exec-4dd147a6-0fff-46d8-bdf1-c174fccc3841",
+            "process_id": "91327",
+            "command": [
+              "/bin/zsh",
+              "-lc",
+              "for file in README.md package.json src/dispatch.js src/registry.js src/codec.js src/preview.js src/channels/*.js; do printf '\\n--- %s ---\\n' \"$file\"; nl -ba \"$file\"; done"
+            ],
+            "cwd": "file:///private/tmp/loci-r1-native-q7rb_mxw/dispatch-ambiguity-eager/workspace",
+            "parsed_cmd": [
+              {
+                "type": "unknown",
+                "cmd": "for file in README.md package.json src/dispatch.js src/registry.js src/codec.js src/preview.js src/channels/*.js; do printf '\\n--- %s ---\\n' \"$file\"; nl -ba \"$file\"; done"
+              }
+            ],
+            "source": "unified_exec_startup",
+            "status": "completed",
+            "aggregated_output": "\n--- README.md ---\n     1\tSmall inventory service fixture. No network or dependencies are required.\n\n--- package.json ---\n     1\t{\"type\":\"module\",\"private\":true}\n\n--- src/dispatch.js ---\n     1\timport { registry } from './registry.js';\n     2\texport function dispatch(event) {\n     3\t  const handler = registry[event.kind];\n     4\t  if (!handler) throw new Error('unknown kind');\n     5\t  return handler(event.payload);\n     6\t}\n\n--- src/registry.js ---\n     1\timport { handle as mail } from './channels/mail.js';\n     2\timport { handle as audit } from './channels/audit.js';\n     3\texport const registry = Object.assign(Object.create(null), { mail, audit });\n\n--- src/codec.js ---\n     1\texport function encode(value) { return String(value).trim().toLowerCase(); }\n\n--- src/preview.js ---\n     1\timport { handle } from './channels/legacy.js';\n     2\texport function preview(value) { return handle(value); }\n\n--- src/channels/audit.js ---\n     1\texport function handle(value) { return `audit:${JSON.stringify(value)}`; }\n\n--- src/channels/legacy.js ---\n     1\texport function handle(value) { return `legacy:${value}`; }\n\n--- src/channels/mail.js ---\n     1\timport { encode } from '../codec.js';\n     2\texport function handle(value) { return `mail:${encode(value)}`; }\n",
+            "exit_code": 0,
+            "duration": {
+              "secs": 0,
+              "nanos": 2728000
+            },
+            "native_type": "CommandExecution",
+            "exitCode": 0,
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T05:40:02.369Z",
+              "emitted_at_ms": 1793079602369,
+              "ordinal": 35,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0ddb4f0e73ce1b36016ae0393cc4288191a17c1a2d3192d075",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T05:40:11.905Z",
+              "emitted_at_ms": 1793079611905,
+              "ordinal": 38,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0ddb4f0e73ce1b36016ae03941a52c8191831c6c4bf3f87a54",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T05:40:16.759Z",
+              "emitted_at_ms": 1793079616759,
+              "ordinal": 40,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "AgentMessage",
+            "id": "msg_0ddb4f0e73ce1b36016ae03941b21881919b8a2c8063594e78",
+            "content": [
+              {
+                "type": "Text",
+                "text": "The registry contains the mail and audit handlers; the legacy handler is used by `preview`. I’ll verify the selected output and unknown-kind error against the code while writing the result."
+              }
+            ],
+            "phase": "commentary",
+            "native_type": "AgentMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T05:40:17.696Z",
+              "emitted_at_ms": 1793079617696,
+              "ordinal": 42,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "commandExecution",
+            "id": "exec-9d155725-1e9f-4e9b-972e-abfe1d91a72a",
+            "process_id": "96119",
+            "command": [
+              "/bin/zsh",
+              "-lc",
+              "node --input-type=module <<'NODE'\nimport assert from 'node:assert/strict';\nimport { readFileSync, writeFileSync } from 'node:fs';\nimport { dispatch } from './src/dispatch.js';\nimport { registry } from './src/registry.js';\nimport { handle as mail } from './src/channels/mail.js';\nimport { handle as audit } from './src/channels/audit.js';\nimport { handle as legacy } from './src/channels/legacy.js';\n\nassert.deepEqual(Object.keys(registry).sort(), ['audit', 'mail']);\nassert.equal(registry.mail, mail);\nassert.equal(registry.audit, audit);\nassert.equal(Object.values(registry).includes(legacy), false);\nassert.equal(dispatch({ kind: 'mail', payload: ' Hi ' }), 'mail:hi');\nassert.equal(dispatch({ kind: 'audit', payload: ' Hi ' }), 'audit:\" Hi \"');\nassert.throws(() => dispatch({ kind: 'unknown', payload: ' Hi ' }), { message: 'unknown kind' });\nconst answer = {\n  registered_files: ['src/channels/audit.js', 'src/channels/mail.js'],\n  selected_file: 'src/channels/mail.js',\n  selected_output: 'mail:hi',\n  unknown_kind_error: 'unknown kind',\n  target_depends_on_runtime_kind: true,\n  legacy_reachable_from_dispatch: false\n};\nwriteFileSync('answer.json', `${JSON.stringify(answer, null, 2)}\\n`);\nassert.deepEqual(JSON.parse(readFileSync('answer.json', 'utf8')), answer);\nconsole.log('Verified registry mappings, mail and audit dispatch, unknown-kind error, legacy exclusion, and answer.json.');\nNODE"
+            ],
+            "cwd": "file:///private/tmp/loci-r1-native-q7rb_mxw/dispatch-ambiguity-eager/workspace",
+            "parsed_cmd": [
+              {
+                "type": "unknown",
+                "cmd": "node --input-type=module <<'NODE'\nimport assert from 'node:assert/strict';\nimport { readFileSync, writeFileSync } from 'node:fs';\nimport { dispatch } from './src/dispatch.js';\nimport { registry } from './src/registry.js';\nimport { handle as mail } from './src/channels/mail.js';\nimport { handle as audit } from './src/channels/audit.js';\nimport { handle as legacy } from './src/channels/legacy.js';\n\nassert.deepEqual(Object.keys(registry).sort(), ['audit', 'mail']);\nassert.equal(registry.mail, mail);\nassert.equal(registry.audit, audit);\nassert.equal(Object.values(registry).includes(legacy), false);\nassert.equal(dispatch({ kind: 'mail', payload: ' Hi ' }), 'mail:hi');\nassert.equal(dispatch({ kind: 'audit', payload: ' Hi ' }), 'audit:\" Hi \"');\nassert.throws(() => dispatch({ kind: 'unknown', payload: ' Hi ' }), { message: 'unknown kind' });\nconst answer = {\n  registered_files: ['src/channels/audit.js', 'src/channels/mail.js'],\n  selected_file: 'src/channels/mail.js',\n  selected_output: 'mail:hi',\n  unknown_kind_error: 'unknown kind',\n  target_depends_on_runtime_kind: true,\n  legacy_reachable_from_dispatch: false\n};\nwriteFileSync('answer.json', `${JSON.stringify(answer, null, 2)}\\n`);\nassert.deepEqual(JSON.parse(readFileSync('answer.json', 'utf8')), answer);\nconsole.log('Verified registry mappings, mail and audit dispatch, unknown-kind error, legacy exclusion, and answer.json.');\nNODE"
+              }
+            ],
+            "source": "unified_exec_startup",
+            "status": "completed",
+            "aggregated_output": "Verified registry mappings, mail and audit dispatch, unknown-kind error, legacy exclusion, and answer.json.\n",
+            "exit_code": 0,
+            "duration": {
+              "secs": 0,
+              "nanos": 2792
+            },
+            "native_type": "CommandExecution",
+            "exitCode": 0,
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T05:40:21.182Z",
+              "emitted_at_ms": 1793079621182,
+              "ordinal": 46,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "Reasoning",
+            "id": "rs_0ddb4f0e73ce1b36016ae0394b23108191b3f1ad851e33ed70",
+            "summary_text": [],
+            "raw_content": [],
+            "native_type": "Reasoning",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T05:40:26.265Z",
+              "emitted_at_ms": 1793079626265,
+              "ordinal": 49,
+              "monotonic": null
+            }
+          },
+          {
+            "type": "AgentMessage",
+            "id": "msg_0ddb4f0e73ce1b36016ae0394b230c8191a4a27ed47910bb3d",
+            "content": [
+              {
+                "type": "Text",
+                "text": "Wrote [answer.json](/private/tmp/loci-r1-native-q7rb_mxw/dispatch-ambiguity-eager/workspace/answer.json) and verified it against the running code.\n\n`registry` in [src/registry.js](/private/tmp/loci-r1-native-q7rb_mxw/dispatch-ambiguity-eager/workspace/src/registry.js) registers `handle` from [src/channels/audit.js](/private/tmp/loci-r1-native-q7rb_mxw/dispatch-ambiguity-eager/workspace/src/channels/audit.js) and [src/channels/mail.js](/private/tmp/loci-r1-native-q7rb_mxw/dispatch-ambiguity-eager/workspace/src/channels/mail.js). For the given event, `dispatch` selects the mail handler and returns `mail:hi`. If `kind` is known only at runtime, the handler depends on that value; an unregistered kind produces `unknown kind`. See `dispatch` in [src/dispatch.js](/private/tmp/loci-r1-native-q7rb_mxw/dispatch-ambiguity-eager/workspace/src/dispatch.js).\n\nThe legacy `handle` in [src/channels/legacy.js](/private/tmp/loci-r1-native-q7rb_mxw/dispatch-ambiguity-eager/workspace/src/channels/legacy.js) is used by `preview` in [src/preview.js](/private/tmp/loci-r1-native-q7rb_mxw/dispatch-ambiguity-eager/workspace/src/preview.js) and is not registered for dispatch."
+              }
+            ],
+            "phase": "final_answer",
+            "native_type": "AgentMessage",
+            "capture_boundary": "item/completed",
+            "capture_started": null,
+            "capture_completed": {
+              "utc": "2026-10-27T05:40:28.931Z",
+              "emitted_at_ms": 1793079628931,
+              "ordinal": 51,
+              "monotonic": null
+            }
+          }
+        ],
+        "raw_tool_calls": [
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0ddb4f0e73ce1b36016ae0392b7dc081918cb72925a2350583",
+            "status": "completed",
+            "call_id": "call_aafb99837e0949f78fecdbf1390685ac",
+            "name": "exec",
+            "input": "const names = ALL_TOOLS.filter(t => /^mcp__loci__/.test(t.name) || /(?:^|__)loci_[A-Za-z0-9_]+$/.test(t.name)).map(t => t.name).sort();\ntext({loci_runtime_catalog_v1: names});\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17bdf-3e37-76a3-994b-c07fc4879b16",
+              "create_time": 1793079595.4926112
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17bdf-5006-7153-bc32-59d53d46fbbb",
+              "call_id": "call_aafb99837e0949f78fecdbf1390685ac",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"loci_runtime_catalog_v1\":[\"mcp__loci__loci_read\",\"mcp__loci__loci_retrieve\"]}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17bdf-3e37-76a3-994b-c07fc4879b16",
+                "create_time": 1793079595.014681
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0ddb4f0e73ce1b36016ae0392ef0d48191a6695f9de653f693",
+            "status": "completed",
+            "call_id": "call_7bfe99cf432a402891c0eb43df878dd0",
+            "name": "exec",
+            "input": "const r = await tools.exec_command({cmd:\"pwd && rg --files -g '!answer.json' -g '!node_modules' -g '!vendor' -g '!dist' -g '!build' | sort\",workdir:\"/private/tmp/loci-r1-native-q7rb_mxw/dispatch-ambiguity-eager/workspace\",max_output_tokens:4000,yield_time_ms:10000}); text(r.output);\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17bdf-3e37-76a3-994b-c07fc4879b16",
+              "create_time": 1793079598.9507298
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17bdf-6069-7463-9fc7-ab0f70ad5621",
+              "call_id": "call_7bfe99cf432a402891c0eb43df878dd0",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "/private/tmp/loci-r1-native-q7rb_mxw/dispatch-ambiguity-eager/workspace\nREADME.md\npackage.json\nsrc/channels/audit.js\nsrc/channels/legacy.js\nsrc/channels/mail.js\nsrc/codec.js\nsrc/dispatch.js\nsrc/preview.js\nsrc/registry.js\n"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17bdf-3e37-76a3-994b-c07fc4879b16",
+                "create_time": 1793079599.209561
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0ddb4f0e73ce1b36016ae039323d508191bacd3f5d524f7fbf",
+            "status": "completed",
+            "call_id": "call_66b0aa0237244e759fef3b7f1ff6f2cf",
+            "name": "exec",
+            "input": "const r = await tools.exec_command({cmd:\"for file in README.md package.json src/dispatch.js src/registry.js src/codec.js src/preview.js src/channels/*.js; do printf '\\\\n--- %s ---\\\\n' \\\"$file\\\"; nl -ba \\\"$file\\\"; done\",workdir:\"/private/tmp/loci-r1-native-q7rb_mxw/dispatch-ambiguity-eager/workspace\",max_output_tokens:8000,yield_time_ms:10000}); text(r.output);\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17bdf-3e37-76a3-994b-c07fc4879b16",
+              "create_time": 1793079602.245068
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17bdf-6cc7-7bc0-839f-681576d89c0d",
+              "call_id": "call_66b0aa0237244e759fef3b7f1ff6f2cf",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "\n--- README.md ---\n     1\tSmall inventory service fixture. No network or dependencies are required.\n\n--- package.json ---\n     1\t{\"type\":\"module\",\"private\":true}\n\n--- src/dispatch.js ---\n     1\timport { registry } from './registry.js';\n     2\texport function dispatch(event) {\n     3\t  const handler = registry[event.kind];\n     4\t  if (!handler) throw new Error('unknown kind');\n     5\t  return handler(event.payload);\n     6\t}\n\n--- src/registry.js ---\n     1\timport { handle as mail } from './channels/mail.js';\n     2\timport { handle as audit } from './channels/audit.js';\n     3\texport const registry = Object.assign(Object.create(null), { mail, audit });\n\n--- src/codec.js ---\n     1\texport function encode(value) { return String(value).trim().toLowerCase(); }\n\n--- src/preview.js ---\n     1\timport { handle } from './channels/legacy.js';\n     2\texport function preview(value) { return handle(value); }\n\n--- src/channels/audit.js ---\n     1\texport function handle(value) { return `audit:${JSON.stringify(value)}`; }\n\n--- src/channels/legacy.js ---\n     1\texport function handle(value) { return `legacy:${value}`; }\n\n--- src/channels/mail.js ---\n     1\timport { encode } from '../codec.js';\n     2\texport function handle(value) { return `mail:${encode(value)}`; }\n"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17bdf-3e37-76a3-994b-c07fc4879b16",
+                "create_time": 1793079602.375379
+              }
+            }
+          },
+          {
+            "type": "custom_tool_call",
+            "id": "ctc_0ddb4f0e73ce1b36016ae039429b2081919bb6d1126bfdceb2",
+            "status": "completed",
+            "call_id": "call_a312ca216aa842fabc86fd79e9383b2e",
+            "name": "exec",
+            "input": "const r = await tools.exec_command({cmd:\"node --input-type=module <<'NODE'\\nimport assert from 'node:assert/strict';\\nimport { readFileSync, writeFileSync } from 'node:fs';\\nimport { dispatch } from './src/dispatch.js';\\nimport { registry } from './src/registry.js';\\nimport { handle as mail } from './src/channels/mail.js';\\nimport { handle as audit } from './src/channels/audit.js';\\nimport { handle as legacy } from './src/channels/legacy.js';\\n\\nassert.deepEqual(Object.keys(registry).sort(), ['audit', 'mail']);\\nassert.equal(registry.mail, mail);\\nassert.equal(registry.audit, audit);\\nassert.equal(Object.values(registry).includes(legacy), false);\\nassert.equal(dispatch({ kind: 'mail', payload: ' Hi ' }), 'mail:hi');\\nassert.equal(dispatch({ kind: 'audit', payload: ' Hi ' }), 'audit:\\\" Hi \\\"');\\nassert.throws(() => dispatch({ kind: 'unknown', payload: ' Hi ' }), { message: 'unknown kind' });\\nconst answer = {\\n  registered_files: ['src/channels/audit.js', 'src/channels/mail.js'],\\n  selected_file: 'src/channels/mail.js',\\n  selected_output: 'mail:hi',\\n  unknown_kind_error: 'unknown kind',\\n  target_depends_on_runtime_kind: true,\\n  legacy_reachable_from_dispatch: false\\n};\\nwriteFileSync('answer.json', `${JSON.stringify(answer, null, 2)}\\\\n`);\\nassert.deepEqual(JSON.parse(readFileSync('answer.json', 'utf8')), answer);\\nconsole.log('Verified registry mappings, mail and audit dispatch, unknown-kind error, legacy exclusion, and answer.json.');\\nNODE\",workdir:\"/private/tmp/loci-r1-native-q7rb_mxw/dispatch-ambiguity-eager/workspace\",max_output_tokens:2000,yield_time_ms:10000}); text(JSON.stringify({operation:\"write and verify answer.json\",exit_code:r.exit_code,output:r.output}));\n",
+            "internal_chat_message_metadata_passthrough": {
+              "turn_id": "01a17bdf-3e37-76a3-994b-c07fc4879b16",
+              "create_time": 1793079618.6079638
+            },
+            "output_item": {
+              "type": "custom_tool_call_output",
+              "id": "ctco_01a17bdf-b646-7c62-a49f-6a1116ff14b5",
+              "call_id": "call_a312ca216aa842fabc86fd79e9383b2e",
+              "output": [
+                {
+                  "type": "input_text",
+                  "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+                },
+                {
+                  "type": "input_text",
+                  "text": "{\"operation\":\"write and verify answer.json\",\"exit_code\":0,\"output\":\"Verified registry mappings, mail and audit dispatch, unknown-kind error, legacy exclusion, and answer.json.\\n\"}"
+                }
+              ],
+              "internal_chat_message_metadata_passthrough": {
+                "turn_id": "01a17bdf-3e37-76a3-994b-c07fc4879b16",
+                "create_time": 1793079621.190153
+              }
+            }
+          }
+        ],
+        "late_items_after_abort": 0,
+        "post_abort_cleanup_ms": null
+      }
+    ],
+    "usage_status": "known",
+    "usage": {
+      "inputTokens": 135195,
+      "cachedInputTokens": 112896,
+      "outputTokens": 2435,
+      "reasoningOutputTokens": 1243,
+      "totalTokens": 137630,
+      "cacheWriteInputTokens": 0,
+      "uncachedInputTokens": 22299
+    },
+    "observed_cumulative_usage": {
+      "inputTokens": 135195,
+      "cachedInputTokens": 112896,
+      "outputTokens": 2435,
+      "reasoningOutputTokens": 1243,
+      "totalTokens": 137630,
+      "cacheWriteInputTokens": 0
+    },
+    "usage_errors": [],
+    "capture_errors": [],
+    "operation_totals": {
+      "mcp_calls": 0,
+      "shell_calls": 3,
+      "file_change_calls": 0,
+      "context_compactions": 0,
+      "subagent_calls": 0,
+      "failed_shell_calls": 0
+    },
+    "phase_groups": {},
+    "limitations": [
+      "Usage updates are not proven model-request counts; unique raw response completions are a lower bound that may omit failed upstream requests/retries.",
+      "Raw outer-call availability is explicit; nested operation counts are distinct.",
+      "Behavioral quality and rework attribution require the independent oracle/review.",
+      "MCP source/delivery receipts are joined separately; item presence is not model reliance."
+    ],
+    "native_provenance": {
+      "rollout_path": "/private/tmp/loci-r1-native-q7rb_mxw/dispatch-ambiguity-eager/observer/qualification/native-rollout.jsonl",
+      "session_id": "01a17bdf-376f-79e2-9b92-5a4446db15ca",
+      "cwd": "/private/tmp/loci-r1-native-q7rb_mxw/dispatch-ambiguity-eager/workspace",
+      "cli_version": "0.164.0",
+      "source": "exec",
+      "thread_source": "user",
+      "bootstrap_message_rows": [
+        7
+      ]
+    },
+    "turn_contexts": [
+      {
+        "turn_id": "01a17bdf-3e37-76a3-994b-c07fc4879b16",
+        "cwd": "/private/tmp/loci-r1-native-q7rb_mxw/dispatch-ambiguity-eager/workspace",
+        "model": "gpt-6.1-terra",
+        "effort": "max",
+        "approval_policy": "on-request",
+        "approvals_reviewer": "auto_review",
+        "sandbox_policy": {
+          "type": "workspace-write",
+          "writable_roots": [
+            "/",
+            "/private/var/folders/lk/6bn0g9j10lggp_ybc__zpvqrf8sfm1/T"
+          ],
+          "network_access": true,
+          "exclude_tmpdir_env_var": false,
+          "exclude_slash_tmp": false
+        },
+        "permission_profile": {
+          "type": "managed",
+          "file_system": {
+            "type": "restricted",
+            "entries": [
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/"
+                },
+                "access": "write"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/.claude"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/.claude/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/Downloads"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/Downloads/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/claude-otel"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/claude-otel/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/improvements"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/improvements/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "path",
+                  "path": "/Users/brummerv/work"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "glob_pattern",
+                  "pattern": "/Users/brummerv/work/**"
+                },
+                "access": "deny"
+              },
+              {
+                "path": {
+                  "type": "special",
+                  "value": {
+                    "kind": "minimal"
+                  }
+                },
+                "access": "read"
+              },
+              {
+                "path": {
+                  "type": "special",
+                  "value": {
+                    "kind": "tmpdir"
+                  }
+                },
+                "access": "write"
+              }
+            ]
+          },
+          "network": "enabled"
+        },
+        "active_permission_profile": {
+          "id": "brummerv_filesystem_guard"
+        },
+        "file_system_sandbox_policy": {
+          "kind": "restricted",
+          "entries": [
+            {
+              "path": {
+                "type": "path",
+                "path": "/"
+              },
+              "access": "write"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/.claude"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/.claude/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/Downloads"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/Downloads/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/claude-otel"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/claude-otel/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/improvements"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/improvements/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "path",
+                "path": "/Users/brummerv/work"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "glob_pattern",
+                "pattern": "/Users/brummerv/work/**"
+              },
+              "access": "deny"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "minimal"
+                }
+              },
+              "access": "read"
+            },
+            {
+              "path": {
+                "type": "special",
+                "value": {
+                  "kind": "tmpdir"
+                }
+              },
+              "access": "write"
+            }
+          ]
+        }
+      }
+    ],
+    "native_errors": []
+  },
+  "errors": [],
+  "limitations": [
+    "Experimental separation uses independent source copies and fresh native sessions; no additional access-control layer.",
+    "Native-only navigation is an audited instruction policy, not a hidden-tool capability boundary.",
+    "Observed response usage does not prove complete billing or invisible upstream retry accounting.",
+    "This readback neither launches nor authorizes a measured pilot; independent grading and a prospective freeze remain necessary."
+  ],
+  "config_validation": {
+    "raw_sha256": "c1b4cb33f778ac0653f9849d390579595aa6cfc848a8a78f1f17b5282d3500d8",
+    "effective_sha256": "b05622179c2edf196e00c1a145d93a6d0ee312b19e694192248618eefe8b3969",
+    "overridden_default_changes": [
+      "model"
+    ],
+    "raw_changed": true,
+    "contract_sha256": "b83a20ed11728ad9de4c175255cdf38ec41632c366af9bd57d4437fd9775454f",
+    "observed_only_changes": [
+      "agents"
+    ]
+  }
+}

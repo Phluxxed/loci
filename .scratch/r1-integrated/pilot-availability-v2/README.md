@@ -1,6 +1,6 @@
 # R1 native availability preflight — configuration handoff repair
 
-**Current status:** first scored assignment recovered under the explicitly amended [personal-host observation policy](../host-robustness-repair/README.md), correct with known usage and matching independent replay. One retained, 15 pending. Actual unattended continuation is blocked by macOS job submission; the failed submission is retained. Use host-robustness-repair/execution-amendment.json for the final repaired harness. Earlier stop records below are preserved history.
+**Current status:** complete: 16/16 qualified, known usage, all catalogs verified, independent replay agrees. Native 3/4, path-only 2/4, integrated 3/4, eager 1/4. Zero scored Loci/semantic/proof calls. See [final report](analysis/REPORT.md); recommendation revise / hold advancement. No further execution is required. The setup commands and earlier repair descriptions below are retained history; the final execution amendment is host-robustness-repair/execution-amendment.json.
 
 The prior rejection was reproduced: the global default model changed from `gpt-6-sol` to `gpt-6.1-sol`. Replacing that single value reconstructs the old raw file SHA256 exactly. The pilot explicitly supplies `gpt-6.1-terra` and `max`; its actual native contexts must match both.
 
