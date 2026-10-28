@@ -21,7 +21,7 @@ from loci.integrated import IntegratedSource
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / '.scratch/r1-integrated/pilot-execute.py'
-ACTIVE_AMENDMENT = SCRIPT.with_name('managed-resume-amendment.json')
+ACTIVE_AMENDMENT = SCRIPT.with_name('terminal-observation-amendment.json')
 PROTECTIONS = {
     'approval_policy': 'on-request', 'approvals_reviewer': 'auto_review',
     'sandbox_policy': {'type': 'workspace-write'}, 'permission_profile': {'type': 'managed'},
@@ -102,6 +102,7 @@ class NativeDelivery:
         self.catalog_drift = None
         self.catalog_syntax_failure = None
         self.memory_truncation_run = None
+        self.catalog_runtime_failure_run = None
 
     def __call__(self, argv, **kwargs):
         if str(argv[0]) != str(self.host):
@@ -194,6 +195,9 @@ class NativeDelivery:
         fingerprint = {'count': len(values), 'sha256': hashlib.sha256(raw[:-1]).hexdigest()}
         capture = availability.capture_program(artifact) in prompt
         program = availability.capture_program(artifact) if capture else availability.COMMON_CATALOG_PROGRAM
+        capture_failed = manifest['run_id'] == self.catalog_runtime_failure_run
+        if capture_failed:
+            program = program.replace('0xab1c5ed5', '0xab1c5d5', 1)
         if manifest['run_id'] == self.catalog_syntax_failure:
             rows.append(response('custom_tool_call', name='functions.exec', call_id='failed-catalog',
                                  input=program.replace('0xa81a664b', '00xa81a664b', 1)))
@@ -213,7 +217,10 @@ class NativeDelivery:
                    'common_runtime_catalog_v1': fingerprint}
         if capture:
             receipt['native_access_v1'] = {'apply_patch': True, 'exec_command': True}
-        rows.append(response('custom_tool_call_output', call_id='catalog', output=json.dumps(receipt)))
+        output = ([text('Script failed\nWall time 0.5 seconds\nOutput:\n'),
+                   text('Script error:\nError: Catalog capture failed: retained bytes differ from the first-call registry')]
+                  if capture_failed else json.dumps(receipt))
+        rows.append(response('custom_tool_call_output', call_id='catalog', output=output))
         if manifest['r1'].get('phase') == 'availability' and tools:
             service = IntegratedSource(self.stores / thread)
             retrieved = service.retrieve(workspace, 'entry.ts')
@@ -233,7 +240,7 @@ class NativeDelivery:
                     'arguments': {'repo': str(workspace), **args}, 'status': 'completed',
                     'result': {'content': [], 'structuredContent': packet, 'isError': False}})
                 rows.append(response('custom_tool_call_output', call_id=call_id, output='Native tool completed.'))
-        elif manifest['r1'].get('phase') != 'availability':
+        elif manifest['r1'].get('phase') != 'availability' and not capture_failed:
             number = int(manifest['r1']['task'].split('-')[-1])
             if manifest['run_id'] == 'task-2-eager':
                 number = -1  # A wrong answer must remain a valid measured outcome.
@@ -243,7 +250,8 @@ class NativeDelivery:
             rows += operation({'type': 'FileChange', 'id': 'answer-write', 'status': 'completed',
                 'changes': {str(workspace / 'answer.json'): {'type': 'add', 'content': content}}})
             rows.append(response('custom_tool_call_output', call_id='answer', output='Answer written.'))
-        rows.append(response('message', role='assistant', phase='final_answer', content=[{'type': 'output_text', 'text': 'Done.'}]))
+        rows.append(response('message', role='assistant', phase='final_answer', content=[{'type': 'output_text',
+            'text': 'Capture failed; stopped before the task.' if capture_failed else 'Done.'}]))
         usage = {'input_tokens': 100, 'cached_input_tokens': 20, 'cache_write_input_tokens': 0,
                  'output_tokens': 10, 'reasoning_output_tokens': 2, 'total_tokens': 110}
         rows += [row('token_usage_record', {'thread_id': thread, 'session_id': session, 'turn_id': turn,
@@ -467,3 +475,41 @@ def test_waiting_existing_runner_accepts_bound_repair_and_finishes_without_repea
     changes = final['runs'][6]['evaluation']['treatment_validity']['startup_rendering_variations']
     assert changes[0]['expected_tokens'] == 5091 and changes[0]['observed_tokens'] == 5316
     assert all((root / 'archived-runs' / name).read_bytes() == raw for name, raw in archived_before.items())
+
+
+def test_closed_capture_failure_keeps_false_grade_unqualified_and_continues_without_replacement(integrated_runner, monkeypatch):
+    runner, native, root, argv, freeze, amendment, gate = integrated_runner
+    native.catalog_runtime_failure_run = 'task-2-integrated'
+    # Reproduce the old reader's stop after an actual failed, non-retried capture.
+    def old_observe(*args, **kwargs):
+        return {'status': 'verified', **r1.audit_treatment(*args, **kwargs)}
+    with monkeypatch.context() as old:
+        old.setattr(r1, 'observe_treatment', old_observe)
+        blocked = runner.main(argv)
+    assert blocked['status'] == 'blocked' and blocked['attempted'] == 9
+    assert len(native.launches) == 13
+    original_index = (root / 'execution-index.json').read_bytes()
+    original = runner.read(root / 'execution-index.json')['runs'][-1]
+    archive = Path(original['archive'])
+    archive_bytes = bytes_under(archive)
+    result = runner.main(argv + ['--resume', '--wait-for-repair'])
+    assert result['status'] == 'complete' and len(native.launches) == 20
+    index = runner.read(root / 'execution-index.json')
+    failed = index['runs'][8]
+    evaluation = failed['evaluation']
+    assert failed['execution']['thread_id'] == original['execution']['thread_id']
+    assert evaluation['correct'] is False
+    assert evaluation['qualification_status'] == 'qualified_observations'
+    assert evaluation['accounting']['usage_status'] == 'known'
+    assert evaluation['comparison_status'] == 'unqualified'
+    assert evaluation['treatment_validity']['status'] == 'unqualified'
+    assert evaluation['changes'] == [] and failed['replay_matches'] is True
+    assert Path(failed['recovery']['original_index']).read_bytes() == original_index
+    assert bytes_under(archive) == archive_bytes
+    assert not (root / 'repair-wait.json').exists()
+    assert len({item['run_id'] for item in native.launches}) == 20
+    # An ordinary wrong answer with valid treatment still counts as a qualified
+    # incorrect outcome; qualification is never chosen from the answer score.
+    other_wrong = next(e['evaluation'] for e in index['runs'] if e['run_id'] == 'task-2-eager')
+    assert other_wrong['correct'] is False and other_wrong['comparison_status'] == 'qualified'
+    assert runner.main(argv + ['--resume', '--check-only'])['pending'] == 0

@@ -390,8 +390,9 @@ def _syntax_rejected_attempt(rows: list[dict], calls: list[tuple[int, dict]], po
     outputs = [(i, row["payload"]) for i, row in enumerate(rows)
                if row.get("type") == "response_item" and row["payload"].get("call_id") == identity
                and row["payload"].get("type") == call["type"] + "_output"]
-    if (position + 1 == len(calls) or len(outputs) != 1
-            or not index < outputs[0][0] < calls[position + 1][0]):
+    if position + 1 == len(calls):
+        raise ValueError("no successful fixed catalog capture was recorded")
+    if (len(outputs) != 1 or not index < outputs[0][0] < calls[position + 1][0]):
         raise ValueError("catalog syntax failure lacks one completed output before its retry")
     output_index, output = outputs[0]
     blocks = output.get("output")

@@ -250,7 +250,7 @@ def test_another_passed_deterministic_gate_cannot_authorize_launch_or_probe_reus
         r1.preflight(path, other, gate_path.parent)
 
 
-def test_catalog_failure_is_retained_and_never_graded(host_gate, tmp_path, monkeypatch):
+def test_missing_native_task_prompt_blocks_grading_even_with_claimed_qualification(host_gate, tmp_path, monkeypatch):
     path, _, gate_path, _, _ = host_gate
     manifest = r1.prepare(path, 'task-0-native', tmp_path / 'measured', availability_gate=gate_path)
     observer = Path(manifest['observer']); trace = tmp_path / 'native.jsonl'

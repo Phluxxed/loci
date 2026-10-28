@@ -99,12 +99,17 @@ def validate_prefix(index, frozen, root, verified, *, completed_count=None):
                 and original_qualification.get('native_trace_sha256') == r0.digest(trace),
                 'archived qualification bindings differ')
         retained = {'retained_observer': observer} if frozen.get('common_context') else {}
-        treatment = {'status': 'verified', **r1.audit_treatment(frozen, manifest, trace, verified, **retained)}
+        treatment = r1.observe_treatment(frozen, manifest, trace, verified, **retained)
         treatment_path = Path(entry.get('treatment_result', observer / 'treatment.json'))
         if 'treatment_result' in entry:
             require(r0.digest(treatment_path) == entry['treatment_result_sha256'], 'retained treatment bytes differ')
         require(result.get('treatment_validity') == treatment
-                and read(treatment_path) == treatment, 'retained tool catalog is unverified or differs')
+                and read(treatment_path) == treatment,
+                'retained tool catalog is unverified or differs: ' + treatment.get('error', ''))
+        require(treatment.get('status') in {'verified', 'unqualified'}, 'invalid retained treatment status')
+        comparison_status = 'qualified' if treatment['status'] == 'verified' else 'unqualified'
+        require(result.get('comparison_status', 'qualified') == comparison_status,
+                'retained comparison qualification differs from treatment observation')
         qualified_path = Path(entry['qualification_result'])
         require(r0.digest(qualified_path) == entry['qualification_result_sha256'], 'corrected qualification bytes differ')
         qualified = read(qualified_path)
@@ -271,6 +276,7 @@ def run(freeze, gate, amendment, root, *, resume=False, check_only=False,
             require(entry['replay_matches'], 'independent replay differs')
             print(json.dumps({'run_id': run_id, 'correct': result['correct'],
                               'qualification': result['qualification_status'],
+                              'comparison_status': result.get('comparison_status', 'qualified'),
                               'usage': result['accounting']['usage_status']}), flush=True)
         except Exception as exc:
             entry['evidence_error'] = f'{type(exc).__name__}: {exc}'

@@ -6,7 +6,7 @@ import subprocess
 
 import pytest
 
-from benchmarks.complete_work import r1
+from benchmarks.complete_work import r0, r1
 from benchmarks.complete_work.evaluate import write_json
 from tests.test_complete_work_r1_resume import pilot
 
@@ -190,3 +190,138 @@ def test_malformed_execution_marker_does_not_replace_original_failure(pilot, mon
     assert 'JSONDecodeError' in entry['execution_error']
     assert (Path(entry['archive']) / 'observer/execution.json').read_text() == '{'
     assert not pilot['calls']['execute']
+
+
+def failed_treatment(pilot, monkeypatch, run_id):
+    original = r1.observe_treatment
+    def observe(frozen, manifest, trace, verified, **kwargs):
+        if manifest['run_id'] == run_id:
+            return {'status': 'unqualified', 'code': 'treatment_observation_failed',
+                    'error': 'capture program supplied a mismatched SHA constant',
+                    'native_trace_sha256': r0.digest(trace)}
+        return original(frozen, manifest, trace, verified, **kwargs)
+    monkeypatch.setattr(r1, 'observe_treatment', observe)
+    return observe
+
+
+def retain_unqualified(pilot, monkeypatch):
+    first = pilot['retain'](0, correct=False)
+    observer = Path(first['archive']) / 'observer'
+    observe = failed_treatment(pilot, monkeypatch, first['run_id'])
+    treatment = observe(pilot['frozen'], pilot['runner'].read(observer / 'run.json'),
+                        observer / 'qualification/native-rollout.jsonl', {})
+    first['evaluation'].update(treatment_validity=treatment, comparison_status='unqualified')
+    write_json(observer / 'evaluation/result.json', first['evaluation'])
+    write_json(observer / 'treatment.json', treatment)
+    pilot['runner'].record_results(first, observer)
+    return first
+
+
+def test_terminal_unqualified_comparison_retains_false_oracle_and_continues(pilot, monkeypatch):
+    first = retain_unqualified(pilot, monkeypatch)
+    pilot['save']([first])
+    archive_before = file_bytes(Path(first['archive']))
+    assert pilot['run'](resume=True)['status'] == 'complete'
+    assert len(pilot['calls']['execute']) == 15
+    assert first['run_id'] not in pilot['calls']['execute']
+    retained = pilot['runner'].read(pilot['root'] / 'execution-index.json')['runs'][0]
+    assert retained['evaluation']['correct'] is False
+    assert retained['evaluation']['comparison_status'] == 'unqualified'
+    assert retained['evaluation']['qualification_status'] == 'qualified_observations'
+    assert file_bytes(Path(first['archive'])) == archive_before
+
+
+def test_new_unqualified_comparison_prints_status_and_continues(pilot, monkeypatch, capsys):
+    run_id = pilot['frozen']['schedule'][0]['run_id']
+    observe = failed_treatment(pilot, monkeypatch, run_id)
+    original_evaluate = r1.evaluate
+    def evaluate(config, trace, thread, *, amendment=None):
+        result = original_evaluate(config, trace, thread, amendment=amendment)
+        if result['run_id'] == run_id:
+            treatment = observe(pilot['frozen'], pilot['runner'].read(config), trace, {})
+            result.update(correct=False, treatment_validity=treatment, comparison_status='unqualified')
+            write_json(config.parent / 'evaluation/result.json', result)
+            write_json(config.parent / 'treatment.json', treatment)
+        return result
+    monkeypatch.setattr(r1, 'evaluate', evaluate)
+    pilot['frozen']['schedule'] = pilot['frozen']['schedule'][:2]
+    assert pilot['run']()['status'] == 'complete'
+    assert len(pilot['calls']['execute']) == 2
+    progress = [json.loads(line) for line in capsys.readouterr().out.splitlines()]
+    graded = next(record for record in progress if record.get('run_id') == run_id and 'correct' in record)
+    assert graded['correct'] is False
+    assert graded['qualification'] == 'qualified_observations'
+    assert graded['comparison_status'] == 'unqualified'
+
+
+@pytest.mark.parametrize('damage', ['comparison-qualified', 'comparison-missing', 'usage', 'source', 'replay', 'native'])
+def test_unqualified_comparison_keeps_all_existing_integrity_guards(pilot, monkeypatch, damage):
+    first = retain_unqualified(pilot, monkeypatch)
+    observer = Path(first['archive']) / 'observer'
+    result = first['evaluation']
+    if damage == 'comparison-qualified':
+        result['comparison_status'] = 'qualified'
+    elif damage == 'comparison-missing':
+        result.pop('comparison_status')
+    elif damage == 'usage':
+        result['accounting']['usage_status'] = 'unknown'
+    elif damage == 'source':
+        result['source_identity'] = '0' * 64
+        replay = pilot['runner'].read(observer / 'replay/oracle.json')
+        replay['source_identity'] = result['source_identity']
+        write_json(observer / 'replay/oracle.json', replay)
+    elif damage == 'replay':
+        replay = pilot['runner'].read(observer / 'replay/oracle.json')
+        replay['correct'] = True
+        write_json(observer / 'replay/oracle.json', replay)
+    elif damage == 'native':
+        first['execution']['status'] = 'running'
+        write_json(observer / 'execution.json', first['execution'])
+    write_json(observer / 'evaluation/result.json', result)
+    pilot['runner'].record_results(first, observer)
+    pilot['save']([first])
+    with pytest.raises((ValueError, RuntimeError)):
+        pilot['run'](resume=True, check_only=True)
+    assert not any(pilot['calls'].values())
+
+
+def test_closed_failed_tail_recovers_as_unqualified_false_result_without_native_retry(pilot, monkeypatch):
+    first = pilot['retain'](0, correct=False)
+    first['evidence_error'] = 'old reader rejected unsuccessful capture'
+    first.pop('evaluation')
+    pilot['save']([first])
+    index_path = pilot['root'] / 'execution-index.json'
+    original_index = index_path.read_bytes()
+    archive = Path(first['archive'])
+    original_archive = file_bytes(archive)
+    observe = failed_treatment(pilot, monkeypatch, first['run_id'])
+
+    def evaluate(config, trace, thread, *, amendment, retained_observer, output):
+        result = pilot['runner'].read(retained_observer / 'evaluation/result.json')
+        treatment = observe(pilot['frozen'], pilot['runner'].read(config), trace, {})
+        result.update(treatment_validity=treatment, comparison_status='unqualified')
+        for relative in ['qualification/result.json', 'evaluation/result.json']:
+            target = output / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes((retained_observer / relative).read_bytes())
+        write_json(output / 'evaluation/result.json', result)
+        write_json(output / 'treatment.json', treatment)
+        return result
+
+    def replay(config, destination, *, retained_observer):
+        destination.mkdir(parents=True)
+        value = pilot['runner'].read(retained_observer / 'replay/oracle.json')
+        write_json(destination / 'oracle.json', value)
+        return value
+
+    monkeypatch.setattr(r1, 'evaluate', evaluate)
+    monkeypatch.setattr(r1, 'replay', replay)
+    pilot['frozen']['schedule'] = pilot['frozen']['schedule'][:1]
+    assert pilot['run'](resume=True)['status'] == 'complete'
+    recovered = pilot['runner'].read(index_path)['runs'][0]
+    assert recovered['evaluation']['correct'] is False
+    assert recovered['evaluation']['comparison_status'] == 'unqualified'
+    assert recovered['evaluation']['qualification_status'] == 'qualified_observations'
+    assert Path(recovered['recovery']['original_index']).read_bytes() == original_index
+    assert file_bytes(archive) == original_archive
+    assert not any(pilot['calls'].values())

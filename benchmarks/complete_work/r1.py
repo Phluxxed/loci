@@ -32,6 +32,10 @@ MEASUREMENTS = (
 )
 
 
+class TreatmentObservationError(ValueError):
+    """A closed attempt lacks a qualified condition observation; retain its task result."""
+
+
 def identity(value: dict) -> str:
     return hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
 
@@ -307,13 +311,20 @@ def audit_treatment(frozen: dict, manifest: dict, trace: Path, verified: dict,
     condition = manifest["r1"]["condition"]
     observer = Path(manifest["observer"])
     capture = _capture_arguments(frozen, observer, retained_observer)
-    treatment = availability.audit_catalog(trace, frozen["conditions"][condition]["tools"],
-                                            common_context=_common_context(frozen), **capture)
-    if _common_context(frozen):
+    common = _common_context(frozen)
+    try:
+        treatment = availability.audit_catalog(trace, frozen["conditions"][condition]["tools"],
+                                               common_context=common, **capture)
+    except ValueError as exc:
+        raise TreatmentObservationError(str(exc)) from exc
+    if common:
         task = next(task for task in frozen["tasks"] if task["id"] == manifest["r1"]["task"])
-        context = availability.audit_common_context(trace, Path(manifest["workspace"]), Path(manifest["observer"]),
-            measured_prompt(frozen, task, condition, observer=observer),
-            frozen["conditions"][condition]["tools"], **capture)
+        prompt = measured_prompt(frozen, task, condition, observer=observer)
+        try:
+            context = availability.audit_common_context(trace, Path(manifest["workspace"]), Path(manifest["observer"]),
+                prompt, frozen["conditions"][condition]["tools"], **capture)
+        except ValueError as exc:
+            raise TreatmentObservationError(str(exc)) from exc
         baseline = verified["common_context"]
         common_matches = context["common_sha256"] == baseline["common_sha256"]
         if not common_matches:
@@ -332,9 +343,20 @@ def audit_treatment(frozen: dict, manifest: dict, trace: Path, verified: dict,
             if capture and baseline.get("catalog_artifact"):
                 detail = "; catalog difference: " + json.dumps(availability.catalog_difference(
                     Path(baseline["catalog_artifact"]), capture["catalog_artifact"]), sort_keys=True)
-            raise ValueError("measured rendered startup context differs from qualified probes" + detail)
+            raise TreatmentObservationError("measured rendered startup context differs from qualified probes" + detail)
         treatment["common_context"] = context
     return treatment
+
+
+def observe_treatment(frozen: dict, manifest: dict, trace: Path, verified: dict,
+                      *, retained_observer: Path | None = None) -> dict:
+    """Separate unqualified observations from failures of frozen-input integrity."""
+    try:
+        return {"status": "verified", **audit_treatment(frozen, manifest, trace, verified,
+                                                        retained_observer=retained_observer)}
+    except TreatmentObservationError as exc:
+        return {"status": "unqualified", "code": "treatment_observation_failed", "error": str(exc),
+                "native_trace_sha256": r0.digest(trace)}
 
 
 def require_availability(frozen: dict, gate: Path | None) -> dict:
@@ -872,14 +894,14 @@ def evaluate(config: Path, trace: Path, thread_id: str,
         if (retained / "prompt.txt").read_text() != expected:
             raise ValueError("retained measured prompt differs from freeze")
         _verify_native_prompt(qualification["accounting"], expected)
-        treatment = audit_treatment(frozen, manifest, trace, verified, retained_observer=retained_observer)
         if qualification["status"] != "qualified_observations":
             raise ValueError("native session qualification failed")
+        treatment = observe_treatment(frozen, manifest, trace, verified, retained_observer=retained_observer)
     except ValueError as exc:
         write_json(observer / "treatment.json", {"status": "invalid", "error": str(exc),
                                                 "native_trace_sha256": r0.digest(trace)})
         raise ValueError("treatment invalid; no correctness grade: " + str(exc)) from exc
-    write_json(observer / "treatment.json", {"status": "verified", **treatment})
+    write_json(observer / "treatment.json", treatment)
     oracle = replay(config, observer / "evaluation", retained_observer=retained_observer)
     result = {"run_id": manifest["run_id"], "condition": manifest["r1"]["condition"],
               "thread_id": thread_id, "freeze_sha256": frozen["freeze_sha256"],
@@ -891,7 +913,8 @@ def evaluate(config: Path, trace: Path, thread_id: str,
                                  "proof_requests": None, "status": "requires_captured_call_attribution"},
               "manual_review": "pending_arm_blinded_review", "measured": True,
               "instrumentation_amendment": _amendment_record(amendment),
-              "treatment_validity": {"status": "verified", **treatment},
+              "treatment_validity": treatment,
+              "comparison_status": "qualified" if treatment["status"] == "verified" else "unqualified",
               "limitations": qualification["limitations"][:3] + [
                   "Native tool availability follows unchanged host config; other MCP tools remain available.",
                   "Loci use, semantic/proof requests and evidence bytes require captured-call attribution; unavailable values remain unknown.",
@@ -899,6 +922,8 @@ def evaluate(config: Path, trace: Path, thread_id: str,
     if frozen.get("host_observations"):
         result["host_observations"] = frozen["host_observations"]
         result["limitations"].append("Personal host instructions are observed covariates; they may change during a session. This run does not establish fixed instruction exposure.")
+    if treatment["status"] != "verified":
+        result["limitations"].append("The task outcome is independently graded, but its treatment observation is unqualified. Exclude this attempt from controlled condition comparisons; do not replace or rerun it.")
     write_json(observer / "evaluation" / "result.json", result)
     return result
 

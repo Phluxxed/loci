@@ -238,7 +238,7 @@ def test_resume_rechecks_shared_context_gate_before_any_launch(pilot, monkeypatc
     first = pilot['retain'](0)
     pilot['save']([first])
     seen = []
-    def reject_context(frozen, manifest, trace, verified):
+    def reject_context(frozen, manifest, trace, verified, *, retained_observer=None):
         seen.append((manifest['run_id'], trace, verified))
         raise ValueError('measured rendered startup context differs from qualified probes')
     monkeypatch.setattr(r1, 'audit_treatment', reject_context)

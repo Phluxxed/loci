@@ -228,7 +228,7 @@ def test_retained_probe_root_agents_bytes_are_verified(host_gate):
 
 @pytest.mark.parametrize('host_gate', [{'common_context': True}], indirect=True)
 @pytest.mark.parametrize('kind', [None, 'skills', 'schema', 'catalog', 'agents', 'boundaries', 'loci_contract'])
-def test_each_measured_trace_is_checked_before_oracle(host_gate, monkeypatch, kind):
+def test_measured_trace_drift_is_excluded_from_comparisons_while_task_is_graded(host_gate, monkeypatch, kind):
     path, frozen, gate_path, _, _ = host_gate
     condition = 'integrated'
     manifest = r1.prepare(path, 'task-0-' + condition, gate_path.parent / 'measured', availability_gate=gate_path)
@@ -251,13 +251,16 @@ def test_each_measured_trace_is_checked_before_oracle(host_gate, monkeypatch, ki
         return {'correct': True}
     monkeypatch.setattr(r1, 'replay', oracle)
     if kind is None:
-        assert r1.evaluate(observer / 'run.json', trace, 'new-measured-thread')['correct'] is True
+        result = r1.evaluate(observer / 'run.json', trace, 'new-measured-thread')
+        assert result['correct'] is True and result['comparison_status'] == 'qualified'
         assert len(grades) == 1
     else:
-        with pytest.raises(ValueError, match='no correctness grade.*startup context differs'):
-            r1.evaluate(observer / 'run.json', trace, 'new-measured-thread')
-        assert not grades and not (observer / 'evaluation').exists()
-        assert json.loads((observer / 'treatment.json').read_text())['status'] == 'invalid'
+        result = r1.evaluate(observer / 'run.json', trace, 'new-measured-thread')
+        assert len(grades) == 1 and result['correct'] is True
+        assert result['comparison_status'] == 'unqualified'
+        assert result['treatment_validity']['status'] == 'unqualified'
+        assert 'startup context differs' in result['treatment_validity']['error']
+        assert json.loads((observer / 'treatment.json').read_text())['status'] == 'unqualified'
 
 
 @pytest.mark.parametrize('update_role', ['user', 'developer'])

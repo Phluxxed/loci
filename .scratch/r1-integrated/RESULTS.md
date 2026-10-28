@@ -1,4 +1,14 @@
-# Current real-source pilot: seven assignments qualified, nine pending
+# Current real-source pilot: eight qualified outcomes, one retained failed attempt
+
+The ninth attempt stopped after a real capture checksum failure and produced no
+task answer. It is independently incorrect and its condition observation remains
+unqualified. The runner now records these separately and continues the unchanged
+schedule without replacing the failed attempt. [Disposition, evidence and limits](terminal-observation.md).
+Remaining results are pending; no complete architecture comparison is claimed.
+
+---
+
+# Prior state: seven assignments qualified, nine pending
 
 The seventh completed native assignment was recovered after a comparison of
 host memory-summary truncation counts blocked its reader. Visible instructions
