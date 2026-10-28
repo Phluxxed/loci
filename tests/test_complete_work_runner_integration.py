@@ -21,7 +21,7 @@ from loci.integrated import IntegratedSource
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / '.scratch/r1-integrated/pilot-execute.py'
-ACTIVE_AMENDMENT = SCRIPT.with_name('capture-host-observation-amendment.json')
+ACTIVE_AMENDMENT = SCRIPT.with_name('capture-syntax-recovery-amendment.json')
 PROTECTIONS = {
     'approval_policy': 'on-request', 'approvals_reviewer': 'auto_review',
     'sandbox_policy': {'type': 'workspace-write'}, 'permission_profile': {'type': 'managed'},
@@ -100,6 +100,7 @@ class NativeDelivery:
         self.launches = []
         self.run_roots = set()
         self.catalog_drift = None
+        self.catalog_syntax_failure = None
 
     def __call__(self, argv, **kwargs):
         if str(argv[0]) != str(self.host):
@@ -184,6 +185,12 @@ class NativeDelivery:
         fingerprint = {'count': len(values), 'sha256': hashlib.sha256(raw[:-1]).hexdigest()}
         capture = availability.capture_program(artifact) in prompt
         program = availability.capture_program(artifact) if capture else availability.COMMON_CATALOG_PROGRAM
+        if manifest['run_id'] == self.catalog_syntax_failure:
+            rows.append(response('custom_tool_call', name='functions.exec', call_id='failed-catalog',
+                                 input=program.replace('0xa81a664b', '00xa81a664b', 1)))
+            rows.append(response('custom_tool_call_output', call_id='failed-catalog', output=[
+                text('Script failed\nWall time 0.0 seconds\nOutput:\n'),
+                text('Script error:\nSyntaxError: Invalid or unexpected token')]))
         rows.append(response('custom_tool_call', name='functions.exec', call_id='catalog', input=program))
         if capture:
             artifact.write_bytes(raw)
@@ -338,27 +345,31 @@ def test_catalog_mismatch_is_actionable_and_retained_reprocessing_never_launches
 
 def test_closed_treatment_reader_failure_recovers_same_native_assignment(integrated_runner, monkeypatch):
     runner, native, root, argv, freeze, amendment, gate = integrated_runner
+    native.catalog_syntax_failure = 'task-1-integrated'
     assert runner.main(argv + ['--preflight-only'])['status'] == 'passed'
     original_audit = r1.audit_treatment
     def fail_after_real_validation(*args, **kwargs):
-        original_audit(*args, **kwargs)
-        raise ValueError('injected treatment reader failure after raw validation')
+        result = original_audit(*args, **kwargs)
+        if result.get('pre_capture_failures'):
+            raise ValueError('injected treatment reader failure after raw validation')
+        return result
     with monkeypatch.context() as fault:
         fault.setattr(r1, 'audit_treatment', fail_after_real_validation)
         blocked = runner.main(argv)
-    assert blocked['status'] == 'blocked' and blocked['attempted'] == 1
+    assert blocked['status'] == 'blocked' and blocked['attempted'] == 6
     index_path = root / 'execution-index.json'
     original_index = index_path.read_bytes()
-    original = runner.read(index_path)['runs'][0]
+    original = runner.read(index_path)['runs'][-1]
     archive = Path(original['archive'])
     archive_bytes = bytes_under(archive)
-    assert original['execution']['status'] == 'closed' and len(native.launches) == 5
+    assert original['execution']['status'] == 'closed' and len(native.launches) == 10
     shutil.rmtree(Path(runner.read(index_path)['run_root']))
     assert runner.main(argv + ['--resume'])['status'] == 'complete'
     completed = runner.read(index_path)
-    recovered = completed['runs'][0]
+    recovered = completed['runs'][5]
     assert recovered['execution']['thread_id'] == original['execution']['thread_id']
     assert recovered['evaluation']['correct'] is True
+    assert len(recovered['evaluation']['treatment_validity']['pre_capture_failures']) == 1
     assert Path(recovered['recovery']['original_index']).read_bytes() == original_index
     assert bytes_under(archive) == archive_bytes
     assert Path(recovered['treatment_result']).is_relative_to(root / 'reprocessed')

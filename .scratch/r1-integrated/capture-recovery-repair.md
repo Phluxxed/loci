@@ -1,5 +1,10 @@
 # R1 capture and recovery repair
 
+Superseded execution status: six measured assignments are now qualified, ten
+remain pending. Use the [sixth-run recovery and resume command](capture-syntax-recovery.md),
+which preserves the frozen capture program and handles non-executing syntax
+rejections. The fresh-run command below is historical.
+
 Current execution amendment: [capture plus personal-host observations](capture-host-observation-amendment.json).
 The original capture amendment omitted the existing personal-host policy and
 rejected a later global AGENTS.md edit before launching a probe. The new amendment

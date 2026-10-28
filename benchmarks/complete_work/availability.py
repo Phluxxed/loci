@@ -8,8 +8,10 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
 import re
 import shlex
+import subprocess
 from copy import deepcopy
 from pathlib import Path
 
@@ -376,6 +378,46 @@ def _audit_capture_events(events: list[tuple[str, dict]], destination: Path, raw
         raise ValueError("catalog capture requires exactly one native write followed by readback")
 
 
+def _syntax_rejected_attempt(rows: list[dict], calls: list[tuple[int, dict]], position: int) -> dict:
+    """Prove an earlier Code Mode attempt failed parsing, without executing it."""
+    index, call = calls[position]
+    program = call.get("input") if call["type"] == "custom_tool_call" else call.get("arguments")
+    identity = call.get("call_id")
+    if (call.get("name") not in {"exec", "functions.exec"} or not isinstance(program, str)
+            or not isinstance(identity, str) or not identity
+            or sum(p.get("call_id") == identity for _, p in calls) != 1):
+        raise ValueError("first tool action is not the fixed live catalog program")
+    outputs = [(i, row["payload"]) for i, row in enumerate(rows)
+               if row.get("type") == "response_item" and row["payload"].get("call_id") == identity
+               and row["payload"].get("type") == call["type"] + "_output"]
+    if (position + 1 == len(calls) or len(outputs) != 1
+            or not index < outputs[0][0] < calls[position + 1][0]):
+        raise ValueError("catalog syntax failure lacks one completed output before its retry")
+    output_index, output = outputs[0]
+    blocks = output.get("output")
+    # This is a host error, not an assistant's explanation or a JSON success
+    # receipt. Independently check the syntax as well: valid JavaScript can
+    # deliberately throw a SyntaxError after performing arbitrary work.
+    if (not isinstance(blocks, list) or len(blocks) != 2
+            or any(not isinstance(b, dict) or b.get("type") != "input_text"
+                   or not isinstance(b.get("text"), str) for b in blocks)
+            or not re.fullmatch(r"Script failed\nWall time [0-9.]+ seconds\nOutput:\n", blocks[0]["text"])
+            or not re.fullmatch(r"Script error:\nSyntaxError: [^\n]+\n?", blocks[1]["text"])):
+        raise ValueError("earlier catalog attempt is not a retained native syntax rejection")
+    try:
+        parsed = subprocess.run(["node", "--input-type=module", "--check"], input=program,
+                                text=True, capture_output=True, check=False, timeout=5,
+                                env={**os.environ, "NODE_OPTIONS": ""})
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise ValueError("could not independently verify catalog parse failure") from exc
+    if parsed.returncode != 1 or "SyntaxError:" not in parsed.stderr:
+        raise ValueError("earlier catalog attempt is not independently parse-invalid")
+    return {"row": index, "output_row": output_index, "call_id": identity,
+            "status": "syntax_rejected_before_execution",
+            "program_sha256": hashlib.sha256(program.encode()).hexdigest(),
+            "native_error": blocks[1]["text"].strip()}
+
+
 def audit_catalog(trace: Path, expected_tools: list[str], *, common_context: bool = False,
                   catalog_artifact: Path | None = None, catalog_destination: Path | None = None) -> dict:
     capture = catalog_artifact is not None or catalog_destination is not None
@@ -389,11 +431,18 @@ def audit_catalog(trace: Path, expected_tools: list[str], *, common_context: boo
              and r["payload"].get("type") in {"function_call", "custom_tool_call"}]
     if not calls:
         raise ValueError("live catalog discovery was not the first tool action")
-    index, call = calls[0]
-    program = call.get("input") if call["type"] == "custom_tool_call" else call.get("arguments")
-    if (call.get("name") not in {"exec", "functions.exec"} or not isinstance(program, str)
-            or program.strip() != fixed_program):
-        raise ValueError("first tool action is not the fixed live catalog program")
+    rejected = []
+    position = 0
+    while True:
+        index, call = calls[position]
+        program = call.get("input") if call["type"] == "custom_tool_call" else call.get("arguments")
+        if (call.get("name") in {"exec", "functions.exec"} and isinstance(program, str)
+                and program.strip() == fixed_program):
+            break
+        if not capture:
+            raise ValueError("first tool action is not the fixed live catalog program")
+        rejected.append(_syntax_rejected_attempt(rows, calls, position))
+        position += 1
     identity = call.get("call_id")
     if not isinstance(identity, str) or not identity:
         raise ValueError("catalog call has no native identity")
@@ -403,7 +452,7 @@ def audit_catalog(trace: Path, expected_tools: list[str], *, common_context: boo
            and isinstance(p.get("input") if p["type"] == "custom_tool_call" else p.get("arguments"), str)
            and (p.get("input") if p["type"] == "custom_tool_call" else p.get("arguments")).strip()
                == fixed_program
-           for _, p in calls[1:]):
+           for _, p in calls[position + 1:]):
         raise ValueError("duplicated live catalog discovery")
     outputs = [(i, r["payload"]) for i, r in enumerate(rows)
                if r.get("type") == "response_item" and r["payload"].get("call_id") == identity
@@ -429,6 +478,8 @@ def audit_catalog(trace: Path, expected_tools: list[str], *, common_context: boo
         raise ValueError("live catalog differs from expected tool set")
     result = {"tools": names, "row": index, "output_row": output_index, "call_id": identity,
               "trace_sha256": hashlib.sha256(raw).hexdigest()}
+    if rejected:
+        result["pre_capture_failures"] = rejected
     if common_context:
         result["common_catalog"] = receipt["common_runtime_catalog_v1"]
     if capture:

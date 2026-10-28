@@ -207,3 +207,54 @@ def test_capture_audit_rejects_missing_changed_artifact_and_partial_configuratio
     data[2].unlink()
     with pytest.raises(ValueError, match="missing or malformed"):
         _audit(data)
+
+
+def _syntax_retry(data, program="const broken = 00xa81a664b;"):
+    failed = {"type": "response_item", "payload": {"type": "custom_tool_call", "name": "exec",
+              "call_id": "parse-failure", "input": program}}
+    output = {"type": "response_item", "payload": {"type": "custom_tool_call_output",
+              "call_id": "parse-failure", "output": [
+                  {"type": "input_text", "text": "Script failed\nWall time 0.0 seconds\nOutput:\n"},
+                  {"type": "input_text", "text": "Script error:\nSyntaxError: Invalid or unexpected token"}]}}
+    data[1][0:0] = [failed, output]
+    return data
+
+
+def test_parse_rejected_attempt_is_retained_before_exact_capture_retry(tmp_path):
+    data = _syntax_retry(_trace(tmp_path))
+    result = _audit(data)
+    assert result["row"] == 2 and result["output_row"] == 5
+    assert result["pre_capture_failures"] == [{"row": 0, "output_row": 1, "call_id": "parse-failure",
+        "status": "syntax_rejected_before_execution",
+        "program_sha256": hashlib.sha256(data[1][0]["payload"]["input"].encode()).hexdigest(),
+        "native_error": "Script error:\nSyntaxError: Invalid or unexpected token"}]
+    assert result["native_access_v1"] == {"apply_patch": True, "exec_command": True}
+
+
+@pytest.mark.parametrize("program", [
+    'throw new SyntaxError("Invalid or unexpected token");',
+    'await tools.exec_command({cmd:"cat source.js"}); throw new SyntaxError("Invalid or unexpected token");',
+    'text({loci_runtime_catalog_v1:[]});',
+])
+def test_reported_syntax_error_cannot_hide_executable_work(tmp_path, program):
+    data = _syntax_retry(_trace(tmp_path), program)
+    with pytest.raises(ValueError, match="independently parse-invalid"):
+        _audit(data)
+
+
+@pytest.mark.parametrize("mutation", [
+    lambda rows: rows[1]["payload"].update(call_id="unjoined"),
+    lambda rows: rows.insert(2, deepcopy(rows[1])),
+    lambda rows: rows.insert(1, {"type": "event_msg", "payload": {"type": "item_completed", "item": {"type": "CommandExecution"}}}),
+    lambda rows: rows.insert(2, {"type": "event_msg", "payload": {"type": "item_completed", "item": {"type": "McpToolCall"}}}),
+    lambda rows: rows.insert(2, {"type": "event_msg", "payload": {"type": "item_completed", "item": {"type": "FileChange"}}}),
+    lambda rows: rows[1]["payload"]["output"][1].update(text="Script error:\nError: runtime failure"),
+    lambda rows: rows[1]["payload"].update(output='SyntaxError: Invalid or unexpected token'),
+    lambda rows: rows.append(deepcopy(rows[0])),
+    lambda rows: rows.__setitem__(slice(1, 3), list(reversed(rows[1:3]))),
+])
+def test_capture_retry_rejects_unbound_errors_and_any_earlier_native_actions(tmp_path, mutation):
+    data = _syntax_retry(_trace(tmp_path))
+    mutation(data[1])
+    with pytest.raises(ValueError):
+        _audit(data)

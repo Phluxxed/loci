@@ -1,4 +1,15 @@
-# Current real-source pilot: capture and recovery repaired; live qualification pending
+# Current real-source pilot: six assignments qualified, ten pending
+
+All four native availability probes passed. The first six measured assignments
+are now qualified and correct. The sixth was recovered from its original
+archive after the reader rejected a syntax-error attempt followed by a successful
+exact capture. Its failed attempt and costs remain retained. No native session
+was repeated. [Recovery evidence and the current resume command](capture-syntax-recovery.md).
+The comparison remains incomplete; no architecture benefit is claimed.
+
+---
+
+# Prior state: capture and recovery repaired; live qualification pending
 
 The current [host-observation amendment](capture-host-observation-amendment.json)
 also enables the existing handling of changed personal instructions. It passes

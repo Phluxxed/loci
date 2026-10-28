@@ -75,5 +75,9 @@ retain full private catalogs, identify descriptor changes, and support archive-o
 resume and reader-only reprocessing. Its explicit measurement-prefix amendment
 preserves the original freeze and task inputs. The repair passes 251 tests and
 a real native-helper capture smoke check; fresh top-level qualification and all
-16 scored assignments remain pending. Semantic/proof benefit remains unmeasured
-and advancement is on hold. This is not a production integration.
+16 scored assignments remained pending at that repair. Subsequently all four
+native probes passed and six assignments qualified with correct outcomes. The
+sixth was [recovered without repeating its native session](../.scratch/r1-integrated/capture-syntax-recovery.md)
+after a capture syntax-error retry. Ten assignments remain pending. The
+comparison and semantic/proof benefit remain incomplete; advancement is on hold.
+This is not a production integration.
