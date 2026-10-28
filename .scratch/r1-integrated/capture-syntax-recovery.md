@@ -1,5 +1,8 @@
 # R1 sixth-run recovery
 
+Current status and command: [seven assignments qualified, with bounded repair wait](managed-resume.md).
+The command below records the prior non-waiting resume.
+
 The sixth native assignment completed correctly. Its archived source passes
 the unchanged independent grader and replay after reader-only recovery. Six
 assignments are retained and qualified, with ten pending. No native session was

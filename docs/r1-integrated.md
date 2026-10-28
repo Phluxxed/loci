@@ -78,6 +78,9 @@ a real native-helper capture smoke check; fresh top-level qualification and all
 16 scored assignments remained pending at that repair. Subsequently all four
 native probes passed and six assignments qualified with correct outcomes. The
 sixth was [recovered without repeating its native session](../.scratch/r1-integrated/capture-syntax-recovery.md)
-after a capture syntax-error retry. Ten assignments remain pending. The
+after a capture syntax-error retry. The seventh was also recovered after a host
+memory-summary rendering-count difference; seven assignments are qualified and
+nine remain pending. The [current existing-runner mode](../.scratch/r1-integrated/managed-resume.md)
+can wait for bound reader repairs without another operator relaunch. The
 comparison and semantic/proof benefit remain incomplete; advancement is on hold.
 This is not a production integration.

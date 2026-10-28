@@ -315,7 +315,18 @@ def audit_treatment(frozen: dict, manifest: dict, trace: Path, verified: dict,
             measured_prompt(frozen, task, condition, observer=observer),
             frozen["conditions"][condition]["tools"], **capture)
         baseline = verified["common_context"]
-        if (context["common_sha256"] != baseline["common_sha256"]
+        common_matches = context["common_sha256"] == baseline["common_sha256"]
+        if not common_matches:
+            probes = json.loads(Path(verified["path"]).read_text())["probes"]
+            record = next(probe for probe in probes if probe["condition"] == "native")["files"]["evidence"]
+            if r0.digest(Path(record["path"])) != record["sha256"]:
+                raise ValueError("qualified common-context evidence changed")
+            expected = json.loads(Path(record["path"]).read_text())["common_context"]["common"]
+            comparison = availability.compare_common_context(expected, context["common"])
+            common_matches = comparison["equivalent"]
+            if common_matches:
+                treatment["startup_rendering_variations"] = comparison["memory_truncation_counts"]
+        if (not common_matches
                 or context["loci_contracts_sha256"] != baseline["loci_contracts_sha256"][condition]):
             detail = ""
             if capture and baseline.get("catalog_artifact"):
@@ -436,8 +447,13 @@ def require_availability(frozen: dict, gate: Path | None) -> dict:
     if _common_context(frozen):
         baseline = contexts["native"]["common"]
         differences = {}
+        rendering_variations = {}
         for condition, context in contexts.items():
             if context["common"] != baseline:
+                comparison = availability.compare_common_context(baseline, context["common"])
+                if comparison["equivalent"]:
+                    rendering_variations[condition] = comparison["memory_truncation_counts"]
+                    continue
                 differences[condition] = {"instructions_differ": context["common"]["instructions"] != baseline["instructions"],
                                           "catalog_differ": context["common"]["catalog"] != baseline["catalog"]}
                 if catalogs:
@@ -453,6 +469,8 @@ def require_availability(frozen: dict, gate: Path | None) -> dict:
         }
         if catalogs:
             verified["common_context"]["catalog_artifact"] = str(catalogs["native"])
+        if rendering_variations:
+            verified["common_context"]["startup_rendering_variations"] = rendering_variations
     return verified
 
 

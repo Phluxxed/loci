@@ -14,6 +14,58 @@ from tests.test_complete_work_r1 import _freeze
 from tests.test_complete_work_r1_availability import host_gate, _startup_rows
 
 
+def _memory_rendering(tokens):
+    return {'catalog': {'count': 1, 'sha256': 'a' * 64}, 'instructions': [{
+        'type': 'message', 'role': 'developer', 'content': [{'type': 'input_text',
+        'text': 'Keep instructions.\n========= MEMORY_SUMMARY BEGINS =========\n'
+                f'Visible prefix…{tokens} tokens truncated…Visible suffix\n'
+                '========= MEMORY_SUMMARY ENDS =========\nKeep the footer.'}],
+        'internal_chat_message_metadata_passthrough': {
+            'content_item_kinds': ['memories.instructions'],
+            'content_item_metadata': [{'provenance': {'type': 'harness', 'hook': False}}]}}]}
+
+
+def test_typed_memory_truncation_count_is_comparable_and_raw_context_stays_intact():
+    expected, observed = _memory_rendering(5091), _memory_rendering(5316)
+    originals = deepcopy((expected, observed))
+    assert availability.compare_common_context(expected, observed) == {
+        'equivalent': True, 'memory_truncation_counts': [{'instruction': 0, 'content_part': 0,
+            'marker': 0, 'expected_tokens': 5091, 'observed_tokens': 5316}]}
+    assert (expected, observed) == originals
+
+
+@pytest.mark.parametrize('where', ['visible', 'prefix', 'footer', 'catalog', 'marker_added', 'marker_removed'])
+def test_memory_rendering_comparison_preserves_every_visible_instruction_and_marker(where):
+    expected, observed = _memory_rendering(5091), _memory_rendering(5316)
+    part = observed['instructions'][0]['content'][0]
+    if where == 'catalog':
+        observed['catalog']['sha256'] = 'b' * 64
+    else:
+        before, after = {'visible': ('Visible prefix', 'Different instruction'),
+            'prefix': ('Keep instructions.', 'Different prefix.'),
+            'footer': ('Keep the footer.', 'Different footer.'),
+            'marker_added': ('Visible suffix', 'Visible suffix…1 tokens truncated…'),
+            'marker_removed': ('…5316 tokens truncated…', '')}[where]
+        part['text'] = part['text'].replace(before, after)
+    assert availability.compare_common_context(expected, observed)['equivalent'] is False
+
+
+@pytest.mark.parametrize('field,value', [('role', 'user'), ('kind', 'generic.developer_instructions'),
+                                       ('provenance', {'type': 'harness', 'hook': True})])
+def test_truncation_text_without_exact_native_memory_provenance_is_not_normalized(field, value):
+    expected, observed = _memory_rendering(5091), _memory_rendering(5316)
+    for common in (expected, observed):
+        item = common['instructions'][0]
+        metadata = item['internal_chat_message_metadata_passthrough']
+        if field == 'role':
+            item['role'] = value
+        elif field == 'kind':
+            metadata['content_item_kinds'][0] = value
+        else:
+            metadata['content_item_metadata'][0]['provenance'] = value
+    assert availability.compare_common_context(expected, observed)['equivalent'] is False
+
+
 def test_common_policy_is_prospective_and_binds_cards_root_instructions_and_validator(tmp_path):
     legacy = _freeze(tmp_path)
     old = r1.read_freeze(legacy)

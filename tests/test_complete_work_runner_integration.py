@@ -21,7 +21,7 @@ from loci.integrated import IntegratedSource
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / '.scratch/r1-integrated/pilot-execute.py'
-ACTIVE_AMENDMENT = SCRIPT.with_name('capture-syntax-recovery-amendment.json')
+ACTIVE_AMENDMENT = SCRIPT.with_name('managed-resume-amendment.json')
 PROTECTIONS = {
     'approval_policy': 'on-request', 'approvals_reviewer': 'auto_review',
     'sandbox_policy': {'type': 'workspace-write'}, 'permission_profile': {'type': 'managed'},
@@ -101,6 +101,7 @@ class NativeDelivery:
         self.run_roots = set()
         self.catalog_drift = None
         self.catalog_syntax_failure = None
+        self.memory_truncation_run = None
 
     def __call__(self, argv, **kwargs):
         if str(argv[0]) != str(self.host):
@@ -156,6 +157,7 @@ class NativeDelivery:
             'content_item_metadata': [{'provenance': {'type': 'agents_md'}},
                                       {'provenance': {'type': 'harness', 'hook': False}}]}
         prompt = (observer / 'prompt.txt').read_text()
+        memory_count = 5316 if manifest['run_id'] == self.memory_truncation_run else 5091
         rows = [row('session_meta', {'id': thread, 'session_id': session, 'cwd': str(workspace),
                     'cli_version': 'offline-native-shape', 'source': 'cli', 'thread_source': 'user'}),
                 event('task_started', started_at=100),
@@ -164,6 +166,13 @@ class NativeDelivery:
                 response('additional_tools', role='developer', id='startup-envelope', tools=schemas),
                 response('message', role='developer', content=[text('Common developer instructions.'),
                          text('Preserve native tools and permissions.')]),
+                response('message', role='developer', content=[text(
+                    '========= MEMORY_SUMMARY BEGINS =========\n'
+                    f'Visible prefix…{memory_count} tokens truncated…Visible suffix\n'
+                    '========= MEMORY_SUMMARY ENDS =========')],
+                    internal_chat_message_metadata_passthrough={'turn_id': turn,
+                        'content_item_kinds': ['memories.instructions'],
+                        'content_item_metadata': [{'provenance': {'type': 'harness', 'hook': False}}]}),
                 response('message', role='user', content=[text(
                          (Path(manifest['native_config']).parent / 'AGENTS.md').read_text()
                          + 'Shared fixture repository instructions.\n'),
@@ -399,3 +408,62 @@ def test_legacy_hash_only_probes_cannot_gain_missing_capture_by_reprocessing(int
     assert 'only catalog hashes' in result['error'] or 'cannot reconstruct' in result['error']
     assert bytes_under(source) == original and len(native.launches) == 4
     assert not (root / 'execution-index.json').exists()
+
+
+def test_waiting_existing_runner_accepts_bound_repair_and_finishes_without_repeating_native_work(integrated_runner, monkeypatch):
+    runner, native, root, argv, freeze, amendment, gate = integrated_runner
+    native.catalog_syntax_failure = 'task-1-integrated'
+    native.memory_truncation_run = 'task-1-native'
+    real_audit = r1.audit_treatment
+    def old_reader(*args, **kwargs):
+        treatment = real_audit(*args, **kwargs)
+        if treatment.get('startup_rendering_variations'):
+            raise ValueError('injected old reader rejects a host rendering count')
+        return treatment
+    with monkeypatch.context() as fault:
+        fault.setattr(r1, 'audit_treatment', old_reader)
+        blocked = runner.main(argv)
+    assert blocked['status'] == 'blocked' and blocked['attempted'] == 7
+    assert len(native.launches) == 11
+    archived_before = bytes_under(root / 'archived-runs')
+    prior_index = (root / 'execution-index.json').read_bytes()
+    repaired = runner.read(amendment)
+    repaired.pop('amendment_sha256')
+    repaired['note'] = 'Test repair request; successful readers remain real.'
+    repaired['amendment_sha256'] = r1.identity(repaired)
+    repair_path = amendment.with_name('requested-repair.json')
+    write_json(repair_path, repaired)
+    restarted = []
+    class ReplacedProcess(BaseException):
+        pass
+    def resume_request(seconds):
+        assert seconds == 1 and len(native.launches) == 11
+        state = runner.read(root / 'repair-wait.json')
+        assert state['status'] == 'waiting'
+        write_json(root / 'repair-request.json', {'schema_version': 1,
+            'freeze_sha256': state['freeze_sha256'],
+            'execution_index_sha256': state['execution_index_sha256'],
+            'amendment': {'path': str(repair_path), 'sha256': r0.digest(repair_path)}})
+    def replace_process(executable, arguments):
+        restarted.append((executable, arguments))
+        raise ReplacedProcess
+    with monkeypatch.context() as host:
+        host.setattr(r1, 'audit_treatment', old_reader)
+        host.setattr(runner.time, 'sleep', resume_request)
+        host.setattr(runner.os, 'execv', replace_process)
+        with pytest.raises(ReplacedProcess):
+            runner.main(argv + ['--resume', '--wait-for-repair'])
+    assert len(restarted) == 1 and len(native.launches) == 11
+    assert (root / 'execution-index.json').read_bytes() == prior_index
+    assert bytes_under(root / 'archived-runs') == archived_before
+    executable, restart_argv = restarted[0]
+    assert restart_argv[:3] == [executable, '-u', str(SCRIPT)]
+    assert restart_argv[-2:] == ['--resume', '--wait-for-repair']
+    assert runner.main(restart_argv[3:])['status'] == 'complete'
+    final = runner.read(root / 'execution-index.json')
+    assert len(final['runs']) == 16 and len(native.launches) == 20
+    assert len({item['run_id'] for item in native.launches}) == 20
+    assert final['runs'][6]['evaluation']['correct'] is True
+    changes = final['runs'][6]['evaluation']['treatment_validity']['startup_rendering_variations']
+    assert changes[0]['expected_tokens'] == 5091 and changes[0]['observed_tokens'] == 5316
+    assert all((root / 'archived-runs' / name).read_bytes() == raw for name, raw in archived_before.items())

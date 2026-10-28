@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import traceback
 import uuid
 
@@ -368,6 +369,152 @@ def background(args, root):
     return result
 
 
+def repair_wait_state(args, root, frozen, failure):
+    """Require complete original evidence without using the failing observer reader."""
+    index_path = root / 'execution-index.json'
+    index = read(index_path)
+    runs = index.get('runs', [])
+    require(index.get('status') == 'blocked' and runs, 'repair wait requires a blocked assignment')
+    require(index.get('freeze_sha256') == frozen['freeze_sha256'], 'index freeze differs')
+    require(len(frozen['schedule']) == 16 and len(runs) <= 16,
+            'repair wait is limited to the frozen16 pilot')
+    require([entry['run_id'] for entry in runs] ==
+            [entry['run_id'] for entry in frozen['schedule'][:len(runs)]], 'retained schedule differs')
+    tail = runs[-1]
+    require(tail.get('evidence_error') and not tail.get('archive_error'),
+            'repair wait requires an observer failure with a complete archive')
+    execution = tail.get('execution', {})
+    require(execution.get('status') == 'closed' and execution.get('exit_code') == 0,
+            'repair wait cannot retry incomplete native execution')
+    run_id = tail['run_id']
+    archive = root / 'archived-runs' / run_id
+    require(Path(tail.get('archive', '')).resolve() == archive.resolve() and archive.is_dir(),
+            'complete original archive is required for repair wait')
+    observer = archive / 'observer'
+    for relative in ('run.json', 'execution.json', 'source-before.json', 'qualification/result.json',
+                     'qualification/native-rollout.jsonl', 'qualification/source-after.json'):
+        require((observer / relative).is_file(), 'repair wait missing archived ' + relative)
+    require(read(observer / 'execution.json') == execution, 'archived execution differs')
+    manifest = read(observer / 'run.json')
+    qualified = read(observer / 'qualification/result.json')
+    trace = observer / 'qualification/native-rollout.jsonl'
+    with trace.open() as stream:
+        metadata = json.loads(stream.readline())
+    thread = execution.get('thread_id')
+    require(isinstance(thread, str) and thread
+            and metadata.get('type') == 'session_meta' and metadata.get('payload', {}).get('id') == thread,
+            'archived native session differs')
+    require(manifest.get('run_id') == run_id and manifest.get('permission_overrides') == {}
+            and execution.get('run_id') == run_id
+            and execution.get('freeze_sha256') == frozen['freeze_sha256'], 'archived execution identity differs')
+    require(qualified.get('status') == 'qualified_observations'
+            and qualified.get('accounting', {}).get('usage_status') == 'known'
+            and qualified.get('accounting', {}).get('usage') is not None,
+            'repair wait requires qualified original observations and known usage')
+    require(qualified.get('run_id') == run_id and qualified.get('thread_id') == thread
+            and qualified.get('config_sha256') == r0.digest(observer / 'run.json')
+            and qualified.get('native_trace_sha256') == r0.digest(trace), 'archived qualification bindings differ')
+    before = read(observer / 'source-before.json')
+    after = read(observer / 'qualification/source-after.json')
+    task = next(task for task in frozen['tasks'] if task['id'] == frozen['schedule'][len(runs) - 1]['task'])
+    verify_snapshot(before, task['source_identity'])
+    verify_snapshot(after, after['sha256'])
+    require(qualified.get('source_before') == before['sha256']
+            and qualified.get('source_after') == after['sha256'], 'archived source bindings differ')
+    verified = index.get('availability_gate', {})
+    availability_gate = args.availability_gate or root / 'availability/gate.json'
+    require(verified.get('path') == str(availability_gate.resolve())
+            and verified.get('sha256') == r0.digest(availability_gate)
+            and read(args.gate).get('status') == 'passed'
+            and verified.get('deterministic_gate_sha256') == r0.digest(args.gate), 'retained gate bindings differ')
+    return {'schema_version': 1, 'status': 'waiting', 'pid': os.getpid(),
+            'freeze_sha256': frozen['freeze_sha256'], 'freeze_file_sha256': r0.digest(args.freeze),
+            'execution_index_sha256': r0.digest(index_path), 'blocker_run': run_id,
+            'amendment': None if args.amendment is None else
+                {'path': str(args.amendment.resolve()), 'sha256': r0.digest(args.amendment)},
+            'diagnostics': {'original_failure': failure, 'evidence_error': tail['evidence_error']}}
+
+
+def repair_request(args, root, state, request):
+    """Validate only a new instrumentation amendment; execution stays in normal resume."""
+    require(isinstance(request, dict) and set(request) ==
+            {'schema_version', 'freeze_sha256', 'execution_index_sha256', 'amendment'},
+            'request fields must be exactly schema_version, freeze_sha256, execution_index_sha256, amendment')
+    require(type(request['schema_version']) is int and request['schema_version'] == 1,
+            'request schema_version must be 1')
+    require(request['freeze_sha256'] == state['freeze_sha256'], 'request freeze_sha256 differs from blocked freeze')
+    require(request['execution_index_sha256'] == state['execution_index_sha256'],
+            'request execution_index_sha256 is stale; use repair-wait.json')
+    require(r0.digest(root / 'execution-index.json') == state['execution_index_sha256'],
+            'execution index changed while waiting; restart and inspect retained state')
+    require(r0.digest(args.freeze) == state['freeze_file_sha256'], 'original freeze file changed while waiting')
+    amendment = request['amendment']
+    require(isinstance(amendment, dict) and set(amendment) == {'path', 'sha256'},
+            'request amendment must contain exactly path and sha256')
+    require(isinstance(amendment['path'], str) and Path(amendment['path']).is_absolute(),
+            'request amendment path must be absolute')
+    path = Path(amendment['path'])
+    require(path.is_file() and r0.digest(path) == amendment['sha256'], 'request amendment file/hash differs')
+    require(state['amendment'] is None or amendment['sha256'] != state['amendment']['sha256'],
+            'repair amendment bytes must differ from the blocked amendment')
+    frozen = r1.read_freeze(args.freeze, amendment=path)
+    require(frozen['freeze_sha256'] == state['freeze_sha256'], 'repair amendment changed frozen identity')
+    require(r0.digest(path) == amendment['sha256'], 'repair amendment changed during validation')
+    require(r0.digest(root / 'execution-index.json') == state['execution_index_sha256']
+            and r0.digest(args.freeze) == state['freeze_file_sha256'],
+            'blocked execution index or freeze changed during repair validation')
+    return [sys.executable, '-u', str(Path(__file__).resolve()),
+            '--freeze', str(args.freeze.resolve()), '--gate', str(args.gate.resolve()),
+            '--output-root', str(root.resolve()),
+            '--availability-gate', str((args.availability_gate or root / 'availability/gate.json').resolve()),
+            '--amendment', str(path.resolve()), '--resume', '--wait-for-repair']
+
+
+def wait_for_repair(args, root, state):
+    """Wait in the existing Terminal process; a validated request replaces this process."""
+    marker = root / 'repair-wait.json'
+    write_json(marker, state)
+    print(json.dumps(state), flush=True)
+    try:
+        while True:
+            incoming = root / 'repair-request.json'
+            if incoming.exists():
+                retained = root / 'repair-requests' / (uuid.uuid4().hex + '.json')
+                retained.parent.mkdir(exist_ok=True)
+                os.replace(incoming, retained)
+                receipt = {'schema_version': 1, 'request': str(retained), 'status': 'rejected'}
+                try:
+                    argv = repair_request(args, root, state, read(retained))
+                except Exception as exc:
+                    receipt['error'] = f'{type(exc).__name__}: {exc}'
+                    state['diagnostics']['last_rejected_request'] = receipt
+                    write_json(retained.with_suffix('.receipt.json'), receipt)
+                    write_json(marker, state)
+                    print(json.dumps(receipt), flush=True)
+                else:
+                    receipt.update(status='accepted', argv=argv)
+                    write_json(retained.with_suffix('.receipt.json'), receipt)
+                    state.update(status='restarting', accepted_request=str(retained))
+                    write_json(marker, state)
+                    try:
+                        os.execv(sys.executable, argv)
+                    except OSError as exc:
+                        error = f'{type(exc).__name__}: {exc}'
+                        receipt.update(status='restart_failed', error=error)
+                        state.update(status='restart_failed', error=error)
+                        write_json(retained.with_suffix('.receipt.json'), receipt)
+                        write_json(marker, state)
+                        return {'status': 'blocked', 'stage': 'repair_restart', 'error': error,
+                                'original_failure': state['diagnostics']['original_failure']}
+                    return state  # execv only returns when replaced by a test double.
+            time.sleep(1)
+    except KeyboardInterrupt:
+        state['status'] = 'interrupted'
+        write_json(marker, state)
+        return {'status': 'blocked', 'stage': 'repair_wait', 'error': 'repair wait interrupted',
+                'original_failure': state['diagnostics']['original_failure']}
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--freeze', type=Path, required=True)
@@ -379,10 +526,15 @@ def main(argv=None):
     parser.add_argument('--check-only', action='store_true')
     parser.add_argument('--background', action='store_true')
     parser.add_argument('--availability-gate', type=Path)
+    parser.add_argument('--wait-for-repair', action='store_true',
+                        help='Keep this Terminal process waiting for a validated observer-repair amendment')
     parser.add_argument('--reprocess', action='store_true',
                         help='Reprocess retained availability evidence only; never launch native work')
     args = parser.parse_args(argv)
     root = args.output_root if args.output_root is not None else args.freeze.parent
+    if args.wait_for_repair and (not args.resume or args.preflight_only or args.check_only
+                                 or args.reprocess or args.background):
+        parser.error('--wait-for-repair requires --resume and cannot combine with preflight, check, reprocess or background')
     if args.reprocess:
         if args.resume or args.check_only or args.preflight_only or args.background:
             parser.error('--reprocess cannot be combined with execution or preflight flags')
@@ -424,8 +576,30 @@ def main(argv=None):
         if args.preflight_only or preflight.get('status') != 'passed':
             print(json.dumps(preflight), flush=True)
             return preflight
-    result = run(args.freeze, args.gate, args.amendment, root,
-                 resume=args.resume, check_only=args.check_only, availability_gate=args.availability_gate)
+    # Check runtime pins before catching observer/recovery exceptions. Unsafe
+    # configuration must fail normally, rather than becoming a repair wait.
+    frozen = r1.read_freeze(args.freeze, amendment=args.amendment) if args.wait_for_repair else None
+    try:
+        result = run(args.freeze, args.gate, args.amendment, root,
+                     resume=args.resume, check_only=args.check_only, availability_gate=args.availability_gate)
+    except Exception as exc:
+        if not args.wait_for_repair:
+            raise
+        failure = {'status': 'blocked', 'error': f'{type(exc).__name__}: {exc}',
+                   'traceback': traceback.format_exc()}
+        try:
+            state = repair_wait_state(args, root, frozen, failure)
+        except Exception:
+            raise exc
+        result = wait_for_repair(args, root, state)
+    else:
+        if args.wait_for_repair and result.get('status') == 'blocked':
+            try:
+                state = repair_wait_state(args, root, frozen, result)
+            except Exception:
+                pass  # Incomplete native/archive evidence remains an ordinary hard stop.
+            else:
+                result = wait_for_repair(args, root, state)
     print(json.dumps(result), flush=True)
     return result
 

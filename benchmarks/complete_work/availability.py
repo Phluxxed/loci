@@ -646,6 +646,48 @@ def audit_common_context(trace: Path, workspace: Path, observer: Path,
             "loci_contracts_sha256": digest(contracts)}
 
 
+def compare_common_context(expected: dict, observed: dict) -> dict:
+    """Keep raw inputs intact; ignore only a typed host memory clipping count."""
+    def rendering(value):
+        copied = deepcopy(value)
+        counts = {}
+        for i, instruction in enumerate(copied.get("instructions", [])):
+            if instruction.get("type") != "message" or instruction.get("role") != "developer":
+                continue
+            metadata = instruction.get("internal_chat_message_metadata_passthrough", {})
+            content = instruction.get("content", [])
+            kinds = metadata.get("content_item_kinds", [])
+            origins = metadata.get("content_item_metadata", [])
+            if not (len(content) == len(kinds) == len(origins)):
+                continue
+            for j, (part, kind, origin) in enumerate(zip(content, kinds, origins)):
+                if (kind != "memories.instructions" or part.get("type") != "input_text"
+                        or origin.get("provenance") != {"type": "harness", "hook": False}):
+                    continue
+                text = part.get("text", "")
+                start = "========= MEMORY_SUMMARY BEGINS ========="
+                end = "========= MEMORY_SUMMARY ENDS ========="
+                if text.count(start) != 1 or text.count(end) != 1 or text.index(start) >= text.index(end):
+                    continue
+                prefix, body = text.split(start, 1)
+                body, suffix = body.split(end, 1)
+                pattern = r"…([0-9]+) tokens truncated…"
+                for k, match in enumerate(re.finditer(pattern, body)):
+                    counts[(i, j, k)] = int(match.group(1))
+                body = re.sub(pattern, "…<r1.rendered-token-count> tokens truncated…", body)
+                part["text"] = prefix + start + body + end + suffix
+        return copied, counts
+
+    left, before = rendering(expected)
+    right, after = rendering(observed)
+    equivalent = left == right and before.keys() == after.keys()
+    changes = [{"instruction": i, "content_part": j, "marker": k,
+                "expected_tokens": before[(i, j, k)], "observed_tokens": after[(i, j, k)]}
+               for i, j, k in sorted(before.keys() & after.keys())
+               if before[(i, j, k)] != after[(i, j, k)]]
+    return {"equivalent": equivalent, "memory_truncation_counts": changes}
+
+
 def _sources(packet: dict, *, read: bool = False) -> dict:
     sources = [packet.get("source")] if read else packet.get("sources")
     if not isinstance(sources, list) or not sources:

@@ -1,4 +1,14 @@
-# Current real-source pilot: six assignments qualified, ten pending
+# Current real-source pilot: seven assignments qualified, nine pending
+
+The seventh completed native assignment was recovered after a comparison of
+host memory-summary truncation counts blocked its reader. Visible instructions
+and catalogs matched; raw context remains retained. The existing runner now has
+an opt-in bounded wait-for-repair mode to avoid repeated manual relaunches after
+eligible observer failures. [Current command, recovery evidence and limits](managed-resume.md).
+
+---
+
+# Prior state: six assignments qualified, ten pending
 
 All four native availability probes passed. The first six measured assignments
 are now qualified and correct. The sixth was recovered from its original
