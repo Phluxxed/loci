@@ -1,0 +1,50 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: Matched search and source-delivery ablation; local deterministic targets
+prompts:
+  - '{{kind}}:{{case_id}}'
+providers:
+  - id: file://./provider.py
+    label: local-ablation
+    config:
+      pythonExecutable: /Users/brummerv/phluxxed/loci/.venv/bin/python
+      workers: 1
+      timeout: 120000
+      run_id: measured-v1
+evaluateOptions:
+  maxConcurrency: 1
+  cache: false
+defaultTest:
+  assert:
+    - type: javascript
+      value: |
+        const r = typeof output === 'string' ? JSON.parse(output) : output;
+        if (r.schema !== 1 || r.ok !== true || r.rounds !== 7 || r.whole_agent_measurement !== false) return false;
+        if (!Array.isArray(r.trials) || r.trials.length !== 21 || r.expected_trial_count !== 21) return false;
+        const modes = r.kind === 'search' ? ['rg', 'tgrep_index', 'tgrep_scan'] : ['r1', 'direct_full_refresh', 'direct'];
+        for (let round = 0; round < 7; round++) {
+          const group = r.trials.filter(t => t.round === round);
+          if (group.length !== 3 || new Set(group.map(t => t.mode)).size !== 3 || modes.some(m => !group.some(t => t.mode === m))) return false;
+        }
+        if (r.kind === 'search') {
+          return r.equivalence?.equal === true && r.warmup_equivalence?.equal === true &&
+            r.trials.every(t => ['match', 'no_match'].includes(t.status) && !t.error && t.result_sha256 && t.elapsed_ms >= 0) &&
+            new Set(r.trials.map(t => t.result_sha256)).size === 1;
+        }
+        if (r.kind === 'delivery') {
+          return r.trials.every(t => t.complete === true && !t.error && t.required_bytes > 0 &&
+            t.required_bytes === t.covered_required_bytes && t.required_sha256 === t.delivered_required_sha256 &&
+            t.tool_calls >= 1 && t.encoded_output_bytes > 0 && t.elapsed_ns >= 0);
+        }
+        return false;
+tests:
+  - vars: {kind: search, case_id: viewer-native-stop-identity}
+  - vars: {kind: search, case_id: graph-native-symbol-flow}
+  - vars: {kind: search, case_id: graph-native-schema-keys}
+  - vars: {kind: search, case_id: template-native-loader-contract}
+  - vars: {kind: search, case_id: results-native-reader-contract}
+  - vars: {kind: search, case_id: viewer-loci-retrieve-symbolic-query}
+  - vars: {kind: search, case_id: graph-loci-retrieve-symbol}
+  - vars: {kind: delivery, case_id: viewer-lifecycle-lines-1-440}
+  - vars: {kind: delivery, case_id: graph-service-http-rpc}
+  - vars: {kind: delivery, case_id: graph-domain-validation-mutation}
+  - vars: {kind: delivery, case_id: graph-git-cas-persistence}
