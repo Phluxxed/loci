@@ -1,4 +1,32 @@
-# Current real-source pilot: eight qualified outcomes, one retained failed attempt
+# Current R1 result: real-source pilot complete; hold advancement
+
+All 16 scheduled Terra 6.1/max native attempts are retained. The frozen grader
+passed 15; one catalog-capture failure produced no task answer and remains failed
+and treatment-unqualified. Independent archive replay reproduces every outcome,
+with no repeated native task. All four operational probes passed.
+
+Separate blinded review finds three passing code changes miss the explicit
+append requirement for a valid BOM-prefixed file without a trailing newline.
+The integrated session's code handles it, but that session used native tools
+only. Frozen scores remain unchanged. Only the first two tasks have four
+qualified successes accepted by both evaluator and source review.
+
+**Recommendation: keep R1 experimental and hold advancement.** Integrated made
+no task-level Loci calls; optional semantics/proof benefit is unmeasured. The
+bounded implementation and evaluation are complete, with no remaining launch
+blocker. No production integration or additional campaign is warranted by these
+observations.
+
+See the [full per-task comparison and recommendation](real-repo-pilot-results.md)
+and [sanitized machine evidence](real-repo-pilot-checks.json). Detailed private
+source, prompts, raw runs and independent reproductions remain local and ignored.
+The experimental implementation, usage documentation, deterministic qualification
+and earlier failed attempts remain retained. Historical reports below are not
+pooled with this completed real-source cohort.
+
+---
+
+# Prior real-source state: eight qualified outcomes, one retained failed attempt
 
 The ninth attempt stopped after a real capture checksum failure and produced no
 task answer. It is independently incorrect and its condition observation remains

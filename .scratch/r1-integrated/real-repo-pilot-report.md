@@ -1,10 +1,11 @@
-# R1 replacement pilot: real-source inputs qualified, native execution pending
+# R1 real-source pilot preparation: historical record
 
-Current state: [capture and archive recovery are repaired and tested](capture-recovery-repair.md).
-The original failed probes remain retained. The amended capture protocol needs
-fresh top-level qualification before the 16 scored assignments. The current
-command and its explicit measurement-prefix amendment are in the linked report;
-the command below is historical and must not be rerun unchanged.
+Current state: [all 16 native attempts are complete](real-repo-pilot-results.md).
+The final report separates frozen grades, independent source review, execution
+costs and actual Loci use. Advancement remains on hold because optional semantics
+were not used in task work. No further execution is required for this pilot.
+The preparation details and commands below are historical; previous failures and
+original frozen inputs remain retained.
 
 The replacement uses a pinned source-only snapshot of the maintained
 kaggle_lab repository, rather than generated toy repositories. No replacement

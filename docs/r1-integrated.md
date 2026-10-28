@@ -61,26 +61,19 @@ introduced.
 
 ## Evaluation status
 
-The completed pilot verified tool callability but recorded no voluntary task-level
-Loci use on tiny fixtures. Its [corrected interpretation](../.scratch/r1-integrated/astra-evaluation-review/REVIEW.md)
-identifies task/rubric and unrelated-context problems; it does not establish a
-broad adoption failure.
+The [real-source pilot is complete](../.scratch/r1-integrated/real-repo-pilot-results.md):
+16 native Terra 6.1/max attempts, 15 frozen-grader passes and one retained
+capture-induced failure with unqualified treatment observation. Independent
+archive replay reproduces every outcome. Separate blinded review finds an append
+edge case missed by three passing code changes; the frozen grades are preserved.
 
-A [replacement using maintained repository source](../.scratch/r1-integrated/real-repo-pilot-report.md)
-has qualified local inputs and a prospective gate for actual common instructions,
-native schemas and tool availability. All four operational probes passed, but
-[a common tool catalog mismatch](../.scratch/r1-integrated/catalog-drift-report.md)
-blocked scoring. The [capture/recovery repair and current execution command](../.scratch/r1-integrated/capture-recovery-repair.md)
-retain full private catalogs, identify descriptor changes, and support archive-only
-resume and reader-only reprocessing. Its explicit measurement-prefix amendment
-preserves the original freeze and task inputs. The repair passes 251 tests and
-a real native-helper capture smoke check; fresh top-level qualification and all
-16 scored assignments remained pending at that repair. Subsequently all four
-native probes passed and six assignments qualified with correct outcomes. The
-sixth was [recovered without repeating its native session](../.scratch/r1-integrated/capture-syntax-recovery.md)
-after a capture syntax-error retry. The seventh was also recovered after a host
-memory-summary rendering-count difference; seven assignments are qualified and
-nine remain pending. The [current existing-runner mode](../.scratch/r1-integrated/managed-resume.md)
-can wait for bound reader repairs without another operator relaunch. The
-comparison and semantic/proof benefit remain incomplete; advancement is on hold.
-This is not a production integration.
+Four operational probes established callability. During task work, path-only
+made five Loci calls and eager made two; integrated made none. No optional
+semantic or focused-proof operation was requested. Integrated usefulness remains
+unmeasured, so advancement is on hold and R1 remains experimental. The report
+contains per-task timing, provider usage, effort, delivery findings and evidence
+limits. No production integration was performed.
+
+The earlier tiny-fixture cohorts and their
+[corrected interpretation](../.scratch/r1-integrated/astra-evaluation-review/REVIEW.md)
+remain historical evidence and are not pooled with the real-source pilot.
