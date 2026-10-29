@@ -1,0 +1,845 @@
+{
+  "schema": 1,
+  "completed_utc": "2026-10-29T01:32:27.868748+00:00",
+  "model": "openai-codex/gpt-6-sol",
+  "requested_effort": "high",
+  "pi_version": "0.87.1",
+  "promptfoo_version": "0.125.1",
+  "assignments": 18,
+  "source_files": 701,
+  "source_bytes": 10062803,
+  "source_sha256": "cf7d215dd9bf82ebb9fd25c079202319982166de727161ef213a4eaa4607edac",
+  "measurement_frozen_code_unchanged": true,
+  "source_unchanged_assignments": 18,
+  "arms": {
+    "native": {
+      "assignments": 6,
+      "requested_facts_correct": 6,
+      "substantive_source_support": 6,
+      "full_prompt_compliance": 1,
+      "original_full_rubric_pass": 1,
+      "accounting_qualified": 6,
+      "token_status": "complete",
+      "reported_usage": {
+        "logical_input": 201539,
+        "input": 72515,
+        "cacheRead": 129024,
+        "cacheWrite": 0,
+        "output": 9769,
+        "totalTokens": 211308
+      },
+      "reported_reasoning_known": 1406,
+      "missing_reasoning_records": 0,
+      "assistant_response_records": 38,
+      "tool_calls": 62,
+      "loci_used_assignments": 0,
+      "loci_retrieve_calls": 0,
+      "loci_read_calls": 0,
+      "elapsed_seconds": 260.962,
+      "reported_total_change_vs_native_percent": 0.0
+    },
+    "loci_full": {
+      "assignments": 6,
+      "requested_facts_correct": 6,
+      "substantive_source_support": 6,
+      "full_prompt_compliance": 4,
+      "original_full_rubric_pass": 3,
+      "accounting_qualified": 5,
+      "token_status": "reported_lower_bound",
+      "reported_usage": {
+        "logical_input": 227443,
+        "input": 96243,
+        "cacheRead": 131200,
+        "cacheWrite": 0,
+        "output": 10118,
+        "totalTokens": 237561
+      },
+      "reported_reasoning_known": 1536,
+      "missing_reasoning_records": 2,
+      "assistant_response_records": 42,
+      "tool_calls": 64,
+      "loci_used_assignments": 1,
+      "loci_retrieve_calls": 1,
+      "loci_read_calls": 0,
+      "elapsed_seconds": 307.66,
+      "reported_total_change_vs_native_percent": 12.424044522687261
+    },
+    "loci_anchors": {
+      "assignments": 6,
+      "requested_facts_correct": 6,
+      "substantive_source_support": 6,
+      "full_prompt_compliance": 3,
+      "original_full_rubric_pass": 3,
+      "accounting_qualified": 6,
+      "token_status": "complete",
+      "reported_usage": {
+        "logical_input": 235851,
+        "input": 88139,
+        "cacheRead": 147712,
+        "cacheWrite": 0,
+        "output": 11316,
+        "totalTokens": 247167
+      },
+      "reported_reasoning_known": 2055,
+      "missing_reasoning_records": 0,
+      "assistant_response_records": 38,
+      "tool_calls": 73,
+      "loci_used_assignments": 2,
+      "loci_retrieve_calls": 2,
+      "loci_read_calls": 0,
+      "elapsed_seconds": 387.101,
+      "reported_total_change_vs_native_percent": 16.97001533306832
+    }
+  },
+  "matched_accounting_qualified_pairs": {
+    "loci_full_vs_native_requested_facts": {
+      "pairs": 5,
+      "arm_total": 184501,
+      "native_total": 168729,
+      "change_percent": 9.347533618998515
+    },
+    "loci_full_vs_native_full_prompt": {
+      "pairs": 1,
+      "arm_total": 37041,
+      "native_total": 26044,
+      "change_percent": 42.22469666717863
+    },
+    "loci_anchors_vs_native_requested_facts": {
+      "pairs": 6,
+      "arm_total": 247167,
+      "native_total": 211308,
+      "change_percent": 16.97001533306832
+    },
+    "loci_anchors_vs_native_full_prompt": {
+      "pairs": 1,
+      "arm_total": 40515,
+      "native_total": 26044,
+      "change_percent": 55.56366149592997
+    }
+  },
+  "verification": {
+    "original": {
+      "controls": {
+        "successes": 3,
+        "failures": 6,
+        "errors": 0
+      },
+      "saved_answer_replay": {
+        "successes": 7,
+        "failures": 11,
+        "errors": 0
+      }
+    },
+    "prompt": {
+      "controls": {
+        "successes": 3,
+        "failures": 6,
+        "errors": 0
+      },
+      "saved_answer_replay": {
+        "successes": 8,
+        "failures": 10,
+        "errors": 0
+      }
+    },
+    "focused_tests": {
+      "passed": 7,
+      "command": "/Users/brummerv/phluxxed/loci/.venv/bin/python -m pytest -q tests/test_search_ablation_agent_provider.py tests/test_search_ablation_agent_loci.py"
+    },
+    "actual_pi_operational_probes": {
+      "passed": 3,
+      "failures": 0,
+      "errors": 0
+    }
+  },
+  "measurement_format_gate": {
+    "successes": 17,
+    "failures": 0,
+    "errors": 1
+  },
+  "reported_total_tokens_all_arms": 696036,
+  "qualifications": [
+    "Prompt-aligned semantic judgment is a disclosed post-hoc evaluator correction; original scores preserved.",
+    "Internal blinded model review, not human acceptance.",
+    "One full-Loci episode recovered from two server-overload errors with zero/unreported failed-attempt usage; its total is a lower bound.",
+    "Loci used in only 3 of 12 eligible episodes; one measured graph-enriched retrieval.",
+    "Target cwd paths contained condition labels; target agents were not blinded to arm.",
+    "Three convenience tasks, two repetitions, one historical snapshot; native tools retained and fresh empty Loci stores.",
+    "Strict JSON, quote-length and exact-line citation contract; substantive accuracy is distinct from full compliance.",
+    "Private source/prompts/oracles/traces are retained locally and excluded from publication."
+  ],
+  "artifact_sha256": {
+    "freeze.json": "95460f3b67b3374c506a5b3e284b26d5d0a6a3928ea07923515971e2a525bd3c",
+    "results.json": "e051b8f087c3be891ab102bc8cd8878dcb858c3ec6b957e217f7dddb75b0973b",
+    "measurement-closure.json": "486cfebfce5311cb70e65cbcf4bd2bddbe42beeeafcf63e454ccfef6304921e3",
+    "replay-original-results.json": "d4bebeff63c10331b12566748502e99866b13128b67f33c1e5d08169673b3677",
+    "replay-prompt-results.json": "f805008fee40f33ef637500a722905e39db2324fbc69dbd40f6ce329a90a23cf"
+  },
+  "trials": [
+    {
+      "trial_id": "01-graph-mutation-contract-r1-native",
+      "case_id": "graph-mutation-contract",
+      "arm": "native",
+      "repetition": 1,
+      "accounting_complete": true,
+      "source_unchanged": true,
+      "usage": {
+        "input": 11797,
+        "output": 2070,
+        "cacheRead": 29312,
+        "cacheWrite": 0,
+        "reasoning": 290,
+        "totalTokens": 43179,
+        "logical_input": 41109
+      },
+      "assistant_requests": 7,
+      "tool_counts": {
+        "ls": 2,
+        "find": 2,
+        "grep": 6,
+        "read": 4
+      },
+      "tool_errors": 0,
+      "enrichment_exposure": {
+        "retrievals": 0,
+        "relationships": 0,
+        "ownership": 0,
+        "related_items": 0
+      },
+      "elapsed_seconds": 72.47349016700082,
+      "requested_facts_correct": true,
+      "substantive_source_support": true,
+      "full_prompt_compliance": false,
+      "original_full_rubric_pass": false,
+      "citation_issue_count": 2
+    },
+    {
+      "trial_id": "02-graph-mutation-contract-r1-loci_full",
+      "case_id": "graph-mutation-contract",
+      "arm": "loci_full",
+      "repetition": 1,
+      "accounting_complete": true,
+      "source_unchanged": true,
+      "usage": {
+        "input": 21263,
+        "output": 2014,
+        "cacheRead": 27136,
+        "cacheWrite": 0,
+        "reasoning": 340,
+        "totalTokens": 50413,
+        "logical_input": 48399
+      },
+      "assistant_requests": 6,
+      "tool_counts": {
+        "ls": 2,
+        "loci_retrieve": 1,
+        "read": 5,
+        "grep": 4
+      },
+      "tool_errors": 1,
+      "enrichment_exposure": {
+        "retrievals": 1,
+        "relationships": 2,
+        "ownership": 4,
+        "related_items": 2
+      },
+      "elapsed_seconds": 88.51610608299961,
+      "requested_facts_correct": true,
+      "substantive_source_support": true,
+      "full_prompt_compliance": true,
+      "original_full_rubric_pass": true,
+      "citation_issue_count": 0
+    },
+    {
+      "trial_id": "03-graph-mutation-contract-r1-loci_anchors",
+      "case_id": "graph-mutation-contract",
+      "arm": "loci_anchors",
+      "repetition": 1,
+      "accounting_complete": true,
+      "source_unchanged": true,
+      "usage": {
+        "input": 19626,
+        "output": 2416,
+        "cacheRead": 44672,
+        "cacheWrite": 0,
+        "reasoning": 542,
+        "totalTokens": 66714,
+        "logical_input": 64298
+      },
+      "assistant_requests": 9,
+      "tool_counts": {
+        "loci_retrieve": 1,
+        "ls": 3,
+        "read": 6,
+        "grep": 4
+      },
+      "tool_errors": 0,
+      "enrichment_exposure": {
+        "retrievals": 1,
+        "relationships": 0,
+        "ownership": 2,
+        "related_items": 0
+      },
+      "elapsed_seconds": 103.19633824999983,
+      "requested_facts_correct": true,
+      "substantive_source_support": true,
+      "full_prompt_compliance": false,
+      "original_full_rubric_pass": false,
+      "citation_issue_count": 1
+    },
+    {
+      "trial_id": "04-viewer-stop-location-r2-loci_anchors",
+      "case_id": "viewer-stop-location",
+      "arm": "loci_anchors",
+      "repetition": 2,
+      "accounting_complete": true,
+      "source_unchanged": true,
+      "usage": {
+        "input": 17854,
+        "output": 1137,
+        "cacheRead": 13312,
+        "cacheWrite": 0,
+        "reasoning": 176,
+        "totalTokens": 32303,
+        "logical_input": 31166
+      },
+      "assistant_requests": 5,
+      "tool_counts": {
+        "loci_retrieve": 1,
+        "read": 2,
+        "grep": 1
+      },
+      "tool_errors": 0,
+      "enrichment_exposure": {
+        "retrievals": 1,
+        "relationships": 0,
+        "ownership": 3,
+        "related_items": 0
+      },
+      "elapsed_seconds": 83.64778012499937,
+      "requested_facts_correct": true,
+      "substantive_source_support": true,
+      "full_prompt_compliance": false,
+      "original_full_rubric_pass": false,
+      "citation_issue_count": 1
+    },
+    {
+      "trial_id": "05-viewer-stop-location-r2-loci_full",
+      "case_id": "viewer-stop-location",
+      "arm": "loci_full",
+      "repetition": 2,
+      "accounting_complete": true,
+      "source_unchanged": true,
+      "usage": {
+        "input": 15226,
+        "output": 898,
+        "cacheRead": 3456,
+        "cacheWrite": 0,
+        "reasoning": 97,
+        "totalTokens": 19580,
+        "logical_input": 18682
+      },
+      "assistant_requests": 5,
+      "tool_counts": {
+        "ls": 1,
+        "grep": 2,
+        "read": 1
+      },
+      "tool_errors": 0,
+      "enrichment_exposure": {
+        "retrievals": 0,
+        "relationships": 0,
+        "ownership": 0,
+        "related_items": 0
+      },
+      "elapsed_seconds": 25.665898042000663,
+      "requested_facts_correct": true,
+      "substantive_source_support": true,
+      "full_prompt_compliance": false,
+      "original_full_rubric_pass": false,
+      "citation_issue_count": 1
+    },
+    {
+      "trial_id": "06-viewer-stop-location-r2-native",
+      "case_id": "viewer-stop-location",
+      "arm": "native",
+      "repetition": 2,
+      "accounting_complete": true,
+      "source_unchanged": true,
+      "usage": {
+        "input": 7462,
+        "output": 1013,
+        "cacheRead": 17408,
+        "cacheWrite": 0,
+        "reasoning": 115,
+        "totalTokens": 25883,
+        "logical_input": 24870
+      },
+      "assistant_requests": 6,
+      "tool_counts": {
+        "ls": 1,
+        "find": 1,
+        "read": 1,
+        "grep": 2
+      },
+      "tool_errors": 0,
+      "enrichment_exposure": {
+        "retrievals": 0,
+        "relationships": 0,
+        "ownership": 0,
+        "related_items": 0
+      },
+      "elapsed_seconds": 29.179361167000025,
+      "requested_facts_correct": true,
+      "substantive_source_support": true,
+      "full_prompt_compliance": false,
+      "original_full_rubric_pass": false,
+      "citation_issue_count": 1
+    },
+    {
+      "trial_id": "07-template-model-uncertainty-r1-loci_anchors",
+      "case_id": "template-model-uncertainty",
+      "arm": "loci_anchors",
+      "repetition": 1,
+      "accounting_complete": true,
+      "source_unchanged": true,
+      "usage": {
+        "input": 19526,
+        "output": 2143,
+        "cacheRead": 15744,
+        "cacheWrite": 0,
+        "reasoning": 307,
+        "totalTokens": 37413,
+        "logical_input": 35270
+      },
+      "assistant_requests": 6,
+      "tool_counts": {
+        "ls": 1,
+        "find": 2,
+        "grep": 5,
+        "read": 10
+      },
+      "tool_errors": 0,
+      "enrichment_exposure": {
+        "retrievals": 0,
+        "relationships": 0,
+        "ownership": 0,
+        "related_items": 0
+      },
+      "elapsed_seconds": 47.14544245899924,
+      "requested_facts_correct": true,
+      "substantive_source_support": true,
+      "full_prompt_compliance": true,
+      "original_full_rubric_pass": true,
+      "citation_issue_count": 0
+    },
+    {
+      "trial_id": "08-template-model-uncertainty-r1-native",
+      "case_id": "template-model-uncertainty",
+      "arm": "native",
+      "repetition": 1,
+      "accounting_complete": true,
+      "source_unchanged": true,
+      "usage": {
+        "input": 16243,
+        "output": 1760,
+        "cacheRead": 24576,
+        "cacheWrite": 0,
+        "reasoning": 248,
+        "totalTokens": 42579,
+        "logical_input": 40819
+      },
+      "assistant_requests": 6,
+      "tool_counts": {
+        "ls": 1,
+        "find": 1,
+        "grep": 1,
+        "read": 6,
+        "bash": 1
+      },
+      "tool_errors": 0,
+      "enrichment_exposure": {
+        "retrievals": 0,
+        "relationships": 0,
+        "ownership": 0,
+        "related_items": 0
+      },
+      "elapsed_seconds": 43.41473345899976,
+      "requested_facts_correct": true,
+      "substantive_source_support": true,
+      "full_prompt_compliance": false,
+      "original_full_rubric_pass": false,
+      "citation_issue_count": 2
+    },
+    {
+      "trial_id": "09-template-model-uncertainty-r1-loci_full",
+      "case_id": "template-model-uncertainty",
+      "arm": "loci_full",
+      "repetition": 1,
+      "accounting_complete": false,
+      "source_unchanged": true,
+      "usage": {
+        "input": 17100,
+        "output": 2040,
+        "cacheRead": 33920,
+        "cacheWrite": 0,
+        "reasoning": null,
+        "totalTokens": 53060,
+        "logical_input": 51020
+      },
+      "assistant_requests": 10,
+      "tool_counts": {
+        "ls": 1,
+        "find": 2,
+        "grep": 8,
+        "read": 4
+      },
+      "tool_errors": 0,
+      "enrichment_exposure": {
+        "retrievals": 0,
+        "relationships": 0,
+        "ownership": 0,
+        "related_items": 0
+      },
+      "elapsed_seconds": 77.60617945899958,
+      "requested_facts_correct": true,
+      "substantive_source_support": true,
+      "full_prompt_compliance": true,
+      "original_full_rubric_pass": true,
+      "citation_issue_count": 0
+    },
+    {
+      "trial_id": "10-graph-mutation-contract-r2-native",
+      "case_id": "graph-mutation-contract",
+      "arm": "native",
+      "repetition": 2,
+      "accounting_complete": true,
+      "source_unchanged": true,
+      "usage": {
+        "input": 17446,
+        "output": 2154,
+        "cacheRead": 34944,
+        "cacheWrite": 0,
+        "reasoning": 269,
+        "totalTokens": 54544,
+        "logical_input": 52390
+      },
+      "assistant_requests": 9,
+      "tool_counts": {
+        "ls": 3,
+        "grep": 3,
+        "find": 1,
+        "read": 7,
+        "bash": 1
+      },
+      "tool_errors": 0,
+      "enrichment_exposure": {
+        "retrievals": 0,
+        "relationships": 0,
+        "ownership": 0,
+        "related_items": 0
+      },
+      "elapsed_seconds": 52.219439790999786,
+      "requested_facts_correct": true,
+      "substantive_source_support": true,
+      "full_prompt_compliance": false,
+      "original_full_rubric_pass": false,
+      "citation_issue_count": 3
+    },
+    {
+      "trial_id": "11-graph-mutation-contract-r2-loci_anchors",
+      "case_id": "graph-mutation-contract",
+      "arm": "loci_anchors",
+      "repetition": 2,
+      "accounting_complete": true,
+      "source_unchanged": true,
+      "usage": {
+        "input": 12160,
+        "output": 2293,
+        "cacheRead": 29312,
+        "cacheWrite": 0,
+        "reasoning": 436,
+        "totalTokens": 43765,
+        "logical_input": 41472
+      },
+      "assistant_requests": 6,
+      "tool_counts": {
+        "ls": 3,
+        "grep": 6,
+        "find": 1,
+        "read": 4
+      },
+      "tool_errors": 0,
+      "enrichment_exposure": {
+        "retrievals": 0,
+        "relationships": 0,
+        "ownership": 0,
+        "related_items": 0
+      },
+      "elapsed_seconds": 43.645762624999406,
+      "requested_facts_correct": true,
+      "substantive_source_support": true,
+      "full_prompt_compliance": true,
+      "original_full_rubric_pass": true,
+      "citation_issue_count": 0
+    },
+    {
+      "trial_id": "12-graph-mutation-contract-r2-loci_full",
+      "case_id": "graph-mutation-contract",
+      "arm": "loci_full",
+      "repetition": 2,
+      "accounting_complete": true,
+      "source_unchanged": true,
+      "usage": {
+        "input": 13790,
+        "output": 2169,
+        "cacheRead": 36096,
+        "cacheWrite": 0,
+        "reasoning": 357,
+        "totalTokens": 52055,
+        "logical_input": 49886
+      },
+      "assistant_requests": 10,
+      "tool_counts": {
+        "ls": 3,
+        "grep": 5,
+        "find": 2,
+        "read": 4
+      },
+      "tool_errors": 0,
+      "enrichment_exposure": {
+        "retrievals": 0,
+        "relationships": 0,
+        "ownership": 0,
+        "related_items": 0
+      },
+      "elapsed_seconds": 50.74160408300031,
+      "requested_facts_correct": true,
+      "substantive_source_support": true,
+      "full_prompt_compliance": false,
+      "original_full_rubric_pass": false,
+      "citation_issue_count": 1
+    },
+    {
+      "trial_id": "13-template-model-uncertainty-r2-loci_full",
+      "case_id": "template-model-uncertainty",
+      "arm": "loci_full",
+      "repetition": 2,
+      "accounting_complete": true,
+      "source_unchanged": true,
+      "usage": {
+        "input": 12084,
+        "output": 1917,
+        "cacheRead": 23040,
+        "cacheWrite": 0,
+        "reasoning": 295,
+        "totalTokens": 37041,
+        "logical_input": 35124
+      },
+      "assistant_requests": 6,
+      "tool_counts": {
+        "ls": 1,
+        "find": 2,
+        "grep": 6,
+        "read": 4
+      },
+      "tool_errors": 0,
+      "enrichment_exposure": {
+        "retrievals": 0,
+        "relationships": 0,
+        "ownership": 0,
+        "related_items": 0
+      },
+      "elapsed_seconds": 38.1588001250002,
+      "requested_facts_correct": true,
+      "substantive_source_support": true,
+      "full_prompt_compliance": true,
+      "original_full_rubric_pass": true,
+      "citation_issue_count": 0
+    },
+    {
+      "trial_id": "14-template-model-uncertainty-r2-native",
+      "case_id": "template-model-uncertainty",
+      "arm": "native",
+      "repetition": 2,
+      "accounting_complete": true,
+      "source_unchanged": true,
+      "usage": {
+        "input": 11217,
+        "output": 1771,
+        "cacheRead": 13056,
+        "cacheWrite": 0,
+        "reasoning": 346,
+        "totalTokens": 26044,
+        "logical_input": 24273
+      },
+      "assistant_requests": 5,
+      "tool_counts": {
+        "ls": 1,
+        "find": 2,
+        "grep": 4,
+        "read": 5
+      },
+      "tool_errors": 0,
+      "enrichment_exposure": {
+        "retrievals": 0,
+        "relationships": 0,
+        "ownership": 0,
+        "related_items": 0
+      },
+      "elapsed_seconds": 37.29456824999943,
+      "requested_facts_correct": true,
+      "substantive_source_support": true,
+      "full_prompt_compliance": true,
+      "original_full_rubric_pass": true,
+      "citation_issue_count": 0
+    },
+    {
+      "trial_id": "15-template-model-uncertainty-r2-loci_anchors",
+      "case_id": "template-model-uncertainty",
+      "arm": "loci_anchors",
+      "repetition": 2,
+      "accounting_complete": true,
+      "source_unchanged": true,
+      "usage": {
+        "input": 11186,
+        "output": 2193,
+        "cacheRead": 27136,
+        "cacheWrite": 0,
+        "reasoning": 467,
+        "totalTokens": 40515,
+        "logical_input": 38322
+      },
+      "assistant_requests": 6,
+      "tool_counts": {
+        "ls": 3,
+        "grep": 5,
+        "read": 10
+      },
+      "tool_errors": 0,
+      "enrichment_exposure": {
+        "retrievals": 0,
+        "relationships": 0,
+        "ownership": 0,
+        "related_items": 0
+      },
+      "elapsed_seconds": 69.61409191700022,
+      "requested_facts_correct": true,
+      "substantive_source_support": true,
+      "full_prompt_compliance": true,
+      "original_full_rubric_pass": true,
+      "citation_issue_count": 0
+    },
+    {
+      "trial_id": "16-viewer-stop-location-r1-loci_full",
+      "case_id": "viewer-stop-location",
+      "arm": "loci_full",
+      "repetition": 1,
+      "accounting_complete": true,
+      "source_unchanged": true,
+      "usage": {
+        "input": 16780,
+        "output": 1080,
+        "cacheRead": 7552,
+        "cacheWrite": 0,
+        "reasoning": 177,
+        "totalTokens": 25412,
+        "logical_input": 24332
+      },
+      "assistant_requests": 5,
+      "tool_counts": {
+        "ls": 1,
+        "grep": 3,
+        "find": 1,
+        "read": 1
+      },
+      "tool_errors": 0,
+      "enrichment_exposure": {
+        "retrievals": 0,
+        "relationships": 0,
+        "ownership": 0,
+        "related_items": 0
+      },
+      "elapsed_seconds": 26.97149191599965,
+      "requested_facts_correct": true,
+      "substantive_source_support": true,
+      "full_prompt_compliance": true,
+      "original_full_rubric_pass": false,
+      "citation_issue_count": 0
+    },
+    {
+      "trial_id": "17-viewer-stop-location-r1-loci_anchors",
+      "case_id": "viewer-stop-location",
+      "arm": "loci_anchors",
+      "repetition": 1,
+      "accounting_complete": true,
+      "source_unchanged": true,
+      "usage": {
+        "input": 7787,
+        "output": 1134,
+        "cacheRead": 17536,
+        "cacheWrite": 0,
+        "reasoning": 127,
+        "totalTokens": 26457,
+        "logical_input": 25323
+      },
+      "assistant_requests": 6,
+      "tool_counts": {
+        "ls": 1,
+        "grep": 3,
+        "read": 1
+      },
+      "tool_errors": 0,
+      "enrichment_exposure": {
+        "retrievals": 0,
+        "relationships": 0,
+        "ownership": 0,
+        "related_items": 0
+      },
+      "elapsed_seconds": 39.85155745800057,
+      "requested_facts_correct": true,
+      "substantive_source_support": true,
+      "full_prompt_compliance": false,
+      "original_full_rubric_pass": false,
+      "citation_issue_count": 1
+    },
+    {
+      "trial_id": "18-viewer-stop-location-r1-native",
+      "case_id": "viewer-stop-location",
+      "arm": "native",
+      "repetition": 1,
+      "accounting_complete": true,
+      "source_unchanged": true,
+      "usage": {
+        "input": 8350,
+        "output": 1001,
+        "cacheRead": 9728,
+        "cacheWrite": 0,
+        "reasoning": 138,
+        "totalTokens": 19079,
+        "logical_input": 18078
+      },
+      "assistant_requests": 5,
+      "tool_counts": {
+        "ls": 1,
+        "grep": 3,
+        "find": 1,
+        "read": 1
+      },
+      "tool_errors": 0,
+      "enrichment_exposure": {
+        "retrievals": 0,
+        "relationships": 0,
+        "ownership": 0,
+        "related_items": 0
+      },
+      "elapsed_seconds": 26.380007583000406,
+      "requested_facts_correct": true,
+      "substantive_source_support": true,
+      "full_prompt_compliance": false,
+      "original_full_rubric_pass": false,
+      "citation_issue_count": 1
+    }
+  ],
+  "token_aggregate_is_lower_bound": true
+}

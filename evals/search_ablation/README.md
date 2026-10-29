@@ -1,4 +1,18 @@
-# Local search and source-delivery ablation
+# Local search and agent-discovery ablation
+
+The corrected end-to-end study is specified in [agent-study.md](../../.scratch/search-ablation/agent-study.md), with findings in [AGENT-RESULTS.md](../../.scratch/search-ablation/AGENT-RESULTS.md) and per-assignment measurements in [agent-summary.json](../../.scratch/search-ablation/agent-summary.json). It starts agents from engineering questions and measures source-backed answer quality and cumulative provider token usage. The original mechanical replay below remains separate historical evidence.
+
+`agent_provider.py` runs fresh Pi processes through Promptfoo, with native search/read tools in all three conditions: native only, normal Loci retrieval, and the same retrieval with graph expansion disabled. `pi_extension.ts` and `agent_loci.py` bind the existing service to a private trial repository/store. Both Loci conditions expose identical tool schemas. The disabled-expansion condition still indexes source, selects anchors and returns anchor ownership metadata; it is not a graph-free implementation.
+
+The fixed study has three real-source investigation tasks, two repetitions and 18 assignments. Each starts with an unchanged source copy and empty index store. Instructions, model/effort, limits and balanced run order are fixed. Raw prompts, source, traces, answers, reviews and replay configurations remain ignored under `private/agent-v1`, `private/agent-cases` and `private/agent-review`. Nothing here configures the production server or global Pi/Codex settings.
+
+The adapter counts each authoritative Pi assistant response once, plus reported compaction usage. Logical input includes uncached and cached input; output already includes reasoning. Missing/unreconciled counters and unknown failed-attempt consumption fail accounting qualification. Tool schemas, voluntary non-use, repeated conversation context and ordinary native fallback remain part of the measured integration.
+
+`agent_cases.py` checks private factual expectations and authentic source quotations. Independent blinded source review supplies semantic judgments, bound to exact answer bytes. These are model judgments, not human acceptance. Promptfoo replays saved answers for grading without rerunning targets. The protocol records the original strict rubric and a disclosed correction where it required details absent from the task prompt.
+
+Focused verification is in `tests/test_search_ablation_agent_provider.py` and `tests/test_search_ablation_agent_loci.py`; actual Pi tool/usage qualification and calibrated source review are retained privately. Fixture tests alone are not agent-success evidence.
+
+## Original mechanical replay
 
 This is the experiment on `experiment/search-ablation`, not a replacement for the production Loci server. See the [results](../../.scratch/search-ablation/RESULTS.md) and [frozen protocol](../../.scratch/search-ablation/spec.md).
 

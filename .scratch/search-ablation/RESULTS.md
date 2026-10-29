@@ -1,5 +1,7 @@
 # Search and source-delivery ablation
 
+Historical mechanical replay. The corrected task-discovery and model-token findings are in [AGENT-RESULTS.md](AGENT-RESULTS.md); the measurements below do not answer that end-to-end question.
+
 Completed 2026-10-28 on `experiment/search-ablation`, based on R1 commit `84d5179a42c5ee12d76031dd440c0ce8941d0e83`.
 
 **The main measured cost is repository inventory refresh during already-located source acquisition.** A direct reader delivered the same required source in one call per case. Adding the actual repository refresh back to that otherwise identical reader restored most of R1's elapsed cost. The experiment supports simplifying that read path. It does not establish whole-agent task improvement or settle source ranking and graph usefulness.
